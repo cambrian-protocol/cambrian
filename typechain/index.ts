@@ -11,7 +11,7 @@ export type { IERC20 } from "./IERC20";
 export type { ERC165 } from "./ERC165";
 export type { IERC165 } from "./IERC165";
 export type { ConditionalTokens } from "./ConditionalTokens";
-export type { Counter } from "./Counter";
+export type { ConditionalTokensEventEmitter } from "./ConditionalTokensEventEmitter";
 export type { ToyToken } from "./ToyToken";
 
 export { ERC1155__factory } from "./factories/ERC1155__factory";
@@ -24,5 +24,5 @@ export { IERC20__factory } from "./factories/IERC20__factory";
 export { ERC165__factory } from "./factories/ERC165__factory";
 export { IERC165__factory } from "./factories/IERC165__factory";
 export { ConditionalTokens__factory } from "./factories/ConditionalTokens__factory";
-export { Counter__factory } from "./factories/Counter__factory";
+export { ConditionalTokensEventEmitter__factory } from "./factories/ConditionalTokensEventEmitter__factory";
 export { ToyToken__factory } from "./factories/ToyToken__factory";

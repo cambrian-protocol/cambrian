@@ -36,7 +36,7 @@
       ]
     },
     "E:\\cryptodev\\cts\\contracts\\ConditionalTokens.sol": {
-      "lastModificationDate": 1622492073596,
+      "lastModificationDate": 1622497717520,
       "contentHash": "dbc7ff580995688a8632932e6dfebd59",
       "sourceName": "contracts/ConditionalTokens.sol",
       "solcConfig": {
@@ -431,7 +431,7 @@
       ]
     },
     "E:\\cryptodev\\cts\\contracts\\ToyToken.sol": {
-      "lastModificationDate": 1622491732558,
+      "lastModificationDate": 1622494365575,
       "contentHash": "7a6c9d4c75ab68eacfbaac6b1f067389",
       "sourceName": "contracts/ToyToken.sol",
       "solcConfig": {
