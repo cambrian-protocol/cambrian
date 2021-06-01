@@ -53,7 +53,6 @@ describe("ConditionalTokens contract", function() {
     it("Should create a position for ToyToken at collection A from (A,B,C)", async function() {
         const questionId = ethers.utils.formatBytes32String("Test")
         
-        
         const conditionId = await this.CT.getConditionId(this.oracle.address, questionId, 3)
         await this.CT.prepareCondition(this.oracle.address, questionId, 3, {from: this.buyer.address})
 
@@ -113,6 +112,13 @@ describe("ConditionalTokens contract", function() {
         sellerCTBalance = await this.CT.balanceOf(this.seller.address, positionIdBC)
         expect(sellerCTBalance).to.equal(0)
 
+        // Report result "A"
+        await this.CT.connect(this.oracle).reportPayouts(questionId, [1,0,0])
+
+        // Seller can redeem result "A"
+        await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetA])
+        const sellerToyTokenBalance = await this.ToyToken.balanceOf(this.seller.address)
+        expect(sellerToyTokenBalance).to.equal(100)
 
     })
 })
