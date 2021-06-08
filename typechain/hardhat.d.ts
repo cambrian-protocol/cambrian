@@ -53,9 +53,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ConditionalTokens__factory>;
     getContractFactory(
-      name: "ConditionalTokensEventEmitter",
+      name: "SimpleSolver",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ConditionalTokensEventEmitter__factory>;
+    ): Promise<Contracts.SimpleSolver__factory>;
+    getContractFactory(
+      name: "SolutionManager",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SolutionManager__factory>;
     getContractFactory(
       name: "ToyToken",
       signerOrOptions?: ethers.Signer | FactoryOptions

@@ -1,6 +1,8 @@
 require("@nomiclabs/hardhat-waffle");
 require("@typechain/hardhat")
 require("hardhat-contract-sizer")
+require("@nomiclabs/hardhat-ethers")
+require('hardhat-deploy');
 const { HardhatUserConfig } = require("hardhat/types");
 
 const config = {
