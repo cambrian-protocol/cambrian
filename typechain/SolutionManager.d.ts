@@ -21,14 +21,38 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolutionManagerInterface extends ethers.utils.Interface {
   functions: {
-    "reportOutcomes(bytes32,bytes32,uint256[])": FunctionFragment;
+    "askQuestion(address,address,address,bytes32)": FunctionFragment;
+    "confirmOutcomes(bytes32)": FunctionFragment;
+    "questions(bytes32)": FunctionFragment;
+    "reportOutcomes(bytes32,uint256[])": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "askQuestion",
+    values: [string, string, string, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "confirmOutcomes",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "questions",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "reportOutcomes",
-    values: [BytesLike, BytesLike, BigNumberish[]]
+    values: [BytesLike, BigNumberish[]]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "askQuestion",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "confirmOutcomes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "questions", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "reportOutcomes",
     data: BytesLike
@@ -81,25 +105,100 @@ export class SolutionManager extends BaseContract {
   interface: SolutionManagerInterface;
 
   functions: {
-    reportOutcomes(
+    askQuestion(
+      solver: string,
+      keeper: string,
+      warden: string,
       solutionId: BytesLike,
-      solvableId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    confirmOutcomes(
+      questionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    questions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [boolean, string, string, string, string] & {
+        isActive: boolean;
+        solver: string;
+        keeper: string;
+        warden: string;
+        id: string;
+      }
+    >;
+
+    reportOutcomes(
+      questionId: BytesLike,
       outcomes: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  reportOutcomes(
+  askQuestion(
+    solver: string,
+    keeper: string,
+    warden: string,
     solutionId: BytesLike,
-    solvableId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  confirmOutcomes(
+    questionId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  questions(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<
+    [boolean, string, string, string, string] & {
+      isActive: boolean;
+      solver: string;
+      keeper: string;
+      warden: string;
+      id: string;
+    }
+  >;
+
+  reportOutcomes(
+    questionId: BytesLike,
     outcomes: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    reportOutcomes(
+    askQuestion(
+      solver: string,
+      keeper: string,
+      warden: string,
       solutionId: BytesLike,
-      solvableId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    confirmOutcomes(
+      questionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    questions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [boolean, string, string, string, string] & {
+        isActive: boolean;
+        solver: string;
+        keeper: string;
+        warden: string;
+        id: string;
+      }
+    >;
+
+    reportOutcomes(
+      questionId: BytesLike,
       outcomes: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -108,18 +207,49 @@ export class SolutionManager extends BaseContract {
   filters: {};
 
   estimateGas: {
-    reportOutcomes(
+    askQuestion(
+      solver: string,
+      keeper: string,
+      warden: string,
       solutionId: BytesLike,
-      solvableId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    confirmOutcomes(
+      questionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    questions(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
+    reportOutcomes(
+      questionId: BytesLike,
       outcomes: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    reportOutcomes(
+    askQuestion(
+      solver: string,
+      keeper: string,
+      warden: string,
       solutionId: BytesLike,
-      solvableId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    confirmOutcomes(
+      questionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    questions(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    reportOutcomes(
+      questionId: BytesLike,
       outcomes: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

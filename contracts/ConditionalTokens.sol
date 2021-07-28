@@ -62,7 +62,7 @@ contract ConditionalTokens is ERC1155 {
     /// Denominator is also used for checking if the condition has been resolved. If the denominator is non-zero, then the condition has been resolved.
     mapping(bytes32 => uint256) public payoutDenominator;
 
-    constructor() public ERC1155("") {}
+    constructor() ERC1155("") {}
 
     /// @dev This function prepares a condition by initializing a payout vector associated with the condition.
     /// @param oracle The account assigned to report the result for the prepared condition.
@@ -79,8 +79,11 @@ contract ConditionalTokens is ERC1155 {
             outcomeSlotCount > 1,
             "there should be more than one outcome slot"
         );
-        bytes32 conditionId =
-            CTHelpers.getConditionId(oracle, questionId, outcomeSlotCount);
+        bytes32 conditionId = CTHelpers.getConditionId(
+            oracle,
+            questionId,
+            outcomeSlotCount
+        );
         require(
             payoutNumerators[conditionId].length == 0,
             "condition already prepared"
@@ -106,8 +109,11 @@ contract ConditionalTokens is ERC1155 {
             "there should be more than one outcome slot"
         );
         // IMPORTANT, the oracle is enforced to be the sender because it's part of the hash.
-        bytes32 conditionId =
-            CTHelpers.getConditionId(msg.sender, questionId, outcomeSlotCount);
+        bytes32 conditionId = CTHelpers.getConditionId(
+            msg.sender,
+            questionId,
+            outcomeSlotCount
+        );
         require(
             payoutNumerators[conditionId].length == outcomeSlotCount,
             "condition not prepared or found"
@@ -342,15 +348,14 @@ contract ConditionalTokens is ERC1155 {
                 indexSet > 0 && indexSet < fullIndexSet,
                 "got invalid index set"
             );
-            uint256 positionId =
-                CTHelpers.getPositionId(
-                    collateralToken,
-                    CTHelpers.getCollectionId(
-                        parentCollectionId,
-                        conditionId,
-                        indexSet
-                    )
-                );
+            uint256 positionId = CTHelpers.getPositionId(
+                collateralToken,
+                CTHelpers.getCollectionId(
+                    parentCollectionId,
+                    conditionId,
+                    indexSet
+                )
+            );
 
             uint256 payoutNumerator = 0;
             for (uint256 j = 0; j < outcomeSlotCount; j++) {

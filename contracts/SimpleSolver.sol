@@ -1,10 +1,14 @@
 pragma solidity ^0.8.0;
 
-import {
-    IERC1155Receiver
-} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import {IERC1155Receiver} from "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "./ConditionalTokens.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+// Local ConditionalTokens address = 0x5FbDB2315678afecb367f032d93F642f64180aa3
 
 contract SimpleSolver {
+    ConditionalTokens public conditionalTokens;
+
     /**
         @dev This struct holds information about a Solvable the Solver is expected to report outcomes to.
         @param id The ID of the Solvable
@@ -48,8 +52,12 @@ contract SimpleSolver {
         bytes32[] calldata questionIds,
         uint256[] calldata positionSlotCounts
     ) external {
-        Solvable memory _solvable =
-            Solvable(solvableId, keeper, questionIds, positionSlotCounts);
+        Solvable memory _solvable = Solvable(
+            solvableId,
+            keeper,
+            questionIds,
+            positionSlotCounts
+        );
         solvables[solvableId] = _solvable;
     }
 

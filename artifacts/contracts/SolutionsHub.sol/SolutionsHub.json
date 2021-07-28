@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SolutionsHub",
+  "sourceName": "contracts/SolutionsHub.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212205a895d3e37c05c85eca317369d23bd6448edc3e6f0b1605d5a54e0985307dfec64736f6c63430008000033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212205a895d3e37c05c85eca317369d23bd6448edc3e6f0b1605d5a54e0985307dfec64736f6c63430008000033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

@@ -13,8 +13,9 @@ const config = {
     },
   },
   solidity: {
-    compilers: [{ version: "0.8.0", settings: {} }],
+    compilers: [{ version: "0.8.0", settings: {} }, { version: "0.5.17", settings: {} }],
   },
+  excludeContracts: ['contracts/d2d/CtfTreasury']
   // contractSizer: {
   //   alphaSort: true,
   //   runOnCompile: true,

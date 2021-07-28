@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SimpleSolverInterface extends ethers.utils.Interface {
   functions: {
+    "conditionalTokens()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "receiveCommission(bytes32,address,bytes32[],uint256[])": FunctionFragment;
@@ -28,6 +29,10 @@ interface SimpleSolverInterface extends ethers.utils.Interface {
     "solvables(bytes32)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "conditionalTokens",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "onERC1155BatchReceived",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
@@ -49,6 +54,10 @@ interface SimpleSolverInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "conditionalTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "onERC1155BatchReceived",
     data: BytesLike
@@ -114,6 +123,8 @@ export class SimpleSolver extends BaseContract {
   interface: SimpleSolverInterface;
 
   functions: {
+    conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -152,6 +163,8 @@ export class SimpleSolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, string] & { id: string; keeper: string }>;
   };
+
+  conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
   onERC1155BatchReceived(
     operator: string,
@@ -192,6 +205,8 @@ export class SimpleSolver extends BaseContract {
   ): Promise<[string, string] & { id: string; keeper: string }>;
 
   callStatic: {
+    conditionalTokens(overrides?: CallOverrides): Promise<string>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -234,6 +249,8 @@ export class SimpleSolver extends BaseContract {
   filters: {};
 
   estimateGas: {
+    conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -271,6 +288,8 @@ export class SimpleSolver extends BaseContract {
   };
 
   populateTransaction: {
+    conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
