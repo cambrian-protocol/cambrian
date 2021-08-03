@@ -19,7 +19,7 @@ describe("BinaryConditions contract", function() {
         this.CTFactory = await ethers.getContractFactory("ConditionalTokens")
         this.CT = await this.CTFactory.deploy()
 
-        this.SolverFactory = await ethers.getContractFactory("BinarySolver")
+        this.SolverFactory = await ethers.getContractFactory("BinaryCondition")
         this.Solver = await this.SolverFactory.deploy()
         await this.Solver.initialize(this.avatar.address, this.CT.address, 10) // 10& = fee
         await this.Solver.setOracle(this.oracle.address)

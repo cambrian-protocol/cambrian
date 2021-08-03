@@ -2,7 +2,7 @@
 /* solhint-disable space-after-comma */
 pragma solidity 0.8.0;
 
-import "./ConditionalTokens.sol";
+import "../ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /*
@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * Many of the require statements have been forked from the Conditional Tokens framework
  * for easier error checking in the event of a tx revert.
  */
-contract BinarySolver {
+contract BinaryCondition {
     bool public initialized;
     address public avatar;
     ConditionalTokens public conditionalTokens;

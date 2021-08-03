@@ -26,9 +26,6 @@ contract ProposalsHub {
         );
         require(_amount > 0, "Amount cannot be zero");
 
-        uint256 _allowance = _token.allowance(msg.sender, address(this));
-        require(_amount <= _allowance, "Allowance is lower than amount.");
-
         proposals[_proposalId].funding += _amount;
         proposals[_proposalId].funderAmount[msg.sender] += _amount;
         _token.transferFrom(msg.sender, address(this), _amount);
