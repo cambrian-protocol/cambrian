@@ -23,8 +23,11 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
   functions: {
     "defundProposal(bytes32,address,uint256)": FunctionFragment;
     "fundProposal(bytes32,address,uint256)": FunctionFragment;
+    "initiateSolution(bytes32)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "proposalSolvers(bytes32)": FunctionFragment;
+    "proposals(bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -36,12 +39,24 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     values: [BytesLike, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "initiateSolution",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "onERC1155BatchReceived",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "onERC1155Received",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalSolvers",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposals",
+    values: [BytesLike]
   ): string;
 
   decodeFunctionResult(
@@ -53,6 +68,10 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "initiateSolution",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "onERC1155BatchReceived",
     data: BytesLike
   ): Result;
@@ -60,6 +79,11 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     functionFragment: "onERC1155Received",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "proposalSolvers",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
 
   events: {};
 }
@@ -122,6 +146,11 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    initiateSolution(
+      _proposalId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -139,6 +168,25 @@ export class ProposalsHub extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    proposalSolvers(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    proposals(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, BigNumber, string, BigNumber, BigNumber] & {
+        collateralToken: string;
+        keeper: string;
+        id: BigNumber;
+        solutionId: string;
+        funding: BigNumber;
+        fundingGoal: BigNumber;
+      }
+    >;
   };
 
   defundProposal(
@@ -152,6 +200,11 @@ export class ProposalsHub extends BaseContract {
     _proposalId: BytesLike,
     _token: string,
     _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  initiateSolution(
+    _proposalId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -173,6 +226,22 @@ export class ProposalsHub extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  proposalSolvers(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+  proposals(
+    arg0: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, BigNumber, string, BigNumber, BigNumber] & {
+      collateralToken: string;
+      keeper: string;
+      id: BigNumber;
+      solutionId: string;
+      funding: BigNumber;
+      fundingGoal: BigNumber;
+    }
+  >;
+
   callStatic: {
     defundProposal(
       _proposalId: BytesLike,
@@ -185,6 +254,11 @@ export class ProposalsHub extends BaseContract {
       _proposalId: BytesLike,
       _token: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    initiateSolution(
+      _proposalId: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -205,6 +279,25 @@ export class ProposalsHub extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    proposalSolvers(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    proposals(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, BigNumber, string, BigNumber, BigNumber] & {
+        collateralToken: string;
+        keeper: string;
+        id: BigNumber;
+        solutionId: string;
+        funding: BigNumber;
+        fundingGoal: BigNumber;
+      }
+    >;
   };
 
   filters: {};
@@ -224,6 +317,11 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    initiateSolution(
+      _proposalId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -241,6 +339,13 @@ export class ProposalsHub extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    proposalSolvers(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    proposals(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -258,6 +363,11 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    initiateSolution(
+      _proposalId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     onERC1155BatchReceived(
       operator: string,
       from: string,
@@ -273,6 +383,16 @@ export class ProposalsHub extends BaseContract {
       id: BigNumberish,
       value: BigNumberish,
       data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    proposalSolvers(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    proposals(
+      arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

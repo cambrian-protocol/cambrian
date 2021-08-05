@@ -84,7 +84,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\hardhat\\console.sol": {
-      "lastModificationDate": 1626925611404,
+      "lastModificationDate": 1626925992732,
       "contentHash": "cc4777addd464ea56fa35b1c45df0591",
       "sourceName": "hardhat/console.sol",
       "solcConfig": {
@@ -834,51 +834,6 @@
         "ConditionalTokensInterface"
       ]
     },
-    "E:\\cryptodev\\cambrian\\contracts\\BinarySolver.sol": {
-      "lastModificationDate": 1627439477362,
-      "contentHash": "d1ec471a2e82acde7143268552bb0475",
-      "sourceName": "contracts/BinarySolver.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "devdoc",
-                "userdoc",
-                "storageLayout",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "./ConditionalTokens.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "0.8.0"
-      ],
-      "artifacts": [
-        "BinarySolver"
-      ]
-    },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
       "lastModificationDate": 1627376293279,
       "contentHash": "4d00ba88cf5b0017f9d7d53c63fb5e92",
@@ -924,8 +879,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1627376289850,
-      "contentHash": "2f1d92a19531194ad280884455c8d468",
+      "lastModificationDate": 1628137309898,
+      "contentHash": "0e16787761b585f1386b831a89a43f60",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -958,7 +913,10 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./ConditionalTokens.sol",
+        "./SolverFactory.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -967,10 +925,191 @@
         "ProposalsHub"
       ]
     },
-    "E:\\cryptodev\\cambrian\\contracts\\d2d\\Oracle.sol": {
-      "lastModificationDate": 1627439082299,
+    "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
+      "lastModificationDate": 1626925609519,
+      "contentHash": "17d9f40220b0ab370db2c77e7c92c4ef",
+      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../utils/Context.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Ownable"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\contracts\\SolverFactory.sol": {
+      "lastModificationDate": 1628134506238,
+      "contentHash": "b0931b47b6e5b5e693b18f1e74ce4003",
+      "sourceName": "contracts/SolverFactory.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./ConditionalTokens.sol",
+        "./Solver.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "SolverFactory"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
+      "lastModificationDate": 1628137263471,
+      "contentHash": "4687008655195368fbc0455209b89fc8",
+      "sourceName": "contracts/Solver.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "./ConditionalTokens.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "Solver"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\contracts\\test\\BinaryCondition.sol": {
+      "lastModificationDate": 1627450827702,
+      "contentHash": "81816b873a2b5fa753faa9276cd3b8b3",
+      "sourceName": "contracts/test/BinaryCondition.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [
+        "../ConditionalTokens.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "BinaryCondition"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\contracts\\test\\Oracle.sol": {
+      "lastModificationDate": 1627448890512,
       "contentHash": "8e12fd7f14411478912b1cd2b9ae2b02",
-      "sourceName": "contracts/d2d/Oracle.sol",
+      "sourceName": "contracts/test/Oracle.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {

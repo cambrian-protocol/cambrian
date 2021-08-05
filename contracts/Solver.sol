@@ -4,11 +4,10 @@ pragma solidity 0.8.0;
 
 import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Solver {
     // ConditionalTokens contract
-    ConditionalTokens public conditionalTokens;
+    ConditionalTokens public conditionalTokens = ConditionalTokens(address(0));
 
     // Collateral token
     IERC20 collateralToken;
@@ -21,6 +20,9 @@ contract Solver {
 
     // True when waiting for arbiter decision
     bool pendingArbitration;
+
+    // True when arbitration has been delivered
+    bool arbitrationDelivered;
 
     // Keeper address
     address keeper;
@@ -36,6 +38,12 @@ contract Solver {
 
     // Partition of positions for payouts
     uint256[] partition;
+
+    // Recipient addresses of conditional tokens for each index set in partition
+    address[][] partitionAddresses;
+
+    // Number of condition tokens allocated to _partitionAddresses
+    uint256[][] partitionAmounts;
 
     // num outcome slots for conditions
     uint256 outcomeSlots;
@@ -71,7 +79,7 @@ contract Solver {
         _;
     }
 
-    modifier protected() {
+    modifier privileged() {
         require(
             msg.sender == keeper || msg.sender == arbiter,
             "Solver: Only the Keeper or Arbiter may call this."
@@ -79,42 +87,70 @@ contract Solver {
         _;
     }
 
+    modifier isActive() {
+        require(initiated = true, "Solver: Uninitiated");
+        require(pendingArbitration = false, "Solver: Arbitration is pending");
+        require(
+            arbitrationDelivered = false,
+            "Solver: Arbitration has been delivered"
+        );
+        require(solved = false, "Solver: Solve is complete");
+        _;
+    }
+
     constructor(
-        ConditionalTokens _conditionalTokens,
         address _keeper,
         address _arbiter,
-        bytes32 _questionId,
         bytes32 _parentCollectionId,
         uint256[] memory _partition,
+        address[][] memory _partitionAddresses,
+        uint256[][] memory _partitionAmounts,
         uint256 _outcomeSlots,
         uint256 _amount,
         uint256 _timelockDurationHours,
         bytes memory _data
     ) {
-        require(
-            _conditionalTokens != ConditionalTokens(address(0)),
-            "Solver: ConditionalTokens address invalid"
-        );
         require(_keeper != address(0), "Solver: Keeper address invalid");
         require(
             _outcomeSlots >= 2,
             "Solver: Outcome slots cannot be fewer than 2"
         );
 
-        conditionalTokens = _conditionalTokens;
         keeper = _keeper;
         arbiter = _arbiter;
-        questionId = _questionId;
         parentCollectionId = _parentCollectionId;
         partition = _partition;
+        partitionAddresses = _partitionAddresses;
+        partitionAmounts = _partitionAmounts;
         outcomeSlots = _outcomeSlots;
         amount = _amount;
         timelockDuration = _timelockDurationHours * 1 hours;
         data = _data;
+
+        questionId = keccak256(
+            abi.encodePacked(
+                _keeper,
+                _arbiter,
+                _parentCollectionId,
+                _data,
+                block.timestamp
+            )
+        );
+    }
+
+    /**
+     * @dev                  Sets or unsets the approval of a given operator. An operator is allowed to
+     *                       transfer all tokens of the sender on their behalf.
+     * @param operator       Address to set the approval
+     * @param approved       Representing the status of the approval to be set
+     */
+    function setApproval(address operator, bool approved) external {
+        conditionalTokens.setApprovalForAll(operator, approved);
     }
 
     function createCondition(bytes32 _questionId, uint256 _outcomeSlots)
         internal
+        isActive
     {
         conditionalTokens.prepareCondition(
             address(this),
@@ -138,7 +174,9 @@ contract Solver {
         uint256[] memory _partition,
         IERC20 _collateralToken,
         uint256 _amount
-    ) public onlyKeeper {
+    ) public onlyKeeper isActive {
+        require(initiated == true, "Solver: Uninitiated");
+
         // get condition id
         bytes32 _conditionId = conditionalTokens.getConditionId(
             address(this), // Solver is Oracle
@@ -169,7 +207,38 @@ contract Solver {
         );
     }
 
-    function initiateSolvable() external {
+    function allocatePartition() private {
+        bytes32 _conditionId = conditionalTokens.getConditionId(
+            address(this), // Solver is Oracle
+            questionId,
+            outcomeSlots
+        );
+
+        for (uint256 i; i < partition.length; i++) {
+            bytes32 _collectionId = conditionalTokens.getCollectionId(
+                parentCollectionId,
+                _conditionId,
+                partition[i]
+            );
+
+            uint256 _positionId = conditionalTokens.getPositionId(
+                collateralToken,
+                _collectionId
+            );
+
+            for (uint256 j; j < partitionAddresses.length; j++) {
+                conditionalTokens.safeTransferFrom(
+                    address(this),
+                    partitionAddresses[i][j],
+                    _positionId,
+                    partitionAmounts[i][j],
+                    ""
+                );
+            }
+        }
+    }
+
+    function initiateSolve() external onlyKeeper {
         initiated = true;
         createCondition(questionId, outcomeSlots);
         splitCondition(
@@ -180,37 +249,56 @@ contract Solver {
             collateralToken,
             amount
         );
+        allocatePartition();
         processData(data);
     }
 
-    function processData(bytes storage _data) internal returns (bytes memory) {
+    function processData(bytes storage _data)
+        private
+        isActive
+        returns (bytes memory)
+    {
         return _data;
     }
 
-    function updateTimelock() private {
+    function updateTimelock() private isActive {
         timelock = block.timestamp + timelockDuration;
     }
 
-    function proposePayouts(uint256[] calldata _payouts) public protected {
-        require(pendingArbitration == false, "Solver: Arbitration is pending");
+    function proposePayouts(uint256[] calldata _payouts)
+        public
+        privileged
+        isActive
+    {
         payouts = _payouts;
         updateTimelock();
     }
 
-    function confirmPayouts() external protected {
+    function confirmPayouts() external privileged isActive {
         require(
             block.timestamp > timelock,
             "Solver: Timelock is still in the future"
         );
-        require(pendingArbitration == false, "Solver: Arbitration is pending");
         conditionalTokens.reportPayouts(questionId, payouts);
+        solved = true;
     }
 
-    function receiveArbitration(uint256[] calldata _payouts)
-        external
-        onlyArbiter
-    {
+    function arbitrate(uint256[] calldata _payouts) external onlyArbiter {
+        require(initiated == true, "Solver: Uninitiated");
+        require(pendingArbitration == true, "Solver: Arbitration not pending");
         payouts = _payouts;
+        pendingArbitration = false;
+        arbitrationDelivered = true;
+        updateTimelock();
+    }
+
+    function nullArbitrate() external onlyArbiter {
+        require(
+            pendingArbitration = true,
+            "Solver: Arbitration is not pending"
+        );
+        pendingArbitration = false;
+        updateTimelock();
     }
 
     function onERC1155Received(

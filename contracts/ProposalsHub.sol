@@ -1,18 +1,61 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./ConditionalTokens.sol";
+import "./SolverFactory.sol";
 
 contract ProposalsHub {
+    struct solverConfig {
+        SolverFactory factory;
+        address keeper;
+        address arbiter;
+        bytes32 questionId;
+        bytes32 parentCollectionId;
+        uint256[] partition;
+        address[][] partitionAddresses;
+        uint256[][] partitionAmounts;
+        uint256 outcomeSlots;
+        uint256 amount;
+        uint256 timelockDurationHours;
+        bytes data;
+    }
+
     struct proposal {
+        address collateralToken;
+        address keeper;
         uint256 id;
         bytes32 solutionId;
-        address collateralToken;
         uint256 funding;
         uint256 fundingGoal;
         mapping(address => uint256) funderAmount;
+        solverConfig[] solverConfigs;
     }
 
-    mapping(bytes32 => proposal) private proposals;
+    mapping(bytes32 => proposal) public proposals;
+
+    mapping(bytes32 => address) public proposalSolvers;
+
+    function initiateSolution(bytes32 _proposalId) external {
+        for (uint256 i; i < proposals[_proposalId].solverConfigs.length; i++) {
+            SolverFactory _factory = proposals[_proposalId]
+            .solverConfigs[i]
+            .factory;
+
+            _factory.createSolver(
+                proposals[_proposalId].solverConfigs[i].keeper,
+                proposals[_proposalId].solverConfigs[i].arbiter,
+                proposals[_proposalId].solverConfigs[i].parentCollectionId,
+                proposals[_proposalId].solverConfigs[i].partition,
+                proposals[_proposalId].solverConfigs[i].partitionAddresses,
+                proposals[_proposalId].solverConfigs[i].partitionAmounts,
+                proposals[_proposalId].solverConfigs[i].outcomeSlots,
+                proposals[_proposalId].solverConfigs[i].amount,
+                proposals[_proposalId].solverConfigs[i].timelockDurationHours,
+                proposals[_proposalId].solverConfigs[i].data
+            );
+        }
+    }
 
     function fundProposal(
         bytes32 _proposalId,

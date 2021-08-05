@@ -1,6 +1,6 @@
 const { ethers } = require("hardhat")
 const { expect } = require("chai")
-const { getIndexSetFromBinaryArray, getCollectionId } = require("../helpers/ConditionalTokens.js")
+const { getIndexSetFromBinaryArray } = require("../helpers/ConditionalTokens.js")
 
 describe("ConditionalTokens contract", function() {
 
