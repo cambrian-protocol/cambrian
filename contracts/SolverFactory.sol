@@ -16,27 +16,10 @@ contract SolverFactory is Ownable {
     function createSolver(
         address _keeper,
         address _arbiter,
-        bytes32 _parentCollectionId,
-        uint256[] memory _partition,
-        address[][] memory _partitionAddresses,
-        uint256[][] memory _partitionAmounts,
-        uint256 _outcomeSlots,
-        uint256 _amount,
-        uint256 _timelockDurationHours,
+        uint256 _timelockHours,
         bytes memory _data
     ) external returns (address _solver) {
-        Solver solver = new Solver(
-            _keeper,
-            _arbiter,
-            _parentCollectionId,
-            _partition,
-            _partitionAddresses,
-            _partitionAmounts,
-            _outcomeSlots,
-            _amount,
-            _timelockDurationHours,
-            _data
-        );
+        Solver solver = new Solver(_keeper, _arbiter, _timelockHours, _data);
 
         solverAddresses.push(solver);
         solverMap[address(solver)] = solver;

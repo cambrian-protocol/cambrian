@@ -16,6 +16,7 @@ export type { ConditionalTokens } from "./ConditionalTokens";
 export type { ConditionalTokensInterface } from "./ConditionalTokensInterface";
 export type { ProposalsHub } from "./ProposalsHub";
 export type { SimpleSolver } from "./SimpleSolver";
+export type { SolutionsHub } from "./SolutionsHub";
 export type { Solver } from "./Solver";
 export type { SolverFactory } from "./SolverFactory";
 export type { BinaryCondition } from "./BinaryCondition";
@@ -36,6 +37,7 @@ export { ConditionalTokens__factory } from "./factories/ConditionalTokens__facto
 export { ConditionalTokensInterface__factory } from "./factories/ConditionalTokensInterface__factory";
 export { ProposalsHub__factory } from "./factories/ProposalsHub__factory";
 export { SimpleSolver__factory } from "./factories/SimpleSolver__factory";
+export { SolutionsHub__factory } from "./factories/SolutionsHub__factory";
 export { Solver__factory } from "./factories/Solver__factory";
 export { SolverFactory__factory } from "./factories/SolverFactory__factory";
 export { BinaryCondition__factory } from "./factories/BinaryCondition__factory";

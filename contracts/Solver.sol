@@ -101,40 +101,18 @@ contract Solver {
     constructor(
         address _keeper,
         address _arbiter,
-        bytes32 _parentCollectionId,
-        uint256[] memory _partition,
-        address[][] memory _partitionAddresses,
-        uint256[][] memory _partitionAmounts,
-        uint256 _outcomeSlots,
-        uint256 _amount,
-        uint256 _timelockDurationHours,
+        uint256 _timelockHours,
         bytes memory _data
     ) {
         require(_keeper != address(0), "Solver: Keeper address invalid");
-        require(
-            _outcomeSlots >= 2,
-            "Solver: Outcome slots cannot be fewer than 2"
-        );
 
         keeper = _keeper;
         arbiter = _arbiter;
-        parentCollectionId = _parentCollectionId;
-        partition = _partition;
-        partitionAddresses = _partitionAddresses;
-        partitionAmounts = _partitionAmounts;
-        outcomeSlots = _outcomeSlots;
-        amount = _amount;
-        timelockDuration = _timelockDurationHours * 1 hours;
+        timelockDuration = _timelockHours * 1 hours;
         data = _data;
 
         questionId = keccak256(
-            abi.encodePacked(
-                _keeper,
-                _arbiter,
-                _parentCollectionId,
-                _data,
-                block.timestamp
-            )
+            abi.encodePacked(_keeper, _arbiter, _data, block.timestamp)
         );
     }
 
@@ -300,6 +278,42 @@ contract Solver {
         pendingArbitration = false;
         updateTimelock();
     }
+
+    // function executeActions(bytes32 _solutionId) private {
+    //     for (uint256 i; i < solutions[_solutionId].actions.length; i++) {
+    //         executeAction(_solutionId, i);
+    //     }
+    // }
+
+    // function executeAction(bytes32 _solutionId, uint256 _index)
+    //     private
+    //     returns (bytes memory)
+    // {
+    //     Action memory action = solutions[_solutionId].actions[_index];
+
+    //     // minion did not submit this proposal
+    //     require(action.to != address(0), "Minion::invalid _solutionId");
+    //     // can't call arbitrary functions on parent moloch
+    //     require(action.to != address(this), "Minion::invalid target");
+    //     require(!action.executed, "Minion::action executed");
+    //     require(
+    //         address(this).balance >= action.value,
+    //         "Minion::insufficient eth"
+    //     );
+
+    //     // execute call
+    //     solutions[_solutionId].actions[_index].executed = true;
+
+    //     (bool success, bytes memory retData) = action.to.call{
+    //         value: action.value
+    //     }(action.data);
+
+    //     require(success, "Minion::call failure");
+
+    //     emit ActionExecuted(_solutionId, msg.sender);
+
+    //     return retData;
+    // }
 
     function onERC1155Received(
         address operator,

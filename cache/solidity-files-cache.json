@@ -1,44 +1,6 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "E:\\cryptodev\\cambrian\\contracts\\Solutions.sol": {
-      "lastModificationDate": 1623896141864,
-      "contentHash": "9215b662e31402d86a715de411f677ee",
-      "sourceName": "contracts/Solutions.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "devdoc",
-                "userdoc",
-                "storageLayout",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [],
-      "artifacts": []
-    },
     "E:\\cryptodev\\cambrian\\contracts\\Argparse.sol": {
       "lastModificationDate": 1623910853622,
       "contentHash": "99f6b4439b0c7d0fa18a412405612c1e",
@@ -743,52 +705,6 @@
         "IERC20Metadata"
       ]
     },
-    "E:\\cryptodev\\cambrian\\contracts\\SimpleSolver.sol": {
-      "lastModificationDate": 1627438759614,
-      "contentHash": "e403166d57d440c0b3258800c3b30298",
-      "sourceName": "contracts/SimpleSolver.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "devdoc",
-                "userdoc",
-                "storageLayout",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
-        "./ConditionalTokens.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "SimpleSolver"
-      ]
-    },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ConditionalTokensInterface.sol": {
       "lastModificationDate": 1623213250003,
       "contentHash": "329912bf4ad796d44d0ab277bc648078",
@@ -835,8 +751,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1627376293279,
-      "contentHash": "4d00ba88cf5b0017f9d7d53c63fb5e92",
+      "lastModificationDate": 1628234972086,
+      "contentHash": "7725fb103615c1e43141a9615c0dc533",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -869,7 +785,8 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "./SolverFactory.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -879,8 +796,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1628137309898,
-      "contentHash": "0e16787761b585f1386b831a89a43f60",
+      "lastModificationDate": 1628235232932,
+      "contentHash": "795f5aacb47e13b3def7c37f1d30076a",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -970,8 +887,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverFactory.sol": {
-      "lastModificationDate": 1628134506238,
-      "contentHash": "b0931b47b6e5b5e693b18f1e74ce4003",
+      "lastModificationDate": 1628235250346,
+      "contentHash": "e7a41b098662c143ac7d600a3359e61a",
       "sourceName": "contracts/SolverFactory.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1017,8 +934,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1628137263471,
-      "contentHash": "4687008655195368fbc0455209b89fc8",
+      "lastModificationDate": 1628235273231,
+      "contentHash": "491183a051b5d35e225d0a677cf1093a",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",

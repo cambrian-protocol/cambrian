@@ -6,55 +6,44 @@ import "./ConditionalTokens.sol";
 import "./SolverFactory.sol";
 
 contract ProposalsHub {
-    struct solverConfig {
-        SolverFactory factory;
-        address keeper;
-        address arbiter;
-        bytes32 questionId;
-        bytes32 parentCollectionId;
-        uint256[] partition;
-        address[][] partitionAddresses;
-        uint256[][] partitionAmounts;
-        uint256 outcomeSlots;
-        uint256 amount;
-        uint256 timelockDurationHours;
-        bytes data;
-    }
+    uint256 nonce;
 
-    struct proposal {
-        address collateralToken;
-        address keeper;
-        uint256 id;
+    struct Proposal {
+        bool configured;
+        IERC20 collateralToken;
+        address proposer;
+        bytes32 id;
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
         mapping(address => uint256) funderAmount;
-        solverConfig[] solverConfigs;
     }
 
-    mapping(bytes32 => proposal) public proposals;
+    mapping(bytes32 => Proposal) public proposals;
 
-    mapping(bytes32 => address) public proposalSolvers;
+    function createProposal(
+        IERC20 _collateralToken,
+        address _keeper,
+        uint256 _fundingGoal,
+        bytes32 _solutionId
+    ) public {
+        bytes32 _proposalId = keccak256(
+            abi.encodePacked(
+                msg.sender,
+                _collateralToken,
+                _keeper,
+                _fundingGoal,
+                nonce
+            )
+        );
 
-    function initiateSolution(bytes32 _proposalId) external {
-        for (uint256 i; i < proposals[_proposalId].solverConfigs.length; i++) {
-            SolverFactory _factory = proposals[_proposalId]
-            .solverConfigs[i]
-            .factory;
-
-            _factory.createSolver(
-                proposals[_proposalId].solverConfigs[i].keeper,
-                proposals[_proposalId].solverConfigs[i].arbiter,
-                proposals[_proposalId].solverConfigs[i].parentCollectionId,
-                proposals[_proposalId].solverConfigs[i].partition,
-                proposals[_proposalId].solverConfigs[i].partitionAddresses,
-                proposals[_proposalId].solverConfigs[i].partitionAmounts,
-                proposals[_proposalId].solverConfigs[i].outcomeSlots,
-                proposals[_proposalId].solverConfigs[i].amount,
-                proposals[_proposalId].solverConfigs[i].timelockDurationHours,
-                proposals[_proposalId].solverConfigs[i].data
-            );
-        }
+        Proposal storage proposal = proposals[_proposalId];
+        proposal.configured = false;
+        proposal.collateralToken = _collateralToken;
+        proposal.proposer = msg.sender;
+        proposal.id = _proposalId;
+        proposal.solutionId = _solutionId;
+        proposal.fundingGoal = _fundingGoal;
     }
 
     function fundProposal(
@@ -64,7 +53,7 @@ contract ProposalsHub {
     ) external {
         require(proposals[_proposalId].id != 0, "Proposal does not exist");
         require(
-            proposals[_proposalId].collateralToken == address(_token),
+            proposals[_proposalId].collateralToken == _token,
             "Proposal does not include this token to be funded"
         );
         require(_amount > 0, "Amount cannot be zero");
@@ -81,7 +70,7 @@ contract ProposalsHub {
     ) external {
         require(proposals[_proposalId].id != 0, "Proposal does not exist");
         require(
-            proposals[_proposalId].collateralToken == address(_token),
+            proposals[_proposalId].collateralToken == _token,
             "Proposal does not include this token to be funded"
         );
         require(_amount > 0, "Amount cannot be zero");
