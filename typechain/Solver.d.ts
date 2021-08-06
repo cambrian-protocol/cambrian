@@ -24,6 +24,8 @@ interface SolverInterface extends ethers.utils.Interface {
     "arbitrate(uint256[])": FunctionFragment;
     "conditionalTokens()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
+    "executeAction(uint256)": FunctionFragment;
+    "executeActions()": FunctionFragment;
     "initiateSolve()": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -43,6 +45,14 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "confirmPayouts",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeAction",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeActions",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -88,6 +98,14 @@ interface SolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "confirmPayouts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeAction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeActions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -177,6 +195,15 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    executeAction(
+      _actionIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    executeActions(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     initiateSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -233,6 +260,15 @@ export class Solver extends BaseContract {
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
   confirmPayouts(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  executeAction(
+    _actionIndex: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  executeActions(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -293,6 +329,13 @@ export class Solver extends BaseContract {
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
 
+    executeAction(
+      _actionIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    executeActions(overrides?: CallOverrides): Promise<void>;
+
     initiateSolve(overrides?: CallOverrides): Promise<void>;
 
     nullArbitrate(overrides?: CallOverrides): Promise<void>;
@@ -348,6 +391,15 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    executeAction(
+      _actionIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    executeActions(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -408,6 +460,15 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executeAction(
+      _actionIndex: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executeActions(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

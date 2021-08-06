@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Minion",
+  "sourceName": "contracts/Minion.sol",
+  "abi": [],
+  "bytecode": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212206583642f0bbe47977c9d07aeffaba17ae2a3feb448f4bf3605d23a75e293710764736f6c63430008000033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212206583642f0bbe47977c9d07aeffaba17ae2a3feb448f4bf3605d23a75e293710764736f6c63430008000033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

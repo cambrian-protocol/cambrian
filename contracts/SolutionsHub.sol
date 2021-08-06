@@ -2,15 +2,9 @@ pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SolverFactory.sol";
+import "./Minion.sol";
 
 contract SolutionsHub {
-    struct Action {
-        uint256 value;
-        address to;
-        bool executed;
-        bytes data;
-    }
-
     struct SolverConfig {
         SolverFactory factory;
         address keeper;
@@ -20,7 +14,7 @@ contract SolutionsHub {
         uint256 amount;
         uint256 timelockHours;
         bytes data;
-        Action[] actions;
+        Minion.Action[] actions;
     }
 
     struct Solution {
@@ -40,6 +34,7 @@ contract SolutionsHub {
                 _keeper: _solution.solverConfigs[i].keeper,
                 _arbiter: _solution.solverConfigs[i].arbiter,
                 _timelockHours: _solution.solverConfigs[i].timelockHours,
+                _actions: _solution.solverConfigs[i].actions,
                 _data: _solution.solverConfigs[i].data
             });
         }

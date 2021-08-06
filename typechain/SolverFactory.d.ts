@@ -21,55 +21,38 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSolver(address,address,uint256,bytes)": FunctionFragment;
-    "owner()": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
+    "createSolver(address,address,uint256,tuple[],bytes)": FunctionFragment;
     "solverAddresses(uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createSolver",
-    values: [string, string, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
+    values: [
+      string,
+      string,
+      BigNumberish,
+      { value: BigNumberish; to: string; executed: boolean; data: BytesLike }[],
+      BytesLike
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "solverAddresses",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
-  ): string;
 
   decodeFunctionResult(
     functionFragment: "createSolver",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "solverAddresses",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
     "SolverCreated(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SolverCreated"): EventFragment;
 }
 
@@ -121,13 +104,13 @@ export class SolverFactory extends BaseContract {
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
+      _actions: {
+        value: BigNumberish;
+        to: string;
+        executed: boolean;
+        data: BytesLike;
+      }[],
       _data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<[string]>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -135,24 +118,19 @@ export class SolverFactory extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
   createSolver(
     _keeper: string,
     _arbiter: string,
     _timelockHours: BigNumberish,
+    _actions: {
+      value: BigNumberish;
+      to: string;
+      executed: boolean;
+      data: BytesLike;
+    }[],
     _data: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  owner(overrides?: CallOverrides): Promise<string>;
-
-  renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -161,44 +139,28 @@ export class SolverFactory extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  transferOwnership(
-    newOwner: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     createSolver(
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
+      _actions: {
+        value: BigNumberish;
+        to: string;
+        executed: boolean;
+        data: BytesLike;
+      }[],
       _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    owner(overrides?: CallOverrides): Promise<string>;
-
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     solverAddresses(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
   };
 
   filters: {
-    OwnershipTransferred(
-      previousOwner?: string | null,
-      newOwner?: string | null
-    ): TypedEventFilter<
-      [string, string],
-      { previousOwner: string; newOwner: string }
-    >;
-
     SolverCreated(
       solver?: null
     ): TypedEventFilter<[string], { solver: string }>;
@@ -209,24 +171,19 @@ export class SolverFactory extends BaseContract {
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
+      _actions: {
+        value: BigNumberish;
+        to: string;
+        executed: boolean;
+        data: BytesLike;
+      }[],
       _data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     solverAddresses(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
@@ -235,24 +192,19 @@ export class SolverFactory extends BaseContract {
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
+      _actions: {
+        value: BigNumberish;
+        to: string;
+        executed: boolean;
+        data: BytesLike;
+      }[],
       _data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     solverAddresses(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    transferOwnership(
-      newOwner: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

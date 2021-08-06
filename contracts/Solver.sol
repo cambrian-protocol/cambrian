@@ -4,6 +4,7 @@ pragma solidity 0.8.0;
 
 import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./Minion.sol";
 
 contract Solver {
     // ConditionalTokens contract
@@ -39,12 +40,6 @@ contract Solver {
     // Partition of positions for payouts
     uint256[] partition;
 
-    // Recipient addresses of conditional tokens for each index set in partition
-    address[][] partitionAddresses;
-
-    // Number of condition tokens allocated to _partitionAddresses
-    uint256[][] partitionAmounts;
-
     // num outcome slots for conditions
     uint256 outcomeSlots;
 
@@ -59,6 +54,9 @@ contract Solver {
 
     // reported payouts
     uint256[] payouts;
+
+    // Contract calls to be performed on execution
+    Minion.Action[] actions;
 
     // arbitrary data
     bytes data;
@@ -98,13 +96,24 @@ contract Solver {
         _;
     }
 
+    modifier isWhitelisted(address _addr) {
+        //TODO
+        _;
+    }
+
     constructor(
         address _keeper,
         address _arbiter,
         uint256 _timelockHours,
+        Minion.Action[] memory _actions,
         bytes memory _data
     ) {
         require(_keeper != address(0), "Solver: Keeper address invalid");
+
+        // Add actions to storage
+        for (uint256 i; i < _actions.length; i++) {
+            actions.push(_actions[i]);
+        }
 
         keeper = _keeper;
         arbiter = _arbiter;
@@ -112,7 +121,14 @@ contract Solver {
         data = _data;
 
         questionId = keccak256(
-            abi.encodePacked(_keeper, _arbiter, _data, block.timestamp)
+            abi.encode(
+                address(this),
+                _keeper,
+                _arbiter,
+                _actions,
+                _data,
+                block.timestamp
+            )
         );
     }
 
@@ -185,50 +201,50 @@ contract Solver {
         );
     }
 
-    function allocatePartition() private {
-        bytes32 _conditionId = conditionalTokens.getConditionId(
-            address(this), // Solver is Oracle
-            questionId,
-            outcomeSlots
-        );
+    // function allocatePartition() private {
+    //     bytes32 _conditionId = conditionalTokens.getConditionId(
+    //         address(this), // Solver is Oracle
+    //         questionId,
+    //         outcomeSlots
+    //     );
 
-        for (uint256 i; i < partition.length; i++) {
-            bytes32 _collectionId = conditionalTokens.getCollectionId(
-                parentCollectionId,
-                _conditionId,
-                partition[i]
-            );
+    //     for (uint256 i; i < partition.length; i++) {
+    //         bytes32 _collectionId = conditionalTokens.getCollectionId(
+    //             parentCollectionId,
+    //             _conditionId,
+    //             partition[i]
+    //         );
 
-            uint256 _positionId = conditionalTokens.getPositionId(
-                collateralToken,
-                _collectionId
-            );
+    //         uint256 _positionId = conditionalTokens.getPositionId(
+    //             collateralToken,
+    //             _collectionId
+    //         );
 
-            for (uint256 j; j < partitionAddresses.length; j++) {
-                conditionalTokens.safeTransferFrom(
-                    address(this),
-                    partitionAddresses[i][j],
-                    _positionId,
-                    partitionAmounts[i][j],
-                    ""
-                );
-            }
-        }
-    }
+    //         for (uint256 j; j < partitionAddresses.length; j++) {
+    //             conditionalTokens.safeTransferFrom(
+    //                 address(this),
+    //                 partitionAddresses[i][j],
+    //                 _positionId,
+    //                 partitionAmounts[i][j],
+    //                 ""
+    //             );
+    //         }
+    //     }
+    // }
 
     function initiateSolve() external onlyKeeper {
         initiated = true;
-        createCondition(questionId, outcomeSlots);
-        splitCondition(
-            questionId,
-            parentCollectionId,
-            outcomeSlots,
-            partition,
-            collateralToken,
-            amount
-        );
-        allocatePartition();
-        processData(data);
+        // createCondition(questionId, outcomeSlots);
+        // splitCondition(
+        //     questionId,
+        //     parentCollectionId,
+        //     outcomeSlots,
+        //     partition,
+        //     collateralToken,
+        //     amount
+        // );
+        // allocatePartition();
+        // processData(data);
     }
 
     function processData(bytes storage _data)
@@ -279,41 +295,33 @@ contract Solver {
         updateTimelock();
     }
 
-    // function executeActions(bytes32 _solutionId) private {
-    //     for (uint256 i; i < solutions[_solutionId].actions.length; i++) {
-    //         executeAction(_solutionId, i);
-    //     }
-    // }
+    function executeActions() public {
+        for (uint256 i; i < actions.length; i++) {
+            executeAction(i);
+        }
+    }
 
-    // function executeAction(bytes32 _solutionId, uint256 _index)
-    //     private
-    //     returns (bytes memory)
-    // {
-    //     Action memory action = solutions[_solutionId].actions[_index];
+    function executeAction(uint256 _actionIndex)
+        public
+        isWhitelisted(actions[_actionIndex].to)
+        returns (bytes memory)
+    {
+        require(!actions[_actionIndex].executed, "Minion::action executed");
+        require(
+            address(this).balance >= actions[_actionIndex].value,
+            "Minion::insufficient eth"
+        );
 
-    //     // minion did not submit this proposal
-    //     require(action.to != address(0), "Minion::invalid _solutionId");
-    //     // can't call arbitrary functions on parent moloch
-    //     require(action.to != address(this), "Minion::invalid target");
-    //     require(!action.executed, "Minion::action executed");
-    //     require(
-    //         address(this).balance >= action.value,
-    //         "Minion::insufficient eth"
-    //     );
+        // execute call
+        actions[_actionIndex].executed = true;
 
-    //     // execute call
-    //     solutions[_solutionId].actions[_index].executed = true;
+        (bool success, bytes memory retData) = actions[_actionIndex].to.call{
+            value: actions[_actionIndex].value
+        }(actions[_actionIndex].data);
 
-    //     (bool success, bytes memory retData) = action.to.call{
-    //         value: action.value
-    //     }(action.data);
-
-    //     require(success, "Minion::call failure");
-
-    //     emit ActionExecuted(_solutionId, msg.sender);
-
-    //     return retData;
-    // }
+        require(success, "Minion::call failure");
+        return retData;
+    }
 
     function onERC1155Received(
         address operator,
