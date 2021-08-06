@@ -77,7 +77,7 @@ contract Solver {
         _;
     }
 
-    modifier privileged() {
+    modifier isPrivileged() {
         require(
             msg.sender == keeper || msg.sender == arbiter,
             "Solver: Only the Keeper or Arbiter may call this."
@@ -261,14 +261,14 @@ contract Solver {
 
     function proposePayouts(uint256[] calldata _payouts)
         public
-        privileged
+        isPrivileged
         isActive
     {
         payouts = _payouts;
         updateTimelock();
     }
 
-    function confirmPayouts() external privileged isActive {
+    function confirmPayouts() external isPrivileged isActive {
         require(
             block.timestamp > timelock,
             "Solver: Timelock is still in the future"

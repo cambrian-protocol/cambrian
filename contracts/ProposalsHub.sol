@@ -37,6 +37,8 @@ contract ProposalsHub {
             )
         );
 
+        nonce += 1;
+
         Proposal storage proposal = proposals[_proposalId];
         proposal.configured = false;
         proposal.collateralToken = _collateralToken;

@@ -797,8 +797,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1628235232932,
-      "contentHash": "795f5aacb47e13b3def7c37f1d30076a",
+      "lastModificationDate": 1628247671694,
+      "contentHash": "ff50f67e0521d6a1e62af03a0b33ca9d",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -935,8 +935,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1628246855689,
-      "contentHash": "98dccddbd01a8e3508928378489c996a",
+      "lastModificationDate": 1628247379186,
+      "contentHash": "ca23f9ce39f7c61a573458edd01ad80d",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
