@@ -25,6 +25,9 @@ contract Solver {
     // True when arbitration has been delivered
     bool arbitrationDelivered;
 
+    // The solutionsHub address managing this Solver;
+    address solutionsHub;
+
     // Keeper address
     address keeper;
 
@@ -60,6 +63,14 @@ contract Solver {
 
     // arbitrary data
     bytes data;
+
+    modifier onlySolution() {
+        require(
+            msg.sender == solutionsHub,
+            "Solver: Only the Keeper address may call this"
+        );
+        _;
+    }
 
     modifier onlyKeeper() {
         require(
@@ -102,6 +113,7 @@ contract Solver {
     }
 
     constructor(
+        address _solutionsHub,
         address _keeper,
         address _arbiter,
         uint256 _timelockHours,
@@ -115,6 +127,7 @@ contract Solver {
             actions.push(_actions[i]);
         }
 
+        solutionsHub = _solutionsHub;
         keeper = _keeper;
         arbiter = _arbiter;
         timelockDuration = _timelockHours * 1 hours;
@@ -177,11 +190,12 @@ contract Solver {
             _questionId,
             _outcomeSlots
         );
+
         // if shallow position
         if (_parentCollectionId == bytes32(0)) {
             // pull collateral in
             IERC20(_collateralToken).transferFrom(
-                msg.sender,
+                solutionsHub,
                 address(this),
                 _amount
             );
@@ -201,50 +215,44 @@ contract Solver {
         );
     }
 
-    // function allocatePartition() private {
-    //     bytes32 _conditionId = conditionalTokens.getConditionId(
-    //         address(this), // Solver is Oracle
-    //         questionId,
-    //         outcomeSlots
-    //     );
+    function allocatePartition(
+        uint256[] calldata _partition,
+        uint256[][] calldata _amounts,
+        address[][] calldata _addresses
+    ) private {
+        bytes32 _conditionId = conditionalTokens.getConditionId(
+            address(this), // Solver is Oracle
+            questionId,
+            outcomeSlots
+        );
 
-    //     for (uint256 i; i < partition.length; i++) {
-    //         bytes32 _collectionId = conditionalTokens.getCollectionId(
-    //             parentCollectionId,
-    //             _conditionId,
-    //             partition[i]
-    //         );
+        for (uint256 i; i < partition.length; i++) {
+            bytes32 _collectionId = conditionalTokens.getCollectionId(
+                parentCollectionId,
+                _conditionId,
+                _partition[i]
+            );
 
-    //         uint256 _positionId = conditionalTokens.getPositionId(
-    //             collateralToken,
-    //             _collectionId
-    //         );
+            uint256 _positionId = conditionalTokens.getPositionId(
+                collateralToken,
+                _collectionId
+            );
 
-    //         for (uint256 j; j < partitionAddresses.length; j++) {
-    //             conditionalTokens.safeTransferFrom(
-    //                 address(this),
-    //                 partitionAddresses[i][j],
-    //                 _positionId,
-    //                 partitionAmounts[i][j],
-    //                 ""
-    //             );
-    //         }
-    //     }
-    // }
+            for (uint256 j; j < _addresses.length; j++) {
+                conditionalTokens.safeTransferFrom(
+                    address(this),
+                    _addresses[i][j],
+                    _positionId,
+                    _amounts[i][j],
+                    ""
+                );
+            }
+        }
+    }
 
-    function initiateSolve() external onlyKeeper {
+    function initiateSolve() external onlySolution {
         initiated = true;
-        // createCondition(questionId, outcomeSlots);
-        // splitCondition(
-        //     questionId,
-        //     parentCollectionId,
-        //     outcomeSlots,
-        //     partition,
-        //     collateralToken,
-        //     amount
-        // );
-        // allocatePartition();
-        // processData(data);
+        executeActions();
     }
 
     function processData(bytes storage _data)
@@ -295,21 +303,21 @@ contract Solver {
         updateTimelock();
     }
 
-    function executeActions() public {
+    function executeActions() private {
         for (uint256 i; i < actions.length; i++) {
             executeAction(i);
         }
     }
 
     function executeAction(uint256 _actionIndex)
-        public
+        private
         isWhitelisted(actions[_actionIndex].to)
         returns (bytes memory)
     {
-        require(!actions[_actionIndex].executed, "Minion::action executed");
+        require(!actions[_actionIndex].executed, "Solver::action executed");
         require(
             address(this).balance >= actions[_actionIndex].value,
-            "Minion::insufficient eth"
+            "Solver::insufficient eth"
         );
 
         // execute call
@@ -319,7 +327,7 @@ contract Solver {
             value: actions[_actionIndex].value
         }(actions[_actionIndex].data);
 
-        require(success, "Minion::call failure");
+        require(success, "Solver::call failure");
         return retData;
     }
 

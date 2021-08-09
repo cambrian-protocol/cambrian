@@ -21,6 +21,7 @@ contract SolverFactory {
         bytes memory _data
     ) external returns (address _solver) {
         Solver solver = new Solver(
+            msg.sender,
             _keeper,
             _arbiter,
             _timelockHours,

@@ -21,19 +21,29 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ProposalsHubInterface extends ethers.utils.Interface {
   functions: {
-    "createProposal(address,address,uint256,bytes32)": FunctionFragment;
+    "approveERC20Transfer(bytes32,address)": FunctionFragment;
+    "createProposal(address,address,address,uint256,bytes32)": FunctionFragment;
     "defundProposal(bytes32,address,uint256)": FunctionFragment;
+    "executeProposal(bytes32)": FunctionFragment;
     "fundProposal(bytes32,address,uint256)": FunctionFragment;
     "proposals(bytes32)": FunctionFragment;
   };
 
   encodeFunctionData(
+    functionFragment: "approveERC20Transfer",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "createProposal",
-    values: [string, string, BigNumberish, BytesLike]
+    values: [string, string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "defundProposal",
     values: [BytesLike, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeProposal",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "fundProposal",
@@ -45,11 +55,19 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "approveERC20Transfer",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "createProposal",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "defundProposal",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeProposal",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -105,8 +123,15 @@ export class ProposalsHub extends BaseContract {
   interface: ProposalsHubInterface;
 
   functions: {
+    approveERC20Transfer(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     createProposal(
       _collateralToken: string,
+      _solutionsHub: string,
       _keeper: string,
       _fundingGoal: BigNumberish,
       _solutionId: BytesLike,
@@ -117,6 +142,11 @@ export class ProposalsHub extends BaseContract {
       _proposalId: BytesLike,
       _token: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    executeProposal(
+      _proposalId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -131,10 +161,22 @@ export class ProposalsHub extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, string, string, string, string, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
         configured: boolean;
         collateralToken: string;
         proposer: string;
+        solutionsHub: string;
+        primeSolver: string;
         id: string;
         solutionId: string;
         funding: BigNumber;
@@ -143,8 +185,15 @@ export class ProposalsHub extends BaseContract {
     >;
   };
 
+  approveERC20Transfer(
+    _proposalId: BytesLike,
+    _solver: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   createProposal(
     _collateralToken: string,
+    _solutionsHub: string,
     _keeper: string,
     _fundingGoal: BigNumberish,
     _solutionId: BytesLike,
@@ -155,6 +204,11 @@ export class ProposalsHub extends BaseContract {
     _proposalId: BytesLike,
     _token: string,
     _amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  executeProposal(
+    _proposalId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -169,10 +223,22 @@ export class ProposalsHub extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [boolean, string, string, string, string, BigNumber, BigNumber] & {
+    [
+      boolean,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      BigNumber,
+      BigNumber
+    ] & {
       configured: boolean;
       collateralToken: string;
       proposer: string;
+      solutionsHub: string;
+      primeSolver: string;
       id: string;
       solutionId: string;
       funding: BigNumber;
@@ -181,8 +247,15 @@ export class ProposalsHub extends BaseContract {
   >;
 
   callStatic: {
+    approveERC20Transfer(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     createProposal(
       _collateralToken: string,
+      _solutionsHub: string,
       _keeper: string,
       _fundingGoal: BigNumberish,
       _solutionId: BytesLike,
@@ -193,6 +266,11 @@ export class ProposalsHub extends BaseContract {
       _proposalId: BytesLike,
       _token: string,
       _amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    executeProposal(
+      _proposalId: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -207,10 +285,22 @@ export class ProposalsHub extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [boolean, string, string, string, string, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
         configured: boolean;
         collateralToken: string;
         proposer: string;
+        solutionsHub: string;
+        primeSolver: string;
         id: string;
         solutionId: string;
         funding: BigNumber;
@@ -222,8 +312,15 @@ export class ProposalsHub extends BaseContract {
   filters: {};
 
   estimateGas: {
+    approveERC20Transfer(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     createProposal(
       _collateralToken: string,
+      _solutionsHub: string,
       _keeper: string,
       _fundingGoal: BigNumberish,
       _solutionId: BytesLike,
@@ -234,6 +331,11 @@ export class ProposalsHub extends BaseContract {
       _proposalId: BytesLike,
       _token: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    executeProposal(
+      _proposalId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -248,8 +350,15 @@ export class ProposalsHub extends BaseContract {
   };
 
   populateTransaction: {
+    approveERC20Transfer(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     createProposal(
       _collateralToken: string,
+      _solutionsHub: string,
       _keeper: string,
       _fundingGoal: BigNumberish,
       _solutionId: BytesLike,
@@ -260,6 +369,11 @@ export class ProposalsHub extends BaseContract {
       _proposalId: BytesLike,
       _token: string,
       _amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executeProposal(
+      _proposalId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
