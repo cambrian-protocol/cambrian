@@ -5,10 +5,12 @@ pragma solidity 0.8.0;
 import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Minion.sol";
+import "./interfaces/ISolutionsHub.sol";
+import "hardhat/console.sol";
 
 contract Solver {
     // ConditionalTokens contract
-    ConditionalTokens public conditionalTokens = ConditionalTokens(address(0));
+    ConditionalTokens public conditionalTokens;
 
     // Collateral token
     IERC20 collateralToken;
@@ -24,6 +26,12 @@ contract Solver {
 
     // True when arbitration has been delivered
     bool arbitrationDelivered;
+
+    // ID of solution being solved
+    bytes32 solutionId;
+
+    // The proposalsHub address managing this Solver;
+    address proposalsHub;
 
     // The solutionsHub address managing this Solver;
     address solutionsHub;
@@ -67,7 +75,7 @@ contract Solver {
     modifier onlySolution() {
         require(
             msg.sender == solutionsHub,
-            "Solver: Only the Keeper address may call this"
+            "Solver: Only the solutionsHub address may call this"
         );
         _;
     }
@@ -97,13 +105,13 @@ contract Solver {
     }
 
     modifier isActive() {
-        require(initiated = true, "Solver: Uninitiated");
-        require(pendingArbitration = false, "Solver: Arbitration is pending");
+        require(initiated == true, "Solver: Uninitiated");
+        require(pendingArbitration == false, "Solver: Arbitration is pending");
         require(
-            arbitrationDelivered = false,
+            arbitrationDelivered == false,
             "Solver: Arbitration has been delivered"
         );
-        require(solved = false, "Solver: Solve is complete");
+        require(solved == false, "Solver: Solve is complete");
         _;
     }
 
@@ -113,6 +121,9 @@ contract Solver {
     }
 
     constructor(
+        ConditionalTokens _conditionalTokens,
+        bytes32 _solutionId,
+        address _proposalsHub,
         address _solutionsHub,
         address _keeper,
         address _arbiter,
@@ -127,22 +138,25 @@ contract Solver {
             actions.push(_actions[i]);
         }
 
+        conditionalTokens = _conditionalTokens;
+        solutionId = _solutionId;
+        proposalsHub = _proposalsHub;
         solutionsHub = _solutionsHub;
         keeper = _keeper;
         arbiter = _arbiter;
         timelockDuration = _timelockHours * 1 hours;
         data = _data;
 
-        questionId = keccak256(
-            abi.encode(
-                address(this),
-                _keeper,
-                _arbiter,
-                _actions,
-                _data,
-                block.timestamp
-            )
-        );
+        // questionId = keccak256(
+        //     abi.encode(
+        //         address(this),
+        //         _keeper,
+        //         _arbiter,
+        //         _actions,
+        //         _data,
+        //         block.timestamp
+        //     )
+        // );
     }
 
     /**
@@ -156,14 +170,17 @@ contract Solver {
     }
 
     function createCondition(bytes32 _questionId, uint256 _outcomeSlots)
-        internal
+        external
         isActive
+        returns (bool)
     {
         conditionalTokens.prepareCondition(
             address(this),
             _questionId,
             _outcomeSlots
         );
+
+        questionId = _questionId; // Hmmmm. one main questionId per solver?
     }
 
     /**
@@ -181,7 +198,7 @@ contract Solver {
         uint256[] memory _partition,
         IERC20 _collateralToken,
         uint256 _amount
-    ) public onlyKeeper isActive {
+    ) external isActive {
         require(initiated == true, "Solver: Uninitiated");
 
         // get condition id
@@ -195,7 +212,7 @@ contract Solver {
         if (_parentCollectionId == bytes32(0)) {
             // pull collateral in
             IERC20(_collateralToken).transferFrom(
-                solutionsHub,
+                proposalsHub,
                 address(this),
                 _amount
             );
@@ -216,25 +233,29 @@ contract Solver {
     }
 
     function allocatePartition(
+        bytes32 _questionId,
+        uint256 _outcomeSlots,
+        bytes32 _parentCollectionId,
+        IERC20 _collateralToken,
         uint256[] calldata _partition,
         uint256[][] calldata _amounts,
         address[][] calldata _addresses
-    ) private {
+    ) external {
         bytes32 _conditionId = conditionalTokens.getConditionId(
             address(this), // Solver is Oracle
-            questionId,
-            outcomeSlots
+            _questionId,
+            _outcomeSlots
         );
 
         for (uint256 i; i < partition.length; i++) {
             bytes32 _collectionId = conditionalTokens.getCollectionId(
-                parentCollectionId,
+                _parentCollectionId,
                 _conditionId,
                 _partition[i]
             );
 
             uint256 _positionId = conditionalTokens.getPositionId(
-                collateralToken,
+                _collateralToken,
                 _collectionId
             );
 
@@ -320,12 +341,23 @@ contract Solver {
             "Solver::insufficient eth"
         );
 
+        Minion.Action memory action = actions[_actionIndex];
+
+        if (action.useSolverIdx) {
+            action.to = ISolutionsHub(solutionsHub).solverFromIndex(
+                solutionId,
+                action.solverIdx
+            );
+        }
+
         // execute call
         actions[_actionIndex].executed = true;
 
-        (bool success, bytes memory retData) = actions[_actionIndex].to.call{
-            value: actions[_actionIndex].value
-        }(actions[_actionIndex].data);
+        (bool success, bytes memory retData) = action.to.call{
+            value: action.value
+        }(action.data);
+
+        console.logBytes(retData);
 
         require(success, "Solver::call failure");
         return retData;

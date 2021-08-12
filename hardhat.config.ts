@@ -3,6 +3,7 @@ require("@typechain/hardhat")
 require("hardhat-contract-sizer")
 require("@nomiclabs/hardhat-ethers")
 require('hardhat-deploy');
+require("@nomiclabs/hardhat-web3");
 const { HardhatUserConfig } = require("hardhat/types");
 
 const config = {

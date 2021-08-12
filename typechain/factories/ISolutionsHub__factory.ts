@@ -8,6 +8,83 @@ import type { ISolutionsHub, ISolutionsHubInterface } from "../ISolutionsHub";
 
 const _abi = [
   {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "contract SolverFactory",
+            name: "factory",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "keeper",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "arbiter",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "timelockHours",
+            type: "uint256",
+          },
+          {
+            internalType: "bytes",
+            name: "data",
+            type: "bytes",
+          },
+          {
+            components: [
+              {
+                internalType: "address",
+                name: "to",
+                type: "address",
+              },
+              {
+                internalType: "bool",
+                name: "executed",
+                type: "bool",
+              },
+              {
+                internalType: "bool",
+                name: "useSolverIdx",
+                type: "bool",
+              },
+              {
+                internalType: "uint256",
+                name: "solverIdx",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "value",
+                type: "uint256",
+              },
+              {
+                internalType: "bytes",
+                name: "data",
+                type: "bytes",
+              },
+            ],
+            internalType: "struct Minion.Action[]",
+            name: "actions",
+            type: "tuple[]",
+          },
+        ],
+        internalType: "struct ISolutionsHub.SolverConfig[]",
+        name: "_solverConfigs",
+        type: "tuple[]",
+      },
+    ],
+    name: "createSolution",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "createSolution",
     outputs: [
@@ -42,6 +119,37 @@ const _abi = [
     inputs: [
       {
         internalType: "bytes32",
+        name: "_id",
+        type: "bytes32",
+      },
+    ],
+    name: "getSolution",
+    outputs: [],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_proposalId",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes32",
+        name: "_solutionId",
+        type: "bytes32",
+      },
+    ],
+    name: "linkToProposal",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
         name: "_solutionId",
         type: "bytes32",
       },
@@ -63,21 +171,6 @@ const _abi = [
             type: "address",
           },
           {
-            internalType: "address",
-            name: "parentCollectionId",
-            type: "address",
-          },
-          {
-            internalType: "uint256",
-            name: "outcomeSlots",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "amount",
-            type: "uint256",
-          },
-          {
             internalType: "uint256",
             name: "timelockHours",
             type: "uint256",
@@ -90,11 +183,6 @@ const _abi = [
           {
             components: [
               {
-                internalType: "uint256",
-                name: "value",
-                type: "uint256",
-              },
-              {
                 internalType: "address",
                 name: "to",
                 type: "address",
@@ -103,6 +191,21 @@ const _abi = [
                 internalType: "bool",
                 name: "executed",
                 type: "bool",
+              },
+              {
+                internalType: "bool",
+                name: "useSolverIdx",
+                type: "bool",
+              },
+              {
+                internalType: "uint256",
+                name: "solverIdx",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "value",
+                type: "uint256",
               },
               {
                 internalType: "bytes",

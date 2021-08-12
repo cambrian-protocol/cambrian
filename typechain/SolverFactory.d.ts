@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSolver(address,address,uint256,tuple[],bytes)": FunctionFragment;
+    "createSolver(address,bytes32,address,address,address,uint256,tuple[],bytes)": FunctionFragment;
     "solverAddresses(uint256)": FunctionFragment;
   };
 
@@ -29,9 +29,19 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
     functionFragment: "createSolver",
     values: [
       string,
+      BytesLike,
+      string,
+      string,
       string,
       BigNumberish,
-      { value: BigNumberish; to: string; executed: boolean; data: BytesLike }[],
+      {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
       BytesLike
     ]
   ): string;
@@ -101,13 +111,18 @@ export class SolverFactory extends BaseContract {
 
   functions: {
     createSolver(
+      _conditionalTokens: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
       _actions: {
-        value: BigNumberish;
         to: string;
         executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
         data: BytesLike;
       }[],
       _data: BytesLike,
@@ -121,13 +136,18 @@ export class SolverFactory extends BaseContract {
   };
 
   createSolver(
+    _conditionalTokens: string,
+    _solutionId: BytesLike,
+    _proposalsHub: string,
     _keeper: string,
     _arbiter: string,
     _timelockHours: BigNumberish,
     _actions: {
-      value: BigNumberish;
       to: string;
       executed: boolean;
+      useSolverIdx: boolean;
+      solverIdx: BigNumberish;
+      value: BigNumberish;
       data: BytesLike;
     }[],
     _data: BytesLike,
@@ -141,13 +161,18 @@ export class SolverFactory extends BaseContract {
 
   callStatic: {
     createSolver(
+      _conditionalTokens: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
       _actions: {
-        value: BigNumberish;
         to: string;
         executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
         data: BytesLike;
       }[],
       _data: BytesLike,
@@ -168,13 +193,18 @@ export class SolverFactory extends BaseContract {
 
   estimateGas: {
     createSolver(
+      _conditionalTokens: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
       _actions: {
-        value: BigNumberish;
         to: string;
         executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
         data: BytesLike;
       }[],
       _data: BytesLike,
@@ -189,13 +219,18 @@ export class SolverFactory extends BaseContract {
 
   populateTransaction: {
     createSolver(
+      _conditionalTokens: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
       _keeper: string,
       _arbiter: string,
       _timelockHours: BigNumberish,
       _actions: {
-        value: BigNumberish;
         to: string;
         executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
         data: BytesLike;
       }[],
       _data: BytesLike,

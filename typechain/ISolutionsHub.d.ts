@@ -21,18 +21,44 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ISolutionsHubInterface extends ethers.utils.Interface {
   functions: {
-    "createSolution()": FunctionFragment;
+    "createSolution(tuple[])": FunctionFragment;
     "executeSolution(bytes32,bytes32)": FunctionFragment;
+    "getSolution(bytes32)": FunctionFragment;
+    "linkToProposal(bytes32,bytes32)": FunctionFragment;
     "setSolverConfigs(bytes32,tuple[])": FunctionFragment;
     "solverFromIndex(bytes32,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createSolution",
-    values?: undefined
+    values: [
+      {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockHours: BigNumberish;
+        data: BytesLike;
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }[]
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "executeSolution",
+    values: [BytesLike, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSolution",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "linkToProposal",
     values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
@@ -43,15 +69,14 @@ interface ISolutionsHubInterface extends ethers.utils.Interface {
         factory: string;
         keeper: string;
         arbiter: string;
-        parentCollectionId: string;
-        outcomeSlots: BigNumberish;
-        amount: BigNumberish;
         timelockHours: BigNumberish;
         data: BytesLike;
         actions: {
-          value: BigNumberish;
           to: string;
           executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
           data: BytesLike;
         }[];
       }[]
@@ -68,6 +93,14 @@ interface ISolutionsHubInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "executeSolution",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSolution",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "linkToProposal",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -126,11 +159,38 @@ export class ISolutionsHub extends BaseContract {
   interface: ISolutionsHubInterface;
 
   functions: {
-    createSolution(
+    "createSolution(tuple[])"(
+      _solverConfigs: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockHours: BigNumberish;
+        data: BytesLike;
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "createSolution()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     executeSolution(
+      _proposalId: BytesLike,
+      _solutionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<[void]>;
+
+    linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -142,15 +202,14 @@ export class ISolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        parentCollectionId: string;
-        outcomeSlots: BigNumberish;
-        amount: BigNumberish;
         timelockHours: BigNumberish;
         data: BytesLike;
         actions: {
-          value: BigNumberish;
           to: string;
           executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
           data: BytesLike;
         }[];
       }[],
@@ -164,11 +223,38 @@ export class ISolutionsHub extends BaseContract {
     ): Promise<[string] & { solver: string }>;
   };
 
-  createSolution(
+  "createSolution(tuple[])"(
+    _solverConfigs: {
+      factory: string;
+      keeper: string;
+      arbiter: string;
+      timelockHours: BigNumberish;
+      data: BytesLike;
+      actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[];
+    }[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "createSolution()"(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   executeSolution(
+    _proposalId: BytesLike,
+    _solutionId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+  linkToProposal(
     _proposalId: BytesLike,
     _solutionId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -180,15 +266,14 @@ export class ISolutionsHub extends BaseContract {
       factory: string;
       keeper: string;
       arbiter: string;
-      parentCollectionId: string;
-      outcomeSlots: BigNumberish;
-      amount: BigNumberish;
       timelockHours: BigNumberish;
       data: BytesLike;
       actions: {
-        value: BigNumberish;
         to: string;
         executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
         data: BytesLike;
       }[];
     }[],
@@ -202,9 +287,36 @@ export class ISolutionsHub extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
-    createSolution(overrides?: CallOverrides): Promise<string>;
+    "createSolution(tuple[])"(
+      _solverConfigs: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockHours: BigNumberish;
+        data: BytesLike;
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "createSolution()"(overrides?: CallOverrides): Promise<string>;
 
     executeSolution(
+      _proposalId: BytesLike,
+      _solutionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<void>;
+
+    linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
       overrides?: CallOverrides
@@ -216,15 +328,14 @@ export class ISolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        parentCollectionId: string;
-        outcomeSlots: BigNumberish;
-        amount: BigNumberish;
         timelockHours: BigNumberish;
         data: BytesLike;
         actions: {
-          value: BigNumberish;
           to: string;
           executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
           data: BytesLike;
         }[];
       }[],
@@ -241,11 +352,38 @@ export class ISolutionsHub extends BaseContract {
   filters: {};
 
   estimateGas: {
-    createSolution(
+    "createSolution(tuple[])"(
+      _solverConfigs: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockHours: BigNumberish;
+        data: BytesLike;
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "createSolution()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     executeSolution(
+      _proposalId: BytesLike,
+      _solutionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
+    linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -257,15 +395,14 @@ export class ISolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        parentCollectionId: string;
-        outcomeSlots: BigNumberish;
-        amount: BigNumberish;
         timelockHours: BigNumberish;
         data: BytesLike;
         actions: {
-          value: BigNumberish;
           to: string;
           executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
           data: BytesLike;
         }[];
       }[],
@@ -280,11 +417,41 @@ export class ISolutionsHub extends BaseContract {
   };
 
   populateTransaction: {
-    createSolution(
+    "createSolution(tuple[])"(
+      _solverConfigs: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockHours: BigNumberish;
+        data: BytesLike;
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "createSolution()"(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     executeSolution(
+      _proposalId: BytesLike,
+      _solutionId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getSolution(
+      _id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -296,15 +463,14 @@ export class ISolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        parentCollectionId: string;
-        outcomeSlots: BigNumberish;
-        amount: BigNumberish;
         timelockHours: BigNumberish;
         data: BytesLike;
         actions: {
-          value: BigNumberish;
           to: string;
           executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
           data: BytesLike;
         }[];
       }[],

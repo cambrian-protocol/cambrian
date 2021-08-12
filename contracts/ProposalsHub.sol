@@ -9,7 +9,6 @@ contract ProposalsHub {
     uint256 nonce;
 
     struct Proposal {
-        bool configured;
         IERC20 collateralToken;
         address proposer;
         address solutionsHub;
@@ -18,10 +17,13 @@ contract ProposalsHub {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
-        mapping(address => uint256) funderAmount;
     }
 
+    mapping(bytes32 => mapping(address => uint256)) funderAmountMap;
+
     mapping(bytes32 => Proposal) public proposals;
+
+    event CreateProposal(bytes32 id);
 
     function executeProposal(bytes32 _proposalId) external {
         require(
@@ -29,11 +31,8 @@ contract ProposalsHub {
                 proposals[_proposalId].fundingGoal,
             "Proposal not fully funded"
         );
-        ISolutionsHub _solutionsHub = ISolutionsHub(
-            proposals[_proposalId].solutionsHub
-        );
 
-        _solutionsHub.executeSolution(
+        ISolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
             _proposalId,
             proposals[_proposalId].solutionId
         );
@@ -46,6 +45,18 @@ contract ProposalsHub {
             msg.sender == proposals[_proposalId].solutionsHub,
             "msg.sender not solutionsHub"
         );
+        require(_solver != address(0), "Invalid address");
+
+        ISolutionsHub _solutionsHub = ISolutionsHub(
+            proposals[_proposalId].solutionsHub
+        );
+        require(
+            _solutionsHub.solverFromIndex(
+                proposals[_proposalId].solutionId,
+                0
+            ) == _solver,
+            "Incorrect solver address"
+        );
 
         IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
         _token.approve(_solver, 0);
@@ -55,31 +66,35 @@ contract ProposalsHub {
     function createProposal(
         IERC20 _collateralToken,
         address _solutionsHub,
-        address _keeper,
         uint256 _fundingGoal,
         bytes32 _solutionId
-    ) public {
+    ) external {
         bytes32 _proposalId = keccak256(
             abi.encodePacked(
                 msg.sender,
                 _solutionId,
                 _collateralToken,
-                _keeper,
                 _fundingGoal,
                 nonce
             )
         );
 
-        nonce += 1;
+        nonce++;
 
         Proposal storage proposal = proposals[_proposalId];
-        proposal.configured = false;
         proposal.collateralToken = _collateralToken;
         proposal.proposer = msg.sender;
         proposal.solutionsHub = _solutionsHub;
         proposal.id = _proposalId;
         proposal.solutionId = _solutionId;
         proposal.fundingGoal = _fundingGoal;
+
+        ISolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
+        emit CreateProposal(_proposalId);
+    }
+
+    function isProposal(bytes32 _id) external view returns (bool) {
+        return proposals[_id].id != bytes32(0);
     }
 
     function fundProposal(
@@ -100,8 +115,12 @@ contract ProposalsHub {
         );
 
         proposals[_proposalId].funding += _amount;
-        proposals[_proposalId].funderAmount[msg.sender] += _amount;
-        _token.transferFrom(msg.sender, address(this), _amount);
+        funderAmountMap[_proposalId][msg.sender] += _amount;
+
+        require(
+            _token.transferFrom(msg.sender, address(this), _amount),
+            "Could not transfer from msg.sender"
+        );
     }
 
     function defundProposal(
@@ -116,13 +135,21 @@ contract ProposalsHub {
         );
         require(_amount > 0, "Amount cannot be zero");
         require(
-            _amount <= proposals[_proposalId].funderAmount[msg.sender],
+            _amount <= funderAmountMap[_proposalId][msg.sender],
             "Committed funds is lower than amount."
         );
 
         proposals[_proposalId].funding -= _amount;
-        proposals[_proposalId].funderAmount[msg.sender] -= _amount;
+        funderAmountMap[_proposalId][msg.sender] -= _amount;
 
         _token.transferFrom(address(this), msg.sender, _amount);
+    }
+
+    function getProposal(bytes32 _id)
+        external
+        view
+        returns (Proposal memory proposal)
+    {
+        return proposals[_id];
     }
 }

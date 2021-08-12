@@ -38,11 +38,6 @@ const _abi = [
         type: "address",
       },
       {
-        internalType: "address",
-        name: "_keeper",
-        type: "address",
-      },
-      {
         internalType: "uint256",
         name: "_fundingGoal",
         type: "uint256",
@@ -115,6 +110,25 @@ const _abi = [
     name: "fundProposal",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_id",
+        type: "bytes32",
+      },
+    ],
+    name: "isProposal",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
 ];

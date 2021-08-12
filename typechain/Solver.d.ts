@@ -21,9 +21,11 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverInterface extends ethers.utils.Interface {
   functions: {
+    "allocatePartition(bytes32,uint256,bytes32,address,uint256[],uint256[][],address[][])": FunctionFragment;
     "arbitrate(uint256[])": FunctionFragment;
     "conditionalTokens()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
+    "createCondition(bytes32,uint256)": FunctionFragment;
     "initiateSolve()": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -33,6 +35,18 @@ interface SolverInterface extends ethers.utils.Interface {
     "splitCondition(bytes32,bytes32,uint256,uint256[],address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "allocatePartition",
+    values: [
+      BytesLike,
+      BigNumberish,
+      BytesLike,
+      string,
+      BigNumberish[],
+      BigNumberish[][],
+      string[][]
+    ]
+  ): string;
   encodeFunctionData(
     functionFragment: "arbitrate",
     values: [BigNumberish[]]
@@ -44,6 +58,10 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "confirmPayouts",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createCondition",
+    values: [BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "initiateSolve",
@@ -81,6 +99,10 @@ interface SolverInterface extends ethers.utils.Interface {
     ]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "allocatePartition",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "arbitrate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "conditionalTokens",
@@ -88,6 +110,10 @@ interface SolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "confirmPayouts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createCondition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -166,6 +192,17 @@ export class Solver extends BaseContract {
   interface: SolverInterface;
 
   functions: {
+    allocatePartition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
+      _parentCollectionId: BytesLike,
+      _collateralToken: string,
+      _partition: BigNumberish[],
+      _amounts: BigNumberish[][],
+      _addresses: string[][],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -174,6 +211,12 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    createCondition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -225,6 +268,17 @@ export class Solver extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  allocatePartition(
+    _questionId: BytesLike,
+    _outcomeSlots: BigNumberish,
+    _parentCollectionId: BytesLike,
+    _collateralToken: string,
+    _partition: BigNumberish[],
+    _amounts: BigNumberish[][],
+    _addresses: string[][],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   arbitrate(
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -233,6 +287,12 @@ export class Solver extends BaseContract {
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
   confirmPayouts(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  createCondition(
+    _questionId: BytesLike,
+    _outcomeSlots: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -284,6 +344,17 @@ export class Solver extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    allocatePartition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
+      _parentCollectionId: BytesLike,
+      _collateralToken: string,
+      _partition: BigNumberish[],
+      _amounts: BigNumberish[][],
+      _addresses: string[][],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: CallOverrides
@@ -292,6 +363,12 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
+
+    createCondition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     initiateSolve(overrides?: CallOverrides): Promise<void>;
 
@@ -340,6 +417,17 @@ export class Solver extends BaseContract {
   filters: {};
 
   estimateGas: {
+    allocatePartition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
+      _parentCollectionId: BytesLike,
+      _collateralToken: string,
+      _partition: BigNumberish[],
+      _amounts: BigNumberish[][],
+      _addresses: string[][],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -348,6 +436,12 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    createCondition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -400,6 +494,17 @@ export class Solver extends BaseContract {
   };
 
   populateTransaction: {
+    allocatePartition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
+      _parentCollectionId: BytesLike,
+      _collateralToken: string,
+      _partition: BigNumberish[],
+      _amounts: BigNumberish[][],
+      _addresses: string[][],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -408,6 +513,12 @@ export class Solver extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    createCondition(
+      _questionId: BytesLike,
+      _outcomeSlots: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

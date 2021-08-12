@@ -400,8 +400,9 @@ library CTHelpers {
         bytes32 conditionId,
         uint256 indexSet
     ) internal view returns (bytes32) {
-        uint256 x1 =
-            uint256(keccak256(abi.encodePacked(conditionId, indexSet)));
+        uint256 x1 = uint256(
+            keccak256(abi.encodePacked(conditionId, indexSet))
+        );
         bool odd = x1 >> 255 != 0;
         uint256 y1;
         uint256 yy;
@@ -419,10 +420,11 @@ library CTHelpers {
             yy = addmod(mulmod(x2, mulmod(x2, x2, P), P), B, P);
             uint256 y2 = sqrt(yy);
             if ((odd && y2 % 2 == 0) || (!odd && y2 % 2 == 1)) y2 = P - y2;
-            require(mulmod(y2, y2, P) == yy, "invalid parent collection ID");
+            require(mulmod(y2, y2, P) == yy, "invalid parentID");
 
-            (bool success, bytes memory ret) =
-                address(6).staticcall(abi.encode(x1, y1, x2, y2));
+            (bool success, bytes memory ret) = address(6).staticcall(
+                abi.encode(x1, y1, x2, y2)
+            );
             require(success, "ecadd failed");
             (x1, y1) = abi.decode(ret, (uint256, uint256));
         }
