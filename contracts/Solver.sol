@@ -12,65 +12,62 @@ contract Solver {
     // ConditionalTokens contract
     ConditionalTokens public conditionalTokens;
 
-    // Collateral token
-    IERC20 collateralToken;
-
     // True when solve is complete
-    bool solved;
+    bool public solved;
 
     // True when solve has begun
-    bool initiated;
+    bool public initiated;
 
     // True when waiting for arbiter decision
-    bool pendingArbitration;
+    bool public pendingArbitration;
 
     // True when arbitration has been delivered
-    bool arbitrationDelivered;
+    bool public arbitrationDelivered;
 
     // ID of solution being solved
-    bytes32 solutionId;
+    bytes32 public solutionId;
 
     // The proposalsHub address managing this Solver;
-    address proposalsHub;
+    address public proposalsHub;
 
     // The solutionsHub address managing this Solver;
-    address solutionsHub;
+    address public solutionsHub;
 
     // Keeper address
-    address keeper;
+    address public keeper;
 
     // Arbiter address
-    address arbiter;
-
-    // questionId to be interpreted for reporting on conditions
-    bytes32 questionId;
-
-    // ID of the parent collection above this Solver in the conditional tokens framework
-    bytes32 parentCollectionId;
-
-    // Partition of positions for payouts
-    uint256[] partition;
-
-    // num outcome slots for conditions
-    uint256 outcomeSlots;
-
-    // Amount of the token being handled
-    uint256 amount;
+    address public arbiter;
 
     // Mandatory delay between proposed payouts and confirmation by Keeper. Arbitration may be requested in this window.
-    uint256 timelockDuration;
+    uint256 public timelockDuration;
 
     // Current timelock
-    uint256 timelock;
+    uint256 public timelock;
 
-    // reported payouts
+    // currently proposed/reported payouts
     uint256[] payouts;
 
     // Contract calls to be performed on execution
-    Minion.Action[] actions;
+    Minion.Action[] public actions;
 
     // arbitrary data
-    bytes data;
+    bytes public data;
+
+    Condition public canonCondition;
+
+    bool executeCanonConditionDone; // executeCanonCondition may only run once
+
+    struct Condition {
+        IERC20 collateralToken; // collateral token
+        address oracle; // address reporting on this condition
+        bytes32 questionId; // questionId to be interpreted for reporting on conditions
+        uint256 outcomeSlots; // num outcome slots for conditions
+        bytes32 parentCollectionId; // ID of the parent collection above this Solver in the conditional tokens framework
+        bytes32 conditionId;
+        uint256 amount; // Amount of the token being handled
+        uint256[] partition; // Partition of positions for payouts
+    }
 
     modifier onlySolution() {
         require(
@@ -92,6 +89,14 @@ contract Solver {
         require(
             msg.sender == arbiter,
             "Solver: Only the Arbiter address may call this"
+        );
+        _;
+    }
+
+    modifier onlyThis() {
+        require(
+            msg.sender == address(this),
+            "Solver: Only this solver may call this"
         );
         _;
     }
@@ -146,108 +151,17 @@ contract Solver {
         arbiter = _arbiter;
         timelockDuration = _timelockHours * 1 hours;
         data = _data;
-
-        // questionId = keccak256(
-        //     abi.encode(
-        //         address(this),
-        //         _keeper,
-        //         _arbiter,
-        //         _actions,
-        //         _data,
-        //         block.timestamp
-        //     )
-        // );
-    }
-
-    /**
-     * @dev                  Sets or unsets the approval of a given operator. An operator is allowed to
-     *                       transfer all tokens of the sender on their behalf.
-     * @param operator       Address to set the approval
-     * @param approved       Representing the status of the approval to be set
-     */
-    function setApproval(address operator, bool approved) external {
-        conditionalTokens.setApprovalForAll(operator, approved);
-    }
-
-    function createCondition(bytes32 _questionId, uint256 _outcomeSlots)
-        external
-        isActive
-        returns (bool)
-    {
-        conditionalTokens.prepareCondition(
-            address(this),
-            _questionId,
-            _outcomeSlots
-        );
-
-        questionId = _questionId; // Hmmmm. one main questionId per solver?
-    }
-
-    /**
-     * @dev
-     * @param _questionId          An identifier for the question to be answered by the oracle.
-     * @param _parentCollectionId  The ID of the outcome collections common to the position being split and
-     *                             the split target positions. May be null, in which only the collateral is shared.
-     * @param _collateralToken     The address of the positions' backing collateral token.
-     * @param _amount              The amount of collateral or stake to split.
-     */
-    function splitCondition(
-        bytes32 _questionId,
-        bytes32 _parentCollectionId,
-        uint256 _outcomeSlots,
-        uint256[] memory _partition,
-        IERC20 _collateralToken,
-        uint256 _amount
-    ) external isActive {
-        require(initiated == true, "Solver: Uninitiated");
-
-        // get condition id
-        bytes32 _conditionId = conditionalTokens.getConditionId(
-            address(this), // Solver is Oracle
-            _questionId,
-            _outcomeSlots
-        );
-
-        // if shallow position
-        if (_parentCollectionId == bytes32(0)) {
-            // pull collateral in
-            IERC20(_collateralToken).transferFrom(
-                proposalsHub,
-                address(this),
-                _amount
-            );
-            // approve erc20 transfer to conditional tokens contract
-            IERC20(_collateralToken).approve(
-                address(conditionalTokens),
-                _amount
-            );
-        }
-        // splitPosition
-        conditionalTokens.splitPosition(
-            _collateralToken,
-            _parentCollectionId,
-            _conditionId,
-            _partition,
-            _amount
-        );
     }
 
     function allocatePartition(
-        bytes32 _questionId,
-        uint256 _outcomeSlots,
-        bytes32 _parentCollectionId,
         IERC20 _collateralToken,
+        bytes32 _conditionId,
+        bytes32 _parentCollectionId,
         uint256[] calldata _partition,
-        uint256[][] calldata _amounts,
-        address[][] calldata _addresses
-    ) external {
-        bytes32 _conditionId = conditionalTokens.getConditionId(
-            address(this), // Solver is Oracle
-            _questionId,
-            _outcomeSlots
-        );
-
-        for (uint256 i; i < partition.length; i++) {
+        address[][] calldata _initialRecipientAddresses,
+        uint256[][] calldata _initialRecipientAmounts
+    ) internal isActive {
+        for (uint256 i; i < _partition.length; i++) {
             bytes32 _collectionId = conditionalTokens.getCollectionId(
                 _parentCollectionId,
                 _conditionId,
@@ -259,16 +173,84 @@ contract Solver {
                 _collectionId
             );
 
-            for (uint256 j; j < _addresses.length; j++) {
+            for (uint256 j; j < _initialRecipientAddresses.length; j++) {
                 conditionalTokens.safeTransferFrom(
                     address(this),
-                    _addresses[i][j],
+                    _initialRecipientAddresses[i][j],
                     _positionId,
-                    _amounts[i][j],
+                    _initialRecipientAmounts[i][j],
                     ""
                 );
             }
         }
+    }
+
+    function executeCanonCondition(
+        IERC20 _collateralToken,
+        bytes32 _questionId,
+        uint256 _outcomeSlots,
+        bytes32 _parentCollectionId,
+        uint256 _amount,
+        uint256[] calldata _partition,
+        address[][] calldata _initialRecipientAddresses,
+        uint256[][] calldata _initialRecipientAmounts
+    ) external isActive onlyThis {
+        require(
+            executeCanonConditionDone == false,
+            "Solver:: This has already run"
+        );
+        executeCanonConditionDone = true;
+
+        // prepare condition
+        conditionalTokens.prepareCondition(
+            address(this),
+            _questionId,
+            _outcomeSlots
+        );
+
+        // get condition id
+        bytes32 _conditionId = conditionalTokens.getConditionId(
+            address(this), // Solver is Oracle
+            _questionId,
+            _outcomeSlots
+        );
+
+        // if shallow position
+        if (_parentCollectionId == bytes32(0)) {
+            IERC20 _token = IERC20(_collateralToken);
+            // pull collateral in
+            _token.transferFrom(proposalsHub, address(this), _amount);
+            // approve erc20 transfer to conditional tokens contract
+            _token.approve(address(conditionalTokens), _amount);
+        }
+        // splitPosition
+        conditionalTokens.splitPosition(
+            _collateralToken,
+            _parentCollectionId,
+            _conditionId,
+            _partition,
+            _amount
+        );
+
+        canonCondition = Condition(
+            _collateralToken,
+            address(this), // Solver is Oracle
+            _questionId,
+            _outcomeSlots,
+            _parentCollectionId,
+            _conditionId,
+            _amount,
+            _partition
+        );
+
+        allocatePartition(
+            _collateralToken,
+            _conditionId,
+            _parentCollectionId,
+            _partition,
+            _initialRecipientAddresses,
+            _initialRecipientAmounts
+        );
     }
 
     function initiateSolve() external onlySolution {
@@ -302,7 +284,7 @@ contract Solver {
             block.timestamp > timelock,
             "Solver: Timelock is still in the future"
         );
-        conditionalTokens.reportPayouts(questionId, payouts);
+        conditionalTokens.reportPayouts(canonCondition.questionId, payouts);
         solved = true;
     }
 
@@ -361,6 +343,10 @@ contract Solver {
 
         require(success, "Solver::call failure");
         return retData;
+    }
+
+    function getPayouts() public view returns (uint256[] memory) {
+        return payouts;
     }
 
     function onERC1155Received(
