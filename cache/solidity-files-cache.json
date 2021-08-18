@@ -2,15 +2,15 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "E:\\cryptodev\\cambrian\\contracts\\Argparse.sol": {
-      "lastModificationDate": 1623910853622,
+      "lastModificationDate": 1628763940913,
       "contentHash": "99f6b4439b0c7d0fa18a412405612c1e",
       "sourceName": "contracts/Argparse.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -53,8 +53,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -95,8 +95,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -141,8 +141,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -183,8 +183,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -232,8 +232,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -276,8 +276,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -320,8 +320,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -364,8 +364,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -408,8 +408,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -450,8 +450,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -492,8 +492,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -536,8 +536,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -578,8 +578,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -623,8 +623,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -669,8 +669,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -713,8 +713,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -751,15 +751,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1628765053504,
-      "contentHash": "b72f0b0534ddabef40b1499d86685cb1",
+      "lastModificationDate": 1629286582439,
+      "contentHash": "a4f27c83589c285611f7e16bb5fc155e",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -790,7 +790,8 @@
         "./Minion.sol",
         "./ConditionalTokens.sol",
         "./interfaces/ISolver.sol",
-        "./interfaces/IProposalsHub.sol"
+        "./ProposalsHub.sol",
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -800,15 +801,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1628740008669,
+      "lastModificationDate": 1629285780784,
       "contentHash": "71eb7bd0b07a1a7610013e7612630976",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -891,15 +892,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverFactory.sol": {
-      "lastModificationDate": 1628764952206,
-      "contentHash": "173a7822596835f88aa2328957fff7f9",
+      "lastModificationDate": 1629286499012,
+      "contentHash": "712aad2e4732928d46c91195c91fb011",
       "sourceName": "contracts/SolverFactory.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -925,10 +926,12 @@
         }
       },
       "imports": [
+        "@openzeppelin/contracts/proxy/Clones.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./ConditionalTokens.sol",
+        "./Minion.sol",
         "./Solver.sol",
-        "./Minion.sol"
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -938,15 +941,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1629194191232,
-      "contentHash": "1e84a81d14a82f1fbcbb02d6d705a7f9",
+      "lastModificationDate": 1629286846850,
+      "contentHash": "b0b4cb2f1f696ca568e694a1da8517b2",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -974,8 +977,9 @@
       "imports": [
         "./ConditionalTokens.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/proxy/utils/Initializable.sol",
         "./Minion.sol",
-        "./interfaces/ISolutionsHub.sol",
+        "./SolutionsHub.sol",
         "hardhat/console.sol"
       ],
       "versionPragmas": [
@@ -993,8 +997,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1038,8 +1042,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1076,8 +1080,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1111,15 +1115,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolutionsHub.sol": {
-      "lastModificationDate": 1628762263956,
+      "lastModificationDate": 1629280861439,
       "contentHash": "92f3ea5bf1dbd6869d4d0370e529ecdd",
       "sourceName": "contracts/interfaces/ISolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1157,15 +1161,15 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolver.sol": {
-      "lastModificationDate": 1628509860390,
-      "contentHash": "fdf5bdb3ea05c6d1b1add9c6713f0ab1",
+      "lastModificationDate": 1629255688581,
+      "contentHash": "87ecb97e9136589eaa264d04f0fe5455",
       "sourceName": "contracts/interfaces/ISolver.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1210,8 +1214,8 @@
         "version": "0.8.0",
         "settings": {
           "optimizer": {
-            "enabled": false,
-            "runs": 200
+            "enabled": true,
+            "runs": 1000
           },
           "outputSelection": {
             "*": {
@@ -1244,6 +1248,90 @@
       ],
       "artifacts": [
         "IProposalsHub"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol": {
+      "lastModificationDate": 1622447918905,
+      "contentHash": "76309b022d76aa52bb1830b7bf515e9e",
+      "sourceName": "@openzeppelin/contracts/proxy/utils/Initializable.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Initializable"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\proxy\\Clones.sol": {
+      "lastModificationDate": 1622447918831,
+      "contentHash": "08b85f1ee6d839857b6feaa519390069",
+      "sourceName": "@openzeppelin/contracts/proxy/Clones.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Clones"
       ]
     }
   }

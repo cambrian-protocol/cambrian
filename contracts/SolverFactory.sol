@@ -1,46 +1,50 @@
-// SPDX-License-Identifier: GPL-3.0-or-Collateral
-/* solhint-disable space-after-comma */
 pragma solidity 0.8.0;
 
+import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ConditionalTokens.sol";
-import "./Solver.sol";
 import "./Minion.sol";
+import "./Solver.sol";
+import "hardhat/console.sol";
 
 contract SolverFactory {
-    Solver[] public solverAddresses;
-    mapping(address => Solver) solverMap;
+    address public immutable implementationAddress;
+    Solver[] public solvers;
 
-    event SolverCreated(Solver solver);
+    event SolverCreated(address newSolverAddress);
 
-    // TODO require msg.sender is a solutionsHub?
+    constructor() {
+        implementationAddress = address(new Solver());
+    }
 
     function createSolver(
-        ConditionalTokens _conditionalTokens,
+        IERC20 _collateralToken,
         bytes32 _solutionId,
         address _proposalsHub,
+        address _solutionsHub,
         address _keeper,
         address _arbiter,
         uint256 _timelockHours,
-        Minion.Action[] calldata _actions,
+        Minion.Action[] memory _actions,
         bytes memory _data
-    ) external returns (address _solver) {
-        Solver solver = new Solver({
-            _conditionalTokens: _conditionalTokens,
-            _solutionId: _solutionId,
-            _proposalsHub: _proposalsHub,
-            _solutionsHub: msg.sender,
-            _keeper: _keeper,
-            _arbiter: _arbiter,
-            _timelockHours: _timelockHours,
-            _actions: _actions,
-            _data: _data
-        });
+    ) external returns (address) {
+        Solver clone = Solver(Clones.clone(implementationAddress));
 
-        solverAddresses.push(solver);
-        solverMap[address(solver)] = solver;
-        emit SolverCreated(solver);
+        Solver(clone).init(
+            _collateralToken,
+            _solutionId,
+            _proposalsHub,
+            _solutionsHub,
+            _keeper,
+            _arbiter,
+            _timelockHours,
+            _actions,
+            _data
+        );
 
-        return address(solver);
+        solvers.push(clone);
+
+        console.logAddress(address(clone));
+        return address(clone);
     }
 }

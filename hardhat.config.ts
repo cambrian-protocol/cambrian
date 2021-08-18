@@ -4,6 +4,7 @@ require("hardhat-contract-sizer")
 require("@nomiclabs/hardhat-ethers")
 require('hardhat-deploy');
 require("@nomiclabs/hardhat-web3");
+// require("hardhat-gas-reporter");
 const { HardhatUserConfig } = require("hardhat/types");
 
 const config = {
@@ -14,9 +15,18 @@ const config = {
     },
   },
   solidity: {
-    compilers: [{ version: "0.8.0", settings: {} }, { version: "0.5.17", settings: {} }],
+    compilers: [{ version: "0.8.0", settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    } }, { version: "0.5.17", settings: {} }],
   },
-  excludeContracts: ['contracts/d2d/CtfTreasury']
+  gasReporter: {
+    currency: 'USD',
+    gasPrice: 32,
+    coinmarketcap: "5dc6d6fd-09c5-4c48-8296-9e2b44dde46a"
+  }
   // contractSizer: {
   //   alphaSort: true,
   //   runOnCompile: true,

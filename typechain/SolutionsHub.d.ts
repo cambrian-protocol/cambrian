@@ -21,7 +21,8 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolutionsHubInterface extends ethers.utils.Interface {
   functions: {
-    "createSolution(tuple[])": FunctionFragment;
+    "conditionalTokens()": FunctionFragment;
+    "createSolution(address,tuple[])": FunctionFragment;
     "executeSolution(bytes32,bytes32)": FunctionFragment;
     "getSolution(bytes32)": FunctionFragment;
     "linkToProposal(bytes32,bytes32)": FunctionFragment;
@@ -30,8 +31,13 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(
+    functionFragment: "conditionalTokens",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "createSolution",
     values: [
+      string,
       {
         factory: string;
         keeper: string;
@@ -87,6 +93,10 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     values: [BytesLike, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "conditionalTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "createSolution",
     data: BytesLike
@@ -163,7 +173,10 @@ export class SolutionsHub extends BaseContract {
   interface: SolutionsHubInterface;
 
   functions: {
+    conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
+
     createSolution(
+      _collateralToken: string,
       _solverConfigs: {
         factory: string;
         keeper: string;
@@ -195,6 +208,7 @@ export class SolutionsHub extends BaseContract {
       [
         [
           boolean,
+          string,
           string,
           string,
           string,
@@ -238,6 +252,7 @@ export class SolutionsHub extends BaseContract {
           string[]
         ] & {
           executed: boolean;
+          collateralToken: string;
           keeper: string;
           proposalHub: string;
           proposalId: string;
@@ -287,6 +302,7 @@ export class SolutionsHub extends BaseContract {
           string,
           string,
           string,
+          string,
           ([
             string,
             string,
@@ -326,6 +342,7 @@ export class SolutionsHub extends BaseContract {
           string[]
         ] & {
           executed: boolean;
+          collateralToken: string;
           keeper: string;
           proposalHub: string;
           proposalId: string;
@@ -404,7 +421,10 @@ export class SolutionsHub extends BaseContract {
     ): Promise<[string] & { solver: string }>;
   };
 
+  conditionalTokens(overrides?: CallOverrides): Promise<string>;
+
   createSolution(
+    _collateralToken: string,
     _solverConfigs: {
       factory: string;
       keeper: string;
@@ -435,6 +455,7 @@ export class SolutionsHub extends BaseContract {
   ): Promise<
     [
       boolean,
+      string,
       string,
       string,
       string,
@@ -471,6 +492,7 @@ export class SolutionsHub extends BaseContract {
       string[]
     ] & {
       executed: boolean;
+      collateralToken: string;
       keeper: string;
       proposalHub: string;
       proposalId: string;
@@ -541,7 +563,10 @@ export class SolutionsHub extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
+    conditionalTokens(overrides?: CallOverrides): Promise<string>;
+
     createSolution(
+      _collateralToken: string,
       _solverConfigs: {
         factory: string;
         keeper: string;
@@ -572,6 +597,7 @@ export class SolutionsHub extends BaseContract {
     ): Promise<
       [
         boolean,
+        string,
         string,
         string,
         string,
@@ -608,6 +634,7 @@ export class SolutionsHub extends BaseContract {
         string[]
       ] & {
         executed: boolean;
+        collateralToken: string;
         keeper: string;
         proposalHub: string;
         proposalId: string;
@@ -683,7 +710,10 @@ export class SolutionsHub extends BaseContract {
   };
 
   estimateGas: {
+    conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
     createSolution(
+      _collateralToken: string,
       _solverConfigs: {
         factory: string;
         keeper: string;
@@ -744,7 +774,10 @@ export class SolutionsHub extends BaseContract {
   };
 
   populateTransaction: {
+    conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     createSolution(
+      _collateralToken: string,
       _solverConfigs: {
         factory: string;
         keeper: string;

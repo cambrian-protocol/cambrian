@@ -96,7 +96,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "initiateSolve",
+    name: "executeSolve",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

@@ -26,13 +26,15 @@ interface SolverInterface extends ethers.utils.Interface {
     "arbitrate(uint256[])": FunctionFragment;
     "arbitrationDelivered()": FunctionFragment;
     "canonCondition()": FunctionFragment;
+    "collateralToken()": FunctionFragment;
     "conditionalTokens()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
     "data()": FunctionFragment;
-    "executeCanonCondition(address,bytes32,uint256,bytes32,uint256,uint256[],address[][],uint256[][])": FunctionFragment;
+    "executeCanonCondition(uint256,bytes32,uint256,uint256[],address[][],uint256[][],string)": FunctionFragment;
+    "executeSolve()": FunctionFragment;
+    "executed()": FunctionFragment;
     "getPayouts()": FunctionFragment;
-    "initiateSolve()": FunctionFragment;
-    "initiated()": FunctionFragment;
+    "init(address,bytes32,address,address,address,address,uint256,tuple[],bytes)": FunctionFragment;
     "keeper()": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
@@ -65,6 +67,10 @@ interface SolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "collateralToken",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "conditionalTokens",
     values?: undefined
   ): string;
@@ -76,25 +82,45 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "executeCanonCondition",
     values: [
-      string,
-      BytesLike,
       BigNumberish,
       BytesLike,
       BigNumberish,
       BigNumberish[],
       string[][],
-      BigNumberish[][]
+      BigNumberish[][],
+      string
     ]
   ): string;
+  encodeFunctionData(
+    functionFragment: "executeSolve",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "executed", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getPayouts",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initiateSolve",
-    values?: undefined
+    functionFragment: "init",
+    values: [
+      string,
+      BytesLike,
+      string,
+      string,
+      string,
+      string,
+      BigNumberish,
+      {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
+      BytesLike
+    ]
   ): string;
-  encodeFunctionData(functionFragment: "initiated", values?: undefined): string;
   encodeFunctionData(functionFragment: "keeper", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "nullArbitrate",
@@ -147,6 +173,10 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "collateralToken",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "conditionalTokens",
     data: BytesLike
   ): Result;
@@ -159,12 +189,13 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "executeCanonCondition",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getPayouts", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "initiateSolve",
+    functionFragment: "executeSolve",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "initiated", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "executed", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getPayouts", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "keeper", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "nullArbitrate",
@@ -286,6 +317,8 @@ export class Solver extends BaseContract {
       }
     >;
 
+    collateralToken(overrides?: CallOverrides): Promise<[string]>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
     confirmPayouts(
@@ -295,24 +328,43 @@ export class Solver extends BaseContract {
     data(overrides?: CallOverrides): Promise<[string]>;
 
     executeCanonCondition(
-      _collateralToken: string,
-      _questionId: BytesLike,
       _outcomeSlots: BigNumberish,
       _parentCollectionId: BytesLike,
       _amount: BigNumberish,
       _partition: BigNumberish[],
       _initialRecipientAddresses: string[][],
       _initialRecipientAmounts: BigNumberish[][],
+      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    executeSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    executed(overrides?: CallOverrides): Promise<[boolean]>;
 
     getPayouts(overrides?: CallOverrides): Promise<[BigNumber[]]>;
 
-    initiateSolve(
+    init(
+      _collateralToken: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
+      _solutionsHub: string,
+      _keeper: string,
+      _arbiter: string,
+      _timelockHours: BigNumberish,
+      _actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    initiated(overrides?: CallOverrides): Promise<[boolean]>;
 
     keeper(overrides?: CallOverrides): Promise<[string]>;
 
@@ -326,8 +378,8 @@ export class Solver extends BaseContract {
       ids: BigNumberish[],
       values: BigNumberish[],
       data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     onERC1155Received(
       operator: string,
@@ -335,8 +387,8 @@ export class Solver extends BaseContract {
       id: BigNumberish,
       value: BigNumberish,
       data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     pendingArbitration(overrides?: CallOverrides): Promise<[boolean]>;
 
@@ -395,6 +447,8 @@ export class Solver extends BaseContract {
     }
   >;
 
+  collateralToken(overrides?: CallOverrides): Promise<string>;
+
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
   confirmPayouts(
@@ -404,24 +458,43 @@ export class Solver extends BaseContract {
   data(overrides?: CallOverrides): Promise<string>;
 
   executeCanonCondition(
-    _collateralToken: string,
-    _questionId: BytesLike,
     _outcomeSlots: BigNumberish,
     _parentCollectionId: BytesLike,
     _amount: BigNumberish,
     _partition: BigNumberish[],
     _initialRecipientAddresses: string[][],
     _initialRecipientAmounts: BigNumberish[][],
+    _metadata: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  executeSolve(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  executed(overrides?: CallOverrides): Promise<boolean>;
 
   getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
-  initiateSolve(
+  init(
+    _collateralToken: string,
+    _solutionId: BytesLike,
+    _proposalsHub: string,
+    _solutionsHub: string,
+    _keeper: string,
+    _arbiter: string,
+    _timelockHours: BigNumberish,
+    _actions: {
+      to: string;
+      executed: boolean;
+      useSolverIdx: boolean;
+      solverIdx: BigNumberish;
+      value: BigNumberish;
+      data: BytesLike;
+    }[],
+    _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  initiated(overrides?: CallOverrides): Promise<boolean>;
 
   keeper(overrides?: CallOverrides): Promise<string>;
 
@@ -435,8 +508,8 @@ export class Solver extends BaseContract {
     ids: BigNumberish[],
     values: BigNumberish[],
     data: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   onERC1155Received(
     operator: string,
@@ -444,8 +517,8 @@ export class Solver extends BaseContract {
     id: BigNumberish,
     value: BigNumberish,
     data: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<string>;
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   pendingArbitration(overrides?: CallOverrides): Promise<boolean>;
 
@@ -504,6 +577,8 @@ export class Solver extends BaseContract {
       }
     >;
 
+    collateralToken(overrides?: CallOverrides): Promise<string>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
@@ -511,22 +586,41 @@ export class Solver extends BaseContract {
     data(overrides?: CallOverrides): Promise<string>;
 
     executeCanonCondition(
-      _collateralToken: string,
-      _questionId: BytesLike,
       _outcomeSlots: BigNumberish,
       _parentCollectionId: BytesLike,
       _amount: BigNumberish,
       _partition: BigNumberish[],
       _initialRecipientAddresses: string[][],
       _initialRecipientAmounts: BigNumberish[][],
+      _metadata: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    executeSolve(overrides?: CallOverrides): Promise<void>;
+
+    executed(overrides?: CallOverrides): Promise<boolean>;
+
     getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
-    initiateSolve(overrides?: CallOverrides): Promise<void>;
-
-    initiated(overrides?: CallOverrides): Promise<boolean>;
+    init(
+      _collateralToken: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
+      _solutionsHub: string,
+      _keeper: string,
+      _arbiter: string,
+      _timelockHours: BigNumberish,
+      _actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     keeper(overrides?: CallOverrides): Promise<string>;
 
@@ -586,6 +680,8 @@ export class Solver extends BaseContract {
 
     canonCondition(overrides?: CallOverrides): Promise<BigNumber>;
 
+    collateralToken(overrides?: CallOverrides): Promise<BigNumber>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     confirmPayouts(
@@ -595,24 +691,43 @@ export class Solver extends BaseContract {
     data(overrides?: CallOverrides): Promise<BigNumber>;
 
     executeCanonCondition(
-      _collateralToken: string,
-      _questionId: BytesLike,
       _outcomeSlots: BigNumberish,
       _parentCollectionId: BytesLike,
       _amount: BigNumberish,
       _partition: BigNumberish[],
       _initialRecipientAddresses: string[][],
       _initialRecipientAmounts: BigNumberish[][],
+      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    executeSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    executed(overrides?: CallOverrides): Promise<BigNumber>;
 
     getPayouts(overrides?: CallOverrides): Promise<BigNumber>;
 
-    initiateSolve(
+    init(
+      _collateralToken: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
+      _solutionsHub: string,
+      _keeper: string,
+      _arbiter: string,
+      _timelockHours: BigNumberish,
+      _actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    initiated(overrides?: CallOverrides): Promise<BigNumber>;
 
     keeper(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -626,7 +741,7 @@ export class Solver extends BaseContract {
       ids: BigNumberish[],
       values: BigNumberish[],
       data: BytesLike,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     onERC1155Received(
@@ -635,7 +750,7 @@ export class Solver extends BaseContract {
       id: BigNumberish,
       value: BigNumberish,
       data: BytesLike,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     pendingArbitration(overrides?: CallOverrides): Promise<BigNumber>;
@@ -677,6 +792,8 @@ export class Solver extends BaseContract {
 
     canonCondition(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    collateralToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     confirmPayouts(
@@ -686,24 +803,43 @@ export class Solver extends BaseContract {
     data(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     executeCanonCondition(
-      _collateralToken: string,
-      _questionId: BytesLike,
       _outcomeSlots: BigNumberish,
       _parentCollectionId: BytesLike,
       _amount: BigNumberish,
       _partition: BigNumberish[],
       _initialRecipientAddresses: string[][],
       _initialRecipientAmounts: BigNumberish[][],
+      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    executeSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    executed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getPayouts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    initiateSolve(
+    init(
+      _collateralToken: string,
+      _solutionId: BytesLike,
+      _proposalsHub: string,
+      _solutionsHub: string,
+      _keeper: string,
+      _arbiter: string,
+      _timelockHours: BigNumberish,
+      _actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[],
+      _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    initiated(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     keeper(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -717,7 +853,7 @@ export class Solver extends BaseContract {
       ids: BigNumberish[],
       values: BigNumberish[],
       data: BytesLike,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     onERC1155Received(
@@ -726,7 +862,7 @@ export class Solver extends BaseContract {
       id: BigNumberish,
       value: BigNumberish,
       data: BytesLike,
-      overrides?: CallOverrides
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     pendingArbitration(

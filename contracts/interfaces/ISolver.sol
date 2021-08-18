@@ -41,7 +41,7 @@ interface ISolver {
         address[][] calldata _addresses
     ) external;
 
-    function initiateSolve() external;
+    function executeSolve() external;
 
     function proposePayouts(uint256[] calldata _payouts) external;
 

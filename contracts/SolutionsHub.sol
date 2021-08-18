@@ -5,11 +5,12 @@ import "./SolverFactory.sol";
 import "./Minion.sol";
 import "./ConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
-import "./interfaces/IProposalsHub.sol";
+import "./ProposalsHub.sol";
+import "hardhat/console.sol";
 
 contract SolutionsHub {
     uint256 nonce;
-    ConditionalTokens conditionalTokens;
+    ConditionalTokens public conditionalTokens;
 
     struct SolverConfig {
         SolverFactory factory;
@@ -22,6 +23,7 @@ contract SolutionsHub {
 
     struct Solution {
         bool executed;
+        IERC20 collateralToken;
         address keeper;
         address proposalHub;
         bytes32 proposalId;
@@ -49,7 +51,7 @@ contract SolutionsHub {
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
-            IProposalsHub(msg.sender).isProposal(_proposalId),
+            ProposalsHub(msg.sender).isProposal(_proposalId),
             "Proposal is not valid at proposalHub"
         );
         solutions[_solutionId].proposalHub = msg.sender;
@@ -80,9 +82,10 @@ contract SolutionsHub {
                 .factory;
 
             address _solver = _factory.createSolver({
-                _conditionalTokens: conditionalTokens,
+                _collateralToken: solutions[_solutionId].collateralToken,
                 _solutionId: _solutionId,
                 _proposalsHub: solutions[_solutionId].proposalHub,
+                _solutionsHub: address(this),
                 _keeper: solutions[_solutionId].solverConfigs[i].keeper,
                 _arbiter: solutions[_solutionId].solverConfigs[i].arbiter,
                 _timelockHours: solutions[_solutionId]
@@ -92,14 +95,15 @@ contract SolutionsHub {
                 _data: solutions[_solutionId].solverConfigs[i].data
             });
 
+            console.logAddress(_solver);
+
             require(_solver != address(0), "Invalid address");
 
             solutions[_solutionId].solverAddresses.push(_solver);
             solverSolutionMap[_solver] = _solutionId;
         }
 
-        IProposalsHub _proposalsHub = IProposalsHub(msg.sender);
-        _proposalsHub.approveERC20Transfer(
+        ProposalsHub(msg.sender).approveERC20Transfer(
             _proposalId,
             solutions[_solutionId].solverAddresses[0]
         );
@@ -108,7 +112,8 @@ contract SolutionsHub {
             ISolver _solver = ISolver(
                 solutions[_solutionId].solverAddresses[i]
             );
-            _solver.initiateSolve();
+            console.logAddress(solutions[_solutionId].solverAddresses[i]);
+            _solver.executeSolve();
         }
     }
 
@@ -120,16 +125,17 @@ contract SolutionsHub {
         return solutions[_solutionId].solverAddresses[_index];
     }
 
-    function createSolution(SolverConfig[] calldata _solverConfigs)
-        external
-        returns (bytes32 _solutionId)
-    {
+    function createSolution(
+        IERC20 _collateralToken,
+        SolverConfig[] calldata _solverConfigs
+    ) external returns (bytes32 _solutionId) {
         nonce++;
         bytes32 _id = keccak256(abi.encodePacked(msg.sender, nonce));
         Solution storage solution = solutions[_id];
 
         solution.id = _id;
         solution.keeper = msg.sender;
+        solution.collateralToken = _collateralToken;
 
         for (uint256 i; i < _solverConfigs.length; i++) {
             solution.solverConfigs.push(_solverConfigs[i]);

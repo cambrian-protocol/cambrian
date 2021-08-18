@@ -27,7 +27,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     "createCondition(bytes32,uint256)": FunctionFragment;
     "executeAction(uint256)": FunctionFragment;
     "executeActions()": FunctionFragment;
-    "initiateSolve()": FunctionFragment;
+    "executeSolve()": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -61,7 +61,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "initiateSolve",
+    functionFragment: "executeSolve",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -118,7 +118,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "initiateSolve",
+    functionFragment: "executeSolve",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -224,7 +224,7 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    initiateSolve(
+    executeSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -303,7 +303,7 @@ export class ISolver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  initiateSolve(
+  executeSolve(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -378,7 +378,7 @@ export class ISolver extends BaseContract {
 
     executeActions(overrides?: CallOverrides): Promise<void>;
 
-    initiateSolve(overrides?: CallOverrides): Promise<void>;
+    executeSolve(overrides?: CallOverrides): Promise<void>;
 
     nullArbitrate(overrides?: CallOverrides): Promise<void>;
 
@@ -456,7 +456,7 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    initiateSolve(
+    executeSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -536,7 +536,7 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    initiateSolve(
+    executeSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
