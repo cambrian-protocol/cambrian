@@ -10,57 +10,14 @@ import "./SolutionsHub.sol";
 import "hardhat/console.sol";
 
 contract Solver is Initializable {
-    // ConditionalTokens contract
-    ConditionalTokens public conditionalTokens;
-
-    // Collateral being used
-    IERC20 public collateralToken;
-
-    // True when solve is complete
-    bool public solved;
-
-    // True when solve has begun
-    bool public executed;
-
-    // True when waiting for arbiter decision
-    bool public pendingArbitration;
-
-    // True when arbitration has been delivered
-    bool public arbitrationDelivered;
-
-    // ID of solution being solved
-    bytes32 public solutionId;
-
-    // The proposalsHub address managing this Solver;
-    address public proposalsHub;
-
-    // The solutionsHub address managing this Solver;
-    address public solutionsHub;
-
-    // Keeper address
-    address public keeper;
-
-    // Arbiter address
-    address public arbiter;
-
-    // Mandatory delay between proposed payouts and confirmation by Keeper. Arbitration may be requested in this window.
-    uint256 public timelockDuration;
-
-    // Current timelock
-    uint256 public timelock;
-
-    // currently proposed/reported payouts
-    uint256[] payouts;
-
-    // Contract calls to be performed on execution
-    Minion.Action[] public actions;
-
-    // arbitrary data
-    bytes public data;
-
-    Condition public canonCondition;
-
-    bool executeCanonConditionDone; // executeCanonCondition may only run once
+    struct Config {
+        SolverFactory factory;
+        address keeper; // Keeper address
+        address arbiter; // Arbiter address
+        uint256 timelockSeconds;
+        bytes data;
+        Minion.Action[] actions;
+    }
 
     struct Condition {
         IERC20 collateralToken; // collateral token
@@ -68,10 +25,25 @@ contract Solver is Initializable {
         bytes32 questionId; // questionId to be interpreted for reporting on conditions
         uint256 outcomeSlots; // num outcome slots for conditions
         bytes32 parentCollectionId; // ID of the parent collection above this Solver in the conditional tokens framework
-        bytes32 conditionId;
+        bytes32 conditionId; // ID of this condition in the conditional tokens framework
         uint256 amount; // Amount of the token being handled
         uint256[] partition; // Partition of positions for payouts
     }
+
+    Config public config; // Primary config of the Solver
+    Condition public canonCondition; // Canonical condition of the Solver
+    ConditionalTokens public conditionalTokens; // ConditionalTokens contract
+    IERC20 public collateralToken; // Collateral being used
+    bool executeCanonConditionDone; // executeCanonCondition may only run once
+    bool public solved; // True when solve is complete
+    bool public executed; // True when solve has begun
+    bool public pendingArbitration; // True when waiting for arbiter decision
+    bool public arbitrationDelivered; // True when arbitration has been delivered
+    bytes32 public solutionId; // ID of solution being solved
+    address public proposalsHub; // The proposalsHub address managing this Solver;
+    address public solutionsHub; // The solutionsHub address managing this Solver;
+    uint256 public timelock; // Current timelock
+    uint256[] payouts; // currently proposed/reported payouts
 
     modifier onlySolution() {
         require(
@@ -83,7 +55,7 @@ contract Solver is Initializable {
 
     modifier onlyKeeper() {
         require(
-            msg.sender == keeper,
+            msg.sender == config.keeper,
             "Solver: Only the Keeper address may call this"
         );
         _;
@@ -91,7 +63,7 @@ contract Solver is Initializable {
 
     modifier onlyArbiter() {
         require(
-            msg.sender == arbiter,
+            msg.sender == config.arbiter,
             "Solver: Only the Arbiter address may call this"
         );
         _;
@@ -107,7 +79,7 @@ contract Solver is Initializable {
 
     modifier isPrivileged() {
         require(
-            msg.sender == keeper || msg.sender == arbiter,
+            msg.sender == config.keeper || msg.sender == config.arbiter,
             "Solver: Only the Keeper or Arbiter may call this."
         );
         _;
@@ -134,28 +106,20 @@ contract Solver is Initializable {
         bytes32 _solutionId,
         address _proposalsHub,
         address _solutionsHub,
-        address _keeper,
-        address _arbiter,
-        uint256 _timelockHours,
-        Minion.Action[] memory _actions,
-        bytes memory _data
+        Config calldata _solverConfig
     ) public {
-        require(_keeper != address(0), "Solver: Keeper address invalid");
+        require(
+            _solverConfig.keeper != address(0),
+            "Solver: Keeper address invalid"
+        );
 
-        // Add actions to storage
-        for (uint256 i; i < _actions.length; i++) {
-            actions.push(_actions[i]);
-        }
+        config = _solverConfig;
 
         conditionalTokens = SolutionsHub(_solutionsHub).conditionalTokens();
         collateralToken = _collateralToken;
         solutionId = _solutionId;
         proposalsHub = _proposalsHub;
         solutionsHub = _solutionsHub;
-        keeper = _keeper;
-        arbiter = _arbiter;
-        timelockDuration = _timelockHours * 1 hours;
-        data = _data;
     }
 
     function allocatePartition(
@@ -262,7 +226,7 @@ contract Solver is Initializable {
     }
 
     function updateTimelock() internal isActive {
-        timelock = block.timestamp + timelockDuration;
+        timelock = block.timestamp + (config.timelockSeconds * 1 seconds);
     }
 
     function proposePayouts(uint256[] calldata _payouts)
@@ -302,23 +266,26 @@ contract Solver is Initializable {
     }
 
     function executeActions() private {
-        for (uint256 i; i < actions.length; i++) {
+        for (uint256 i; i < config.actions.length; i++) {
             executeAction(i);
         }
     }
 
     function executeAction(uint256 _actionIndex)
         private
-        isWhitelisted(actions[_actionIndex].to)
+        isWhitelisted(config.actions[_actionIndex].to)
         returns (bytes memory)
     {
-        require(!actions[_actionIndex].executed, "Solver::action executed");
         require(
-            address(this).balance >= actions[_actionIndex].value,
+            !config.actions[_actionIndex].executed,
+            "Solver::action executed"
+        );
+        require(
+            address(this).balance >= config.actions[_actionIndex].value,
             "Solver::insufficient eth"
         );
 
-        Minion.Action memory action = actions[_actionIndex];
+        Minion.Action memory action = config.actions[_actionIndex];
 
         if (action.useSolverIdx) {
             action.to = SolutionsHub(solutionsHub).solverFromIndex(
@@ -328,7 +295,7 @@ contract Solver is Initializable {
         }
 
         // execute call
-        actions[_actionIndex].executed = true;
+        config.actions[_actionIndex].executed = true;
 
         (bool success, bytes memory retData) = action.to.call{
             value: action.value

@@ -22,11 +22,7 @@ contract SolverFactory {
         bytes32 _solutionId,
         address _proposalsHub,
         address _solutionsHub,
-        address _keeper,
-        address _arbiter,
-        uint256 _timelockHours,
-        Minion.Action[] memory _actions,
-        bytes memory _data
+        Solver.Config calldata _solverConfig
     ) external returns (address) {
         Solver clone = Solver(Clones.clone(implementationAddress));
 
@@ -35,11 +31,7 @@ contract SolverFactory {
             _solutionId,
             _proposalsHub,
             _solutionsHub,
-            _keeper,
-            _arbiter,
-            _timelockHours,
-            _actions,
-            _data
+            _solverConfig
         );
 
         solvers.push(clone);

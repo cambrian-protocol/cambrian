@@ -21,21 +21,18 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverInterface extends ethers.utils.Interface {
   functions: {
-    "actions(uint256)": FunctionFragment;
-    "arbiter()": FunctionFragment;
     "arbitrate(uint256[])": FunctionFragment;
     "arbitrationDelivered()": FunctionFragment;
     "canonCondition()": FunctionFragment;
     "collateralToken()": FunctionFragment;
     "conditionalTokens()": FunctionFragment;
+    "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
-    "data()": FunctionFragment;
     "executeCanonCondition(uint256,bytes32,uint256,uint256[],address[][],uint256[][],string)": FunctionFragment;
     "executeSolve()": FunctionFragment;
     "executed()": FunctionFragment;
     "getPayouts()": FunctionFragment;
-    "init(address,bytes32,address,address,address,address,uint256,tuple[],bytes)": FunctionFragment;
-    "keeper()": FunctionFragment;
+    "init(address,bytes32,address,address,tuple)": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -46,14 +43,8 @@ interface SolverInterface extends ethers.utils.Interface {
     "solutionsHub()": FunctionFragment;
     "solved()": FunctionFragment;
     "timelock()": FunctionFragment;
-    "timelockDuration()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "actions",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "arbiter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "arbitrate",
     values: [BigNumberish[]]
@@ -74,11 +65,11 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "conditionalTokens",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "config", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "confirmPayouts",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "data", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "executeCanonCondition",
     values: [
@@ -107,21 +98,23 @@ interface SolverInterface extends ethers.utils.Interface {
       BytesLike,
       string,
       string,
-      string,
-      string,
-      BigNumberish,
       {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      BytesLike
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }
     ]
   ): string;
-  encodeFunctionData(functionFragment: "keeper", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "nullArbitrate",
     values?: undefined
@@ -156,13 +149,7 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "solved", values?: undefined): string;
   encodeFunctionData(functionFragment: "timelock", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "timelockDuration",
-    values?: undefined
-  ): string;
 
-  decodeFunctionResult(functionFragment: "actions", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "arbiter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "arbitrate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "arbitrationDelivered",
@@ -180,11 +167,11 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "conditionalTokens",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "config", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "confirmPayouts",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "data", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "executeCanonCondition",
     data: BytesLike
@@ -196,7 +183,6 @@ interface SolverInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "executed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getPayouts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "keeper", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "nullArbitrate",
     data: BytesLike
@@ -228,10 +214,6 @@ interface SolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "solved", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "timelock", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "timelockDuration",
-    data: BytesLike
-  ): Result;
 
   events: {};
 }
@@ -280,22 +262,6 @@ export class Solver extends BaseContract {
   interface: SolverInterface;
 
   functions: {
-    actions(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, boolean, boolean, BigNumber, BigNumber, string] & {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumber;
-        value: BigNumber;
-        data: string;
-      }
-    >;
-
-    arbiter(overrides?: CallOverrides): Promise<[string]>;
-
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -321,11 +287,21 @@ export class Solver extends BaseContract {
 
     conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
+    config(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string] & {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumber;
+        data: string;
+      }
+    >;
+
     confirmPayouts(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    data(overrides?: CallOverrides): Promise<[string]>;
 
     executeCanonCondition(
       _outcomeSlots: BigNumberish,
@@ -351,22 +327,23 @@ export class Solver extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    keeper(overrides?: CallOverrides): Promise<[string]>;
 
     nullArbitrate(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -406,25 +383,7 @@ export class Solver extends BaseContract {
     solved(overrides?: CallOverrides): Promise<[boolean]>;
 
     timelock(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    timelockDuration(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
-
-  actions(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [string, boolean, boolean, BigNumber, BigNumber, string] & {
-      to: string;
-      executed: boolean;
-      useSolverIdx: boolean;
-      solverIdx: BigNumber;
-      value: BigNumber;
-      data: string;
-    }
-  >;
-
-  arbiter(overrides?: CallOverrides): Promise<string>;
 
   arbitrate(
     _payouts: BigNumberish[],
@@ -451,11 +410,21 @@ export class Solver extends BaseContract {
 
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
+  config(
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, string, BigNumber, string] & {
+      factory: string;
+      keeper: string;
+      arbiter: string;
+      timelockSeconds: BigNumber;
+      data: string;
+    }
+  >;
+
   confirmPayouts(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  data(overrides?: CallOverrides): Promise<string>;
 
   executeCanonCondition(
     _outcomeSlots: BigNumberish,
@@ -481,22 +450,23 @@ export class Solver extends BaseContract {
     _solutionId: BytesLike,
     _proposalsHub: string,
     _solutionsHub: string,
-    _keeper: string,
-    _arbiter: string,
-    _timelockHours: BigNumberish,
-    _actions: {
-      to: string;
-      executed: boolean;
-      useSolverIdx: boolean;
-      solverIdx: BigNumberish;
-      value: BigNumberish;
+    _solverConfig: {
+      factory: string;
+      keeper: string;
+      arbiter: string;
+      timelockSeconds: BigNumberish;
       data: BytesLike;
-    }[],
-    _data: BytesLike,
+      actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[];
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  keeper(overrides?: CallOverrides): Promise<string>;
 
   nullArbitrate(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -537,25 +507,7 @@ export class Solver extends BaseContract {
 
   timelock(overrides?: CallOverrides): Promise<BigNumber>;
 
-  timelockDuration(overrides?: CallOverrides): Promise<BigNumber>;
-
   callStatic: {
-    actions(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [string, boolean, boolean, BigNumber, BigNumber, string] & {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumber;
-        value: BigNumber;
-        data: string;
-      }
-    >;
-
-    arbiter(overrides?: CallOverrides): Promise<string>;
-
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: CallOverrides
@@ -581,9 +533,19 @@ export class Solver extends BaseContract {
 
     conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
-    confirmPayouts(overrides?: CallOverrides): Promise<void>;
+    config(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string] & {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumber;
+        data: string;
+      }
+    >;
 
-    data(overrides?: CallOverrides): Promise<string>;
+    confirmPayouts(overrides?: CallOverrides): Promise<void>;
 
     executeCanonCondition(
       _outcomeSlots: BigNumberish,
@@ -607,22 +569,23 @@ export class Solver extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: CallOverrides
     ): Promise<void>;
-
-    keeper(overrides?: CallOverrides): Promise<string>;
 
     nullArbitrate(overrides?: CallOverrides): Promise<void>;
 
@@ -660,17 +623,11 @@ export class Solver extends BaseContract {
     solved(overrides?: CallOverrides): Promise<boolean>;
 
     timelock(overrides?: CallOverrides): Promise<BigNumber>;
-
-    timelockDuration(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   filters: {};
 
   estimateGas: {
-    actions(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
-    arbiter(overrides?: CallOverrides): Promise<BigNumber>;
-
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -684,11 +641,11 @@ export class Solver extends BaseContract {
 
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
+    config(overrides?: CallOverrides): Promise<BigNumber>;
+
     confirmPayouts(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    data(overrides?: CallOverrides): Promise<BigNumber>;
 
     executeCanonCondition(
       _outcomeSlots: BigNumberish,
@@ -714,22 +671,23 @@ export class Solver extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    keeper(overrides?: CallOverrides): Promise<BigNumber>;
 
     nullArbitrate(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -769,18 +727,9 @@ export class Solver extends BaseContract {
     solved(overrides?: CallOverrides): Promise<BigNumber>;
 
     timelock(overrides?: CallOverrides): Promise<BigNumber>;
-
-    timelockDuration(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    actions(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    arbiter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     arbitrate(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -796,11 +745,11 @@ export class Solver extends BaseContract {
 
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    config(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     confirmPayouts(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    data(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     executeCanonCondition(
       _outcomeSlots: BigNumberish,
@@ -826,22 +775,23 @@ export class Solver extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    keeper(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nullArbitrate(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -883,7 +833,5 @@ export class Solver extends BaseContract {
     solved(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     timelock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    timelockDuration(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

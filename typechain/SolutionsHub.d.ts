@@ -42,7 +42,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -75,7 +75,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -181,7 +181,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -231,7 +231,7 @@ export class SolutionsHub extends BaseContract {
             factory: string;
             keeper: string;
             arbiter: string;
-            timelockHours: BigNumber;
+            timelockSeconds: BigNumber;
             data: string;
             actions: ([
               string,
@@ -275,7 +275,7 @@ export class SolutionsHub extends BaseContract {
             factory: string;
             keeper: string;
             arbiter: string;
-            timelockHours: BigNumber;
+            timelockSeconds: BigNumber;
             data: string;
             actions: ([
               string,
@@ -321,7 +321,7 @@ export class SolutionsHub extends BaseContract {
             factory: string;
             keeper: string;
             arbiter: string;
-            timelockHours: BigNumber;
+            timelockSeconds: BigNumber;
             data: string;
             actions: ([
               string,
@@ -365,7 +365,7 @@ export class SolutionsHub extends BaseContract {
             factory: string;
             keeper: string;
             arbiter: string;
-            timelockHours: BigNumber;
+            timelockSeconds: BigNumber;
             data: string;
             actions: ([
               string,
@@ -400,7 +400,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -429,7 +429,7 @@ export class SolutionsHub extends BaseContract {
       factory: string;
       keeper: string;
       arbiter: string;
-      timelockHours: BigNumberish;
+      timelockSeconds: BigNumberish;
       data: BytesLike;
       actions: {
         to: string;
@@ -478,7 +478,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumber;
+        timelockSeconds: BigNumber;
         data: string;
         actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
           to: string;
@@ -515,7 +515,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumber;
+        timelockSeconds: BigNumber;
         data: string;
         actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
           to: string;
@@ -542,7 +542,7 @@ export class SolutionsHub extends BaseContract {
       factory: string;
       keeper: string;
       arbiter: string;
-      timelockHours: BigNumberish;
+      timelockSeconds: BigNumberish;
       data: BytesLike;
       actions: {
         to: string;
@@ -571,7 +571,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -620,7 +620,7 @@ export class SolutionsHub extends BaseContract {
           factory: string;
           keeper: string;
           arbiter: string;
-          timelockHours: BigNumber;
+          timelockSeconds: BigNumber;
           data: string;
           actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
             to: string;
@@ -657,7 +657,7 @@ export class SolutionsHub extends BaseContract {
           factory: string;
           keeper: string;
           arbiter: string;
-          timelockHours: BigNumber;
+          timelockSeconds: BigNumber;
           data: string;
           actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
             to: string;
@@ -684,7 +684,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -718,7 +718,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -752,7 +752,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -782,7 +782,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;
@@ -819,7 +819,7 @@ export class SolutionsHub extends BaseContract {
         factory: string;
         keeper: string;
         arbiter: string;
-        timelockHours: BigNumberish;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
         actions: {
           to: string;

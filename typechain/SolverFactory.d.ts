@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSolver(address,bytes32,address,address,address,address,uint256,tuple[],bytes)": FunctionFragment;
+    "createSolver(address,bytes32,address,address,tuple)": FunctionFragment;
     "implementationAddress()": FunctionFragment;
     "solvers(uint256)": FunctionFragment;
   };
@@ -33,18 +33,21 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
       BytesLike,
       string,
       string,
-      string,
-      string,
-      BigNumberish,
       {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      BytesLike
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      }
     ]
   ): string;
   encodeFunctionData(
@@ -122,18 +125,21 @@ export class SolverFactory extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -147,18 +153,21 @@ export class SolverFactory extends BaseContract {
     _solutionId: BytesLike,
     _proposalsHub: string,
     _solutionsHub: string,
-    _keeper: string,
-    _arbiter: string,
-    _timelockHours: BigNumberish,
-    _actions: {
-      to: string;
-      executed: boolean;
-      useSolverIdx: boolean;
-      solverIdx: BigNumberish;
-      value: BigNumberish;
+    _solverConfig: {
+      factory: string;
+      keeper: string;
+      arbiter: string;
+      timelockSeconds: BigNumberish;
       data: BytesLike;
-    }[],
-    _data: BytesLike,
+      actions: {
+        to: string;
+        executed: boolean;
+        useSolverIdx: boolean;
+        solverIdx: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[];
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -172,18 +181,21 @@ export class SolverFactory extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: CallOverrides
     ): Promise<string>;
 
@@ -204,18 +216,21 @@ export class SolverFactory extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -230,18 +245,21 @@ export class SolverFactory extends BaseContract {
       _solutionId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
-      _keeper: string,
-      _arbiter: string,
-      _timelockHours: BigNumberish,
-      _actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
+      _solverConfig: {
+        factory: string;
+        keeper: string;
+        arbiter: string;
+        timelockSeconds: BigNumberish;
         data: BytesLike;
-      }[],
-      _data: BytesLike,
+        actions: {
+          to: string;
+          executed: boolean;
+          useSolverIdx: boolean;
+          solverIdx: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
