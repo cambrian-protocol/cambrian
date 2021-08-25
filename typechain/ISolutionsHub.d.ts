@@ -11,7 +11,6 @@ import {
   PopulatedTransaction,
   BaseContract,
   ContractTransaction,
-  Overrides,
   CallOverrides,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
@@ -21,66 +20,13 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ISolutionsHubInterface extends ethers.utils.Interface {
   functions: {
-    "createSolution(tuple[])": FunctionFragment;
-    "executeSolution(bytes32,bytes32)": FunctionFragment;
     "getSolution(bytes32)": FunctionFragment;
-    "linkToProposal(bytes32,bytes32)": FunctionFragment;
-    "setSolverConfigs(bytes32,tuple[])": FunctionFragment;
     "solverFromIndex(bytes32,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "createSolution",
-    values: [
-      {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[]
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "executeSolution",
-    values: [BytesLike, BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "getSolution",
     values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "linkToProposal",
-    values: [BytesLike, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSolverConfigs",
-    values: [
-      BytesLike,
-      {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[]
-    ]
   ): string;
   encodeFunctionData(
     functionFragment: "solverFromIndex",
@@ -88,23 +34,7 @@ interface ISolutionsHubInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "createSolution",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "executeSolution",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "getSolution",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "linkToProposal",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setSolverConfigs",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -159,192 +89,29 @@ export class ISolutionsHub extends BaseContract {
   interface: ISolutionsHubInterface;
 
   functions: {
-    "createSolution(tuple[])"(
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "createSolution()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    executeSolution(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<[void]>;
-
-    linkToProposal(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setSolverConfigs(
-      _solutionId: BytesLike,
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     solverFromIndex(
       _solutionId: BytesLike,
-      _index: BigNumberish,
+      _solverIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string] & { solver: string }>;
   };
 
-  "createSolution(tuple[])"(
-    _solverConfigs: {
-      factory: string;
-      keeper: string;
-      arbiter: string;
-      timelockHours: BigNumberish;
-      data: BytesLike;
-      actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
-        data: BytesLike;
-      }[];
-    }[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "createSolution()"(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  executeSolution(
-    _proposalId: BytesLike,
-    _solutionId: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<void>;
-
-  linkToProposal(
-    _proposalId: BytesLike,
-    _solutionId: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setSolverConfigs(
-    _solutionId: BytesLike,
-    _solverConfigs: {
-      factory: string;
-      keeper: string;
-      arbiter: string;
-      timelockHours: BigNumberish;
-      data: BytesLike;
-      actions: {
-        to: string;
-        executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
-        value: BigNumberish;
-        data: BytesLike;
-      }[];
-    }[],
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   solverFromIndex(
     _solutionId: BytesLike,
-    _index: BigNumberish,
+    _solverIndex: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
   callStatic: {
-    "createSolution(tuple[])"(
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "createSolution()"(overrides?: CallOverrides): Promise<string>;
-
-    executeSolution(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<void>;
-
-    linkToProposal(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSolverConfigs(
-      _solutionId: BytesLike,
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     solverFromIndex(
       _solutionId: BytesLike,
-      _index: BigNumberish,
+      _solverIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
   };
@@ -352,134 +119,24 @@ export class ISolutionsHub extends BaseContract {
   filters: {};
 
   estimateGas: {
-    "createSolution(tuple[])"(
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "createSolution()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    executeSolution(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
-
-    linkToProposal(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setSolverConfigs(
-      _solutionId: BytesLike,
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     solverFromIndex(
       _solutionId: BytesLike,
-      _index: BigNumberish,
+      _solverIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    "createSolution(tuple[])"(
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "createSolution()"(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    executeSolution(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     getSolution(
       _id: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    linkToProposal(
-      _proposalId: BytesLike,
-      _solutionId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setSolverConfigs(
-      _solutionId: BytesLike,
-      _solverConfigs: {
-        factory: string;
-        keeper: string;
-        arbiter: string;
-        timelockHours: BigNumberish;
-        data: BytesLike;
-        actions: {
-          to: string;
-          executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
-          value: BigNumberish;
-          data: BytesLike;
-        }[];
-      }[],
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     solverFromIndex(
       _solutionId: BytesLike,
-      _index: BigNumberish,
+      _solverIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

@@ -3,7 +3,7 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ConditionalTokens.sol";
 import "./SolverFactory.sol";
-import "./interfaces/ISolutionsHub.sol";
+import "./SolutionsHub.sol";
 
 contract ProposalsHub {
     uint256 nonce;
@@ -32,7 +32,7 @@ contract ProposalsHub {
             "Proposal not fully funded"
         );
 
-        ISolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
+        SolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
             _proposalId,
             proposals[_proposalId].solutionId
         );
@@ -47,7 +47,7 @@ contract ProposalsHub {
         );
         require(_solver != address(0), "Invalid address");
 
-        ISolutionsHub _solutionsHub = ISolutionsHub(
+        SolutionsHub _solutionsHub = SolutionsHub(
             proposals[_proposalId].solutionsHub
         );
         require(
@@ -61,6 +61,7 @@ contract ProposalsHub {
         IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
         _token.approve(_solver, 0);
         _token.approve(_solver, proposals[_proposalId].funding);
+        console.log("Approved funding from proposalsHub");
     }
 
     function createProposal(
@@ -89,7 +90,7 @@ contract ProposalsHub {
         proposal.solutionId = _solutionId;
         proposal.fundingGoal = _fundingGoal;
 
-        ISolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
+        SolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
         emit CreateProposal(_proposalId);
     }
 

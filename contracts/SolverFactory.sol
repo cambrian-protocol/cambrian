@@ -3,7 +3,6 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ConditionalTokens.sol";
-import "./Minion.sol";
 import "./Solver.sol";
 import "hardhat/console.sol";
 

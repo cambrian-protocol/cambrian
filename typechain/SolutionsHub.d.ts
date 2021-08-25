@@ -22,7 +22,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface SolutionsHubInterface extends ethers.utils.Interface {
   functions: {
     "conditionalTokens()": FunctionFragment;
-    "createSolution(address,tuple[])": FunctionFragment;
+    "createSolution(bytes32,address,tuple[])": FunctionFragment;
     "executeSolution(bytes32,bytes32)": FunctionFragment;
     "getSolution(bytes32)": FunctionFragment;
     "linkToProposal(bytes32,bytes32)": FunctionFragment;
@@ -37,6 +37,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createSolution",
     values: [
+      BytesLike,
       string,
       {
         factory: string;
@@ -44,14 +45,31 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[]
     ]
   ): string;
@@ -77,14 +95,31 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[]
     ]
   ): string;
@@ -176,6 +211,7 @@ export class SolutionsHub extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
     createSolution(
+      _id: BytesLike,
       _collateralToken: string,
       _solverConfigs: {
         factory: string;
@@ -183,14 +219,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -219,35 +272,92 @@ export class SolutionsHub extends BaseContract {
             string,
             BigNumber,
             string,
-            ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-              to: string;
+            ([boolean, boolean, number, BigNumber, BigNumber, string] & {
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[],
+            ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
-            })[]
+            })[],
+            [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            }
           ] & {
             factory: string;
             keeper: string;
             arbiter: string;
             timelockSeconds: BigNumber;
             data: string;
-            actions: ([
-              string,
+            ingests: ([
               boolean,
               boolean,
+              number,
               BigNumber,
               BigNumber,
               string
             ] & {
-              to: string;
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[];
+            actions: ([
+              boolean,
+              boolean,
+              string,
+              BigNumber,
+              BigNumber,
+              string
+            ] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
             })[];
+            canonConditionExecutor: [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            };
           })[],
           string[]
         ] & {
@@ -263,35 +373,92 @@ export class SolutionsHub extends BaseContract {
             string,
             BigNumber,
             string,
-            ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-              to: string;
+            ([boolean, boolean, number, BigNumber, BigNumber, string] & {
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[],
+            ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
-            })[]
+            })[],
+            [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            }
           ] & {
             factory: string;
             keeper: string;
             arbiter: string;
             timelockSeconds: BigNumber;
             data: string;
-            actions: ([
-              string,
+            ingests: ([
               boolean,
               boolean,
+              number,
               BigNumber,
               BigNumber,
               string
             ] & {
-              to: string;
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[];
+            actions: ([
+              boolean,
+              boolean,
+              string,
+              BigNumber,
+              BigNumber,
+              string
+            ] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
             })[];
+            canonConditionExecutor: [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            };
           })[];
           solverAddresses: string[];
         }
@@ -309,35 +476,92 @@ export class SolutionsHub extends BaseContract {
             string,
             BigNumber,
             string,
-            ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-              to: string;
+            ([boolean, boolean, number, BigNumber, BigNumber, string] & {
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[],
+            ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
-            })[]
+            })[],
+            [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            }
           ] & {
             factory: string;
             keeper: string;
             arbiter: string;
             timelockSeconds: BigNumber;
             data: string;
-            actions: ([
-              string,
+            ingests: ([
               boolean,
               boolean,
+              number,
               BigNumber,
               BigNumber,
               string
             ] & {
-              to: string;
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[];
+            actions: ([
+              boolean,
+              boolean,
+              string,
+              BigNumber,
+              BigNumber,
+              string
+            ] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
             })[];
+            canonConditionExecutor: [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            };
           })[],
           string[]
         ] & {
@@ -353,35 +577,92 @@ export class SolutionsHub extends BaseContract {
             string,
             BigNumber,
             string,
-            ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-              to: string;
+            ([boolean, boolean, number, BigNumber, BigNumber, string] & {
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[],
+            ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
-            })[]
+            })[],
+            [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            }
           ] & {
             factory: string;
             keeper: string;
             arbiter: string;
             timelockSeconds: BigNumber;
             data: string;
-            actions: ([
-              string,
+            ingests: ([
               boolean,
               boolean,
+              number,
               BigNumber,
               BigNumber,
               string
             ] & {
-              to: string;
               executed: boolean;
-              useSolverIdx: boolean;
-              solverIdx: BigNumber;
+              isConstant: boolean;
+              port: number;
+              key: BigNumber;
+              solverIndex: BigNumber;
+              data: string;
+            })[];
+            actions: ([
+              boolean,
+              boolean,
+              string,
+              BigNumber,
+              BigNumber,
+              string
+            ] & {
+              executed: boolean;
+              isPort: boolean;
+              to: string;
+              portIndex: BigNumber;
               value: BigNumber;
               data: string;
             })[];
+            canonConditionExecutor: [
+              BigNumber,
+              BigNumber,
+              BigNumber,
+              BigNumber[],
+              BigNumber[][],
+              BigNumber[][],
+              string
+            ] & {
+              outcomeSlots: BigNumber;
+              parentCollectionIdPort: BigNumber;
+              amount: BigNumber;
+              partition: BigNumber[];
+              recipientAddressPorts: BigNumber[][];
+              recipientAmounts: BigNumber[][];
+              metadata: string;
+            };
           })[];
           solverAddresses: string[];
         };
@@ -402,14 +683,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -424,6 +722,7 @@ export class SolutionsHub extends BaseContract {
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
   createSolution(
+    _id: BytesLike,
     _collateralToken: string,
     _solverConfigs: {
       factory: string;
@@ -431,14 +730,31 @@ export class SolutionsHub extends BaseContract {
       arbiter: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
-      actions: {
-        to: string;
+      ingests: {
         executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
+        isConstant: boolean;
+        port: BigNumberish;
+        key: BigNumberish;
+        solverIndex: BigNumberish;
+        data: BytesLike;
+      }[];
+      actions: {
+        executed: boolean;
+        isPort: boolean;
+        to: string;
+        portIndex: BigNumberish;
         value: BigNumberish;
         data: BytesLike;
       }[];
+      canonConditionExecutor: {
+        outcomeSlots: BigNumberish;
+        parentCollectionIdPort: BigNumberish;
+        amount: BigNumberish;
+        partition: BigNumberish[];
+        recipientAddressPorts: BigNumberish[][];
+        recipientAmounts: BigNumberish[][];
+        metadata: string;
+      };
     }[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -466,28 +782,78 @@ export class SolutionsHub extends BaseContract {
         string,
         BigNumber,
         string,
-        ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-          to: string;
+        ([boolean, boolean, number, BigNumber, BigNumber, string] & {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumber;
+          isConstant: boolean;
+          port: number;
+          key: BigNumber;
+          solverIndex: BigNumber;
+          data: string;
+        })[],
+        ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumber;
           value: BigNumber;
           data: string;
-        })[]
+        })[],
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        }
       ] & {
         factory: string;
         keeper: string;
         arbiter: string;
         timelockSeconds: BigNumber;
         data: string;
-        actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-          to: string;
+        ingests: ([boolean, boolean, number, BigNumber, BigNumber, string] & {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumber;
+          isConstant: boolean;
+          port: number;
+          key: BigNumber;
+          solverIndex: BigNumber;
+          data: string;
+        })[];
+        actions: ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumber;
           value: BigNumber;
           data: string;
         })[];
+        canonConditionExecutor: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        };
       })[],
       string[]
     ] & {
@@ -503,28 +869,78 @@ export class SolutionsHub extends BaseContract {
         string,
         BigNumber,
         string,
-        ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-          to: string;
+        ([boolean, boolean, number, BigNumber, BigNumber, string] & {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumber;
+          isConstant: boolean;
+          port: number;
+          key: BigNumber;
+          solverIndex: BigNumber;
+          data: string;
+        })[],
+        ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumber;
           value: BigNumber;
           data: string;
-        })[]
+        })[],
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        }
       ] & {
         factory: string;
         keeper: string;
         arbiter: string;
         timelockSeconds: BigNumber;
         data: string;
-        actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-          to: string;
+        ingests: ([boolean, boolean, number, BigNumber, BigNumber, string] & {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumber;
+          isConstant: boolean;
+          port: number;
+          key: BigNumber;
+          solverIndex: BigNumber;
+          data: string;
+        })[];
+        actions: ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumber;
           value: BigNumber;
           data: string;
         })[];
+        canonConditionExecutor: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        };
       })[];
       solverAddresses: string[];
     }
@@ -544,14 +960,31 @@ export class SolutionsHub extends BaseContract {
       arbiter: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
-      actions: {
-        to: string;
+      ingests: {
         executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
+        isConstant: boolean;
+        port: BigNumberish;
+        key: BigNumberish;
+        solverIndex: BigNumberish;
+        data: BytesLike;
+      }[];
+      actions: {
+        executed: boolean;
+        isPort: boolean;
+        to: string;
+        portIndex: BigNumberish;
         value: BigNumberish;
         data: BytesLike;
       }[];
+      canonConditionExecutor: {
+        outcomeSlots: BigNumberish;
+        parentCollectionIdPort: BigNumberish;
+        amount: BigNumberish;
+        partition: BigNumberish[];
+        recipientAddressPorts: BigNumberish[][];
+        recipientAmounts: BigNumberish[][];
+        metadata: string;
+      };
     }[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -566,6 +999,7 @@ export class SolutionsHub extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
     createSolution(
+      _id: BytesLike,
       _collateralToken: string,
       _solverConfigs: {
         factory: string;
@@ -573,14 +1007,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: CallOverrides
     ): Promise<string>;
@@ -608,28 +1059,78 @@ export class SolutionsHub extends BaseContract {
           string,
           BigNumber,
           string,
-          ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-            to: string;
+          ([boolean, boolean, number, BigNumber, BigNumber, string] & {
             executed: boolean;
-            useSolverIdx: boolean;
-            solverIdx: BigNumber;
+            isConstant: boolean;
+            port: number;
+            key: BigNumber;
+            solverIndex: BigNumber;
+            data: string;
+          })[],
+          ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+            executed: boolean;
+            isPort: boolean;
+            to: string;
+            portIndex: BigNumber;
             value: BigNumber;
             data: string;
-          })[]
+          })[],
+          [
+            BigNumber,
+            BigNumber,
+            BigNumber,
+            BigNumber[],
+            BigNumber[][],
+            BigNumber[][],
+            string
+          ] & {
+            outcomeSlots: BigNumber;
+            parentCollectionIdPort: BigNumber;
+            amount: BigNumber;
+            partition: BigNumber[];
+            recipientAddressPorts: BigNumber[][];
+            recipientAmounts: BigNumber[][];
+            metadata: string;
+          }
         ] & {
           factory: string;
           keeper: string;
           arbiter: string;
           timelockSeconds: BigNumber;
           data: string;
-          actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-            to: string;
+          ingests: ([boolean, boolean, number, BigNumber, BigNumber, string] & {
             executed: boolean;
-            useSolverIdx: boolean;
-            solverIdx: BigNumber;
+            isConstant: boolean;
+            port: number;
+            key: BigNumber;
+            solverIndex: BigNumber;
+            data: string;
+          })[];
+          actions: ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+            executed: boolean;
+            isPort: boolean;
+            to: string;
+            portIndex: BigNumber;
             value: BigNumber;
             data: string;
           })[];
+          canonConditionExecutor: [
+            BigNumber,
+            BigNumber,
+            BigNumber,
+            BigNumber[],
+            BigNumber[][],
+            BigNumber[][],
+            string
+          ] & {
+            outcomeSlots: BigNumber;
+            parentCollectionIdPort: BigNumber;
+            amount: BigNumber;
+            partition: BigNumber[];
+            recipientAddressPorts: BigNumber[][];
+            recipientAmounts: BigNumber[][];
+            metadata: string;
+          };
         })[],
         string[]
       ] & {
@@ -645,28 +1146,78 @@ export class SolutionsHub extends BaseContract {
           string,
           BigNumber,
           string,
-          ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-            to: string;
+          ([boolean, boolean, number, BigNumber, BigNumber, string] & {
             executed: boolean;
-            useSolverIdx: boolean;
-            solverIdx: BigNumber;
+            isConstant: boolean;
+            port: number;
+            key: BigNumber;
+            solverIndex: BigNumber;
+            data: string;
+          })[],
+          ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+            executed: boolean;
+            isPort: boolean;
+            to: string;
+            portIndex: BigNumber;
             value: BigNumber;
             data: string;
-          })[]
+          })[],
+          [
+            BigNumber,
+            BigNumber,
+            BigNumber,
+            BigNumber[],
+            BigNumber[][],
+            BigNumber[][],
+            string
+          ] & {
+            outcomeSlots: BigNumber;
+            parentCollectionIdPort: BigNumber;
+            amount: BigNumber;
+            partition: BigNumber[];
+            recipientAddressPorts: BigNumber[][];
+            recipientAmounts: BigNumber[][];
+            metadata: string;
+          }
         ] & {
           factory: string;
           keeper: string;
           arbiter: string;
           timelockSeconds: BigNumber;
           data: string;
-          actions: ([string, boolean, boolean, BigNumber, BigNumber, string] & {
-            to: string;
+          ingests: ([boolean, boolean, number, BigNumber, BigNumber, string] & {
             executed: boolean;
-            useSolverIdx: boolean;
-            solverIdx: BigNumber;
+            isConstant: boolean;
+            port: number;
+            key: BigNumber;
+            solverIndex: BigNumber;
+            data: string;
+          })[];
+          actions: ([boolean, boolean, string, BigNumber, BigNumber, string] & {
+            executed: boolean;
+            isPort: boolean;
+            to: string;
+            portIndex: BigNumber;
             value: BigNumber;
             data: string;
           })[];
+          canonConditionExecutor: [
+            BigNumber,
+            BigNumber,
+            BigNumber,
+            BigNumber[],
+            BigNumber[][],
+            BigNumber[][],
+            string
+          ] & {
+            outcomeSlots: BigNumber;
+            parentCollectionIdPort: BigNumber;
+            amount: BigNumber;
+            partition: BigNumber[];
+            recipientAddressPorts: BigNumber[][];
+            recipientAmounts: BigNumber[][];
+            metadata: string;
+          };
         })[];
         solverAddresses: string[];
       }
@@ -686,14 +1237,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -713,6 +1281,7 @@ export class SolutionsHub extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     createSolution(
+      _id: BytesLike,
       _collateralToken: string,
       _solverConfigs: {
         factory: string;
@@ -720,14 +1289,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -754,14 +1340,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -777,6 +1380,7 @@ export class SolutionsHub extends BaseContract {
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     createSolution(
+      _id: BytesLike,
       _collateralToken: string,
       _solverConfigs: {
         factory: string;
@@ -784,14 +1388,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -821,14 +1442,31 @@ export class SolutionsHub extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

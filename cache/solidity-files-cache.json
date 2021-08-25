@@ -88,8 +88,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ConditionalTokens.sol": {
-      "lastModificationDate": 1628627261992,
-      "contentHash": "76b74d6020827cecf51859ef5d9be401",
+      "lastModificationDate": 1629884184824,
+      "contentHash": "5c5cc521e7ff56261bf1735c0ec6f167",
       "sourceName": "contracts/ConditionalTokens.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -124,7 +124,8 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
-        "./CTHelpers.sol"
+        "./CTHelpers.sol",
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
@@ -751,8 +752,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1629379759289,
-      "contentHash": "47c1fadf72f041c32d3e3c1c6f622997",
+      "lastModificationDate": 1629536675767,
+      "contentHash": "3e607b4737b57ecebb80e0f22f734ee7",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -788,7 +789,6 @@
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./SolverFactory.sol",
         "./Solver.sol",
-        "./Minion.sol",
         "./ConditionalTokens.sol",
         "./interfaces/ISolver.sol",
         "./ProposalsHub.sol",
@@ -802,8 +802,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1629285780784,
-      "contentHash": "71eb7bd0b07a1a7610013e7612630976",
+      "lastModificationDate": 1629536716290,
+      "contentHash": "4faee96202bb7fa2c9d442e9907ab74d",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -839,7 +839,7 @@
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./ConditionalTokens.sol",
         "./SolverFactory.sol",
-        "./interfaces/ISolutionsHub.sol"
+        "./SolutionsHub.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -893,8 +893,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverFactory.sol": {
-      "lastModificationDate": 1629363381238,
-      "contentHash": "08f5a164730ba7a2e67c74e3f712c900",
+      "lastModificationDate": 1629813766175,
+      "contentHash": "ca4aec609755cc3e97ae45776d288c7d",
       "sourceName": "contracts/SolverFactory.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -930,7 +930,6 @@
         "@openzeppelin/contracts/proxy/Clones.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./ConditionalTokens.sol",
-        "./Minion.sol",
         "./Solver.sol",
         "hardhat/console.sol"
       ],
@@ -942,8 +941,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1629379744958,
-      "contentHash": "0f8cf7441059d06facfe60e022c0d1c8",
+      "lastModificationDate": 1629884684904,
+      "contentHash": "69e33e03b0f113fe07a057e4f4b5caa0",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -979,7 +978,7 @@
         "./ConditionalTokens.sol",
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/proxy/utils/Initializable.sol",
-        "./Minion.sol",
+        "solidity-bytes-utils/contracts/BytesLib.sol",
         "./SolutionsHub.sol",
         "hardhat/console.sol"
       ],
@@ -1073,10 +1072,10 @@
       "versionPragmas": [],
       "artifacts": []
     },
-    "E:\\cryptodev\\cambrian\\contracts\\Minion.sol": {
-      "lastModificationDate": 1628759074507,
-      "contentHash": "85f1d819e6148aa4ad676c9c73ff452d",
-      "sourceName": "contracts/Minion.sol",
+    "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolutionsHub.sol": {
+      "lastModificationDate": 1629790655009,
+      "contentHash": "38c4b518b4d6dd1031eecec29509b0db",
+      "sourceName": "contracts/interfaces/ISolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
         "settings": {
@@ -1112,58 +1111,12 @@
         "0.8.0"
       ],
       "artifacts": [
-        "Minion"
-      ]
-    },
-    "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolutionsHub.sol": {
-      "lastModificationDate": 1629280861439,
-      "contentHash": "92f3ea5bf1dbd6869d4d0370e529ecdd",
-      "sourceName": "contracts/interfaces/ISolutionsHub.sol",
-      "solcConfig": {
-        "version": "0.8.0",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 1000
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "devdoc",
-                "userdoc",
-                "storageLayout",
-                "evm.gasEstimates"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          },
-          "metadata": {
-            "useLiteralContent": true
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "../SolverFactory.sol",
-        "../Minion.sol"
-      ],
-      "versionPragmas": [
-        "0.8.0"
-      ],
-      "artifacts": [
         "ISolutionsHub"
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolver.sol": {
-      "lastModificationDate": 1629255688581,
-      "contentHash": "87ecb97e9136589eaa264d04f0fe5455",
+      "lastModificationDate": 1629819079718,
+      "contentHash": "e8243eb2f38866307180c3b9836b445f",
       "sourceName": "contracts/interfaces/ISolver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1197,8 +1150,7 @@
       },
       "imports": [
         "../ConditionalTokens.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-        "../Minion.sol"
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
       ],
       "versionPragmas": [
         "0.8.0"
@@ -1333,6 +1285,48 @@
       ],
       "artifacts": [
         "Clones"
+      ]
+    },
+    "E:\\cryptodev\\cambrian\\node_modules\\solidity-bytes-utils\\contracts\\BytesLib.sol": {
+      "lastModificationDate": 1629427103877,
+      "contentHash": "9c6b01be648f655631038d79648a7c05",
+      "sourceName": "solidity-bytes-utils/contracts/BytesLib.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 1000
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "devdoc",
+                "userdoc",
+                "storageLayout",
+                "evm.gasEstimates"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          },
+          "metadata": {
+            "useLiteralContent": true
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">=0.8.0 <0.9.0"
+      ],
+      "artifacts": [
+        "BytesLib"
       ]
     }
   }

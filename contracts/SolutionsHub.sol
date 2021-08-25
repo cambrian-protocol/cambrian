@@ -3,14 +3,12 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SolverFactory.sol";
 import "./Solver.sol";
-import "./Minion.sol";
 import "./ConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
 import "./ProposalsHub.sol";
 import "hardhat/console.sol";
 
 contract SolutionsHub {
-    uint256 nonce;
     ConditionalTokens public conditionalTokens;
 
     struct Solution {
@@ -79,16 +77,7 @@ contract SolutionsHub {
                 _proposalsHub: solutions[_solutionId].proposalHub,
                 _solutionsHub: address(this),
                 _solverConfig: solutions[_solutionId].solverConfigs[i]
-                // _keeper: solutions[_solutionId].solverConfigs[i].keeper
-                // _arbiter: solutions[_solutionId].solverConfigs[i].arbiter,
-                // _timelockHours: solutions[_solutionId]
-                //     .solverConfigs[i]
-                //     .timelockHours,
-                // _actions: solutions[_solutionId].solverConfigs[i].actions,
-                // _data: solutions[_solutionId].solverConfigs[i].data
             });
-
-            console.logAddress(_solver);
 
             require(_solver != address(0), "Invalid address");
 
@@ -119,11 +108,15 @@ contract SolutionsHub {
     }
 
     function createSolution(
+        bytes32 _id,
         IERC20 _collateralToken,
         Solver.Config[] calldata _solverConfigs
     ) external returns (bytes32 _solutionId) {
-        nonce++;
-        bytes32 _id = keccak256(abi.encodePacked(msg.sender, nonce));
+        require(
+            solutions[_id].id != _id,
+            "SolutionsHub::This ID already exists"
+        );
+
         Solution storage solution = solutions[_id];
 
         solution.id = _id;

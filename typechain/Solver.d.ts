@@ -28,9 +28,11 @@ interface SolverInterface extends ethers.utils.Interface {
     "conditionalTokens()": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
-    "executeCanonCondition(uint256,bytes32,uint256,uint256[],address[][],uint256[][],string)": FunctionFragment;
+    "executeCanonCondition()": FunctionFragment;
     "executeSolve()": FunctionFragment;
     "executed()": FunctionFragment;
+    "getAddress()": FunctionFragment;
+    "getCanonCollectionId(uint256)": FunctionFragment;
     "getPayouts()": FunctionFragment;
     "init(address,bytes32,address,address,tuple)": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
@@ -72,21 +74,21 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeCanonCondition",
-    values: [
-      BigNumberish,
-      BytesLike,
-      BigNumberish,
-      BigNumberish[],
-      string[][],
-      BigNumberish[][],
-      string
-    ]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "executeSolve",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "executed", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getAddress",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCanonCollectionId",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "getPayouts",
     values?: undefined
@@ -104,14 +106,31 @@ interface SolverInterface extends ethers.utils.Interface {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       }
     ]
   ): string;
@@ -181,6 +200,11 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "executed", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getAddress", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getCanonCollectionId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "getPayouts", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
   decodeFunctionResult(
@@ -290,12 +314,52 @@ export class Solver extends BaseContract {
     config(
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, string] & {
+      [
+        string,
+        string,
+        string,
+        BigNumber,
+        string,
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        }
+      ] & {
         factory: string;
         keeper: string;
         arbiter: string;
         timelockSeconds: BigNumber;
         data: string;
+        canonConditionExecutor: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        };
       }
     >;
 
@@ -304,13 +368,6 @@ export class Solver extends BaseContract {
     ): Promise<ContractTransaction>;
 
     executeCanonCondition(
-      _outcomeSlots: BigNumberish,
-      _parentCollectionId: BytesLike,
-      _amount: BigNumberish,
-      _partition: BigNumberish[],
-      _initialRecipientAddresses: string[][],
-      _initialRecipientAmounts: BigNumberish[][],
-      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -319,6 +376,15 @@ export class Solver extends BaseContract {
     ): Promise<ContractTransaction>;
 
     executed(overrides?: CallOverrides): Promise<[boolean]>;
+
+    getAddress(
+      overrides?: CallOverrides
+    ): Promise<[string] & { _address: string }>;
+
+    getCanonCollectionId(
+      _partitionIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string] & { _id: string }>;
 
     getPayouts(overrides?: CallOverrides): Promise<[BigNumber[]]>;
 
@@ -333,14 +399,31 @@ export class Solver extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -413,12 +496,52 @@ export class Solver extends BaseContract {
   config(
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, BigNumber, string] & {
+    [
+      string,
+      string,
+      string,
+      BigNumber,
+      string,
+      [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber[],
+        BigNumber[][],
+        BigNumber[][],
+        string
+      ] & {
+        outcomeSlots: BigNumber;
+        parentCollectionIdPort: BigNumber;
+        amount: BigNumber;
+        partition: BigNumber[];
+        recipientAddressPorts: BigNumber[][];
+        recipientAmounts: BigNumber[][];
+        metadata: string;
+      }
+    ] & {
       factory: string;
       keeper: string;
       arbiter: string;
       timelockSeconds: BigNumber;
       data: string;
+      canonConditionExecutor: [
+        BigNumber,
+        BigNumber,
+        BigNumber,
+        BigNumber[],
+        BigNumber[][],
+        BigNumber[][],
+        string
+      ] & {
+        outcomeSlots: BigNumber;
+        parentCollectionIdPort: BigNumber;
+        amount: BigNumber;
+        partition: BigNumber[];
+        recipientAddressPorts: BigNumber[][];
+        recipientAmounts: BigNumber[][];
+        metadata: string;
+      };
     }
   >;
 
@@ -427,13 +550,6 @@ export class Solver extends BaseContract {
   ): Promise<ContractTransaction>;
 
   executeCanonCondition(
-    _outcomeSlots: BigNumberish,
-    _parentCollectionId: BytesLike,
-    _amount: BigNumberish,
-    _partition: BigNumberish[],
-    _initialRecipientAddresses: string[][],
-    _initialRecipientAmounts: BigNumberish[][],
-    _metadata: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -442,6 +558,13 @@ export class Solver extends BaseContract {
   ): Promise<ContractTransaction>;
 
   executed(overrides?: CallOverrides): Promise<boolean>;
+
+  getAddress(overrides?: CallOverrides): Promise<string>;
+
+  getCanonCollectionId(
+    _partitionIndex: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
@@ -456,14 +579,31 @@ export class Solver extends BaseContract {
       arbiter: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
-      actions: {
-        to: string;
+      ingests: {
         executed: boolean;
-        useSolverIdx: boolean;
-        solverIdx: BigNumberish;
+        isConstant: boolean;
+        port: BigNumberish;
+        key: BigNumberish;
+        solverIndex: BigNumberish;
+        data: BytesLike;
+      }[];
+      actions: {
+        executed: boolean;
+        isPort: boolean;
+        to: string;
+        portIndex: BigNumberish;
         value: BigNumberish;
         data: BytesLike;
       }[];
+      canonConditionExecutor: {
+        outcomeSlots: BigNumberish;
+        parentCollectionIdPort: BigNumberish;
+        amount: BigNumberish;
+        partition: BigNumberish[];
+        recipientAddressPorts: BigNumberish[][];
+        recipientAmounts: BigNumberish[][];
+        metadata: string;
+      };
     },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -536,31 +676,69 @@ export class Solver extends BaseContract {
     config(
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, BigNumber, string] & {
+      [
+        string,
+        string,
+        string,
+        BigNumber,
+        string,
+        [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        }
+      ] & {
         factory: string;
         keeper: string;
         arbiter: string;
         timelockSeconds: BigNumber;
         data: string;
+        canonConditionExecutor: [
+          BigNumber,
+          BigNumber,
+          BigNumber,
+          BigNumber[],
+          BigNumber[][],
+          BigNumber[][],
+          string
+        ] & {
+          outcomeSlots: BigNumber;
+          parentCollectionIdPort: BigNumber;
+          amount: BigNumber;
+          partition: BigNumber[];
+          recipientAddressPorts: BigNumber[][];
+          recipientAmounts: BigNumber[][];
+          metadata: string;
+        };
       }
     >;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
 
-    executeCanonCondition(
-      _outcomeSlots: BigNumberish,
-      _parentCollectionId: BytesLike,
-      _amount: BigNumberish,
-      _partition: BigNumberish[],
-      _initialRecipientAddresses: string[][],
-      _initialRecipientAmounts: BigNumberish[][],
-      _metadata: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    executeCanonCondition(overrides?: CallOverrides): Promise<void>;
 
     executeSolve(overrides?: CallOverrides): Promise<void>;
 
     executed(overrides?: CallOverrides): Promise<boolean>;
+
+    getAddress(overrides?: CallOverrides): Promise<string>;
+
+    getCanonCollectionId(
+      _partitionIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
@@ -575,14 +753,31 @@ export class Solver extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       },
       overrides?: CallOverrides
     ): Promise<void>;
@@ -648,13 +843,6 @@ export class Solver extends BaseContract {
     ): Promise<BigNumber>;
 
     executeCanonCondition(
-      _outcomeSlots: BigNumberish,
-      _parentCollectionId: BytesLike,
-      _amount: BigNumberish,
-      _partition: BigNumberish[],
-      _initialRecipientAddresses: string[][],
-      _initialRecipientAmounts: BigNumberish[][],
-      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -663,6 +851,13 @@ export class Solver extends BaseContract {
     ): Promise<BigNumber>;
 
     executed(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getCanonCollectionId(
+      _partitionIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getPayouts(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -677,14 +872,31 @@ export class Solver extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -752,13 +964,6 @@ export class Solver extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     executeCanonCondition(
-      _outcomeSlots: BigNumberish,
-      _parentCollectionId: BytesLike,
-      _amount: BigNumberish,
-      _partition: BigNumberish[],
-      _initialRecipientAddresses: string[][],
-      _initialRecipientAmounts: BigNumberish[][],
-      _metadata: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -767,6 +972,13 @@ export class Solver extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     executed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getCanonCollectionId(
+      _partitionIndex: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     getPayouts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -781,14 +993,31 @@ export class Solver extends BaseContract {
         arbiter: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
-        actions: {
-          to: string;
+        ingests: {
           executed: boolean;
-          useSolverIdx: boolean;
-          solverIdx: BigNumberish;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
           value: BigNumberish;
           data: BytesLike;
         }[];
+        canonConditionExecutor: {
+          outcomeSlots: BigNumberish;
+          parentCollectionIdPort: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

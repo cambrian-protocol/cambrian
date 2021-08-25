@@ -5,18 +5,27 @@ pragma solidity 0.8.0;
 import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "./Minion.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./SolutionsHub.sol";
 import "hardhat/console.sol";
 
 contract Solver is Initializable {
-    struct Config {
-        SolverFactory factory;
-        address keeper; // Keeper address
-        address arbiter; // Arbiter address
-        uint256 timelockSeconds;
+    struct Action {
+        bool executed;
+        bool isPort;
+        address to;
+        uint256 portIndex;
+        uint256 value;
         bytes data;
-        Minion.Action[] actions;
+    }
+
+    struct Ingest {
+        bool executed;
+        bool isConstant;
+        uint8 port;
+        uint256 key;
+        uint256 solverIndex;
+        bytes data;
     }
 
     struct Condition {
@@ -28,6 +37,27 @@ contract Solver is Initializable {
         bytes32 conditionId; // ID of this condition in the conditional tokens framework
         uint256 amount; // Amount of the token being handled
         uint256[] partition; // Partition of positions for payouts
+    }
+
+    struct ConditionExecutor {
+        uint256 outcomeSlots; // num outcomeslots
+        uint256 parentCollectionIdPort; // bytes32Port containing parentCollectionId
+        uint256 amount; // amount of collateral being used
+        uint256[] partition; // Partition of positions for payouts
+        uint256[][] recipientAddressPorts; // addressPorts containg recipients
+        uint256[][] recipientAmounts; // amounts for each recipient for each partition
+        string metadata; // condition metadata
+    }
+
+    struct Config {
+        SolverFactory factory;
+        address keeper; // Keeper address
+        address arbiter; // Arbiter address
+        uint256 timelockSeconds;
+        bytes data;
+        Ingest[] ingests;
+        Action[] actions;
+        ConditionExecutor canonConditionExecutor;
     }
 
     Config public config; // Primary config of the Solver
@@ -44,6 +74,13 @@ contract Solver is Initializable {
     address public solutionsHub; // The solutionsHub address managing this Solver;
     uint256 public timelock; // Current timelock
     uint256[] payouts; // currently proposed/reported payouts
+
+    mapping(uint256 => address) addressPort;
+    mapping(uint256 => bool) boolPort;
+    mapping(uint256 => bytes) bytesPort;
+    mapping(uint256 => bytes32) bytes32Port;
+    mapping(uint256 => uint256) uint256Port;
+    mapping(uint256 => mapping(uint256 => bool)) mappedPorts; // maintains mapped ports
 
     modifier onlySolution() {
         require(
@@ -101,6 +138,56 @@ contract Solver is Initializable {
         _;
     }
 
+    function inputRouter(
+        uint8 _port,
+        uint256 _key,
+        bytes memory _data
+    ) internal {
+        require(!mappedPorts[_port][_key], "Solver::Port already mapped");
+        mappedPorts[_port][_key] = true;
+
+        if (_port == 0) {
+            addressPort[_key] = BytesLib.toAddress(_data, 0);
+        } else if (_port == 1) {
+            boolPort[_key] = BytesLib.toUint8(_data, 0) > 0 ? true : false;
+        } else if (_port == 2) {
+            bytesPort[_key] = _data;
+        } else if (_port == 3) {
+            console.log("Ingest Bytes32 Data");
+            console.logBytes(_data);
+            bytes32Port[_key] = BytesLib.toBytes32(_data, 0);
+        } else if (_port == 4) {
+            uint256Port[_key] = BytesLib.toUint256(_data, 0);
+        }
+    }
+
+    function executeIngests() internal {
+        for (uint256 i; i < config.ingests.length; i++) {
+            ingest(config.ingests[i]);
+        }
+    }
+
+    function ingest(Ingest storage _ingest) internal {
+        require(!_ingest.executed, "Solver::Ingest already executed");
+        _ingest.executed = true;
+
+        if (_ingest.isConstant) {
+            inputRouter(_ingest.port, _ingest.key, _ingest.data);
+        } else {
+            address _solver = SolutionsHub(solutionsHub).solverFromIndex(
+                solutionId,
+                _ingest.solverIndex
+            );
+
+            (bool success, bytes memory retData) = _solver.staticcall(
+                _ingest.data
+            );
+
+            require(success, "Solver::Ingest staticcall failed");
+            inputRouter(_ingest.port, _ingest.key, retData);
+        }
+    }
+
     function init(
         IERC20 _collateralToken,
         bytes32 _solutionId,
@@ -112,7 +199,6 @@ contract Solver is Initializable {
             _solverConfig.keeper != address(0),
             "Solver: Keeper address invalid"
         );
-
         config = _solverConfig;
 
         conditionalTokens = SolutionsHub(_solutionsHub).conditionalTokens();
@@ -122,14 +208,93 @@ contract Solver is Initializable {
         solutionsHub = _solutionsHub;
     }
 
+    function executeCanonCondition() external isActive onlyThis {
+        require(
+            executeCanonConditionDone == false,
+            "Solver:: This has already run"
+        );
+        executeCanonConditionDone = true;
+        console.log("Executing canon condition");
+
+        // questionId is hash of descriptive metadata and this solver address
+        canonCondition.questionId = keccak256(
+            abi.encodePacked(
+                config.canonConditionExecutor.metadata,
+                address(this)
+            )
+        );
+
+        canonCondition.outcomeSlots = config
+            .canonConditionExecutor
+            .outcomeSlots;
+        canonCondition.parentCollectionId = bytes32Port[
+            config.canonConditionExecutor.parentCollectionIdPort
+        ];
+        canonCondition.amount = config.canonConditionExecutor.amount;
+        canonCondition.partition = config.canonConditionExecutor.partition;
+        canonCondition.oracle = address(this);
+        canonCondition.conditionId = conditionalTokens.getConditionId(
+            address(this), // Solver is Oracle
+            canonCondition.questionId,
+            config.canonConditionExecutor.outcomeSlots
+        );
+
+        // prepareCondition
+        conditionalTokens.prepareCondition(
+            address(this),
+            canonCondition.questionId,
+            canonCondition.outcomeSlots
+        );
+
+        // if shallow position
+        if (
+            bytes32Port[config.canonConditionExecutor.parentCollectionIdPort] ==
+            bytes32("")
+        ) {
+            IERC20 _token = IERC20(collateralToken);
+            // pull collateral in
+            _token.transferFrom(
+                proposalsHub,
+                address(this),
+                config.canonConditionExecutor.amount
+            );
+            // approve erc20 transfer to conditional tokens contract
+            _token.approve(address(conditionalTokens), 0);
+            _token.approve(
+                address(conditionalTokens),
+                config.canonConditionExecutor.amount
+            );
+        }
+
+        // splitPosition
+        conditionalTokens.splitPosition(
+            collateralToken,
+            bytes32Port[config.canonConditionExecutor.parentCollectionIdPort],
+            canonCondition.conditionId,
+            config.canonConditionExecutor.partition,
+            config.canonConditionExecutor.amount
+        );
+
+        allocatePartition(
+            collateralToken,
+            canonCondition.conditionId,
+            bytes32Port[config.canonConditionExecutor.parentCollectionIdPort],
+            config.canonConditionExecutor.partition,
+            config.canonConditionExecutor.recipientAddressPorts,
+            config.canonConditionExecutor.recipientAmounts
+        );
+    }
+
     function allocatePartition(
         IERC20 _collateralToken,
         bytes32 _conditionId,
         bytes32 _parentCollectionId,
-        uint256[] calldata _partition,
-        address[][] calldata _initialRecipientAddresses,
-        uint256[][] calldata _initialRecipientAmounts
+        uint256[] storage _partition,
+        uint256[][] storage _initialRecipientAddressPorts,
+        uint256[][] storage _initialRecipientAmounts
     ) internal isActive {
+        console.log("allocatePartition");
+
         for (uint256 i; i < _partition.length; i++) {
             bytes32 _collectionId = conditionalTokens.getCollectionId(
                 _parentCollectionId,
@@ -142,10 +307,10 @@ contract Solver is Initializable {
                 _collectionId
             );
 
-            for (uint256 j; j < _initialRecipientAddresses.length; j++) {
+            for (uint256 j; j < _initialRecipientAddressPorts.length; j++) {
                 conditionalTokens.safeTransferFrom(
                     address(this),
-                    _initialRecipientAddresses[i][j],
+                    addressPort[_initialRecipientAddressPorts[i][j]],
                     _positionId,
                     _initialRecipientAmounts[i][j],
                     ""
@@ -154,75 +319,10 @@ contract Solver is Initializable {
         }
     }
 
-    function executeCanonCondition(
-        uint256 _outcomeSlots,
-        bytes32 _parentCollectionId,
-        uint256 _amount,
-        uint256[] calldata _partition,
-        address[][] calldata _initialRecipientAddresses,
-        uint256[][] calldata _initialRecipientAmounts,
-        string calldata _metadata
-    ) external isActive onlyThis {
-        require(
-            executeCanonConditionDone == false,
-            "Solver:: This has already run"
-        );
-        executeCanonConditionDone = true;
-
-        // questionId is hash of descriptive metadata and this solver address
-        canonCondition.questionId = keccak256(
-            abi.encodePacked(_metadata, address(this))
-        );
-
-        canonCondition.outcomeSlots = _outcomeSlots;
-        canonCondition.parentCollectionId = _parentCollectionId;
-        canonCondition.amount = _amount;
-        canonCondition.partition = _partition;
-        canonCondition.oracle = address(this);
-        canonCondition.conditionId = conditionalTokens.getConditionId(
-            address(this), // Solver is Oracle
-            canonCondition.questionId,
-            _outcomeSlots
-        );
-
-        // prepareCondition
-        conditionalTokens.prepareCondition(
-            address(this),
-            canonCondition.questionId,
-            canonCondition.outcomeSlots
-        );
-
-        // if shallow position
-        if (_parentCollectionId == bytes32(0)) {
-            IERC20 _token = IERC20(collateralToken);
-            // pull collateral in
-            _token.transferFrom(proposalsHub, address(this), _amount);
-            // approve erc20 transfer to conditional tokens contract
-            _token.approve(address(conditionalTokens), _amount);
-        }
-
-        // splitPosition
-        conditionalTokens.splitPosition(
-            collateralToken,
-            _parentCollectionId,
-            canonCondition.conditionId,
-            _partition,
-            _amount
-        );
-
-        allocatePartition(
-            collateralToken,
-            canonCondition.conditionId,
-            _parentCollectionId,
-            _partition,
-            _initialRecipientAddresses,
-            _initialRecipientAmounts
-        );
-    }
-
     function executeSolve() external onlySolution {
         executed = true;
-        executeActions();
+        executeIngests();
+        unsafeExecuteActions();
     }
 
     function updateTimelock() internal isActive {
@@ -265,16 +365,15 @@ contract Solver is Initializable {
         updateTimelock();
     }
 
-    function executeActions() private {
+    function unsafeExecuteActions() private {
         for (uint256 i; i < config.actions.length; i++) {
-            executeAction(i);
+            unsafeExecuteAction(i);
         }
     }
 
-    function executeAction(uint256 _actionIndex)
+    function unsafeExecuteAction(uint256 _actionIndex)
         private
         isWhitelisted(config.actions[_actionIndex].to)
-        returns (bytes memory)
     {
         require(
             !config.actions[_actionIndex].executed,
@@ -285,28 +384,43 @@ contract Solver is Initializable {
             "Solver::insufficient eth"
         );
 
-        Minion.Action memory action = config.actions[_actionIndex];
-
-        if (action.useSolverIdx) {
-            action.to = SolutionsHub(solutionsHub).solverFromIndex(
-                solutionId,
-                action.solverIdx
-            );
-        }
-
         // execute call
         config.actions[_actionIndex].executed = true;
 
-        (bool success, bytes memory retData) = action.to.call{
-            value: action.value
-        }(action.data);
+        Action memory _action = config.actions[_actionIndex];
 
+        if (_action.isPort) {
+            _action.to = addressPort[_action.portIndex];
+        }
+
+        (bool success, bytes memory retData) = _action.to.call{
+            value: _action.value
+        }(_action.data);
+
+        console.logBool(success);
+        console.logBytes(retData);
         require(success, "Solver::call failure");
-        return retData;
     }
 
     function getPayouts() public view returns (uint256[] memory) {
         return payouts;
+    }
+
+    function getCanonCollectionId(uint256 _partitionIndex)
+        external
+        view
+        returns (bytes32 _id)
+    {
+        bytes32 _collectionId = conditionalTokens.getCollectionId(
+            canonCondition.parentCollectionId,
+            canonCondition.conditionId,
+            canonCondition.partition[_partitionIndex]
+        );
+        return _collectionId;
+    }
+
+    function getAddress() external view returns (bytes20 _address) {
+        return bytes20(address(this));
     }
 
     function onERC1155Received(
