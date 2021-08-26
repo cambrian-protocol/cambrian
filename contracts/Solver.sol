@@ -206,6 +206,12 @@ contract Solver is Initializable {
         solutionId = _solutionId;
         proposalsHub = _proposalsHub;
         solutionsHub = _solutionsHub;
+        defaultIngest();
+    }
+
+    function defaultIngest() internal {
+        mappedPorts[0][0] = true;
+        addressPort[0] = address(this);
     }
 
     function executeCanonCondition() external isActive onlyThis {

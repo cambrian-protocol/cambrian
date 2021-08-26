@@ -49,14 +49,6 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executed: false,
-        isConstant: false,
-        port: 0,
-        key: 0,
-        solverIndex: 0,
-        data: this.ISolver.encodeFunctionData("getAddress",[])
-      },
-      {
-        executed: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -104,14 +96,6 @@ describe("It should all work", function () {
   
     // Second Solver
     const ingests1 = [
-      {
-        executed: false,
-        isConstant: false,
-        port: 0,
-        key: 0,
-        solverIndex: 1,
-        data: this.ISolver.encodeFunctionData("getAddress",[])
-      },
       {
         executed: false,
         isConstant: true,
