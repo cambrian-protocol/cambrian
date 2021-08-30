@@ -58,7 +58,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -168,7 +168,7 @@ export class SolverFactory extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -214,7 +214,7 @@ export class SolverFactory extends BaseContract {
       }[];
       conditionBase: {
         outcomeSlots: BigNumberish;
-        parentCollectionIdPort: BigNumberish;
+        parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressPorts: BigNumberish[][];
@@ -260,7 +260,7 @@ export class SolverFactory extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -313,7 +313,7 @@ export class SolverFactory extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -360,7 +360,7 @@ export class SolverFactory extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];

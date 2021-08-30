@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverInterface extends ethers.utils.Interface {
   functions: {
+    "addData(uint8,uint256,bytes)": FunctionFragment;
     "addressPort(uint256)": FunctionFragment;
     "allocatePartition()": FunctionFragment;
     "arbitrate(uint256[])": FunctionFragment;
@@ -33,7 +34,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "conditions(uint256)": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
-    "deferredIngest(uint256)": FunctionFragment;
     "deferredIngestsValid()": FunctionFragment;
     "executeSolve()": FunctionFragment;
     "executed()": FunctionFragment;
@@ -41,6 +41,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "getOutput(uint256,uint256)": FunctionFragment;
     "getPayouts()": FunctionFragment;
     "handleShallowPosition()": FunctionFragment;
+    "ingest(uint256)": FunctionFragment;
     "init(address,bytes32,address,address,tuple)": FunctionFragment;
     "lockedPorts(uint256,uint256)": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
@@ -63,6 +64,10 @@ interface SolverInterface extends ethers.utils.Interface {
     "uint256Port(uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addData",
+    values: [BigNumberish, BigNumberish, BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "addressPort",
     values: [BigNumberish]
@@ -109,10 +114,6 @@ interface SolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "deferredIngest",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "deferredIngestsValid",
     values?: undefined
   ): string;
@@ -136,6 +137,10 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "handleShallowPosition",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "ingest",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "init",
@@ -169,7 +174,7 @@ interface SolverInterface extends ethers.utils.Interface {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -250,6 +255,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
+  decodeFunctionResult(functionFragment: "addData", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addressPort",
     data: BytesLike
@@ -284,10 +290,6 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "deferredIngest",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "deferredIngestsValid",
     data: BytesLike
   ): Result;
@@ -306,6 +308,7 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "handleShallowPosition",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "ingest", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "init", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lockedPorts",
@@ -422,6 +425,13 @@ export class Solver extends BaseContract {
   interface: SolverInterface;
 
   functions: {
+    addData(
+      _port: BigNumberish,
+      _key: BigNumberish,
+      _data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     addressPort(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -482,7 +492,7 @@ export class Solver extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -505,7 +515,7 @@ export class Solver extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -516,11 +526,6 @@ export class Solver extends BaseContract {
     >;
 
     confirmPayouts(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    deferredIngest(
-      i: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -546,6 +551,11 @@ export class Solver extends BaseContract {
     getPayouts(overrides?: CallOverrides): Promise<[BigNumber[]]>;
 
     handleShallowPosition(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    ingest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -579,7 +589,7 @@ export class Solver extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -672,6 +682,13 @@ export class Solver extends BaseContract {
     ): Promise<[BigNumber]>;
   };
 
+  addData(
+    _port: BigNumberish,
+    _key: BigNumberish,
+    _data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   addressPort(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   allocatePartition(
@@ -726,7 +743,7 @@ export class Solver extends BaseContract {
         string
       ] & {
         outcomeSlots: BigNumber;
-        parentCollectionIdPort: BigNumber;
+        parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
         recipientAddressPorts: BigNumber[][];
@@ -749,7 +766,7 @@ export class Solver extends BaseContract {
         string
       ] & {
         outcomeSlots: BigNumber;
-        parentCollectionIdPort: BigNumber;
+        parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
         recipientAddressPorts: BigNumber[][];
@@ -760,11 +777,6 @@ export class Solver extends BaseContract {
   >;
 
   confirmPayouts(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  deferredIngest(
-    i: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -790,6 +802,11 @@ export class Solver extends BaseContract {
   getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
   handleShallowPosition(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  ingest(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -823,7 +840,7 @@ export class Solver extends BaseContract {
       }[];
       conditionBase: {
         outcomeSlots: BigNumberish;
-        parentCollectionIdPort: BigNumberish;
+        parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressPorts: BigNumberish[][];
@@ -916,6 +933,13 @@ export class Solver extends BaseContract {
   ): Promise<BigNumber>;
 
   callStatic: {
+    addData(
+      _port: BigNumberish,
+      _key: BigNumberish,
+      _data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     addressPort(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     allocatePartition(overrides?: CallOverrides): Promise<void>;
@@ -968,7 +992,7 @@ export class Solver extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -991,7 +1015,7 @@ export class Solver extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -1002,8 +1026,6 @@ export class Solver extends BaseContract {
     >;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
-
-    deferredIngest(i: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     deferredIngestsValid(overrides?: CallOverrides): Promise<boolean>;
 
@@ -1025,6 +1047,8 @@ export class Solver extends BaseContract {
     getPayouts(overrides?: CallOverrides): Promise<BigNumber[]>;
 
     handleShallowPosition(overrides?: CallOverrides): Promise<void>;
+
+    ingest(_index: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     init(
       _collateralToken: string,
@@ -1056,7 +1080,7 @@ export class Solver extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1144,6 +1168,13 @@ export class Solver extends BaseContract {
   filters: {};
 
   estimateGas: {
+    addData(
+      _port: BigNumberish,
+      _key: BigNumberish,
+      _data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     addressPort(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1187,11 +1218,6 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    deferredIngest(
-      i: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     deferredIngestsValid(overrides?: CallOverrides): Promise<BigNumber>;
 
     executeSolve(
@@ -1214,6 +1240,11 @@ export class Solver extends BaseContract {
     getPayouts(overrides?: CallOverrides): Promise<BigNumber>;
 
     handleShallowPosition(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    ingest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1247,7 +1278,7 @@ export class Solver extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1341,6 +1372,13 @@ export class Solver extends BaseContract {
   };
 
   populateTransaction: {
+    addData(
+      _port: BigNumberish,
+      _key: BigNumberish,
+      _data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     addressPort(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1389,11 +1427,6 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    deferredIngest(
-      i: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     deferredIngestsValid(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1418,6 +1451,11 @@ export class Solver extends BaseContract {
     getPayouts(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     handleShallowPosition(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    ingest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1451,7 +1489,7 @@ export class Solver extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];

@@ -108,7 +108,7 @@ contract SolutionsHub {
         return solutions[_solutionId].solverAddresses[_index];
     }
 
-    function nextSolver(bytes32 _solutionId)
+    function childSolver(bytes32 _solutionId)
         external
         view
         returns (address solver)
@@ -120,6 +120,28 @@ contract SolutionsHub {
         ) {
             if (msg.sender == solutions[_solutionId].solverAddresses[i]) {
                 return solutions[_solutionId].solverAddresses[i + 1];
+            }
+        }
+
+        return address(0);
+    }
+
+    function parentSolver(bytes32 _solutionId)
+        external
+        view
+        returns (address solver)
+    {
+        for (
+            uint256 i;
+            i < solutions[_solutionId].solverAddresses.length;
+            i++
+        ) {
+            if (msg.sender == solutions[_solutionId].solverAddresses[i]) {
+                if (i == 0) {
+                    return address(0);
+                } else {
+                    return solutions[_solutionId].solverAddresses[i - 1];
+                }
             }
         }
 

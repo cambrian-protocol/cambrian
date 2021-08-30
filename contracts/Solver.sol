@@ -39,7 +39,7 @@ contract Solver is Initializable {
 
     struct ConditionBase {
         uint256 outcomeSlots; // num outcomeslots
-        uint256 parentCollectionIdPort; // bytes32Port containing parentCollectionId
+        uint256 parentCollectionPartitionIndex; // Partition to get parentCollectionId from parent Solver
         uint256 amount; // amount of collateral being used
         uint256[] partition; // Partition of positions for payouts
         uint256[][] recipientAddressPorts; // addressPorts containg recipients
@@ -176,7 +176,7 @@ contract Solver is Initializable {
     ) internal {
         require(!lockedPorts[_port][_key], "Solver::Dynamic port locked");
         require(
-            portVersions[_port][_key] == conditions.length,
+            portVersions[_port][_key] == (conditions.length - 1),
             "Solver::Port version does not match condition version"
         );
         portVersions[_port][_key]++;
@@ -201,6 +201,14 @@ contract Solver is Initializable {
         }
     }
 
+    function addData(
+        uint8 _port,
+        uint256 _key,
+        bytes memory _data
+    ) external onlyKeeper {
+        dynamicRouter(_port, _key, _data);
+    }
+
     function executeIngests() internal {
         console.log("Executing ingests");
         for (uint256 i; i < config.ingests.length; i++) {
@@ -210,7 +218,7 @@ contract Solver is Initializable {
         }
     }
 
-    function ingest(uint256 _index) internal {
+    function ingest(uint256 _index) public {
         config.ingests[_index].executions++;
 
         console.logAddress(address(this));
@@ -274,14 +282,6 @@ contract Solver is Initializable {
         return _bool;
     }
 
-    function deferredIngest(uint256 i) external onlyKeeper {
-        bytes memory _retData = staticcallSolver(
-            config.ingests[i].solverIndex,
-            config.ingests[i].data
-        );
-        dynamicRouter(config.ingests[i].port, config.ingests[i].key, _retData);
-    }
-
     function defaultIngest() internal {
         lockedPorts[0][0] = true;
         addressPort[0] = address(this);
@@ -300,9 +300,18 @@ contract Solver is Initializable {
             )
         );
 
-        _condition.parentCollectionId = bytes32Port[
-            config.conditionBase.parentCollectionIdPort
-        ];
+        address _parentSolver = SolutionsHub(solutionsHub).parentSolver(
+            solutionId
+        );
+        if (_parentSolver == address(0)) {
+            _condition.parentCollectionId = bytes32(""); // top level collection
+        } else {
+            _condition.parentCollectionId = Solver(_parentSolver)
+                .getCanonCollectionId(
+                    config.conditionBase.parentCollectionPartitionIndex
+                );
+        }
+
         _condition.conditionId = conditionalTokens.getConditionId(
             address(this), // Solver is Oracle
             _condition.questionId,
@@ -347,7 +356,7 @@ contract Solver is Initializable {
         console.log("Split position");
         conditionalTokens.splitPosition(
             collateralToken,
-            bytes32Port[config.conditionBase.parentCollectionIdPort],
+            conditions[conditions.length - 1].parentCollectionId,
             conditions[conditions.length - 1].conditionId,
             config.conditionBase.partition,
             config.conditionBase.amount
@@ -359,10 +368,10 @@ contract Solver is Initializable {
 
         for (uint256 i; i < config.conditionBase.partition.length; i++) {
             console.logBytes32(
-                bytes32Port[config.conditionBase.parentCollectionIdPort]
+                conditions[conditions.length - 1].parentCollectionId
             );
             bytes32 _collectionId = conditionalTokens.getCollectionId(
-                bytes32Port[config.conditionBase.parentCollectionIdPort],
+                conditions[conditions.length - 1].parentCollectionId,
                 conditions[conditions.length - 1].conditionId,
                 config.conditionBase.partition[i]
             );
@@ -393,30 +402,30 @@ contract Solver is Initializable {
     function prepareSolve() public {
         console.log("Preparing solve");
         executed = true;
-
-        executeIngests();
         addCondition();
+        executeIngests();
     }
 
     function executeSolve() public {
         console.log("Executing solve");
-        if (deferredIngestsValid()) {
-            console.log("deferred ingests valid");
-
-            console.log("Executing condition");
-
-            handleShallowPosition();
-            splitPosition();
-            allocatePartition();
-            executeActions();
-            cascade();
-        }
+        require(deferredIngestsValid(), "Solver::Deferred ingests invalid");
+        console.log("deferred ingests valid");
+        handleShallowPosition();
+        splitPosition();
+        allocatePartition();
+        executeActions();
+        cascade();
     }
 
     function cascade() internal {
-        address _nextSolver = SolutionsHub(solutionsHub).nextSolver(solutionId);
-        if (_nextSolver != address(0)) {
-            Solver(_nextSolver).executeSolve();
+        address _childSolver = SolutionsHub(solutionsHub).childSolver(
+            solutionId
+        );
+        if (
+            _childSolver != address(0) &&
+            Solver(_childSolver).deferredIngestsValid()
+        ) {
+            Solver(_childSolver).executeSolve();
         }
     }
 

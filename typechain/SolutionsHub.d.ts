@@ -21,16 +21,21 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolutionsHubInterface extends ethers.utils.Interface {
   functions: {
+    "childSolver(bytes32)": FunctionFragment;
     "conditionalTokens()": FunctionFragment;
     "createSolution(bytes32,address,tuple[])": FunctionFragment;
     "executeSolution(bytes32,bytes32)": FunctionFragment;
     "getSolution(bytes32)": FunctionFragment;
     "linkToProposal(bytes32,bytes32)": FunctionFragment;
-    "nextSolver(bytes32)": FunctionFragment;
+    "parentSolver(bytes32)": FunctionFragment;
     "setSolverConfigs(bytes32,tuple[])": FunctionFragment;
     "solverFromIndex(bytes32,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "childSolver",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "conditionalTokens",
     values?: undefined
@@ -65,7 +70,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -88,7 +93,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     values: [BytesLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "nextSolver",
+    functionFragment: "parentSolver",
     values: [BytesLike]
   ): string;
   encodeFunctionData(
@@ -120,7 +125,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -135,6 +140,10 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     values: [BytesLike, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "childSolver",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "conditionalTokens",
     data: BytesLike
@@ -155,7 +164,10 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     functionFragment: "linkToProposal",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "nextSolver", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "parentSolver",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setSolverConfigs",
     data: BytesLike
@@ -216,6 +228,11 @@ export class SolutionsHub extends BaseContract {
   interface: SolutionsHubInterface;
 
   functions: {
+    childSolver(
+      _solutionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string] & { solver: string }>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
     createSolution(
@@ -246,7 +263,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -316,7 +333,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -371,7 +388,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -428,7 +445,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -483,7 +500,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -542,7 +559,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -597,7 +614,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -654,7 +671,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -709,7 +726,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               outcomeSlots: BigNumber;
-              parentCollectionIdPort: BigNumber;
+              parentCollectionPartitionIndex: BigNumber;
               amount: BigNumber;
               partition: BigNumber[];
               recipientAddressPorts: BigNumber[][];
@@ -728,7 +745,7 @@ export class SolutionsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    nextSolver(
+    parentSolver(
       _solutionId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[string] & { solver: string }>;
@@ -760,7 +777,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -777,6 +794,11 @@ export class SolutionsHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { solver: string }>;
   };
+
+  childSolver(
+    _solutionId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
@@ -808,7 +830,7 @@ export class SolutionsHub extends BaseContract {
       }[];
       conditionBase: {
         outcomeSlots: BigNumberish;
-        parentCollectionIdPort: BigNumberish;
+        parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressPorts: BigNumberish[][];
@@ -869,7 +891,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -917,7 +939,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -966,7 +988,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -1014,7 +1036,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           outcomeSlots: BigNumber;
-          parentCollectionIdPort: BigNumber;
+          parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
           recipientAddressPorts: BigNumber[][];
@@ -1032,7 +1054,7 @@ export class SolutionsHub extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  nextSolver(
+  parentSolver(
     _solutionId: BytesLike,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -1064,7 +1086,7 @@ export class SolutionsHub extends BaseContract {
       }[];
       conditionBase: {
         outcomeSlots: BigNumberish;
-        parentCollectionIdPort: BigNumberish;
+        parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressPorts: BigNumberish[][];
@@ -1082,6 +1104,11 @@ export class SolutionsHub extends BaseContract {
   ): Promise<string>;
 
   callStatic: {
+    childSolver(
+      _solutionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
     createSolution(
@@ -1112,7 +1139,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1181,7 +1208,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             outcomeSlots: BigNumber;
-            parentCollectionIdPort: BigNumber;
+            parentCollectionPartitionIndex: BigNumber;
             amount: BigNumber;
             partition: BigNumber[];
             recipientAddressPorts: BigNumber[][];
@@ -1229,7 +1256,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             outcomeSlots: BigNumber;
-            parentCollectionIdPort: BigNumber;
+            parentCollectionPartitionIndex: BigNumber;
             amount: BigNumber;
             partition: BigNumber[];
             recipientAddressPorts: BigNumber[][];
@@ -1286,7 +1313,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             outcomeSlots: BigNumber;
-            parentCollectionIdPort: BigNumber;
+            parentCollectionPartitionIndex: BigNumber;
             amount: BigNumber;
             partition: BigNumber[];
             recipientAddressPorts: BigNumber[][];
@@ -1334,7 +1361,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             outcomeSlots: BigNumber;
-            parentCollectionIdPort: BigNumber;
+            parentCollectionPartitionIndex: BigNumber;
             amount: BigNumber;
             partition: BigNumber[];
             recipientAddressPorts: BigNumber[][];
@@ -1352,7 +1379,7 @@ export class SolutionsHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    nextSolver(
+    parentSolver(
       _solutionId: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -1384,7 +1411,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1407,6 +1434,11 @@ export class SolutionsHub extends BaseContract {
   };
 
   estimateGas: {
+    childSolver(
+      _solutionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     createSolution(
@@ -1437,7 +1469,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1462,7 +1494,7 @@ export class SolutionsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    nextSolver(
+    parentSolver(
       _solutionId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1494,7 +1526,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1513,6 +1545,11 @@ export class SolutionsHub extends BaseContract {
   };
 
   populateTransaction: {
+    childSolver(
+      _solutionId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     createSolution(
@@ -1543,7 +1580,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
@@ -1571,7 +1608,7 @@ export class SolutionsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    nextSolver(
+    parentSolver(
       _solutionId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1603,7 +1640,7 @@ export class SolutionsHub extends BaseContract {
         }[];
         conditionBase: {
           outcomeSlots: BigNumberish;
-          parentCollectionIdPort: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressPorts: BigNumberish[][];
