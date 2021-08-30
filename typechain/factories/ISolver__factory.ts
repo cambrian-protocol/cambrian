@@ -187,6 +187,13 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "prepareSolve",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256[]",

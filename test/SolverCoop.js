@@ -48,7 +48,8 @@ describe("It should all work", function () {
     /////////INGESTS & ACTIONS & CONFIG ///////////////
     const ingests0 = [
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -56,15 +57,17 @@ describe("It should all work", function () {
         data: this.buyer.address
       },
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: false,
         port: 0,
         key: 2,
-        solverIndex: 1,
-        data: this.ISolver.encodeFunctionData("getAddress",[])
+        solverIndex: 0,
+        data: this.ISolver.encodeFunctionData("solverAddressFromIndex",[1])
       },
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: true,
         port: 3,
         key: 0,
@@ -73,18 +76,9 @@ describe("It should all work", function () {
       }
     ]
 
-    const actions0 = [
-      [
-        false, // bool executed
-        true, // isPort
-        ethers.constants.AddressZero, // to address
-        0, // portIndex. 0 is equal to address(this)
-        0, // value
-        this.ISolver.encodeFunctionData("executeCanonCondition", []),
-      ]
-    ];
+    const actions0 = [];
 
-    const canon0 = {
+    const conditionBase0 = {
       outcomeSlots: 2,
       parentCollectionIdPort: 0,
       amount: 100,
@@ -97,7 +91,8 @@ describe("It should all work", function () {
     // Second Solver
     const ingests1 = [
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -105,7 +100,8 @@ describe("It should all work", function () {
         data: this.buyer.address
       },
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: true,
         port: 0,
         key: 2,
@@ -113,7 +109,8 @@ describe("It should all work", function () {
         data: this.seller.address
       },
       {
-        executed: false,
+        executions: 0,
+        deferred: false,
         isConstant: false,
         port: 3,
         key: 0,
@@ -121,18 +118,9 @@ describe("It should all work", function () {
         data: this.ISolver.encodeFunctionData("getCanonCollectionId",[0]) // collection for Success case
       },
     ]
-    const actions1 = [
-      [
-        false, // bool executed
-        true, // isPort
-        ethers.constants.AddressZero, // to address
-        0, // portIndex. 0 is equal to address(this)
-        0, // value
-        this.ISolver.encodeFunctionData("executeCanonCondition", []),
-      ]
-    ];
+    const actions1 = [];
 
-    const canon1 = {
+    const conditionBase1 = {
       outcomeSlots: 2,
       parentCollectionIdPort: 0,
       amount: 100,
@@ -141,6 +129,7 @@ describe("It should all work", function () {
       recipientAmounts: [[0,100],[100,0]],
       metadata: ""
     }
+
   
     const solverConfigs = [
       [
@@ -151,7 +140,7 @@ describe("It should all work", function () {
         ethers.utils.formatBytes32String(""),
         ingests0,
         actions0,
-        canon0
+        conditionBase0
       ],
       [
         this.SolverFactory.address,
@@ -161,7 +150,7 @@ describe("It should all work", function () {
         ethers.utils.formatBytes32String(""),
         ingests1,
         actions1,
-        canon1
+        conditionBase1
       ],
     ];
     //////////////////////////////////////////
@@ -219,14 +208,15 @@ describe("It should all work", function () {
     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
 
-
-    const condition0 = await solver0.canonCondition()
+    const numConditions0 = await solver0.numConditions()
+    const condition0 = await solver0.conditions(numConditions0-1)
     const conditionId0 = condition0['conditionId']
     const collectionId0Success = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId0, indexSetSuccess)
     const positionId0Success = await this.CT.getPositionId(this.ToyToken.address, collectionId0Success)
 
 
-    const condition1 = await solver1.canonCondition()
+    const numConditions1 = await solver1.numConditions()
+    const condition1 = await solver1.conditions(numConditions1-1)
     const conditionId1 = condition1['conditionId']
     const collectionId1Success = await this.CT.getCollectionId(collectionId0Success, conditionId1, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionId1Success)
@@ -260,6 +250,10 @@ describe("It should all work", function () {
     await solver0.connect(this.keeper).confirmPayouts();
     await solver1.connect(this.keeper).confirmPayouts();
 
+    await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
+    const sellerCT0SuccessBalance = await this.CT.balanceOf(this.seller.address, positionId0Success);
+    expect(sellerCT0SuccessBalance).to.equal(100)
+
   
     // // Buyer redeems tokens
     // await this.CT.connect(this.buyer).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
@@ -272,10 +266,5 @@ describe("It should all work", function () {
     const sellerERC20Balance = await this.ToyToken.balanceOf(this.seller.address);
     expect(sellerERC20Balance).to.equal(100);
   });
-  
-
-
-
-
 });
 

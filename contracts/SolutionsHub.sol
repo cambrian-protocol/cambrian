@@ -94,9 +94,10 @@ contract SolutionsHub {
             ISolver _solver = ISolver(
                 solutions[_solutionId].solverAddresses[i]
             );
-            console.logAddress(solutions[_solutionId].solverAddresses[i]);
-            _solver.executeSolve();
+            _solver.prepareSolve();
         }
+        // Execute first Solver
+        ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve();
     }
 
     function solverFromIndex(bytes32 _solutionId, uint256 _index)
@@ -105,6 +106,24 @@ contract SolutionsHub {
         returns (address solver)
     {
         return solutions[_solutionId].solverAddresses[_index];
+    }
+
+    function nextSolver(bytes32 _solutionId)
+        external
+        view
+        returns (address solver)
+    {
+        for (
+            uint256 i;
+            i < solutions[_solutionId].solverAddresses.length - 1;
+            i++
+        ) {
+            if (msg.sender == solutions[_solutionId].solverAddresses[i]) {
+                return solutions[_solutionId].solverAddresses[i + 1];
+            }
+        }
+
+        return address(0);
     }
 
     function createSolution(

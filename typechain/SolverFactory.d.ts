@@ -40,7 +40,8 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
-          executed: boolean;
+          executions: BigNumberish;
+          deferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -55,7 +56,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
           value: BigNumberish;
           data: BytesLike;
         }[];
-        canonConditionExecutor: {
+        conditionBase: {
           outcomeSlots: BigNumberish;
           parentCollectionIdPort: BigNumberish;
           amount: BigNumberish;
@@ -149,7 +150,8 @@ export class SolverFactory extends BaseContract {
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
-          executed: boolean;
+          executions: BigNumberish;
+          deferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -164,7 +166,7 @@ export class SolverFactory extends BaseContract {
           value: BigNumberish;
           data: BytesLike;
         }[];
-        canonConditionExecutor: {
+        conditionBase: {
           outcomeSlots: BigNumberish;
           parentCollectionIdPort: BigNumberish;
           amount: BigNumberish;
@@ -194,7 +196,8 @@ export class SolverFactory extends BaseContract {
       timelockSeconds: BigNumberish;
       data: BytesLike;
       ingests: {
-        executed: boolean;
+        executions: BigNumberish;
+        deferred: boolean;
         isConstant: boolean;
         port: BigNumberish;
         key: BigNumberish;
@@ -209,7 +212,7 @@ export class SolverFactory extends BaseContract {
         value: BigNumberish;
         data: BytesLike;
       }[];
-      canonConditionExecutor: {
+      conditionBase: {
         outcomeSlots: BigNumberish;
         parentCollectionIdPort: BigNumberish;
         amount: BigNumberish;
@@ -239,7 +242,8 @@ export class SolverFactory extends BaseContract {
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
-          executed: boolean;
+          executions: BigNumberish;
+          deferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -254,7 +258,7 @@ export class SolverFactory extends BaseContract {
           value: BigNumberish;
           data: BytesLike;
         }[];
-        canonConditionExecutor: {
+        conditionBase: {
           outcomeSlots: BigNumberish;
           parentCollectionIdPort: BigNumberish;
           amount: BigNumberish;
@@ -291,7 +295,8 @@ export class SolverFactory extends BaseContract {
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
-          executed: boolean;
+          executions: BigNumberish;
+          deferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -306,7 +311,7 @@ export class SolverFactory extends BaseContract {
           value: BigNumberish;
           data: BytesLike;
         }[];
-        canonConditionExecutor: {
+        conditionBase: {
           outcomeSlots: BigNumberish;
           parentCollectionIdPort: BigNumberish;
           amount: BigNumberish;
@@ -337,7 +342,8 @@ export class SolverFactory extends BaseContract {
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
-          executed: boolean;
+          executions: BigNumberish;
+          deferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -352,7 +358,7 @@ export class SolverFactory extends BaseContract {
           value: BigNumberish;
           data: BytesLike;
         }[];
-        canonConditionExecutor: {
+        conditionBase: {
           outcomeSlots: BigNumberish;
           parentCollectionIdPort: BigNumberish;
           amount: BigNumberish;

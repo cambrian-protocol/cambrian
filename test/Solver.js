@@ -50,7 +50,7 @@ describe("It should all work", function () {
     /////////INGESTS & ACTIONS & CONFIG ///////////////
     const ingests0 = [
       {
-        executed: false,
+        executions: 0,
         isConstant: true,
         port: 0,
         key: 1,
@@ -58,7 +58,7 @@ describe("It should all work", function () {
         data: this.buyer.address
       },
       {
-        executed: false,
+        executions: 0,
         isConstant: true,
         port: 0,
         key: 2,
@@ -66,7 +66,7 @@ describe("It should all work", function () {
         data: this.seller.address
       },
       {
-        executed: false,
+        executions: 0,
         isConstant: true,
         port: 3,
         key: 0,
@@ -103,6 +103,7 @@ describe("It should all work", function () {
         this.arbiter.address,
         0,
         ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         actions0,
         canon0

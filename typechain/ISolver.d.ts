@@ -31,6 +31,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     "nullArbitrate()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
     "setApproval(address,bool)": FunctionFragment;
     "splitCondition(bytes32,bytes32,uint256,uint256[],address,uint256)": FunctionFragment;
@@ -75,6 +76,10 @@ interface ISolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "onERC1155Received",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "prepareSolve",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "proposePayouts",
@@ -131,6 +136,10 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "onERC1155Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "prepareSolve",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -250,6 +259,10 @@ export class ISolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
+    prepareSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     proposePayouts(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -329,6 +342,10 @@ export class ISolver extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  prepareSolve(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   proposePayouts(
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -399,6 +416,8 @@ export class ISolver extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    prepareSolve(overrides?: CallOverrides): Promise<void>;
 
     proposePayouts(
       _payouts: BigNumberish[],
@@ -482,6 +501,10 @@ export class ISolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    prepareSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     proposePayouts(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -560,6 +583,10 @@ export class ISolver extends BaseContract {
       value: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    prepareSolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     proposePayouts(
