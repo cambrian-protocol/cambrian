@@ -19,6 +19,7 @@ contract SolverFactory {
     function createSolver(
         IERC20 _collateralToken,
         bytes32 _solutionId,
+        bytes32 _proposalId,
         address _proposalsHub,
         address _solutionsHub,
         Solver.Config calldata _solverConfig
@@ -28,6 +29,7 @@ contract SolverFactory {
         Solver(clone).init(
             _collateralToken,
             _solutionId,
+            _proposalId,
             _proposalsHub,
             _solutionsHub,
             _solverConfig

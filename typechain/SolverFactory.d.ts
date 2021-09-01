@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSolver(address,bytes32,address,address,tuple)": FunctionFragment;
+    "createSolver(address,bytes32,bytes32,address,address,tuple)": FunctionFragment;
     "implementationAddress()": FunctionFragment;
     "solvers(uint256)": FunctionFragment;
   };
@@ -30,6 +30,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
     functionFragment: "createSolver",
     values: [
       string,
+      BytesLike,
       BytesLike,
       string,
       string,
@@ -141,6 +142,7 @@ export class SolverFactory extends BaseContract {
     createSolver(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -187,6 +189,7 @@ export class SolverFactory extends BaseContract {
   createSolver(
     _collateralToken: string,
     _solutionId: BytesLike,
+    _proposalId: BytesLike,
     _proposalsHub: string,
     _solutionsHub: string,
     _solverConfig: {
@@ -233,6 +236,7 @@ export class SolverFactory extends BaseContract {
     createSolver(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -286,6 +290,7 @@ export class SolverFactory extends BaseContract {
     createSolver(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -333,6 +338,7 @@ export class SolverFactory extends BaseContract {
     createSolver(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {

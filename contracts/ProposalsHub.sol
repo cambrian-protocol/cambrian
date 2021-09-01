@@ -1,11 +1,13 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "./ConditionalTokens.sol";
 import "./SolverFactory.sol";
 import "./SolutionsHub.sol";
+import "hardhat/console.sol";
 
-contract ProposalsHub {
+contract ProposalsHub is ERC1155Receiver {
     uint256 nonce;
 
     struct Proposal {
@@ -19,9 +21,11 @@ contract ProposalsHub {
         uint256 fundingGoal;
     }
 
-    mapping(bytes32 => mapping(address => uint256)) funderAmountMap;
-
     mapping(bytes32 => Proposal) public proposals;
+    mapping(bytes32 => mapping(address => uint256)) public funderAmountMap;
+
+    mapping(bytes32 => mapping(uint256 => uint256)) public reclaimableTokens;
+    mapping(uint256 => mapping(address => uint256)) public reclaimedTokens;
 
     event CreateProposal(bytes32 id);
 
@@ -143,7 +147,7 @@ contract ProposalsHub {
         proposals[_proposalId].funding -= _amount;
         funderAmountMap[_proposalId][msg.sender] -= _amount;
 
-        _token.transferFrom(address(this), msg.sender, _amount);
+        _token.transfer(msg.sender, _amount);
     }
 
     function getProposal(bytes32 _id)
@@ -152,5 +156,75 @@ contract ProposalsHub {
         returns (Proposal memory proposal)
     {
         return proposals[_id];
+    }
+
+    function postReclaimableTokens(
+        bytes32 _proposalId,
+        uint256 _tokenId,
+        uint256 _amount
+    ) private {
+        reclaimableTokens[_proposalId][_tokenId] += _amount;
+    }
+
+    function reclaimTokens(bytes32 _proposalId, uint256 _tokenId) external {
+        require(
+            funderAmountMap[_proposalId][msg.sender] > 0,
+            "ProposalsHub::msg.sender has no claim"
+        );
+
+        uint256 _claimDenominator = proposals[_proposalId].funding /
+            funderAmountMap[_proposalId][msg.sender];
+
+        console.log("claimDenominator: ", _claimDenominator);
+
+        uint256 _claimAmount = (reclaimableTokens[_proposalId][_tokenId] -
+            reclaimedTokens[_tokenId][msg.sender]) / _claimDenominator;
+
+        require(
+            _claimAmount <= reclaimableTokens[_proposalId][_tokenId],
+            "ProposalsHub::Claim is too large"
+        );
+        reclaimedTokens[_tokenId][msg.sender] += _claimAmount;
+
+        ConditionalTokens _conditionalTokens = SolutionsHub(
+            proposals[_proposalId].solutionsHub
+        ).conditionalTokens();
+
+        _conditionalTokens.safeTransferFrom(
+            address(this),
+            msg.sender,
+            _tokenId,
+            _claimAmount,
+            abi.encode(_proposalId)
+        );
+    }
+
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) external virtual override returns (bytes4) {
+        bytes32 _proposalId = abi.decode(data, (bytes32));
+        require(
+            proposals[_proposalId].id == _proposalId,
+            "ProposalsHub::Data is not valid proposalId"
+        );
+
+        console.log("Received ERC1155 Tokens: ", id);
+        postReclaimableTokens(_proposalId, id, value);
+
+        return this.onERC1155Received.selector;
+    }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external virtual override returns (bytes4) {
+        return this.onERC1155BatchReceived.selector;
     }
 }

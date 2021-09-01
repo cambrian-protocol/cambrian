@@ -74,6 +74,7 @@ contract SolutionsHub {
             address _solver = _factory.createSolver({
                 _collateralToken: solutions[_solutionId].collateralToken,
                 _solutionId: _solutionId,
+                _proposalId: _proposalId,
                 _proposalsHub: solutions[_solutionId].proposalHub,
                 _solutionsHub: address(this),
                 _solverConfig: solutions[_solutionId].solverConfigs[i]

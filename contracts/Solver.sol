@@ -109,9 +109,10 @@ contract Solver is Initializable, ERC1155Receiver {
     bool public pendingArbitration; // True when waiting for arbiter decision
     bool public arbitrationDelivered; // True when arbitration has been delivered
 
+    bytes32 public proposalId; // ID of proposal linked to the solution
     bytes32 public solutionId; // ID of solution being solved
-    address public proposalsHub; // The proposalsHub address managing this Solver;
-    address public solutionsHub; // The solutionsHub address managing this Solver;
+    address public proposalsHub; // The proposalsHub address managing this Solver
+    address public solutionsHub; // The solutionsHub address managing this Solver
     uint256 public timelock; // Current timelock
 
     mapping(uint256 => address) public addressPort;
@@ -139,6 +140,7 @@ contract Solver is Initializable, ERC1155Receiver {
     function init(
         IERC20 _collateralToken,
         bytes32 _solutionId,
+        bytes32 _proposalId,
         address _proposalsHub,
         address _solutionsHub,
         Config calldata _solverConfig
@@ -157,6 +159,7 @@ contract Solver is Initializable, ERC1155Receiver {
         conditionalTokens = SolutionsHub(_solutionsHub).conditionalTokens();
         collateralToken = _collateralToken;
         solutionId = _solutionId;
+        proposalId = _proposalId;
         proposalsHub = _proposalsHub;
         solutionsHub = _solutionsHub;
     }
@@ -384,15 +387,17 @@ contract Solver is Initializable, ERC1155Receiver {
                 j < config.conditionBase.recipientAddressPorts.length;
                 j++
             ) {
-                conditionalTokens.safeTransferFrom(
-                    address(this),
-                    addressPort[
-                        config.conditionBase.recipientAddressPorts[i][j]
-                    ],
-                    _positionId,
-                    config.conditionBase.recipientAmounts[i][j],
-                    ""
-                );
+                if (config.conditionBase.recipientAmounts[i][j] > 0) {
+                    conditionalTokens.safeTransferFrom(
+                        address(this),
+                        addressPort[
+                            config.conditionBase.recipientAddressPorts[i][j]
+                        ],
+                        _positionId,
+                        config.conditionBase.recipientAmounts[i][j],
+                        abi.encode(proposalId)
+                    );
+                }
             }
         }
     }

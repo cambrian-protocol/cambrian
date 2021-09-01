@@ -40,7 +40,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "getOutput(uint256,uint256)": FunctionFragment;
     "getPayouts()": FunctionFragment;
     "ingest(uint256)": FunctionFragment;
-    "init(address,bytes32,address,address,tuple)": FunctionFragment;
+    "init(address,bytes32,bytes32,address,address,tuple)": FunctionFragment;
     "lockedPorts(uint256,uint256)": FunctionFragment;
     "nullArbitrate()": FunctionFragment;
     "numConditions()": FunctionFragment;
@@ -49,6 +49,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "pendingArbitration()": FunctionFragment;
     "portVersions(uint256,uint256)": FunctionFragment;
     "prepareSolve()": FunctionFragment;
+    "proposalId()": FunctionFragment;
     "proposalsHub()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
     "requestArbitration()": FunctionFragment;
@@ -137,6 +138,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [
       string,
       BytesLike,
+      BytesLike,
       string,
       string,
       {
@@ -204,6 +206,10 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "prepareSolve",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalId",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -324,6 +330,7 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "prepareSolve",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "proposalId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "proposalsHub",
     data: BytesLike
@@ -536,6 +543,7 @@ export class Solver extends BaseContract {
     init(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -615,6 +623,8 @@ export class Solver extends BaseContract {
     prepareSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    proposalId(overrides?: CallOverrides): Promise<[string]>;
 
     proposalsHub(overrides?: CallOverrides): Promise<[string]>;
 
@@ -780,6 +790,7 @@ export class Solver extends BaseContract {
   init(
     _collateralToken: string,
     _solutionId: BytesLike,
+    _proposalId: BytesLike,
     _proposalsHub: string,
     _solutionsHub: string,
     _solverConfig: {
@@ -859,6 +870,8 @@ export class Solver extends BaseContract {
   prepareSolve(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  proposalId(overrides?: CallOverrides): Promise<string>;
 
   proposalsHub(overrides?: CallOverrides): Promise<string>;
 
@@ -1017,6 +1030,7 @@ export class Solver extends BaseContract {
     init(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -1092,6 +1106,8 @@ export class Solver extends BaseContract {
     ): Promise<BigNumber>;
 
     prepareSolve(overrides?: CallOverrides): Promise<void>;
+
+    proposalId(overrides?: CallOverrides): Promise<string>;
 
     proposalsHub(overrides?: CallOverrides): Promise<string>;
 
@@ -1210,6 +1226,7 @@ export class Solver extends BaseContract {
     init(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -1289,6 +1306,8 @@ export class Solver extends BaseContract {
     prepareSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    proposalId(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalsHub(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1414,6 +1433,7 @@ export class Solver extends BaseContract {
     init(
       _collateralToken: string,
       _solutionId: BytesLike,
+      _proposalId: BytesLike,
       _proposalsHub: string,
       _solutionsHub: string,
       _solverConfig: {
@@ -1495,6 +1515,8 @@ export class Solver extends BaseContract {
     prepareSolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    proposalId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     proposalsHub(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

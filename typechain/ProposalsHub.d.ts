@@ -26,9 +26,16 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     "defundProposal(bytes32,address,uint256)": FunctionFragment;
     "executeProposal(bytes32)": FunctionFragment;
     "fundProposal(bytes32,address,uint256)": FunctionFragment;
+    "funderAmountMap(bytes32,address)": FunctionFragment;
     "getProposal(bytes32)": FunctionFragment;
     "isProposal(bytes32)": FunctionFragment;
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "proposals(bytes32)": FunctionFragment;
+    "reclaimTokens(bytes32,uint256)": FunctionFragment;
+    "reclaimableTokens(bytes32,uint256)": FunctionFragment;
+    "reclaimedTokens(uint256,address)": FunctionFragment;
+    "supportsInterface(bytes4)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -52,6 +59,10 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     values: [BytesLike, string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "funderAmountMap",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getProposal",
     values: [BytesLike]
   ): string;
@@ -60,7 +71,31 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "onERC1155BatchReceived",
+    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC1155Received",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "proposals",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "reclaimTokens",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "reclaimableTokens",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "reclaimedTokens",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
 
@@ -85,11 +120,39 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "funderAmountMap",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getProposal",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "isProposal", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155BatchReceived",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155Received",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "reclaimTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "reclaimableTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "reclaimedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
 
   events: {
     "CreateProposal(bytes32)": EventFragment;
@@ -175,6 +238,12 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    funderAmountMap(
+      arg0: BytesLike,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     getProposal(
       _id: BytesLike,
       overrides?: CallOverrides
@@ -224,6 +293,24 @@ export class ProposalsHub extends BaseContract {
 
     isProposal(_id: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     proposals(
       arg0: BytesLike,
       overrides?: CallOverrides
@@ -239,6 +326,29 @@ export class ProposalsHub extends BaseContract {
         fundingGoal: BigNumber;
       }
     >;
+
+    reclaimTokens(
+      _proposalId: BytesLike,
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    reclaimableTokens(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    reclaimedTokens(
+      arg0: BigNumberish,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
   };
 
   approveERC20Transfer(
@@ -274,6 +384,12 @@ export class ProposalsHub extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  funderAmountMap(
+    arg0: BytesLike,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   getProposal(
     _id: BytesLike,
     overrides?: CallOverrides
@@ -292,6 +408,24 @@ export class ProposalsHub extends BaseContract {
 
   isProposal(_id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
+  onERC1155BatchReceived(
+    operator: string,
+    from: string,
+    ids: BigNumberish[],
+    values: BigNumberish[],
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  onERC1155Received(
+    operator: string,
+    from: string,
+    id: BigNumberish,
+    value: BigNumberish,
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   proposals(
     arg0: BytesLike,
     overrides?: CallOverrides
@@ -307,6 +441,29 @@ export class ProposalsHub extends BaseContract {
       fundingGoal: BigNumber;
     }
   >;
+
+  reclaimTokens(
+    _proposalId: BytesLike,
+    _tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  reclaimableTokens(
+    arg0: BytesLike,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  reclaimedTokens(
+    arg0: BigNumberish,
+    arg1: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  supportsInterface(
+    interfaceId: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   callStatic: {
     approveERC20Transfer(
@@ -342,6 +499,12 @@ export class ProposalsHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    funderAmountMap(
+      arg0: BytesLike,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getProposal(
       _id: BytesLike,
       overrides?: CallOverrides
@@ -360,6 +523,24 @@ export class ProposalsHub extends BaseContract {
 
     isProposal(_id: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     proposals(
       arg0: BytesLike,
       overrides?: CallOverrides
@@ -375,6 +556,29 @@ export class ProposalsHub extends BaseContract {
         fundingGoal: BigNumber;
       }
     >;
+
+    reclaimTokens(
+      _proposalId: BytesLike,
+      _tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    reclaimableTokens(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    reclaimedTokens(
+      arg0: BigNumberish,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
   };
 
   filters: {
@@ -415,11 +619,58 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    funderAmountMap(
+      arg0: BytesLike,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getProposal(_id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
     isProposal(_id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     proposals(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
+    reclaimTokens(
+      _proposalId: BytesLike,
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    reclaimableTokens(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    reclaimedTokens(
+      arg0: BigNumberish,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -456,6 +707,12 @@ export class ProposalsHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    funderAmountMap(
+      arg0: BytesLike,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getProposal(
       _id: BytesLike,
       overrides?: CallOverrides
@@ -466,8 +723,49 @@ export class ProposalsHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    onERC1155BatchReceived(
+      operator: string,
+      from: string,
+      ids: BigNumberish[],
+      values: BigNumberish[],
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    onERC1155Received(
+      operator: string,
+      from: string,
+      id: BigNumberish,
+      value: BigNumberish,
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     proposals(
       arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    reclaimTokens(
+      _proposalId: BytesLike,
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    reclaimableTokens(
+      arg0: BytesLike,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    reclaimedTokens(
+      arg0: BigNumberish,
+      arg1: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    supportsInterface(
+      interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };
