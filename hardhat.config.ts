@@ -4,7 +4,7 @@ require("hardhat-contract-sizer")
 require("@nomiclabs/hardhat-ethers")
 require('hardhat-deploy');
 require("@nomiclabs/hardhat-web3");
-require("hardhat-gas-reporter");
+// require("hardhat-gas-reporter");
 const { HardhatUserConfig } = require("hardhat/types");
 
 const config = {

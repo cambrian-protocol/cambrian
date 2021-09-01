@@ -51,6 +51,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -59,6 +60,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 2,
@@ -75,20 +77,11 @@ describe("It should all work", function () {
       }
     ]
 
-    const actions0 = [
-      [
-        false, // bool executed
-        true, // isPort
-        ethers.constants.AddressZero, // to address
-        0, // portIndex. 0 is equal to address(this)
-        0, // value
-        this.ISolver.encodeFunctionData("executeCanonCondition", []),
-      ]
-    ];
+    const actions0 = [];
 
     const canon0 = {
       outcomeSlots: 2,
-      parentCollectionIdPort: 0,
+      parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressPorts: [[1,2],[1,2]],
@@ -103,7 +96,6 @@ describe("It should all work", function () {
         this.arbiter.address,
         0,
         ethers.utils.formatBytes32String(""),
-        [],
         ingests0,
         actions0,
         canon0
@@ -144,8 +136,8 @@ describe("It should all work", function () {
 
     await this.ProposalsHub.executeProposal(proposalId);
 
-    const primeSolverAddress = await this.SolutionsHub.solverFromIndex(solutionId, 0);
-    const solverERC20Balance = await this.ToyToken.balanceOf(primeSolverAddress);
+    const solverAddress = await this.SolutionsHub.solverFromIndex(solutionId, 0);
+    const solverERC20Balance = await this.ToyToken.balanceOf(solverAddress);
     const CTERC20Balance = await this.ToyToken.balanceOf(this.CT.address);
     // Collateral has been sent to CT contract
     expect(solverERC20Balance).to.equal(0);
@@ -153,9 +145,10 @@ describe("It should all work", function () {
 
 
     // Connect to our Prime Solver
-    let primeSolver = new ethers.Contract(primeSolverAddress, SOLVER_ABI, ethers.provider);
+    let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
 
-    const condition = await primeSolver.canonCondition()
+    const numConditions = await solver.numConditions()
+    const condition = await solver.conditions(numConditions-1)
     const conditionId = condition['conditionId']
 
     // Seller should have all the success tokens
@@ -182,13 +175,13 @@ describe("It should all work", function () {
     expect(sellerFailureBalance).to.equal(0)
 
     // Keeper proposes payouts
-    await primeSolver.connect(this.keeper).proposePayouts([1,0]);
-    const payouts = await primeSolver.getPayouts();
+    await solver.connect(this.keeper).proposePayouts([1,0]);
+    const payouts = await solver.getPayouts();
     expect(payouts[0]).to.equal(1)
     expect(payouts[1]).to.equal(0)
 
     // We set timelock to 0, so confirm right away
-    await primeSolver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).confirmPayouts();
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure])

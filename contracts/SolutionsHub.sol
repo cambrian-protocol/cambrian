@@ -189,4 +189,12 @@ contract SolutionsHub {
     {
         return solutions[_id];
     }
+
+    function getSolutionSolverAddresses(bytes32 _id)
+        external
+        view
+        returns (address[] memory _addresses)
+    {
+        return solutions[_id].solverAddresses;
+    }
 }

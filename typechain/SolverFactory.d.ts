@@ -41,7 +41,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -151,7 +151,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -197,7 +197,7 @@ export class SolverFactory extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        deferred: boolean;
+        isDeferred: boolean;
         isConstant: boolean;
         port: BigNumberish;
         key: BigNumberish;
@@ -243,7 +243,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -296,7 +296,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -343,7 +343,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;

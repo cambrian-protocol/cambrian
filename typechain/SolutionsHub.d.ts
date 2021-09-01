@@ -26,6 +26,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     "createSolution(bytes32,address,tuple[])": FunctionFragment;
     "executeSolution(bytes32,bytes32)": FunctionFragment;
     "getSolution(bytes32)": FunctionFragment;
+    "getSolutionSolverAddresses(bytes32)": FunctionFragment;
     "linkToProposal(bytes32,bytes32)": FunctionFragment;
     "parentSolver(bytes32)": FunctionFragment;
     "setSolverConfigs(bytes32,tuple[])": FunctionFragment;
@@ -53,7 +54,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -89,6 +90,10 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getSolutionSolverAddresses",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "linkToProposal",
     values: [BytesLike, BytesLike]
   ): string;
@@ -108,7 +113,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -158,6 +163,10 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getSolution",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSolutionSolverAddresses",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -246,7 +255,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -308,7 +317,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -356,7 +365,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -420,7 +429,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -468,7 +477,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -534,7 +543,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -582,7 +591,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -646,7 +655,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -694,7 +703,7 @@ export class SolutionsHub extends BaseContract {
               string
             ] & {
               executions: BigNumber;
-              deferred: boolean;
+              isDeferred: boolean;
               isConstant: boolean;
               port: number;
               key: BigNumber;
@@ -739,6 +748,11 @@ export class SolutionsHub extends BaseContract {
       }
     >;
 
+    getSolutionSolverAddresses(
+      _id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { _addresses: string[] }>;
+
     linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
@@ -760,7 +774,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -813,7 +827,7 @@ export class SolutionsHub extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        deferred: boolean;
+        isDeferred: boolean;
         isConstant: boolean;
         port: BigNumberish;
         key: BigNumberish;
@@ -866,7 +880,7 @@ export class SolutionsHub extends BaseContract {
         string,
         ([BigNumber, boolean, boolean, number, BigNumber, BigNumber, string] & {
           executions: BigNumber;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: number;
           key: BigNumber;
@@ -914,7 +928,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           executions: BigNumber;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: number;
           key: BigNumber;
@@ -963,7 +977,7 @@ export class SolutionsHub extends BaseContract {
         string,
         ([BigNumber, boolean, boolean, number, BigNumber, BigNumber, string] & {
           executions: BigNumber;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: number;
           key: BigNumber;
@@ -1011,7 +1025,7 @@ export class SolutionsHub extends BaseContract {
           string
         ] & {
           executions: BigNumber;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: number;
           key: BigNumber;
@@ -1048,6 +1062,11 @@ export class SolutionsHub extends BaseContract {
     }
   >;
 
+  getSolutionSolverAddresses(
+    _id: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
+
   linkToProposal(
     _proposalId: BytesLike,
     _solutionId: BytesLike,
@@ -1069,7 +1088,7 @@ export class SolutionsHub extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        deferred: boolean;
+        isDeferred: boolean;
         isConstant: boolean;
         port: BigNumberish;
         key: BigNumberish;
@@ -1122,7 +1141,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -1183,7 +1202,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             executions: BigNumber;
-            deferred: boolean;
+            isDeferred: boolean;
             isConstant: boolean;
             port: number;
             key: BigNumber;
@@ -1231,7 +1250,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             executions: BigNumber;
-            deferred: boolean;
+            isDeferred: boolean;
             isConstant: boolean;
             port: number;
             key: BigNumber;
@@ -1288,7 +1307,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             executions: BigNumber;
-            deferred: boolean;
+            isDeferred: boolean;
             isConstant: boolean;
             port: number;
             key: BigNumber;
@@ -1336,7 +1355,7 @@ export class SolutionsHub extends BaseContract {
             string
           ] & {
             executions: BigNumber;
-            deferred: boolean;
+            isDeferred: boolean;
             isConstant: boolean;
             port: number;
             key: BigNumber;
@@ -1373,6 +1392,11 @@ export class SolutionsHub extends BaseContract {
       }
     >;
 
+    getSolutionSolverAddresses(
+      _id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
+
     linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
@@ -1394,7 +1418,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -1452,7 +1476,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -1488,6 +1512,11 @@ export class SolutionsHub extends BaseContract {
 
     getSolution(_id: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
+    getSolutionSolverAddresses(
+      _id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
@@ -1509,7 +1538,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -1563,7 +1592,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;
@@ -1602,6 +1631,11 @@ export class SolutionsHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getSolutionSolverAddresses(
+      _id: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     linkToProposal(
       _proposalId: BytesLike,
       _solutionId: BytesLike,
@@ -1623,7 +1657,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          deferred: boolean;
+          isDeferred: boolean;
           isConstant: boolean;
           port: BigNumberish;
           key: BigNumberish;

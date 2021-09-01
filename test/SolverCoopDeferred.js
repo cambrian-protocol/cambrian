@@ -41,7 +41,7 @@ describe("It should all work", function () {
   });
 
 
-  it("Should execute two-solver Proposal", async function () {
+  it("Should execute two-solver Proposal with deferred proposal", async function () {
     //Create solution
     const solutionId = ethers.utils.formatBytes32String("TestID")
   
@@ -49,7 +49,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -58,7 +58,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: false,
         port: 0,
         key: 2,
@@ -83,7 +83,7 @@ describe("It should all work", function () {
     const ingests1 = [
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -92,16 +92,16 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 2,
         solverIndex: 0,
         data: this.seller.address
       },
-      { // add arbitrary deferred data ingest
+      { // add arbitrary isDeferred data ingest
         executions: 0,
-        deferred: true,
+        isDeferred: true,
         isConstant: false,
         port: 2,
         key: 0,

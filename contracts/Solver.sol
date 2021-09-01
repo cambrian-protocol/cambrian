@@ -4,12 +4,13 @@ pragma solidity 0.8.0;
 
 import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./SolutionsHub.sol";
 import "hardhat/console.sol";
 
-contract Solver is Initializable {
+contract Solver is Initializable, ERC1155Receiver {
     struct Action {
         bool executed;
         bool isPort;
@@ -19,9 +20,19 @@ contract Solver is Initializable {
         bytes data;
     }
 
+    /**
+        @dev                    Expected sources of data being ingested into the Solver
+        executions              Number of times this Ingest has been executed
+        isDeferred              Data is waiting on an upstream action and must be ingested manually later
+        isConstant              Data is supplied directly which cannot change
+        port                    Destination port for data: addressPort || boolPort || bytesPort || bytes32Port || uint256Port
+        key                     Destination key for data
+        solverIndex             Index of the Solver in the chain to make this call to
+        data                    Raw when isConstant=true, else an encoded function call
+     */
     struct Ingest {
         uint256 executions;
-        bool deferred;
+        bool isDeferred;
         bool isConstant;
         uint8 port;
         uint256 key;
@@ -29,28 +40,57 @@ contract Solver is Initializable {
         bytes data;
     }
 
+    /**
+        @dev                    Condition object created by addCondition() from ConditionBase
+        reported                True when reportPayouts() has been called on CTF
+        questionId              keccak256(abi.encodePacked(config.conditionBase.metadata, address(this), conditions.length))
+        parentCollectionId      ID of the parent collection above this Solver in the CTF
+        conditionId             ID of this condition in the CTF
+        payouts                 Currently proposed payouts. Final if reported == true
+     */
     struct Condition {
         bool reported;
-        bytes32 questionId; // questionId to be interpreted for reporting on conditions
-        bytes32 parentCollectionId; // ID of the parent collection above this Solver in the conditional tokens framework
-        bytes32 conditionId; // ID of this condition in the conditional tokens framework
-        uint256[] payouts; // currently proposed/reported payouts
+        bytes32 questionId;
+        bytes32 parentCollectionId;
+        bytes32 conditionId;
+        uint256[] payouts;
     }
 
+    /**
+        @dev                    Used to generate conditions when addCondition() is called
+        outcomeSlots            Num outcome slots
+        ParentColl...           Index of partition to get parentCollectionId from parent Solver's uint256[] partition
+        amount                  Amount of collateral being used        // TODO maybe make this dynamic also
+        partition               Partition of positions for payouts
+        recipientAddressPorts   Arrays of [i] for addressPorts[i] containing CT recipients
+        recipientAmounts        Arrays containing amount of CTs to send to each recipient for each partition
+        metadata                Descriptive string describing the condition
+     */
     struct ConditionBase {
-        uint256 outcomeSlots; // num outcomeslots
-        uint256 parentCollectionPartitionIndex; // Partition to get parentCollectionId from parent Solver
-        uint256 amount; // amount of collateral being used
-        uint256[] partition; // Partition of positions for payouts
-        uint256[][] recipientAddressPorts; // addressPorts containg recipients
-        uint256[][] recipientAmounts; // amounts for each recipient for each partition
-        string metadata; // condition metadata
+        uint256 outcomeSlots;
+        uint256 parentCollectionPartitionIndex;
+        uint256 amount;
+        uint256[] partition;
+        uint256[][] recipientAddressPorts;
+        uint256[][] recipientAmounts;
+        string metadata;
     }
 
+    /**
+        @dev                    Configuration of this Solver
+        factory                 The implementation address for this Solver
+        keeper                  Keeper address
+        arbiter                 Arbiter address
+        timelockSeconds         Number of seconds to increment timelock for during critical activities
+        data                    Arbitrary data
+        ingests;                Data ingests to be performed to bring data in from other Solver
+        actions                 Arbitrary actions to be run during execution
+        conditionBase           Base to create conditions from
+     */
     struct Config {
         SolverFactory factory;
-        address keeper; // Keeper address
-        address arbiter; // Arbiter address
+        address keeper;
+        address arbiter;
         uint256 timelockSeconds;
         bytes data;
         Ingest[] ingests;
@@ -82,60 +122,18 @@ contract Solver is Initializable {
     mapping(uint256 => mapping(uint256 => bool)) public lockedPorts; // locks constant ports
     mapping(uint256 => mapping(uint256 => uint256)) public portVersions; // version tracking for unlocked ports
 
-    modifier onlySolution() {
-        require(
-            msg.sender == solutionsHub,
-            "Solver: Only the solutionsHub address may call this"
-        );
-        _;
-    }
-
-    modifier onlyKeeper() {
-        require(
-            msg.sender == config.keeper,
-            "Solver: Only the Keeper address may call this"
-        );
-        _;
-    }
-
-    modifier onlyArbiter() {
-        require(
-            msg.sender == config.arbiter,
-            "Solver: Only the Arbiter address may call this"
-        );
-        _;
-    }
-
-    modifier onlyThis() {
-        require(
-            msg.sender == address(this),
-            "Solver: Only this solver may call this"
-        );
-        _;
-    }
-
-    modifier isPrivileged() {
-        require(
-            msg.sender == config.keeper || msg.sender == config.arbiter,
-            "Solver: Only the Keeper or Arbiter may call this."
-        );
-        _;
-    }
-
-    modifier isActive() {
-        require(executed == true, "Solver: Unexecuted");
-        require(pendingArbitration == false, "Solver: Arbitration is pending");
-        require(
-            arbitrationDelivered == false,
-            "Solver: Arbitration has been delivered"
-        );
-        require(solved == false, "Solver: Solve is complete");
-        _;
-    }
-
-    modifier isWhitelisted(address _addr) {
-        //TODO
-        _;
+    modifier solverOrKeeper() {
+        if (msg.sender == config.keeper) {
+            _;
+        } else {
+            address[] memory _solvers = SolutionsHub(solutionsHub)
+                .getSolutionSolverAddresses(solutionId);
+            for (uint256 i; i < _solvers.length; i++) {
+                if (msg.sender == _solvers[i]) {
+                    _;
+                }
+            }
+        }
     }
 
     function init(
@@ -144,11 +142,16 @@ contract Solver is Initializable {
         address _proposalsHub,
         address _solutionsHub,
         Config calldata _solverConfig
-    ) public {
+    ) external {
+        require(
+            msg.sender == address(_solverConfig.factory),
+            "Solver::Only factory may call init"
+        );
         require(
             _solverConfig.keeper != address(0),
             "Solver: Keeper address invalid"
         );
+
         config = _solverConfig;
 
         conditionalTokens = SolutionsHub(_solutionsHub).conditionalTokens();
@@ -156,7 +159,24 @@ contract Solver is Initializable {
         solutionId = _solutionId;
         proposalsHub = _proposalsHub;
         solutionsHub = _solutionsHub;
-        defaultIngest();
+    }
+
+    function router(
+        uint8 _port,
+        uint256 _key,
+        bytes memory _data
+    ) private {
+        if (_port == 0) {
+            addressPort[_key] = BytesLib.toAddress(_data, 0);
+        } else if (_port == 1) {
+            boolPort[_key] = BytesLib.toUint8(_data, 0) > 0 ? true : false;
+        } else if (_port == 2) {
+            bytesPort[_key] = _data;
+        } else if (_port == 3) {
+            bytes32Port[_key] = BytesLib.toBytes32(_data, 0);
+        } else if (_port == 4) {
+            uint256Port[_key] = BytesLib.toUint256(_data, 0);
+        }
     }
 
     function constantRouter(
@@ -183,36 +203,18 @@ contract Solver is Initializable {
         router(_port, _key, _data);
     }
 
-    function router(
-        uint8 _port,
-        uint256 _key,
-        bytes memory _data
-    ) internal {
-        if (_port == 0) {
-            addressPort[_key] = BytesLib.toAddress(_data, 0);
-        } else if (_port == 1) {
-            boolPort[_key] = BytesLib.toUint8(_data, 0) > 0 ? true : false;
-        } else if (_port == 2) {
-            bytesPort[_key] = _data;
-        } else if (_port == 3) {
-            bytes32Port[_key] = BytesLib.toBytes32(_data, 0);
-        } else if (_port == 4) {
-            uint256Port[_key] = BytesLib.toUint256(_data, 0);
-        }
-    }
-
     function addData(
         uint8 _port,
         uint256 _key,
         bytes memory _data
-    ) external onlyKeeper {
+    ) external solverOrKeeper {
         dynamicRouter(_port, _key, _data);
     }
 
-    function executeIngests() internal {
+    function executeIngests() private {
         console.log("Executing ingests");
         for (uint256 i; i < config.ingests.length; i++) {
-            if (!config.ingests[i].deferred) {
+            if (!config.ingests[i].isDeferred) {
                 ingest(i);
             }
         }
@@ -225,6 +227,7 @@ contract Solver is Initializable {
         console.logUint(config.ingests[_index].port);
         console.logUint(config.ingests[_index].key);
         console.logBytes(config.ingests[_index].data);
+
         if (config.ingests[_index].isConstant) {
             constantRouter(
                 config.ingests[_index].port,
@@ -272,7 +275,7 @@ contract Solver is Initializable {
 
         for (uint256 i; i < config.ingests.length; i++) {
             if (
-                config.ingests[i].deferred &&
+                config.ingests[i].isDeferred &&
                 (config.ingests[i].executions != conditions.length)
             ) {
                 _bool = false;
@@ -282,12 +285,7 @@ contract Solver is Initializable {
         return _bool;
     }
 
-    function defaultIngest() internal {
-        lockedPorts[0][0] = true;
-        addressPort[0] = address(this);
-    }
-
-    function addCondition() internal {
+    function addCondition() private {
         console.log("Adding condition");
 
         Condition memory _condition;
@@ -323,7 +321,7 @@ contract Solver is Initializable {
         prepareCondition();
     }
 
-    function prepareCondition() public isActive {
+    function prepareCondition() private {
         // prepareCondition
         conditionalTokens.prepareCondition(
             address(this),
@@ -332,7 +330,7 @@ contract Solver is Initializable {
         );
     }
 
-    function handleShallowPosition() public {
+    function handleShallowPosition() private {
         if (
             conditions[conditions.length - 1].parentCollectionId == bytes32("")
         ) {
@@ -352,7 +350,7 @@ contract Solver is Initializable {
         }
     }
 
-    function splitPosition() public {
+    function splitPosition() private {
         console.log("Split position");
         conditionalTokens.splitPosition(
             collateralToken,
@@ -363,7 +361,7 @@ contract Solver is Initializable {
         );
     }
 
-    function allocatePartition() public isActive {
+    function allocatePartition() private {
         console.log("allocatePartition");
 
         for (uint256 i; i < config.conditionBase.partition.length; i++) {
@@ -413,11 +411,11 @@ contract Solver is Initializable {
         handleShallowPosition();
         splitPosition();
         allocatePartition();
-        executeActions();
+        unsafeExecuteActions();
         cascade();
     }
 
-    function cascade() internal {
+    function cascade() private {
         address _childSolver = SolutionsHub(solutionsHub).childSolver(
             solutionId
         );
@@ -429,20 +427,25 @@ contract Solver is Initializable {
         }
     }
 
-    function updateTimelock() internal isActive {
+    function updateTimelock() internal {
         timelock = block.timestamp + (config.timelockSeconds * 1 seconds);
     }
 
-    function proposePayouts(uint256[] calldata _payouts)
-        public
-        isPrivileged
-        isActive
-    {
+    function proposePayouts(uint256[] calldata _payouts) external {
+        require(
+            msg.sender == config.keeper || msg.sender == config.arbiter,
+            "Solver: Only the Keeper or Arbiter may call this."
+        );
+
         conditions[conditions.length - 1].payouts = _payouts;
         updateTimelock();
     }
 
-    function confirmPayouts() external isPrivileged isActive {
+    function confirmPayouts() external {
+        require(
+            msg.sender == config.keeper || msg.sender == config.arbiter,
+            "Solver::Only Keeper or Arbiter"
+        );
         require(
             block.timestamp > timelock,
             "Solver: Timelock is still in the future"
@@ -455,7 +458,15 @@ contract Solver is Initializable {
         // solved = true;
     }
 
-    function arbitrate(uint256[] calldata _payouts) external onlyArbiter {
+    function requestArbitration() external {
+        // TODO
+    }
+
+    function arbitrate(uint256[] calldata _payouts) external {
+        require(
+            msg.sender == config.arbiter,
+            "Solver: Only the Arbiter address may call this"
+        );
         require(executed == true, "Solver: Unexecuted");
         require(pendingArbitration == true, "Solver: Arbitration not pending");
         conditions[conditions.length - 1].payouts = _payouts;
@@ -464,7 +475,11 @@ contract Solver is Initializable {
         updateTimelock();
     }
 
-    function nullArbitrate() external onlyArbiter {
+    function nullArbitrate() external {
+        require(
+            msg.sender == config.arbiter,
+            "Solver: Only the Arbiter address may call this"
+        );
         require(
             pendingArbitration = true,
             "Solver: Arbitration is not pending"
@@ -473,16 +488,13 @@ contract Solver is Initializable {
         updateTimelock();
     }
 
-    function executeActions() private {
+    function unsafeExecuteActions() private {
         for (uint256 i; i < config.actions.length; i++) {
-            executeAction(i);
+            unsafeExecuteAction(i);
         }
     }
 
-    function executeAction(uint256 _actionIndex)
-        private
-        isWhitelisted(config.actions[_actionIndex].to)
-    {
+    function unsafeExecuteAction(uint256 _actionIndex) private {
         require(
             !config.actions[_actionIndex].executed,
             "Solver::action executed"
@@ -565,7 +577,7 @@ contract Solver is Initializable {
         uint256 id,
         uint256 value,
         bytes calldata data
-    ) external virtual returns (bytes4) {
+    ) external virtual override returns (bytes4) {
         return this.onERC1155Received.selector;
     }
 
@@ -575,7 +587,7 @@ contract Solver is Initializable {
         uint256[] calldata ids,
         uint256[] calldata values,
         bytes calldata data
-    ) external virtual returns (bytes4) {
+    ) external virtual override returns (bytes4) {
         return this.onERC1155BatchReceived.selector;
     }
 }

@@ -49,7 +49,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -58,21 +58,12 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: false,
         port: 0,
         key: 2,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("solverAddressFromIndex",[1])
-      },
-      {
-        executions: 0,
-        deferred: false,
-        isConstant: true,
-        port: 3,
-        key: 0,
-        solverIndex: 0,
-        data: ethers.utils.formatBytes32String("")
       }
     ]
 
@@ -80,7 +71,7 @@ describe("It should all work", function () {
 
     const conditionBase0 = {
       outcomeSlots: 2,
-      parentCollectionIdPort: 0,
+      parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressPorts: [[1,2],[1,2]],
@@ -92,7 +83,7 @@ describe("It should all work", function () {
     const ingests1 = [
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 1,
@@ -101,28 +92,19 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        deferred: false,
+        isDeferred: false,
         isConstant: true,
         port: 0,
         key: 2,
         solverIndex: 0,
         data: this.seller.address
-      },
-      {
-        executions: 0,
-        deferred: false,
-        isConstant: false,
-        port: 3,
-        key: 0,
-        solverIndex: 0,
-        data: this.ISolver.encodeFunctionData("getCanonCollectionId",[0]) // collection for Success case
-      },
+      }
     ]
     const actions1 = [];
 
     const conditionBase1 = {
       outcomeSlots: 2,
-      parentCollectionIdPort: 0,
+      parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressPorts: [[1,2],[1,2]],
@@ -155,6 +137,8 @@ describe("It should all work", function () {
     ];
     //////////////////////////////////////////
   
+    console.log("ree")
+
     await this.SolutionsHub.connect(this.keeper).createSolution(
       solutionId,
       this.ToyToken.address,
