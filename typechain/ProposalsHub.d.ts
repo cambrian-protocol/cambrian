@@ -250,6 +250,7 @@ export class ProposalsHub extends BaseContract {
     ): Promise<
       [
         [
+          boolean,
           string,
           string,
           string,
@@ -259,6 +260,7 @@ export class ProposalsHub extends BaseContract {
           BigNumber,
           BigNumber
         ] & {
+          isExecuted: boolean;
           collateralToken: string;
           proposer: string;
           solutionsHub: string;
@@ -270,6 +272,7 @@ export class ProposalsHub extends BaseContract {
         }
       ] & {
         proposal: [
+          boolean,
           string,
           string,
           string,
@@ -279,6 +282,7 @@ export class ProposalsHub extends BaseContract {
           BigNumber,
           BigNumber
         ] & {
+          isExecuted: boolean;
           collateralToken: string;
           proposer: string;
           solutionsHub: string;
@@ -315,7 +319,18 @@ export class ProposalsHub extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, string, string, string, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
+        isExecuted: boolean;
         collateralToken: string;
         proposer: string;
         solutionsHub: string;
@@ -394,7 +409,18 @@ export class ProposalsHub extends BaseContract {
     _id: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, string, string, string, BigNumber, BigNumber] & {
+    [
+      boolean,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      BigNumber,
+      BigNumber
+    ] & {
+      isExecuted: boolean;
       collateralToken: string;
       proposer: string;
       solutionsHub: string;
@@ -430,7 +456,18 @@ export class ProposalsHub extends BaseContract {
     arg0: BytesLike,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, string, string, string, BigNumber, BigNumber] & {
+    [
+      boolean,
+      string,
+      string,
+      string,
+      string,
+      string,
+      string,
+      BigNumber,
+      BigNumber
+    ] & {
+      isExecuted: boolean;
       collateralToken: string;
       proposer: string;
       solutionsHub: string;
@@ -509,7 +546,18 @@ export class ProposalsHub extends BaseContract {
       _id: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, string, string, string, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
+        isExecuted: boolean;
         collateralToken: string;
         proposer: string;
         solutionsHub: string;
@@ -545,7 +593,18 @@ export class ProposalsHub extends BaseContract {
       arg0: BytesLike,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, string, string, string, BigNumber, BigNumber] & {
+      [
+        boolean,
+        string,
+        string,
+        string,
+        string,
+        string,
+        string,
+        BigNumber,
+        BigNumber
+      ] & {
+        isExecuted: boolean;
         collateralToken: string;
         proposer: string;
         solutionsHub: string;

@@ -11,6 +11,7 @@ contract ProposalsHub is ERC1155Receiver {
     uint256 nonce;
 
     struct Proposal {
+        bool isExecuted;
         IERC20 collateralToken;
         address proposer;
         address solutionsHub;
@@ -35,6 +36,11 @@ contract ProposalsHub is ERC1155Receiver {
                 proposals[_proposalId].fundingGoal,
             "Proposal not fully funded"
         );
+        require(
+            proposals[_proposalId].isExecuted == false,
+            "ProposalsHub::Proposal already executed"
+        );
+        proposals[_proposalId].isExecuted = true;
 
         SolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
             _proposalId,
@@ -74,6 +80,8 @@ contract ProposalsHub is ERC1155Receiver {
         uint256 _fundingGoal,
         bytes32 _solutionId
     ) external {
+        nonce++;
+
         bytes32 _proposalId = keccak256(
             abi.encodePacked(
                 msg.sender,
@@ -83,8 +91,6 @@ contract ProposalsHub is ERC1155Receiver {
                 nonce
             )
         );
-
-        nonce++;
 
         Proposal storage proposal = proposals[_proposalId];
         proposal.collateralToken = _collateralToken;
@@ -108,6 +114,10 @@ contract ProposalsHub is ERC1155Receiver {
         uint256 _amount
     ) external {
         require(proposals[_proposalId].id != 0, "Proposal does not exist");
+        require(
+            proposals[_proposalId].isExecuted == false,
+            "ProposalsHub::Proposal already executed"
+        );
         require(
             proposals[_proposalId].collateralToken == _token,
             "Proposal does not include this token to be funded"
@@ -134,6 +144,10 @@ contract ProposalsHub is ERC1155Receiver {
         uint256 _amount
     ) external {
         require(proposals[_proposalId].id != 0, "Proposal does not exist");
+        require(
+            proposals[_proposalId].isExecuted == false,
+            "ProposalsHub::Proposal already executed"
+        );
         require(
             proposals[_proposalId].collateralToken == _token,
             "Proposal does not include this token to be funded"
@@ -171,15 +185,14 @@ contract ProposalsHub is ERC1155Receiver {
             funderAmountMap[_proposalId][msg.sender] > 0,
             "ProposalsHub::msg.sender has no claim"
         );
-
         uint256 _claimDenominator = proposals[_proposalId].funding /
             funderAmountMap[_proposalId][msg.sender];
 
-        console.log("claimDenominator: ", _claimDenominator);
+        uint256 _claimAmount = (reclaimableTokens[_proposalId][_tokenId] /
+            _claimDenominator) - reclaimedTokens[_tokenId][msg.sender];
 
-        uint256 _claimAmount = (reclaimableTokens[_proposalId][_tokenId] -
-            reclaimedTokens[_tokenId][msg.sender]) / _claimDenominator;
-
+        console.log("Claim amount: ", _claimAmount);
+        require(_claimAmount > 0, "ProposalsHub::Claim is 0");
         require(
             _claimAmount <= reclaimableTokens[_proposalId][_tokenId],
             "ProposalsHub::Claim is too large"
@@ -199,6 +212,12 @@ contract ProposalsHub is ERC1155Receiver {
         );
     }
 
+    /** 
+        IMPORTANT!
+        Any CTs sent to this contract are reclaimable by the funders in proportion to their funding.
+        If a user reclaims CTs and sends them back again to this contract, they will only be able
+        to reclaim the same fraction of it.
+    */
     function onERC1155Received(
         address operator,
         address from,
@@ -210,6 +229,10 @@ contract ProposalsHub is ERC1155Receiver {
         require(
             proposals[_proposalId].id == _proposalId,
             "ProposalsHub::Data is not valid proposalId"
+        );
+        require(
+            proposals[_proposalId].isExecuted,
+            "ProposalsHub::Proposal has not been executed"
         );
 
         console.log("Received ERC1155 Tokens: ", id);

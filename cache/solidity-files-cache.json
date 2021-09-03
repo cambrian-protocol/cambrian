@@ -758,8 +758,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\ProposalsHub.sol": {
-      "lastModificationDate": 1630492729069,
-      "contentHash": "c7c378b0d6bee38d3659491c59dd51e7",
+      "lastModificationDate": 1630669613527,
+      "contentHash": "2f1f855a8ef326dafba42eae80ca5569",
       "sourceName": "contracts/ProposalsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
