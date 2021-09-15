@@ -123,7 +123,7 @@ export class SolverCloneFactory extends BaseContract {
       _proposalsHub: string,
       _solutionsHub: string,
       _keeper: string,
-      _arbiter: string,
+      _arbitrator: string,
       _timelockHours: BigNumberish,
       _actions: {
         to: string;
@@ -148,7 +148,7 @@ export class SolverCloneFactory extends BaseContract {
     _proposalsHub: string,
     _solutionsHub: string,
     _keeper: string,
-    _arbiter: string,
+    _arbitrator: string,
     _timelockHours: BigNumberish,
     _actions: {
       to: string;
@@ -173,7 +173,7 @@ export class SolverCloneFactory extends BaseContract {
       _proposalsHub: string,
       _solutionsHub: string,
       _keeper: string,
-      _arbiter: string,
+      _arbitrator: string,
       _timelockHours: BigNumberish,
       _actions: {
         to: string;
@@ -205,7 +205,7 @@ export class SolverCloneFactory extends BaseContract {
       _proposalsHub: string,
       _solutionsHub: string,
       _keeper: string,
-      _arbiter: string,
+      _arbitrator: string,
       _timelockHours: BigNumberish,
       _actions: {
         to: string;
@@ -231,7 +231,7 @@ export class SolverCloneFactory extends BaseContract {
       _proposalsHub: string,
       _solutionsHub: string,
       _keeper: string,
-      _arbiter: string,
+      _arbitrator: string,
       _timelockHours: BigNumberish,
       _actions: {
         to: string;

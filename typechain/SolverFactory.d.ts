@@ -37,7 +37,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
       {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -148,7 +148,7 @@ export class SolverFactory extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -195,7 +195,7 @@ export class SolverFactory extends BaseContract {
     _solverConfig: {
       factory: string;
       keeper: string;
-      arbiter: string;
+      arbitrator: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
       ingests: {
@@ -242,7 +242,7 @@ export class SolverFactory extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -296,7 +296,7 @@ export class SolverFactory extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -344,7 +344,7 @@ export class SolverFactory extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {

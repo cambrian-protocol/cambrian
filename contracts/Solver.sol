@@ -41,19 +41,39 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
+        @dev                    Status state for Conditions
+        Initiated               Default state
+        Executed                Solver has executed according to configuration
+        OutcomeProposed         Outcome has been proposed for reporting.
+        ArbitrationRequested    One party has requested arbitration on this condition
+        ArbitrationPending      An official dispute has been raised and requires arbitration
+        ArbitrationDelivered    Arbitration (except 'null' arbitration) has been delivered for this condition
+        OutcomeReported         Outcome has been reported to the CTF via reportPayouts()
+     */
+    enum Status {
+        Initiated,
+        Executed,
+        OutcomeProposed,
+        ArbitrationRequested,
+        ArbitrationPending,
+        ArbitrationDelivered,
+        OutcomeReported
+    }
+
+    /**
         @dev                    Condition object created by addCondition() from ConditionBase
-        reported                True when reportPayouts() has been called on CTF
         questionId              keccak256(abi.encodePacked(config.conditionBase.metadata, address(this), conditions.length))
         parentCollectionId      ID of the parent collection above this Solver in the CTF
         conditionId             ID of this condition in the CTF
         payouts                 Currently proposed payouts. Final if reported == true
+        status                  Status of this condition
      */
     struct Condition {
-        bool reported;
         bytes32 questionId;
         bytes32 parentCollectionId;
         bytes32 conditionId;
         uint256[] payouts;
+        Status status;
     }
 
     /**
@@ -80,7 +100,7 @@ contract Solver is Initializable, ERC1155Receiver {
         @dev                    Configuration of this Solver
         factory                 The implementation address for this Solver
         keeper                  Keeper address
-        arbiter                 Arbiter address
+        arbitrator                 Arbitrator address
         timelockSeconds         Number of seconds to increment timelock for during critical activities
         data                    Arbitrary data
         ingests;                Data ingests to be performed to bring data in from other Solver
@@ -90,7 +110,7 @@ contract Solver is Initializable, ERC1155Receiver {
     struct Config {
         SolverFactory factory;
         address keeper;
-        address arbiter;
+        address arbitrator;
         uint256 timelockSeconds;
         bytes data;
         Ingest[] ingests;
@@ -103,11 +123,6 @@ contract Solver is Initializable, ERC1155Receiver {
 
     ConditionalTokens public conditionalTokens; // ConditionalTokens contract
     IERC20 public collateralToken; // Collateral being used
-    bool executeCanonConditionDone; // executeCanonCondition may only run once
-    bool public solved; // True when solve is complete
-    bool public executed; // True when solve has begun
-    bool public pendingArbitration; // True when waiting for arbiter decision
-    bool public arbitrationDelivered; // True when arbitration has been delivered
 
     bytes32 public proposalId; // ID of proposal linked to the solution
     bytes32 public solutionId; // ID of solution being solved
@@ -404,15 +419,20 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function prepareSolve() public {
         console.log("Preparing solve");
-        executed = true;
         addCondition();
         executeIngests();
     }
 
     function executeSolve() public {
         console.log("Executing solve");
+        require(
+            conditions[conditions.length - 1].status == Status.Initiated,
+            "Solver::Condition not status Initiated"
+        );
         require(deferredIngestsValid(), "Solver::Deferred ingests invalid");
-        console.log("deferred ingests valid");
+
+        conditions[conditions.length - 1].status = Status.Executed;
+
         handleShallowPosition();
         splitPosition();
         allocatePartition();
@@ -437,60 +457,83 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function proposePayouts(uint256[] calldata _payouts) external {
+        require(msg.sender == config.keeper, "Solver::Only Keeper");
         require(
-            msg.sender == config.keeper || msg.sender == config.arbiter,
-            "Solver: Only the Keeper or Arbiter may call this."
+            conditions[conditions.length - 1].status == Status.Executed,
+            "Solver::Condition state not Status.Executed"
         );
 
+        conditions[conditions.length - 1].status = Status.OutcomeProposed;
         conditions[conditions.length - 1].payouts = _payouts;
         updateTimelock();
     }
 
     function confirmPayouts() external {
+        require(msg.sender == config.keeper, "Solver::Only Keeper");
+        require(block.timestamp > timelock, "Solver::Timelock still locked");
         require(
-            msg.sender == config.keeper || msg.sender == config.arbiter,
-            "Solver::Only Keeper or Arbiter"
+            conditions[conditions.length - 1].status == Status.OutcomeProposed,
+            "Solver::Outcome must be proposed first"
         );
-        require(
-            block.timestamp > timelock,
-            "Solver: Timelock is still in the future"
-        );
+
         conditionalTokens.reportPayouts(
             conditions[conditions.length - 1].questionId,
             conditions[conditions.length - 1].payouts
         );
-        conditions[conditions.length - 1].reported = true;
-        // solved = true;
+        conditions[conditions.length - 1].status = Status.OutcomeReported;
     }
 
-    function requestArbitration() external {
-        // TODO
-    }
-
-    function arbitrate(uint256[] calldata _payouts) external {
+    function requestArbitration(uint256[] memory _requestedPayouts)
+        external
+        payable
+    {
         require(
-            msg.sender == config.arbiter,
-            "Solver: Only the Arbiter address may call this"
-        );
-        require(executed == true, "Solver: Unexecuted");
-        require(pendingArbitration == true, "Solver: Arbitration not pending");
-        conditions[conditions.length - 1].payouts = _payouts;
-        pendingArbitration = false;
-        arbitrationDelivered = true;
-        updateTimelock();
+            conditions[conditions.length - 1].status == Status.Executed ||
+                conditions[conditions.length - 1].status ==
+                Status.OutcomeProposed ||
+                conditions[conditions.length - 1].status ==
+                Status.ArbitrationRequested,
+            "Solver::Condition must be Status.Executed, Status.OutcomeProposed or Status.ArbitrationRequested"
+        ); // TODO, interface for Solver Arbitrators
     }
 
-    function nullArbitrate() external {
+    function rule(bytes memory _arbitratedPayoutData) external {
         require(
-            msg.sender == config.arbiter,
-            "Solver: Only the Arbiter address may call this"
+            msg.sender == address(config.arbitrator),
+            "Solver::Only arbitrator"
         );
         require(
-            pendingArbitration = true,
+            conditions[conditions.length - 1].status ==
+                Status.ArbitrationPending,
+            "Solver::Not Status.ArbitrationPending"
+        );
+        require(block.timestamp > timelock, "Solver::Timelock still locked");
+
+        uint256[] memory _arbitratedPayouts = abi.decode(
+            _arbitratedPayoutData,
+            (uint256[])
+        );
+
+        conditions[conditions.length - 1].status = Status.ArbitrationDelivered;
+        conditions[conditions.length - 1].payouts = _arbitratedPayouts;
+
+        conditionalTokens.reportPayouts(
+            conditions[conditions.length - 1].questionId,
+            conditions[conditions.length - 1].payouts
+        );
+    }
+
+    function nullArbitrate() private {
+        require(
+            msg.sender == address(config.arbitrator),
+            "Solver: Only Arbitrator"
+        );
+        require(
+            conditions[conditions.length - 1].status ==
+                Status.ArbitrationPending,
             "Solver: Arbitration is not pending"
         );
-        pendingArbitration = false;
-        updateTimelock();
+        conditions[conditions.length - 1].status = Status.Executed;
     }
 
     function unsafeExecuteActions() private {

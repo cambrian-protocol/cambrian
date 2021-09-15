@@ -11,12 +11,12 @@ const {
 
 describe("It should all work", function () {
   this.beforeEach(async function () {
-    const [user0, user1, seller, keeper, arbiter] = await ethers.getSigners();
+    const [user0, user1, seller, keeper, arbitrator] = await ethers.getSigners();
     this.user0 = user0;
     this.user1 = user1;
     this.seller = seller;
     this.keeper = keeper;
-    this.arbiter = arbiter;
+    this.arbitrator = arbitrator;
     this.amount = 1000;
 
     this.ToyTokenFactory = await ethers.getContractFactory("ToyToken");
@@ -51,7 +51,7 @@ describe("It should all work", function () {
     this.solutionId = ethers.utils.formatBytes32String("TestID")
 
     await this.SolutionsHub.connect(this.keeper).createSolution(
-      ...getSimpleSolutionConfig(this.solutionId, this.amount, this.SolverFactory.address, this.keeper.address, this.arbiter.address, this.ProposalsHub.address, this.ProposalsHub.address, this.ToyToken.address)
+      ...getSimpleSolutionConfig(this.solutionId, this.amount, this.SolverFactory.address, this.keeper.address, this.arbitrator.address, this.ProposalsHub.address, this.ProposalsHub.address, this.ToyToken.address)
     );
   });
 

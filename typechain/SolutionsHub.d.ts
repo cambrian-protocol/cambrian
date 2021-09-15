@@ -49,7 +49,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
       {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -108,7 +108,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
       {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -250,7 +250,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -352,7 +352,7 @@ export class SolutionsHub extends BaseContract {
           ] & {
             factory: string;
             keeper: string;
-            arbiter: string;
+            arbitrator: string;
             timelockSeconds: BigNumber;
             data: string;
             ingests: ([
@@ -464,7 +464,7 @@ export class SolutionsHub extends BaseContract {
           ] & {
             factory: string;
             keeper: string;
-            arbiter: string;
+            arbitrator: string;
             timelockSeconds: BigNumber;
             data: string;
             ingests: ([
@@ -578,7 +578,7 @@ export class SolutionsHub extends BaseContract {
           ] & {
             factory: string;
             keeper: string;
-            arbiter: string;
+            arbitrator: string;
             timelockSeconds: BigNumber;
             data: string;
             ingests: ([
@@ -690,7 +690,7 @@ export class SolutionsHub extends BaseContract {
           ] & {
             factory: string;
             keeper: string;
-            arbiter: string;
+            arbitrator: string;
             timelockSeconds: BigNumber;
             data: string;
             ingests: ([
@@ -769,7 +769,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -822,7 +822,7 @@ export class SolutionsHub extends BaseContract {
     _solverConfigs: {
       factory: string;
       keeper: string;
-      arbiter: string;
+      arbitrator: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
       ingests: {
@@ -915,7 +915,7 @@ export class SolutionsHub extends BaseContract {
       ] & {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumber;
         data: string;
         ingests: ([
@@ -1012,7 +1012,7 @@ export class SolutionsHub extends BaseContract {
       ] & {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumber;
         data: string;
         ingests: ([
@@ -1083,7 +1083,7 @@ export class SolutionsHub extends BaseContract {
     _solverConfigs: {
       factory: string;
       keeper: string;
-      arbiter: string;
+      arbitrator: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
       ingests: {
@@ -1136,7 +1136,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1237,7 +1237,7 @@ export class SolutionsHub extends BaseContract {
         ] & {
           factory: string;
           keeper: string;
-          arbiter: string;
+          arbitrator: string;
           timelockSeconds: BigNumber;
           data: string;
           ingests: ([
@@ -1342,7 +1342,7 @@ export class SolutionsHub extends BaseContract {
         ] & {
           factory: string;
           keeper: string;
-          arbiter: string;
+          arbitrator: string;
           timelockSeconds: BigNumber;
           data: string;
           ingests: ([
@@ -1413,7 +1413,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1471,7 +1471,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1533,7 +1533,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1587,7 +1587,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1652,7 +1652,7 @@ export class SolutionsHub extends BaseContract {
       _solverConfigs: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {

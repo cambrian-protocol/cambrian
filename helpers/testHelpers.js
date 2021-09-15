@@ -1,7 +1,7 @@
 
 
 
-const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbiterAddress, buyerAddress, sellerAddress) => {
+const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress) => {
     const ingests = [
         {
           executions: 0,
@@ -47,7 +47,7 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbiterAdd
         [
           factoryAddress,
           keeperAddress,
-          arbiterAddress,
+          arbitratorAddress,
           0,
           ethers.utils.formatBytes32String(""),
           ingests,
@@ -59,9 +59,9 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbiterAdd
       return solverConfigs
 }
 
-const getSimpleSolutionConfig = (testID, amount, factoryAddress, keeperAddress, arbiterAddress, buyerAddress, sellerAddress, toyToken) => {
+const getSimpleSolutionConfig = (testID, amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress, toyToken) => {
     return (
-        [testID, toyToken, getSimpleSolverConfig(amount, factoryAddress, keeperAddress, arbiterAddress, buyerAddress,sellerAddress)]
+        [testID, toyToken, getSimpleSolverConfig(amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress,sellerAddress)]
     )
 }
 

@@ -9,11 +9,11 @@ const { getIndexSetFromBinaryArray } = require("../helpers/ConditionalTokens.js"
 describe("It should all work", function () {
   this.beforeEach(async function () {
     
-    const [buyer, seller, keeper, arbiter] = await ethers.getSigners();
+    const [buyer, seller, keeper, arbitrator] = await ethers.getSigners();
     this.buyer = buyer;
     this.seller = seller;
     this.keeper = keeper;
-    this.arbiter = arbiter;
+    this.arbitrator = arbitrator;
 
     this.ToyTokenFactory = await ethers.getContractFactory("ToyToken");
     this.ToyToken = await this.ToyTokenFactory.deploy("TOY", "TOY");
@@ -93,7 +93,7 @@ describe("It should all work", function () {
       [
         this.SolverFactory.address,
         this.keeper.address,
-        this.arbiter.address,
+        this.arbitrator.address,
         0,
         ethers.utils.formatBytes32String(""),
         ingests0,

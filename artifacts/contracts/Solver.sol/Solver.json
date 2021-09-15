@@ -204,7 +204,7 @@
         },
         {
           "internalType": "address",
-          "name": "arbiter",
+          "name": "arbitrator",
           "type": "address"
         },
         {
@@ -413,7 +413,7 @@
             },
             {
               "internalType": "address",
-              "name": "arbiter",
+              "name": "arbitrator",
               "type": "address"
             },
             {

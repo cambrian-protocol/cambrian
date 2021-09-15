@@ -144,7 +144,7 @@ interface SolverInterface extends ethers.utils.Interface {
       {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -487,7 +487,7 @@ export class Solver extends BaseContract {
       ] & {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumber;
         data: string;
         conditionBase: [
@@ -549,7 +549,7 @@ export class Solver extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -734,7 +734,7 @@ export class Solver extends BaseContract {
     ] & {
       factory: string;
       keeper: string;
-      arbiter: string;
+      arbitrator: string;
       timelockSeconds: BigNumber;
       data: string;
       conditionBase: [
@@ -796,7 +796,7 @@ export class Solver extends BaseContract {
     _solverConfig: {
       factory: string;
       keeper: string;
-      arbiter: string;
+      arbitrator: string;
       timelockSeconds: BigNumberish;
       data: BytesLike;
       ingests: {
@@ -981,7 +981,7 @@ export class Solver extends BaseContract {
       ] & {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumber;
         data: string;
         conditionBase: [
@@ -1036,7 +1036,7 @@ export class Solver extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1232,7 +1232,7 @@ export class Solver extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {
@@ -1439,7 +1439,7 @@ export class Solver extends BaseContract {
       _solverConfig: {
         factory: string;
         keeper: string;
-        arbiter: string;
+        arbitrator: string;
         timelockSeconds: BigNumberish;
         data: BytesLike;
         ingests: {

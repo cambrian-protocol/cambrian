@@ -57,7 +57,7 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "_arbiter",
+        name: "_arbitrator",
         type: "address",
       },
       {
