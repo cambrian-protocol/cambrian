@@ -483,25 +483,8 @@ contract Solver is Initializable, ERC1155Receiver {
         conditions[conditions.length - 1].status = Status.OutcomeReported;
     }
 
-    function requestArbitration(uint256[] memory _requestedPayouts)
-        external
-        payable
-    {
-        require(
-            conditions[conditions.length - 1].status == Status.Executed ||
-                conditions[conditions.length - 1].status ==
-                Status.OutcomeProposed ||
-                conditions[conditions.length - 1].status ==
-                Status.ArbitrationRequested,
-            "Solver::Condition must be Status.Executed, Status.OutcomeProposed or Status.ArbitrationRequested"
-        ); // TODO, interface for Solver Arbitrators
-    }
-
-    function rule(bytes memory _arbitratedPayoutData) external {
-        require(
-            msg.sender == address(config.arbitrator),
-            "Solver::Only arbitrator"
-        );
+    function arbitrate(uint256[] memory payouts) external {
+        require(msg.sender == config.arbitrator, "Solver::Only arbitrator");
         require(
             conditions[conditions.length - 1].status ==
                 Status.ArbitrationPending,
@@ -509,31 +492,44 @@ contract Solver is Initializable, ERC1155Receiver {
         );
         require(block.timestamp > timelock, "Solver::Timelock still locked");
 
-        uint256[] memory _arbitratedPayouts = abi.decode(
-            _arbitratedPayoutData,
-            (uint256[])
-        );
-
         conditions[conditions.length - 1].status = Status.ArbitrationDelivered;
-        conditions[conditions.length - 1].payouts = _arbitratedPayouts;
-
         conditionalTokens.reportPayouts(
             conditions[conditions.length - 1].questionId,
-            conditions[conditions.length - 1].payouts
+            payouts
         );
     }
 
-    function nullArbitrate() private {
-        require(
-            msg.sender == address(config.arbitrator),
-            "Solver: Only Arbitrator"
-        );
+    function arbitrateNull() external {
+        require(msg.sender == config.arbitrator, "Solver::Only arbitrator");
         require(
             conditions[conditions.length - 1].status ==
                 Status.ArbitrationPending,
-            "Solver: Arbitration is not pending"
+            "Solver::Not Status.ArbitrationPending"
         );
-        conditions[conditions.length - 1].status = Status.Executed;
+
+        conditions[conditions.length - 1].status = Status.OutcomeProposed;
+        updateTimelock();
+    }
+
+    function arbitrationRequested() external {
+        require(msg.sender == config.arbitrator, "Solver::Only arbitrator");
+        require(
+            conditions[conditions.length - 1].status == Status.OutcomeProposed,
+            "Solver::Not Status.OutcomeProposed"
+        );
+        conditions[conditions.length - 1].status = Status.ArbitrationRequested;
+        updateTimelock();
+    }
+
+    function arbitrationPending() external {
+        require(msg.sender == config.arbitrator, "Solver::Only arbitrator");
+        require(
+            conditions[conditions.length - 1].status ==
+                Status.ArbitrationRequested,
+            "Solver::Not Status.ArbitrationRequested"
+        );
+        conditions[conditions.length - 1].status = Status.ArbitrationPending;
+        updateTimelock();
     }
 
     function unsafeExecuteActions() private {
@@ -617,6 +613,14 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function numConditions() public view returns (uint256) {
         return conditions.length;
+    }
+
+    function arbitrator() public view returns (address) {
+        return config.arbitrator;
+    }
+
+    function keeper() public view returns (address) {
+        return config.keeper;
     }
 
     function onERC1155Received(
