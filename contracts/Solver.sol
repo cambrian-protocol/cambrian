@@ -8,9 +8,13 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./SolutionsHub.sol";
-import "hardhat/console.sol";
+
+// CT_DEV Address = 0x5FbDB2315678afecb367f032d93F642f64180aa3
 
 contract Solver is Initializable, ERC1155Receiver {
+    ConditionalTokens public immutable conditionalTokens =
+        ConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
+
     struct Action {
         bool executed;
         bool isPort;
@@ -121,7 +125,6 @@ contract Solver is Initializable, ERC1155Receiver {
     Config public config; // Primary config of the Solver
     Condition[] public conditions; // Array of conditions
 
-    ConditionalTokens public conditionalTokens; // ConditionalTokens contract
     IERC20 public collateralToken; // Collateral being used
 
     bytes32 public proposalId; // ID of proposal linked to the solution
@@ -171,7 +174,6 @@ contract Solver is Initializable, ERC1155Receiver {
 
         config = _solverConfig;
 
-        conditionalTokens = SolutionsHub(_solutionsHub).conditionalTokens();
         collateralToken = _collateralToken;
         solutionId = _solutionId;
         proposalId = _proposalId;
@@ -230,7 +232,6 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function executeIngests() private {
-        console.log("Executing ingests");
         for (uint256 i; i < config.ingests.length; i++) {
             if (!config.ingests[i].isDeferred) {
                 ingest(i);
@@ -240,11 +241,6 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function ingest(uint256 _index) public {
         config.ingests[_index].executions++;
-
-        console.logAddress(address(this));
-        console.logUint(config.ingests[_index].port);
-        console.logUint(config.ingests[_index].key);
-        console.logBytes(config.ingests[_index].data);
 
         if (config.ingests[_index].isConstant) {
             constantRouter(
@@ -304,8 +300,6 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function addCondition() private {
-        console.log("Adding condition");
-
         Condition memory _condition;
 
         _condition.questionId = keccak256(
@@ -369,7 +363,6 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function splitPosition() private {
-        console.log("Split position");
         conditionalTokens.splitPosition(
             collateralToken,
             conditions[conditions.length - 1].parentCollectionId,
@@ -380,12 +373,7 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function allocatePartition() private {
-        console.log("allocatePartition");
-
         for (uint256 i; i < config.conditionBase.partition.length; i++) {
-            console.logBytes32(
-                conditions[conditions.length - 1].parentCollectionId
-            );
             bytes32 _collectionId = conditionalTokens.getCollectionId(
                 conditions[conditions.length - 1].parentCollectionId,
                 conditions[conditions.length - 1].conditionId,
@@ -418,13 +406,11 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function prepareSolve() public {
-        console.log("Preparing solve");
         addCondition();
         executeIngests();
     }
 
     function executeSolve() public {
-        console.log("Executing solve");
         require(
             conditions[conditions.length - 1].status == Status.Initiated,
             "Solver::Condition not status Initiated"
@@ -560,9 +546,6 @@ contract Solver is Initializable, ERC1155Receiver {
         (bool success, bytes memory retData) = _action.to.call{
             value: _action.value
         }(_action.data);
-
-        console.logBool(success);
-        console.logBytes(retData);
         require(success, "Solver::call failure");
     }
 

@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "./ConditionalTokens.sol";
 import "./SolverFactory.sol";
 import "./SolutionsHub.sol";
-import "hardhat/console.sol";
 
 contract ProposalsHub is ERC1155Receiver {
     uint256 nonce;
@@ -71,7 +70,6 @@ contract ProposalsHub is ERC1155Receiver {
         IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
         _token.approve(_solver, 0);
         _token.approve(_solver, proposals[_proposalId].funding);
-        console.log("Approved funding from proposalsHub");
     }
 
     function createProposal(
@@ -190,8 +188,6 @@ contract ProposalsHub is ERC1155Receiver {
 
         uint256 _claimAmount = (reclaimableTokens[_proposalId][_tokenId] /
             _claimDenominator) - reclaimedTokens[_tokenId][msg.sender];
-
-        console.log("Claim amount: ", _claimAmount);
         require(_claimAmount > 0, "ProposalsHub::Claim is 0");
         require(
             _claimAmount <= reclaimableTokens[_proposalId][_tokenId],
@@ -234,8 +230,6 @@ contract ProposalsHub is ERC1155Receiver {
             proposals[_proposalId].isExecuted,
             "ProposalsHub::Proposal has not been executed"
         );
-
-        console.log("Received ERC1155 Tokens: ", id);
         postReclaimableTokens(_proposalId, id, value);
 
         return this.onERC1155Received.selector;

@@ -4,7 +4,6 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ConditionalTokens.sol";
 import "./Solver.sol";
-import "hardhat/console.sol";
 
 contract SolverFactory {
     address public immutable implementationAddress;
@@ -36,8 +35,6 @@ contract SolverFactory {
         );
 
         solvers.push(clone);
-
-        console.logAddress(address(clone));
         return address(clone);
     }
 }

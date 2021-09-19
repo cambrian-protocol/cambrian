@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
 const SOLUTIONSHUB_ABI = require("../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
@@ -10,6 +10,8 @@ const {
 } = require('@openzeppelin/test-helpers');
 
 describe("It should all work", function () {
+
+
   this.beforeEach(async function () {
     const [user0, user1, seller, keeper, arbitrator] = await ethers.getSigners();
     this.user0 = user0;
@@ -19,33 +21,21 @@ describe("It should all work", function () {
     this.arbitrator = arbitrator;
     this.amount = 1000;
 
-    this.ToyTokenFactory = await ethers.getContractFactory("ToyToken");
-    this.ToyToken = await this.ToyTokenFactory.deploy("TOY", "TOY");
-    await this.ToyToken.mint(this.user0.address, this.amount);
-    await this.ToyToken.mint(this.user1.address, this.amount);
-
-
-    this.CTFactory = await ethers.getContractFactory("ConditionalTokens");
-    this.CT = await this.CTFactory.deploy();
-
-    this.ProposalsHubFactory = await ethers.getContractFactory("ProposalsHub");
-    this.ProposalsHub = await this.ProposalsHubFactory.deploy();
-
-    this.SolutionsHubFactory = await ethers.getContractFactory("SolutionsHub");
-    this.SolutionsHub = await this.SolutionsHubFactory.deploy(this.CT.address);
-
-
-    this.SolverFactoryFactory = await ethers.getContractFactory(
-      "SolverFactory"
-    );
-    this.SolverFactory = await this.SolverFactoryFactory.deploy();
-
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken"]);
+    this.CT = await ethers.getContract("ConditionalTokens")
+    this.SolverFactory = await ethers.getContract("SolverFactory")
+    this.SolutionsHub = await ethers.getContract("SolutionsHub")
+    this.ProposalsHub = await ethers.getContract("ProposalsHub")
+    this.ToyToken = await ethers.getContract("ToyToken")
+  
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
-
+  
     this.ISolutionsHub = new ethers.utils.Interface(SOLUTIONSHUB_ABI);
     this.ISolutionsHub.format(FormatTypes.full);
 
+    await this.ToyToken.mint(this.user0.address, this.amount);
+    await this.ToyToken.mint(this.user1.address, this.amount);
 
     //Create solution
     this.solutionId = ethers.utils.formatBytes32String("TestID")

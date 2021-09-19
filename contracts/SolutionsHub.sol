@@ -6,10 +6,10 @@ import "./Solver.sol";
 import "./ConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
 import "./ProposalsHub.sol";
-import "hardhat/console.sol";
 
 contract SolutionsHub {
-    ConditionalTokens public conditionalTokens;
+    ConditionalTokens public immutable conditionalTokens =
+        ConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
 
     struct Solution {
         bool executed;
@@ -34,10 +34,6 @@ contract SolutionsHub {
     }
 
     event CreateSolution(bytes32 id);
-
-    constructor(ConditionalTokens _conditionalTokens) {
-        conditionalTokens = _conditionalTokens;
-    }
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(

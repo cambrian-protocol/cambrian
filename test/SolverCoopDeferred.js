@@ -1,4 +1,4 @@
-const { ethers } = require("hardhat");
+const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
 const SOLUTIONSHUB_ABI = require("../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
@@ -6,32 +6,26 @@ const { FormatTypes } = require("ethers/lib/utils");
 const { getIndexSetFromBinaryArray } = require("../helpers/ConditionalTokens.js")
 
 
-describe("It should all work", function () {
+describe("It should all work", async function () {
   this.beforeEach(async function () {
     
     const [buyer, seller, keeper, arbitrator] = await ethers.getSigners();
+
+    
     this.buyer = buyer;
     this.seller = seller;
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    this.ToyTokenFactory = await ethers.getContractFactory("ToyToken");
-    this.ToyToken = await this.ToyTokenFactory.deploy("TOY", "TOY");
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken"]);
+    this.CT = await ethers.getContract("ConditionalTokens")
+    this.SolverFactory = await ethers.getContract("SolverFactory")
+    this.SolutionsHub = await ethers.getContract("SolutionsHub")
+    this.ProposalsHub = await ethers.getContract("ProposalsHub")
+    this.ToyToken = await ethers.getContract("ToyToken")
+    
     await this.ToyToken.mint(this.buyer.address, "100");
 
-    this.CTFactory = await ethers.getContractFactory("ConditionalTokens");
-    this.CT = await this.CTFactory.deploy();
-
-    this.ProposalsHubFactory = await ethers.getContractFactory("ProposalsHub");
-    this.ProposalsHub = await this.ProposalsHubFactory.deploy();
-
-    this.SolutionsHubFactory = await ethers.getContractFactory("SolutionsHub");
-    this.SolutionsHub = await this.SolutionsHubFactory.deploy(this.CT.address);
-
-    this.SolverFactoryFactory = await ethers.getContractFactory(
-      "SolverFactory"
-    );
-    this.SolverFactory = await this.SolverFactoryFactory.deploy();
 
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);

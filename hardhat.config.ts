@@ -4,6 +4,7 @@ require("hardhat-contract-sizer")
 require("@nomiclabs/hardhat-ethers")
 require('hardhat-deploy');
 require("@nomiclabs/hardhat-web3");
+require('hardhat-log-remover');
 // require("hardhat-gas-reporter");
 const { HardhatUserConfig } = require("hardhat/types");
 
@@ -21,6 +22,9 @@ const config = {
         runs: 1000,
       },
     } }, { version: "0.5.17", settings: {} }],
+  },
+  namedAccounts: {
+    deployer: 0,
   },
   gasReporter: {
     currency: 'USD',

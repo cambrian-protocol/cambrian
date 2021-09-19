@@ -1,8 +1,10 @@
-module.exports = async () => {
-    // We get the contract to deploy
-    const ConditionalTokens = await ethers.getContractFactory("ConditionalTokens");
-    const conditionalTokens = await ConditionalTokens.deploy();
-  
-    console.log("ConditionalTokens deployed to:", conditionalTokens.address);
-  }
-  
+module.exports = async ({getNamedAccounts, deployments}) => {
+  const {deploy} = deployments;
+  const {deployer} = await getNamedAccounts();
+  await deploy('ConditionalTokens', {
+    from: deployer,
+    args: [],
+    log: true,
+  })
+};
+module.exports.tags = ['ConditionalTokens'];
