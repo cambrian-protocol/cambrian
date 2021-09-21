@@ -6,8 +6,8 @@ import "./ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./SolutionsHub.sol";
+import "hardhat/console.sol";
 
 // CT_DEV Address = 0x5FbDB2315678afecb367f032d93F642f64180aa3
 
@@ -102,9 +102,9 @@ contract Solver is Initializable, ERC1155Receiver {
 
     /**
         @dev                    Configuration of this Solver
-        factory                 The implementation address for this Solver
+        implementation          The implementation address for this Solver
         keeper                  Keeper address
-        arbitrator                 Arbitrator address
+        arbitrator              Arbitrator address
         timelockSeconds         Number of seconds to increment timelock for during critical activities
         data                    Arbitrary data
         ingests;                Data ingests to be performed to bring data in from other Solver
@@ -112,7 +112,7 @@ contract Solver is Initializable, ERC1155Receiver {
         conditionBase           Base to create conditions from
      */
     struct Config {
-        SolverFactory factory;
+        Solver implementation;
         address keeper;
         address arbitrator;
         uint256 timelockSeconds;
@@ -127,11 +127,11 @@ contract Solver is Initializable, ERC1155Receiver {
 
     IERC20 public collateralToken; // Collateral being used
 
-    bytes32 public proposalId; // ID of proposal linked to the solution
-    bytes32 public solutionId; // ID of solution being solved
-    address public proposalsHub; // The proposalsHub address managing this Solver
-    address public solutionsHub; // The solutionsHub address managing this Solver
+    address public chainParent;
+    address public chainChild;
+    uint256 public chainIndex;
     uint256 public timelock; // Current timelock
+    bytes32 public trackingId;
 
     mapping(uint256 => address) public addressPort;
     mapping(uint256 => bool) public boolPort;
@@ -141,44 +141,41 @@ contract Solver is Initializable, ERC1155Receiver {
     mapping(uint256 => mapping(uint256 => bool)) public lockedPorts; // locks constant ports
     mapping(uint256 => mapping(uint256 => uint256)) public portVersions; // version tracking for unlocked ports
 
-    modifier solverOrKeeper() {
-        if (msg.sender == config.keeper) {
-            _;
-        } else {
-            address[] memory _solvers = SolutionsHub(solutionsHub)
-                .getSolutionSolverAddresses(solutionId);
-            for (uint256 i; i < _solvers.length; i++) {
-                if (msg.sender == _solvers[i]) {
-                    _;
-                }
-            }
-        }
-    }
-
     function init(
         IERC20 _collateralToken,
-        bytes32 _solutionId,
-        bytes32 _proposalId,
-        address _proposalsHub,
-        address _solutionsHub,
+        address _chainParent,
+        uint256 _chainIndex,
         Config calldata _solverConfig
     ) external {
         require(
-            msg.sender == address(_solverConfig.factory),
+            msg.sender == address(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512), // FACTORY DEV ADDRESS
             "Solver::Only factory may call init"
         );
         require(
             _solverConfig.keeper != address(0),
             "Solver: Keeper address invalid"
         );
-
-        config = _solverConfig;
-
         collateralToken = _collateralToken;
-        solutionId = _solutionId;
-        proposalId = _proposalId;
-        proposalsHub = _proposalsHub;
-        solutionsHub = _solutionsHub;
+        chainParent = _chainParent;
+        chainIndex = _chainIndex;
+        config = _solverConfig;
+    }
+
+    function deployChild(Config calldata _config)
+        external
+        returns (Solver _solver)
+    {
+        require(chainChild == address(0), "Solver::Solver already has child");
+
+        chainChild = SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
+            .createSolver(
+                collateralToken,
+                address(this),
+                chainIndex + 1,
+                _config
+            );
+
+        _solver = Solver(chainChild);
     }
 
     function router(
@@ -187,15 +184,15 @@ contract Solver is Initializable, ERC1155Receiver {
         bytes memory _data
     ) private {
         if (_port == 0) {
-            addressPort[_key] = BytesLib.toAddress(_data, 0);
+            addressPort[_key] = abi.decode(_data, (address));
         } else if (_port == 1) {
-            boolPort[_key] = BytesLib.toUint8(_data, 0) > 0 ? true : false;
+            boolPort[_key] = abi.decode(_data, (bool));
         } else if (_port == 2) {
-            bytesPort[_key] = _data;
+            bytesPort[_key] = abi.decode(_data, (bytes));
         } else if (_port == 3) {
-            bytes32Port[_key] = BytesLib.toBytes32(_data, 0);
+            bytes32Port[_key] = abi.decode(_data, (bytes32));
         } else if (_port == 4) {
-            uint256Port[_key] = BytesLib.toUint256(_data, 0);
+            uint256Port[_key] = abi.decode(_data, (uint256));
         }
     }
 
@@ -227,7 +224,7 @@ contract Solver is Initializable, ERC1155Receiver {
         uint8 _port,
         uint256 _key,
         bytes memory _data
-    ) external solverOrKeeper {
+    ) external {
         dynamicRouter(_port, _key, _data);
     }
 
@@ -272,15 +269,15 @@ contract Solver is Initializable, ERC1155Receiver {
             "Solver::Port is unmapped or wrong version."
         );
         if (_port == 0) {
-            return abi.encodePacked(addressPort[_key]);
+            return abi.encode(addressPort[_key]);
         } else if (_port == 1) {
-            return abi.encodePacked(boolPort[_key]);
+            return abi.encode(boolPort[_key]);
         } else if (_port == 2) {
-            return abi.encodePacked(bytesPort[_key]);
+            return abi.encode(bytesPort[_key]);
         } else if (_port == 3) {
-            return abi.encodePacked(bytes32Port[_key]);
+            return abi.encode(bytes32Port[_key]);
         } else if (_port == 3) {
-            return abi.encodePacked(uint256Port[_key]);
+            return abi.encode(uint256Port[_key]);
         }
     }
 
@@ -310,13 +307,10 @@ contract Solver is Initializable, ERC1155Receiver {
             )
         );
 
-        address _parentSolver = SolutionsHub(solutionsHub).parentSolver(
-            solutionId
-        );
-        if (_parentSolver == address(0)) {
+        if (chainParent == address(0)) {
             _condition.parentCollectionId = bytes32(""); // top level collection
         } else {
-            _condition.parentCollectionId = Solver(_parentSolver)
+            _condition.parentCollectionId = Solver(chainParent)
                 .getCanonCollectionId(
                     config.conditionBase.parentCollectionPartitionIndex
                 );
@@ -334,7 +328,6 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function prepareCondition() private {
-        // prepareCondition
         conditionalTokens.prepareCondition(
             address(this),
             conditions[conditions.length - 1].questionId,
@@ -343,19 +336,8 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function handleShallowPosition() private {
-        if (
-            conditions[conditions.length - 1].parentCollectionId == bytes32("")
-        ) {
-            IERC20 _token = IERC20(collateralToken);
-            // pull collateral in
-            _token.transferFrom(
-                proposalsHub,
-                address(this),
-                config.conditionBase.amount
-            );
-            // approve erc20 transfer to conditional tokens contract
-            _token.approve(address(conditionalTokens), 0);
-            _token.approve(
+        if (chainParent == address(0)) {
+            IERC20(collateralToken).approve(
                 address(conditionalTokens),
                 config.conditionBase.amount
             );
@@ -391,6 +373,11 @@ contract Solver is Initializable, ERC1155Receiver {
                 j++
             ) {
                 if (config.conditionBase.recipientAmounts[i][j] > 0) {
+                    console.logAddress(
+                        addressPort[
+                            config.conditionBase.recipientAddressPorts[i][j]
+                        ]
+                    );
                     conditionalTokens.safeTransferFrom(
                         address(this),
                         addressPort[
@@ -398,7 +385,7 @@ contract Solver is Initializable, ERC1155Receiver {
                         ],
                         _positionId,
                         config.conditionBase.recipientAmounts[i][j],
-                        abi.encode(proposalId)
+                        abi.encode(trackingId)
                     );
                 }
             }
@@ -427,14 +414,11 @@ contract Solver is Initializable, ERC1155Receiver {
     }
 
     function cascade() private {
-        address _childSolver = SolutionsHub(solutionsHub).childSolver(
-            solutionId
-        );
         if (
-            _childSolver != address(0) &&
-            Solver(_childSolver).deferredIngestsValid()
+            chainChild != address(0) &&
+            Solver(chainChild).deferredIngestsValid()
         ) {
-            Solver(_childSolver).executeSolve();
+            Solver(chainChild).executeSolve();
         }
     }
 
@@ -562,16 +546,18 @@ contract Solver is Initializable, ERC1155Receiver {
         return _collectionId;
     }
 
-    function solverAddressFromIndex(uint256 _index)
-        external
+    function addressFromChainIndex(uint256 _index)
+        public
         view
-        returns (bytes20 _address)
+        returns (address _address)
     {
-        address _solver = SolutionsHub(solutionsHub).solverFromIndex(
-            solutionId,
-            _index
-        );
-        return bytes20(_solver);
+        if (_index == chainIndex) {
+            _address = address(this);
+        } else if (_index < chainIndex) {
+            _address = Solver(chainParent).addressFromChainIndex(_index);
+        } else if (_index > chainIndex) {
+            _address = Solver(chainChild).addressFromChainIndex(_index);
+        }
     }
 
     function staticcallSolver(uint256 _solverIndex, bytes memory _data)
@@ -579,13 +565,8 @@ contract Solver is Initializable, ERC1155Receiver {
         view
         returns (bytes memory)
     {
-        address _solver = SolutionsHub(solutionsHub).solverFromIndex(
-            solutionId,
-            _solverIndex
-        );
-
+        address _solver = addressFromChainIndex(_solverIndex);
         (bool success, bytes memory retData) = _solver.staticcall(_data);
-
         require(success, "Solver::Ingest staticcall failed");
         return retData;
     }
@@ -604,6 +585,11 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function keeper() public view returns (address) {
         return config.keeper;
+    }
+
+    function setTrackingId(bytes32 _trackingId) public {
+        require(trackingId == bytes32(0), "Solver::TrackingId already set");
+        trackingId = _trackingId;
     }
 
     function onERC1155Received(

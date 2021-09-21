@@ -5,35 +5,32 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ConditionalTokens.sol";
 import "./Solver.sol";
 
+// 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512  DEV_ADDRESS
 contract SolverFactory {
-    address public immutable implementationAddress;
     Solver[] public solvers;
 
     event SolverCreated(address newSolverAddress);
 
-    constructor() {
-        implementationAddress = address(new Solver());
-    }
-
     function createSolver(
         IERC20 _collateralToken,
-        bytes32 _solutionId,
-        bytes32 _proposalId,
-        address _proposalsHub,
-        address _solutionsHub,
+        address _chainParent,
+        uint256 _chainIndex,
         Solver.Config calldata _solverConfig
     ) external returns (address) {
-        Solver clone = Solver(Clones.clone(implementationAddress));
-
-        Solver(clone).init(
-            _collateralToken,
-            _solutionId,
-            _proposalId,
-            _proposalsHub,
-            _solutionsHub,
-            _solverConfig
+        require(
+            address(_solverConfig.implementation) != address(0),
+            "SolverFactory::Invalid implementation address"
         );
 
+        Solver clone = Solver(
+            Clones.clone(address(_solverConfig.implementation))
+        );
+        Solver(clone).init(
+            _collateralToken,
+            _chainParent,
+            _chainIndex,
+            _solverConfig
+        );
         solvers.push(clone);
         return address(clone);
     }

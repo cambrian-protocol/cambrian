@@ -6,6 +6,7 @@ import "./ConditionalTokens.sol";
 import "./SolverFactory.sol";
 import "./SolutionsHub.sol";
 
+// 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
     uint256 nonce;
 
@@ -47,9 +48,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
     }
 
-    function approveERC20Transfer(bytes32 _proposalId, address _solver)
-        external
-    {
+    function transferERC20(bytes32 _proposalId, address _solver) external {
         require(
             msg.sender == proposals[_proposalId].solutionsHub,
             "msg.sender not solutionsHub"
@@ -68,8 +67,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
 
         IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
-        _token.approve(_solver, 0);
-        _token.approve(_solver, proposals[_proposalId].funding);
+        _token.transfer(_solver, proposals[_proposalId].funding);
     }
 
     function createProposal(

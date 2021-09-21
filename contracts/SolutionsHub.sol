@@ -7,6 +7,8 @@ import "./ConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
 import "./ProposalsHub.sol";
 
+// 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 DEV_ADDRESS
+
 contract SolutionsHub {
     ConditionalTokens public immutable conditionalTokens =
         ConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
@@ -44,6 +46,29 @@ contract SolutionsHub {
         solutions[_solutionId].proposalId = _proposalId;
     }
 
+    function deploySolverChain(bytes32 _solutionId) private {
+        Solver _solver;
+
+        for (uint256 i; i < solutions[_solutionId].solverConfigs.length; i++) {
+            if (i == 0) {
+                _solver = Solver(
+                    SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
+                        .createSolver(
+                            solutions[_solutionId].collateralToken,
+                            address(0),
+                            i,
+                            solutions[_solutionId].solverConfigs[i]
+                        )
+                );
+            } else {
+                _solver = _solver.deployChild(
+                    solutions[_solutionId].solverConfigs[i]
+                );
+            }
+            solutions[_solutionId].solverAddresses.push(address(_solver));
+        }
+    }
+
     function executeSolution(bytes32 _proposalId, bytes32 _solutionId)
         external
     {
@@ -62,27 +87,9 @@ contract SolutionsHub {
         );
         solutions[_solutionId].executed = true;
 
-        for (uint256 i; i < solutions[_solutionId].solverConfigs.length; i++) {
-            SolverFactory _factory = solutions[_solutionId]
-                .solverConfigs[i]
-                .factory;
+        deploySolverChain(_solutionId);
 
-            address _solver = _factory.createSolver({
-                _collateralToken: solutions[_solutionId].collateralToken,
-                _solutionId: _solutionId,
-                _proposalId: _proposalId,
-                _proposalsHub: solutions[_solutionId].proposalHub,
-                _solutionsHub: address(this),
-                _solverConfig: solutions[_solutionId].solverConfigs[i]
-            });
-
-            require(_solver != address(0), "Invalid address");
-
-            solutions[_solutionId].solverAddresses.push(_solver);
-            solverSolutionMap[_solver] = _solutionId;
-        }
-
-        ProposalsHub(msg.sender).approveERC20Transfer(
+        ProposalsHub(msg.sender).transferERC20(
             _proposalId,
             solutions[_solutionId].solverAddresses[0]
         );
@@ -91,58 +98,11 @@ contract SolutionsHub {
             ISolver _solver = ISolver(
                 solutions[_solutionId].solverAddresses[i]
             );
+            _solver.setTrackingId(solutions[_solutionId].proposalId);
             _solver.prepareSolve();
         }
         // Execute first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve();
-    }
-
-    function solverFromIndex(bytes32 _solutionId, uint256 _index)
-        external
-        view
-        returns (address solver)
-    {
-        return solutions[_solutionId].solverAddresses[_index];
-    }
-
-    function childSolver(bytes32 _solutionId)
-        external
-        view
-        returns (address solver)
-    {
-        for (
-            uint256 i;
-            i < solutions[_solutionId].solverAddresses.length - 1;
-            i++
-        ) {
-            if (msg.sender == solutions[_solutionId].solverAddresses[i]) {
-                return solutions[_solutionId].solverAddresses[i + 1];
-            }
-        }
-
-        return address(0);
-    }
-
-    function parentSolver(bytes32 _solutionId)
-        external
-        view
-        returns (address solver)
-    {
-        for (
-            uint256 i;
-            i < solutions[_solutionId].solverAddresses.length;
-            i++
-        ) {
-            if (msg.sender == solutions[_solutionId].solverAddresses[i]) {
-                if (i == 0) {
-                    return address(0);
-                } else {
-                    return solutions[_solutionId].solverAddresses[i - 1];
-                }
-            }
-        }
-
-        return address(0);
     }
 
     function createSolution(
@@ -179,19 +139,11 @@ contract SolutionsHub {
         }
     }
 
-    function getSolution(bytes32 _id)
+    function solverFromIndex(bytes32 _solutionId, uint256 _index)
         external
         view
-        returns (Solution memory solution)
+        returns (address _address)
     {
-        return solutions[_id];
-    }
-
-    function getSolutionSolverAddresses(bytes32 _id)
-        external
-        view
-        returns (address[] memory _addresses)
-    {
-        return solutions[_id].solverAddresses;
+        _address = solutions[_solutionId].solverAddresses[_index];
     }
 }

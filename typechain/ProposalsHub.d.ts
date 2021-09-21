@@ -21,7 +21,6 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ProposalsHubInterface extends ethers.utils.Interface {
   functions: {
-    "approveERC20Transfer(bytes32,address)": FunctionFragment;
     "createProposal(address,address,uint256,bytes32)": FunctionFragment;
     "defundProposal(bytes32,address,uint256)": FunctionFragment;
     "executeProposal(bytes32)": FunctionFragment;
@@ -36,12 +35,9 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     "reclaimableTokens(bytes32,uint256)": FunctionFragment;
     "reclaimedTokens(uint256,address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "transferERC20(bytes32,address)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "approveERC20Transfer",
-    values: [BytesLike, string]
-  ): string;
   encodeFunctionData(
     functionFragment: "createProposal",
     values: [string, string, BigNumberish, BytesLike]
@@ -98,11 +94,11 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "transferERC20",
+    values: [BytesLike, string]
+  ): string;
 
-  decodeFunctionResult(
-    functionFragment: "approveERC20Transfer",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "createProposal",
     data: BytesLike
@@ -151,6 +147,10 @@ interface ProposalsHubInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferERC20",
     data: BytesLike
   ): Result;
 
@@ -205,12 +205,6 @@ export class ProposalsHub extends BaseContract {
   interface: ProposalsHubInterface;
 
   functions: {
-    approveERC20Transfer(
-      _proposalId: BytesLike,
-      _solver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     createProposal(
       _collateralToken: string,
       _solutionsHub: string,
@@ -364,13 +358,13 @@ export class ProposalsHub extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
-  };
 
-  approveERC20Transfer(
-    _proposalId: BytesLike,
-    _solver: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+    transferERC20(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+  };
 
   createProposal(
     _collateralToken: string,
@@ -502,13 +496,13 @@ export class ProposalsHub extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  callStatic: {
-    approveERC20Transfer(
-      _proposalId: BytesLike,
-      _solver: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+  transferERC20(
+    _proposalId: BytesLike,
+    _solver: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
+  callStatic: {
     createProposal(
       _collateralToken: string,
       _solutionsHub: string,
@@ -638,6 +632,12 @@ export class ProposalsHub extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    transferERC20(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
@@ -645,12 +645,6 @@ export class ProposalsHub extends BaseContract {
   };
 
   estimateGas: {
-    approveERC20Transfer(
-      _proposalId: BytesLike,
-      _solver: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     createProposal(
       _collateralToken: string,
       _solutionsHub: string,
@@ -730,15 +724,15 @@ export class ProposalsHub extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-  };
 
-  populateTransaction: {
-    approveERC20Transfer(
+    transferERC20(
       _proposalId: BytesLike,
       _solver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<BigNumber>;
+  };
 
+  populateTransaction: {
     createProposal(
       _collateralToken: string,
       _solutionsHub: string,
@@ -826,6 +820,12 @@ export class ProposalsHub extends BaseContract {
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    transferERC20(
+      _proposalId: BytesLike,
+      _solver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

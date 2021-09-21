@@ -21,12 +21,13 @@ describe("It should all work", function () {
     this.arbitrator = arbitrator;
     this.amount = 1000;
 
-    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken"]);
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "Solver"]);
     this.CT = await ethers.getContract("ConditionalTokens")
     this.SolverFactory = await ethers.getContract("SolverFactory")
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
+    this.Solver = await ethers.getContract("Solver")
   
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
@@ -41,12 +42,11 @@ describe("It should all work", function () {
     this.solutionId = ethers.utils.formatBytes32String("TestID")
 
     await this.SolutionsHub.connect(this.keeper).createSolution(
-      ...getSimpleSolutionConfig(this.solutionId, this.amount, this.SolverFactory.address, this.keeper.address, this.arbitrator.address, this.ProposalsHub.address, this.ProposalsHub.address, this.ToyToken.address)
+      ...getSimpleSolutionConfig(this.solutionId, this.amount, this.Solver.address, this.keeper.address, this.arbitrator.address, this.ProposalsHub.address, this.ProposalsHub.address, this.ToyToken.address)
     );
   });
 
   it("Should fund a proposal", async function () {
-
     //Create proposal
     let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
       this.ToyToken.address,

@@ -25,6 +25,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     "arbitrate(uint256[])": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
     "createCondition(bytes32,uint256)": FunctionFragment;
+    "deployChild(tuple)": FunctionFragment;
     "executeAction(uint256)": FunctionFragment;
     "executeActions()": FunctionFragment;
     "executeSolve()": FunctionFragment;
@@ -34,6 +35,7 @@ interface ISolverInterface extends ethers.utils.Interface {
     "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
     "setApproval(address,bool)": FunctionFragment;
+    "setTrackingId(bytes32)": FunctionFragment;
     "splitCondition(bytes32,bytes32,uint256,uint256[],address,uint256)": FunctionFragment;
   };
 
@@ -52,6 +54,44 @@ interface ISolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "createCondition",
     values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "deployChild",
+    values: [
+      {
+        implementation: string;
+        keeper: string;
+        arbitrator: string;
+        timelockSeconds: BigNumberish;
+        data: BytesLike;
+        ingests: {
+          executions: BigNumberish;
+          isDeferred: boolean;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+        conditionBase: {
+          outcomeSlots: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
+      }
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "executeAction",
@@ -90,6 +130,10 @@ interface ISolverInterface extends ethers.utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setTrackingId",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "splitCondition",
     values: [
       BytesLike,
@@ -112,6 +156,10 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "createCondition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "deployChild",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -148,6 +196,10 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApproval",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setTrackingId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -224,6 +276,43 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    deployChild(
+      _config: {
+        implementation: string;
+        keeper: string;
+        arbitrator: string;
+        timelockSeconds: BigNumberish;
+        data: BytesLike;
+        ingests: {
+          executions: BigNumberish;
+          isDeferred: boolean;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+        conditionBase: {
+          outcomeSlots: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     executeAction(
       _actionIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -274,6 +363,11 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setTrackingId(
+      _trackingId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     splitCondition(
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
@@ -304,6 +398,43 @@ export class ISolver extends BaseContract {
   createCondition(
     _questionId: BytesLike,
     _outcomeSlots: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  deployChild(
+    _config: {
+      implementation: string;
+      keeper: string;
+      arbitrator: string;
+      timelockSeconds: BigNumberish;
+      data: BytesLike;
+      ingests: {
+        executions: BigNumberish;
+        isDeferred: boolean;
+        isConstant: boolean;
+        port: BigNumberish;
+        key: BigNumberish;
+        solverIndex: BigNumberish;
+        data: BytesLike;
+      }[];
+      actions: {
+        executed: boolean;
+        isPort: boolean;
+        to: string;
+        portIndex: BigNumberish;
+        value: BigNumberish;
+        data: BytesLike;
+      }[];
+      conditionBase: {
+        outcomeSlots: BigNumberish;
+        parentCollectionPartitionIndex: BigNumberish;
+        amount: BigNumberish;
+        partition: BigNumberish[];
+        recipientAddressPorts: BigNumberish[][];
+        recipientAmounts: BigNumberish[][];
+        metadata: string;
+      };
+    },
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -357,6 +488,11 @@ export class ISolver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setTrackingId(
+    _trackingId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   splitCondition(
     _questionId: BytesLike,
     _parentCollectionId: BytesLike,
@@ -387,6 +523,43 @@ export class ISolver extends BaseContract {
       _outcomeSlots: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    deployChild(
+      _config: {
+        implementation: string;
+        keeper: string;
+        arbitrator: string;
+        timelockSeconds: BigNumberish;
+        data: BytesLike;
+        ingests: {
+          executions: BigNumberish;
+          isDeferred: boolean;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+        conditionBase: {
+          outcomeSlots: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
+      },
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     executeAction(
       _actionIndex: BigNumberish,
@@ -430,6 +603,11 @@ export class ISolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    setTrackingId(
+      _trackingId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     splitCondition(
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
@@ -463,6 +641,43 @@ export class ISolver extends BaseContract {
     createCondition(
       _questionId: BytesLike,
       _outcomeSlots: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    deployChild(
+      _config: {
+        implementation: string;
+        keeper: string;
+        arbitrator: string;
+        timelockSeconds: BigNumberish;
+        data: BytesLike;
+        ingests: {
+          executions: BigNumberish;
+          isDeferred: boolean;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+        conditionBase: {
+          outcomeSlots: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
+      },
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -513,6 +728,11 @@ export class ISolver extends BaseContract {
     setApproval(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setTrackingId(
+      _trackingId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -550,6 +770,43 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    deployChild(
+      _config: {
+        implementation: string;
+        keeper: string;
+        arbitrator: string;
+        timelockSeconds: BigNumberish;
+        data: BytesLike;
+        ingests: {
+          executions: BigNumberish;
+          isDeferred: boolean;
+          isConstant: boolean;
+          port: BigNumberish;
+          key: BigNumberish;
+          solverIndex: BigNumberish;
+          data: BytesLike;
+        }[];
+        actions: {
+          executed: boolean;
+          isPort: boolean;
+          to: string;
+          portIndex: BigNumberish;
+          value: BigNumberish;
+          data: BytesLike;
+        }[];
+        conditionBase: {
+          outcomeSlots: BigNumberish;
+          parentCollectionPartitionIndex: BigNumberish;
+          amount: BigNumberish;
+          partition: BigNumberish[];
+          recipientAddressPorts: BigNumberish[][];
+          recipientAmounts: BigNumberish[][];
+          metadata: string;
+        };
+      },
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     executeAction(
       _actionIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -597,6 +854,11 @@ export class ISolver extends BaseContract {
     setApproval(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setTrackingId(
+      _trackingId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

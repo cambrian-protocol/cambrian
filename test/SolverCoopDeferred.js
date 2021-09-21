@@ -17,12 +17,13 @@ describe("It should all work", async function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken"]);
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "Solver"]);
     this.CT = await ethers.getContract("ConditionalTokens")
     this.SolverFactory = await ethers.getContract("SolverFactory")
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
+this.Solver = await ethers.getContract("Solver")
     
     await this.ToyToken.mint(this.buyer.address, "100");
 
@@ -48,7 +49,7 @@ describe("It should all work", async function () {
         port: 0,
         key: 1,
         solverIndex: 0,
-        data: this.buyer.address
+        data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
       },
       {
         executions: 0,
@@ -57,7 +58,7 @@ describe("It should all work", async function () {
         port: 0,
         key: 2,
         solverIndex: 0,
-        data: this.ISolver.encodeFunctionData("solverAddressFromIndex",[1])
+        data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
       }
     ]
 
@@ -82,7 +83,7 @@ describe("It should all work", async function () {
         port: 0,
         key: 1,
         solverIndex: 0,
-        data: this.buyer.address
+        data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
       },
       {
         executions: 0,
@@ -91,7 +92,7 @@ describe("It should all work", async function () {
         port: 0,
         key: 2,
         solverIndex: 0,
-        data: this.seller.address
+        data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
       },
       { // add arbitrary isDeferred data ingest
         executions: 0,
@@ -118,7 +119,7 @@ describe("It should all work", async function () {
   
     const solverConfigs = [
       [
-        this.SolverFactory.address,
+        this.Solver.address,
         this.keeper.address,
         this.arbitrator.address,
         0,
@@ -128,7 +129,7 @@ describe("It should all work", async function () {
         conditionBase0
       ],
       [
-        this.SolverFactory.address,
+        this.Solver.address,
         this.keeper.address,
         this.arbitrator.address,
         0,

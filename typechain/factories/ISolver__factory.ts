@@ -71,6 +71,173 @@ const _abi = [
   {
     inputs: [
       {
+        components: [
+          {
+            internalType: "contract Solver",
+            name: "implementation",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "keeper",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "arbitrator",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "timelockSeconds",
+            type: "uint256",
+          },
+          {
+            internalType: "bytes",
+            name: "data",
+            type: "bytes",
+          },
+          {
+            components: [
+              {
+                internalType: "uint256",
+                name: "executions",
+                type: "uint256",
+              },
+              {
+                internalType: "bool",
+                name: "isDeferred",
+                type: "bool",
+              },
+              {
+                internalType: "bool",
+                name: "isConstant",
+                type: "bool",
+              },
+              {
+                internalType: "uint8",
+                name: "port",
+                type: "uint8",
+              },
+              {
+                internalType: "uint256",
+                name: "key",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "solverIndex",
+                type: "uint256",
+              },
+              {
+                internalType: "bytes",
+                name: "data",
+                type: "bytes",
+              },
+            ],
+            internalType: "struct Solver.Ingest[]",
+            name: "ingests",
+            type: "tuple[]",
+          },
+          {
+            components: [
+              {
+                internalType: "bool",
+                name: "executed",
+                type: "bool",
+              },
+              {
+                internalType: "bool",
+                name: "isPort",
+                type: "bool",
+              },
+              {
+                internalType: "address",
+                name: "to",
+                type: "address",
+              },
+              {
+                internalType: "uint256",
+                name: "portIndex",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "value",
+                type: "uint256",
+              },
+              {
+                internalType: "bytes",
+                name: "data",
+                type: "bytes",
+              },
+            ],
+            internalType: "struct Solver.Action[]",
+            name: "actions",
+            type: "tuple[]",
+          },
+          {
+            components: [
+              {
+                internalType: "uint256",
+                name: "outcomeSlots",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "parentCollectionPartitionIndex",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256",
+                name: "amount",
+                type: "uint256",
+              },
+              {
+                internalType: "uint256[]",
+                name: "partition",
+                type: "uint256[]",
+              },
+              {
+                internalType: "uint256[][]",
+                name: "recipientAddressPorts",
+                type: "uint256[][]",
+              },
+              {
+                internalType: "uint256[][]",
+                name: "recipientAmounts",
+                type: "uint256[][]",
+              },
+              {
+                internalType: "string",
+                name: "metadata",
+                type: "string",
+              },
+            ],
+            internalType: "struct Solver.ConditionBase",
+            name: "conditionBase",
+            type: "tuple",
+          },
+        ],
+        internalType: "struct Solver.Config",
+        name: "_config",
+        type: "tuple",
+      },
+    ],
+    name: "deployChild",
+    outputs: [
+      {
+        internalType: "contract Solver",
+        name: "_solver",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_actionIndex",
         type: "uint256",
@@ -220,6 +387,19 @@ const _abi = [
       },
     ],
     name: "setApproval",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_trackingId",
+        type: "bytes32",
+      },
+    ],
+    name: "setTrackingId",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

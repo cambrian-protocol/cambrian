@@ -4,6 +4,7 @@ pragma solidity 0.8.0;
 
 import "../ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../Solver.sol";
 
 interface ISolver {
     /**
@@ -40,6 +41,10 @@ interface ISolver {
         address[][] calldata _addresses
     ) external;
 
+    function deployChild(Solver.Config calldata _config)
+        external
+        returns (Solver _solver);
+
     function prepareSolve() external;
 
     function executeSolve() external;
@@ -57,6 +62,8 @@ interface ISolver {
     function executeAction(uint256 _actionIndex)
         external
         returns (bytes memory);
+
+    function setTrackingId(bytes32 _trackingId) external;
 
     function onERC1155Received(
         address operator,

@@ -1,7 +1,8 @@
+const { ethers } = require("hardhat");
 
 
 
-const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress) => {
+const getSimpleSolverConfig = (amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress) => {
     const ingests = [
         {
           executions: 0,
@@ -10,7 +11,7 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitrator
           port: 0,
           key: 1,
           solverIndex: 0,
-          data: buyerAddress
+          data: ethers.utils.defaultAbiCoder.encode(['address'], [buyerAddress])
         },
         {
           executions: 0,
@@ -19,7 +20,7 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitrator
           port: 0,
           key: 2,
           solverIndex: 0,
-          data: sellerAddress
+          data: ethers.utils.defaultAbiCoder.encode(['address'], [sellerAddress])
         },
         {
           executions: 0,
@@ -27,7 +28,7 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitrator
           port: 3,
           key: 0,
           solverIndex: 0,
-          data: ethers.utils.formatBytes32String("")
+          data: ethers.utils.defaultAbiCoder.encode(['bytes32'], [ethers.utils.formatBytes32String("")])
         }
       ]
 
@@ -45,7 +46,7 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitrator
   
       const solverConfigs = [
         [
-          factoryAddress,
+          implementationAddress,
           keeperAddress,
           arbitratorAddress,
           0,
@@ -59,9 +60,9 @@ const getSimpleSolverConfig = (amount, factoryAddress, keeperAddress, arbitrator
       return solverConfigs
 }
 
-const getSimpleSolutionConfig = (testID, amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress, toyToken) => {
+const getSimpleSolutionConfig = (testID, amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress, toyToken) => {
     return (
-        [testID, toyToken, getSimpleSolverConfig(amount, factoryAddress, keeperAddress, arbitratorAddress, buyerAddress,sellerAddress)]
+        [testID, toyToken, getSimpleSolverConfig(amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress,sellerAddress)]
     )
 }
 
