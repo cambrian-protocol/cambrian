@@ -45,6 +45,7 @@ contract Solver is Initializable, ERC1155Receiver {
         returns (Solver _solver)
     {
         require(chainChild == address(0), "Solver has child");
+
         (chainChild, _solver) = SolverLib.deployChild(
             _config,
             collateralToken,
@@ -145,7 +146,7 @@ contract Solver is Initializable, ERC1155Receiver {
             datas,
             trackingId
         );
-        unsafeExecuteActions();
+        SolverLib.unsafeExecuteActions(config.actions, datas);
         cascade();
     }
 
@@ -235,25 +236,6 @@ contract Solver is Initializable, ERC1155Receiver {
         );
         SolverLib.arbitrationPending(conditions[conditions.length - 1]);
         updateTimelock();
-    }
-
-    function unsafeExecuteActions() private {
-        for (uint256 i; i < config.actions.length; i++) {
-            unsafeExecuteAction(i);
-        }
-    }
-
-    function unsafeExecuteAction(uint256 _actionIndex)
-        private
-        returns (bytes memory)
-    {
-        require(!config.actions[_actionIndex].executed, "action executed");
-        require(
-            address(this).balance >= config.actions[_actionIndex].value,
-            "insufficient eth"
-        );
-        return
-            SolverLib.unsafeExecuteAction(config.actions[_actionIndex], datas);
     }
 
     function getCanonCollectionId(uint256 _partitionIndex)

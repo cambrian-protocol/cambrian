@@ -313,6 +313,14 @@ library SolverLib {
             );
     }
 
+    function unsafeExecuteActions(Action[] storage actions, Datas storage datas)
+        public
+    {
+        for (uint256 i; i < actions.length; i++) {
+            unsafeExecuteAction(actions[i], datas);
+        }
+    }
+
     function unsafeExecuteAction(Action storage action, Datas storage datas)
         public
         returns (bytes memory)
