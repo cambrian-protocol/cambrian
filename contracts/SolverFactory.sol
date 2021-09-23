@@ -13,7 +13,6 @@ contract SolverFactory {
     event SolverCreated(address newSolverAddress);
 
     function createSolver(
-        IERC20 _collateralToken,
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
@@ -26,12 +25,7 @@ contract SolverFactory {
         Solver clone = Solver(
             Clones.clone(address(_solverConfig.implementation))
         );
-        Solver(clone).init(
-            _collateralToken,
-            _chainParent,
-            _chainIndex,
-            _solverConfig
-        );
+        Solver(clone).init(_chainParent, _chainIndex, _solverConfig);
         solvers.push(clone);
         return address(clone);
     }

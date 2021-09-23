@@ -30,18 +30,17 @@ interface SolverInterface extends ethers.utils.Interface {
     "chainChild()": FunctionFragment;
     "chainIndex()": FunctionFragment;
     "chainParent()": FunctionFragment;
-    "collateralToken()": FunctionFragment;
     "conditions(uint256)": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
+    "deferredIngest(uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
     "executeSolve()": FunctionFragment;
     "getCanonCollectionId(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
     "getOutput(uint256)": FunctionFragment;
-    "ingest(uint256)": FunctionFragment;
     "ingestsValid()": FunctionFragment;
-    "init(address,address,uint256,tuple)": FunctionFragment;
+    "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "prepareSolve()": FunctionFragment;
@@ -89,10 +88,6 @@ interface SolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "collateralToken",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "conditions",
     values: [BigNumberish]
   ): string;
@@ -100,6 +95,10 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "confirmPayouts",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "deferredIngest",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "deployChild",
@@ -128,6 +127,7 @@ interface SolverInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -156,17 +156,12 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "ingest",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "ingestsValid",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "init",
     values: [
-      string,
       string,
       BigNumberish,
       {
@@ -193,6 +188,7 @@ interface SolverInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -258,14 +254,14 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "chainParent",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "collateralToken",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "conditions", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "config", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "confirmPayouts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "deferredIngest",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -285,7 +281,6 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOutput", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "ingest", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "ingestsValid",
     data: BytesLike
@@ -400,8 +395,6 @@ export class Solver extends BaseContract {
 
     chainParent(overrides?: CallOverrides): Promise<[string]>;
 
-    collateralToken(overrides?: CallOverrides): Promise<[string]>;
-
     conditions(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -425,6 +418,7 @@ export class Solver extends BaseContract {
         BigNumber,
         string,
         [
+          string,
           BigNumber,
           BigNumber,
           BigNumber,
@@ -433,6 +427,7 @@ export class Solver extends BaseContract {
           BigNumber[][],
           string
         ] & {
+          collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
@@ -448,6 +443,7 @@ export class Solver extends BaseContract {
         timelockSeconds: BigNumber;
         data: string;
         conditionBase: [
+          string,
           BigNumber,
           BigNumber,
           BigNumber,
@@ -456,6 +452,7 @@ export class Solver extends BaseContract {
           BigNumber[][],
           string
         ] & {
+          collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
@@ -468,6 +465,11 @@ export class Solver extends BaseContract {
     >;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    deferredIngest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -496,6 +498,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -537,15 +540,9 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { data: string }>;
 
-    ingest(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     ingestsValid(overrides?: CallOverrides): Promise<[boolean]>;
 
     init(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -572,6 +569,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -661,8 +659,6 @@ export class Solver extends BaseContract {
 
   chainParent(overrides?: CallOverrides): Promise<string>;
 
-  collateralToken(overrides?: CallOverrides): Promise<string>;
-
   conditions(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -686,6 +682,7 @@ export class Solver extends BaseContract {
       BigNumber,
       string,
       [
+        string,
         BigNumber,
         BigNumber,
         BigNumber,
@@ -694,6 +691,7 @@ export class Solver extends BaseContract {
         BigNumber[][],
         string
       ] & {
+        collateralToken: string;
         outcomeSlots: BigNumber;
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
@@ -709,6 +707,7 @@ export class Solver extends BaseContract {
       timelockSeconds: BigNumber;
       data: string;
       conditionBase: [
+        string,
         BigNumber,
         BigNumber,
         BigNumber,
@@ -717,6 +716,7 @@ export class Solver extends BaseContract {
         BigNumber[][],
         string
       ] & {
+        collateralToken: string;
         outcomeSlots: BigNumber;
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
@@ -729,6 +729,11 @@ export class Solver extends BaseContract {
   >;
 
   confirmPayouts(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  deferredIngest(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -757,6 +762,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -793,15 +799,9 @@ export class Solver extends BaseContract {
 
   getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  ingest(
-    _index: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   ingestsValid(overrides?: CallOverrides): Promise<boolean>;
 
   init(
-    _collateralToken: string,
     _chainParent: string,
     _chainIndex: BigNumberish,
     _solverConfig: {
@@ -828,6 +828,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -911,8 +912,6 @@ export class Solver extends BaseContract {
 
     chainParent(overrides?: CallOverrides): Promise<string>;
 
-    collateralToken(overrides?: CallOverrides): Promise<string>;
-
     conditions(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -936,6 +935,7 @@ export class Solver extends BaseContract {
         BigNumber,
         string,
         [
+          string,
           BigNumber,
           BigNumber,
           BigNumber,
@@ -944,6 +944,7 @@ export class Solver extends BaseContract {
           BigNumber[][],
           string
         ] & {
+          collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
@@ -959,6 +960,7 @@ export class Solver extends BaseContract {
         timelockSeconds: BigNumber;
         data: string;
         conditionBase: [
+          string,
           BigNumber,
           BigNumber,
           BigNumber,
@@ -967,6 +969,7 @@ export class Solver extends BaseContract {
           BigNumber[][],
           string
         ] & {
+          collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
@@ -979,6 +982,11 @@ export class Solver extends BaseContract {
     >;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
+
+    deferredIngest(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     deployChild(
       _config: {
@@ -1005,6 +1013,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -1039,12 +1048,9 @@ export class Solver extends BaseContract {
 
     getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    ingest(_index: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
     ingestsValid(overrides?: CallOverrides): Promise<boolean>;
 
     init(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -1071,6 +1077,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -1161,8 +1168,6 @@ export class Solver extends BaseContract {
 
     chainParent(overrides?: CallOverrides): Promise<BigNumber>;
 
-    collateralToken(overrides?: CallOverrides): Promise<BigNumber>;
-
     conditions(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1171,6 +1176,11 @@ export class Solver extends BaseContract {
     config(overrides?: CallOverrides): Promise<BigNumber>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    deferredIngest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1199,6 +1209,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -1227,15 +1238,9 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    ingest(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     ingestsValid(overrides?: CallOverrides): Promise<BigNumber>;
 
     init(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -1262,6 +1267,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -1352,8 +1358,6 @@ export class Solver extends BaseContract {
 
     chainParent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    collateralToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     conditions(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1362,6 +1366,11 @@ export class Solver extends BaseContract {
     config(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     confirmPayouts(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    deferredIngest(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1390,6 +1399,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -1418,15 +1428,9 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    ingest(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     ingestsValid(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     init(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -1453,6 +1457,7 @@ export class Solver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;

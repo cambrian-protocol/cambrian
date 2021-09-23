@@ -70,6 +70,7 @@ describe("It should all work", function () {
     const actions0 = [];
 
     const canon0 = {
+      collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionPartitionIndex: 0,
       amount: 100,

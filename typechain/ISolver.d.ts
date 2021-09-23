@@ -87,6 +87,7 @@ interface ISolverInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -315,6 +316,7 @@ export class ISolver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -445,6 +447,7 @@ export class ISolver extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -573,6 +576,7 @@ export class ISolver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -698,6 +702,7 @@ export class ISolver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -829,6 +834,7 @@ export class ISolver extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;

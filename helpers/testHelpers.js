@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 
 
-const getSimpleSolverConfig = (amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress) => {
+const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress) => {
     const ingests = [
         {
           executions: 0,
@@ -35,6 +35,7 @@ const getSimpleSolverConfig = (amount, implementationAddress, keeperAddress, arb
       const actions = [];
 
       const canon = {
+        collateralToken: collateralAddress,
         outcomeSlots: 2,
         parentCollectionPartitionIndex: 0,
         amount: amount,
@@ -62,7 +63,7 @@ const getSimpleSolverConfig = (amount, implementationAddress, keeperAddress, arb
 
 const getSimpleSolutionConfig = (testID, amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress, sellerAddress, toyToken) => {
     return (
-        [testID, toyToken, getSimpleSolverConfig(amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress,sellerAddress)]
+        [testID, toyToken, getSimpleSolverConfig(toyToken, amount, implementationAddress, keeperAddress, arbitratorAddress, buyerAddress,sellerAddress)]
     )
 }
 

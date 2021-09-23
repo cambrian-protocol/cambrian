@@ -12,9 +12,6 @@ import "./SolverLib.sol";
 contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
-
-    IERC20 public collateralToken; // Collateral being used
-
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
@@ -24,7 +21,6 @@ contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Datas datas;
 
     function init(
-        IERC20 _collateralToken,
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
@@ -34,7 +30,6 @@ contract Solver is Initializable, ERC1155Receiver {
             "Only factory"
         );
         require(_solverConfig.keeper != address(0), "Keeper invalid");
-        collateralToken = _collateralToken;
         chainParent = _chainParent;
         chainIndex = _chainIndex;
         config = _solverConfig;
@@ -48,7 +43,6 @@ contract Solver is Initializable, ERC1155Receiver {
 
         (chainChild, _solver) = SolverLib.deployChild(
             _config,
-            collateralToken,
             address(this),
             chainIndex
         );
@@ -83,17 +77,17 @@ contract Solver is Initializable, ERC1155Receiver {
         router(_type, _key, false, _data);
     }
 
-    function ingest(uint256 _index) public {
-        bytes memory data = SolverLib.ingest(
-            config.ingests[_index],
-            address(this)
-        );
+    function deferredIngest(uint256 _index) external {
+        require(msg.sender == config.keeper, "OnlyKeeper");
+        ingest(_index);
+    }
 
+    function ingest(uint256 _index) private {
         router(
             config.ingests[_index].port,
             config.ingests[_index].key,
             config.ingests[_index].isConstant,
-            data
+            SolverLib.ingest(config.ingests[_index], address(this))
         );
     }
 
@@ -134,13 +128,11 @@ contract Solver is Initializable, ERC1155Receiver {
         SolverLib.splitPosition(
             chainParent,
             config.conditionBase,
-            conditions[conditions.length - 1],
-            collateralToken
+            conditions[conditions.length - 1]
         );
 
         SolverLib.allocatePartition(
             conditions[conditions.length - 1],
-            collateralToken,
             config.conditionBase,
             address(this),
             datas,

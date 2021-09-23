@@ -66,6 +66,7 @@ this.Solver = await ethers.getContract("Solver")
     const actions0 = [];
 
     const conditionBase0 = {
+      collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionPartitionIndex: 0,
       amount: 100,
@@ -99,6 +100,7 @@ this.Solver = await ethers.getContract("Solver")
     const actions1 = [];
 
     const conditionBase1 = {
+      collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionPartitionIndex: 0,
       amount: 100,

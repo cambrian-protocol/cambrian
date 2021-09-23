@@ -747,8 +747,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1632365219323,
-      "contentHash": "8893303d6b8e1284fe92f2a2f4824473",
+      "lastModificationDate": 1632372798910,
+      "contentHash": "546a2e56f561a72c43c740dcbbd0ab3a",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -838,8 +838,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1632211709127,
-      "contentHash": "200e94eb792a6d54c61c913fff4d8628",
+      "lastModificationDate": 1632366418511,
+      "contentHash": "2ff67e72dc73e1ebc02fd1bfcb2c0677",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -888,8 +888,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverFactory.sol": {
-      "lastModificationDate": 1632211819136,
-      "contentHash": "2eedb00d25f68ec12f5b76d65afcd699",
+      "lastModificationDate": 1632366385446,
+      "contentHash": "c3e337190f1e205956081b7040b50ce5",
       "sourceName": "contracts/SolverFactory.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -936,7 +936,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolver.sol": {
-      "lastModificationDate": 1632283063609,
+      "lastModificationDate": 1632365316673,
       "contentHash": "22112d159b3f996e738146c2efff4a05",
       "sourceName": "contracts/interfaces/ISolver.sol",
       "solcConfig": {
@@ -1246,8 +1246,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1632365206806,
-      "contentHash": "fd7a6181a9ddda671a4d0d22f3c25add",
+      "lastModificationDate": 1632366430779,
+      "contentHash": "bb25b404b98b60a743fba016b6977a13",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1293,7 +1293,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\IConditionalTokens.sol": {
-      "lastModificationDate": 1632262312696,
+      "lastModificationDate": 1632365316673,
       "contentHash": "fd7d1a819d880d214f9beb161d11e0b1",
       "sourceName": "contracts/interfaces/IConditionalTokens.sol",
       "solcConfig": {

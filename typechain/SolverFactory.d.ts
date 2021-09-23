@@ -21,14 +21,13 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverFactoryInterface extends ethers.utils.Interface {
   functions: {
-    "createSolver(address,address,uint256,tuple)": FunctionFragment;
+    "createSolver(address,uint256,tuple)": FunctionFragment;
     "solvers(uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "createSolver",
     values: [
-      string,
       string,
       BigNumberish,
       {
@@ -55,6 +54,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -129,7 +129,6 @@ export class SolverFactory extends BaseContract {
 
   functions: {
     createSolver(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -156,6 +155,7 @@ export class SolverFactory extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -172,7 +172,6 @@ export class SolverFactory extends BaseContract {
   };
 
   createSolver(
-    _collateralToken: string,
     _chainParent: string,
     _chainIndex: BigNumberish,
     _solverConfig: {
@@ -199,6 +198,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -215,7 +215,6 @@ export class SolverFactory extends BaseContract {
 
   callStatic: {
     createSolver(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -242,6 +241,7 @@ export class SolverFactory extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -265,7 +265,6 @@ export class SolverFactory extends BaseContract {
 
   estimateGas: {
     createSolver(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -292,6 +291,7 @@ export class SolverFactory extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -309,7 +309,6 @@ export class SolverFactory extends BaseContract {
 
   populateTransaction: {
     createSolver(
-      _collateralToken: string,
       _chainParent: string,
       _chainIndex: BigNumberish,
       _solverConfig: {
@@ -336,6 +335,7 @@ export class SolverFactory extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;

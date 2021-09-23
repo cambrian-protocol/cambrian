@@ -198,6 +198,11 @@ const _abi = [
           {
             components: [
               {
+                internalType: "contract IERC20",
+                name: "collateralToken",
+                type: "address",
+              },
+              {
                 internalType: "uint256",
                 name: "outcomeSlots",
                 type: "uint256",

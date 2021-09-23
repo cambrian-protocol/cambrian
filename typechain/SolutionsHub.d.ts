@@ -62,6 +62,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -109,6 +110,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -230,6 +232,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -280,6 +283,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -328,6 +332,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -378,6 +383,7 @@ export class SolutionsHub extends BaseContract {
         data: BytesLike;
       }[];
       conditionBase: {
+        collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
@@ -426,6 +432,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -476,6 +483,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -529,6 +537,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -579,6 +588,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -628,6 +638,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
@@ -678,6 +689,7 @@ export class SolutionsHub extends BaseContract {
           data: BytesLike;
         }[];
         conditionBase: {
+          collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;

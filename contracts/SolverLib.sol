@@ -49,8 +49,9 @@ library SolverLib {
         Status status; // Status of this condition
     }
 
-    // Used to generate conditions when addCondition() is called
+    // Immutable data regarding conditions which may be created
     struct ConditionBase {
+        IERC20 collateralToken;
         uint256 outcomeSlots; // Num outcome slots
         uint256 parentCollectionPartitionIndex; // Index of partition to get parentCollectionId from parent Solver's uint256[] partition
         uint256 amount; // Amount of collateral being used        // TODO maybe make this dynamic also
@@ -134,12 +135,11 @@ library SolverLib {
 
     function deployChild(
         Config calldata config,
-        IERC20 collateralToken,
         address solver,
         uint256 solverIndex
     ) public returns (address child, Solver) {
         child = SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
-            .createSolver(collateralToken, solver, solverIndex + 1, config);
+            .createSolver(solver, solverIndex + 1, config);
 
         return (child, Solver(child));
     }
@@ -165,11 +165,10 @@ library SolverLib {
     function splitPosition(
         address chainParent,
         ConditionBase calldata base,
-        Condition calldata condition,
-        IERC20 collateralToken
+        Condition calldata condition
     ) public {
         if (chainParent == address(0)) {
-            collateralToken.approve(
+            base.collateralToken.approve(
                 address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
                 base.amount
             );
@@ -177,7 +176,7 @@ library SolverLib {
 
         IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
             .splitPosition(
-                collateralToken,
+                base.collateralToken,
                 condition.parentCollectionId,
                 condition.conditionId,
                 base.partition,
@@ -248,7 +247,6 @@ library SolverLib {
 
     function allocatePartition(
         Condition calldata condition,
-        IERC20 collateralToken,
         ConditionBase calldata base,
         address solver,
         Datas storage data,
@@ -257,7 +255,7 @@ library SolverLib {
         for (uint256 i; i < base.partition.length; i++) {
             uint256 positionId = getPositionId(
                 condition,
-                collateralToken,
+                base.collateralToken,
                 base.partition[i]
             );
 
