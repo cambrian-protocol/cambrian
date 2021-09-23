@@ -186,16 +186,16 @@ this.Solver = await ethers.getContract("Solver")
     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
 
-    const numConditions0 = await solver0.numConditions()
-    const condition0 = await solver0.conditions(numConditions0-1)
-    const conditionId0 = condition0['conditionId']
+
+    const conditions0 = await solver0.getConditions();
+    const conditionId0 = conditions0[conditions0.length-1].conditionId
+
     const collectionId0Success = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId0, indexSetSuccess)
     const positionId0Success = await this.CT.getPositionId(this.ToyToken.address, collectionId0Success)
 
+    const conditions1 = await solver1.getConditions();
+    const conditionId1 = conditions1[conditions1.length-1].conditionId
 
-    const numConditions1 = await solver1.numConditions()
-    const condition1 = await solver1.conditions(numConditions1-1)
-    const conditionId1 = condition1['conditionId']
     const collectionId1Success = await this.CT.getCollectionId(collectionId0Success, conditionId1, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionId1Success)
 
@@ -215,12 +215,14 @@ this.Solver = await ethers.getContract("Solver")
   
     // Keeper proposes payouts
     await solver0.connect(this.keeper).proposePayouts([1,0]);
-    const payouts0 = await solver0.getPayouts();
+    const conditions0Proposed = await solver0.getConditions();
+    const payouts0 = conditions0Proposed[conditions0Proposed.length-1].payouts;
     expect(payouts0[0]).to.equal(1)
     expect(payouts0[1]).to.equal(0)
 
     await solver1.connect(this.keeper).proposePayouts([1,0]);
-    const payouts1 = await solver0.getPayouts();
+    const conditions1Proposed = await solver0.getConditions();
+    const payouts1 = conditions1Proposed[conditions1Proposed.length-1].payouts;
     expect(payouts1[0]).to.equal(1)
     expect(payouts1[1]).to.equal(0)
   

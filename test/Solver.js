@@ -21,7 +21,7 @@ describe("It should all work", function () {
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
-this.Solver = await ethers.getContract("Solver")
+    this.Solver = await ethers.getContract("Solver")
 
     await this.ToyToken.mint(this.buyer.address, "100");
 
@@ -92,6 +92,7 @@ this.Solver = await ethers.getContract("Solver")
       ]
     ];
 
+
     await this.SolutionsHub.connect(this.keeper).createSolution(
       solutionId,
       this.ToyToken.address,
@@ -137,9 +138,8 @@ this.Solver = await ethers.getContract("Solver")
     // Connect to our Prime Solver
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
 
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
-    const conditionId = condition['conditionId']
+    const conditions = await solver.getConditions();
+    const conditionId = conditions[conditions.length-1].conditionId
 
     // Seller should have all the success tokens
     const indexSetSuccess = getIndexSetFromBinaryArray([1,0]) // If success
@@ -164,9 +164,12 @@ this.Solver = await ethers.getContract("Solver")
     expect(buyerFailureBalance).to.equal(100)
     expect(sellerFailureBalance).to.equal(0)
 
+
     // Keeper proposes payouts
     await solver.connect(this.keeper).proposePayouts([1,0]);
-    const payouts = await solver.getPayouts();
+
+    const conditionsProposed = await solver.getConditions();
+    const payouts = conditionsProposed[conditionsProposed.length-1].payouts;
     expect(payouts[0]).to.equal(1)
     expect(payouts[1]).to.equal(0)
 
@@ -177,6 +180,8 @@ this.Solver = await ethers.getContract("Solver")
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure])
     const sellerERC20Balance = await this.ToyToken.balanceOf(this.seller.address);
     expect(sellerERC20Balance).to.equal(100);
+
+
   });
 
 });

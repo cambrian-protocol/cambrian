@@ -3,6 +3,7 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SolverFactory.sol";
 import "./Solver.sol";
+import "./SolverLib.sol";
 import "./ConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
 import "./ProposalsHub.sol";
@@ -20,7 +21,7 @@ contract SolutionsHub {
         address proposalHub;
         bytes32 proposalId;
         bytes32 id;
-        Solver.Config[] solverConfigs;
+        SolverLib.Config[] solverConfigs;
         address[] solverAddresses;
     }
 
@@ -108,7 +109,7 @@ contract SolutionsHub {
     function createSolution(
         bytes32 _id,
         IERC20 _collateralToken,
-        Solver.Config[] calldata _solverConfigs
+        SolverLib.Config[] calldata _solverConfigs
     ) external returns (bytes32 _solutionId) {
         require(
             solutions[_id].id != _id,
@@ -131,7 +132,7 @@ contract SolutionsHub {
 
     function setSolverConfigs(
         bytes32 _solutionId,
-        Solver.Config[] calldata _solverConfigs
+        SolverLib.Config[] calldata _solverConfigs
     ) external onlyKeeper(_solutionId) {
         delete solutions[_solutionId].solverConfigs;
         for (uint256 i; i < _solverConfigs.length; i++) {

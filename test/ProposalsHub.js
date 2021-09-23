@@ -204,8 +204,8 @@ describe("It should all work", function () {
 
     const solverAddress = await this.SolutionsHub.solverFromIndex(this.solutionId, 0);
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
+    const conditions = await solver.getConditions()
+    const condition = await conditions[conditions.length-1]
     const conditionId = condition['conditionId']
 
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
@@ -245,8 +245,8 @@ describe("It should all work", function () {
 
     const solverAddress = await this.SolutionsHub.solverFromIndex(this.solutionId, 0);
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
+    const conditions = await solver.getConditions()
+    const condition = await conditions[conditions.length-1]
     const conditionId = condition['conditionId']
 
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
@@ -308,8 +308,8 @@ describe("It should all work", function () {
 
     const solverAddress = await this.SolutionsHub.solverFromIndex(this.solutionId, 0);
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
+    const conditions = await solver.getConditions()
+    const condition = await conditions[conditions.length-1]
     const conditionId = condition['conditionId']
 
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
@@ -442,8 +442,8 @@ describe("It should all work", function () {
 
     const solverAddress = await this.SolutionsHub.solverFromIndex(this.solutionId, 0);
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
+    const conditions = await solver.getConditions()
+    const condition = await conditions[conditions.length-1]
     const conditionId = condition['conditionId']
 
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
@@ -509,8 +509,8 @@ describe("It should all work", function () {
 
     const solverAddress = await this.SolutionsHub.solverFromIndex(this.solutionId, 0);
     let solver = new ethers.Contract(solverAddress, SOLVER_ABI, ethers.provider);
-    const numConditions = await solver.numConditions()
-    const condition = await solver.conditions(numConditions-1)
+    const conditions = await solver.getConditions()
+    const condition = await conditions[conditions.length-1]
     const conditionId = condition['conditionId']
 
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure

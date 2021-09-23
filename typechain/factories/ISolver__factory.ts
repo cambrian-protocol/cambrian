@@ -10,6 +10,25 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
+    name: "addressFromChainIndex",
+    outputs: [
+      {
+        internalType: "address",
+        name: "_address",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256[]",
         name: "_partition",
         type: "uint256[]",
@@ -135,7 +154,7 @@ const _abi = [
                 type: "bytes",
               },
             ],
-            internalType: "struct Solver.Ingest[]",
+            internalType: "struct SolverLib.Ingest[]",
             name: "ingests",
             type: "tuple[]",
           },
@@ -172,7 +191,7 @@ const _abi = [
                 type: "bytes",
               },
             ],
-            internalType: "struct Solver.Action[]",
+            internalType: "struct SolverLib.Action[]",
             name: "actions",
             type: "tuple[]",
           },
@@ -214,12 +233,12 @@ const _abi = [
                 type: "string",
               },
             ],
-            internalType: "struct Solver.ConditionBase",
+            internalType: "struct SolverLib.ConditionBase",
             name: "conditionBase",
             type: "tuple",
           },
         ],
-        internalType: "struct Solver.Config",
+        internalType: "struct SolverLib.Config",
         name: "_config",
         type: "tuple",
       },

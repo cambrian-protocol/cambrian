@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ISolverInterface extends ethers.utils.Interface {
   functions: {
+    "addressFromChainIndex(uint256)": FunctionFragment;
     "allocatePartition(uint256[],uint256[][],address[][])": FunctionFragment;
     "arbitrate(uint256[])": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
@@ -39,6 +40,10 @@ interface ISolverInterface extends ethers.utils.Interface {
     "splitCondition(bytes32,bytes32,uint256,uint256[],address,uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "addressFromChainIndex",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "allocatePartition",
     values: [BigNumberish[], BigNumberish[][], string[][]]
@@ -145,6 +150,10 @@ interface ISolverInterface extends ethers.utils.Interface {
     ]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "addressFromChainIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "allocatePartition",
     data: BytesLike
@@ -254,6 +263,11 @@ export class ISolver extends BaseContract {
   interface: ISolverInterface;
 
   functions: {
+    addressFromChainIndex(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string] & { _address: string }>;
+
     allocatePartition(
       _partition: BigNumberish[],
       _amounts: BigNumberish[][],
@@ -378,6 +392,11 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  addressFromChainIndex(
+    _index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   allocatePartition(
     _partition: BigNumberish[],
@@ -504,6 +523,11 @@ export class ISolver extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    addressFromChainIndex(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     allocatePartition(
       _partition: BigNumberish[],
       _amounts: BigNumberish[][],
@@ -622,6 +646,11 @@ export class ISolver extends BaseContract {
   filters: {};
 
   estimateGas: {
+    addressFromChainIndex(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     allocatePartition(
       _partition: BigNumberish[],
       _amounts: BigNumberish[][],
@@ -748,6 +777,11 @@ export class ISolver extends BaseContract {
   };
 
   populateTransaction: {
+    addressFromChainIndex(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     allocatePartition(
       _partition: BigNumberish[],
       _amounts: BigNumberish[][],
