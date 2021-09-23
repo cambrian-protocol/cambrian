@@ -12,6 +12,8 @@ import "./SolverLib.sol";
 contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
+
+    bool hasCondition;
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
@@ -33,6 +35,36 @@ contract Solver is Initializable, ERC1155Receiver {
         chainParent = _chainParent;
         chainIndex = _chainIndex;
         config = _solverConfig;
+    }
+
+    function prepareSolve() public {
+        if (hasCondition) {
+            require(msg.sender == config.keeper, "Only keeper");
+            require(
+                conditions[conditions.length - 1].status ==
+                    SolverLib.Status.ArbitrationDelivered ||
+                    conditions[conditions.length - 1].status ==
+                    SolverLib.Status.OutcomeReported,
+                "Current solve active"
+            );
+        }
+        hasCondition = true;
+        addCondition();
+        executeIngests();
+    }
+
+    function executeIngests() private {
+        for (uint256 i; i < config.ingests.length; i++) {
+            if (!config.ingests[i].isDeferred) {
+                ingest(i);
+            }
+        }
+    }
+
+    function cascade() private {
+        if (chainChild != address(0) && Solver(chainChild).ingestsValid()) {
+            Solver(chainChild).executeSolve();
+        }
     }
 
     function deployChild(SolverLib.Config calldata _config)
@@ -91,7 +123,7 @@ contract Solver is Initializable, ERC1155Receiver {
         );
     }
 
-    function getOutput(uint256 _key) external view returns (bytes memory data) {
+    function getOutput(uint256 _key) public view returns (bytes memory data) {
         require(
             datas.lockedPorts[_key] ||
                 datas.portVersions[_key] == conditions.length,
@@ -103,16 +135,6 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function ingestsValid() public view returns (bool) {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
-    }
-
-    function prepareSolve() public {
-        addCondition();
-
-        for (uint256 i; i < config.ingests.length; i++) {
-            if (!config.ingests[i].isDeferred) {
-                ingest(i);
-            }
-        }
     }
 
     function executeSolve() public {
@@ -140,12 +162,6 @@ contract Solver is Initializable, ERC1155Receiver {
         );
         SolverLib.unsafeExecuteActions(config.actions, datas);
         cascade();
-    }
-
-    function cascade() private {
-        if (chainChild != address(0) && Solver(chainChild).ingestsValid()) {
-            Solver(chainChild).executeSolve();
-        }
     }
 
     function addCondition() private {

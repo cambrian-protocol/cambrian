@@ -399,8 +399,7 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, string, number] & {
-        collateralToken: string;
+      [string, string, string, number] & {
         questionId: string;
         parentCollectionId: string;
         conditionId: string;
@@ -524,8 +523,7 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [
-        ([string, string, string, string, BigNumber[], number] & {
-          collateralToken: string;
+        ([string, string, string, BigNumber[], number] & {
           questionId: string;
           parentCollectionId: string;
           conditionId: string;
@@ -663,8 +661,7 @@ export class Solver extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, string, number] & {
-      collateralToken: string;
+    [string, string, string, number] & {
       questionId: string;
       parentCollectionId: string;
       conditionId: string;
@@ -787,8 +784,7 @@ export class Solver extends BaseContract {
   getConditions(
     overrides?: CallOverrides
   ): Promise<
-    ([string, string, string, string, BigNumber[], number] & {
-      collateralToken: string;
+    ([string, string, string, BigNumber[], number] & {
       questionId: string;
       parentCollectionId: string;
       conditionId: string;
@@ -916,8 +912,7 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, string, number] & {
-        collateralToken: string;
+      [string, string, string, number] & {
         questionId: string;
         parentCollectionId: string;
         conditionId: string;
@@ -1036,8 +1031,7 @@ export class Solver extends BaseContract {
     getConditions(
       overrides?: CallOverrides
     ): Promise<
-      ([string, string, string, string, BigNumber[], number] & {
-        collateralToken: string;
+      ([string, string, string, BigNumber[], number] & {
         questionId: string;
         parentCollectionId: string;
         conditionId: string;

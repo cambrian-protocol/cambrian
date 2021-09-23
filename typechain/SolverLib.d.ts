@@ -34,7 +34,6 @@ interface SolverLibInterface extends ethers.utils.Interface {
     functionFragment: "getCanonCollectionId",
     values: [
       {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -48,7 +47,6 @@ interface SolverLibInterface extends ethers.utils.Interface {
     functionFragment: "getPositionId",
     values: [
       {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -150,7 +148,6 @@ export class SolverLib extends BaseContract {
 
     getCanonCollectionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -163,7 +160,6 @@ export class SolverLib extends BaseContract {
 
     getPositionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -201,7 +197,6 @@ export class SolverLib extends BaseContract {
 
   getCanonCollectionId(
     condition: {
-      collateralToken: string;
       questionId: BytesLike;
       parentCollectionId: BytesLike;
       conditionId: BytesLike;
@@ -214,7 +209,6 @@ export class SolverLib extends BaseContract {
 
   getPositionId(
     condition: {
-      collateralToken: string;
       questionId: BytesLike;
       parentCollectionId: BytesLike;
       conditionId: BytesLike;
@@ -252,7 +246,6 @@ export class SolverLib extends BaseContract {
 
     getCanonCollectionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -265,7 +258,6 @@ export class SolverLib extends BaseContract {
 
     getPositionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -306,7 +298,6 @@ export class SolverLib extends BaseContract {
 
     getCanonCollectionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -319,7 +310,6 @@ export class SolverLib extends BaseContract {
 
     getPositionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -358,7 +348,6 @@ export class SolverLib extends BaseContract {
 
     getCanonCollectionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;
@@ -371,7 +360,6 @@ export class SolverLib extends BaseContract {
 
     getPositionId(
       condition: {
-        collateralToken: string;
         questionId: BytesLike;
         parentCollectionId: BytesLike;
         conditionId: BytesLike;

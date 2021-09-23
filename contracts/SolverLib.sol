@@ -41,7 +41,6 @@ library SolverLib {
 
     // Condition object created by addCondition() from ConditionBase
     struct Condition {
-        IERC20 collateralToken;
         bytes32 questionId; // // keccak256(abi.encodePacked(config.conditionBase.metadata, address(this), conditions.length))
         bytes32 parentCollectionId; // ID of the parent collection above this Solver in the CTF
         bytes32 conditionId; // ID of this condition in the CTF
