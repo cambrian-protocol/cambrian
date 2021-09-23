@@ -747,8 +747,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1632351603326,
-      "contentHash": "f102c8f579c9a8a5ab4c35f1035ad236",
+      "lastModificationDate": 1632360154823,
+      "contentHash": "1e81b606c070321bd53397df3e9b1fcb",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1246,8 +1246,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1632346258941,
-      "contentHash": "71ba477a3f496fa45c8ab8763b1495f9",
+      "lastModificationDate": 1632360001090,
+      "contentHash": "4320690d9d2feb896d3c9671046b8fee",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1282,7 +1282,8 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "./interfaces/ISolver.sol",
-        "./interfaces/IConditionalTokens.sol"
+        "./interfaces/IConditionalTokens.sol",
+        "./SolverFactory.sol"
       ],
       "versionPragmas": [
         "0.8.0"

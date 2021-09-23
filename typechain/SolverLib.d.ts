@@ -21,13 +21,28 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface SolverLibInterface extends ethers.utils.Interface {
   functions: {
     "addressFromChainIndex(uint256,address,address,address,uint256)": FunctionFragment;
-    "getPositionId(tuple,IERC20,IConditionalTokens,uint256)": FunctionFragment;
+    "getCanonCollectionId(tuple,uint256)": FunctionFragment;
+    "getPositionId(tuple,IERC20,uint256)": FunctionFragment;
     "ingestsValid(tuple[],uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
     functionFragment: "addressFromChainIndex",
     values: [BigNumberish, string, string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCanonCollectionId",
+    values: [
+      {
+        collateralToken: string;
+        questionId: BytesLike;
+        parentCollectionId: BytesLike;
+        conditionId: BytesLike;
+        payouts: BigNumberish[];
+        status: BigNumberish;
+      },
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getPositionId",
@@ -40,7 +55,6 @@ interface SolverLibInterface extends ethers.utils.Interface {
         payouts: BigNumberish[];
         status: BigNumberish;
       },
-      string,
       string,
       BigNumberish
     ]
@@ -63,6 +77,10 @@ interface SolverLibInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "addressFromChainIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCanonCollectionId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -130,6 +148,19 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { _address: string }>;
 
+    getCanonCollectionId(
+      condition: {
+        collateralToken: string;
+        questionId: BytesLike;
+        parentCollectionId: BytesLike;
+        conditionId: BytesLike;
+        payouts: BigNumberish[];
+        status: BigNumberish;
+      },
+      partition: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string] & { collectionId: string }>;
+
     getPositionId(
       condition: {
         collateralToken: string;
@@ -140,7 +171,6 @@ export class SolverLib extends BaseContract {
         status: BigNumberish;
       },
       collateralToken: string,
-      ct: string,
       partition: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { positionId: BigNumber }>;
@@ -169,6 +199,19 @@ export class SolverLib extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
+  getCanonCollectionId(
+    condition: {
+      collateralToken: string;
+      questionId: BytesLike;
+      parentCollectionId: BytesLike;
+      conditionId: BytesLike;
+      payouts: BigNumberish[];
+      status: BigNumberish;
+    },
+    partition: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   getPositionId(
     condition: {
       collateralToken: string;
@@ -179,7 +222,6 @@ export class SolverLib extends BaseContract {
       status: BigNumberish;
     },
     collateralToken: string,
-    ct: string,
     partition: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
@@ -208,6 +250,19 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
+    getCanonCollectionId(
+      condition: {
+        collateralToken: string;
+        questionId: BytesLike;
+        parentCollectionId: BytesLike;
+        conditionId: BytesLike;
+        payouts: BigNumberish[];
+        status: BigNumberish;
+      },
+      partition: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     getPositionId(
       condition: {
         collateralToken: string;
@@ -218,7 +273,6 @@ export class SolverLib extends BaseContract {
         status: BigNumberish;
       },
       collateralToken: string,
-      ct: string,
       partition: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -250,6 +304,19 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getCanonCollectionId(
+      condition: {
+        collateralToken: string;
+        questionId: BytesLike;
+        parentCollectionId: BytesLike;
+        conditionId: BytesLike;
+        payouts: BigNumberish[];
+        status: BigNumberish;
+      },
+      partition: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     getPositionId(
       condition: {
         collateralToken: string;
@@ -260,7 +327,6 @@ export class SolverLib extends BaseContract {
         status: BigNumberish;
       },
       collateralToken: string,
-      ct: string,
       partition: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -290,6 +356,19 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getCanonCollectionId(
+      condition: {
+        collateralToken: string;
+        questionId: BytesLike;
+        parentCollectionId: BytesLike;
+        conditionId: BytesLike;
+        payouts: BigNumberish[];
+        status: BigNumberish;
+      },
+      partition: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     getPositionId(
       condition: {
         collateralToken: string;
@@ -300,7 +379,6 @@ export class SolverLib extends BaseContract {
         status: BigNumberish;
       },
       collateralToken: string,
-      ct: string,
       partition: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

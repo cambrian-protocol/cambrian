@@ -10,9 +10,6 @@ import "./SolutionsHub.sol";
 import "./SolverLib.sol";
 
 contract Solver is Initializable, ERC1155Receiver {
-    IConditionalTokens public immutable conditionalTokens =
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
-
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
 
@@ -48,16 +45,12 @@ contract Solver is Initializable, ERC1155Receiver {
         returns (Solver _solver)
     {
         require(chainChild == address(0), "Solver has child");
-
-        chainChild = SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
-            .createSolver(
-                collateralToken,
-                address(this),
-                chainIndex + 1,
-                _config
-            );
-
-        _solver = Solver(chainChild);
+        (chainChild, _solver) = SolverLib.deployChild(
+            _config,
+            collateralToken,
+            address(this),
+            chainIndex
+        );
     }
 
     function router(
@@ -119,6 +112,7 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function prepareSolve() public {
         addCondition();
+
         for (uint256 i; i < config.ingests.length; i++) {
             if (!config.ingests[i].isDeferred) {
                 ingest(i);
@@ -136,22 +130,21 @@ contract Solver is Initializable, ERC1155Receiver {
 
         conditions[conditions.length - 1].status = SolverLib.Status.Executed;
 
-        if (chainParent == address(0)) {
-            collateralToken.approve(
-                address(conditionalTokens),
-                config.conditionBase.amount
-            );
-        }
-
-        conditionalTokens.splitPosition(
-            collateralToken,
-            conditions[conditions.length - 1].parentCollectionId,
-            conditions[conditions.length - 1].conditionId,
-            config.conditionBase.partition,
-            config.conditionBase.amount
+        SolverLib.splitPosition(
+            chainParent,
+            config.conditionBase,
+            conditions[conditions.length - 1],
+            collateralToken
         );
 
-        allocatePartition();
+        SolverLib.allocatePartition(
+            conditions[conditions.length - 1],
+            collateralToken,
+            config.conditionBase,
+            address(this),
+            datas,
+            trackingId
+        );
         unsafeExecuteActions();
         cascade();
     }
@@ -168,21 +161,8 @@ contract Solver is Initializable, ERC1155Receiver {
                 config.conditionBase,
                 chainParent,
                 address(this),
-                conditions.length,
-                conditionalTokens
+                conditions.length
             )
-        );
-    }
-
-    function allocatePartition() private {
-        SolverLib.allocatePartition(
-            conditions[conditions.length - 1],
-            collateralToken,
-            conditionalTokens,
-            config.conditionBase,
-            address(this),
-            datas,
-            trackingId
         );
     }
 
@@ -198,10 +178,7 @@ contract Solver is Initializable, ERC1155Receiver {
             "Condition Executed"
         );
 
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .OutcomeProposed;
-        conditions[conditions.length - 1].payouts = _payouts;
+        SolverLib.proposePayouts(conditions[conditions.length - 1], _payouts);
         updateTimelock();
     }
 
@@ -212,14 +189,7 @@ contract Solver is Initializable, ERC1155Receiver {
                 SolverLib.Status.OutcomeProposed,
             "Outcome not proposed"
         );
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .OutcomeReported;
-
-        SolverLib.reportPayouts(
-            conditions[conditions.length - 1],
-            conditionalTokens
-        );
+        SolverLib.reportPayouts(conditions[conditions.length - 1]);
     }
 
     function arbitrate(uint256[] memory payouts) external {
@@ -230,14 +200,7 @@ contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationPending"
         );
         require(block.timestamp > timelock, "Timelock still locked");
-
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .ArbitrationDelivered;
-        conditionalTokens.reportPayouts(
-            conditions[conditions.length - 1].questionId,
-            payouts
-        );
+        SolverLib.reportPayouts(conditions[conditions.length - 1], payouts);
     }
 
     function arbitrateNull() external {
@@ -247,10 +210,7 @@ contract Solver is Initializable, ERC1155Receiver {
                 SolverLib.Status.ArbitrationPending,
             "Not ArbitrationPending"
         );
-
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .OutcomeProposed;
+        SolverLib.arbitrateNull(conditions[conditions.length - 1]);
         updateTimelock();
     }
 
@@ -261,9 +221,8 @@ contract Solver is Initializable, ERC1155Receiver {
                 SolverLib.Status.OutcomeProposed,
             "Not OutcomeProposed"
         );
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .ArbitrationRequested;
+
+        SolverLib.arbitrationRequested(conditions[conditions.length - 1]);
         updateTimelock();
     }
 
@@ -274,9 +233,7 @@ contract Solver is Initializable, ERC1155Receiver {
                 SolverLib.Status.ArbitrationRequested,
             "Not ArbitrationRequested"
         );
-        conditions[conditions.length - 1].status = SolverLib
-            .Status
-            .ArbitrationPending;
+        SolverLib.arbitrationPending(conditions[conditions.length - 1]);
         updateTimelock();
     }
 
@@ -295,21 +252,8 @@ contract Solver is Initializable, ERC1155Receiver {
             address(this).balance >= config.actions[_actionIndex].value,
             "insufficient eth"
         );
-
-        // execute call
-        config.actions[_actionIndex].executed = true;
-
-        SolverLib.Action memory _action = config.actions[_actionIndex];
-
-        if (_action.isPort) {
-            _action.to = abi.decode(datas.ports[_action.portIndex], (address));
-        }
-
-        (bool success, bytes memory retData) = _action.to.call{
-            value: _action.value
-        }(_action.data);
-        require(success, "call failure");
-        return retData;
+        return
+            SolverLib.unsafeExecuteAction(config.actions[_actionIndex], datas);
     }
 
     function getCanonCollectionId(uint256 _partitionIndex)
@@ -317,9 +261,8 @@ contract Solver is Initializable, ERC1155Receiver {
         view
         returns (bytes32 collectionId)
     {
-        collectionId = conditionalTokens.getCollectionId(
-            conditions[conditions.length - 1].parentCollectionId,
-            conditions[conditions.length - 1].conditionId,
+        collectionId = SolverLib.getCanonCollectionId(
+            conditions[conditions.length - 1],
             config.conditionBase.partition[_partitionIndex]
         );
     }

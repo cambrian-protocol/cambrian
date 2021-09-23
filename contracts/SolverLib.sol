@@ -5,6 +5,7 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/ISolver.sol";
 import "./interfaces/IConditionalTokens.sol";
+import "./SolverFactory.sol";
 
 library SolverLib {
     struct Action {
@@ -90,8 +91,7 @@ library SolverLib {
         ConditionBase calldata base,
         address chainParent,
         address oracle,
-        uint256 conditionVer,
-        IConditionalTokens ct
+        uint256 conditionVer
     ) public returns (Condition memory condition) {
         condition.questionId = keccak256(
             abi.encodePacked(base.metadata, oracle, conditionVer)
@@ -104,13 +104,16 @@ library SolverLib {
                 .getCanonCollectionId(base.parentCollectionPartitionIndex);
         }
 
-        condition.conditionId = ct.getConditionId(
-            oracle, // Solver is Oracle
-            condition.questionId,
-            base.outcomeSlots
-        );
+        condition.conditionId = IConditionalTokens(
+            0x5FbDB2315678afecb367f032d93F642f64180aa3
+        ).getConditionId(
+                oracle, // Solver is Oracle
+                condition.questionId,
+                base.outcomeSlots
+            );
 
-        ct.prepareCondition(oracle, condition.questionId, base.outcomeSlots);
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .prepareCondition(oracle, condition.questionId, base.outcomeSlots);
     }
 
     function ingestsValid(Ingest[] calldata ingests, uint256 conditionVer)
@@ -129,12 +132,26 @@ library SolverLib {
         return true;
     }
 
+    function deployChild(
+        Config calldata config,
+        IERC20 collateralToken,
+        address solver,
+        uint256 solverIndex
+    ) public returns (address child, Solver) {
+        child = SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
+            .createSolver(collateralToken, solver, solverIndex + 1, config);
+
+        return (child, Solver(child));
+    }
+
     function getPositionId(
         Condition memory condition,
         IERC20 collateralToken,
-        IConditionalTokens ct,
         uint256 partition
     ) public view returns (uint256 positionId) {
+        IConditionalTokens ct = IConditionalTokens(
+            0x5FbDB2315678afecb367f032d93F642f64180aa3
+        );
         positionId = ct.getPositionId(
             collateralToken,
             ct.getCollectionId(
@@ -145,30 +162,72 @@ library SolverLib {
         );
     }
 
-    // function splitPosition(
-    //     address chainParent,
-    //     IConditionalTokens ct,
-    //     ConditionBase calldata base,
-    //     Condition calldata condition,
-    //     IERC20 collateralToken
-    // ) public {
-    //     if (chainParent == address(0)) {
-    //         collateralToken.approve(address(ct), base.amount);
-    //     }
+    function splitPosition(
+        address chainParent,
+        ConditionBase calldata base,
+        Condition calldata condition,
+        IERC20 collateralToken
+    ) public {
+        if (chainParent == address(0)) {
+            collateralToken.approve(
+                address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
+                base.amount
+            );
+        }
 
-    //     ct.splitPosition(
-    //         collateralToken,
-    //         condition.parentCollectionId,
-    //         condition.conditionId,
-    //         base.partition,
-    //         base.amount
-    //     );
-    // }
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .splitPosition(
+                collateralToken,
+                condition.parentCollectionId,
+                condition.conditionId,
+                base.partition,
+                base.amount
+            );
+    }
 
-    function reportPayouts(Condition calldata condition, IConditionalTokens ct)
+    function reportPayouts(Condition storage condition) public {
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .reportPayouts(condition.questionId, condition.payouts);
+    }
+
+    function proposePayouts(
+        Condition storage condition,
+        uint256[] calldata _payouts
+    ) public {
+        condition.status = Status.OutcomeProposed;
+        condition.payouts = _payouts;
+    }
+
+    function confirmPayouts(Condition storage condition) public {
+        condition.status = Status.OutcomeReported;
+        reportPayouts(condition);
+    }
+
+    function reportPayouts(
+        Condition storage condition,
+        uint256[] memory payouts
+    ) public {
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .reportPayouts(condition.questionId, payouts);
+    }
+
+    function arbitrationPending(Condition storage condition) public {
+        condition.status = Status.ArbitrationPending;
+    }
+
+    function arbitrationRequested(Condition storage condition) public {
+        condition.status = Status.ArbitrationRequested;
+    }
+
+    function arbitrateNull(Condition storage condition) public {
+        condition.status = Status.OutcomeProposed;
+    }
+
+    function arbitrate(Condition storage condition, uint256[] memory payouts)
         public
     {
-        ct.reportPayouts(condition.questionId, condition.payouts);
+        condition.status = Status.ArbitrationDelivered;
+        reportPayouts(condition, payouts);
     }
 
     function addressFromChainIndex(
@@ -190,7 +249,6 @@ library SolverLib {
     function allocatePartition(
         Condition calldata condition,
         IERC20 collateralToken,
-        IConditionalTokens ct,
         ConditionBase calldata base,
         address solver,
         Datas storage data,
@@ -200,22 +258,23 @@ library SolverLib {
             uint256 positionId = getPositionId(
                 condition,
                 collateralToken,
-                ct,
                 base.partition[i]
             );
 
             for (uint256 j; j < base.recipientAddressPorts.length; j++) {
                 if (base.recipientAmounts[i][j] > 0) {
-                    ct.safeTransferFrom(
-                        solver,
-                        abi.decode(
-                            data.ports[base.recipientAddressPorts[i][j]],
-                            (address)
-                        ),
-                        positionId,
-                        base.recipientAmounts[i][j],
-                        abi.encode(trackingId)
-                    );
+                    IConditionalTokens(
+                        0x5FbDB2315678afecb367f032d93F642f64180aa3
+                    ).safeTransferFrom(
+                            solver,
+                            abi.decode(
+                                data.ports[base.recipientAddressPorts[i][j]],
+                                (address)
+                            ),
+                            positionId,
+                            base.recipientAmounts[i][j],
+                            abi.encode(trackingId)
+                        );
                 }
             }
         }
@@ -239,5 +298,37 @@ library SolverLib {
         } else {
             data = _ingest.data;
         }
+    }
+
+    function getCanonCollectionId(
+        Condition calldata condition,
+        uint256 partition
+    ) public view returns (bytes32 collectionId) {
+        collectionId = IConditionalTokens(
+            0x5FbDB2315678afecb367f032d93F642f64180aa3
+        ).getCollectionId(
+                condition.parentCollectionId,
+                condition.conditionId,
+                partition
+            );
+    }
+
+    function unsafeExecuteAction(Action storage action, Datas storage datas)
+        public
+        returns (bytes memory)
+    {
+        action.executed = true;
+
+        SolverLib.Action memory _action = action;
+
+        if (_action.isPort) {
+            _action.to = abi.decode(datas.ports[_action.portIndex], (address));
+        }
+
+        (bool success, bytes memory retData) = _action.to.call{
+            value: _action.value
+        }(_action.data);
+        require(success, "call failure");
+        return retData;
     }
 }

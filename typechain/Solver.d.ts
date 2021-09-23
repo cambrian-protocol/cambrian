@@ -31,7 +31,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "chainIndex()": FunctionFragment;
     "chainParent()": FunctionFragment;
     "collateralToken()": FunctionFragment;
-    "conditionalTokens()": FunctionFragment;
     "conditions(uint256)": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
@@ -91,10 +90,6 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "collateralToken",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "conditionalTokens",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -267,10 +262,6 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "collateralToken",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "conditionalTokens",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "conditions", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "config", data: BytesLike): Result;
   decodeFunctionResult(
@@ -410,8 +401,6 @@ export class Solver extends BaseContract {
     chainParent(overrides?: CallOverrides): Promise<[string]>;
 
     collateralToken(overrides?: CallOverrides): Promise<[string]>;
-
-    conditionalTokens(overrides?: CallOverrides): Promise<[string]>;
 
     conditions(
       arg0: BigNumberish,
@@ -674,8 +663,6 @@ export class Solver extends BaseContract {
 
   collateralToken(overrides?: CallOverrides): Promise<string>;
 
-  conditionalTokens(overrides?: CallOverrides): Promise<string>;
-
   conditions(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -925,8 +912,6 @@ export class Solver extends BaseContract {
     chainParent(overrides?: CallOverrides): Promise<string>;
 
     collateralToken(overrides?: CallOverrides): Promise<string>;
-
-    conditionalTokens(overrides?: CallOverrides): Promise<string>;
 
     conditions(
       arg0: BigNumberish,
@@ -1178,8 +1163,6 @@ export class Solver extends BaseContract {
 
     collateralToken(overrides?: CallOverrides): Promise<BigNumber>;
 
-    conditionalTokens(overrides?: CallOverrides): Promise<BigNumber>;
-
     conditions(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -1370,8 +1353,6 @@ export class Solver extends BaseContract {
     chainParent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     collateralToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    conditionalTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     conditions(
       arg0: BigNumberish,
