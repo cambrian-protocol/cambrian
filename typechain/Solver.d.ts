@@ -45,6 +45,8 @@ interface SolverInterface extends ethers.utils.Interface {
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
+    "receivedTokens(uint256)": FunctionFragment;
+    "retrySolve()": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -217,6 +219,14 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [BigNumberish[]]
   ): string;
   encodeFunctionData(
+    functionFragment: "receivedTokens",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "retrySolve",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "setTrackingId",
     values: [BytesLike]
   ): string;
@@ -302,6 +312,11 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "proposePayouts",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "receivedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "retrySolve", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setTrackingId",
     data: BytesLike
@@ -399,7 +414,8 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, number] & {
+      [string, string, string, string, number] & {
+        collateralToken: string;
         questionId: string;
         parentCollectionId: string;
         conditionId: string;
@@ -523,7 +539,8 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [
-        ([string, string, string, BigNumber[], number] & {
+        ([string, string, string, string, BigNumber[], number] & {
+          collateralToken: string;
           questionId: string;
           parentCollectionId: string;
           conditionId: string;
@@ -607,6 +624,15 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    receivedTokens(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    retrySolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setTrackingId(
       _trackingId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -661,7 +687,8 @@ export class Solver extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [string, string, string, number] & {
+    [string, string, string, string, number] & {
+      collateralToken: string;
       questionId: string;
       parentCollectionId: string;
       conditionId: string;
@@ -784,7 +811,8 @@ export class Solver extends BaseContract {
   getConditions(
     overrides?: CallOverrides
   ): Promise<
-    ([string, string, string, BigNumber[], number] & {
+    ([string, string, string, string, BigNumber[], number] & {
+      collateralToken: string;
       questionId: string;
       parentCollectionId: string;
       conditionId: string;
@@ -864,6 +892,15 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  receivedTokens(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  retrySolve(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setTrackingId(
     _trackingId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -912,7 +949,8 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [string, string, string, number] & {
+      [string, string, string, string, number] & {
+        collateralToken: string;
         questionId: string;
         parentCollectionId: string;
         conditionId: string;
@@ -1031,7 +1069,8 @@ export class Solver extends BaseContract {
     getConditions(
       overrides?: CallOverrides
     ): Promise<
-      ([string, string, string, BigNumber[], number] & {
+      ([string, string, string, string, BigNumber[], number] & {
+        collateralToken: string;
         questionId: string;
         parentCollectionId: string;
         conditionId: string;
@@ -1108,6 +1147,13 @@ export class Solver extends BaseContract {
       _payouts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
+
+    receivedTokens(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    retrySolve(overrides?: CallOverrides): Promise<void>;
 
     setTrackingId(
       _trackingId: BytesLike,
@@ -1301,6 +1347,15 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    receivedTokens(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    retrySolve(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setTrackingId(
       _trackingId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1488,6 +1543,15 @@ export class Solver extends BaseContract {
 
     proposePayouts(
       _payouts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    receivedTokens(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    retrySolve(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

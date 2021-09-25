@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const CT_ABI = require("../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
 
 
 
@@ -67,4 +68,62 @@ const getSimpleSolutionConfig = (testID, amount, implementationAddress, keeperAd
     )
 }
 
-module.exports = {getSimpleSolverConfig, getSimpleSolutionConfig}
+const getCTBalances = async(CT, address, solver, indexSets) => {
+  let promises = [];
+  let CTBalances = [];
+
+  const conditions = await solver.getConditions()
+  const condition = conditions[conditions.length-1];
+
+  indexSets.forEach((partition, i) => {
+    let p = CT.getCollectionId(
+      condition.parentCollectionId, 
+      condition.conditionId,
+      partition
+      ).then(collectionId => {
+        return CT.getPositionId(condition.collateralToken, collectionId)
+      }).then(positionId => {
+        CTBalances.push({
+          positionId: positionId.toString(),
+          value: null
+        });
+        return CT.balanceOf(address, positionId)
+      }).then(balance => {
+        CTBalances[i].value = balance.toString()
+      })
+      promises.push(p);
+  })
+  await Promise.all(promises);
+  console.log(`${address} balances: `, CTBalances);
+  return CTBalances;
+}
+
+
+const redeemPositions = async(CT, signer, solver, indexSets) => {
+  const conditions = await solver.getConditions()
+  const condition = conditions[conditions.length-1];
+
+  const tx = await CT.connect(signer).redeemPositions(
+    condition.collateralToken, 
+    condition.parentCollectionId, 
+    condition.conditionId,
+    indexSets
+  )
+
+  const rc = await tx.wait()
+  let iface = new ethers.utils.Interface(CT_ABI);
+  let events = rc.logs.map(log => {
+    try {
+      return iface.parseLog(log)
+    } catch(err){}
+  });
+  
+  events.forEach(event => {
+    if (event && event.name == "PayoutRedemption"){
+      console.log("ParentCollectionId: ", event.args.parentCollectionId)
+      console.log("Payout: ",event.args.payout.toString())
+    }
+  })
+}
+
+module.exports = {getSimpleSolverConfig, getSimpleSolutionConfig, getCTBalances, redeemPositions}

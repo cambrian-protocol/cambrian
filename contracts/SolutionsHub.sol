@@ -99,9 +99,9 @@ contract SolutionsHub {
                 solutions[_solutionId].solverAddresses[i]
             );
             _solver.setTrackingId(solutions[_solutionId].proposalId);
-            _solver.prepareSolve();
         }
         // Execute first Solver
+        ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve();
         ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve();
     }
 

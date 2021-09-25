@@ -84,8 +84,8 @@
       "artifacts": []
     },
     "E:\\cryptodev\\cambrian\\contracts\\ConditionalTokens.sol": {
-      "lastModificationDate": 1632189609935,
-      "contentHash": "eed4b5fd352092a778bc745d607403a5",
+      "lastModificationDate": 1632543858902,
+      "contentHash": "dc3c6ab81fb6ace249a8a67bda94f335",
       "sourceName": "contracts/ConditionalTokens.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -120,7 +120,8 @@
       "imports": [
         "@openzeppelin/contracts/token/ERC20/IERC20.sol",
         "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
-        "./CTHelpers.sol"
+        "./CTHelpers.sol",
+        "hardhat/console.sol"
       ],
       "versionPragmas": [
         "^0.8.0"
@@ -747,8 +748,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1632384519761,
-      "contentHash": "51644d34cd638f9f7f90857f26076931",
+      "lastModificationDate": 1632534483629,
+      "contentHash": "3c149097d1a851cc0115731eaa9527cd",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -838,8 +839,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1632384293238,
-      "contentHash": "2ff67e72dc73e1ebc02fd1bfcb2c0677",
+      "lastModificationDate": 1632454098165,
+      "contentHash": "0346b9766eef16fec7bfbcb4209ef281",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1246,8 +1247,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1632374481593,
-      "contentHash": "8c0b762cc0dd8eb523fdc9da5b744d2f",
+      "lastModificationDate": 1632529412803,
+      "contentHash": "096674cf33c9fbe36ce9de3ba9badad7",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",

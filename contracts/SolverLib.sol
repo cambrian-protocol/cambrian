@@ -41,6 +41,7 @@ library SolverLib {
 
     // Condition object created by addCondition() from ConditionBase
     struct Condition {
+        IERC20 collateralToken;
         bytes32 questionId; // // keccak256(abi.encodePacked(config.conditionBase.metadata, address(this), conditions.length))
         bytes32 parentCollectionId; // ID of the parent collection above this Solver in the CTF
         bytes32 conditionId; // ID of this condition in the CTF
@@ -82,7 +83,6 @@ library SolverLib {
 
     struct Datas {
         mapping(uint256 => bytes) ports;
-        mapping(uint256 => bool) lockedPorts;
         mapping(uint256 => uint256) portVersions;
         mapping(uint256 => DataType) portTypes;
     }
@@ -111,6 +111,8 @@ library SolverLib {
                 condition.questionId,
                 base.outcomeSlots
             );
+
+        condition.collateralToken = base.collateralToken;
 
         IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
             .prepareCondition(oracle, condition.questionId, base.outcomeSlots);

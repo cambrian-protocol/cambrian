@@ -20,6 +20,9 @@ contract Solver is Initializable, ERC1155Receiver {
     uint256 public timelock; // Current timelock
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
 
+    uint256[] public receivedTokens;
+    mapping(uint256 => bool) hasToken;
+
     SolverLib.Datas datas;
 
     function init(
@@ -39,7 +42,10 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function prepareSolve() public {
         if (hasCondition) {
-            require(msg.sender == config.keeper, "Only keeper");
+            require(
+                msg.sender == config.keeper || msg.sender == chainParent,
+                "Only keeper/parent"
+            );
             require(
                 conditions[conditions.length - 1].status ==
                     SolverLib.Status.ArbitrationDelivered ||
@@ -51,6 +57,33 @@ contract Solver is Initializable, ERC1155Receiver {
         hasCondition = true;
         addCondition();
         executeIngests();
+        if (chainChild != address(0)) {
+            Solver(chainChild).prepareSolve();
+        }
+    }
+
+    function retrySolve() public {
+        SolverLib.Condition[] memory _conditions = Solver(chainChild)
+            .getConditions();
+
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .redeemPositions(
+                config.conditionBase.collateralToken,
+                _conditions[_conditions.length - 1].parentCollectionId,
+                _conditions[_conditions.length - 1].conditionId,
+                config.conditionBase.partition
+            );
+
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .redeemPositions(
+                config.conditionBase.collateralToken,
+                conditions[conditions.length - 1].parentCollectionId,
+                conditions[conditions.length - 1].conditionId,
+                config.conditionBase.partition
+            );
+
+        prepareSolve();
+        executeSolve();
     }
 
     function executeIngests() private {
@@ -86,16 +119,11 @@ contract Solver is Initializable, ERC1155Receiver {
         bool _constant,
         bytes memory _data
     ) private {
-        require(!datas.lockedPorts[_key], "Port locked");
-        if (_constant) {
-            datas.lockedPorts[_key] = true;
-        } else {
-            require(
-                datas.portVersions[_key] == (conditions.length - 1),
-                "Port version invalid"
-            );
-            datas.portVersions[_key]++;
-        }
+        require(
+            datas.portVersions[_key] == (conditions.length - 1),
+            "Port version invalid"
+        );
+        datas.portVersions[_key]++;
         datas.ports[_key] = _data;
         datas.portTypes[_key] = SolverLib.DataType(_type);
     }
@@ -111,7 +139,20 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function deferredIngest(uint256 _index) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        ingest(_index);
+        require(
+            config.ingests[_index].isDeferred == true,
+            "Ingest not deferred"
+        );
+
+        router(
+            config.ingests[_index].port,
+            config.ingests[_index].key,
+            config.ingests[_index].isConstant,
+            abi.decode(
+                SolverLib.ingest(config.ingests[_index], address(this)),
+                (bytes)
+            )
+        );
     }
 
     function ingest(uint256 _index) private {
@@ -125,9 +166,8 @@ contract Solver is Initializable, ERC1155Receiver {
 
     function getOutput(uint256 _key) public view returns (bytes memory data) {
         require(
-            datas.lockedPorts[_key] ||
-                datas.portVersions[_key] == conditions.length,
-            "Port invalid."
+            datas.portVersions[_key] == conditions.length,
+            "Port invalid ver."
         );
 
         data = datas.ports[_key];
@@ -152,7 +192,6 @@ contract Solver is Initializable, ERC1155Receiver {
             config.conditionBase,
             conditions[conditions.length - 1]
         );
-
         SolverLib.allocatePartition(
             conditions[conditions.length - 1],
             config.conditionBase,
@@ -184,7 +223,7 @@ contract Solver is Initializable, ERC1155Receiver {
         require(
             conditions[conditions.length - 1].status ==
                 SolverLib.Status.Executed,
-            "Condition Executed"
+            "Condition not Executed"
         );
 
         SolverLib.proposePayouts(conditions[conditions.length - 1], _payouts);
@@ -198,7 +237,7 @@ contract Solver is Initializable, ERC1155Receiver {
                 SolverLib.Status.OutcomeProposed,
             "Outcome not proposed"
         );
-        SolverLib.reportPayouts(conditions[conditions.length - 1]);
+        SolverLib.confirmPayouts(conditions[conditions.length - 1]);
     }
 
     function arbitrate(uint256[] memory payouts) external {
@@ -209,7 +248,7 @@ contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationPending"
         );
         require(block.timestamp > timelock, "Timelock still locked");
-        SolverLib.reportPayouts(conditions[conditions.length - 1], payouts);
+        SolverLib.arbitrate(conditions[conditions.length - 1], payouts);
     }
 
     function arbitrateNull() external {
@@ -291,6 +330,11 @@ contract Solver is Initializable, ERC1155Receiver {
         uint256 value,
         bytes calldata data
     ) external virtual override returns (bytes4) {
+        if (!hasToken[id]) {
+            receivedTokens.push(id);
+            hasToken[id] = true;
+        }
+
         return this.onERC1155Received.selector;
     }
 
