@@ -244,7 +244,9 @@ library SolverLib {
         bytes32 trackingId
     ) public {
         uint256[] memory _tokens = new uint256[](base.partition.length);
-        uint256[][] memory _amounts = new uint256[][](base.partition.length);
+        uint256[][] memory _amounts = new uint256[][](
+            base.recipientAddressSlots.length
+        );
 
         for (uint256 i; i < base.partition.length; i++) {
             _tokens[i] = getPositionId(
@@ -252,19 +254,20 @@ library SolverLib {
                 base.collateralToken,
                 base.partition[i]
             );
+        }
+
+        for (uint256 i; i < base.recipientAddressSlots.length; i++) {
             _amounts[i] = new uint256[](base.partition.length);
 
-            for (uint256 j; j < base.recipientAmountSlots.length; j++) {
+            for (uint256 j; j < base.partition.length; j++) {
                 _amounts[i][j] = abi.decode(
-                    data.slots[base.recipientAmountSlots[i][j]],
+                    data.slots[base.recipientAmountSlots[j][i]],
                     (uint256)
                 );
             }
         }
 
-        for (uint256 i; i < _tokens.length; i++) {
-            console.log(_tokens[i]);
-
+        for (uint256 i; i < _amounts.length; i++) {
             for (uint256 j; j < _amounts[i].length; j++) {
                 console.log(_amounts[i][j]);
             }
