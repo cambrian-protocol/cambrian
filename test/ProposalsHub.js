@@ -21,13 +21,13 @@ describe("It should all work", function () {
     this.arbitrator = arbitrator;
     this.amount = 1000;
 
-    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "Solver"]);
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "BasicSolverV1"]);
     this.CT = await ethers.getContract("ConditionalTokens")
     this.SolverFactory = await ethers.getContract("SolverFactory")
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
-    this.Solver = await ethers.getContract("Solver")
+    this.Solver = await ethers.getContract("BasicSolverV1")
   
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);

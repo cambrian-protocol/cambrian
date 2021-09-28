@@ -46,7 +46,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
     "receivedTokens(uint256)": FunctionFragment;
-    "retrySolve()": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -134,7 +133,7 @@ interface SolverInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -195,7 +194,7 @@ interface SolverInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -221,10 +220,6 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "receivedTokens",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "retrySolve",
-    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "setTrackingId",
@@ -316,7 +311,6 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "receivedTokens",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "retrySolve", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setTrackingId",
     data: BytesLike
@@ -438,7 +432,7 @@ export class Solver extends BaseContract {
           BigNumber,
           BigNumber,
           BigNumber[],
-          BigNumber[][],
+          BigNumber[],
           BigNumber[][],
           string
         ] & {
@@ -447,7 +441,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[][];
+          recipientAddressPorts: BigNumber[];
           recipientAmounts: BigNumber[][];
           metadata: string;
         }
@@ -463,7 +457,7 @@ export class Solver extends BaseContract {
           BigNumber,
           BigNumber,
           BigNumber[],
-          BigNumber[][],
+          BigNumber[],
           BigNumber[][],
           string
         ] & {
@@ -472,7 +466,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[][];
+          recipientAddressPorts: BigNumber[];
           recipientAmounts: BigNumber[][];
           metadata: string;
         };
@@ -518,7 +512,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -589,7 +583,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -628,10 +622,6 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
-
-    retrySolve(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     setTrackingId(
       _trackingId: BytesLike,
@@ -711,7 +701,7 @@ export class Solver extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber[],
-        BigNumber[][],
+        BigNumber[],
         BigNumber[][],
         string
       ] & {
@@ -720,7 +710,7 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
-        recipientAddressPorts: BigNumber[][];
+        recipientAddressPorts: BigNumber[];
         recipientAmounts: BigNumber[][];
         metadata: string;
       }
@@ -736,7 +726,7 @@ export class Solver extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber[],
-        BigNumber[][],
+        BigNumber[],
         BigNumber[][],
         string
       ] & {
@@ -745,7 +735,7 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
-        recipientAddressPorts: BigNumber[][];
+        recipientAddressPorts: BigNumber[];
         recipientAmounts: BigNumber[][];
         metadata: string;
       };
@@ -791,7 +781,7 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[][];
+        recipientAddressPorts: BigNumberish[];
         recipientAmounts: BigNumberish[][];
         metadata: string;
       };
@@ -857,7 +847,7 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[][];
+        recipientAddressPorts: BigNumberish[];
         recipientAmounts: BigNumberish[][];
         metadata: string;
       };
@@ -896,10 +886,6 @@ export class Solver extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  retrySolve(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   setTrackingId(
     _trackingId: BytesLike,
@@ -973,7 +959,7 @@ export class Solver extends BaseContract {
           BigNumber,
           BigNumber,
           BigNumber[],
-          BigNumber[][],
+          BigNumber[],
           BigNumber[][],
           string
         ] & {
@@ -982,7 +968,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[][];
+          recipientAddressPorts: BigNumber[];
           recipientAmounts: BigNumber[][];
           metadata: string;
         }
@@ -998,7 +984,7 @@ export class Solver extends BaseContract {
           BigNumber,
           BigNumber,
           BigNumber[],
-          BigNumber[][],
+          BigNumber[],
           BigNumber[][],
           string
         ] & {
@@ -1007,7 +993,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[][];
+          recipientAddressPorts: BigNumber[];
           recipientAmounts: BigNumber[][];
           metadata: string;
         };
@@ -1051,7 +1037,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1115,7 +1101,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1152,8 +1138,6 @@ export class Solver extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    retrySolve(overrides?: CallOverrides): Promise<void>;
 
     setTrackingId(
       _trackingId: BytesLike,
@@ -1254,7 +1238,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1312,7 +1296,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1350,10 +1334,6 @@ export class Solver extends BaseContract {
     receivedTokens(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    retrySolve(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setTrackingId(
@@ -1453,7 +1433,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1511,7 +1491,7 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -1549,10 +1529,6 @@ export class Solver extends BaseContract {
     receivedTokens(
       arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    retrySolve(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setTrackingId(

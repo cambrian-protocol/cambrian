@@ -67,7 +67,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -115,7 +115,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -237,7 +237,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -288,7 +288,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -337,7 +337,7 @@ export class SolutionsHub extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[][];
+        recipientAddressPorts: BigNumberish[];
         recipientAmounts: BigNumberish[][];
         metadata: string;
       };
@@ -388,7 +388,7 @@ export class SolutionsHub extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[][];
+        recipientAddressPorts: BigNumberish[];
         recipientAmounts: BigNumberish[][];
         metadata: string;
       };
@@ -437,7 +437,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -488,7 +488,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -542,7 +542,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -593,7 +593,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -643,7 +643,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -694,7 +694,7 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };

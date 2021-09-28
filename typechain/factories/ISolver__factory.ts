@@ -223,9 +223,9 @@ const _abi = [
                 type: "uint256[]",
               },
               {
-                internalType: "uint256[][]",
+                internalType: "uint256[]",
                 name: "recipientAddressPorts",
-                type: "uint256[][]",
+                type: "uint256[]",
               },
               {
                 internalType: "uint256[][]",

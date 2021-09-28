@@ -56,7 +56,7 @@ library SolverLib {
         uint256 parentCollectionPartitionIndex; // Index of partition to get parentCollectionId from parent Solver's uint256[] partition
         uint256 amount; // Amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
-        uint256[][] recipientAddressPorts; // Arrays of [i] for addressPorts[i] containing CT recipients
+        uint256[] recipientAddressPorts; // Arrays of [i] for addressPorts[i] containing CT recipients
         uint256[][] recipientAmounts; // Arrays containing amount of CTs to send to each recipient for each partition
         string metadata;
     }
@@ -253,29 +253,28 @@ library SolverLib {
         Datas storage data,
         bytes32 trackingId
     ) public {
+        uint256[] memory _tokens = new uint256[](base.partition.length);
+
         for (uint256 i; i < base.partition.length; i++) {
-            uint256 positionId = getPositionId(
+            _tokens[i] = getPositionId(
                 condition,
                 base.collateralToken,
                 base.partition[i]
             );
+        }
 
-            for (uint256 j; j < base.recipientAddressPorts.length; j++) {
-                if (base.recipientAmounts[i][j] > 0) {
-                    IConditionalTokens(
-                        0x5FbDB2315678afecb367f032d93F642f64180aa3
-                    ).safeTransferFrom(
-                            solver,
-                            abi.decode(
-                                data.ports[base.recipientAddressPorts[i][j]],
-                                (address)
-                            ),
-                            positionId,
-                            base.recipientAmounts[i][j],
-                            abi.encode(trackingId)
-                        );
-                }
-            }
+        for (uint256 i; i < base.recipientAddressPorts.length; i++) {
+            IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+                .safeBatchTransferFrom(
+                    solver,
+                    abi.decode(
+                        data.ports[base.recipientAddressPorts[i]],
+                        (address)
+                    ),
+                    _tokens,
+                    base.recipientAmounts[i],
+                    abi.encode(trackingId)
+                );
         }
     }
 
@@ -310,32 +309,5 @@ library SolverLib {
                 condition.conditionId,
                 partition
             );
-    }
-
-    function unsafeExecuteActions(Action[] storage actions, Datas storage datas)
-        public
-    {
-        for (uint256 i; i < actions.length; i++) {
-            unsafeExecuteAction(actions[i], datas);
-        }
-    }
-
-    function unsafeExecuteAction(Action storage action, Datas storage datas)
-        public
-        returns (bytes memory)
-    {
-        action.executed = true;
-
-        SolverLib.Action memory _action = action;
-
-        if (_action.isPort) {
-            _action.to = abi.decode(datas.ports[_action.portIndex], (address));
-        }
-
-        (bool success, bytes memory retData) = _action.to.call{
-            value: _action.value
-        }(_action.data);
-        require(success, "call failure");
-        return retData;
     }
 }

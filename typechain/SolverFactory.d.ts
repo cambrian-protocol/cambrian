@@ -59,7 +59,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -160,7 +160,7 @@ export class SolverFactory extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -203,7 +203,7 @@ export class SolverFactory extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[][];
+        recipientAddressPorts: BigNumberish[];
         recipientAmounts: BigNumberish[][];
         metadata: string;
       };
@@ -246,7 +246,7 @@ export class SolverFactory extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -296,7 +296,7 @@ export class SolverFactory extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };
@@ -340,7 +340,7 @@ export class SolverFactory extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[][];
+          recipientAddressPorts: BigNumberish[];
           recipientAmounts: BigNumberish[][];
           metadata: string;
         };

@@ -15,13 +15,13 @@ describe("It should all work", function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "Solver"]);
+    await deployments.fixture(["ConditionalTokens", "SolverFactory", "SolutionsHub", "ProposalsHub", "ToyToken", "BasicSolverV1"]);
     this.CT = await ethers.getContract("ConditionalTokens")
     this.SolverFactory = await ethers.getContract("SolverFactory")
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
-    this.Solver = await ethers.getContract("Solver")
+    this.Solver = await ethers.getContract("BasicSolverV1")
 
     await this.ToyToken.mint(this.buyer.address, "100");
 
@@ -75,7 +75,7 @@ describe("It should all work", function () {
       parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
-      recipientAddressPorts: [[1,2],[1,2]],
+      recipientAddressPorts: [1,2],
       recipientAmounts: [[0,100],[100,0]],
       metadata: ""
     }

@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./SolutionsHub.sol";
 import "./SolverLib.sol";
 
-contract Solver is Initializable, ERC1155Receiver {
+abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
 
@@ -60,30 +60,6 @@ contract Solver is Initializable, ERC1155Receiver {
         if (chainChild != address(0)) {
             Solver(chainChild).prepareSolve();
         }
-    }
-
-    function retrySolve() public {
-        SolverLib.Condition[] memory _conditions = Solver(chainChild)
-            .getConditions();
-
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .redeemPositions(
-                config.conditionBase.collateralToken,
-                _conditions[_conditions.length - 1].parentCollectionId,
-                _conditions[_conditions.length - 1].conditionId,
-                config.conditionBase.partition
-            );
-
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .redeemPositions(
-                config.conditionBase.collateralToken,
-                conditions[conditions.length - 1].parentCollectionId,
-                conditions[conditions.length - 1].conditionId,
-                config.conditionBase.partition
-            );
-
-        prepareSolve();
-        executeSolve();
     }
 
     function executeIngests() private {
@@ -199,9 +175,12 @@ contract Solver is Initializable, ERC1155Receiver {
             datas,
             trackingId
         );
-        SolverLib.unsafeExecuteActions(config.actions, datas);
+
+        postroll();
         cascade();
     }
+
+    function postroll() internal virtual;
 
     function addCondition() private {
         conditions.push(

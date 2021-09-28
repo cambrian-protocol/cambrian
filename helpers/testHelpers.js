@@ -41,7 +41,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         parentCollectionPartitionIndex: 0,
         amount: amount,
         partition: [1,2],
-        recipientAddressPorts: [[1,2],[1,2]],
+        recipientAddressPorts: [1,2],
         recipientAmounts: [[0,amount],[amount,0]],
         metadata: ""
       }

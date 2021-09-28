@@ -8,7 +8,7 @@ module.exports = async ({getNamedAccounts, deployments}) => {
     log: true,
   })
 
-  await deploy('Solver', {
+  await deploy("BasicSolverV1", {
     from: deployer,
     args: [],
     libraries: {
@@ -17,4 +17,4 @@ module.exports = async ({getNamedAccounts, deployments}) => {
     log: true,
   })
 };
-module.exports.tags = ['Solver'];
+module.exports.tags = ["BasicSolverV1"];

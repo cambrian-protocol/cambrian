@@ -240,6 +240,18 @@ contract ProposalsHub is ERC1155Receiver {
         uint256[] calldata values,
         bytes calldata data
     ) external virtual override returns (bytes4) {
+        bytes32 _proposalId = abi.decode(data, (bytes32));
+        require(
+            proposals[_proposalId].id == _proposalId,
+            "ProposalsHub::Data is not valid proposalId"
+        );
+        require(
+            proposals[_proposalId].isExecuted,
+            "ProposalsHub::Proposal has not been executed"
+        );
+        for (uint256 i; i < ids.length; i++) {
+            postReclaimableTokens(_proposalId, ids[i], values[i]);
+        }
         return this.onERC1155BatchReceived.selector;
     }
 }
