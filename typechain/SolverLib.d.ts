@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 interface SolverLibInterface extends ethers.utils.Interface {
   functions: {
     "addressFromChainIndex(uint256,address,address,address,uint256)": FunctionFragment;
-    "getCanonCollectionId(tuple,uint256)": FunctionFragment;
+    "getCollectionId(tuple,uint256)": FunctionFragment;
     "getPositionId(tuple,IERC20,uint256)": FunctionFragment;
     "ingestsValid(tuple[],uint256)": FunctionFragment;
   };
@@ -31,7 +31,7 @@ interface SolverLibInterface extends ethers.utils.Interface {
     values: [BigNumberish, string, string, string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCanonCollectionId",
+    functionFragment: "getCollectionId",
     values: [
       {
         collateralToken: string;
@@ -80,7 +80,7 @@ interface SolverLibInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCanonCollectionId",
+    functionFragment: "getCollectionId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -148,7 +148,7 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { _address: string }>;
 
-    getCanonCollectionId(
+    getCollectionId(
       condition: {
         collateralToken: string;
         questionId: BytesLike;
@@ -199,7 +199,7 @@ export class SolverLib extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getCanonCollectionId(
+  getCollectionId(
     condition: {
       collateralToken: string;
       questionId: BytesLike;
@@ -250,7 +250,7 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getCanonCollectionId(
+    getCollectionId(
       condition: {
         collateralToken: string;
         questionId: BytesLike;
@@ -304,7 +304,7 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getCanonCollectionId(
+    getCollectionId(
       condition: {
         collateralToken: string;
         questionId: BytesLike;
@@ -356,7 +356,7 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getCanonCollectionId(
+    getCollectionId(
       condition: {
         collateralToken: string;
         questionId: BytesLike;

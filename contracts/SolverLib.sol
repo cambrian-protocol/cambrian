@@ -90,8 +90,9 @@ library SolverLib {
         if (chainParent == address(0)) {
             condition.parentCollectionId = bytes32(""); // top level collection
         } else {
-            condition.parentCollectionId = Solver(chainParent)
-                .getCanonCollectionId(base.parentCollectionPartitionIndex);
+            condition.parentCollectionId = Solver(chainParent).getCollectionId(
+                base.parentCollectionPartitionIndex
+            );
         }
 
         condition.conditionId = IConditionalTokens(
@@ -308,10 +309,11 @@ library SolverLib {
         }
     }
 
-    function getCanonCollectionId(
-        Condition calldata condition,
-        uint256 partition
-    ) public view returns (bytes32 collectionId) {
+    function getCollectionId(Condition calldata condition, uint256 partition)
+        public
+        view
+        returns (bytes32 collectionId)
+    {
         collectionId = IConditionalTokens(
             0x5FbDB2315678afecb367f032d93F642f64180aa3
         ).getCollectionId(

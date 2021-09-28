@@ -411,7 +411,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "getCanonCollectionId",
+    name: "getCollectionId",
     outputs: [
       {
         internalType: "bytes32",

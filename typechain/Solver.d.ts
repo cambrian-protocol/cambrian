@@ -36,7 +36,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "deferredIngest(uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
     "executeSolve()": FunctionFragment;
-    "getCanonCollectionId(uint256)": FunctionFragment;
+    "getCollectionId(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
     "getOutput(uint256)": FunctionFragment;
     "ingestsValid()": FunctionFragment;
@@ -136,7 +136,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getCanonCollectionId",
+    functionFragment: "getCollectionId",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -257,7 +257,7 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCanonCollectionId",
+    functionFragment: "getCollectionId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -491,7 +491,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getCanonCollectionId(
+    getCollectionId(
       _partitionIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string] & { collectionId: string }>;
@@ -739,7 +739,7 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getCanonCollectionId(
+  getCollectionId(
     _partitionIndex: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -972,7 +972,7 @@ export class Solver extends BaseContract {
 
     executeSolve(overrides?: CallOverrides): Promise<void>;
 
-    getCanonCollectionId(
+    getCollectionId(
       _partitionIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -1154,7 +1154,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getCanonCollectionId(
+    getCollectionId(
       _partitionIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1328,7 +1328,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getCanonCollectionId(
+    getCollectionId(
       _partitionIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

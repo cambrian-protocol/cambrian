@@ -258,12 +258,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         updateTimelock();
     }
 
-    function getCanonCollectionId(uint256 _partitionIndex)
+    function getCollectionId(uint256 _partitionIndex)
         public
         view
         returns (bytes32 collectionId)
     {
-        collectionId = SolverLib.getCanonCollectionId(
+        collectionId = SolverLib.getCollectionId(
             conditions[conditions.length - 1],
             config.conditionBase.partition[_partitionIndex]
         );
