@@ -8,21 +8,12 @@ import "./interfaces/IConditionalTokens.sol";
 import "./SolverFactory.sol";
 
 library SolverLib {
-    struct Action {
-        bool executed;
-        bool isPort;
-        address to;
-        uint256 portIndex;
-        uint256 value;
-        bytes data;
-    }
-
     // Expected sources of data being ingested into the Solver
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
         bool isDeferred; // Data is waiting on an upstream action and must be ingested manually later
-        bool isConstant; // Data is supplied directly which cannot change
-        uint8 port; // Destination port for data: addressPort || boolPort || bytesPort || bytes32Port || uint256Port
+        bool isConstant; // Data is supplied directly as encoded bytes
+        uint8 dataType;
         uint256 key; // Destination key for data
         uint256 solverIndex; // Index of the Solver in the chain to make this call to
         bytes data; // Raw when isConstant=true, else an encoded function call
@@ -56,8 +47,8 @@ library SolverLib {
         uint256 parentCollectionPartitionIndex; // Index of partition to get parentCollectionId from parent Solver's uint256[] partition
         uint256 amount; // Amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
-        uint256[] recipientAddressPorts; // Arrays of [i] for addressPorts[i] containing CT recipients
-        uint256[][] recipientAmounts; // Arrays containing amount of CTs to send to each recipient for each partition
+        uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
+        uint256[][] recipientAmountSlots; // Arrays containing amount of CTs to send to each recipient for each partition
         string metadata;
     }
 
@@ -69,7 +60,6 @@ library SolverLib {
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
         bytes data; // Arbitrary data
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
-        Action[] actions; // Arbitrary actions to be run during execution
         ConditionBase conditionBase; // Base to create conditions from
     }
 
@@ -82,9 +72,9 @@ library SolverLib {
     }
 
     struct Datas {
-        mapping(uint256 => bytes) ports;
-        mapping(uint256 => uint256) portVersions;
-        mapping(uint256 => DataType) portTypes;
+        mapping(uint256 => bytes) slots;
+        mapping(uint256 => uint256) slotVersions;
+        mapping(uint256 => DataType) slotTypes;
     }
 
     function createCondition(
@@ -254,6 +244,7 @@ library SolverLib {
         bytes32 trackingId
     ) public {
         uint256[] memory _tokens = new uint256[](base.partition.length);
+        uint256[][] memory _amounts = new uint256[][](base.partition.length);
 
         for (uint256 i; i < base.partition.length; i++) {
             _tokens[i] = getPositionId(
@@ -261,18 +252,34 @@ library SolverLib {
                 base.collateralToken,
                 base.partition[i]
             );
+            _amounts[i] = new uint256[](base.partition.length);
+
+            for (uint256 j; j < base.recipientAmountSlots.length; j++) {
+                _amounts[i][j] = abi.decode(
+                    data.slots[base.recipientAmountSlots[i][j]],
+                    (uint256)
+                );
+            }
         }
 
-        for (uint256 i; i < base.recipientAddressPorts.length; i++) {
+        for (uint256 i; i < _tokens.length; i++) {
+            console.log(_tokens[i]);
+
+            for (uint256 j; j < _amounts[i].length; j++) {
+                console.log(_amounts[i][j]);
+            }
+        }
+
+        for (uint256 i; i < base.recipientAddressSlots.length; i++) {
             IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
                 .safeBatchTransferFrom(
                     solver,
                     abi.decode(
-                        data.ports[base.recipientAddressPorts[i]],
+                        data.slots[base.recipientAddressSlots[i]],
                         (address)
                     ),
                     _tokens,
-                    base.recipientAmounts[i],
+                    _amounts[i],
                     abi.encode(trackingId)
                 );
         }

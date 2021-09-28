@@ -50,7 +50,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: true,
-//         port: 0,
+//         dataType: 0,
 //         key: 1,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -59,7 +59,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
@@ -74,8 +74,8 @@
 //       parentCollectionPartitionIndex: 0,
 //       amount: 100,
 //       partition: [1,2],
-//       recipientAddressPorts: [1,2],
-//       recipientAmounts: [[0,100],[100,0]],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[0,100],[100,0]],
 //       metadata: ""
 //     }
   
@@ -85,7 +85,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 1,
 //         solverIndex: 1,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[0])
@@ -94,7 +94,7 @@
 //         executions: 0,
 //         isDeferred: true,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("getOutput", [3])
@@ -108,8 +108,8 @@
 //       parentCollectionPartitionIndex: 0,
 //       amount: 100,
 //       partition: [1,2],
-//       recipientAddressPorts: [1,2],
-//       recipientAmounts: [[0,100],[100,0]],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[0,100],[100,0]],
 //       metadata: ""
 //     }
 
@@ -254,7 +254,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: true,
-//         port: 0,
+//         dataType: 0,
 //         key: 1,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -263,7 +263,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
@@ -278,8 +278,8 @@
 //       parentCollectionPartitionIndex: 0,
 //       amount: 100,
 //       partition: [1,2],
-//       recipientAddressPorts: [1,2],
-//       recipientAmounts: [[0,100],[100,0]],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[0,100],[100,0]],
 //       metadata: ""
 //     }
   
@@ -289,7 +289,7 @@
 //         executions: 0,
 //         isDeferred: false,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 1,
 //         solverIndex: 1,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[0])
@@ -298,7 +298,7 @@
 //         executions: 0,
 //         isDeferred: true,
 //         isConstant: false,
-//         port: 0,
+//         dataType: 0,
 //         key: 2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("getOutput", [3])
@@ -312,8 +312,8 @@
 //       parentCollectionPartitionIndex: 0,
 //       amount: 100,
 //       partition: [1,2],
-//       recipientAddressPorts: [1,2],
-//       recipientAmounts: [[0,100],[100,0]],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[0,100],[100,0]],
 //       metadata: ""
 //     }
 

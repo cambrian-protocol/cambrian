@@ -50,7 +50,7 @@ describe("It should all work", async function () {
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -59,14 +59,28 @@ describe("It should all work", async function () {
         executions: 0,
         isDeferred: false,
         isConstant: false,
-        port: 0,
+        dataType: 0,
         key: 2,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 3,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 4,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
       }
     ]
-
-    const actions0 = [];
 
     const conditionBase0 = {
       collateralToken: this.ToyToken.address,
@@ -74,8 +88,8 @@ describe("It should all work", async function () {
       parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
-      recipientAddressPorts: [1,2],
-      recipientAmounts: [[0,100],[100,0]],
+      recipientAddressSlots: [1,2],
+      recipientAmountSlots: [[3,4],[4,3]],
       metadata: ""
     }
   
@@ -85,7 +99,7 @@ describe("It should all work", async function () {
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -94,22 +108,37 @@ describe("It should all work", async function () {
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 3,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 4,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
       },
       { // add arbitrary isDeferred data ingest
         executions: 0,
         isDeferred: true,
         isConstant: false,
-        port: 2,
+        dataType: 2,
         key: 0,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("getOutput",[0])
       },
     ]
-    const actions1 = [];
 
     const conditionBase1 = {
       collateralToken: this.ToyToken.address,
@@ -117,8 +146,8 @@ describe("It should all work", async function () {
       parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
-      recipientAddressPorts: [1,2],
-      recipientAmounts: [[0,100],[100,0]],
+      recipientAddressSlots: [1,2],
+      recipientAmountSlots: [[3,4],[4,3]],
       metadata: ""
     }
 
@@ -131,7 +160,6 @@ describe("It should all work", async function () {
         0,
         ethers.utils.formatBytes32String(""),
         ingests0,
-        actions0,
         conditionBase0
       ],
       [
@@ -141,7 +169,6 @@ describe("It should all work", async function () {
         0,
         ethers.utils.formatBytes32String(""),
         ingests1,
-        actions1,
         conditionBase1
       ],
     ];
@@ -203,7 +230,7 @@ describe("It should all work", async function () {
 
     // Add deferred data to solver0 and fetch it from solver1
     await solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero);
-    await solver1.connect(this.keeper).deferredIngest(2);
+    await solver1.connect(this.keeper).deferredIngest(4);
     await solver1.connect(this.keeper).executeSolve();
 
 

@@ -45,7 +45,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
-    "receivedTokens(uint256)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -114,17 +113,9 @@ interface SolverInterface extends ethers.utils.Interface {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -133,8 +124,8 @@ interface SolverInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }
@@ -175,17 +166,9 @@ interface SolverInterface extends ethers.utils.Interface {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -194,8 +177,8 @@ interface SolverInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }
@@ -216,10 +199,6 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "proposePayouts",
     values: [BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "receivedTokens",
-    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setTrackingId",
@@ -305,10 +284,6 @@ interface SolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "proposePayouts",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "receivedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -441,8 +416,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[];
-          recipientAmounts: BigNumber[][];
+          recipientAddressSlots: BigNumber[];
+          recipientAmountSlots: BigNumber[][];
           metadata: string;
         }
       ] & {
@@ -466,8 +441,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[];
-          recipientAmounts: BigNumber[][];
+          recipientAddressSlots: BigNumber[];
+          recipientAmountSlots: BigNumber[][];
           metadata: string;
         };
       }
@@ -493,17 +468,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -512,8 +479,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -564,17 +531,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -583,8 +542,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -617,11 +576,6 @@ export class Solver extends BaseContract {
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    receivedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     setTrackingId(
       _trackingId: BytesLike,
@@ -710,8 +664,8 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
-        recipientAddressPorts: BigNumber[];
-        recipientAmounts: BigNumber[][];
+        recipientAddressSlots: BigNumber[];
+        recipientAmountSlots: BigNumber[][];
         metadata: string;
       }
     ] & {
@@ -735,8 +689,8 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumber;
         amount: BigNumber;
         partition: BigNumber[];
-        recipientAddressPorts: BigNumber[];
-        recipientAmounts: BigNumber[][];
+        recipientAddressSlots: BigNumber[];
+        recipientAmountSlots: BigNumber[][];
         metadata: string;
       };
     }
@@ -762,17 +716,9 @@ export class Solver extends BaseContract {
         executions: BigNumberish;
         isDeferred: boolean;
         isConstant: boolean;
-        port: BigNumberish;
+        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
-        data: BytesLike;
-      }[];
-      actions: {
-        executed: boolean;
-        isPort: boolean;
-        to: string;
-        portIndex: BigNumberish;
-        value: BigNumberish;
         data: BytesLike;
       }[];
       conditionBase: {
@@ -781,8 +727,8 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[];
-        recipientAmounts: BigNumberish[][];
+        recipientAddressSlots: BigNumberish[];
+        recipientAmountSlots: BigNumberish[][];
         metadata: string;
       };
     },
@@ -828,17 +774,9 @@ export class Solver extends BaseContract {
         executions: BigNumberish;
         isDeferred: boolean;
         isConstant: boolean;
-        port: BigNumberish;
+        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
-        data: BytesLike;
-      }[];
-      actions: {
-        executed: boolean;
-        isPort: boolean;
-        to: string;
-        portIndex: BigNumberish;
-        value: BigNumberish;
         data: BytesLike;
       }[];
       conditionBase: {
@@ -847,8 +785,8 @@ export class Solver extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[];
-        recipientAmounts: BigNumberish[][];
+        recipientAddressSlots: BigNumberish[];
+        recipientAmountSlots: BigNumberish[][];
         metadata: string;
       };
     },
@@ -881,11 +819,6 @@ export class Solver extends BaseContract {
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  receivedTokens(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   setTrackingId(
     _trackingId: BytesLike,
@@ -968,8 +901,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[];
-          recipientAmounts: BigNumber[][];
+          recipientAddressSlots: BigNumber[];
+          recipientAmountSlots: BigNumber[][];
           metadata: string;
         }
       ] & {
@@ -993,8 +926,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumber;
           amount: BigNumber;
           partition: BigNumber[];
-          recipientAddressPorts: BigNumber[];
-          recipientAmounts: BigNumber[][];
+          recipientAddressSlots: BigNumber[];
+          recipientAmountSlots: BigNumber[][];
           metadata: string;
         };
       }
@@ -1018,17 +951,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1037,8 +962,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1082,17 +1007,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1101,8 +1018,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1133,11 +1050,6 @@ export class Solver extends BaseContract {
       _payouts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
-
-    receivedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     setTrackingId(
       _trackingId: BytesLike,
@@ -1219,17 +1131,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1238,8 +1142,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1277,17 +1181,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1296,8 +1192,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1329,11 +1225,6 @@ export class Solver extends BaseContract {
     proposePayouts(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    receivedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     setTrackingId(
@@ -1414,17 +1305,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1433,8 +1316,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1472,17 +1355,9 @@ export class Solver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -1491,8 +1366,8 @@ export class Solver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -1524,11 +1399,6 @@ export class Solver extends BaseContract {
     proposePayouts(
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    receivedTokens(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     setTrackingId(

@@ -20,9 +20,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     uint256 public timelock; // Current timelock
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
 
-    uint256[] public receivedTokens;
-    mapping(uint256 => bool) hasToken;
-
     SolverLib.Datas datas;
 
     function init(
@@ -92,16 +89,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function router(
         uint8 _type,
         uint256 _key,
-        bool _constant,
         bytes memory _data
     ) private {
         require(
-            datas.portVersions[_key] == (conditions.length - 1),
+            datas.slotVersions[_key] == (conditions.length - 1),
             "Port version invalid"
         );
-        datas.portVersions[_key]++;
-        datas.ports[_key] = _data;
-        datas.portTypes[_key] = SolverLib.DataType(_type);
+        datas.slotVersions[_key]++;
+        datas.slots[_key] = _data;
+        datas.slotTypes[_key] = SolverLib.DataType(_type);
     }
 
     function addData(
@@ -110,7 +106,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         bytes memory _data
     ) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        router(_type, _key, false, _data);
+        router(_type, _key, _data);
     }
 
     function deferredIngest(uint256 _index) external {
@@ -121,9 +117,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
 
         router(
-            config.ingests[_index].port,
+            config.ingests[_index].dataType,
             config.ingests[_index].key,
-            config.ingests[_index].isConstant,
             abi.decode(
                 SolverLib.ingest(config.ingests[_index], address(this)),
                 (bytes)
@@ -133,20 +128,19 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     function ingest(uint256 _index) private {
         router(
-            config.ingests[_index].port,
+            config.ingests[_index].dataType,
             config.ingests[_index].key,
-            config.ingests[_index].isConstant,
             SolverLib.ingest(config.ingests[_index], address(this))
         );
     }
 
     function getOutput(uint256 _key) public view returns (bytes memory data) {
         require(
-            datas.portVersions[_key] == conditions.length,
+            datas.slotVersions[_key] == conditions.length,
             "Port invalid ver."
         );
 
-        data = datas.ports[_key];
+        data = datas.slots[_key];
     }
 
     function ingestsValid() public view returns (bool) {
@@ -309,11 +303,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         uint256 value,
         bytes calldata data
     ) external virtual override returns (bytes4) {
-        if (!hasToken[id]) {
-            receivedTokens.push(id);
-            hasToken[id] = true;
-        }
-
         return this.onERC1155Received.selector;
     }
 

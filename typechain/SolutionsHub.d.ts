@@ -48,17 +48,9 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -67,8 +59,8 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[]
@@ -96,17 +88,9 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -115,8 +99,8 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[]
@@ -218,17 +202,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -237,8 +213,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -269,17 +245,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -288,8 +256,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -318,17 +286,9 @@ export class SolutionsHub extends BaseContract {
         executions: BigNumberish;
         isDeferred: boolean;
         isConstant: boolean;
-        port: BigNumberish;
+        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
-        data: BytesLike;
-      }[];
-      actions: {
-        executed: boolean;
-        isPort: boolean;
-        to: string;
-        portIndex: BigNumberish;
-        value: BigNumberish;
         data: BytesLike;
       }[];
       conditionBase: {
@@ -337,8 +297,8 @@ export class SolutionsHub extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[];
-        recipientAmounts: BigNumberish[][];
+        recipientAddressSlots: BigNumberish[];
+        recipientAmountSlots: BigNumberish[][];
         metadata: string;
       };
     }[],
@@ -369,17 +329,9 @@ export class SolutionsHub extends BaseContract {
         executions: BigNumberish;
         isDeferred: boolean;
         isConstant: boolean;
-        port: BigNumberish;
+        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
-        data: BytesLike;
-      }[];
-      actions: {
-        executed: boolean;
-        isPort: boolean;
-        to: string;
-        portIndex: BigNumberish;
-        value: BigNumberish;
         data: BytesLike;
       }[];
       conditionBase: {
@@ -388,8 +340,8 @@ export class SolutionsHub extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[];
-        recipientAmounts: BigNumberish[][];
+        recipientAddressSlots: BigNumberish[];
+        recipientAmountSlots: BigNumberish[][];
         metadata: string;
       };
     }[],
@@ -418,17 +370,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -437,8 +381,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -469,17 +413,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -488,8 +424,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -523,17 +459,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -542,8 +470,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -574,17 +502,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -593,8 +513,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -624,17 +544,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -643,8 +555,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],
@@ -675,17 +587,9 @@ export class SolutionsHub extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -694,8 +598,8 @@ export class SolutionsHub extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }[],

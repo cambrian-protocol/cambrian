@@ -23,7 +23,7 @@ describe("It should all work", function () {
     this.SolutionsHub = await ethers.getContract("SolutionsHub")
     this.ProposalsHub = await ethers.getContract("ProposalsHub")
     this.ToyToken = await ethers.getContract("ToyToken")
-this.Solver = await ethers.getContract("BasicSolverV1")
+    this.Solver = await ethers.getContract("BasicSolverV1")
 
     
     await this.ToyToken.mint(this.buyer.address, "100");
@@ -47,7 +47,7 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -56,14 +56,28 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         executions: 0,
         isDeferred: false,
         isConstant: false,
-        port: 0,
+        dataType: 0,
         key: 2,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 3,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 4,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
       }
     ]
-
-    const actions0 = [];
 
     const conditionBase0 = {
       collateralToken: this.ToyToken.address,
@@ -71,8 +85,8 @@ this.Solver = await ethers.getContract("BasicSolverV1")
       parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
-      recipientAddressPorts: [1,2],
-      recipientAmounts: [[0,100],[100,0]],
+      recipientAddressSlots: [1,2],
+      recipientAmountSlots: [[3,4],[4,3]],
       metadata: ""
     }
   
@@ -82,7 +96,7 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -91,13 +105,28 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         executions: 0,
         isDeferred: false,
         isConstant: true,
-        port: 0,
+        dataType: 0,
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 3,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+      },
+      {
+        executions: 0,
+        isConstant: true,
+        dataType: 4,
+        key: 4,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
       }
     ]
-    const actions1 = [];
 
     const conditionBase1 = {
       collateralToken: this.ToyToken.address,
@@ -105,8 +134,8 @@ this.Solver = await ethers.getContract("BasicSolverV1")
       parentCollectionPartitionIndex: 0,
       amount: 100,
       partition: [1,2],
-      recipientAddressPorts: [1,2],
-      recipientAmounts: [[0,100],[100,0]],
+      recipientAddressSlots: [1,2],
+      recipientAmountSlots: [[3,4],[4,3]],
       metadata: ""
     }
 
@@ -119,7 +148,6 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         0,
         ethers.utils.formatBytes32String(""),
         ingests0,
-        actions0,
         conditionBase0
       ],
       [
@@ -129,7 +157,6 @@ this.Solver = await ethers.getContract("BasicSolverV1")
         0,
         ethers.utils.formatBytes32String(""),
         ingests1,
-        actions1,
         conditionBase1
       ],
     ];

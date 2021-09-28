@@ -73,17 +73,9 @@ interface ISolverInterface extends ethers.utils.Interface {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -92,8 +84,8 @@ interface ISolverInterface extends ethers.utils.Interface {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       }
@@ -302,17 +294,9 @@ export class ISolver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -321,8 +305,8 @@ export class ISolver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -433,17 +417,9 @@ export class ISolver extends BaseContract {
         executions: BigNumberish;
         isDeferred: boolean;
         isConstant: boolean;
-        port: BigNumberish;
+        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
-        data: BytesLike;
-      }[];
-      actions: {
-        executed: boolean;
-        isPort: boolean;
-        to: string;
-        portIndex: BigNumberish;
-        value: BigNumberish;
         data: BytesLike;
       }[];
       conditionBase: {
@@ -452,8 +428,8 @@ export class ISolver extends BaseContract {
         parentCollectionPartitionIndex: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
-        recipientAddressPorts: BigNumberish[];
-        recipientAmounts: BigNumberish[][];
+        recipientAddressSlots: BigNumberish[];
+        recipientAmountSlots: BigNumberish[][];
         metadata: string;
       };
     },
@@ -562,17 +538,9 @@ export class ISolver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -581,8 +549,8 @@ export class ISolver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -688,17 +656,9 @@ export class ISolver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -707,8 +667,8 @@ export class ISolver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },
@@ -820,17 +780,9 @@ export class ISolver extends BaseContract {
           executions: BigNumberish;
           isDeferred: boolean;
           isConstant: boolean;
-          port: BigNumberish;
+          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
-          data: BytesLike;
-        }[];
-        actions: {
-          executed: boolean;
-          isPort: boolean;
-          to: string;
-          portIndex: BigNumberish;
-          value: BigNumberish;
           data: BytesLike;
         }[];
         conditionBase: {
@@ -839,8 +791,8 @@ export class ISolver extends BaseContract {
           parentCollectionPartitionIndex: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
-          recipientAddressPorts: BigNumberish[];
-          recipientAmounts: BigNumberish[][];
+          recipientAddressSlots: BigNumberish[];
+          recipientAmountSlots: BigNumberish[][];
           metadata: string;
         };
       },

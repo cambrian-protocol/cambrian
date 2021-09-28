@@ -219,12 +219,12 @@ const _abi = [
           },
           {
             internalType: "uint256[]",
-            name: "recipientAddressPorts",
+            name: "recipientAddressSlots",
             type: "uint256[]",
           },
           {
             internalType: "uint256[][]",
-            name: "recipientAmounts",
+            name: "recipientAmountSlots",
             type: "uint256[][]",
           },
           {
@@ -309,7 +309,7 @@ const _abi = [
               },
               {
                 internalType: "uint8",
-                name: "port",
+                name: "dataType",
                 type: "uint8",
               },
               {
@@ -330,43 +330,6 @@ const _abi = [
             ],
             internalType: "struct SolverLib.Ingest[]",
             name: "ingests",
-            type: "tuple[]",
-          },
-          {
-            components: [
-              {
-                internalType: "bool",
-                name: "executed",
-                type: "bool",
-              },
-              {
-                internalType: "bool",
-                name: "isPort",
-                type: "bool",
-              },
-              {
-                internalType: "address",
-                name: "to",
-                type: "address",
-              },
-              {
-                internalType: "uint256",
-                name: "portIndex",
-                type: "uint256",
-              },
-              {
-                internalType: "uint256",
-                name: "value",
-                type: "uint256",
-              },
-              {
-                internalType: "bytes",
-                name: "data",
-                type: "bytes",
-              },
-            ],
-            internalType: "struct SolverLib.Action[]",
-            name: "actions",
             type: "tuple[]",
           },
           {
@@ -398,12 +361,12 @@ const _abi = [
               },
               {
                 internalType: "uint256[]",
-                name: "recipientAddressPorts",
+                name: "recipientAddressSlots",
                 type: "uint256[]",
               },
               {
                 internalType: "uint256[][]",
-                name: "recipientAmounts",
+                name: "recipientAmountSlots",
                 type: "uint256[][]",
               },
               {
@@ -594,7 +557,7 @@ const _abi = [
               },
               {
                 internalType: "uint8",
-                name: "port",
+                name: "dataType",
                 type: "uint8",
               },
               {
@@ -615,43 +578,6 @@ const _abi = [
             ],
             internalType: "struct SolverLib.Ingest[]",
             name: "ingests",
-            type: "tuple[]",
-          },
-          {
-            components: [
-              {
-                internalType: "bool",
-                name: "executed",
-                type: "bool",
-              },
-              {
-                internalType: "bool",
-                name: "isPort",
-                type: "bool",
-              },
-              {
-                internalType: "address",
-                name: "to",
-                type: "address",
-              },
-              {
-                internalType: "uint256",
-                name: "portIndex",
-                type: "uint256",
-              },
-              {
-                internalType: "uint256",
-                name: "value",
-                type: "uint256",
-              },
-              {
-                internalType: "bytes",
-                name: "data",
-                type: "bytes",
-              },
-            ],
-            internalType: "struct SolverLib.Action[]",
-            name: "actions",
             type: "tuple[]",
           },
           {
@@ -683,12 +609,12 @@ const _abi = [
               },
               {
                 internalType: "uint256[]",
-                name: "recipientAddressPorts",
+                name: "recipientAddressSlots",
                 type: "uint256[]",
               },
               {
                 internalType: "uint256[][]",
-                name: "recipientAmounts",
+                name: "recipientAmountSlots",
                 type: "uint256[][]",
               },
               {
@@ -808,25 +734,6 @@ const _abi = [
     name: "proposePayouts",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    name: "receivedTokens",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {

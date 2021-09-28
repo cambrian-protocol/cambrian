@@ -9,7 +9,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
           executions: 0,
           isDeferred: false,
           isConstant: true,
-          port: 0,
+          dataType: 0,
           key: 1,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['address'], [buyerAddress])
@@ -18,7 +18,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
           executions: 0,
           isDeferred: false,
           isConstant: true,
-          port: 0,
+          dataType: 0,
           key: 2,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['address'], [sellerAddress])
@@ -26,14 +26,29 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         {
           executions: 0,
           isConstant: true,
-          port: 3,
+          dataType: 3,
           key: 0,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['bytes32'], [ethers.utils.formatBytes32String("")])
+        },
+        {
+          executions: 0,
+          isConstant: true,
+          dataType: 4,
+          key: 3,
+          solverIndex: 0,
+          data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+        },
+        {
+          executions: 0,
+          isConstant: true,
+          dataType: 4,
+          key: 4,
+          solverIndex: 0,
+          data: ethers.utils.defaultAbiCoder.encode(['uint256'], [amount])
         }
       ]
 
-      const actions = [];
 
       const canon = {
         collateralToken: collateralAddress,
@@ -41,8 +56,8 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         parentCollectionPartitionIndex: 0,
         amount: amount,
         partition: [1,2],
-        recipientAddressPorts: [1,2],
-        recipientAmounts: [[0,amount],[amount,0]],
+        recipientAddressSlots: [1,2],
+        recipientAmountSlots: [[3,4],[4,3]],
         metadata: ""
       }
   
@@ -54,7 +69,6 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
           0,
           ethers.utils.formatBytes32String(""),
           ingests,
-          actions,
           canon
         ]
       ];
