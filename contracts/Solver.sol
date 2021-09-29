@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "./SolutionsHub.sol";
 import "./SolverLib.sol";
+import "hardhat/console.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Config public config; // Primary config of the Solver
@@ -30,7 +31,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
-    ) external {
+    ) external initializer {
         require(
             msg.sender == address(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512), // FACTORY DEV ADDRESS
             "Only factory"
@@ -211,6 +212,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function executeSolve() public {
+        console.log(
+            "executeSolve condition status: ",
+            uint256(conditions[conditions.length - 1].status)
+        );
         require(
             conditions[conditions.length - 1].status ==
                 SolverLib.Status.Initiated,

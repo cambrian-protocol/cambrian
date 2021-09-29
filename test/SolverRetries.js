@@ -40,7 +40,271 @@ describe("It should all work", async function () {
   });
   
 
-  it("Should allow a retry from Solver0 in a 2-solver proposal", async function () {
+//   it("Should allow a retry from Solver0 in a 2-solver proposal", async function () {
+//     //Create solution
+//     const solutionId = ethers.utils.formatBytes32String("TestID")
+  
+//     /////////INGESTS & ACTIONS & CONFIG ///////////////
+//     const ingests0 = [
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: true,
+//         dataType: 0,
+//         key: 1,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: false,
+//         dataType: 0,
+//         key: 2,
+//         solverIndex: 0,
+//         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: true,
+//         dataType: 4,
+//         key: 4,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: true,
+//         dataType: 4,
+//         key: 5,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
+//       }
+//     ]
+
+
+//     const conditionBase0 = {
+//       collateralToken: this.ToyToken.address,
+//       outcomeSlots: 2,
+//       parentCollectionPartitionIndex: 0,
+//       amount: 100,
+//       partition: [1,2],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[4,5],[5,4]],
+//       conditionURI: ""
+//     }
+  
+//     // Second Solver
+//     const ingests1 = [
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: false,
+//         dataType: 0,
+//         key: 1,
+//         solverIndex: 1,
+//         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[0])
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: true,
+//         isConstant: false,
+//         dataType: 0,
+//         key: 2,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [3]) // deferredIngests take the key of slot in solver passing it down
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: true,
+//         dataType: 4,
+//         key: 3,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+//       },
+//       {
+//         executions: 0,
+//         isDeferred: false,
+//         isConstant: true,
+//         dataType: 4,
+//         key: 4,
+//         solverIndex: 0,
+//         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
+//       }
+//     ]
+
+//     const conditionBase1 = {
+//       collateralToken: this.ToyToken.address,
+//       outcomeSlots: 2,
+//       parentCollectionPartitionIndex: 0,
+//       amount: 100,
+//       partition: [1,2],
+//       recipientAddressSlots: [1,2],
+//       recipientAmountSlots: [[3,4],[4,3]],
+//       conditionURI: ""
+//     }
+
+  
+//     const solverConfigs = [
+//       [
+//         this.Solver.address,
+//         this.keeper.address,
+//         this.arbitrator.address,
+//         0,
+//         ethers.utils.formatBytes32String(""),
+//         ingests0,
+//         conditionBase0
+//       ],
+//       [
+//         this.Solver.address,
+//         this.keeper.address,
+//         this.arbitrator.address,
+//         0,
+//         ethers.utils.formatBytes32String(""),
+//         ingests1,
+//         conditionBase1
+//       ],
+//     ];
+//     //////////////////////////////////////////
+  
+//     await this.SolutionsHub.connect(this.keeper).createSolution(
+//       solutionId,
+//       this.ToyToken.address,
+//       solverConfigs
+//     );
+  
+  
+//     //Create proposal
+//     let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+//       this.ToyToken.address,
+//       this.SolutionsHub.address,
+//       100,
+//       solutionId
+//     );
+//     let receipt2 = await tx2.wait();
+//     let iface2 = new ethers.utils.Interface([
+//       "event CreateProposal(bytes32 id)",
+//     ]);
+//     const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+  
+//     //Fund and execute Proposal
+//     await this.ToyToken.connect(this.buyer).approve(
+//       this.ProposalsHub.address,
+//       100
+//     );
+//     await this.ProposalsHub.connect(this.buyer).fundProposal(
+//       proposalId,
+//       this.ToyToken.address,
+//       100
+//     );
+  
+//     let splitPositionEvents = [];
+//     let tx = await this.ProposalsHub.executeProposal(proposalId);
+//     let rc = await tx.wait();
+//     let iface = new ethers.utils.Interface(CT_ABI);
+//     let events = rc.logs.map(log => {
+//       try {
+//         return iface.parseLog(log)
+//       } catch(err){}
+//     });
+//     events.forEach(event => {
+//       if (event && event.name == "PositionSplit"){
+//         console.log("PositionSplit event: ", event)
+//         splitPositionEvents.push(event)
+//       }
+//     })
+  
+//     const solver0Address = await this.SolutionsHub.solverFromIndex(solutionId, 0);
+//     const solver1Address = await this.SolutionsHub.solverFromIndex(solutionId, 1);
+
+//     const solverERC20Balance = await this.ToyToken.balanceOf(solver0Address);
+//     const CTERC20Balance = await this.ToyToken.balanceOf(this.CT.address);
+//     // Collateral has been sent to CT contract
+//     expect(solverERC20Balance).to.equal(0);
+//     expect(CTERC20Balance).to.equal(100);
+  
+    
+//     // Seller should have all the success tokens
+//     const indexSetSuccess = getIndexSetFromBinaryArray([1,0]) // If success
+//     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
+  
+//     console.log("index set success: ", indexSetSuccess)
+//     console.log("index set failure: ", indexSetFailure)
+
+//     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
+//     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
+
+
+//     // // Add deferred data to solver0 and fetch it from solver1
+//     await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address]));
+
+//     tx = await solver1.connect(this.keeper).executeSolve();
+//     rc = await tx.wait();
+//     events = rc.logs.map(log => {
+//       try {
+//         return iface.parseLog(log)
+//       } catch(err){}
+//     });
+//     events.forEach(event => {
+//       if (event && event.name == "PositionSplit"){
+//         splitPositionEvents.push(event)
+//       }
+//     })
+
+//     // Keeper proposes payouts
+//     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
+//     await solver1.connect(this.keeper).proposePayouts([0,1]); // failure, work bad
+//     await solver0.connect(this.keeper).confirmPayouts();
+//     await solver1.connect(this.keeper).confirmPayouts();
+
+
+
+//     // Redeem "failure" CTs  sent back from downstream solver up to ERC20 and prepare new Solve
+//     await solver0.connect(this.keeper).redeemPosition(
+//         splitPositionEvents[1].args.collateralToken, 
+//         splitPositionEvents[1].args.parentCollectionId, 
+//         splitPositionEvents[1].args.conditionId, 
+//         splitPositionEvents[1].args.partition
+//         );
+//     await solver0.connect(this.keeper).redeemPosition(
+//         splitPositionEvents[0].args.collateralToken, 
+//         splitPositionEvents[0].args.parentCollectionId, 
+//         splitPositionEvents[0].args.conditionId, 
+//         splitPositionEvents[0].args.partition
+//         );
+
+//     await solver0.connect(this.keeper).prepareSolve();
+//     await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller2.address]));
+//     await solver0.connect(this.keeper).executeSolve();
+
+
+//     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
+//     await solver0.connect(this.keeper).confirmPayouts();
+//     await solver1.connect(this.keeper).proposePayouts([1,0]); // success, work good
+//     await solver1.connect(this.keeper).confirmPayouts();
+
+
+//     await getCTBalances(this.CT, this.seller2.address, solver0, [indexSetSuccess, indexSetFailure]);
+//     await getCTBalances(this.CT, this.seller2.address, solver1, [indexSetSuccess, indexSetFailure]);
+
+//     await redeemPositions(this.CT, this.seller2, solver1, [indexSetSuccess, indexSetFailure]);
+//     await getCTBalances(this.CT, this.seller2.address, solver1, [indexSetSuccess, indexSetFailure]);
+
+//     await redeemPositions(this.CT, this.seller2, solver0, [indexSetSuccess, indexSetFailure]);
+    
+//     // Seller redeems tokens
+//     const sellerERC20Balance = await this.ToyToken.balanceOf(this.seller2.address);
+//     expect(sellerERC20Balance).to.equal(100);
+//   });
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+  it("Shouldn't require downstream Solver to have reported before retrying", async function () {
     //Create solution
     const solutionId = ethers.utils.formatBytes32String("TestID")
   
@@ -69,7 +333,7 @@ describe("It should all work", async function () {
         isDeferred: false,
         isConstant: true,
         dataType: 4,
-        key: 4,
+        key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
       },
@@ -78,7 +342,7 @@ describe("It should all work", async function () {
         isDeferred: false,
         isConstant: true,
         dataType: 4,
-        key: 5,
+        key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
       }
@@ -92,7 +356,7 @@ describe("It should all work", async function () {
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
-      recipientAmountSlots: [[4,5],[5,4]],
+      recipientAmountSlots: [[3,4],[4,3]],
       conditionURI: ""
     }
   
@@ -109,12 +373,12 @@ describe("It should all work", async function () {
       },
       {
         executions: 0,
-        isDeferred: true,
+        isDeferred: false,
         isConstant: false,
         dataType: 0,
         key: 2,
-        solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [3]) // deferredIngests take the key of slot in solver passing it down
+        solverIndex: 2,
+        data: this.ISolver.encodeFunctionData("addressFromChainIndex",[2])
       },
       {
         executions: 0,
@@ -147,6 +411,57 @@ describe("It should all work", async function () {
       conditionURI: ""
     }
 
+    // Third Solver
+    const ingests2 = [
+        {
+            executions: 0,
+            isDeferred: false,
+            isConstant: false,
+            dataType: 0,
+            key: 1,
+            solverIndex: 1,
+            data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
+        },
+        {
+            executions: 0,
+            isDeferred: true,
+            isConstant: false,
+            dataType: 3,
+            key: 2,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(['uint256'], [5]) // deferredIngests take the key of the data from solver passing it down as data
+        },
+        {
+            executions: 0,
+            isDeferred: false,
+            isConstant: true,
+            dataType: 4,
+            key: 3,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
+        },
+        {
+            executions: 0,
+            isDeferred: false,
+            isConstant: true,
+            dataType: 4,
+            key: 4,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
+        }
+        ]
+    
+        const conditionBase2 = {
+        collateralToken: this.ToyToken.address,
+        outcomeSlots: 2,
+        parentCollectionPartitionIndex: 0,
+        amount: 100,
+        partition: [1,2],
+        recipientAddressSlots: [1,2],
+        recipientAmountSlots: [[3,4],[4,3]],
+        conditionURI: ""
+        }
+
   
     const solverConfigs = [
       [
@@ -166,6 +481,15 @@ describe("It should all work", async function () {
         ethers.utils.formatBytes32String(""),
         ingests1,
         conditionBase1
+      ],
+      [
+        this.Solver.address,
+        this.keeper.address,
+        this.arbitrator.address,
+        0,
+        ethers.utils.formatBytes32String(""),
+        ingests2,
+        conditionBase2
       ],
     ];
     //////////////////////////////////////////
@@ -212,13 +536,15 @@ describe("It should all work", async function () {
     });
     events.forEach(event => {
       if (event && event.name == "PositionSplit"){
-        console.log("PositionSplit event: ", event)
+        // console.log("PositionSplit event: ", event)
         splitPositionEvents.push(event)
       }
     })
   
     const solver0Address = await this.SolutionsHub.solverFromIndex(solutionId, 0);
     const solver1Address = await this.SolutionsHub.solverFromIndex(solutionId, 1);
+    const solver2Address = await this.SolutionsHub.solverFromIndex(solutionId, 2);
+
 
     const solverERC20Balance = await this.ToyToken.balanceOf(solver0Address);
     const CTERC20Balance = await this.ToyToken.balanceOf(this.CT.address);
@@ -236,11 +562,12 @@ describe("It should all work", async function () {
 
     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
+    let solver2 = new ethers.Contract(solver2Address, SOLVER_ABI, ethers.provider);
+
 
 
     // // Add deferred data to solver0 and fetch it from solver1
-    await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address]));
-
+    await solver0.connect(this.keeper).addData(0, 5, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address]));
     tx = await solver1.connect(this.keeper).executeSolve();
     rc = await tx.wait();
     events = rc.logs.map(log => {
@@ -253,13 +580,27 @@ describe("It should all work", async function () {
         splitPositionEvents.push(event)
       }
     })
-
-    // Keeper proposes payouts
     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
-    await solver1.connect(this.keeper).proposePayouts([0,1]); // failure, work bad
     await solver0.connect(this.keeper).confirmPayouts();
-    await solver1.connect(this.keeper).confirmPayouts();
 
+    await solver1.connect(this.keeper).addData(0, 5, ethers.utils.defaultAbiCoder.encode(['bytes'], ["Some content URI"]));
+
+    // Meanwhile, Solver2 executes as well
+    tx = await solver2.connect(this.keeper).executeSolve();
+    rc = await tx.wait();
+    events = rc.logs.map(log => {
+      try {
+        return iface.parseLog(log)
+      } catch(err){}
+    });
+    events.forEach(event => {
+      if (event && event.name == "PositionSplit"){
+        splitPositionEvents.push(event)
+      }
+    })
+
+    await solver1.connect(this.keeper).proposePayouts([0,1]); // failure, work bad
+    await solver1.connect(this.keeper).confirmPayouts();
 
 
     // Redeem "failure" CTs  sent back from downstream solver up to ERC20 and prepare new Solve
@@ -277,15 +618,58 @@ describe("It should all work", async function () {
         );
 
     await solver0.connect(this.keeper).prepareSolve();
-    await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller2.address]));
-    await solver0.connect(this.keeper).executeSolve();
+    tx = await solver0.connect(this.keeper).executeSolve();
+    rc = await tx.wait();
+    events = rc.logs.map(log => {
+      try {
+        return iface.parseLog(log)
+      } catch(err){}
+    });
+    events.forEach(event => {
+      if (event && event.name == "PositionSplit"){
+        splitPositionEvents.push(event)
+      }
+    })
+
+    await solver1.connect(this.keeper).prepareSolve();
+    console.log("executing solver1")
+    tx = await solver1.connect(this.keeper).executeSolve();
+    rc = await tx.wait();
+    events = rc.logs.map(log => {
+      try {
+        return iface.parseLog(log)
+      } catch(err){}
+    });
+    events.forEach(event => {
+      if (event && event.name == "PositionSplit"){
+        splitPositionEvents.push(event)
+      }
+    })
+    console.log("executed solver1")
+
+    await solver1.connect(this.keeper).addData(0, 5, ethers.utils.defaultAbiCoder.encode(['bytes'], ["Some other content URI"]));
+    console.log("execute solver2")
+    tx = await solver2.connect(this.keeper).executeSolve();
+    rc = await tx.wait();
+    events = rc.logs.map(log => {
+      try {
+        return iface.parseLog(log)
+      } catch(err){}
+    });
+    events.forEach(event => {
+      if (event && event.name == "PositionSplit"){
+        splitPositionEvents.push(event)
+      }
+    })
+    console.log("executed solver2")
 
 
     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
     await solver0.connect(this.keeper).confirmPayouts();
     await solver1.connect(this.keeper).proposePayouts([1,0]); // success, work good
     await solver1.connect(this.keeper).confirmPayouts();
-
+    await solver2.connect(this.keeper).proposePayouts([1,0]); // success, work good
+    await solver2.connect(this.keeper).confirmPayouts();
 
     await getCTBalances(this.CT, this.seller2.address, solver0, [indexSetSuccess, indexSetFailure]);
     await getCTBalances(this.CT, this.seller2.address, solver1, [indexSetSuccess, indexSetFailure]);
@@ -299,209 +683,5 @@ describe("It should all work", async function () {
     const sellerERC20Balance = await this.ToyToken.balanceOf(this.seller2.address);
     expect(sellerERC20Balance).to.equal(100);
   });
-
-
-//   it("Shouldn't require down-chain solvers to be finished", async function () {
-//     //Create solution
-//     const solutionId = ethers.utils.formatBytes32String("TestID")
-  
-//     /////////INGESTS & ACTIONS & CONFIG ///////////////
-//     const ingests0 = [
-//       {
-//         executions: 0,
-//         isDeferred: false,
-//         isConstant: true,
-//         dataType: 0,
-//         key: 1,
-//         solverIndex: 0,
-//         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
-//       },
-//       {
-//         executions: 0,
-//         isDeferred: false,
-//         isConstant: false,
-//         dataType: 0,
-//         key: 2,
-//         solverIndex: 0,
-//         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
-//       }
-//     ]
-
-//     const actions0 = [];
-
-//     const conditionBase0 = {
-//       collateralToken: this.ToyToken.address,
-//       outcomeSlots: 2,
-//       parentCollectionPartitionIndex: 0,
-//       amount: 100,
-//       partition: [1,2],
-//       recipientAddressSlots: [1,2],
-//       recipientAmountSlots: [[0,100],[100,0]],
-//       conditionURI: ""
-//     }
-  
-//     // Second Solver
-//     const ingests1 = [
-//       {
-//         executions: 0,
-//         isDeferred: false,
-//         isConstant: false,
-//         dataType: 0,
-//         key: 1,
-//         solverIndex: 1,
-//         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[0])
-//       },
-//       {
-//         executions: 0,
-//         isDeferred: true,
-//         isConstant: false,
-//         dataType: 0,
-//         key: 2,
-//         solverIndex: 0,
-//         data: this.ISolver.encodeFunctionData("getOutput", [3])
-//       }
-//     ]
-//     const actions1 = [];
-
-//     const conditionBase1 = {
-//       collateralToken: this.ToyToken.address,
-//       outcomeSlots: 2,
-//       parentCollectionPartitionIndex: 0,
-//       amount: 100,
-//       partition: [1,2],
-//       recipientAddressSlots: [1,2],
-//       recipientAmountSlots: [[0,100],[100,0]],
-//       conditionURI: ""
-//     }
-
-  
-//     const solverConfigs = [
-//       [
-//         this.Solver.address,
-//         this.keeper.address,
-//         this.arbitrator.address,
-//         0,
-//         ethers.utils.formatBytes32String(""),
-//         ingests0,
-//         actions0,
-//         conditionBase0
-//       ],
-//       [
-//         this.Solver.address,
-//         this.keeper.address,
-//         this.arbitrator.address,
-//         0,
-//         ethers.utils.formatBytes32String(""),
-//         ingests1,
-//         actions1,
-//         conditionBase1
-//       ],
-//     ];
-//     //////////////////////////////////////////
-  
-//     await this.SolutionsHub.connect(this.keeper).createSolution(
-//       solutionId,
-//       this.ToyToken.address,
-//       solverConfigs
-//     );
-  
-  
-//     //Create proposal
-//     let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
-//       this.ToyToken.address,
-//       this.SolutionsHub.address,
-//       100,
-//       solutionId
-//     );
-//     let receipt2 = await tx2.wait();
-//     let iface2 = new ethers.utils.Interface([
-//       "event CreateProposal(bytes32 id)",
-//     ]);
-//     const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
-  
-//     //Fund and execute Proposal
-//     await this.ToyToken.connect(this.buyer).approve(
-//       this.ProposalsHub.address,
-//       100
-//     );
-//     await this.ProposalsHub.connect(this.buyer).fundProposal(
-//       proposalId,
-//       this.ToyToken.address,
-//       100
-//     );
-  
-//     await this.ProposalsHub.executeProposal(proposalId);
-  
-//     const solver0Address = await this.SolutionsHub.solverFromIndex(solutionId, 0);
-//     const solver1Address = await this.SolutionsHub.solverFromIndex(solutionId, 1);
-
-//     const solverERC20Balance = await this.ToyToken.balanceOf(solver0Address);
-//     const CTERC20Balance = await this.ToyToken.balanceOf(this.CT.address);
-//     // Collateral has been sent to CT contract
-//     expect(solverERC20Balance).to.equal(0);
-//     expect(CTERC20Balance).to.equal(100);
-  
-    
-//     // Seller should have all the success tokens
-//     const indexSetSuccess = getIndexSetFromBinaryArray([1,0]) // If success
-//     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
-  
-//     console.log("index set success: ", indexSetSuccess)
-//     console.log("index set failure: ", indexSetFailure)
-
-//     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
-//     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
-
-
-//     // Add deferred data to solver0 and fetch it from solver1
-//     await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address]));
-//     await solver1.connect(this.keeper).deferredIngest(1);
-//     await solver1.connect(this.keeper).executeSolve();
-  
-//     // Keeper proposes payouts
-//     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
-//     await solver0.connect(this.keeper).confirmPayouts();
-//     // await solver1.connect(this.keeper).proposePayouts([0,1]); // failure, work bad
-//     // await solver1.connect(this.keeper).confirmPayouts();
-
-//     // Now Solver0 should be able to redeem CTs for its collateral, then try again.
-//     let tx = await solver0.connect(this.keeper).retrySolve();
-//     let rc = await tx.wait();
-//     let iface = new ethers.utils.Interface(CT_ABI);
-//     let events = rc.logs.map(log => {
-//       try {
-//         return iface.parseLog(log)
-//       } catch(err){}
-//     });
-//     events.forEach(event => {
-//       if (event && event.name == "PayoutRedemption"){
-//         console.log("ParentCollectionId: ", event.args.parentCollectionId)
-//         console.log("Payout: ",event.args.payout.toString())
-//       }
-//     })
-
-
-//     await solver0.connect(this.keeper).addData(0, 3, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller2.address]));
-//     await solver1.connect(this.keeper).deferredIngest(1);
-//     await solver1.connect(this.keeper).executeSolve();
-
-//     await solver0.connect(this.keeper).proposePayouts([1,0]); // success, found someone
-//     await solver0.connect(this.keeper).confirmPayouts();
-//     await solver1.connect(this.keeper).proposePayouts([1,0]); // success, work good
-//     await solver1.connect(this.keeper).confirmPayouts();
-
-
-//     await getCTBalances(this.CT, this.seller2.address, solver0, [indexSetSuccess, indexSetFailure]);
-//     await getCTBalances(this.CT, this.seller2.address, solver1, [indexSetSuccess, indexSetFailure]);
-
-//     await redeemPositions(this.CT, this.seller2, solver1, [indexSetSuccess, indexSetFailure]);
-//     await getCTBalances(this.CT, this.seller2.address, solver1, [indexSetSuccess, indexSetFailure]);
-
-//     await redeemPositions(this.CT, this.seller2, solver0, [indexSetSuccess, indexSetFailure]);
-    
-//     // Seller redeems tokens
-//     const sellerERC20Balance = await this.ToyToken.balanceOf(this.seller2.address);
-//     expect(sellerERC20Balance).to.equal(100);
-//   });
 });
 
