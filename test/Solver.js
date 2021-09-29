@@ -91,7 +91,7 @@ describe("It should all work", function () {
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
-      metadata: ""
+      conditionURI: ""
     }
 
     const solverConfigs = [
@@ -271,7 +271,7 @@ describe("It should all work", function () {
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
       recipientAmountSlots: [[4,6,5],[7,4,4],[6,4,5]],
-      metadata: ""
+      conditionURI: ""
     }
 
     const solverConfigs = [
@@ -458,7 +458,7 @@ describe("It should all work", function () {
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2], // Buyer, Seller
       recipientAmountSlots: [[4,7],[7,4],[6,5]],
-      metadata: ""
+      conditionURI: ""
     }
 
     const solverConfigs = [
@@ -649,7 +649,7 @@ describe("It should all work", function () {
       partition: [1,2], // Good, Bad
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
       recipientAmountSlots: [[4,6,5],[7,4,4]],
-      metadata: ""
+      conditionURI: ""
     }
     
 

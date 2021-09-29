@@ -33,18 +33,20 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     "conditions(uint256)": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts()": FunctionFragment;
-    "deferredIngest(uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
     "executeSolve()": FunctionFragment;
     "getCollectionId(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
     "getOutput(uint256)": FunctionFragment;
+    "handleCallback(uint256)": FunctionFragment;
     "ingestsValid()": FunctionFragment;
     "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "prepareSolve()": FunctionFragment;
     "proposePayouts(uint256[])": FunctionFragment;
+    "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
+    "registerCallback(uint256,uint256)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -97,10 +99,6 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "deferredIngest",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "deployChild",
     values: [
       {
@@ -126,7 +124,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     ]
@@ -145,6 +143,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getOutput",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "handleCallback",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -179,7 +181,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     ]
@@ -199,6 +201,14 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "proposePayouts",
     values: [BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "redeemPosition",
+    values: [string, BytesLike, BytesLike, BigNumberish[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerCallback",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setTrackingId",
@@ -245,10 +255,6 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "deferredIngest",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "deployChild",
     data: BytesLike
   ): Result;
@@ -265,6 +271,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getOutput", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "handleCallback",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "ingestsValid",
     data: BytesLike
@@ -284,6 +294,14 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "proposePayouts",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "redeemPosition",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "registerCallback",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -418,7 +436,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
-          metadata: string;
+          conditionURI: string;
         }
       ] & {
         implementation: string;
@@ -443,17 +461,12 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     >;
 
     confirmPayouts(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    deferredIngest(
-      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -481,7 +494,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -516,6 +529,11 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { data: string }>;
 
+    handleCallback(
+      _slot: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     ingestsValid(overrides?: CallOverrides): Promise<[boolean]>;
 
     init(
@@ -544,7 +562,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -574,6 +592,20 @@ export class BasicSolverV1 extends BaseContract {
 
     proposePayouts(
       _payouts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    redeemPosition(
+      _collateralToken: string,
+      _parentCollectionId: BytesLike,
+      _conditionId: BytesLike,
+      _indexSets: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    registerCallback(
+      _slot: BigNumberish,
+      _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -666,7 +698,7 @@ export class BasicSolverV1 extends BaseContract {
         partition: BigNumber[];
         recipientAddressSlots: BigNumber[];
         recipientAmountSlots: BigNumber[][];
-        metadata: string;
+        conditionURI: string;
       }
     ] & {
       implementation: string;
@@ -691,17 +723,12 @@ export class BasicSolverV1 extends BaseContract {
         partition: BigNumber[];
         recipientAddressSlots: BigNumber[];
         recipientAmountSlots: BigNumber[][];
-        metadata: string;
+        conditionURI: string;
       };
     }
   >;
 
   confirmPayouts(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  deferredIngest(
-    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -729,7 +756,7 @@ export class BasicSolverV1 extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        metadata: string;
+        conditionURI: string;
       };
     },
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -759,6 +786,11 @@ export class BasicSolverV1 extends BaseContract {
 
   getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  handleCallback(
+    _slot: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   ingestsValid(overrides?: CallOverrides): Promise<boolean>;
 
   init(
@@ -787,7 +819,7 @@ export class BasicSolverV1 extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        metadata: string;
+        conditionURI: string;
       };
     },
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -817,6 +849,20 @@ export class BasicSolverV1 extends BaseContract {
 
   proposePayouts(
     _payouts: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  redeemPosition(
+    _collateralToken: string,
+    _parentCollectionId: BytesLike,
+    _conditionId: BytesLike,
+    _indexSets: BigNumberish[],
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  registerCallback(
+    _slot: BigNumberish,
+    _chainIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -903,7 +949,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
-          metadata: string;
+          conditionURI: string;
         }
       ] & {
         implementation: string;
@@ -928,17 +974,12 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     >;
 
     confirmPayouts(overrides?: CallOverrides): Promise<void>;
-
-    deferredIngest(
-      _index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     deployChild(
       _config: {
@@ -964,7 +1005,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: CallOverrides
@@ -991,6 +1032,11 @@ export class BasicSolverV1 extends BaseContract {
     >;
 
     getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    handleCallback(
+      _slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     ingestsValid(overrides?: CallOverrides): Promise<boolean>;
 
@@ -1020,7 +1066,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: CallOverrides
@@ -1048,6 +1094,20 @@ export class BasicSolverV1 extends BaseContract {
 
     proposePayouts(
       _payouts: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    redeemPosition(
+      _collateralToken: string,
+      _parentCollectionId: BytesLike,
+      _conditionId: BytesLike,
+      _indexSets: BigNumberish[],
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    registerCallback(
+      _slot: BigNumberish,
+      _chainIndex: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -1115,11 +1175,6 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    deferredIngest(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     deployChild(
       _config: {
         implementation: string;
@@ -1144,7 +1199,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1164,6 +1219,11 @@ export class BasicSolverV1 extends BaseContract {
     getOutput(
       _key: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    handleCallback(
+      _slot: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     ingestsValid(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1194,7 +1254,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1224,6 +1284,20 @@ export class BasicSolverV1 extends BaseContract {
 
     proposePayouts(
       _payouts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    redeemPosition(
+      _collateralToken: string,
+      _parentCollectionId: BytesLike,
+      _conditionId: BytesLike,
+      _indexSets: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    registerCallback(
+      _slot: BigNumberish,
+      _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1289,11 +1363,6 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    deferredIngest(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     deployChild(
       _config: {
         implementation: string;
@@ -1318,7 +1387,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1338,6 +1407,11 @@ export class BasicSolverV1 extends BaseContract {
     getOutput(
       _key: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    handleCallback(
+      _slot: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     ingestsValid(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1368,7 +1442,7 @@ export class BasicSolverV1 extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1398,6 +1472,20 @@ export class BasicSolverV1 extends BaseContract {
 
     proposePayouts(
       _payouts: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    redeemPosition(
+      _collateralToken: string,
+      _parentCollectionId: BytesLike,
+      _conditionId: BytesLike,
+      _indexSets: BigNumberish[],
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    registerCallback(
+      _slot: BigNumberish,
+      _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

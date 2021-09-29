@@ -53,7 +53,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     ]
@@ -146,7 +146,7 @@ export class SolverFactory extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -181,7 +181,7 @@ export class SolverFactory extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        metadata: string;
+        conditionURI: string;
       };
     },
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -216,7 +216,7 @@ export class SolverFactory extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: CallOverrides
@@ -258,7 +258,7 @@ export class SolverFactory extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -294,7 +294,7 @@ export class SolverFactory extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }

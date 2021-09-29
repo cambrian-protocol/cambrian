@@ -87,7 +87,7 @@ describe("It should all work", function () {
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
-      metadata: ""
+      conditionURI: ""
     }
   
     // Second Solver
@@ -136,7 +136,7 @@ describe("It should all work", function () {
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
-      metadata: ""
+      conditionURI: ""
     }
 
   

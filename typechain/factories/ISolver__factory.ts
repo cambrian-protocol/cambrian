@@ -197,7 +197,7 @@ const _abi = [
               },
               {
                 internalType: "string",
-                name: "metadata",
+                name: "conditionURI",
                 type: "string",
               },
             ],

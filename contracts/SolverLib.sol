@@ -16,7 +16,7 @@ library SolverLib {
         uint8 dataType;
         uint256 key; // Destination key for data
         uint256 solverIndex; // Index of the Solver in the chain to make this call to
-        bytes data; // Raw when isConstant=true, else an encoded function call
+        bytes data; // Raw when isConstant=true, slot index of upstream solver data when deferred, else an encoded function call
     }
 
     // Status state for Conditions
@@ -49,7 +49,7 @@ library SolverLib {
         uint256[] partition; // Partition of positions for payouts
         uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
         uint256[][] recipientAmountSlots; // Arrays containing amount of CTs to send to each recipient for each partition
-        string metadata;
+        string conditionURI; // Resource containing human-friendly descriptions of the conditions for this Solver
     }
 
     // Configuration of this Solver
@@ -84,7 +84,7 @@ library SolverLib {
         uint256 conditionVer
     ) public returns (Condition memory condition) {
         condition.questionId = keccak256(
-            abi.encodePacked(base.metadata, oracle, conditionVer)
+            abi.encodePacked(base.conditionURI, oracle, conditionVer)
         );
 
         if (chainParent == address(0)) {
@@ -115,9 +115,7 @@ library SolverLib {
         returns (bool)
     {
         for (uint256 i; i < ingests.length; i++) {
-            if (
-                ingests[i].isDeferred && (ingests[i].executions != conditionVer)
-            ) {
+            if (ingests[i].executions != conditionVer) {
                 return false;
             }
         }
@@ -265,12 +263,6 @@ library SolverLib {
                     data.slots[base.recipientAmountSlots[j][i]],
                     (uint256)
                 );
-            }
-        }
-
-        for (uint256 i; i < _amounts.length; i++) {
-            for (uint256 j; j < _amounts[i].length; j++) {
-                console.log(_amounts[i][j]);
             }
         }
 

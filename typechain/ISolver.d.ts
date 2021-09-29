@@ -86,7 +86,7 @@ interface ISolverInterface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       }
     ]
@@ -307,7 +307,7 @@ export class ISolver extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -430,7 +430,7 @@ export class ISolver extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        metadata: string;
+        conditionURI: string;
       };
     },
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -551,7 +551,7 @@ export class ISolver extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: CallOverrides
@@ -669,7 +669,7 @@ export class ISolver extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -793,7 +793,7 @@ export class ISolver extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          metadata: string;
+          conditionURI: string;
         };
       },
       overrides?: Overrides & { from?: string | Promise<string> }

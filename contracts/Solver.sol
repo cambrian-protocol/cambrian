@@ -13,12 +13,16 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
 
+    string UI_URI;
     bool hasCondition;
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
     uint256 public timelock; // Current timelock
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
+
+    mapping(uint256 => address[]) requestedCallbacks; // This Slot => chainIndex
+    mapping(uint256 => uint256) expectedCallbacks; // Caller Slot => ingest index
 
     SolverLib.Datas datas;
 
@@ -38,6 +42,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function prepareSolve() public {
+        console.log("prepareSolve chainIndex: ", chainIndex);
         if (hasCondition) {
             require(
                 msg.sender == config.keeper || msg.sender == chainParent,
@@ -59,10 +64,36 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
     }
 
+    function redeemPosition(
+        IERC20 _collateralToken,
+        bytes32 _parentCollectionId,
+        bytes32 _conditionId,
+        uint256[] calldata _indexSets
+    ) external {
+        require(msg.sender == config.keeper, "Only Keeper");
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+            .redeemPositions(
+                _collateralToken,
+                _parentCollectionId,
+                _conditionId,
+                _indexSets
+            );
+    }
+
     function executeIngests() private {
         for (uint256 i; i < config.ingests.length; i++) {
             if (!config.ingests[i].isDeferred) {
                 ingest(i);
+            } else {
+                expectedCallbacks[
+                    abi.decode(config.ingests[i].data, (uint256))
+                ] = i;
+
+                Solver(addressFromChainIndex(config.ingests[i].solverIndex))
+                    .registerCallback(
+                        abi.decode(config.ingests[i].data, (uint256)),
+                        chainIndex
+                    );
             }
         }
     }
@@ -93,11 +124,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     ) private {
         require(
             datas.slotVersions[_key] == (conditions.length - 1),
-            "Port version invalid"
+            "Slot version invalid"
         );
         datas.slotVersions[_key]++;
         datas.slots[_key] = _data;
         datas.slotTypes[_key] = SolverLib.DataType(_type);
+
+        callback(_key);
     }
 
     function addData(
@@ -109,21 +142,51 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         router(_type, _key, _data);
     }
 
-    function deferredIngest(uint256 _index) external {
-        require(msg.sender == config.keeper, "OnlyKeeper");
+    function registerCallback(uint256 _slot, uint256 _chainIndex) external {
         require(
-            config.ingests[_index].isDeferred == true,
+            msg.sender == addressFromChainIndex(_chainIndex),
+            "msg.sender not solver"
+        );
+        requestedCallbacks[_slot].push(msg.sender);
+    }
+
+    function handleCallback(uint256 _slot) external {
+        console.log("receiving callback: ", _slot);
+        require(
+            msg.sender ==
+                addressFromChainIndex(
+                    config.ingests[expectedCallbacks[_slot]].solverIndex
+                ),
+            "msg.sender not solver"
+        );
+        require(
+            config.ingests[expectedCallbacks[_slot]].isDeferred,
             "Ingest not deferred"
         );
-
+        config.ingests[expectedCallbacks[_slot]].executions++;
         router(
-            config.ingests[_index].dataType,
-            config.ingests[_index].key,
-            abi.decode(
-                SolverLib.ingest(config.ingests[_index], address(this)),
-                (bytes)
+            config.ingests[expectedCallbacks[_slot]].dataType,
+            config.ingests[expectedCallbacks[_slot]].key,
+            Solver(msg.sender).getOutput(
+                abi.decode(
+                    config.ingests[expectedCallbacks[_slot]].data,
+                    (uint256)
+                )
             )
         );
+        delete expectedCallbacks[_slot];
+    }
+
+    function callback(uint256 _slot) private {
+        for (uint256 i; i < requestedCallbacks[_slot].length; i++) {
+            if (address(requestedCallbacks[_slot][i]) != address(0)) {
+                console.log("sending callback: ", _slot);
+                Solver(address(requestedCallbacks[_slot][i])).handleCallback(
+                    _slot
+                );
+                delete requestedCallbacks[_slot][i];
+            }
+        }
     }
 
     function ingest(uint256 _index) private {
@@ -157,6 +220,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         conditions[conditions.length - 1].status = SolverLib.Status.Executed;
 
+        console.log("Splitting position from Solver #", chainIndex);
         SolverLib.splitPosition(
             chainParent,
             config.conditionBase,
@@ -185,6 +249,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 conditions.length
             )
         );
+        console.log("Added condition #", conditions.length);
     }
 
     function updateTimelock() internal {
@@ -313,6 +378,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         uint256[] calldata values,
         bytes calldata data
     ) external virtual override returns (bytes4) {
+        for (uint256 i; i < ids.length; i++) {
+            console.log("chainIndex: ", chainIndex);
+            console.log("received token: ", ids[i]);
+            console.log("received amount: ", values[i]);
+        }
         return this.onERC1155BatchReceived.selector;
     }
 }

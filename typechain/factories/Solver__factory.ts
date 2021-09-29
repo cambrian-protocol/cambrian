@@ -229,7 +229,7 @@ const _abi = [
           },
           {
             internalType: "string",
-            name: "metadata",
+            name: "conditionURI",
             type: "string",
           },
         ],
@@ -244,19 +244,6 @@ const _abi = [
   {
     inputs: [],
     name: "confirmPayouts",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
-    ],
-    name: "deferredIngest",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -371,7 +358,7 @@ const _abi = [
               },
               {
                 internalType: "string",
-                name: "metadata",
+                name: "conditionURI",
                 type: "string",
               },
             ],
@@ -484,6 +471,19 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_slot",
+        type: "uint256",
+      },
+    ],
+    name: "handleCallback",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -619,7 +619,7 @@ const _abi = [
               },
               {
                 internalType: "string",
-                name: "metadata",
+                name: "conditionURI",
                 type: "string",
               },
             ],
@@ -732,6 +732,52 @@ const _abi = [
       },
     ],
     name: "proposePayouts",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IERC20",
+        name: "_collateralToken",
+        type: "address",
+      },
+      {
+        internalType: "bytes32",
+        name: "_parentCollectionId",
+        type: "bytes32",
+      },
+      {
+        internalType: "bytes32",
+        name: "_conditionId",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint256[]",
+        name: "_indexSets",
+        type: "uint256[]",
+      },
+    ],
+    name: "redeemPosition",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_slot",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_chainIndex",
+        type: "uint256",
+      },
+    ],
+    name: "registerCallback",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

@@ -58,7 +58,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         partition: [1,2],
         recipientAddressSlots: [1,2],
         recipientAmountSlots: [[3,4],[4,3]],
-        metadata: ""
+        conditionURI: ""
       }
   
       const solverConfigs = [

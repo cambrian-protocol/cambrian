@@ -7,6 +7,9 @@ const { FormatTypes } = require("ethers/lib/utils");
 const { getIndexSetFromBinaryArray } = require("../helpers/ConditionalTokens.js")
 const { getCTBalances, redeemPositions } = require("../helpers/testHelpers.js")
 
+const {
+  expectRevert, // Assertions for transactions that should fail
+} = require('@openzeppelin/test-helpers');
 
 
 describe("It should all work", async function () {
@@ -66,6 +69,7 @@ describe("It should all work", async function () {
       },
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         dataType: 4,
         key: 3,
@@ -74,6 +78,7 @@ describe("It should all work", async function () {
       },
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         dataType: 4,
         key: 4,
@@ -90,7 +95,7 @@ describe("It should all work", async function () {
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
-      metadata: ""
+      conditionURI: ""
     }
   
     // Second Solver
@@ -115,6 +120,7 @@ describe("It should all work", async function () {
       },
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         dataType: 4,
         key: 3,
@@ -123,6 +129,7 @@ describe("It should all work", async function () {
       },
       {
         executions: 0,
+        isDeferred: false,
         isConstant: true,
         dataType: 4,
         key: 4,
@@ -136,7 +143,7 @@ describe("It should all work", async function () {
         dataType: 2,
         key: 0,
         solverIndex: 0,
-        data: this.ISolver.encodeFunctionData("getOutput",[0])
+        data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0]) // SLOT we are requesting output from for callback
       },
     ]
 
@@ -148,7 +155,7 @@ describe("It should all work", async function () {
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
-      metadata: ""
+      conditionURI: ""
     }
 
   
@@ -227,10 +234,17 @@ describe("It should all work", async function () {
     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);
 
+    // Non-solver should not be able to call callback functions
+    await expectRevert(solver0.connect(this.keeper).registerCallback(0, 0), "msg.sender not solver");
+    await expectRevert(solver0.connect(this.keeper).handleCallback(0), "msg.sender not solver");
 
     // Add deferred data to solver0 and fetch it from solver1
     await solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero);
-    await solver1.connect(this.keeper).deferredIngest(4);
+
+    // Shouldn't be able to add data again
+    await expectRevert(solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero), "Slot version invalid");
+
+    
     await solver1.connect(this.keeper).executeSolve();
 
 
@@ -274,12 +288,6 @@ describe("It should all work", async function () {
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
     const sellerCT0SuccessBalance = await this.CT.balanceOf(this.seller.address, positionId0Success);
     expect(sellerCT0SuccessBalance).to.equal(100)
-
-  
-    // // Buyer redeems tokens
-    // await this.CT.connect(this.buyer).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
-    // const buyerERC20Balance = await this.ToyToken.balanceOf(this.buyer.address);
-    // expect(buyerERC20Balance).to.equal(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
