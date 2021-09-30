@@ -52,6 +52,11 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+      {
         internalType: "uint256[]",
         name: "payouts",
         type: "uint256[]",
@@ -63,21 +68,39 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "arbitrateNull",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "arbitrationPending",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "arbitrationRequested",
     outputs: [],
     stateMutability: "nonpayable",
@@ -204,7 +227,7 @@ const _abi = [
           },
           {
             internalType: "uint256",
-            name: "parentCollectionPartitionIndex",
+            name: "parentCollectionIndexSet",
             type: "uint256",
           },
           {
@@ -242,7 +265,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "confirmPayouts",
     outputs: [],
     stateMutability: "nonpayable",
@@ -333,7 +362,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "parentCollectionPartitionIndex",
+                name: "parentCollectionIndexSet",
                 type: "uint256",
               },
               {
@@ -384,29 +413,16 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "executeSolve",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "uint256",
-        name: "_partitionIndex",
+        name: "_index",
         type: "uint256",
       },
     ],
-    name: "getCollectionId",
-    outputs: [
-      {
-        internalType: "bytes32",
-        name: "collectionId",
-        type: "bytes32",
-      },
-    ],
-    stateMutability: "view",
+    name: "executeSolve",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -594,7 +610,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "parentCollectionPartitionIndex",
+                name: "parentCollectionIndexSet",
                 type: "uint256",
               },
               {
@@ -717,7 +733,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "prepareSolve",
     outputs: [],
     stateMutability: "nonpayable",
@@ -725,6 +747,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
       {
         internalType: "uint256[]",
         name: "_payouts",

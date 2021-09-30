@@ -84,7 +84,7 @@
       "artifacts": []
     },
     "E:\\cryptodev\\cambrian\\contracts\\ConditionalTokens.sol": {
-      "lastModificationDate": 1632892467559,
+      "lastModificationDate": 1632977716599,
       "contentHash": "8b825b4f28236884d65a2bec3cc8219e",
       "sourceName": "contracts/ConditionalTokens.sol",
       "solcConfig": {
@@ -131,8 +131,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
-      "lastModificationDate": 1622447918894,
-      "contentHash": "c7492a9ab60ba083d345f893d5e0f33c",
+      "lastModificationDate": 1632990176705,
+      "contentHash": "0eac3e1a83ee62326ca007811285b274",
       "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -173,8 +173,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC1155\\ERC1155.sol": {
-      "lastModificationDate": 1622447918848,
-      "contentHash": "940bb9269223a34da904c64c50abdffd",
+      "lastModificationDate": 1632990176623,
+      "contentHash": "ba2afe08cb68a6c2695edfee4901d5f1",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -266,8 +266,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC1155\\IERC1155.sol": {
-      "lastModificationDate": 1622447918886,
-      "contentHash": "79f5ef33a7ed00ffb7dfdcd4339a946c",
+      "lastModificationDate": 1632990176686,
+      "contentHash": "bcbcd549c9bfc2da42e5426780ce4e4e",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -310,8 +310,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC1155\\IERC1155Receiver.sol": {
-      "lastModificationDate": 1622447918889,
-      "contentHash": "4c2325989961abc760910c904c6cde62",
+      "lastModificationDate": 1632990176691,
+      "contentHash": "82e386b6255dba9eb011192f66eb78b6",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -354,7 +354,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC1155\\extensions\\IERC1155MetadataURI.sol": {
-      "lastModificationDate": 1622447918888,
+      "lastModificationDate": 1632990176688,
       "contentHash": "f67c3445291b9506fdff7d6527c9e552",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
       "solcConfig": {
@@ -398,8 +398,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\utils\\Address.sol": {
-      "lastModificationDate": 1622447918826,
-      "contentHash": "37103cdc416efc2601c6f6734044b559",
+      "lastModificationDate": 1632990176603,
+      "contentHash": "c5f6c4e4df069c789e7d84b4c3011913",
       "sourceName": "@openzeppelin/contracts/utils/Address.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -440,8 +440,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1622447918833,
-      "contentHash": "bc047f55d4e6dcc5a9c7ee096f530312",
+      "lastModificationDate": 1632990176610,
+      "contentHash": "851485d5b925529b1a2f34a0be077891",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -482,7 +482,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol": {
-      "lastModificationDate": 1622447918855,
+      "lastModificationDate": 1632990176632,
       "contentHash": "a9a5319dff9088c6ffe757ea1c2a6729",
       "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
       "solcConfig": {
@@ -526,7 +526,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol": {
-      "lastModificationDate": 1622447918891,
+      "lastModificationDate": 1632990176698,
       "contentHash": "9a04322bb8f6b8f2767d8358d1d2537b",
       "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
       "solcConfig": {
@@ -613,8 +613,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
-      "lastModificationDate": 1622447918862,
-      "contentHash": "715cc034a225c8fc445e2f4299111d75",
+      "lastModificationDate": 1632990176640,
+      "contentHash": "2cd550cedf51b8d294607dad5023d717",
       "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -659,7 +659,7 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
-      "lastModificationDate": 1622447918895,
+      "lastModificationDate": 1632990176707,
       "contentHash": "aa1be06992a99bb7393b26a6af3c4dfb",
       "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
       "solcConfig": {
@@ -703,8 +703,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\token\\ERC1155\\utils\\ERC1155Receiver.sol": {
-      "lastModificationDate": 1622447918854,
-      "contentHash": "baa5a1c248a5f5bfae096368ccf4bc5c",
+      "lastModificationDate": 1632990176630,
+      "contentHash": "de467e2231a0f5a8ec4c03d572a853d7",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -748,8 +748,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1632912505789,
-      "contentHash": "c3d22e31f3c8e1de4fb35185fe50a770",
+      "lastModificationDate": 1632989094250,
+      "contentHash": "71486f600179a57fcd67aa5c40942e68",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -798,8 +798,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol": {
-      "lastModificationDate": 1622447918905,
-      "contentHash": "76309b022d76aa52bb1830b7bf515e9e",
+      "lastModificationDate": 1632990176735,
+      "contentHash": "cbb8386f0120d46d66ff42dffbbc16c1",
       "sourceName": "@openzeppelin/contracts/proxy/utils/Initializable.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -840,8 +840,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolutionsHub.sol": {
-      "lastModificationDate": 1632819064939,
-      "contentHash": "0346b9766eef16fec7bfbcb4209ef281",
+      "lastModificationDate": 1632975190867,
+      "contentHash": "36e2407e7cabc7844bb09f6406499dd1",
       "sourceName": "contracts/SolutionsHub.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -938,8 +938,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\interfaces\\ISolver.sol": {
-      "lastModificationDate": 1632384290324,
-      "contentHash": "22112d159b3f996e738146c2efff4a05",
+      "lastModificationDate": 1632975696279,
+      "contentHash": "4ee5d05ffa65ec93ef80a0158dc9c7b2",
       "sourceName": "contracts/interfaces/ISolver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1033,8 +1033,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\node_modules\\@openzeppelin\\contracts\\proxy\\Clones.sol": {
-      "lastModificationDate": 1622447918831,
-      "contentHash": "08b85f1ee6d839857b6feaa519390069",
+      "lastModificationDate": 1632990176608,
+      "contentHash": "e8f1f04c46c67381a0b13f90439f9b41",
       "sourceName": "@openzeppelin/contracts/proxy/Clones.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1248,8 +1248,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1632892216245,
-      "contentHash": "7c1d758661c773030f879bd932b3ad0c",
+      "lastModificationDate": 1632978465428,
+      "contentHash": "0a9e4f3fd0270c2c02f7c96d33cdb217",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1340,8 +1340,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\BasicSolverV1.sol": {
-      "lastModificationDate": 1632787420152,
-      "contentHash": "702eac88b1b2a809b81b71e6ddf5e09e",
+      "lastModificationDate": 1632974973335,
+      "contentHash": "04f00065a77fb2acd4577111c5bad88b",
       "sourceName": "contracts/BasicSolverV1.sol",
       "solcConfig": {
         "version": "0.8.0",

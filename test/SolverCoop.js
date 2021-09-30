@@ -58,7 +58,7 @@ describe("It should all work", function () {
         isConstant: false,
         dataType: 0,
         key: 2,
-        solverIndex: 0,
+        solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
       },
       {
@@ -82,7 +82,7 @@ describe("It should all work", function () {
     const conditionBase0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
@@ -131,7 +131,7 @@ describe("It should all work", function () {
     const conditionBase1 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 1,
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
@@ -233,41 +233,26 @@ describe("It should all work", function () {
     expect(buyerSuccessBalance).to.equal(0)
     expect(sellerSuccessBalance).to.equal(100)
   
-  
-    // // Buyer should have all the failure tokens
-    // const collectionIdFailure = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId, indexSetFailure)
-    // const positionIdFailure = await this.CT.getPositionId(this.ToyToken.address, collectionIdFailure)
-    // const buyerFailureBalance = await this.CT.balanceOf(this.buyer.address, positionIdFailure)
-    // const sellerFailureBalance = await this.CT.balanceOf(this.seller.address, positionIdFailure)
-    // expect(buyerFailureBalance).to.equal(100)
-    // expect(sellerFailureBalance).to.equal(0)
-  
     // Keeper proposes payouts
-    await solver0.connect(this.keeper).proposePayouts([1,0]);
+    await solver0.connect(this.keeper).proposePayouts(0,[1,0]);
     const conditions0Proposed = await solver0.getConditions();
     const payouts0 = conditions0Proposed[conditions0Proposed.length-1].payouts;
     expect(payouts0[0]).to.equal(1)
     expect(payouts0[1]).to.equal(0)
 
-    await solver1.connect(this.keeper).proposePayouts([1,0]);
+    await solver1.connect(this.keeper).proposePayouts(0, [1,0]);
     const conditions1Proposed = await solver0.getConditions();
     const payouts1 = conditions1Proposed[conditions1Proposed.length-1].payouts;
     expect(payouts1[0]).to.equal(1)
     expect(payouts1[1]).to.equal(0)
   
     // We set timelock to 0, so confirm right away
-    await solver0.connect(this.keeper).confirmPayouts();
-    await solver1.connect(this.keeper).confirmPayouts();
+    await solver0.connect(this.keeper).confirmPayouts(0);
+    await solver1.connect(this.keeper).confirmPayouts(0);
 
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
     const sellerCT0SuccessBalance = await this.CT.balanceOf(this.seller.address, positionId0Success);
     expect(sellerCT0SuccessBalance).to.equal(100)
-
-  
-    // // Buyer redeems tokens
-    // await this.CT.connect(this.buyer).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
-    // const buyerERC20Balance = await this.ToyToken.balanceOf(this.buyer.address);
-    // expect(buyerERC20Balance).to.equal(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])

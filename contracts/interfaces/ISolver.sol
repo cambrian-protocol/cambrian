@@ -46,23 +46,18 @@ interface ISolver {
         external
         returns (Solver _solver);
 
-    function prepareSolve() external;
+    function prepareSolve(uint256 _index) external;
 
-    function executeSolve() external;
+    function executeSolve(uint256 _index) external;
 
-    function proposePayouts(uint256[] calldata _payouts) external;
+    function proposePayouts(uint256 _index, uint256[] calldata _payouts)
+        external;
 
-    function confirmPayouts() external;
+    function confirmPayouts(uint256 _index) external;
 
-    function arbitrate(uint256[] calldata _payouts) external;
+    function arbitrate(uint256 _index, uint256[] calldata _payouts) external;
 
-    function nullArbitrate() external;
-
-    function executeActions() external;
-
-    function executeAction(uint256 _actionIndex)
-        external
-        returns (bytes memory);
+    function nullArbitrate(uint256 _index) external;
 
     function addressFromChainIndex(uint256 _index)
         external

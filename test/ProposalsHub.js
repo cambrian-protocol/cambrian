@@ -255,8 +255,8 @@ describe("It should all work", function () {
 
     let ProposalsHubCTBalance = await this.CT.balanceOf(this.ProposalsHub.address, positionIdFailure)
     expect(ProposalsHubCTBalance).to.equal(1000);
-    await solver.connect(this.keeper).proposePayouts([0,1]); // Failure.
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).proposePayouts(0, [0,1]); // Failure.
+    await solver.connect(this.keeper).confirmPayouts(0);
 
 
     await this.ProposalsHub.connect(this.user0).reclaimTokens(proposalId, positionIdFailure);
@@ -318,8 +318,8 @@ describe("It should all work", function () {
 
     let ProposalsHubCTBalance = await this.CT.balanceOf(this.ProposalsHub.address, positionIdFailure)
     expect(ProposalsHubCTBalance).to.equal(1000);
-    await solver.connect(this.keeper).proposePayouts([0,1]); // Failure.
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).proposePayouts(0, [0,1]); // Failure.
+    await solver.connect(this.keeper).confirmPayouts(0);
 
 
     await this.ProposalsHub.connect(this.user0).reclaimTokens(proposalId, positionIdFailure);

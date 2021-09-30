@@ -90,7 +90,7 @@ describe("It should all work", async function () {
     const conditionBase0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
@@ -150,7 +150,7 @@ describe("It should all work", async function () {
     const conditionBase1 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 1,
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
@@ -245,7 +245,7 @@ describe("It should all work", async function () {
     await expectRevert(solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero), "Slot version invalid");
 
     
-    await solver1.connect(this.keeper).executeSolve();
+    await solver1.connect(this.keeper).executeSolve(0);
 
 
 
@@ -269,21 +269,21 @@ describe("It should all work", async function () {
   
   
     // Keeper proposes payouts
-    await solver0.connect(this.keeper).proposePayouts([1,0]);
+    await solver0.connect(this.keeper).proposePayouts(0,[1,0]);
     const conditions0Proposed = await solver0.getConditions();
     const payouts0 = conditions0Proposed[conditions0Proposed.length-1].payouts;
     expect(payouts0[0]).to.equal(1)
     expect(payouts0[1]).to.equal(0)
 
-    await solver1.connect(this.keeper).proposePayouts([1,0]);
+    await solver1.connect(this.keeper).proposePayouts(0,[1,0]);
     const conditions1Proposed = await solver0.getConditions();
     const payouts1 = conditions1Proposed[conditions1Proposed.length-1].payouts;
     expect(payouts1[0]).to.equal(1)
     expect(payouts1[1]).to.equal(0)
   
     // We set timelock to 0, so confirm right away
-    await solver0.connect(this.keeper).confirmPayouts();
-    await solver1.connect(this.keeper).confirmPayouts();
+    await solver0.connect(this.keeper).confirmPayouts(0);
+    await solver1.connect(this.keeper).confirmPayouts(0);
 
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, collectionId0Success, conditionId1, [indexSetSuccess, indexSetFailure])
     const sellerCT0SuccessBalance = await this.CT.balanceOf(this.seller.address, positionId0Success);

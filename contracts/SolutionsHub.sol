@@ -101,8 +101,8 @@ contract SolutionsHub {
             _solver.setTrackingId(solutions[_solutionId].proposalId);
         }
         // Execute first Solver
-        ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve();
-        ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve();
+        ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
+        ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve(0);
     }
 
     function createSolution(

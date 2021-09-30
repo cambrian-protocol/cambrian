@@ -44,7 +44,7 @@ library SolverLib {
     struct ConditionBase {
         IERC20 collateralToken;
         uint256 outcomeSlots; // Num outcome slots
-        uint256 parentCollectionPartitionIndex; // Index of partition to get parentCollectionId from parent Solver's uint256[] partition
+        uint256 parentCollectionIndexSet; // IndexSet to get parentCollectionId from parent Solver
         uint256 amount; // Amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
         uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
@@ -90,8 +90,9 @@ library SolverLib {
         if (chainParent == address(0)) {
             condition.parentCollectionId = bytes32(""); // top level collection
         } else {
-            condition.parentCollectionId = Solver(chainParent).getCollectionId(
-                base.parentCollectionPartitionIndex
+            condition.parentCollectionId = getCollectionId(
+                Solver(chainParent).getConditions()[conditionVer],
+                base.parentCollectionIndexSet
             );
         }
 
@@ -301,7 +302,7 @@ library SolverLib {
         }
     }
 
-    function getCollectionId(Condition calldata condition, uint256 partition)
+    function getCollectionId(Condition memory condition, uint256 partition)
         public
         view
         returns (bytes32 collectionId)

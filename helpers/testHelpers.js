@@ -53,7 +53,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
       const canon = {
         collateralToken: collateralAddress,
         outcomeSlots: 2,
-        parentCollectionPartitionIndex: 0,
+        parentCollectionIndexSet: 0,
         amount: amount,
         partition: [1,2],
         recipientAddressSlots: [1,2],
@@ -115,28 +115,30 @@ const getCTBalances = async(CT, address, solver, indexSets) => {
 
 const redeemPositions = async(CT, signer, solver, indexSets) => {
   const conditions = await solver.getConditions()
-  const condition = conditions[conditions.length-1];
 
-  const tx = await CT.connect(signer).redeemPositions(
-    condition.collateralToken, 
-    condition.parentCollectionId, 
-    condition.conditionId,
-    indexSets
-  )
-
-  const rc = await tx.wait()
-  let iface = new ethers.utils.Interface(CT_ABI);
-  let events = rc.logs.map(log => {
-    try {
-      return iface.parseLog(log)
-    } catch(err){}
-  });
+  conditions.forEach(async condition => {
+    const tx = await CT.connect(signer).redeemPositions(
+      condition.collateralToken, 
+      condition.parentCollectionId, 
+      condition.conditionId,
+      indexSets
+    )
   
-  events.forEach(event => {
-    if (event && event.name == "PayoutRedemption"){
-      console.log("ParentCollectionId: ", event.args.parentCollectionId)
-      console.log("Payout: ",event.args.payout.toString())
-    }
+    const rc = await tx.wait()
+    let iface = new ethers.utils.Interface(CT_ABI);
+    let events = rc.logs.map(log => {
+      try {
+        return iface.parseLog(log)
+      } catch(err){}
+    });
+    
+    events.forEach(event => {
+      if (event && event.name == "PayoutRedemption"){
+        console.log("ParentCollectionId: ", event.args.parentCollectionId)
+        console.log("Payout: ",event.args.payout.toString())
+      }
+  })
+
   })
 }
 

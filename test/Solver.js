@@ -86,7 +86,7 @@ describe("It should all work", function () {
     const canon0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [1,2],
       recipientAddressSlots: [1,2],
@@ -180,7 +180,7 @@ describe("It should all work", function () {
 
 
     // Keeper proposes payouts
-    await solver.connect(this.keeper).proposePayouts([1,0]);
+    await solver.connect(this.keeper).proposePayouts(0, [1,0]);
 
     const conditionsProposed = await solver.getConditions();
     const payouts = conditionsProposed[conditionsProposed.length-1].payouts;
@@ -188,7 +188,7 @@ describe("It should all work", function () {
     expect(payouts[1]).to.equal(0)
 
     // We set timelock to 0, so confirm right away
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).confirmPayouts(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure])
@@ -266,7 +266,7 @@ describe("It should all work", function () {
     const canon0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
@@ -378,13 +378,13 @@ describe("It should all work", function () {
 
 
     // Keeper proposes payouts
-    await solver.connect(this.keeper).proposePayouts([0,0,1]);
+    await solver.connect(this.keeper).proposePayouts(0, [0,0,1]);
 
     const conditionsProposed = await solver.getConditions();
     const payouts = conditionsProposed[conditionsProposed.length-1].payouts;
 
     // We set timelock to 0, so confirm right away
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).confirmPayouts(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure, indexSetCancelled])
@@ -453,7 +453,7 @@ describe("It should all work", function () {
     const canon0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2], // Buyer, Seller
@@ -559,13 +559,13 @@ describe("It should all work", function () {
 
 
     // Keeper proposes payouts
-    await solver.connect(this.keeper).proposePayouts([0,0,1]);
+    await solver.connect(this.keeper).proposePayouts(0,[0,0,1]);
 
     const conditionsProposed = await solver.getConditions();
     const payouts = conditionsProposed[conditionsProposed.length-1].payouts;
 
     // We set timelock to 0, so confirm right away
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).confirmPayouts(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure, indexSetCancelled])
@@ -644,7 +644,7 @@ describe("It should all work", function () {
     const canon0 = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
-      parentCollectionPartitionIndex: 0,
+      parentCollectionIndexSet: 0,
       amount: 100,
       partition: [1,2], // Good, Bad
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
@@ -743,13 +743,13 @@ describe("It should all work", function () {
 
 
     // Keeper proposes payouts
-    await solver.connect(this.keeper).proposePayouts([1,0]);
+    await solver.connect(this.keeper).proposePayouts(0,[1,0]);
 
     const conditionsProposed = await solver.getConditions();
     const payouts = conditionsProposed[conditionsProposed.length-1].payouts;
 
     // We set timelock to 0, so confirm right away
-    await solver.connect(this.keeper).confirmPayouts();
+    await solver.connect(this.keeper).confirmPayouts(0);
 
     // Seller redeems tokens
     await this.CT.connect(this.seller).redeemPositions(this.ToyToken.address, ethers.constants.HashZero, conditionId, [indexSetSuccess, indexSetFailure])

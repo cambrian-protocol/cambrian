@@ -23,18 +23,16 @@ interface ISolverInterface extends ethers.utils.Interface {
   functions: {
     "addressFromChainIndex(uint256)": FunctionFragment;
     "allocatePartition(uint256[],uint256[][],address[][])": FunctionFragment;
-    "arbitrate(uint256[])": FunctionFragment;
-    "confirmPayouts()": FunctionFragment;
+    "arbitrate(uint256,uint256[])": FunctionFragment;
+    "confirmPayouts(uint256)": FunctionFragment;
     "createCondition(bytes32,uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
-    "executeAction(uint256)": FunctionFragment;
-    "executeActions()": FunctionFragment;
-    "executeSolve()": FunctionFragment;
-    "nullArbitrate()": FunctionFragment;
+    "executeSolve(uint256)": FunctionFragment;
+    "nullArbitrate(uint256)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
-    "prepareSolve()": FunctionFragment;
-    "proposePayouts(uint256[])": FunctionFragment;
+    "prepareSolve(uint256)": FunctionFragment;
+    "proposePayouts(uint256,uint256[])": FunctionFragment;
     "setApproval(address,bool)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "splitCondition(bytes32,bytes32,uint256,uint256[],address,uint256)": FunctionFragment;
@@ -50,11 +48,11 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "arbitrate",
-    values: [BigNumberish[]]
+    values: [BigNumberish, BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "confirmPayouts",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "createCondition",
@@ -81,7 +79,7 @@ interface ISolverInterface extends ethers.utils.Interface {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -92,20 +90,12 @@ interface ISolverInterface extends ethers.utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "executeAction",
+    functionFragment: "executeSolve",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "executeActions",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "executeSolve",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "nullArbitrate",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "onERC1155BatchReceived",
@@ -117,11 +107,11 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "prepareSolve",
-    values?: undefined
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "proposePayouts",
-    values: [BigNumberish[]]
+    values: [BigNumberish, BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "setApproval",
@@ -162,14 +152,6 @@ interface ISolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "deployChild",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "executeAction",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "executeActions",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -269,11 +251,13 @@ export class ISolver extends BaseContract {
     ): Promise<ContractTransaction>;
 
     arbitrate(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     confirmPayouts(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -302,7 +286,7 @@ export class ISolver extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -313,20 +297,13 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    executeAction(
-      _actionIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    executeActions(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     executeSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     nullArbitrate(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -349,10 +326,12 @@ export class ISolver extends BaseContract {
     ): Promise<[string]>;
 
     prepareSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     proposePayouts(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -392,11 +371,13 @@ export class ISolver extends BaseContract {
   ): Promise<ContractTransaction>;
 
   arbitrate(
+    _index: BigNumberish,
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   confirmPayouts(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -425,7 +406,7 @@ export class ISolver extends BaseContract {
       conditionBase: {
         collateralToken: string;
         outcomeSlots: BigNumberish;
-        parentCollectionPartitionIndex: BigNumberish;
+        parentCollectionIndexSet: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
@@ -436,20 +417,13 @@ export class ISolver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  executeAction(
-    _actionIndex: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  executeActions(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   executeSolve(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   nullArbitrate(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -472,10 +446,12 @@ export class ISolver extends BaseContract {
   ): Promise<string>;
 
   prepareSolve(
+    _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   proposePayouts(
+    _index: BigNumberish,
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -515,11 +491,15 @@ export class ISolver extends BaseContract {
     ): Promise<void>;
 
     arbitrate(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
 
-    confirmPayouts(overrides?: CallOverrides): Promise<void>;
+    confirmPayouts(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     createCondition(
       _questionId: BytesLike,
@@ -546,7 +526,7 @@ export class ISolver extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -557,16 +537,15 @@ export class ISolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    executeAction(
-      _actionIndex: BigNumberish,
+    executeSolve(
+      _index: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
 
-    executeActions(overrides?: CallOverrides): Promise<void>;
-
-    executeSolve(overrides?: CallOverrides): Promise<void>;
-
-    nullArbitrate(overrides?: CallOverrides): Promise<void>;
+    nullArbitrate(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     onERC1155BatchReceived(
       operator: string,
@@ -586,9 +565,13 @@ export class ISolver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    prepareSolve(overrides?: CallOverrides): Promise<void>;
+    prepareSolve(
+      _index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     proposePayouts(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: CallOverrides
     ): Promise<void>;
@@ -631,11 +614,13 @@ export class ISolver extends BaseContract {
     ): Promise<BigNumber>;
 
     arbitrate(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     confirmPayouts(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -664,7 +649,7 @@ export class ISolver extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -675,20 +660,13 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    executeAction(
-      _actionIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    executeActions(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     executeSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     nullArbitrate(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -711,10 +689,12 @@ export class ISolver extends BaseContract {
     ): Promise<BigNumber>;
 
     prepareSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     proposePayouts(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -755,11 +735,13 @@ export class ISolver extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     arbitrate(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     confirmPayouts(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -788,7 +770,7 @@ export class ISolver extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -799,20 +781,13 @@ export class ISolver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    executeAction(
-      _actionIndex: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    executeActions(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     executeSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     nullArbitrate(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -835,10 +810,12 @@ export class ISolver extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     prepareSolve(
+      _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     proposePayouts(
+      _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

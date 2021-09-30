@@ -48,7 +48,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -141,7 +141,7 @@ export class SolverFactory extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -176,7 +176,7 @@ export class SolverFactory extends BaseContract {
       conditionBase: {
         collateralToken: string;
         outcomeSlots: BigNumberish;
-        parentCollectionPartitionIndex: BigNumberish;
+        parentCollectionIndexSet: BigNumberish;
         amount: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
@@ -211,7 +211,7 @@ export class SolverFactory extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -253,7 +253,7 @@ export class SolverFactory extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
@@ -289,7 +289,7 @@ export class SolverFactory extends BaseContract {
         conditionBase: {
           collateralToken: string;
           outcomeSlots: BigNumberish;
-          parentCollectionPartitionIndex: BigNumberish;
+          parentCollectionIndexSet: BigNumberish;
           amount: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];

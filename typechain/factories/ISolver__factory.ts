@@ -52,6 +52,11 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+      {
         internalType: "uint256[]",
         name: "_payouts",
         type: "uint256[]",
@@ -63,7 +68,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "confirmPayouts",
     outputs: [],
     stateMutability: "nonpayable",
@@ -172,7 +183,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "parentCollectionPartitionIndex",
+                name: "parentCollectionIndexSet",
                 type: "uint256",
               },
               {
@@ -226,37 +237,23 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_actionIndex",
+        name: "_index",
         type: "uint256",
       },
     ],
-    name: "executeAction",
-    outputs: [
-      {
-        internalType: "bytes",
-        name: "",
-        type: "bytes",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "executeActions",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "executeSolve",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "nullArbitrate",
     outputs: [],
     stateMutability: "nonpayable",
@@ -341,7 +338,13 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "prepareSolve",
     outputs: [],
     stateMutability: "nonpayable",
@@ -349,6 +352,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
       {
         internalType: "uint256[]",
         name: "_payouts",
