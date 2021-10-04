@@ -20,16 +20,11 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverLibInterface extends ethers.utils.Interface {
   functions: {
-    "addressFromChainIndex(uint256,address,address,address,uint256)": FunctionFragment;
     "getCollectionId(tuple,uint256)": FunctionFragment;
     "getPositionId(tuple,IERC20,uint256)": FunctionFragment;
     "ingestsValid(tuple[],uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "addressFromChainIndex",
-    values: [BigNumberish, string, string, string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "getCollectionId",
     values: [
@@ -73,10 +68,6 @@ interface SolverLibInterface extends ethers.utils.Interface {
     ]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "addressFromChainIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getCollectionId",
     data: BytesLike
@@ -137,15 +128,6 @@ export class SolverLib extends BaseContract {
   interface: SolverLibInterface;
 
   functions: {
-    addressFromChainIndex(
-      index: BigNumberish,
-      _this: string,
-      chainParent: string,
-      chainChild: string,
-      chainIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string] & { _address: string }>;
-
     getCollectionId(
       condition: {
         collateralToken: string;
@@ -185,15 +167,6 @@ export class SolverLib extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
   };
-
-  addressFromChainIndex(
-    index: BigNumberish,
-    _this: string,
-    chainParent: string,
-    chainChild: string,
-    chainIndex: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   getCollectionId(
     condition: {
@@ -235,15 +208,6 @@ export class SolverLib extends BaseContract {
   ): Promise<boolean>;
 
   callStatic: {
-    addressFromChainIndex(
-      index: BigNumberish,
-      _this: string,
-      chainParent: string,
-      chainChild: string,
-      chainIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     getCollectionId(
       condition: {
         collateralToken: string;
@@ -287,15 +251,6 @@ export class SolverLib extends BaseContract {
   filters: {};
 
   estimateGas: {
-    addressFromChainIndex(
-      index: BigNumberish,
-      _this: string,
-      chainParent: string,
-      chainChild: string,
-      chainIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     getCollectionId(
       condition: {
         collateralToken: string;
@@ -337,15 +292,6 @@ export class SolverLib extends BaseContract {
   };
 
   populateTransaction: {
-    addressFromChainIndex(
-      index: BigNumberish,
-      _this: string,
-      chainParent: string,
-      chainChild: string,
-      chainIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     getCollectionId(
       condition: {
         collateralToken: string;

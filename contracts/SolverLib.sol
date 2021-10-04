@@ -73,6 +73,11 @@ library SolverLib {
         mapping(uint256 => uint256) slotVersions;
     }
 
+    struct Callbacks {
+        mapping(uint256 => address[]) requested; // This Slot => chainIndex
+        mapping(bytes32 => uint256) expected; // keccack256(Address, CallerSlot) => ingest index
+    }
+
     function createCondition(
         ConditionBase calldata base,
         address chainParent,
@@ -104,20 +109,6 @@ library SolverLib {
 
         IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
             .prepareCondition(oracle, condition.questionId, base.outcomeSlots);
-    }
-
-    function ingestsValid(Ingest[] calldata ingests, uint256 conditionVer)
-        public
-        pure
-        returns (bool)
-    {
-        for (uint256 i; i < ingests.length; i++) {
-            if (ingests[i].executions != conditionVer) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     function deployChild(
@@ -222,22 +213,6 @@ library SolverLib {
         reportPayouts(condition, payouts);
     }
 
-    function addressFromChainIndex(
-        uint256 index,
-        address _this,
-        address chainParent,
-        address chainChild,
-        uint256 chainIndex
-    ) public view returns (address _address) {
-        if (index == chainIndex) {
-            return _this;
-        } else if (index < chainIndex) {
-            return ISolver(chainParent).addressFromChainIndex(index);
-        } else if (index > chainIndex) {
-            return ISolver(chainChild).addressFromChainIndex(index);
-        }
-    }
-
     function allocatePartition(
         Condition calldata condition,
         ConditionBase calldata base,
@@ -284,14 +259,11 @@ library SolverLib {
         }
     }
 
-    function ingest(Ingest storage _ingest, address solver)
-        public
-        returns (bytes memory data)
-    {
+    function ingest(Ingest storage _ingest) public returns (bytes memory data) {
         _ingest.executions++;
 
         if (_ingest.ingestType != IngestType.Constant) {
-            address _solver = Solver(solver).addressFromChainIndex(
+            address _solver = Solver(address(this)).addressFromChainIndex(
                 _ingest.solverIndex
             );
             (bool success, bytes memory retData) = _solver.staticcall(
@@ -302,6 +274,20 @@ library SolverLib {
         } else {
             data = _ingest.data;
         }
+    }
+
+    function ingestsValid(Ingest[] calldata ingests, uint256 conditionVer)
+        public
+        pure
+        returns (bool)
+    {
+        for (uint256 i; i < ingests.length; i++) {
+            if (ingests[i].executions != conditionVer) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function getCollectionId(Condition memory condition, uint256 partition)

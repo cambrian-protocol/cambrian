@@ -613,7 +613,6 @@ describe("It should all work", async function () {
     await solver0.connect(this.keeper).addData(5, ethers.utils.defaultAbiCoder.encode(['address'], [this.seller2.address]));
     await solver1.connect(this.keeper).addData(5, ethers.utils.defaultAbiCoder.encode(['bytes'], [ethers.utils.hexlify(ethers.utils.toUtf8Bytes("Some content URI"))]));
     
-    console.log("execute solver2")
     tx = await solver2.connect(this.keeper).executeSolve(1);
     rc = await tx.wait();
     events = rc.logs.map(log => {
@@ -626,7 +625,6 @@ describe("It should all work", async function () {
         splitPositionEvents.push(event)
       }
     })
-    console.log("executed solver2")
 
 
     await solver0.connect(this.keeper).proposePayouts(1,[1,0]); // success, found someone

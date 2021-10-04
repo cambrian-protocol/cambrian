@@ -376,7 +376,7 @@ export class Solver extends BaseContract {
     addressFromChainIndex(
       _index: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string] & { _address: string }>;
+    ): Promise<[string]>;
 
     arbitrate(
       _index: BigNumberish,
