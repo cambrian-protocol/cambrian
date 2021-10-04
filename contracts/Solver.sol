@@ -130,18 +130,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************** DATA ****************************************** //
     // ********************************************************************************** //
 
-    function router(
-        uint8 _type,
-        uint256 _key,
-        bytes memory _data
-    ) private {
+    function router(uint256 _key, bytes memory _data) private {
         require(
             datas.slotVersions[_key] == (conditions.length - 1),
             "Slot version invalid"
         );
         datas.slotVersions[_key]++;
         datas.slots[_key] = _data;
-        datas.slotTypes[_key] = SolverLib.DataType(_type);
 
         callback(_key);
     }
@@ -172,7 +167,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     function ingest(uint256 _index) private {
         router(
-            config.ingests[_index].dataType,
             config.ingests[_index].key,
             SolverLib.ingest(config.ingests[_index], address(this))
         );
@@ -182,13 +176,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
     }
 
-    function addData(
-        uint8 _type,
-        uint256 _key,
-        bytes memory _data
-    ) external {
+    function addData(uint256 _key, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        router(_type, _key, _data);
+        router(_key, _data);
     }
 
     function getOutput(uint256 _key) public view returns (bytes memory data) {
@@ -230,7 +220,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         config.ingests[expectedCallbacks[_cb]].executions++;
 
         router(
-            config.ingests[expectedCallbacks[_cb]].dataType,
             config.ingests[expectedCallbacks[_cb]].key,
             Solver(msg.sender).getOutput(
                 abi.decode(

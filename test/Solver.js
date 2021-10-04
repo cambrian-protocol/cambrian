@@ -42,7 +42,6 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -50,7 +49,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -58,7 +57,6 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 3,
         key: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['bytes32'], [ethers.utils.formatBytes32String("")])
@@ -66,7 +64,6 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -74,7 +71,6 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -202,7 +198,7 @@ describe("It should all work", function () {
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -210,7 +206,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -218,7 +214,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.keeper.address])
@@ -226,7 +222,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -234,7 +230,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [10])
@@ -242,7 +238,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 6,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [90])
@@ -250,7 +246,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 7,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -394,7 +390,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -402,7 +398,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -410,7 +406,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -418,7 +414,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [10])
@@ -426,7 +422,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 6,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [90])
@@ -434,7 +430,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 7,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -573,7 +569,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -581,7 +577,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -589,7 +585,7 @@ ingestType: 1,
       {
         executions: 0,
 ingestType: 1,
-        dataType: 0,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.keeper.address])
@@ -597,7 +593,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -605,7 +601,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [10])
@@ -613,7 +609,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 6,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [90])
@@ -621,7 +617,7 @@ ingestType: 1,
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 7,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])

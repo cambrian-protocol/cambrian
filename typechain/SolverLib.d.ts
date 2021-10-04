@@ -65,7 +65,6 @@ interface SolverLibInterface extends ethers.utils.Interface {
       {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -178,7 +177,6 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -228,7 +226,6 @@ export class SolverLib extends BaseContract {
     ingests: {
       executions: BigNumberish;
       ingestType: BigNumberish;
-      dataType: BigNumberish;
       key: BigNumberish;
       solverIndex: BigNumberish;
       data: BytesLike;
@@ -278,7 +275,6 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -331,7 +327,6 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -382,7 +377,6 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;

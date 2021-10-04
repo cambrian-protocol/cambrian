@@ -21,7 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SolverInterface extends ethers.utils.Interface {
   functions: {
-    "addData(uint8,uint256,bytes)": FunctionFragment;
+    "addData(uint256,bytes)": FunctionFragment;
     "addressFromChainIndex(uint256)": FunctionFragment;
     "arbitrate(uint256,uint256[])": FunctionFragment;
     "arbitrateNull(uint256)": FunctionFragment;
@@ -56,7 +56,7 @@ interface SolverInterface extends ethers.utils.Interface {
 
   encodeFunctionData(
     functionFragment: "addData",
-    values: [BigNumberish, BigNumberish, BytesLike]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "addressFromChainIndex",
@@ -111,7 +111,6 @@ interface SolverInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -167,7 +166,6 @@ interface SolverInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -370,7 +368,6 @@ export class Solver extends BaseContract {
 
   functions: {
     addData(
-      _type: BigNumberish,
       _key: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -492,7 +489,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -560,7 +556,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -640,7 +635,6 @@ export class Solver extends BaseContract {
   };
 
   addData(
-    _type: BigNumberish,
     _key: BigNumberish,
     _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -762,7 +756,6 @@ export class Solver extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -825,7 +818,6 @@ export class Solver extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -905,7 +897,6 @@ export class Solver extends BaseContract {
 
   callStatic: {
     addData(
-      _type: BigNumberish,
       _key: BigNumberish,
       _data: BytesLike,
       overrides?: CallOverrides
@@ -1027,7 +1018,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -1090,7 +1080,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -1173,7 +1162,6 @@ export class Solver extends BaseContract {
 
   estimateGas: {
     addData(
-      _type: BigNumberish,
       _key: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1233,7 +1221,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -1288,7 +1275,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -1369,7 +1355,6 @@ export class Solver extends BaseContract {
 
   populateTransaction: {
     addData(
-      _type: BigNumberish,
       _key: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1429,7 +1414,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -1484,7 +1468,6 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;

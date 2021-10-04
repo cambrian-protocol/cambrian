@@ -7,18 +7,14 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
     const ingests = [
         {
           executions: 0,
-          isDeferred: false,
           ingestType: 1,
-          dataType: 0,
           key: 1,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['address'], [buyerAddress])
         },
         {
           executions: 0,
-          isDeferred: false,
           ingestType: 1,
-          dataType: 0,
           key: 2,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['address'], [sellerAddress])
@@ -26,7 +22,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         {
           executions: 0,
           ingestType: 1,
-          dataType: 3,
+  
           key: 0,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['bytes32'], [ethers.utils.formatBytes32String("")])
@@ -34,7 +30,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         {
           executions: 0,
           ingestType: 1,
-          dataType: 4,
+  
           key: 3,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -42,7 +38,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         {
           executions: 0,
           ingestType: 1,
-          dataType: 4,
+  
           key: 4,
           solverIndex: 0,
           data: ethers.utils.defaultAbiCoder.encode(['uint256'], [amount])

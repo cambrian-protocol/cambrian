@@ -10,11 +10,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint8",
-        name: "_type",
-        type: "uint8",
-      },
-      {
         internalType: "uint256",
         name: "_key",
         type: "uint256",
@@ -319,11 +314,6 @@ const _abi = [
                 type: "uint8",
               },
               {
-                internalType: "uint8",
-                name: "dataType",
-                type: "uint8",
-              },
-              {
                 internalType: "uint256",
                 name: "key",
                 type: "uint256",
@@ -578,11 +568,6 @@ const _abi = [
               {
                 internalType: "enum SolverLib.IngestType",
                 name: "ingestType",
-                type: "uint8",
-              },
-              {
-                internalType: "uint8",
-                name: "dataType",
                 type: "uint8",
               },
               {

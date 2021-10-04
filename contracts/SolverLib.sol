@@ -12,7 +12,6 @@ library SolverLib {
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
         IngestType ingestType;
-        uint8 dataType;
         uint256 key; // Destination key for data
         uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
         bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
@@ -69,18 +68,9 @@ library SolverLib {
         ConditionBase conditionBase; // Base to create conditions from
     }
 
-    enum DataType {
-        Address,
-        Bool,
-        Bytes,
-        Bytes32,
-        Uint256
-    }
-
     struct Datas {
         mapping(uint256 => bytes) slots;
         mapping(uint256 => uint256) slotVersions;
-        mapping(uint256 => DataType) slotTypes;
     }
 
     function createCondition(

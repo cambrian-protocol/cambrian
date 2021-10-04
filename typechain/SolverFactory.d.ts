@@ -39,7 +39,6 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -131,7 +130,6 @@ export class SolverFactory extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -165,7 +163,6 @@ export class SolverFactory extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
@@ -199,7 +196,6 @@ export class SolverFactory extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -240,7 +236,6 @@ export class SolverFactory extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
@@ -275,7 +270,6 @@ export class SolverFactory extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;

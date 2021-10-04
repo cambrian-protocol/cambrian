@@ -46,7 +46,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -54,7 +54,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 2,
-        dataType: 0,
+
         key: 2,
         solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
@@ -62,7 +62,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -70,7 +70,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -93,7 +93,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -101,7 +101,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -109,7 +109,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -117,7 +117,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])

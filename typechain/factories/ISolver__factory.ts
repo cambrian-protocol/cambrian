@@ -140,11 +140,6 @@ const _abi = [
                 type: "uint8",
               },
               {
-                internalType: "uint8",
-                name: "dataType",
-                type: "uint8",
-              },
-              {
                 internalType: "uint256",
                 name: "key",
                 type: "uint256",

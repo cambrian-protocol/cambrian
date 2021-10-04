@@ -52,7 +52,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -60,7 +60,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 2,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex",[1])
@@ -68,7 +68,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -76,7 +76,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -99,7 +99,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.buyer.address])
@@ -107,7 +107,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 0,
+
         key: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['address'], [this.seller.address])
@@ -115,7 +115,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [0])
@@ -123,7 +123,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        dataType: 4,
+
         key: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(['uint256'], [100])
@@ -229,10 +229,10 @@ describe("It should all work", async function () {
     await expectRevert(solver0.connect(this.keeper).handleCallback(0), "msg.sender not solver");
 
     // Add deferred data to solver0 and fetch it from solver1
-    await solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero);
+    await solver0.connect(this.keeper).addData(0, ethers.constants.HashZero);
 
     // Shouldn't be able to add data again
-    await expectRevert(solver0.connect(this.keeper).addData(2, 0, ethers.constants.HashZero), "Slot version invalid");
+    await expectRevert(solver0.connect(this.keeper).addData(0, ethers.constants.HashZero), "Slot version invalid");
 
     
     await solver1.connect(this.keeper).executeSolve(0);
