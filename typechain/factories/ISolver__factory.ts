@@ -135,14 +135,9 @@ const _abi = [
                 type: "uint256",
               },
               {
-                internalType: "bool",
-                name: "isDeferred",
-                type: "bool",
-              },
-              {
-                internalType: "bool",
-                name: "isConstant",
-                type: "bool",
+                internalType: "enum SolverLib.IngestType",
+                name: "ingestType",
+                type: "uint8",
               },
               {
                 internalType: "uint8",

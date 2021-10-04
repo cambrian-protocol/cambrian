@@ -49,7 +49,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     function prepareSolve(uint256 _index) external {
-        console.log("prepareSolve chainIndex: ", chainIndex);
         if (hasCondition) {
             require(
                 msg.sender == config.keeper || msg.sender == chainParent,
@@ -65,7 +64,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function addCondition() private {
-        console.log("adding condition #", conditions.length + 1);
         conditions.push(
             SolverLib.createCondition(
                 config.conditionBase,
@@ -94,11 +92,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     function executeSolve(uint256 _index) public {
-        console.log("executeSolve solver#: ", chainIndex);
-        console.log(
-            "executeSolve condition status: ",
-            uint256(conditions[_index].status)
-        );
         require(
             conditions[_index].status == SolverLib.Status.Initiated,
             "not Initiated"
@@ -155,7 +148,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     function executeIngests() private {
         for (uint256 i; i < config.ingests.length; i++) {
-            if (!config.ingests[i].isDeferred) {
+            if (config.ingests[i].ingestType != SolverLib.IngestType.Callback) {
                 ingest(i);
             } else {
                 address _cbSolver = addressFromChainIndex(
@@ -229,8 +222,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "msg.sender not solver"
         );
         require(
-            config.ingests[expectedCallbacks[_cb]].isDeferred,
-            "Ingest not deferred"
+            config.ingests[expectedCallbacks[_cb]].ingestType ==
+                SolverLib.IngestType.Callback,
+            "Ingest not Callback"
         );
 
         config.ingests[expectedCallbacks[_cb]].executions++;
@@ -251,7 +245,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function callback(uint256 _slot) private {
         for (uint256 i; i < requestedCallbacks[_slot].length; i++) {
             if (address(requestedCallbacks[_slot][i]) != address(0)) {
-                console.log("sending callback: ", _slot);
                 Solver(address(requestedCallbacks[_slot][i])).handleCallback(
                     _slot
                 );
@@ -417,11 +410,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         uint256[] calldata values,
         bytes calldata data
     ) external virtual override returns (bytes4) {
-        for (uint256 i; i < ids.length; i++) {
-            console.log("chainIndex: ", chainIndex);
-            console.log("received token: ", ids[i]);
-            console.log("received amountSlot: ", values[i]);
-        }
         return this.onERC1155BatchReceived.selector;
     }
 }

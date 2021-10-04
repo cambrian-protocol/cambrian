@@ -45,8 +45,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+        ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -54,8 +53,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: false,
+        ingestType: 2,
         dataType: 0,
         key: 2,
         solverIndex: 1,
@@ -63,7 +61,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 3,
         solverIndex: 0,
@@ -71,7 +69,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -94,8 +92,7 @@ describe("It should all work", function () {
     const ingests1 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+        ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -103,8 +100,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+        ingestType: 1,
         dataType: 0,
         key: 2,
         solverIndex: 0,
@@ -112,7 +108,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 3,
         solverIndex: 0,
@@ -120,7 +116,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -209,8 +205,7 @@ describe("It should all work", function () {
     const indexSetSuccess = getIndexSetFromBinaryArray([1,0]) // If success
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
   
-    console.log("index set success: ", indexSetSuccess)
-    console.log("index set failure: ", indexSetFailure)
+
 
     let solver0 = new ethers.Contract(solver0Address, SOLVER_ABI, ethers.provider);
     let solver1 = new ethers.Contract(solver1Address, SOLVER_ABI, ethers.provider);

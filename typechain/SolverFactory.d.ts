@@ -38,8 +38,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -131,8 +130,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -166,8 +164,7 @@ export class SolverFactory extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -201,8 +198,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -243,8 +239,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -279,8 +274,7 @@ export class SolverFactory extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;

@@ -369,9 +369,9 @@ contract ConditionalTokens is ERC1155 {
             }
 
             uint256 payoutStake = balanceOf(msg.sender, positionId);
-            console.log("redeeming msg.sender: ", msg.sender);
-            console.log("positionId: ", positionId);
-            console.log("payoutStake: ", payoutStake);
+            // console.log("redeeming msg.sender: ", msg.sender);
+            // console.log("positionId: ", positionId);
+            // console.log("payoutStake: ", payoutStake);
 
             if (payoutStake > 0) {
                 totalPayout =

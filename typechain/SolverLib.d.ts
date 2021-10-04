@@ -64,8 +64,7 @@ interface SolverLibInterface extends ethers.utils.Interface {
     values: [
       {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -178,8 +177,7 @@ export class SolverLib extends BaseContract {
     ingestsValid(
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -229,8 +227,7 @@ export class SolverLib extends BaseContract {
   ingestsValid(
     ingests: {
       executions: BigNumberish;
-      isDeferred: boolean;
-      isConstant: boolean;
+      ingestType: BigNumberish;
       dataType: BigNumberish;
       key: BigNumberish;
       solverIndex: BigNumberish;
@@ -280,8 +277,7 @@ export class SolverLib extends BaseContract {
     ingestsValid(
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -334,8 +330,7 @@ export class SolverLib extends BaseContract {
     ingestsValid(
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -386,8 +381,7 @@ export class SolverLib extends BaseContract {
     ingestsValid(
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;

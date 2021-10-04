@@ -110,8 +110,7 @@ interface SolverInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -167,8 +166,7 @@ interface SolverInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -493,8 +491,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -562,8 +559,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -765,8 +761,7 @@ export class Solver extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -829,8 +824,7 @@ export class Solver extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -1032,8 +1026,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -1096,8 +1089,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -1240,8 +1232,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -1296,8 +1287,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -1438,8 +1428,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -1494,8 +1483,7 @@ export class Solver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;

@@ -84,8 +84,8 @@
       "artifacts": []
     },
     "E:\\cryptodev\\cambrian\\contracts\\ConditionalTokens.sol": {
-      "lastModificationDate": 1632977716599,
-      "contentHash": "8b825b4f28236884d65a2bec3cc8219e",
+      "lastModificationDate": 1633311999378,
+      "contentHash": "b5b0c6d59b09bc7f20b1a16495e28db5",
       "sourceName": "contracts/ConditionalTokens.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -748,8 +748,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1633213657554,
-      "contentHash": "5430b5638319100931de1e3ad78cd97f",
+      "lastModificationDate": 1633311697351,
+      "contentHash": "364795efe309509dac8794627b075048",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1248,8 +1248,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1633154490255,
-      "contentHash": "2d6d8fe5abc20db574dc8f351f7d7b64",
+      "lastModificationDate": 1633311671951,
+      "contentHash": "82947dac013ecfacaba798e6f3986504",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",

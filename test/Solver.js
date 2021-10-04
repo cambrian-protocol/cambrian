@@ -41,8 +41,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+        ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -50,8 +49,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+        ingestType: 1,
         dataType: 0,
         key: 2,
         solverIndex: 0,
@@ -59,7 +57,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 3,
         key: 0,
         solverIndex: 0,
@@ -67,7 +65,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 3,
         solverIndex: 0,
@@ -75,7 +73,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -159,8 +157,7 @@ describe("It should all work", function () {
     const indexSetSuccess = getIndexSetFromBinaryArray([1,0]) // If success
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
 
-    console.log("index set success: ", indexSetSuccess)
-    console.log("index set failure: ", indexSetFailure)
+
 
     const collectionIdSuccess = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionIdSuccess)
@@ -204,8 +201,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -213,8 +209,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 2,
         solverIndex: 0,
@@ -222,8 +217,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 3,
         solverIndex: 0,
@@ -231,7 +225,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -239,7 +233,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 5,
         solverIndex: 0,
@@ -247,7 +241,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 6,
         solverIndex: 0,
@@ -255,7 +249,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 7,
         solverIndex: 0,
@@ -340,8 +334,7 @@ describe("It should all work", function () {
     const indexSetCancelled = getIndexSetFromBinaryArray([1,0,0]) // If cancelled
 
 
-    console.log("index set success: ", indexSetSuccess)
-    console.log("index set failure: ", indexSetFailure)
+
 
     const collectionIdSuccess = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionIdSuccess)
@@ -400,8 +393,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -409,8 +401,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 2,
         solverIndex: 0,
@@ -418,7 +409,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -426,7 +417,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 5,
         solverIndex: 0,
@@ -434,7 +425,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 6,
         solverIndex: 0,
@@ -442,7 +433,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 7,
         solverIndex: 0,
@@ -527,8 +518,7 @@ describe("It should all work", function () {
     const indexSetCancelled = getIndexSetFromBinaryArray([1,0,0]) // If cancelled
 
 
-    console.log("index set success: ", indexSetSuccess)
-    console.log("index set failure: ", indexSetFailure)
+
 
     const collectionIdSuccess = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionIdSuccess)
@@ -582,8 +572,7 @@ describe("It should all work", function () {
     const ingests0 = [
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 1,
         solverIndex: 0,
@@ -591,8 +580,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 2,
         solverIndex: 0,
@@ -600,8 +588,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isDeferred: false,
-        isConstant: true,
+ingestType: 1,
         dataType: 0,
         key: 3,
         solverIndex: 0,
@@ -609,7 +596,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 4,
         solverIndex: 0,
@@ -617,7 +604,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 5,
         solverIndex: 0,
@@ -625,7 +612,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 6,
         solverIndex: 0,
@@ -633,7 +620,7 @@ describe("It should all work", function () {
       },
       {
         executions: 0,
-        isConstant: true,
+        ingestType: 1,
         dataType: 4,
         key: 7,
         solverIndex: 0,
@@ -718,8 +705,7 @@ describe("It should all work", function () {
     const indexSetFailure = getIndexSetFromBinaryArray([0,1]) // If failure
 
 
-    console.log("index set success: ", indexSetSuccess)
-    console.log("index set failure: ", indexSetFailure)
+
 
     const collectionIdSuccess = await this.CT.getCollectionId(ethers.constants.HashZero, conditionId, indexSetSuccess)
     const positionIdSuccess = await this.CT.getPositionId(this.ToyToken.address, collectionIdSuccess)

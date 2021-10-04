@@ -69,8 +69,7 @@ interface ISolverInterface extends ethers.utils.Interface {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -276,8 +275,7 @@ export class ISolver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -396,8 +394,7 @@ export class ISolver extends BaseContract {
       data: BytesLike;
       ingests: {
         executions: BigNumberish;
-        isDeferred: boolean;
-        isConstant: boolean;
+        ingestType: BigNumberish;
         dataType: BigNumberish;
         key: BigNumberish;
         solverIndex: BigNumberish;
@@ -516,8 +513,7 @@ export class ISolver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -639,8 +635,7 @@ export class ISolver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;
@@ -760,8 +755,7 @@ export class ISolver extends BaseContract {
         data: BytesLike;
         ingests: {
           executions: BigNumberish;
-          isDeferred: boolean;
-          isConstant: boolean;
+          ingestType: BigNumberish;
           dataType: BigNumberish;
           key: BigNumberish;
           solverIndex: BigNumberish;

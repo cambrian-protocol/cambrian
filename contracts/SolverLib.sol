@@ -11,12 +11,18 @@ library SolverLib {
     // Expected sources of data being ingested into the Solver
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
-        bool isDeferred; // Data is waiting on an upstream action and must be ingested manually later
-        bool isConstant; // Data is supplied directly as encoded bytes
+        IngestType ingestType;
         uint8 dataType;
         uint256 key; // Destination key for data
-        uint256 solverIndex; // Index of the Solver in the chain to make this call to
-        bytes data; // Raw when isConstant=true, slot index of upstream solver data when deferred, else an encoded function call
+        uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
+        bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
+    }
+
+    // Ingest Types
+    enum IngestType {
+        Callback,
+        Constant,
+        Function
     }
 
     // Status state for Conditions
@@ -159,8 +165,6 @@ library SolverLib {
         Condition calldata condition,
         uint256 amount
     ) public {
-        console.log("addressThis: ", address(this));
-
         // uint256 _amount;
 
         if (chainParent == address(0)) {
@@ -296,7 +300,7 @@ library SolverLib {
     {
         _ingest.executions++;
 
-        if (!_ingest.isConstant) {
+        if (_ingest.ingestType != IngestType.Constant) {
             address _solver = Solver(solver).addressFromChainIndex(
                 _ingest.solverIndex
             );
