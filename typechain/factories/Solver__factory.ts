@@ -8,6 +8,19 @@ import type { Solver, SolverInterface } from "../Solver";
 
 const _abi = [
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "chainChild",
+        type: "address",
+      },
+    ],
+    name: "DeployedChild",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",

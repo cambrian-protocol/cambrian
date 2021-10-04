@@ -27,6 +27,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
 
+    event DeployedChild(address chainChild);
+
     function init(
         address _chainParent,
         uint256 _chainIndex,
@@ -84,6 +86,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             address(this),
             chainIndex
         );
+
+        emit DeployedChild(chainChild);
     }
 
     // ********************************************************************************** //

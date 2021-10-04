@@ -27,6 +27,8 @@ contract SolverFactory {
         );
         Solver(clone).init(_chainParent, _chainIndex, _solverConfig);
         solvers.push(clone);
+
+        emit SolverCreated(address(clone));
         return address(clone);
     }
 }

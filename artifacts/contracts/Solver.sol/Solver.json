@@ -4,6 +4,19 @@
   "sourceName": "contracts/Solver.sol",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "chainChild",
+          "type": "address"
+        }
+      ],
+      "name": "DeployedChild",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "uint256",

@@ -320,7 +320,11 @@ interface SolverInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "timelock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "trackingId", data: BytesLike): Result;
 
-  events: {};
+  events: {
+    "DeployedChild(address)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "DeployedChild"): EventFragment;
 }
 
 export class Solver extends BaseContract {
@@ -1158,7 +1162,11 @@ export class Solver extends BaseContract {
     trackingId(overrides?: CallOverrides): Promise<string>;
   };
 
-  filters: {};
+  filters: {
+    DeployedChild(
+      chainChild?: null
+    ): TypedEventFilter<[string], { chainChild: string }>;
+  };
 
   estimateGas: {
     addData(
