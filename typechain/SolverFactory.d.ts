@@ -49,7 +49,7 @@ interface SolverFactoryInterface extends ethers.utils.Interface {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -142,7 +142,7 @@ export class SolverFactory extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -177,7 +177,7 @@ export class SolverFactory extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionIndexSet: BigNumberish;
-        amount: BigNumberish;
+        amountSlot: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
@@ -212,7 +212,7 @@ export class SolverFactory extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -254,7 +254,7 @@ export class SolverFactory extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -290,7 +290,7 @@ export class SolverFactory extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];

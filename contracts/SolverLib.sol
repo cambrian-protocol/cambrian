@@ -45,7 +45,7 @@ library SolverLib {
         IERC20 collateralToken;
         uint256 outcomeSlots; // Num outcome slots
         uint256 parentCollectionIndexSet; // IndexSet to get parentCollectionId from parent Solver
-        uint256 amount; // Amount of collateral being used        // TODO maybe make this dynamic also
+        uint256 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
         uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
         uint256[][] recipientAmountSlots; // Arrays containing amount of CTs to send to each recipient for each partition
@@ -156,12 +156,20 @@ library SolverLib {
     function splitPosition(
         address chainParent,
         ConditionBase calldata base,
-        Condition calldata condition
+        Condition calldata condition,
+        uint256 amount
     ) public {
+        console.log("addressThis: ", address(this));
+
+        // uint256 _amount;
+
         if (chainParent == address(0)) {
+            // _amount = IERC20(base.collateralToken).balanceOf(address(this));
+            // require(_amount > 0, "No collateral.");
+
             base.collateralToken.approve(
                 address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
-                base.amount
+                amount
             );
         }
 
@@ -171,7 +179,7 @@ library SolverLib {
                 condition.parentCollectionId,
                 condition.conditionId,
                 base.partition,
-                base.amount
+                amount
             );
     }
 
@@ -314,5 +322,18 @@ library SolverLib {
                 condition.conditionId,
                 partition
             );
+    }
+
+    function mulScale(
+        uint256 x,
+        uint256 y,
+        uint128 scale
+    ) internal pure returns (uint256) {
+        uint256 a = x / scale;
+        uint256 b = x % scale;
+        uint256 c = y / scale;
+        uint256 d = y % scale;
+
+        return a * c * scale + a * d + b * c + (b * d) / scale;
     }
 }

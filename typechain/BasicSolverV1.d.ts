@@ -35,6 +35,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     "confirmPayouts(uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
     "executeSolve(uint256)": FunctionFragment;
+    "getCTBalance(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
     "getOutput(uint256)": FunctionFragment;
     "handleCallback(uint256)": FunctionFragment;
@@ -42,6 +43,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "parentPositionId()": FunctionFragment;
     "prepareSolve(uint256)": FunctionFragment;
     "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
@@ -119,7 +121,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -130,6 +132,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "executeSolve",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCTBalance",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -172,7 +178,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -188,6 +194,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "onERC1155Received",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "parentPositionId",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "prepareSolve",
@@ -258,6 +268,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getCTBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getConditions",
     data: BytesLike
   ): Result;
@@ -277,6 +291,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "onERC1155Received",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "parentPositionId",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -427,7 +445,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionIndexSet: BigNumber;
-          amount: BigNumber;
+          amountSlot: BigNumber;
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
@@ -452,7 +470,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionIndexSet: BigNumber;
-          amount: BigNumber;
+          amountSlot: BigNumber;
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
@@ -486,7 +504,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -500,6 +518,11 @@ export class BasicSolverV1 extends BaseContract {
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    getCTBalance(
+      token: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     getConditions(
       overrides?: CallOverrides
@@ -550,7 +573,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -577,6 +600,8 @@ export class BasicSolverV1 extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    parentPositionId(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -692,7 +717,7 @@ export class BasicSolverV1 extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumber;
         parentCollectionIndexSet: BigNumber;
-        amount: BigNumber;
+        amountSlot: BigNumber;
         partition: BigNumber[];
         recipientAddressSlots: BigNumber[];
         recipientAmountSlots: BigNumber[][];
@@ -717,7 +742,7 @@ export class BasicSolverV1 extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumber;
         parentCollectionIndexSet: BigNumber;
-        amount: BigNumber;
+        amountSlot: BigNumber;
         partition: BigNumber[];
         recipientAddressSlots: BigNumber[];
         recipientAmountSlots: BigNumber[][];
@@ -751,7 +776,7 @@ export class BasicSolverV1 extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionIndexSet: BigNumberish;
-        amount: BigNumberish;
+        amountSlot: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
@@ -765,6 +790,11 @@ export class BasicSolverV1 extends BaseContract {
     _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  getCTBalance(
+    token: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   getConditions(
     overrides?: CallOverrides
@@ -810,7 +840,7 @@ export class BasicSolverV1 extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionIndexSet: BigNumberish;
-        amount: BigNumberish;
+        amountSlot: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
@@ -837,6 +867,8 @@ export class BasicSolverV1 extends BaseContract {
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
 
   prepareSolve(
     _index: BigNumberish,
@@ -952,7 +984,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionIndexSet: BigNumber;
-          amount: BigNumber;
+          amountSlot: BigNumber;
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
@@ -977,7 +1009,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumber;
           parentCollectionIndexSet: BigNumber;
-          amount: BigNumber;
+          amountSlot: BigNumber;
           partition: BigNumber[];
           recipientAddressSlots: BigNumber[];
           recipientAmountSlots: BigNumber[][];
@@ -1011,7 +1043,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1025,6 +1057,11 @@ export class BasicSolverV1 extends BaseContract {
       _index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    getCTBalance(
+      token: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getConditions(
       overrides?: CallOverrides
@@ -1070,7 +1107,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1097,6 +1134,8 @@ export class BasicSolverV1 extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -1212,7 +1251,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1225,6 +1264,11 @@ export class BasicSolverV1 extends BaseContract {
     executeSolve(
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    getCTBalance(
+      token: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getConditions(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1263,7 +1307,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1290,6 +1334,8 @@ export class BasicSolverV1 extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -1403,7 +1449,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1416,6 +1462,11 @@ export class BasicSolverV1 extends BaseContract {
     executeSolve(
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    getCTBalance(
+      token: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getConditions(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1454,7 +1505,7 @@ export class BasicSolverV1 extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -1481,6 +1532,8 @@ export class BasicSolverV1 extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    parentPositionId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     prepareSolve(
       _index: BigNumberish,

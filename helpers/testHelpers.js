@@ -54,7 +54,7 @@ const getSimpleSolverConfig = (collateralAddress, amount, implementationAddress,
         collateralToken: collateralAddress,
         outcomeSlots: 2,
         parentCollectionIndexSet: 0,
-        amount: amount,
+        amountSlot: 4,
         partition: [1,2],
         recipientAddressSlots: [1,2],
         recipientAmountSlots: [[3,4],[4,3]],
@@ -108,7 +108,7 @@ const getCTBalances = async(CT, address, solver, indexSets) => {
       promises.push(p);
   })
   await Promise.all(promises);
-  console.log(`${address} balances: `, CTBalances);
+  // console.log(`${address} balances: `, CTBalances);
   return CTBalances;
 }
 
@@ -132,12 +132,12 @@ const redeemPositions = async(CT, signer, solver, indexSets) => {
       } catch(err){}
     });
     
-    events.forEach(event => {
-      if (event && event.name == "PayoutRedemption"){
-        console.log("ParentCollectionId: ", event.args.parentCollectionId)
-        console.log("Payout: ",event.args.payout.toString())
-      }
-  })
+  //   events.forEach(event => {
+  //     if (event && event.name == "PayoutRedemption"){
+  //       console.log("ParentCollectionId: ", event.args.parentCollectionId)
+  //       console.log("Payout: ",event.args.payout.toString())
+  //     }
+  // })
 
   })
 }

@@ -271,7 +271,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -309,7 +309,7 @@ export class ConditionalTokensInterface extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -325,7 +325,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -383,7 +383,7 @@ export class ConditionalTokensInterface extends BaseContract {
     parentCollectionId: BytesLike,
     conditionId: BytesLike,
     partition: BigNumberish[],
-    amount: BigNumberish,
+    amountSlot: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -421,7 +421,7 @@ export class ConditionalTokensInterface extends BaseContract {
     from: string,
     to: string,
     id: BigNumberish,
-    amount: BigNumberish,
+    amountSlot: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -437,7 +437,7 @@ export class ConditionalTokensInterface extends BaseContract {
     parentCollectionId: BytesLike,
     conditionId: BytesLike,
     partition: BigNumberish[],
-    amount: BigNumberish,
+    amountSlot: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -495,7 +495,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -533,7 +533,7 @@ export class ConditionalTokensInterface extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -549,7 +549,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -658,7 +658,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -696,7 +696,7 @@ export class ConditionalTokensInterface extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -712,7 +712,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -771,7 +771,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -809,7 +809,7 @@ export class ConditionalTokensInterface extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -825,7 +825,7 @@ export class ConditionalTokensInterface extends BaseContract {
       parentCollectionId: BytesLike,
       conditionId: BytesLike,
       partition: BigNumberish[],
-      amount: BigNumberish,
+      amountSlot: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

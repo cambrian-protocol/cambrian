@@ -232,7 +232,7 @@ const _abi = [
           },
           {
             internalType: "uint256",
-            name: "amount",
+            name: "amountSlot",
             type: "uint256",
           },
           {
@@ -367,7 +367,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "amount",
+                name: "amountSlot",
                 type: "uint256",
               },
               {
@@ -423,6 +423,25 @@ const _abi = [
     name: "executeSolve",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "token",
+        type: "uint256",
+      },
+    ],
+    name: "getCTBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -615,7 +634,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "amount",
+                name: "amountSlot",
                 type: "uint256",
               },
               {
@@ -730,6 +749,19 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "parentPositionId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {

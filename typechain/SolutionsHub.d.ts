@@ -57,7 +57,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -97,7 +97,7 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -211,7 +211,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -254,7 +254,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -295,7 +295,7 @@ export class SolutionsHub extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionIndexSet: BigNumberish;
-        amount: BigNumberish;
+        amountSlot: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
@@ -338,7 +338,7 @@ export class SolutionsHub extends BaseContract {
         collateralToken: string;
         outcomeSlots: BigNumberish;
         parentCollectionIndexSet: BigNumberish;
-        amount: BigNumberish;
+        amountSlot: BigNumberish;
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
@@ -379,7 +379,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -422,7 +422,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -468,7 +468,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -511,7 +511,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -553,7 +553,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
@@ -596,7 +596,7 @@ export class SolutionsHub extends BaseContract {
           collateralToken: string;
           outcomeSlots: BigNumberish;
           parentCollectionIndexSet: BigNumberish;
-          amount: BigNumberish;
+          amountSlot: BigNumberish;
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];

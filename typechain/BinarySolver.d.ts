@@ -300,7 +300,7 @@ export class BinarySolver extends BaseContract {
 
     rescueTokens(
       _token: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -326,7 +326,7 @@ export class BinarySolver extends BaseContract {
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
       _collateralToken: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       _jv: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -404,7 +404,7 @@ export class BinarySolver extends BaseContract {
 
   rescueTokens(
     _token: string,
-    _amount: BigNumberish,
+    _amountSlot: BigNumberish,
     to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -430,7 +430,7 @@ export class BinarySolver extends BaseContract {
     _questionId: BytesLike,
     _parentCollectionId: BytesLike,
     _collateralToken: string,
-    _amount: BigNumberish,
+    _amountSlot: BigNumberish,
     _jv: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -508,7 +508,7 @@ export class BinarySolver extends BaseContract {
 
     rescueTokens(
       _token: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       to: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -528,7 +528,7 @@ export class BinarySolver extends BaseContract {
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
       _collateralToken: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       _jv: string,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -643,7 +643,7 @@ export class BinarySolver extends BaseContract {
 
     rescueTokens(
       _token: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -669,7 +669,7 @@ export class BinarySolver extends BaseContract {
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
       _collateralToken: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       _jv: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -750,7 +750,7 @@ export class BinarySolver extends BaseContract {
 
     rescueTokens(
       _token: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -776,7 +776,7 @@ export class BinarySolver extends BaseContract {
       _questionId: BytesLike,
       _parentCollectionId: BytesLike,
       _collateralToken: string,
-      _amount: BigNumberish,
+      _amountSlot: BigNumberish,
       _jv: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

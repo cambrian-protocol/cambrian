@@ -87,7 +87,7 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amount: 100,
+      amountSlot: 4,
       partition: [1,2],
       recipientAddressSlots: [1,2],
       recipientAmountSlots: [[3,4],[4,3]],
@@ -267,7 +267,7 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
       parentCollectionIndexSet: 0,
-      amount: 100,
+      amountSlot: 7,
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
       recipientAmountSlots: [[4,6,5],[7,4,4],[6,4,5]],
@@ -454,7 +454,7 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
       parentCollectionIndexSet: 0,
-      amount: 100,
+      amountSlot: 7,
       partition: [4,2,1], // Good, Bad, Cancelled
       recipientAddressSlots: [1,2], // Buyer, Seller
       recipientAmountSlots: [[4,7],[7,4],[6,5]],
@@ -645,7 +645,7 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amount: 100,
+      amountSlot: 7,
       partition: [1,2], // Good, Bad
       recipientAddressSlots: [1,2,3], // Buyer, Seller, Keeper
       recipientAmountSlots: [[4,6,5],[7,4,4]],

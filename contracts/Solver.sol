@@ -20,6 +20,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
     uint256 public timelock; // Current timelock
+    uint256 public parentPositionId;
+
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
 
     mapping(uint256 => address[]) requestedCallbacks; // This Slot => chainIndex
@@ -108,18 +110,19 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         SolverLib.splitPosition(
             chainParent,
             config.conditionBase,
-            conditions[conditions.length - 1]
+            conditions[_index],
+            abi.decode(datas.slots[config.conditionBase.amountSlot], (uint256))
         );
         SolverLib.allocatePartition(
-            conditions[conditions.length - 1],
+            conditions[_index],
             config.conditionBase,
             address(this),
             datas,
             trackingId
         );
 
-        postroll(conditions.length - 1);
-        cascade(conditions.length - 1);
+        postroll(_index);
+        cascade(_index);
     }
 
     function postroll(uint256 _index) internal virtual;
@@ -363,9 +366,23 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         timelock = block.timestamp + (config.timelockSeconds * 1 seconds);
     }
 
+    function mulScale(
+        uint256 x,
+        uint256 y,
+        uint128 scale
+    ) internal pure returns (uint256) {
+        return SolverLib.mulScale(x, y, scale);
+    }
+
     // ********************************************************************************** //
     // ******************************** TOKENS ****************************************** //
     // ********************************************************************************** //
+
+    function getCTBalance(uint256 token) external view returns (uint256) {
+        return
+            IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
+                .balanceOf(address(this), token);
+    }
 
     function redeemPosition(
         IERC20 _collateralToken,
@@ -403,7 +420,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         for (uint256 i; i < ids.length; i++) {
             console.log("chainIndex: ", chainIndex);
             console.log("received token: ", ids[i]);
-            console.log("received amount: ", values[i]);
+            console.log("received amountSlot: ", values[i]);
         }
         return this.onERC1155BatchReceived.selector;
     }

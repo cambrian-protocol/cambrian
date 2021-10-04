@@ -188,7 +188,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "amount",
+                name: "amountSlot",
                 type: "uint256",
               },
               {

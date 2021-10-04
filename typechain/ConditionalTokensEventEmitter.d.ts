@@ -150,7 +150,7 @@ export class ConditionalTokensEventEmitter extends BaseContract {
         parentCollectionId: string;
         conditionId: string;
         partition: BigNumber[];
-        amount: BigNumber;
+        amountSlot: BigNumber;
       }
     >;
 
@@ -169,7 +169,7 @@ export class ConditionalTokensEventEmitter extends BaseContract {
         parentCollectionId: string;
         conditionId: string;
         partition: BigNumber[];
-        amount: BigNumber;
+        amountSlot: BigNumber;
       }
     >;
   };
