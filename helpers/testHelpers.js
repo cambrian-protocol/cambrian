@@ -16,14 +16,14 @@ const getSimpleSolverConfig = (
     {
       executions: 0,
       ingestType: 1,
-      key: 1,
+      slot: 1,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["address"], [buyerAddress]),
     },
     {
       executions: 0,
       ingestType: 1,
-      key: 2,
+      slot: 2,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["address"], [sellerAddress]),
     },
@@ -31,7 +31,7 @@ const getSimpleSolverConfig = (
       executions: 0,
       ingestType: 1,
 
-      key: 0,
+      slot: 0,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(
         ["bytes32"],
@@ -42,7 +42,7 @@ const getSimpleSolverConfig = (
       executions: 0,
       ingestType: 1,
 
-      key: 3,
+      slot: 3,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
     },
@@ -50,7 +50,7 @@ const getSimpleSolverConfig = (
       executions: 0,
       ingestType: 1,
 
-      key: 4,
+      slot: 4,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [amount]),
     },
@@ -143,20 +143,22 @@ const redeemPositions = async (CT, signer, solver, indexSets) => {
   const conditions = await solver.getConditions();
 
   conditions.forEach(async (condition) => {
-    const tx = await CT.connect(signer).redeemPositions(
-      condition.collateralToken,
-      condition.parentCollectionId,
-      condition.conditionId,
-      indexSets
-    );
+    if (condition.status > 4) {
+      const tx = await CT.connect(signer).redeemPositions(
+        condition.collateralToken,
+        condition.parentCollectionId,
+        condition.conditionId,
+        indexSets
+      );
 
-    const rc = await tx.wait();
-    let iface = new ethers.utils.Interface(CT_ABI);
-    let events = rc.logs.map((log) => {
-      try {
-        return iface.parseLog(log);
-      } catch (err) {}
-    });
+      const rc = await tx.wait();
+      let iface = new ethers.utils.Interface(CT_ABI);
+      let events = rc.logs.map((log) => {
+        try {
+          return iface.parseLog(log);
+        } catch (err) {}
+      });
+    }
 
     //   events.forEach(event => {
     //     if (event && event.name == "PayoutRedemption"){

@@ -141,7 +141,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "key",
+                name: "slot",
                 type: "uint256",
               },
               {

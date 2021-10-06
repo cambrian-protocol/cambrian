@@ -43,7 +43,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_key",
+        name: "_slot",
         type: "uint256",
       },
       {
@@ -69,7 +69,7 @@ const _abi = [
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "_address",
         type: "address",
       },
     ],
@@ -347,7 +347,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "key",
+                name: "slot",
                 type: "uint256",
               },
               {
@@ -446,16 +446,16 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "token",
+        name: "_slot",
         type: "uint256",
       },
     ],
-    name: "getCTBalance",
+    name: "getCallbackOutput",
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
       },
     ],
     stateMutability: "view",
@@ -510,16 +510,35 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_key",
+        name: "_slot",
         type: "uint256",
       },
     ],
-    name: "getOutput",
+    name: "getData",
     outputs: [
       {
         internalType: "bytes",
         name: "data",
         type: "bytes",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "slot",
+        type: "uint256",
+      },
+    ],
+    name: "getRequestedCallbacks",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "",
+        type: "address[]",
       },
     ],
     stateMutability: "view",
@@ -604,7 +623,7 @@ const _abi = [
               },
               {
                 internalType: "uint256",
-                name: "key",
+                name: "slot",
                 type: "uint256",
               },
               {
@@ -756,6 +775,35 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "x",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "y",
+        type: "uint256",
+      },
+      {
+        internalType: "uint128",
+        name: "scale",
+        type: "uint128",
+      },
+    ],
+    name: "percentage",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "pure",
     type: "function",
   },
   {

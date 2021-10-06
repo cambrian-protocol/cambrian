@@ -96,7 +96,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             conditions[_index].status == SolverLib.Status.Initiated,
             "not Initiated"
         );
-        require(ingestsValid(), "ingests invalid");
+        require(ingestsValid() == true, "ingests invalid");
 
         conditions[_index].status = SolverLib.Status.Executed;
 
@@ -130,15 +130,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************** DATA ****************************************** //
     // ********************************************************************************** //
 
-    function router(uint256 _key, bytes memory _data) private {
+    function router(uint256 _slot, bytes memory _data) private {
         require(
-            datas.slotVersions[_key] == (conditions.length - 1),
+            datas.slotVersions[_slot] == (conditions.length - 1),
             "Slot version invalid"
         );
-        datas.slotVersions[_key]++;
-        datas.slots[_key] = _data;
+        datas.slotVersions[_slot]++;
+        datas.slots[_slot] = _data;
 
-        callback(_key);
+        callback(_slot);
     }
 
     function executeIngests() private {
@@ -166,25 +166,20 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function ingest(SolverLib.Ingest storage _ingest) private {
-        router(_ingest.key, SolverLib.ingest(_ingest));
+        router(_ingest.slot, SolverLib.ingest(_ingest));
     }
 
     function ingestsValid() public view returns (bool) {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
     }
 
-    function addData(uint256 _key, bytes memory _data) external {
+    function addData(uint256 _slot, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        router(_key, _data);
+        router(_slot, _data);
     }
 
-    function getOutput(uint256 _key) public view returns (bytes memory data) {
-        require(
-            datas.slotVersions[_key] == conditions.length,
-            "Slot invalid ver."
-        );
-
-        data = datas.slots[_key];
+    function getData(uint256 _slot) public view returns (bytes memory data) {
+        data = datas.slots[_slot];
     }
 
     // ********************************************************************************** //
@@ -217,8 +212,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         config.ingests[callbacks.expected[_cb]].executions++;
 
         router(
-            config.ingests[callbacks.expected[_cb]].key,
-            Solver(msg.sender).getOutput(
+            config.ingests[callbacks.expected[_cb]].slot,
+            Solver(msg.sender).getCallbackOutput(
                 abi.decode(
                     config.ingests[callbacks.expected[_cb]].data,
                     (uint256)
@@ -237,6 +232,27 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 delete callbacks.requested[_slot][i];
             }
         }
+    }
+
+    function getCallbackOutput(uint256 _slot)
+        public
+        view
+        returns (bytes memory data)
+    {
+        require(
+            datas.slotVersions[_slot] == conditions.length,
+            "Slot invalid ver."
+        );
+
+        data = datas.slots[_slot];
+    }
+
+    function getRequestedCallbacks(uint256 slot)
+        public
+        view
+        returns (address[] memory)
+    {
+        return callbacks.requested[slot];
     }
 
     // ********************************************************************************** //
@@ -317,14 +333,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function addressFromChainIndex(uint256 _index)
         public
         view
-        returns (address)
+        returns (address _address)
     {
         if (_index == chainIndex) {
-            return address(this);
+            _address = address(this);
         } else if (_index < chainIndex) {
-            return ISolver(chainParent).addressFromChainIndex(_index);
+            _address = ISolver(chainParent).addressFromChainIndex(_index);
         } else if (_index > chainIndex) {
-            return ISolver(chainChild).addressFromChainIndex(_index);
+            _address = ISolver(chainChild).addressFromChainIndex(_index);
         }
     }
 
@@ -345,23 +361,19 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         timelock = block.timestamp + (config.timelockSeconds * 1 seconds);
     }
 
-    function mulScale(
+    function percentage(
         uint256 x,
         uint256 y,
         uint128 scale
-    ) internal pure returns (uint256) {
-        return SolverLib.mulScale(x, y, scale);
+    ) public pure returns (uint256) {
+        return
+            SolverLib.mulScale(y, 100, scale) /
+            SolverLib.mulScale(x, 100, scale);
     }
 
     // ********************************************************************************** //
     // ******************************** TOKENS ****************************************** //
     // ********************************************************************************** //
-
-    function getCTBalance(uint256 token) external view returns (uint256) {
-        return
-            IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-                .balanceOf(address(this), token);
-    }
 
     function redeemPosition(
         IERC20 _collateralToken,

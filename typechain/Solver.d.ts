@@ -35,14 +35,16 @@ interface SolverInterface extends ethers.utils.Interface {
     "confirmPayouts(uint256)": FunctionFragment;
     "deployChild(tuple)": FunctionFragment;
     "executeSolve(uint256)": FunctionFragment;
-    "getCTBalance(uint256)": FunctionFragment;
+    "getCallbackOutput(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
-    "getOutput(uint256)": FunctionFragment;
+    "getData(uint256)": FunctionFragment;
+    "getRequestedCallbacks(uint256)": FunctionFragment;
     "handleCallback(uint256)": FunctionFragment;
     "ingestsValid()": FunctionFragment;
     "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "percentage(uint256,uint256,uint128)": FunctionFragment;
     "prepareSolve(uint256)": FunctionFragment;
     "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
@@ -110,7 +112,7 @@ interface SolverInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -132,7 +134,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getCTBalance",
+    functionFragment: "getCallbackOutput",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -140,7 +142,11 @@ interface SolverInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "getOutput",
+    functionFragment: "getData",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRequestedCallbacks",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -165,7 +171,7 @@ interface SolverInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -189,6 +195,10 @@ interface SolverInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "onERC1155Received",
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "percentage",
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "prepareSolve",
@@ -259,14 +269,18 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getCTBalance",
+    functionFragment: "getCallbackOutput",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "getConditions",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getOutput", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getData", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRequestedCallbacks",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "handleCallback",
     data: BytesLike
@@ -284,6 +298,7 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "onERC1155Received",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "percentage", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "prepareSolve",
     data: BytesLike
@@ -365,7 +380,7 @@ export class Solver extends BaseContract {
 
   functions: {
     addData(
-      _key: BigNumberish,
+      _slot: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -373,7 +388,7 @@ export class Solver extends BaseContract {
     addressFromChainIndex(
       _index: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<[string] & { _address: string }>;
 
     arbitrate(
       _index: BigNumberish,
@@ -486,7 +501,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -509,10 +524,10 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    getCTBalance(
-      token: BigNumberish,
+    getCallbackOutput(
+      _slot: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[string] & { data: string }>;
 
     getConditions(
       overrides?: CallOverrides
@@ -529,10 +544,15 @@ export class Solver extends BaseContract {
       ]
     >;
 
-    getOutput(
-      _key: BigNumberish,
+    getData(
+      _slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string] & { data: string }>;
+
+    getRequestedCallbacks(
+      slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string[]]>;
 
     handleCallback(
       _slot: BigNumberish,
@@ -553,7 +573,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -588,6 +608,13 @@ export class Solver extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    percentage(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -630,7 +657,7 @@ export class Solver extends BaseContract {
   };
 
   addData(
-    _key: BigNumberish,
+    _slot: BigNumberish,
     _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -751,7 +778,7 @@ export class Solver extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[];
@@ -774,10 +801,10 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  getCTBalance(
-    token: BigNumberish,
+  getCallbackOutput(
+    _slot: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<string>;
 
   getConditions(
     overrides?: CallOverrides
@@ -792,7 +819,12 @@ export class Solver extends BaseContract {
     })[]
   >;
 
-  getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  getRequestedCallbacks(
+    slot: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string[]>;
 
   handleCallback(
     _slot: BigNumberish,
@@ -813,7 +845,7 @@ export class Solver extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[];
@@ -848,6 +880,13 @@ export class Solver extends BaseContract {
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  percentage(
+    x: BigNumberish,
+    y: BigNumberish,
+    scale: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   prepareSolve(
     _index: BigNumberish,
@@ -890,7 +929,7 @@ export class Solver extends BaseContract {
 
   callStatic: {
     addData(
-      _key: BigNumberish,
+      _slot: BigNumberish,
       _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1011,7 +1050,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1034,10 +1073,10 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    getCTBalance(
-      token: BigNumberish,
+    getCallbackOutput(
+      _slot: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<string>;
 
     getConditions(
       overrides?: CallOverrides
@@ -1052,7 +1091,12 @@ export class Solver extends BaseContract {
       })[]
     >;
 
-    getOutput(_key: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    getRequestedCallbacks(
+      slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string[]>;
 
     handleCallback(
       _slot: BigNumberish,
@@ -1073,7 +1117,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1108,6 +1152,13 @@ export class Solver extends BaseContract {
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    percentage(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -1165,7 +1216,7 @@ export class Solver extends BaseContract {
 
   estimateGas: {
     addData(
-      _key: BigNumberish,
+      _slot: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1224,7 +1275,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1247,15 +1298,17 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    getCTBalance(
-      token: BigNumberish,
+    getCallbackOutput(
+      _slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     getConditions(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getOutput(
-      _key: BigNumberish,
+    getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    getRequestedCallbacks(
+      slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1278,7 +1331,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1312,6 +1365,13 @@ export class Solver extends BaseContract {
       value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    percentage(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     prepareSolve(
@@ -1356,7 +1416,7 @@ export class Solver extends BaseContract {
 
   populateTransaction: {
     addData(
-      _key: BigNumberish,
+      _slot: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1415,7 +1475,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1438,15 +1498,20 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    getCTBalance(
-      token: BigNumberish,
+    getCallbackOutput(
+      _slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     getConditions(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getOutput(
-      _key: BigNumberish,
+    getData(
+      _slot: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRequestedCallbacks(
+      slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1469,7 +1534,7 @@ export class Solver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -1503,6 +1568,13 @@ export class Solver extends BaseContract {
       value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    percentage(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     prepareSolve(

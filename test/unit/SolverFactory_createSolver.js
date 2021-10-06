@@ -23,7 +23,6 @@ describe("SolverFactory | createSolver", function () {
       "BasicSolverV1",
     ]);
 
-    this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");

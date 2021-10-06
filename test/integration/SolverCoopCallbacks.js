@@ -51,7 +51,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        key: 1,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -62,21 +62,21 @@ describe("It should all work", async function () {
         executions: 0,
         ingestType: 2,
 
-        key: 2,
+        slot: 2,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
       },
       {
         executions: 0,
         ingestType: 1,
-        key: 3,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        key: 4,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -101,7 +101,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        key: 1,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -111,7 +111,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        key: 2,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -121,14 +121,14 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        key: 3,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        key: 4,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -137,7 +137,7 @@ describe("It should all work", async function () {
         executions: 0,
         ingestType: 0,
         dataType: 2,
-        key: 0,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]), // SLOT we are requesting output from for callback
       },
@@ -262,6 +262,15 @@ describe("It should all work", async function () {
       solvers[0],
       indexSets
     );
+
+    expect(
+      await testHelpers.getCTBalances(
+        this.CT,
+        this.seller.address,
+        solvers[0],
+        indexSets
+      )
+    ).to.eql([0, 0]);
 
     expect(await this.ToyToken.balanceOf(this.seller.address)).to.equal(100);
   });

@@ -23,7 +23,6 @@ describe("Solver.sol | prepareSolve", function () {
       "BasicSolverV1",
     ]);
 
-    this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
@@ -71,7 +70,7 @@ describe("Solver.sol | prepareSolve", function () {
     );
   });
 
-  it("Prepares one solve", async function () {
+  it("Prepares one solve and emits event", async function () {
     let tx = await this.solver.connect(this.keeper).prepareSolve(0);
     let rc = await tx.wait();
     expect(rc.events[1].event).to.equal("PreparedSolve");

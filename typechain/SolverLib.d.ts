@@ -23,6 +23,7 @@ interface SolverLibInterface extends ethers.utils.Interface {
     "getCollectionId(tuple,uint256)": FunctionFragment;
     "getPositionId(tuple,IERC20,uint256)": FunctionFragment;
     "ingestsValid(tuple[],uint256)": FunctionFragment;
+    "mulScale(uint256,uint256,uint128)": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -60,12 +61,16 @@ interface SolverLibInterface extends ethers.utils.Interface {
       {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[],
       BigNumberish
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mulScale",
+    values: [BigNumberish, BigNumberish, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -80,6 +85,7 @@ interface SolverLibInterface extends ethers.utils.Interface {
     functionFragment: "ingestsValid",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mulScale", data: BytesLike): Result;
 
   events: {};
 }
@@ -159,13 +165,20 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[],
       conditionVer: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    mulScale(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
   };
 
   getCollectionId(
@@ -199,13 +212,20 @@ export class SolverLib extends BaseContract {
     ingests: {
       executions: BigNumberish;
       ingestType: BigNumberish;
-      key: BigNumberish;
+      slot: BigNumberish;
       solverIndex: BigNumberish;
       data: BytesLike;
     }[],
     conditionVer: BigNumberish,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  mulScale(
+    x: BigNumberish,
+    y: BigNumberish,
+    scale: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   callStatic: {
     getCollectionId(
@@ -239,13 +259,20 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[],
       conditionVer: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    mulScale(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {};
@@ -282,11 +309,18 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[],
       conditionVer: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    mulScale(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
   };
@@ -323,11 +357,18 @@ export class SolverLib extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[],
       conditionVer: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mulScale(
+      x: BigNumberish,
+      y: BigNumberish,
+      scale: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
   };

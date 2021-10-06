@@ -49,7 +49,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 1,
+//         slot:1,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(
 //           ["address"],
@@ -60,7 +60,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 2,
+//         slot:2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
 //       },
@@ -68,7 +68,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 4,
+//         slot:4,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
 //       },
@@ -76,7 +76,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 5,
+//         slot:5,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
 //       },
@@ -102,7 +102,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 1,
+//         slot:1,
 //         solverIndex: 1,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [0]),
 //       },
@@ -110,7 +110,7 @@
 //         executions: 0,
 //         ingestType: 0,
 
-//         key: 2,
+//         slot:2,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [3]), // deferredIngests take the key of slot in solver passing it down
 //       },
@@ -118,7 +118,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 3,
+//         slot:3,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
 //       },
@@ -126,7 +126,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 4,
+//         slot:4,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
 //       },
@@ -292,7 +292,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 1,
+//         slot:1,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(
 //           ["address"],
@@ -303,7 +303,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 2,
+//         slot:2,
 //         solverIndex: 0,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
 //       },
@@ -311,7 +311,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 3,
+//         slot:3,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
 //       },
@@ -319,7 +319,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 4,
+//         slot:4,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
 //       },
@@ -345,7 +345,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 1,
+//         slot:1,
 //         solverIndex: 1,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [0]),
 //       },
@@ -353,7 +353,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 2,
+//         slot:2,
 //         solverIndex: 2,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [2]),
 //       },
@@ -361,7 +361,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 3,
+//         slot:3,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
 //       },
@@ -369,7 +369,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 4,
+//         slot:4,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
 //       },
@@ -395,7 +395,7 @@
 //         executions: 0,
 //         ingestType: 2,
 
-//         key: 1,
+//         slot:1,
 //         solverIndex: 1,
 //         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
 //       },
@@ -403,7 +403,7 @@
 //         executions: 0,
 //         ingestType: 0,
 
-//         key: 2,
+//         slot:2,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [5]), // get seller from solvers[0]
 //       },
@@ -411,7 +411,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 3,
+//         slot:3,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
 //       },
@@ -419,7 +419,7 @@
 //         executions: 0,
 //         ingestType: 1,
 
-//         key: 4,
+//         slot:4,
 //         solverIndex: 0,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
 //       },
@@ -427,7 +427,7 @@
 //         executions: 0,
 //         ingestType: 0,
 
-//         key: 5,
+//         slot:5,
 //         solverIndex: 1,
 //         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [5]), // get content data from solvers[1]
 //       },

@@ -12,7 +12,7 @@ library SolverLib {
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
         IngestType ingestType;
-        uint256 key; // Destination key for data
+        uint256 slot; // Destination slot for data
         uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
         bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
     }
@@ -74,7 +74,7 @@ library SolverLib {
     }
 
     struct Callbacks {
-        mapping(uint256 => address[]) requested; // This Slot => chainIndex
+        mapping(uint256 => address[]) requested; // This Slot => Solver expecting callback
         mapping(bytes32 => uint256) expected; // keccack256(Address, CallerSlot) => ingest index
     }
 
@@ -308,7 +308,7 @@ library SolverLib {
         uint256 x,
         uint256 y,
         uint128 scale
-    ) internal pure returns (uint256) {
+    ) public pure returns (uint256) {
         uint256 a = x / scale;
         uint256 b = x % scale;
         uint256 c = y / scale;

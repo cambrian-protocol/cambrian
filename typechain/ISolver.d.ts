@@ -70,7 +70,7 @@ interface ISolverInterface extends ethers.utils.Interface {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -275,7 +275,7 @@ export class ISolver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -393,7 +393,7 @@ export class ISolver extends BaseContract {
       ingests: {
         executions: BigNumberish;
         ingestType: BigNumberish;
-        key: BigNumberish;
+        slot: BigNumberish;
         solverIndex: BigNumberish;
         data: BytesLike;
       }[];
@@ -511,7 +511,7 @@ export class ISolver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -632,7 +632,7 @@ export class ISolver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];
@@ -751,7 +751,7 @@ export class ISolver extends BaseContract {
         ingests: {
           executions: BigNumberish;
           ingestType: BigNumberish;
-          key: BigNumberish;
+          slot: BigNumberish;
           solverIndex: BigNumberish;
           data: BytesLike;
         }[];

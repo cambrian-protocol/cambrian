@@ -45,7 +45,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 1,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -55,7 +55,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 2,
-        key: 2,
+        slot: 2,
         solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
       },
@@ -63,7 +63,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 3,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
@@ -71,7 +71,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 4,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -97,7 +97,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 1,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -108,7 +108,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 2,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -119,7 +119,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 3,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
@@ -127,7 +127,7 @@ describe("It should all work", function () {
         executions: 0,
         ingestType: 1,
 
-        key: 4,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
