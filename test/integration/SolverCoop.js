@@ -1,12 +1,13 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
-const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
-const SOLUTIONSHUB_ABI =
-  require("../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
+const SOLVER_ABI =
+  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
+
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,
-} = require("../helpers/ConditionalTokens.js");
+} = require("../../helpers/ConditionalTokens.js");
+const testHelpers = require("../../helpers/testHelpers.js");
 
 describe("It should all work", function () {
   this.beforeEach(async function () {
@@ -26,18 +27,12 @@ describe("It should all work", function () {
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
-    this.SolutionsHub = await ethers.getContract("SolutionsHub");
-    this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
-
-    await this.ToyToken.mint(this.buyer.address, "100");
-
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
 
-    this.ISolutionsHub = new ethers.utils.Interface(SOLUTIONSHUB_ABI);
-    this.ISolutionsHub.format(FormatTypes.full);
+    await this.ToyToken.mint(this.buyer.address, "100");
   });
 
   it("Should execute two-solver Proposal", async function () {
@@ -60,7 +55,6 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 2,
-
         key: 2,
         solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
@@ -175,153 +169,67 @@ describe("It should all work", function () {
     ];
     //////////////////////////////////////////
 
-    let solvers = [];
-    let promises = [];
-
-    await this.SolverFactory.createSolver(
-      ethers.constants.AddressZero,
-      0,
-      solverConfigs[0]
-    )
-      .then((tx) => tx.wait())
-      .then((rc) => {
-        solvers.push(
-          new ethers.Contract(
-            ethers.utils.defaultAbiCoder.decode(
-              ["address"],
-              rc.events[0].data
-            )[0],
-            SOLVER_ABI,
-            ethers.provider
-          )
-        );
-      });
-
-    solverConfigs.forEach((config, index) => {
-      if (index > 0) {
-        let p = solvers[index - 1]
-          .connect(this.keeper)
-          .deployChild(config)
-          .then((tx) => tx.wait())
-          .then((rc) => {
-            solvers.push(
-              new ethers.Contract(
-                ethers.utils.defaultAbiCoder.decode(
-                  ["address"],
-                  rc.events[0].data
-                )[0],
-                SOLVER_ABI,
-                ethers.provider
-              )
-            );
-          });
-        promises.push(p);
-      }
-    });
-
-    await Promise.all(promises);
+    let solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
 
     //Fund and execute Solver chain
     await this.ToyToken.connect(this.buyer).transfer(solvers[0].address, 100);
     await solvers[0].connect(this.keeper).prepareSolve(0);
     await solvers[0].connect(this.keeper).executeSolve(0);
 
-    const solverERC20Balance = await this.ToyToken.balanceOf(
-      solvers[0].address
-    );
-    const CTERC20Balance = await this.ToyToken.balanceOf(this.CT.address);
-    // Collateral has been sent to CT contract
-    expect(solverERC20Balance).to.equal(0);
-    expect(CTERC20Balance).to.equal(100);
-
-    // Seller should have all the success tokens
     const indexSetSuccess = getIndexSetFromBinaryArray([1, 0]); // If success
     const indexSetFailure = getIndexSetFromBinaryArray([0, 1]); // If failure
+    const indexSets = [indexSetSuccess, indexSetFailure];
 
-    const conditions0 = await solvers[0].getConditions();
-    const conditionId0 = conditions0[conditions0.length - 1].conditionId;
-
-    const collectionId0Success = await this.CT.getCollectionId(
-      ethers.constants.HashZero,
-      conditionId0,
-      indexSetSuccess
-    );
-    const positionId0Success = await this.CT.getPositionId(
-      this.ToyToken.address,
-      collectionId0Success
-    );
-
-    const conditions1 = await solvers[1].getConditions();
-    const conditionId1 = conditions1[conditions1.length - 1].conditionId;
-
-    const collectionId1Success = await this.CT.getCollectionId(
-      collectionId0Success,
-      conditionId1,
-      indexSetSuccess
-    );
-    const positionIdSuccess = await this.CT.getPositionId(
-      this.ToyToken.address,
-      collectionId1Success
-    );
-
-    const buyerSuccessBalance = await this.CT.balanceOf(
-      this.buyer.address,
-      positionIdSuccess
-    );
-    const sellerSuccessBalance = await this.CT.balanceOf(
-      this.seller.address,
-      positionIdSuccess
-    );
-    expect(buyerSuccessBalance).to.equal(0);
-    expect(sellerSuccessBalance).to.equal(100);
+    expect(
+      await testHelpers.getCTBalances(
+        this.CT,
+        this.buyer.address,
+        solvers[1],
+        indexSets
+      )
+    ).to.eql([0, 100]);
+    expect(
+      await testHelpers.getCTBalances(
+        this.CT,
+        this.seller.address,
+        solvers[1],
+        indexSets
+      )
+    ).to.eql([100, 0]);
 
     // Keeper proposes payouts
     await solvers[0].connect(this.keeper).proposePayouts(0, [1, 0]);
-    const conditions0Proposed = await solvers[0].getConditions();
-    const payouts0 =
-      conditions0Proposed[conditions0Proposed.length - 1].payouts;
-    expect(payouts0[0]).to.equal(1);
-    expect(payouts0[1]).to.equal(0);
-
     await solvers[1].connect(this.keeper).proposePayouts(0, [1, 0]);
-    const conditions1Proposed = await solvers[0].getConditions();
-    const payouts1 =
-      conditions1Proposed[conditions1Proposed.length - 1].payouts;
-    expect(payouts1[0]).to.equal(1);
-    expect(payouts1[1]).to.equal(0);
-
-    // We set timelock to 0, so confirm right away
     await solvers[0].connect(this.keeper).confirmPayouts(0);
     await solvers[1].connect(this.keeper).confirmPayouts(0);
 
-    await this.CT.connect(this.seller).redeemPositions(
-      this.ToyToken.address,
-      collectionId0Success,
-      conditionId1,
-      [indexSetSuccess, indexSetFailure]
+    await testHelpers.redeemPositions(
+      this.CT,
+      this.seller,
+      solvers[1],
+      indexSets
     );
-    const sellerCT0SuccessBalance = await this.CT.balanceOf(
-      this.seller.address,
-      positionId0Success
-    );
-    expect(sellerCT0SuccessBalance).to.equal(100);
 
-    // Seller redeems tokens
-    await this.CT.connect(this.seller).redeemPositions(
-      this.ToyToken.address,
-      collectionId0Success,
-      conditionId1,
-      [indexSetSuccess, indexSetFailure]
+    expect(
+      await testHelpers.getCTBalances(
+        this.CT,
+        this.seller.address,
+        solvers[0],
+        indexSets
+      )
+    ).to.eql([100, 0]);
+
+    await testHelpers.redeemPositions(
+      this.CT,
+      this.seller,
+      solvers[0],
+      indexSets
     );
-    await this.CT.connect(this.seller).redeemPositions(
-      this.ToyToken.address,
-      ethers.constants.HashZero,
-      conditionId0,
-      [indexSetSuccess, indexSetFailure]
-    );
-    const sellerERC20Balance = await this.ToyToken.balanceOf(
-      this.seller.address
-    );
-    expect(sellerERC20Balance).to.equal(100);
+
+    expect(await this.ToyToken.balanceOf(this.seller.address)).to.equal(100);
   });
 });

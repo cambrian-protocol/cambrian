@@ -43,7 +43,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
-    "parentPositionId()": FunctionFragment;
     "prepareSolve(uint256)": FunctionFragment;
     "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
@@ -192,10 +191,6 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "parentPositionId",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "prepareSolve",
     values: [BigNumberish]
   ): string;
@@ -290,10 +285,6 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "parentPositionId",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "prepareSolve",
     data: BytesLike
   ): Result;
@@ -322,9 +313,11 @@ interface SolverInterface extends ethers.utils.Interface {
 
   events: {
     "DeployedChild(address)": EventFragment;
+    "PreparedSolve(address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "DeployedChild"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PreparedSolve"): EventFragment;
 }
 
 export class Solver extends BaseContract {
@@ -596,8 +589,6 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    parentPositionId(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     prepareSolve(
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -857,8 +848,6 @@ export class Solver extends BaseContract {
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
 
   prepareSolve(
     _index: BigNumberish,
@@ -1120,8 +1109,6 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
-
     prepareSolve(
       _index: BigNumberish,
       overrides?: CallOverrides
@@ -1166,6 +1153,14 @@ export class Solver extends BaseContract {
     DeployedChild(
       chainChild?: null
     ): TypedEventFilter<[string], { chainChild: string }>;
+
+    PreparedSolve(
+      solver?: null,
+      solveIndex?: null
+    ): TypedEventFilter<
+      [string, BigNumber],
+      { solver: string; solveIndex: BigNumber }
+    >;
   };
 
   estimateGas: {
@@ -1318,8 +1313,6 @@ export class Solver extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    parentPositionId(overrides?: CallOverrides): Promise<BigNumber>;
 
     prepareSolve(
       _index: BigNumberish,
@@ -1511,8 +1504,6 @@ export class Solver extends BaseContract {
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    parentPositionId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     prepareSolve(
       _index: BigNumberish,

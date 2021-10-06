@@ -13,19 +13,24 @@ contract SolverFactory {
     event SolverCreated(address newSolverAddress);
 
     function createSolver(
-        address _chainParent,
-        uint256 _chainIndex,
-        SolverLib.Config calldata _solverConfig
+        address chainParent,
+        uint256 chainIndex,
+        SolverLib.Config calldata solverConfig
     ) external returns (address) {
         require(
-            address(_solverConfig.implementation) != address(0),
+            address(solverConfig.implementation) != address(0),
             "SolverFactory::Invalid implementation address"
+        );
+        require(
+            (chainParent == address(0) && chainIndex == 0) ||
+                (chainParent != address(0) && chainIndex > 0),
+            "Invalid chain parent/index"
         );
 
         Solver clone = Solver(
-            Clones.clone(address(_solverConfig.implementation))
+            Clones.clone(address(solverConfig.implementation))
         );
-        Solver(clone).init(_chainParent, _chainIndex, _solverConfig);
+        Solver(clone).init(chainParent, chainIndex, solverConfig);
         solvers.push(clone);
 
         emit SolverCreated(address(clone));

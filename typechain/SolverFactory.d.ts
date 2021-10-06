@@ -119,9 +119,9 @@ export class SolverFactory extends BaseContract {
 
   functions: {
     createSolver(
-      _chainParent: string,
-      _chainIndex: BigNumberish,
-      _solverConfig: {
+      chainParent: string,
+      chainIndex: BigNumberish,
+      solverConfig: {
         implementation: string;
         keeper: string;
         arbitrator: string;
@@ -152,9 +152,9 @@ export class SolverFactory extends BaseContract {
   };
 
   createSolver(
-    _chainParent: string,
-    _chainIndex: BigNumberish,
-    _solverConfig: {
+    chainParent: string,
+    chainIndex: BigNumberish,
+    solverConfig: {
       implementation: string;
       keeper: string;
       arbitrator: string;
@@ -185,9 +185,9 @@ export class SolverFactory extends BaseContract {
 
   callStatic: {
     createSolver(
-      _chainParent: string,
-      _chainIndex: BigNumberish,
-      _solverConfig: {
+      chainParent: string,
+      chainIndex: BigNumberish,
+      solverConfig: {
         implementation: string;
         keeper: string;
         arbitrator: string;
@@ -225,9 +225,9 @@ export class SolverFactory extends BaseContract {
 
   estimateGas: {
     createSolver(
-      _chainParent: string,
-      _chainIndex: BigNumberish,
-      _solverConfig: {
+      chainParent: string,
+      chainIndex: BigNumberish,
+      solverConfig: {
         implementation: string;
         keeper: string;
         arbitrator: string;
@@ -259,9 +259,9 @@ export class SolverFactory extends BaseContract {
 
   populateTransaction: {
     createSolver(
-      _chainParent: string,
-      _chainIndex: BigNumberish,
-      _solverConfig: {
+      chainParent: string,
+      chainIndex: BigNumberish,
+      solverConfig: {
         implementation: string;
         keeper: string;
         arbitrator: string;

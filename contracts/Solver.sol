@@ -15,19 +15,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Condition[] public conditions; // Array of conditions
 
     string UI_URI;
-    bool hasCondition;
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
     uint256 public timelock; // Current timelock
-    uint256 public parentPositionId;
-
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
 
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
 
     event DeployedChild(address chainChild);
+    event PreparedSolve(address solver, uint256 solveIndex);
 
     function init(
         address _chainParent,
@@ -49,22 +47,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     function prepareSolve(uint256 _index) external {
-        if (hasCondition) {
-            require(
-                msg.sender == config.keeper || msg.sender == chainParent,
-                "Only keeper/parent"
-            );
-        } else {
-            hasCondition = true;
-        }
-        addCondition();
-        executeIngests();
-        if (chainChild != address(0)) {
-            Solver(chainChild).prepareSolve(_index);
-        }
-    }
+        require(
+            msg.sender == config.keeper || msg.sender == chainParent,
+            "Only keeper/parent"
+        );
+        require(_index == conditions.length, "Invalid index to prepare");
 
-    function addCondition() private {
         conditions.push(
             SolverLib.createCondition(
                 config.conditionBase,
@@ -73,12 +61,21 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 conditions.length
             )
         );
+
+        executeIngests();
+
+        emit PreparedSolve(address(this), _index);
+
+        if (chainChild != address(0)) {
+            Solver(chainChild).prepareSolve(_index);
+        }
     }
 
     function deployChild(SolverLib.Config calldata _config)
         public
         returns (Solver _solver)
     {
+        require(msg.sender == config.keeper, "Only keeper");
         require(chainChild == address(0), "Solver has child");
 
         (chainChild, _solver) = SolverLib.deployChild(
