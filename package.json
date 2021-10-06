@@ -11,6 +11,7 @@
     "@typechain/hardhat": "2.0.1",
     "@types/mocha": "8.2.2",
     "@types/node": "15.3.0",
+    "bs58": "^4.0.1",
     "chai": "4.3.4",
     "chai-as-promised": "^7.1.1",
     "ethereum-waffle": "3.3.0",

@@ -11,10 +11,10 @@ import "./SolverLib.sol";
 import "hardhat/console.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
+    SolverLib.Multihash public uiURI; // Resource for Solver Front End
+
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
-
-    string UI_URI;
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
@@ -271,6 +271,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
     // ****************************** REPORTING ***************************************** //
     // ********************************************************************************** //
+
+    function proposePayouts(uint256 _index) public virtual;
 
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external

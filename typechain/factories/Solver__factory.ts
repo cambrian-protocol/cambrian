@@ -278,9 +278,26 @@ const _abi = [
             type: "uint256[][]",
           },
           {
-            internalType: "string",
-            name: "conditionURI",
-            type: "string",
+            components: [
+              {
+                internalType: "bytes32",
+                name: "digest",
+                type: "bytes32",
+              },
+              {
+                internalType: "uint8",
+                name: "hashFunction",
+                type: "uint8",
+              },
+              {
+                internalType: "uint8",
+                name: "size",
+                type: "uint8",
+              },
+            ],
+            internalType: "struct SolverLib.Multihash[]",
+            name: "outcomeURIs",
+            type: "tuple[]",
           },
         ],
         internalType: "struct SolverLib.ConditionBase",
@@ -403,9 +420,26 @@ const _abi = [
                 type: "uint256[][]",
               },
               {
-                internalType: "string",
-                name: "conditionURI",
-                type: "string",
+                components: [
+                  {
+                    internalType: "bytes32",
+                    name: "digest",
+                    type: "bytes32",
+                  },
+                  {
+                    internalType: "uint8",
+                    name: "hashFunction",
+                    type: "uint8",
+                  },
+                  {
+                    internalType: "uint8",
+                    name: "size",
+                    type: "uint8",
+                  },
+                ],
+                internalType: "struct SolverLib.Multihash[]",
+                name: "outcomeURIs",
+                type: "tuple[]",
               },
             ],
             internalType: "struct SolverLib.ConditionBase",
@@ -679,9 +713,26 @@ const _abi = [
                 type: "uint256[][]",
               },
               {
-                internalType: "string",
-                name: "conditionURI",
-                type: "string",
+                components: [
+                  {
+                    internalType: "bytes32",
+                    name: "digest",
+                    type: "bytes32",
+                  },
+                  {
+                    internalType: "uint8",
+                    name: "hashFunction",
+                    type: "uint8",
+                  },
+                  {
+                    internalType: "uint8",
+                    name: "size",
+                    type: "uint8",
+                  },
+                ],
+                internalType: "struct SolverLib.Multihash[]",
+                name: "outcomeURIs",
+                type: "tuple[]",
               },
             ],
             internalType: "struct SolverLib.ConditionBase",
@@ -826,6 +877,19 @@ const _abi = [
         name: "_index",
         type: "uint256",
       },
+    ],
+    name: "proposePayouts",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
       {
         internalType: "uint256[]",
         name: "_payouts",
@@ -936,6 +1000,29 @@ const _abi = [
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "uiURI",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "digest",
+        type: "bytes32",
+      },
+      {
+        internalType: "uint8",
+        name: "hashFunction",
+        type: "uint8",
+      },
+      {
+        internalType: "uint8",
+        name: "size",
+        type: "uint8",
       },
     ],
     stateMutability: "view",

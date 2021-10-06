@@ -748,8 +748,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\Solver.sol": {
-      "lastModificationDate": 1633560886230,
-      "contentHash": "dd99d81a57bfff79802ebefa185a0e50",
+      "lastModificationDate": 1633562081018,
+      "contentHash": "93ff842de747fbe4950fa3cca96be7f7",
       "sourceName": "contracts/Solver.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1248,8 +1248,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\SolverLib.sol": {
-      "lastModificationDate": 1633560136935,
-      "contentHash": "f855bcf8a07a13c086a1894cb5a253b4",
+      "lastModificationDate": 1633563371807,
+      "contentHash": "ef28c1ecdd2c235408ee35cd919ef6f1",
       "sourceName": "contracts/SolverLib.sol",
       "solcConfig": {
         "version": "0.8.0",
@@ -1340,8 +1340,8 @@
       ]
     },
     "E:\\cryptodev\\cambrian\\contracts\\BasicSolverV1.sol": {
-      "lastModificationDate": 1633313532109,
-      "contentHash": "04f00065a77fb2acd4577111c5bad88b",
+      "lastModificationDate": 1633562058644,
+      "contentHash": "8291e2a0561392b4abb39ee5eea0890a",
       "sourceName": "contracts/BasicSolverV1.sol",
       "solcConfig": {
         "version": "0.8.0",

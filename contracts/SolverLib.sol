@@ -8,15 +8,6 @@ import "./interfaces/IConditionalTokens.sol";
 import "./SolverFactory.sol";
 
 library SolverLib {
-    // Expected sources of data being ingested into the Solver
-    struct Ingest {
-        uint256 executions; // Number of times this Ingest has been executed
-        IngestType ingestType;
-        uint256 slot; // Destination slot for data
-        uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
-        bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
-    }
-
     // Ingest Types
     enum IngestType {
         Callback,
@@ -33,6 +24,21 @@ library SolverLib {
         ArbitrationPending, // An official dispute has been raised and requires arbitration
         ArbitrationDelivered, // Arbitration (except 'null' arbitration) has been delivered for this condition
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
+    }
+
+    struct Multihash {
+        bytes32 digest;
+        uint8 hashFunction;
+        uint8 size;
+    }
+
+    // Expected sources of data being ingested into the Solver
+    struct Ingest {
+        uint256 executions; // Number of times this Ingest has been executed
+        IngestType ingestType;
+        uint256 slot; // Destination slot for data
+        uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
+        bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
     }
 
     // Condition object created by addCondition() from ConditionBase
@@ -54,7 +60,7 @@ library SolverLib {
         uint256[] partition; // Partition of positions for payouts
         uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
         uint256[][] recipientAmountSlots; // Arrays containing amount of CTs to send to each recipient for each partition
-        string conditionURI; // Resource containing human-friendly descriptions of the conditions for this Solver
+        Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
     }
 
     // Configuration of this Solver
@@ -87,7 +93,7 @@ library SolverLib {
         uint256 conditionVer
     ) public returns (Condition memory condition) {
         condition.questionId = keccak256(
-            abi.encodePacked(base.conditionURI, oracle, conditionVer)
+            abi.encode(base.outcomeURIs, oracle, conditionVer)
         );
 
         if (chainParent == address(0)) {

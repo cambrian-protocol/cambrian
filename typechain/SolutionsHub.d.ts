@@ -59,7 +59,11 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[]
     ]
@@ -97,7 +101,11 @@ interface SolutionsHubInterface extends ethers.utils.Interface {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[]
     ]
@@ -209,7 +217,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -250,7 +262,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -289,7 +305,11 @@ export class SolutionsHub extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        conditionURI: string;
+        outcomeURIs: {
+          digest: BytesLike;
+          hashFunction: BigNumberish;
+          size: BigNumberish;
+        }[];
       };
     }[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -330,7 +350,11 @@ export class SolutionsHub extends BaseContract {
         partition: BigNumberish[];
         recipientAddressSlots: BigNumberish[];
         recipientAmountSlots: BigNumberish[][];
-        conditionURI: string;
+        outcomeURIs: {
+          digest: BytesLike;
+          hashFunction: BigNumberish;
+          size: BigNumberish;
+        }[];
       };
     }[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -369,7 +393,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: CallOverrides
@@ -410,7 +438,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: CallOverrides
@@ -454,7 +486,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -495,7 +531,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -535,7 +575,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -576,7 +620,11 @@ export class SolutionsHub extends BaseContract {
           partition: BigNumberish[];
           recipientAddressSlots: BigNumberish[];
           recipientAmountSlots: BigNumberish[][];
-          conditionURI: string;
+          outcomeURIs: {
+            digest: BytesLike;
+            hashFunction: BigNumberish;
+            size: BigNumberish;
+          }[];
         };
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
