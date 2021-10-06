@@ -195,24 +195,8 @@ describe("It should all work", async function () {
     const indexSetFailure = getIndexSetFromBinaryArray([0, 1]); // If failure
     const indexSets = [indexSetSuccess, indexSetFailure];
 
-    // Non-solver should not be able to call callback functions
-    await expectRevert(
-      solvers[0].connect(this.keeper).registerCallback(0, 0),
-      "msg.sender not solver"
-    );
-    await expectRevert(
-      solvers[0].connect(this.keeper).handleCallback(0),
-      "msg.sender not solver"
-    );
-
     // Add deferred data to solvers[0] and fetch it from solvers[1]
     await solvers[0].connect(this.keeper).addData(0, ethers.constants.HashZero);
-
-    // Shouldn't be able to add data again
-    await expectRevert(
-      solvers[0].connect(this.keeper).addData(0, ethers.constants.HashZero),
-      "Slot version invalid"
-    );
 
     await solvers[1].connect(this.keeper).executeSolve(0);
 

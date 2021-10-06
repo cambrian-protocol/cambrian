@@ -136,4 +136,90 @@ describe("Solver.sol | prepareSolve", function () {
       "Invalid index to prepare"
     );
   });
+
+  it("Can't prepare solve before fulfilling outgoing callbacks", async function () {
+    const solverConfigs = [
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [],
+        conditionBase: this.conditionBase,
+      },
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 0,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+    ];
+
+    const solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
+
+    await solvers[0].connect(this.keeper).prepareSolve(0);
+    return expectRevert(
+      solvers[0].connect(this.keeper).prepareSolve(1),
+      "Fulfill outgoing callbacks first"
+    );
+  });
+
+  it("Can't prepare solve before fulfilling incoming callbacks", async function () {
+    const solverConfigs = [
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [],
+        conditionBase: this.conditionBase,
+      },
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 0,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+    ];
+
+    const solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
+
+    await solvers[0].connect(this.keeper).prepareSolve(0);
+    return expectRevert(
+      solvers[1].connect(this.keeper).prepareSolve(1),
+      "Fulfill incoming callbacks first"
+    );
+  });
 });

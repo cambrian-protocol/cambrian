@@ -533,7 +533,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "getRequestedCallbacks",
+    name: "getOutgoingCallbacks",
     outputs: [
       {
         internalType: "address[]",
@@ -878,7 +878,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "registerCallback",
+    name: "registerOutgoingCallback",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

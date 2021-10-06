@@ -46,7 +46,7 @@ describe("Solver.sol | executeIngests", function () {
     };
   });
 
-  it("Reverts when non-Solver calls registerCallback", async function () {
+  it("Reverts when non-Solver calls registerOutgoingCallback", async function () {
     const solverConfigs = [
       {
         implementation: this.Solver.address,
@@ -66,7 +66,7 @@ describe("Solver.sol | executeIngests", function () {
     );
 
     return expectRevert(
-      solvers[0].connect(this.keeper).registerCallback(0, 0),
+      solvers[0].connect(this.keeper).registerOutgoingCallback(0, 0),
       "msg.sender not solver"
     );
   });

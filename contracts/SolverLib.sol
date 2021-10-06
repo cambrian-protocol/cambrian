@@ -74,8 +74,10 @@ library SolverLib {
     }
 
     struct Callbacks {
-        mapping(uint256 => address[]) requested; // This Slot => Solver expecting callback
-        mapping(bytes32 => uint256) expected; // keccack256(Address, CallerSlot) => ingest index
+        uint256 numIncoming;
+        uint256 numOutgoing;
+        mapping(uint256 => address[]) outgoing; // This Slot => Solver expecting callback
+        mapping(bytes32 => uint256) incoming; // keccack256(Address, CallerSlot) => ingest index
     }
 
     function createCondition(

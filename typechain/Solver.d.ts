@@ -38,7 +38,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "getCallbackOutput(uint256)": FunctionFragment;
     "getConditions()": FunctionFragment;
     "getData(uint256)": FunctionFragment;
-    "getRequestedCallbacks(uint256)": FunctionFragment;
+    "getOutgoingCallbacks(uint256)": FunctionFragment;
     "handleCallback(uint256)": FunctionFragment;
     "ingestsValid()": FunctionFragment;
     "init(address,uint256,tuple)": FunctionFragment;
@@ -48,7 +48,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "prepareSolve(uint256)": FunctionFragment;
     "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
-    "registerCallback(uint256,uint256)": FunctionFragment;
+    "registerOutgoingCallback(uint256,uint256)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "timelock()": FunctionFragment;
@@ -146,7 +146,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getRequestedCallbacks",
+    functionFragment: "getOutgoingCallbacks",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -213,7 +213,7 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [string, BytesLike, BytesLike, BigNumberish[]]
   ): string;
   encodeFunctionData(
-    functionFragment: "registerCallback",
+    functionFragment: "registerOutgoingCallback",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -278,7 +278,7 @@ interface SolverInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "getData", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getRequestedCallbacks",
+    functionFragment: "getOutgoingCallbacks",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -312,7 +312,7 @@ interface SolverInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "registerCallback",
+    functionFragment: "registerOutgoingCallback",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -549,7 +549,7 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string] & { data: string }>;
 
-    getRequestedCallbacks(
+    getOutgoingCallbacks(
       slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string[]]>;
@@ -635,7 +635,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    registerCallback(
+    registerOutgoingCallback(
       _slot: BigNumberish,
       _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -821,7 +821,7 @@ export class Solver extends BaseContract {
 
   getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  getRequestedCallbacks(
+  getOutgoingCallbacks(
     slot: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string[]>;
@@ -907,7 +907,7 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  registerCallback(
+  registerOutgoingCallback(
     _slot: BigNumberish,
     _chainIndex: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1093,7 +1093,7 @@ export class Solver extends BaseContract {
 
     getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    getRequestedCallbacks(
+    getOutgoingCallbacks(
       slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string[]>;
@@ -1179,7 +1179,7 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    registerCallback(
+    registerOutgoingCallback(
       _slot: BigNumberish,
       _chainIndex: BigNumberish,
       overrides?: CallOverrides
@@ -1307,7 +1307,7 @@ export class Solver extends BaseContract {
 
     getData(_slot: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    getRequestedCallbacks(
+    getOutgoingCallbacks(
       slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -1393,7 +1393,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    registerCallback(
+    registerOutgoingCallback(
       _slot: BigNumberish,
       _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1510,7 +1510,7 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getRequestedCallbacks(
+    getOutgoingCallbacks(
       slot: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1596,7 +1596,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    registerCallback(
+    registerOutgoingCallback(
       _slot: BigNumberish,
       _chainIndex: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

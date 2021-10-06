@@ -237,9 +237,9 @@ describe("Solver.sol | executeIngests", function () {
     );
 
     await solvers[0].connect(this.keeper).prepareSolve(0); // calls executeIngests
-    expect(
-      await solvers[0].connect(this.user1).getRequestedCallbacks(0)
-    ).to.eql([solvers[1].address]);
+    expect(await solvers[0].connect(this.user1).getOutgoingCallbacks(0)).to.eql(
+      [solvers[1].address]
+    );
   });
 
   it("Ingests callback ingests", async function () {

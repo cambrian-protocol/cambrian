@@ -96,7 +96,7 @@ describe("Solver | deployChild", function () {
     );
 
     await solver.connect(this.keeper).deployChild(this.solverConfigs[0]);
-    expectRevert(
+    return expectRevert(
       solver.connect(this.keeper).deployChild(this.solverConfigs[0]),
       "Solver has child"
     );
@@ -120,7 +120,7 @@ describe("Solver | deployChild", function () {
       ethers.provider
     );
 
-    expectRevert(
+    return expectRevert(
       solver.connect(this.arbitrator).deployChild(this.solverConfigs[0]),
       "Only keeper"
     );
