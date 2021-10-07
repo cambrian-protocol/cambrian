@@ -8,6 +8,7 @@ const {
   getIndexSetFromBinaryArray,
 } = require("../../helpers/ConditionalTokens.js");
 const testHelpers = require("../../helpers/testHelpers.js");
+const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
 describe("It should all work", function () {
   this.beforeEach(async function () {
@@ -88,7 +89,14 @@ describe("It should all work", function () {
         [3, 4],
         [4, 3],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     // Second Solver
@@ -144,7 +152,14 @@ describe("It should all work", function () {
         [3, 4],
         [4, 3],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     const solverConfigs = [

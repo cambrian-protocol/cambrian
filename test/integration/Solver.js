@@ -1,6 +1,8 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const testHelpers = require("../../helpers/testHelpers.js");
+const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
+
 const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
 describe("It should all work", function () {
@@ -90,7 +92,14 @@ describe("It should all work", function () {
         [3, 4],
         [4, 3],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     const solverConfigs = [
@@ -232,7 +241,14 @@ describe("It should all work", function () {
         [7, 4, 4],
         [6, 4, 5],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     const solverConfigs = [
@@ -383,7 +399,14 @@ describe("It should all work", function () {
         [7, 4],
         [6, 5],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     const solverConfigs = [
@@ -532,7 +555,14 @@ describe("It should all work", function () {
         [4, 6, 5],
         [7, 4, 4],
       ],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     const solverConfigs = [

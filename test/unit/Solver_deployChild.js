@@ -5,8 +5,6 @@ const SOLVER_ABI =
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
-const testHelpers = require("../../helpers/testHelpers.js");
-const ctHelpers = require("../../helpers/ConditionalTokens.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
 describe("Solver | deployChild", function () {
@@ -23,10 +21,6 @@ describe("Solver | deployChild", function () {
       "ToyToken",
       "BasicSolverV1",
     ]);
-
-    console.log(
-      getBytes32FromMultihash("QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ")
-    );
 
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");

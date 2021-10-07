@@ -272,8 +272,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ****************************** REPORTING ***************************************** //
     // ********************************************************************************** //
 
-    function proposePayouts(uint256 _index) public virtual;
-
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external
     {

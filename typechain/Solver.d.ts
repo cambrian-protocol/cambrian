@@ -46,7 +46,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "percentage(uint256,uint256,uint128)": FunctionFragment;
     "prepareSolve(uint256)": FunctionFragment;
-    "proposePayouts(uint256)": FunctionFragment;
+    "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
     "registerOutgoingCallback(uint256,uint256)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
@@ -215,7 +215,7 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "proposePayouts",
-    values: [BigNumberish]
+    values: [BigNumberish, BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "redeemPosition",
@@ -656,12 +656,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "proposePayouts(uint256)"(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    "proposePayouts(uint256,uint256[])"(
+    proposePayouts(
       _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -967,12 +962,7 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "proposePayouts(uint256)"(
-    _index: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  "proposePayouts(uint256,uint256[])"(
+  proposePayouts(
     _index: BigNumberish,
     _payouts: BigNumberish[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1278,12 +1268,7 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    "proposePayouts(uint256)"(
-      _index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    "proposePayouts(uint256,uint256[])"(
+    proposePayouts(
       _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: CallOverrides
@@ -1515,12 +1500,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "proposePayouts(uint256)"(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    "proposePayouts(uint256,uint256[])"(
+    proposePayouts(
       _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1733,12 +1713,7 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "proposePayouts(uint256)"(
-      _index: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    "proposePayouts(uint256,uint256[])"(
+    proposePayouts(
       _index: BigNumberish,
       _payouts: BigNumberish[],
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -8,8 +8,4 @@ contract BasicSolverV1 is Solver {
     function postroll(uint256 _index) internal override {
         //
     }
-
-    function proposePayouts(uint256 _index) public pure override {
-        //
-    }
 }

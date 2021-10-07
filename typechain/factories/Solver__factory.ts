@@ -877,19 +877,6 @@ const _abi = [
         name: "_index",
         type: "uint256",
       },
-    ],
-    name: "proposePayouts",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_index",
-        type: "uint256",
-      },
       {
         internalType: "uint256[]",
         name: "_payouts",

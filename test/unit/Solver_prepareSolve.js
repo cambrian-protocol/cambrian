@@ -6,6 +6,8 @@ const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
 const testHelpers = require("../../helpers/testHelpers.js");
+const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
+
 const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
 describe("Solver.sol | prepareSolve", function () {
@@ -38,7 +40,14 @@ describe("Solver.sol | prepareSolve", function () {
       partition: [0, 0],
       recipientAddressSlots: [0],
       recipientAmountSlots: [[0, 0]],
-      conditionURI: "",
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
     };
 
     this.solverConfigs = [
