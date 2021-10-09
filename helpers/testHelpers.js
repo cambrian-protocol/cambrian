@@ -2,6 +2,7 @@ const { ethers } = require("hardhat");
 const CT_ABI =
   require("../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
 const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
+const { getBytes32FromMultihash } = require("./multihash.js");
 
 const getSimpleSolverConfig = (
   collateralAddress,
@@ -13,6 +14,16 @@ const getSimpleSolverConfig = (
   sellerAddress
 ) => {
   const ingests = [
+    {
+      executions: 0,
+      ingestType: 1,
+      slot: 0,
+      solverIndex: 0,
+      data: ethers.utils.defaultAbiCoder.encode(
+        ["bytes32"],
+        [ethers.utils.formatBytes32String("")]
+      ),
+    },
     {
       executions: 0,
       ingestType: 1,
@@ -30,18 +41,6 @@ const getSimpleSolverConfig = (
     {
       executions: 0,
       ingestType: 1,
-
-      slot: 0,
-      solverIndex: 0,
-      data: ethers.utils.defaultAbiCoder.encode(
-        ["bytes32"],
-        [ethers.utils.formatBytes32String("")]
-      ),
-    },
-    {
-      executions: 0,
-      ingestType: 1,
-
       slot: 3,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
@@ -49,7 +48,6 @@ const getSimpleSolverConfig = (
     {
       executions: 0,
       ingestType: 1,
-
       slot: 4,
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [amount]),

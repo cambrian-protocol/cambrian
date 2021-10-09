@@ -44,15 +44,11 @@ describe("It should all work", async function () {
   });
 
   it("Should execute two-solver Proposal with deferred proposal", async function () {
-    //Create solution
-    const solutionId = ethers.utils.formatBytes32String("TestID");
-
-    /////////INGESTS & ACTIONS & CONFIG ///////////////
     const ingests0 = [
       {
         executions: 0,
         ingestType: 1,
-        slot: 1,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -62,22 +58,21 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 2,
-
-        slot: 2,
+        slot: 1,
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 3,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 4,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -87,12 +82,12 @@ describe("It should all work", async function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 4,
+      amountSlot: 3,
       partition: [1, 2],
-      recipientAddressSlots: [1, 2],
+      recipientAddressSlots: [0, 1],
       recipientAmountSlots: [
-        [3, 4],
-        [4, 3],
+        [2, 3],
+        [3, 2],
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
@@ -109,7 +104,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 1,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -119,7 +114,7 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 2,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -129,14 +124,14 @@ describe("It should all work", async function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 3,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 4,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -145,9 +140,9 @@ describe("It should all work", async function () {
         executions: 0,
         ingestType: 0,
         dataType: 2,
-        slot: 0,
+        slot: 4,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]), // SLOT we are requesting output from for callback
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [4]), // SLOT we are requesting output from for callback
       },
     ];
 
@@ -155,12 +150,12 @@ describe("It should all work", async function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 1,
-      amountSlot: 4,
+      amountSlot: 3,
       partition: [1, 2],
-      recipientAddressSlots: [1, 2],
+      recipientAddressSlots: [0, 1],
       recipientAmountSlots: [
-        [3, 4],
-        [4, 3],
+        [2, 3],
+        [3, 2],
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
@@ -211,7 +206,9 @@ describe("It should all work", async function () {
     const indexSets = [indexSetSuccess, indexSetFailure];
 
     // Add deferred data to solvers[0] and fetch it from solvers[1]
-    await solvers[0].connect(this.keeper).addData(0, ethers.constants.HashZero);
+    await solvers[0]
+      .connect(this.keeper)
+      .addData(4, ethers.utils.defaultAbiCoder.encode(["uint256"], [42]));
 
     await solvers[1].connect(this.keeper).executeSolve(0);
 

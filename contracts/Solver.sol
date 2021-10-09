@@ -47,10 +47,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     function prepareSolve(uint256 _index) external {
-        require(
-            msg.sender == config.keeper || msg.sender == chainParent,
-            "Only keeper/parent"
-        );
+        if (conditions.length > 0) {
+            require(
+                msg.sender == config.keeper || msg.sender == chainParent,
+                "Only keeper/parent"
+            );
+        }
+
         require(_index == conditions.length, "Invalid index to prepare");
         require(callbacks.numOutgoing == 0, "Fulfill outgoing callbacks first");
         require(callbacks.numIncoming == 0, "Fulfill incoming callbacks first");
@@ -59,7 +62,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             SolverLib.createCondition(
                 config.conditionBase,
                 chainParent,
-                address(this),
                 conditions.length
             )
         );
@@ -170,6 +172,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     function addData(uint256 _slot, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
+        require(_slot >= (config.ingests.length), "Slot reserved by ingest");
         router(_slot, _data);
     }
 
@@ -201,8 +204,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             msg.sender == addressFromChainIndex(_chainIndex),
             "msg.sender not solver"
         );
-        callbacks.outgoing[_slot].push(msg.sender);
-        callbacks.numOutgoing++;
+
+        if (
+            datas.slotVersions[_slot] > 0 &&
+            datas.slotVersions[_slot] == conditions.length
+        ) {
+            // Downchain Solver is preparing a new condition before us and is happy with the existing data
+            Solver(msg.sender).handleCallback(_slot);
+        } else {
+            callbacks.outgoing[_slot].push(msg.sender);
+            callbacks.numOutgoing++;
+        }
     }
 
     function handleCallback(uint256 _slot) external {

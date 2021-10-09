@@ -37,6 +37,16 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
+        slot: 0,
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(
+          ["bytes32"],
+          [ethers.utils.formatBytes32String("")]
+        ),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
         slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
@@ -53,16 +63,6 @@ describe("It should all work", function () {
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
           [this.seller.address]
-        ),
-      },
-      {
-        executions: 0,
-        ingestType: 1,
-        slot: 0,
-        solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(
-          ["bytes32"],
-          [ethers.utils.formatBytes32String("")]
         ),
       },
       {
@@ -165,8 +165,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 1,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -176,8 +175,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 2,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -187,8 +185,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 3,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -198,32 +195,28 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 4,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 5,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 6,
+        slot: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 7,
+        slot: 6,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -233,13 +226,13 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
       parentCollectionIndexSet: 0,
-      amountSlot: 7,
+      amountSlot: 6,
       partition: [4, 2, 1], // Good, Bad, Cancelled
-      recipientAddressSlots: [1, 2, 3], // Buyer, Seller, Keeper
+      recipientAddressSlots: [0, 1, 2], // Buyer, Seller, Keeper
       recipientAmountSlots: [
-        [4, 6, 5],
-        [7, 4, 4],
-        [6, 4, 5],
+        [3, 5, 4],
+        [6, 3, 3],
+        [5, 3, 4],
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
@@ -334,8 +327,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 1,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -345,8 +337,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 2,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -356,32 +347,28 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 4,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 5,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 6,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 7,
+        slot: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -391,13 +378,13 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 3,
       parentCollectionIndexSet: 0,
-      amountSlot: 7,
+      amountSlot: 5,
       partition: [4, 2, 1], // Good, Bad, Cancelled
-      recipientAddressSlots: [1, 2], // Buyer, Seller
+      recipientAddressSlots: [0, 1], // Buyer, Seller
       recipientAmountSlots: [
-        [4, 7],
-        [7, 4],
-        [6, 5],
+        [2, 5],
+        [5, 2],
+        [4, 3],
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
@@ -480,8 +467,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 1,
+        slot: 0,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -491,8 +477,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 2,
+        slot: 1,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -502,8 +487,7 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 3,
+        slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -513,32 +497,28 @@ describe("It should all work", function () {
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 4,
+        slot: 3,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 5,
+        slot: 4,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 6,
+        slot: 5,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
       },
       {
         executions: 0,
         ingestType: 1,
-
-        slot: 7,
+        slot: 6,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
       },
@@ -548,12 +528,12 @@ describe("It should all work", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 7,
+      amountSlot: 6,
       partition: [1, 2], // Good, Bad
-      recipientAddressSlots: [1, 2, 3], // Buyer, Seller, Keeper
+      recipientAddressSlots: [0, 1, 2], // Buyer, Seller, Keeper
       recipientAmountSlots: [
-        [4, 6, 5],
-        [7, 4, 4],
+        [3, 5, 4],
+        [6, 3, 3],
       ],
       outcomeURIs: [
         getBytes32FromMultihash(

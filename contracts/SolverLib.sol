@@ -89,18 +89,25 @@ library SolverLib {
     function createCondition(
         ConditionBase calldata base,
         address chainParent,
-        address oracle,
-        uint256 conditionVer
+        uint256 conditionIdx
     ) public returns (Condition memory condition) {
         condition.questionId = keccak256(
-            abi.encode(base.outcomeURIs, oracle, conditionVer)
+            abi.encode(base.outcomeURIs, address(this), conditionIdx)
         );
 
         if (chainParent == address(0)) {
             condition.parentCollectionId = bytes32(""); // top level collection
         } else {
+            Condition[] memory _chainParentConditions = Solver(chainParent)
+                .getConditions();
+
+            require(
+                _chainParentConditions.length > 0,
+                "Parent has no conditions"
+            );
+
             condition.parentCollectionId = getCollectionId(
-                Solver(chainParent).getConditions()[conditionVer],
+                _chainParentConditions[_chainParentConditions.length - 1],
                 base.parentCollectionIndexSet
             );
         }
@@ -108,7 +115,7 @@ library SolverLib {
         condition.conditionId = IConditionalTokens(
             0x5FbDB2315678afecb367f032d93F642f64180aa3
         ).getConditionId(
-                oracle, // Solver is Oracle
+                address(this), // Solver is Oracle
                 condition.questionId,
                 base.outcomeSlots
             );
@@ -116,7 +123,11 @@ library SolverLib {
         condition.collateralToken = base.collateralToken;
 
         IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .prepareCondition(oracle, condition.questionId, base.outcomeSlots);
+            .prepareCondition(
+                address(this),
+                condition.questionId,
+                base.outcomeSlots
+            );
     }
 
     function deployChild(

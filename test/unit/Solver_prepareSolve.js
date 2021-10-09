@@ -231,4 +231,100 @@ describe("Solver.sol | prepareSolve", function () {
       "Fulfill incoming callbacks first"
     );
   });
+
+  it("Parent needs at least one condition prepared", async function () {
+    const solverConfigs = [
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [],
+        conditionBase: this.conditionBase,
+      },
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 0,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+    ];
+
+    const solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
+
+    return expectRevert(
+      solvers[1].connect(this.keeper).prepareSolve(0),
+      "Parent has no conditions"
+    );
+  });
+
+  it("Allows downchain solvers to prepare from finalized upstream data", async function () {
+    const solverConfigs = [
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [],
+        conditionBase: this.conditionBase,
+      },
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 0,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+    ];
+
+    const solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
+
+    await solvers[0].connect(this.keeper).prepareSolve(0);
+
+    await solvers[0]
+      .connect(this.keeper)
+      .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42]));
+
+    await solvers[1].connect(this.keeper).prepareSolve(1);
+    expect(await solvers[1].ingestsValid()).to.equal(true);
+
+    await solvers[1].connect(this.keeper).prepareSolve(2);
+    return expect(await solvers[1].ingestsValid()).to.equal(true);
+
+    // return expectRevert(
+    //   solvers[0].connect(this.keeper).prepareSolve(0),
+    //   "Fulfill outgoing callbacks first"
+    // );
+  });
 });
