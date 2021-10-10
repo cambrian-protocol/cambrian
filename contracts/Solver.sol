@@ -18,7 +18,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
-    uint256 public timelock; // Current timelock
+
+    uint256[] public timelocks; // Current timelock, indexed by condition
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
 
     SolverLib.Callbacks callbacks;
@@ -65,6 +66,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 conditions.length
             )
         );
+        timelocks.push(0);
 
         executeIngests();
 
@@ -294,11 +296,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
 
         SolverLib.proposePayouts(conditions[_index], _payouts);
-        updateTimelock();
+        updateTimelock(_index);
     }
 
     function confirmPayouts(uint256 _index) external {
-        require(block.timestamp > timelock, "Timelock still locked");
+        require(block.timestamp > timelocks[_index], "Timelock still locked");
         require(
             conditions[_index].status == SolverLib.Status.OutcomeProposed,
             "Outcome not proposed"
@@ -316,7 +318,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             conditions[_index].status == SolverLib.Status.ArbitrationPending,
             "Not ArbitrationPending"
         );
-        require(block.timestamp > timelock, "Timelock still locked");
+        require(block.timestamp > timelocks[_index], "Timelock still locked");
         SolverLib.arbitrate(conditions[_index], payouts);
     }
 
@@ -327,7 +329,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationPending"
         );
         SolverLib.arbitrateNull(conditions[_index]);
-        updateTimelock();
+        updateTimelock(_index);
     }
 
     function arbitrationRequested(uint256 _index) external {
@@ -338,7 +340,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
 
         SolverLib.arbitrationRequested(conditions[_index]);
-        updateTimelock();
+        updateTimelock(_index);
     }
 
     function arbitrationPending(uint256 _index) external {
@@ -348,7 +350,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationRequested"
         );
         SolverLib.arbitrationPending(conditions[_index]);
-        updateTimelock();
+        updateTimelock(_index);
     }
 
     // ********************************************************************************** //
@@ -382,8 +384,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         trackingId = _trackingId;
     }
 
-    function updateTimelock() internal {
-        timelock = block.timestamp + (config.timelockSeconds * 1 seconds);
+    function updateTimelock(uint256 _index) internal {
+        timelocks[_index] =
+            block.timestamp +
+            (config.timelockSeconds * 1 seconds);
     }
 
     function percentage(

@@ -51,7 +51,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     "registerOutgoingCallback(uint256,uint256)": FunctionFragment;
     "setTrackingId(bytes32)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "timelock()": FunctionFragment;
+    "timelocks(uint256)": FunctionFragment;
     "trackingId()": FunctionFragment;
     "uiURI()": FunctionFragment;
   };
@@ -233,7 +233,10 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "timelock", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "timelocks",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "trackingId",
     values?: undefined
@@ -333,7 +336,7 @@ interface BasicSolverV1Interface extends ethers.utils.Interface {
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "timelock", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "timelocks", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "trackingId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "uiURI", data: BytesLike): Result;
 
@@ -686,7 +689,10 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    timelock(overrides?: CallOverrides): Promise<[BigNumber]>;
+    timelocks(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     trackingId(overrides?: CallOverrides): Promise<[string]>;
 
@@ -992,7 +998,7 @@ export class BasicSolverV1 extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  timelock(overrides?: CallOverrides): Promise<BigNumber>;
+  timelocks(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
   trackingId(overrides?: CallOverrides): Promise<string>;
 
@@ -1298,7 +1304,10 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    timelock(overrides?: CallOverrides): Promise<BigNumber>;
+    timelocks(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     trackingId(overrides?: CallOverrides): Promise<string>;
 
@@ -1530,7 +1539,10 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    timelock(overrides?: CallOverrides): Promise<BigNumber>;
+    timelocks(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     trackingId(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1743,7 +1755,10 @@ export class BasicSolverV1 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    timelock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    timelocks(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     trackingId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

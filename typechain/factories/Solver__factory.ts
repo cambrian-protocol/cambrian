@@ -967,8 +967,14 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "timelock",
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "timelocks",
     outputs: [
       {
         internalType: "uint256",
