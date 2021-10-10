@@ -390,14 +390,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             (config.timelockSeconds * 1 seconds);
     }
 
-    function percentage(
-        uint256 x,
-        uint256 y,
-        uint128 scale
-    ) public pure returns (uint256) {
-        return
-            SolverLib.mulScale(y, 100, scale) /
-            SolverLib.mulScale(x, 100, scale);
+    function collateralBalance() public view returns (uint256 balance) {
+        balance = IERC20(config.conditionBase.collateralToken).balanceOf(
+            address(this)
+        );
     }
 
     // ********************************************************************************** //

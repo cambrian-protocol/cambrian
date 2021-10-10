@@ -117,7 +117,7 @@ describe("Solver.sol | executeIngests", function () {
         ingestType: 2,
         slot: 0,
         solverIndex: 0,
-        data: this.ISolver.encodeFunctionData("percentage", [42, 420, 1]),
+        data: this.ISolver.encodeFunctionData("addressFromChainIndex", [0]),
       },
     ];
 
@@ -160,7 +160,7 @@ describe("Solver.sol | executeIngests", function () {
 
     await solver.connect(this.keeper).prepareSolve(0); // calls executeIngests
     expect(await solver.connect(this.user1).getData(0)).to.equal(
-      ethers.utils.defaultAbiCoder.encode(["uint256"], [10]) // 42 is 10% of 420
+      ethers.utils.defaultAbiCoder.encode(["address"], [solver.address])
     );
   });
 

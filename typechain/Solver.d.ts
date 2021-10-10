@@ -30,6 +30,7 @@ interface SolverInterface extends ethers.utils.Interface {
     "chainChild()": FunctionFragment;
     "chainIndex()": FunctionFragment;
     "chainParent()": FunctionFragment;
+    "collateralBalance()": FunctionFragment;
     "conditions(uint256)": FunctionFragment;
     "config()": FunctionFragment;
     "confirmPayouts(uint256)": FunctionFragment;
@@ -44,7 +45,6 @@ interface SolverInterface extends ethers.utils.Interface {
     "init(address,uint256,tuple)": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
-    "percentage(uint256,uint256,uint128)": FunctionFragment;
     "prepareSolve(uint256)": FunctionFragment;
     "proposePayouts(uint256,uint256[])": FunctionFragment;
     "redeemPosition(address,bytes32,bytes32,uint256[])": FunctionFragment;
@@ -90,6 +90,10 @@ interface SolverInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "chainParent",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "collateralBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -206,10 +210,6 @@ interface SolverInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "percentage",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "prepareSolve",
     values: [BigNumberish]
   ): string;
@@ -267,6 +267,10 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "chainParent",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "collateralBalance",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "conditions", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "config", data: BytesLike): Result;
   decodeFunctionResult(
@@ -311,7 +315,6 @@ interface SolverInterface extends ethers.utils.Interface {
     functionFragment: "onERC1155Received",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "percentage", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "prepareSolve",
     data: BytesLike
@@ -430,6 +433,10 @@ export class Solver extends BaseContract {
     chainIndex(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     chainParent(overrides?: CallOverrides): Promise<[string]>;
+
+    collateralBalance(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { balance: BigNumber }>;
 
     conditions(
       arg0: BigNumberish,
@@ -647,13 +654,6 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    percentage(
-      x: BigNumberish,
-      y: BigNumberish,
-      scale: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     prepareSolve(
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -744,6 +744,8 @@ export class Solver extends BaseContract {
   chainIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
   chainParent(overrides?: CallOverrides): Promise<string>;
+
+  collateralBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   conditions(
     arg0: BigNumberish,
@@ -956,13 +958,6 @@ export class Solver extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  percentage(
-    x: BigNumberish,
-    y: BigNumberish,
-    scale: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   prepareSolve(
     _index: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1050,6 +1045,8 @@ export class Solver extends BaseContract {
     chainIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     chainParent(overrides?: CallOverrides): Promise<string>;
+
+    collateralBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     conditions(
       arg0: BigNumberish,
@@ -1262,13 +1259,6 @@ export class Solver extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    percentage(
-      x: BigNumberish,
-      y: BigNumberish,
-      scale: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     prepareSolve(
       _index: BigNumberish,
       overrides?: CallOverrides
@@ -1374,6 +1364,8 @@ export class Solver extends BaseContract {
     chainIndex(overrides?: CallOverrides): Promise<BigNumber>;
 
     chainParent(overrides?: CallOverrides): Promise<BigNumber>;
+
+    collateralBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     conditions(
       arg0: BigNumberish,
@@ -1497,13 +1489,6 @@ export class Solver extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    percentage(
-      x: BigNumberish,
-      y: BigNumberish,
-      scale: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     prepareSolve(
       _index: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1587,6 +1572,8 @@ export class Solver extends BaseContract {
     chainIndex(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     chainParent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    collateralBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     conditions(
       arg0: BigNumberish,
@@ -1711,13 +1698,6 @@ export class Solver extends BaseContract {
       value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    percentage(
-      x: BigNumberish,
-      y: BigNumberish,
-      scale: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     prepareSolve(

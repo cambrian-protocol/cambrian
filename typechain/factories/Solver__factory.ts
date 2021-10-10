@@ -173,6 +173,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "collateralBalance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "balance",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -826,35 +839,6 @@ const _abi = [
       },
     ],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "x",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "y",
-        type: "uint256",
-      },
-      {
-        internalType: "uint128",
-        name: "scale",
-        type: "uint128",
-      },
-    ],
-    name: "percentage",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "pure",
     type: "function",
   },
   {
