@@ -29,10 +29,6 @@ describe("It should all work", function () {
   });
 
   it("Should execute single-solver Proposal with two outcomes", async function () {
-    //Create solution
-    const solutionId = ethers.utils.formatBytes32String("TestID");
-
-    /////////INGESTS & ACTIONS & CONFIG ///////////////
     const ingests0 = [
       {
         executions: 0,

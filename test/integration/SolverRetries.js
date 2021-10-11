@@ -4,18 +4,12 @@ const CT_ABI =
   require("../../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
 const SOLVER_ABI =
   require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
-const SOLUTIONSHUB_ABI =
-  require("../../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,
 } = require("../../helpers/ConditionalTokens.js");
 const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
-
-const {
-  expectRevert, // Assertions for transactions that should fail
-} = require("@openzeppelin/test-helpers");
 
 describe("It should all work", async function () {
   this.beforeEach(async function () {

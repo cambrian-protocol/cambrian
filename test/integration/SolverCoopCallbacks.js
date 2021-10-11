@@ -11,10 +11,6 @@ const {
 const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-const {
-  expectRevert, // Assertions for transactions that should fail
-} = require("@openzeppelin/test-helpers");
-
 describe("It should all work", async function () {
   this.beforeEach(async function () {
     const [buyer, seller, keeper, seller2, arbitrator] =
