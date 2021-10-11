@@ -8,56 +8,64 @@ import "../Solver.sol";
 import "../SolverLib.sol";
 
 interface ISolver {
-    /**
-     * @dev                  Sets or unsets the approval of a given operator. An operator is allowed to
-     *                       transfer all tokens of the sender on their behalf.
-     * @param operator       Address to set the approval
-     * @param approved       Representing the status of the approval to be set
-     */
-    function setApproval(address operator, bool approved) external;
-
-    function createCondition(bytes32 _questionId, uint256 _outcomeSlots)
-        external;
-
-    /**
-     * @dev
-     * @param _questionId          An identifier for the question to be answered by the oracle.
-     * @param _parentCollectionId  The ID of the outcome collections common to the position being split and
-     *                             the split target positions. May be null, in which only the collateral is shared.
-     * @param _collateralToken     The address of the positions' backing collateral token.
-     * @param _amount              The amount of collateral or stake to split.
-     */
-    function splitCondition(
-        bytes32 _questionId,
-        bytes32 _parentCollectionId,
-        uint256 _outcomeSlots,
-        uint256[] memory _partition,
-        IERC20 _collateralToken,
-        uint256 _amount
+    // INITIALIZATION - Only called by SolverFactory
+    function init(
+        address _chainParent,
+        uint256 _chainIndex,
+        SolverLib.Config calldata _solverConfig
     ) external;
 
-    function allocatePartition(
-        uint256[] calldata _partition,
-        uint256[][] calldata _amounts,
-        address[][] calldata _addresses
-    ) external;
+    // PREP AND EXECUTE
+
+    function prepareSolve(uint256 _index) external;
 
     function deployChild(SolverLib.Config calldata _config)
         external
         returns (Solver _solver);
 
-    function prepareSolve(uint256 _index) external;
-
     function executeSolve(uint256 _index) external;
+
+    // DATA
+
+    function addData(uint256 _slot, bytes memory _data) external;
+
+    function getData(uint256 _slot) external view returns (bytes memory data);
+
+    // CALLBACKS
+
+    function registerOutgoingCallback(uint256 _slot, uint256 _chainIndex)
+        external;
+
+    function handleCallback(uint256 _slot) external;
+
+    function getCallbackOutput(uint256 _slot)
+        external
+        view
+        returns (bytes memory data);
+
+    function getOutgoingCallbacks(uint256 slot)
+        external
+        view
+        returns (address[] memory);
+
+    // REPORTING
 
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external;
 
     function confirmPayouts(uint256 _index) external;
 
+    // ARBITRATION
+
     function arbitrate(uint256 _index, uint256[] calldata _payouts) external;
 
     function nullArbitrate(uint256 _index) external;
+
+    function arbitrationRequested(uint256 _index) external;
+
+    function arbitrationPending(uint256 _index) external;
+
+    // UTILITY
 
     function addressFromChainIndex(uint256 _index)
         external
@@ -65,6 +73,22 @@ interface ISolver {
         returns (address _address);
 
     function setTrackingId(bytes32 _trackingId) external;
+
+    function getConditions()
+        external
+        view
+        returns (SolverLib.Condition[] memory);
+
+    function collateralBalance() external view returns (uint256 balance);
+
+    // ERC1155
+
+    function redeemPosition(
+        IERC20 _collateralToken,
+        bytes32 _parentCollectionId,
+        bytes32 _conditionId,
+        uint256[] calldata _indexSets
+    ) external;
 
     function onERC1155Received(
         address operator,
