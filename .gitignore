@@ -2,3 +2,4 @@ node_modules
 artifacts/
 typechain/
 cache/
+contracts/.solcx-lock-0.8.0
