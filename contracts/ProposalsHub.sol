@@ -2,12 +2,14 @@ pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
-import "./ConditionalTokens.sol";
-import "./SolverFactory.sol";
-import "./SolutionsHub.sol";
+import "./interfaces/ISolutionsHub.sol";
+import "./interfaces/IConditionalTokens.sol";
 
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
+    IConditionalTokens public immutable conditionalTokens =
+        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
+
     uint256 nonce;
 
     struct Proposal {
@@ -42,7 +44,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
         proposals[_proposalId].isExecuted = true;
 
-        SolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
+        ISolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
             _proposalId,
             proposals[_proposalId].solutionId
         );
@@ -55,7 +57,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
         require(_solver != address(0), "Invalid address");
 
-        SolutionsHub _solutionsHub = SolutionsHub(
+        ISolutionsHub _solutionsHub = ISolutionsHub(
             proposals[_proposalId].solutionsHub
         );
         require(
@@ -96,7 +98,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposal.solutionId = _solutionId;
         proposal.fundingGoal = _fundingGoal;
 
-        SolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
+        ISolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
         emit CreateProposal(_proposalId);
     }
 
@@ -193,11 +195,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
         reclaimedTokens[_tokenId][msg.sender] += _claimAmount;
 
-        ConditionalTokens _conditionalTokens = SolutionsHub(
-            proposals[_proposalId].solutionsHub
-        ).conditionalTokens();
-
-        _conditionalTokens.safeTransferFrom(
+        conditionalTokens.safeTransferFrom(
             address(this),
             msg.sender,
             _tokenId,

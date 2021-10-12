@@ -40,4 +40,8 @@ interface IProposalsHub {
     ) external;
 
     function isProposal(bytes32 _id) external view returns (bool);
+
+    function transferERC20(bytes32 _proposalId, address _solver) external;
+
+    function reclaimTokens(bytes32 _proposalId, uint256 _tokenId) external;
 }

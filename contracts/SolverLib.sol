@@ -3,9 +3,10 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./Solver.sol";
 import "./interfaces/ISolver.sol";
 import "./interfaces/IConditionalTokens.sol";
-import "./SolverFactory.sol";
+import "./interfaces/ISolverFactory.sol";
 
 library SolverLib {
     // Ingest Types
@@ -98,7 +99,7 @@ library SolverLib {
         if (chainParent == address(0)) {
             condition.parentCollectionId = bytes32(""); // top level collection
         } else {
-            Condition[] memory _chainParentConditions = Solver(chainParent)
+            Condition[] memory _chainParentConditions = ISolver(chainParent)
                 .getConditions();
 
             require(
@@ -135,7 +136,7 @@ library SolverLib {
         address solver,
         uint256 solverIndex
     ) public returns (address child, Solver) {
-        child = SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
+        child = ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
             .createSolver(solver, solverIndex + 1, config);
 
         return (child, Solver(child));
@@ -282,7 +283,7 @@ library SolverLib {
         _ingest.executions++;
 
         if (_ingest.ingestType != IngestType.Constant) {
-            address _solver = Solver(address(this)).addressFromChainIndex(
+            address _solver = ISolver(address(this)).addressFromChainIndex(
                 _ingest.solverIndex
             );
             (bool success, bytes memory retData) = _solver.staticcall(
@@ -321,18 +322,5 @@ library SolverLib {
                 condition.conditionId,
                 partition
             );
-    }
-
-    function mulScale(
-        uint256 x,
-        uint256 y,
-        uint128 scale
-    ) public pure returns (uint256) {
-        uint256 a = x / scale;
-        uint256 b = x % scale;
-        uint256 c = y / scale;
-        uint256 d = y % scale;
-
-        return a * c * scale + a * d + b * c + (b * d) / scale;
     }
 }

@@ -2,10 +2,14 @@
 /* solhint-disable space-after-comma */
 pragma solidity 0.8.0;
 
-import "./interfaces/IConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+
+import "./interfaces/IConditionalTokens.sol";
+import "./interfaces/ISolver.sol";
+
+import "./Solver.sol";
 import "./SolutionsHub.sol";
 import "./SolverLib.sol";
 import "hardhat/console.sol";
@@ -73,7 +77,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         emit PreparedSolve(address(this), _index);
 
         if (chainChild != address(0)) {
-            Solver(chainChild).prepareSolve(_index);
+            ISolver(chainChild).prepareSolve(_index);
         }
     }
 
@@ -127,8 +131,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function postroll(uint256 _index) internal virtual;
 
     function cascade(uint256 _index) internal {
-        if (chainChild != address(0) && Solver(chainChild).ingestsValid()) {
-            Solver(chainChild).executeSolve(_index);
+        if (chainChild != address(0) && ISolver(chainChild).ingestsValid()) {
+            ISolver(chainChild).executeSolve(_index);
         }
     }
 
@@ -152,11 +156,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             if (config.ingests[i].ingestType != SolverLib.IngestType.Callback) {
                 ingest(config.ingests[i]);
             } else {
-                address _cbSolver = Solver(address(this)).addressFromChainIndex(
-                    config.ingests[i].solverIndex
-                );
+                address _cbSolver = ISolver(address(this))
+                    .addressFromChainIndex(config.ingests[i].solverIndex);
                 registerIncomingCallback(_cbSolver, i);
-                Solver(_cbSolver).registerOutgoingCallback(
+                ISolver(_cbSolver).registerOutgoingCallback(
                     abi.decode(config.ingests[i].data, (uint256)),
                     chainIndex
                 );
@@ -212,7 +215,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             datas.slotVersions[_slot] == conditions.length
         ) {
             // Downchain Solver is preparing a new condition before us and is happy with the existing data
-            Solver(msg.sender).handleCallback(_slot);
+            ISolver(msg.sender).handleCallback(_slot);
         } else {
             callbacks.outgoing[_slot].push(msg.sender);
             callbacks.numOutgoing++;
@@ -238,7 +241,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         router(
             config.ingests[callbacks.incoming[_cb]].slot,
-            Solver(msg.sender).getCallbackOutput(
+            ISolver(msg.sender).getCallbackOutput(
                 abi.decode(
                     config.ingests[callbacks.incoming[_cb]].data,
                     (uint256)
@@ -252,7 +255,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function callback(uint256 _slot) private {
         for (uint256 i; i < callbacks.outgoing[_slot].length; i++) {
             if (address(callbacks.outgoing[_slot][i]) != address(0)) {
-                Solver(address(callbacks.outgoing[_slot][i])).handleCallback(
+                ISolver(address(callbacks.outgoing[_slot][i])).handleCallback(
                     _slot
                 );
                 delete callbacks.outgoing[_slot][i];

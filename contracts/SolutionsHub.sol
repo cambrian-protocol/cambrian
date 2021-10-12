@@ -1,19 +1,14 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./SolverFactory.sol";
+import "./interfaces/ISolverFactory.sol";
 import "./Solver.sol";
 import "./SolverLib.sol";
-import "./ConditionalTokens.sol";
-import "./interfaces/ISolver.sol";
-import "./ProposalsHub.sol";
+import "./interfaces/IProposalsHub.sol";
 
 // 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 DEV_ADDRESS
 
 contract SolutionsHub {
-    ConditionalTokens public immutable conditionalTokens =
-        ConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
-
     struct Solution {
         bool executed;
         IERC20 collateralToken;
@@ -40,7 +35,7 @@ contract SolutionsHub {
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
-            ProposalsHub(msg.sender).isProposal(_proposalId),
+            IProposalsHub(msg.sender).isProposal(_proposalId),
             "Proposal is not valid at proposalHub"
         );
         solutions[_solutionId].proposalHub = msg.sender;
@@ -53,7 +48,7 @@ contract SolutionsHub {
         for (uint256 i; i < solutions[_solutionId].solverConfigs.length; i++) {
             if (i == 0) {
                 _solver = Solver(
-                    SolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
+                    ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
                         .createSolver(
                             address(0),
                             i,
@@ -89,7 +84,7 @@ contract SolutionsHub {
 
         deploySolverChain(_solutionId);
 
-        ProposalsHub(msg.sender).transferERC20(
+        IProposalsHub(msg.sender).transferERC20(
             _proposalId,
             solutions[_solutionId].solverAddresses[0]
         );

@@ -67,6 +67,8 @@ interface ISolver {
 
     // UTILITY
 
+    function ingestsValid() external view returns (bool);
+
     function addressFromChainIndex(uint256 _index)
         external
         view
@@ -81,28 +83,10 @@ interface ISolver {
 
     function collateralBalance() external view returns (uint256 balance);
 
-    // ERC1155
-
     function redeemPosition(
         IERC20 _collateralToken,
         bytes32 _parentCollectionId,
         bytes32 _conditionId,
         uint256[] calldata _indexSets
     ) external;
-
-    function onERC1155Received(
-        address operator,
-        address from,
-        uint256 id,
-        uint256 value,
-        bytes calldata data
-    ) external pure returns (bytes4);
-
-    function onERC1155BatchReceived(
-        address operator,
-        address from,
-        uint256[] calldata ids,
-        uint256[] calldata values,
-        bytes calldata data
-    ) external pure returns (bytes4);
 }
