@@ -344,10 +344,19 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ****************************** REPORTING ***************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Propose payouts (AKA outcomes) for a condition
+        @param _index Index of condition
+        @param _payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
+     */
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external
     {
         require(msg.sender == config.keeper, "Only Keeper");
+        require(
+            _payouts.length == config.conditionBase.outcomeSlots,
+            "payouts.length must match outcomeSlots"
+        );
         require(
             conditions[_index].status == SolverLib.Status.Executed,
             "Condition not Executed"
@@ -357,6 +366,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         updateTimelock(_index);
     }
 
+    /**
+        @dev Confirm payouts for condition (reportPayouts to ConditionalTokens contract)
+        @param _index Index of condition
+     */
     function confirmPayouts(uint256 _index) external {
         require(block.timestamp > timelocks[_index], "Timelock still locked");
         require(
@@ -370,6 +383,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ***************************** ARBITRATION **************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Allows arbitrator to unilaterally make a payout report.
+        @param _index Index of condition
+        @param payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
+     */
     function arbitrate(uint256 _index, uint256[] memory payouts) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
@@ -377,9 +395,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationPending"
         );
         require(block.timestamp > timelocks[_index], "Timelock still locked");
+        require(
+            payouts.length == config.conditionBase.outcomeSlots,
+            "payouts.length must match outcomeSlots"
+        );
         SolverLib.arbitrate(conditions[_index], payouts);
     }
 
+    /**
+        @dev Returns condition.status to OutcomeProposed without a ruling.
+        @param _index Index of condition
+     */
     function arbitrateNull(uint256 _index) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
@@ -390,6 +416,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         updateTimelock(_index);
     }
 
+    /**
+        @dev Sets condition.status to ArbitrationRequested.
+        @param _index Index of condition
+     */
     function arbitrationRequested(uint256 _index) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
@@ -401,6 +431,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         updateTimelock(_index);
     }
 
+    /**
+        @dev Sets condition.status to ArbitrationPending.
+        @param _index Index of condition
+     */
     function arbitrationPending(uint256 _index) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
@@ -415,6 +449,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ******************************** UTILIY ****************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Get address for a Solver by its index in the chain
+        @param _index Index of Solver
+     */
     function addressFromChainIndex(uint256 _index)
         public
         view
@@ -458,6 +496,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ******************************** TOKENS ****************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Redeems CTs held by this Solver. See ConditionalTokens contract for more info.
+     */
     function redeemPosition(
         IERC20 _collateralToken,
         bytes32 _parentCollectionId,
