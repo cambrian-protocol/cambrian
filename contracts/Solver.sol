@@ -14,9 +14,9 @@ import "hardhat/console.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Multihash public uiURI; // Resource for Solver Front End
-
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
+
     address public chainParent; // Parent solver
     address public chainChild; // Child solver
     uint256 public chainIndex; // This Solver's index in chain
@@ -30,6 +30,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     event DeployedChild(address chainChild);
     event PreparedSolve(address solver, uint256 solveIndex);
 
+    /**
+        @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
+        @param _chainParent The address of the Solver above this one in the chain. address(0) if this Solver is first.
+        @param _chainIndex The index of this Solver in the chain
+        @param _solverConfig The configuration of this Solver
+    */
     function init(
         address _chainParent,
         uint256 _chainIndex,
@@ -49,6 +55,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************** SETUP ***************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Creates a new condition, associated timelock, and executes ingests for this Solver and any child Solvers
+        @param _index Index of the new condition to be created.
+    */
     function prepareSolve(uint256 _index) external {
         if (conditions.length > 0) {
             require(
@@ -79,6 +89,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
     }
 
+    /**
+        @dev Deploys a new Solver as a child
+        @param _config Configuration of the child Solver
+    */
     function deployChild(SolverLib.Config calldata _config)
         public
         returns (Solver _solver)
@@ -99,6 +113,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ****************************** EXECUTION ***************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Mints conditional tokens, allocates them to recipients specified by ingested data, runs arbitrary `postroll()` function and tries to do the same for child Solver
+        @param _index Index of condition to execute on
+     */
     function executeSolve(uint256 _index) public {
         require(
             conditions[_index].status == SolverLib.Status.Initiated,
@@ -138,6 +156,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************** DATA ****************************************** //
     // ********************************************************************************** //
 
+    /**
+        @dev Adds data to slot (if valid ver.) and executes any callbacks for this slot
+        @param _slot Destination slot
+        @param _data Data added to slot
+     */
     function router(uint256 _slot, bytes memory _data) private {
         require(
             datas.slotVersions[_slot] == (conditions.length - 1),
@@ -149,6 +172,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         callback(_slot);
     }
 
+    /**
+        @dev Executes ingests from config. Registers callbacks for ingests which wait for upstream solver data
+     */
     function executeIngests() private {
         for (uint256 i; i < config.ingests.length; i++) {
             if (config.ingests[i].ingestType != SolverLib.IngestType.Callback) {
@@ -169,10 +195,18 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         router(_ingest.slot, SolverLib.ingest(_ingest));
     }
 
+    /**
+        @dev Verifies that all ingests have been performed for a condition
+     */
     function ingestsValid() public view returns (bool) {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
     }
 
+    /**
+        @dev Allows keeper to manually add data to slot. Can't be a slot belonging to an ingest
+        @param _slot Destination slot
+        @param _data Data to be added
+     */
     function addData(uint256 _slot, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
         require(_slot >= (config.ingests.length), "Slot reserved by ingest");
@@ -186,6 +220,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
     // ****************************** CALLBACKS ***************************************** //
     // ********************************************************************************** //
+
+    /**
+        @dev Register callback that an upstream Solver will call when some data is added
+        @param _cbSolver Address of the Solver making the callback
+        @param _ingestIndex Index of the ingest registering this callback
+     */
     function registerIncomingCallback(address _cbSolver, uint256 _ingestIndex)
         private
     {
@@ -200,6 +240,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         callbacks.numIncoming++;
     }
 
+    /**
+        @dev Register callback expected by a downstream Solver for some data
+        @param _slot Slot being waited on by downstream Solver
+        @param _chainIndex Index of the Solver requesting this callback
+     */
     function registerOutgoingCallback(uint256 _slot, uint256 _chainIndex)
         external
     {
@@ -220,6 +265,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
     }
 
+    /**
+        @dev Handle upstream Solver making callback and ingest the data
+        @param _slot Destination slot for the data being sent
+     */
     function handleCallback(uint256 _slot) external {
         bytes32 _cb = keccak256(abi.encodePacked(msg.sender, _slot));
         require(
@@ -250,6 +299,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         callbacks.numIncoming--;
     }
 
+    /**
+        @dev Make any callbacks that were waiting on _slot
+        @param _slot Slot being waited on by downstream Solvers
+     */
     function callback(uint256 _slot) private {
         for (uint256 i; i < callbacks.outgoing[_slot].length; i++) {
             if (address(callbacks.outgoing[_slot][i]) != address(0)) {
@@ -262,6 +315,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
     }
 
+    /**
+        @dev A simple getter that requires upstream slot ver. == our condition ver.
+        @param _slot Slot containing data
+     */
     function getCallbackOutput(uint256 _slot)
         public
         view

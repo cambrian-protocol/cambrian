@@ -51,7 +51,7 @@ describe("IPFSSolutionsHub", function () {
     await this.ToyToken.mint(this.buyer.address, this.amount);
   });
 
-  it("Should fund a proposal", async function () {
+  it("Should create, fund and execute proposal tied to hash of solver configs", async function () {
     //Create solution
     const solutionId = ethers.utils.formatBytes32String("TestID");
 
@@ -123,13 +123,6 @@ describe("IPFSSolutionsHub", function () {
       ],
     };
 
-    const ingestsABI =
-      "tuple(uint executions, uint ingestType, uint solverIndex, bytes data)[] ingests";
-    const multiHashABI =
-      "(bytes32 digest, uint8 hashFunction, uint8 size)[] outcomeURIs";
-    const conditionBaseABI = `tuple(address collateralToken, uint outcomeSlots, uint parentCollectionIndexSet, uint amountSlot, uint[] partition, uint[] recipientAddressSlots, uint[][] recipientAmountSlots, ${multiHashABI})`;
-    const solverConfigABI = `tuple(address implementation, address keeper, address arbitrator, uint timelockSeconds, bytes data, ${ingestsABI}, ${conditionBaseABI})[] solverConfigs`;
-
     const solverConfigs = [
       [
         this.Solver.address,
@@ -142,10 +135,13 @@ describe("IPFSSolutionsHub", function () {
       ],
     ];
 
+    const cid = await Hash.of(solverConfigs);
+
     await this.IPFSSolutionsHub.connect(this.keeper).createSolution(
       solutionId,
       this.ToyToken.address,
-      solverConfigs
+      solverConfigs,
+      getBytes32FromMultihash(cid)
     );
 
     let tx = await this.ProposalsHub.connect(this.keeper).createProposal(
@@ -176,7 +172,10 @@ describe("IPFSSolutionsHub", function () {
     );
 
     const solution = await this.IPFSSolutionsHub.solutions(solutionId);
+
     expect(solution.executed).to.equal(true);
+    expect(getMultihashFromBytes32(solution.solverConfigsCID)).to.equal(cid);
+
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       solutionId,
       0

@@ -123,16 +123,6 @@ contract SolutionsHub {
         return _id;
     }
 
-    function setSolverConfigs(
-        bytes32 _solutionId,
-        SolverLib.Config[] calldata _solverConfigs
-    ) external onlyKeeper(_solutionId) {
-        delete solutions[_solutionId].solverConfigs;
-        for (uint256 i; i < _solverConfigs.length; i++) {
-            solutions[_solutionId].solverConfigs.push(_solverConfigs[i]);
-        }
-    }
-
     function solverFromIndex(bytes32 _solutionId, uint256 _index)
         external
         view

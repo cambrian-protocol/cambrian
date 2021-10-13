@@ -17,6 +17,7 @@ contract IPFSSolutionsHub {
         bytes32 proposalId;
         bytes32 id;
         bytes32 solverConfigsHash;
+        SolverLib.Multihash solverConfigsCID;
         address[] solverAddresses;
     }
 
@@ -63,7 +64,8 @@ contract IPFSSolutionsHub {
     function createSolution(
         bytes32 _id,
         IERC20 _collateralToken,
-        SolverLib.Config[] calldata solverConfigs
+        SolverLib.Config[] calldata _solverConfigs,
+        SolverLib.Multihash calldata _solverConfigsCID
     ) external returns (bytes32 _solutionId) {
         require(
             solutions[_id].id != _id,
@@ -75,7 +77,9 @@ contract IPFSSolutionsHub {
         solution.id = _id;
         solution.keeper = msg.sender;
         solution.collateralToken = _collateralToken;
-        solution.solverConfigsHash = keccak256(abi.encode(solverConfigs));
+        solution.solverConfigsHash = keccak256(abi.encode(_solverConfigs));
+        solution.solverConfigsCID = _solverConfigsCID;
+
         emit CreateSolution(_id);
         return _id;
     }

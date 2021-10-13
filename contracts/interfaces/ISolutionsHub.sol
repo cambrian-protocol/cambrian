@@ -10,11 +10,6 @@ interface ISolutionsHub {
         SolverLib.Config[] calldata _solverConfigs
     ) external returns (bytes32 _solutionId);
 
-    function setSolverConfigs(
-        bytes32 _solutionId,
-        SolverLib.Config[] calldata _solverConfigs
-    ) external;
-
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external;
 
     function executeSolution(bytes32 _proposalId, bytes32 _solutionId) external;
