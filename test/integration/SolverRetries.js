@@ -11,7 +11,7 @@ const {
 const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-describe("It should all work", async function () {
+describe("SolverRetries", async function () {
   this.beforeEach(async function () {
     const [buyer, seller, keeper, seller2, arbitrator] =
       await ethers.getSigners();
@@ -29,6 +29,7 @@ describe("It should all work", async function () {
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
+      "IPFSSolutionsHub",
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");

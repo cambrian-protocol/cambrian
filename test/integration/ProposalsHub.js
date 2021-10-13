@@ -13,7 +13,7 @@ const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
 
-describe("It should all work", function () {
+describe("ProposalsHub", function () {
   this.beforeEach(async function () {
     const [user0, user1, seller, keeper, arbitrator] =
       await ethers.getSigners();
@@ -31,6 +31,7 @@ describe("It should all work", function () {
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
+      "IPFSSolutionsHub",
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");

@@ -27,6 +27,7 @@ describe("Solver.sol | executeIngests", function () {
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
+      "IPFSSolutionsHub",
     ]);
 
     this.SolverFactory = await ethers.getContract("SolverFactory");

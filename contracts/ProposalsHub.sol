@@ -2,8 +2,13 @@ pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
+
 import "./interfaces/ISolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
+
+import "./SolverLib.sol";
+
+import "./IPFSSolutionsHub.sol";
 
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
@@ -47,6 +52,28 @@ contract ProposalsHub is ERC1155Receiver {
         ISolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
             _proposalId,
             proposals[_proposalId].solutionId
+        );
+    }
+
+    function executeIPFSProposal(
+        bytes32 _proposalId,
+        SolverLib.Config[] calldata solverConfigs
+    ) external {
+        require(
+            proposals[_proposalId].funding ==
+                proposals[_proposalId].fundingGoal,
+            "Proposal not fully funded"
+        );
+        require(
+            proposals[_proposalId].isExecuted == false,
+            "ProposalsHub::Proposal already executed"
+        );
+        proposals[_proposalId].isExecuted = true;
+
+        IPFSSolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
+            _proposalId,
+            proposals[_proposalId].solutionId,
+            solverConfigs
         );
     }
 

@@ -86,6 +86,13 @@ const getSimpleSolverConfig = (
   return solverConfigs;
 };
 
+// abiCoder.encode(
+//   [
+//     "(tuple(address, address, address, timelockSeconds, bytes, tuple(uint executions, uint ingestType, uint slot, uint solverIndex, bytes data) ingests, tuple(address collateralToken, uint outcomeSlots, uint parentCollectionIndexSet, uint amountSlot, uint[] partition, uint[] recipientAddressSlots, uint[][] recipientAmountSlots, (bytes32 digest, uint8 hashFunction, uint8 size))))[]",
+//   ],
+//   [1234, { b: 5678, c: "Hello World" }]
+// );
+
 const getSimpleSolutionConfig = (
   testID,
   amount,
