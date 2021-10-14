@@ -31,6 +31,7 @@ contract SolutionsHub {
     }
 
     event CreateSolution(bytes32 id);
+    event ExecuteSolution(bytes32 id);
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
@@ -97,6 +98,8 @@ contract SolutionsHub {
         // Execute first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
         ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve(0);
+
+        emit ExecuteSolution(_solutionId);
     }
 
     function createSolution(

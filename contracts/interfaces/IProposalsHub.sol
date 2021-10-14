@@ -1,6 +1,7 @@
 pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../SolverLib.sol";
 
 interface IProposalsHub {
     struct Proposal {
@@ -15,33 +16,37 @@ interface IProposalsHub {
         mapping(address => uint256) funderAmount;
     }
 
-    function executeProposal(bytes32 _proposalId) external;
+    function executeProposal(bytes32 proposalId) external;
 
-    function approveERC20Transfer(bytes32 _proposalId, address _solver)
-        external;
+    function executeIPFSProposal(
+        bytes32 proposalId,
+        SolverLib.Config[] calldata solverConfigs
+    ) external;
+
+    function approveERC20Transfer(bytes32 proposalId, address solver) external;
 
     function createProposal(
-        IERC20 _collateralToken,
-        address _solutionsHub,
-        uint256 _fundingGoal,
-        bytes32 _solutionId
+        IERC20 collateralToken,
+        address solutionsHub,
+        uint256 fundingGoal,
+        bytes32 solutionId
     ) external;
 
     function fundProposal(
-        bytes32 _proposalId,
-        IERC20 _token,
-        uint256 _amount
+        bytes32 proposalId,
+        IERC20 token,
+        uint256 amount
     ) external;
 
     function defundProposal(
-        bytes32 _proposalId,
-        IERC20 _token,
-        uint256 _amount
+        bytes32 proposalId,
+        IERC20 token,
+        uint256 amount
     ) external;
 
-    function isProposal(bytes32 _id) external view returns (bool);
+    function isProposal(bytes32 id) external view returns (bool);
 
-    function transferERC20(bytes32 _proposalId, address _solver) external;
+    function transferERC20(bytes32 proposalId, address solver) external;
 
-    function reclaimTokens(bytes32 _proposalId, uint256 _tokenId) external;
+    function reclaimTokens(bytes32 proposalId, uint256 tokenId) external;
 }

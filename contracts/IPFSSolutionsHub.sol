@@ -32,6 +32,7 @@ contract IPFSSolutionsHub {
     }
 
     event CreateSolution(bytes32 id);
+    event ExecuteSolution(bytes32 id);
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
@@ -53,6 +54,10 @@ contract IPFSSolutionsHub {
                 _solver = Solver(
                     ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
                         .createSolver(address(0), i, solverConfigs[i])
+                );
+                require(
+                    address(_solver) != address(0),
+                    "Invalid address for Solver"
                 );
             } else {
                 _solver = _solver.deployChild(solverConfigs[i]);
@@ -90,6 +95,10 @@ contract IPFSSolutionsHub {
         SolverLib.Config[] calldata solverConfigs
     ) external {
         require(
+            verifyHash(_solutionId, solverConfigs),
+            "Incorrect SolverConfig content"
+        );
+        require(
             msg.sender == solutions[_solutionId].proposalHub,
             "Not correct proposalHub"
         );
@@ -97,15 +106,9 @@ contract IPFSSolutionsHub {
             solutions[_solutionId].proposalId == _proposalId,
             "Wrong proposalId"
         );
-
         require(
             solutions[_solutionId].executed == false,
             "Solution already executed"
-        );
-
-        require(
-            verifyHash(_solutionId, solverConfigs),
-            "Incorrect SolverConfig content"
         );
 
         solutions[_solutionId].executed = true;
@@ -130,6 +133,8 @@ contract IPFSSolutionsHub {
         // Execute first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
         ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve(0);
+
+        emit ExecuteSolution(_solutionId);
     }
 
     function verifyHash(

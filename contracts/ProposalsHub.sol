@@ -12,9 +12,11 @@ import "./IPFSSolutionsHub.sol";
 
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
+    // Used to allow funders to reclaim conditional tokens sent to this address
     IConditionalTokens public immutable conditionalTokens =
         IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
 
+    // Increment for unique proposal IDs
     uint256 nonce;
 
     struct Proposal {
@@ -22,7 +24,6 @@ contract ProposalsHub is ERC1155Receiver {
         IERC20 collateralToken;
         address proposer;
         address solutionsHub;
-        address primeSolver;
         bytes32 id;
         bytes32 solutionId;
         uint256 funding;
@@ -32,63 +33,78 @@ contract ProposalsHub is ERC1155Receiver {
     mapping(bytes32 => Proposal) public proposals;
     mapping(bytes32 => mapping(address => uint256)) public funderAmountMap;
 
+    // Used to allow funders to reclaim conditional tokens sent to this address
     mapping(bytes32 => mapping(uint256 => uint256)) public reclaimableTokens;
     mapping(uint256 => mapping(address => uint256)) public reclaimedTokens;
 
     event CreateProposal(bytes32 id);
+    event ExecuteProposal(bytes32 id);
 
-    function executeProposal(bytes32 _proposalId) external {
+    /**
+        @dev Executes a proposal for Solutions where Solver configs are stored on-chain
+        @param proposalId ID of proposal
+     */
+    function executeProposal(bytes32 proposalId) external {
         require(
-            proposals[_proposalId].funding ==
-                proposals[_proposalId].fundingGoal,
+            proposals[proposalId].funding >= proposals[proposalId].fundingGoal,
             "Proposal not fully funded"
         );
         require(
-            proposals[_proposalId].isExecuted == false,
+            proposals[proposalId].isExecuted == false,
             "ProposalsHub::Proposal already executed"
         );
-        proposals[_proposalId].isExecuted = true;
+        proposals[proposalId].isExecuted = true;
 
-        ISolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
-            _proposalId,
-            proposals[_proposalId].solutionId
+        ISolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
+            proposalId,
+            proposals[proposalId].solutionId
         );
+
+        emit ExecuteProposal(proposalId);
     }
 
+    /**
+        @dev Executes a proposal for Solutions where on the *hash* of solver configs is stored on-chain
+        @param proposalId ID of proposal
+        @param solverConfigs Configurations of Solvers to be run for the proposed solution
+     */
     function executeIPFSProposal(
-        bytes32 _proposalId,
+        bytes32 proposalId,
         SolverLib.Config[] calldata solverConfigs
     ) external {
         require(
-            proposals[_proposalId].funding ==
-                proposals[_proposalId].fundingGoal,
+            proposals[proposalId].funding >= proposals[proposalId].fundingGoal,
             "Proposal not fully funded"
         );
         require(
-            proposals[_proposalId].isExecuted == false,
+            proposals[proposalId].isExecuted == false,
             "ProposalsHub::Proposal already executed"
         );
-        proposals[_proposalId].isExecuted = true;
 
-        IPFSSolutionsHub(proposals[_proposalId].solutionsHub).executeSolution(
-            _proposalId,
-            proposals[_proposalId].solutionId,
+        IPFSSolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
+            proposalId,
+            proposals[proposalId].solutionId,
             solverConfigs
         );
+
+        proposals[proposalId].isExecuted = true;
+
+        emit ExecuteProposal(proposalId);
     }
 
+    /**
+        @dev Called by SolutionsHub after deploying Solvers
+        @param _proposalId Proposal that collateral is being transferred from
+        @param _solver Solver receiving collateral
+     */
     function transferERC20(bytes32 _proposalId, address _solver) external {
         require(
             msg.sender == proposals[_proposalId].solutionsHub,
             "msg.sender not solutionsHub"
         );
         require(_solver != address(0), "Invalid address");
-
-        ISolutionsHub _solutionsHub = ISolutionsHub(
-            proposals[_proposalId].solutionsHub
-        );
         require(
-            _solutionsHub.solverFromIndex(
+            ISolutionsHub(proposals[_proposalId].solutionsHub).solverFromIndex(
                 proposals[_proposalId].solutionId,
                 0
             ) == _solver,
@@ -99,94 +115,109 @@ contract ProposalsHub is ERC1155Receiver {
         _token.transfer(_solver, proposals[_proposalId].funding);
     }
 
+    /**
+        @dev Creates a Proposal from an existing Solution
+        @param collateralToken ERC20 token being used as collateral for conditional tokens
+        @param solutionsHub Address of the SolutionsHub contract managing the Solution
+        @param fundingGoal Amount of ERC20 collateral requested for the Proposal
+        @param solutionId ID of the Solution (from SolutionsHub) being proposed for
+    */
     function createProposal(
-        IERC20 _collateralToken,
-        address _solutionsHub,
-        uint256 _fundingGoal,
-        bytes32 _solutionId
+        IERC20 collateralToken,
+        address solutionsHub,
+        uint256 fundingGoal,
+        bytes32 solutionId
     ) external {
         nonce++;
 
         bytes32 _proposalId = keccak256(
             abi.encodePacked(
                 msg.sender,
-                _solutionId,
-                _collateralToken,
-                _fundingGoal,
+                solutionId,
+                collateralToken,
+                fundingGoal,
                 nonce
             )
         );
 
         Proposal storage proposal = proposals[_proposalId];
-        proposal.collateralToken = _collateralToken;
+        proposal.collateralToken = collateralToken;
         proposal.proposer = msg.sender;
-        proposal.solutionsHub = _solutionsHub;
+        proposal.solutionsHub = solutionsHub;
         proposal.id = _proposalId;
-        proposal.solutionId = _solutionId;
-        proposal.fundingGoal = _fundingGoal;
+        proposal.solutionId = solutionId;
+        proposal.fundingGoal = fundingGoal;
 
-        ISolutionsHub(_solutionsHub).linkToProposal(_proposalId, _solutionId);
+        ISolutionsHub(solutionsHub).linkToProposal(_proposalId, solutionId);
         emit CreateProposal(_proposalId);
     }
 
-    function isProposal(bytes32 _id) external view returns (bool) {
-        return proposals[_id].id != bytes32(0);
-    }
-
+    /**
+        @dev Called by user to add funding to a Proposal
+        @param proposalId ID of Proposal being funded
+        @param token ERC20 token to be funded with
+        @param amount Amount to be funded
+    */
     function fundProposal(
-        bytes32 _proposalId,
-        IERC20 _token,
-        uint256 _amount
+        bytes32 proposalId,
+        IERC20 token,
+        uint256 amount
     ) external {
-        require(proposals[_proposalId].id != 0, "Proposal does not exist");
+        require(proposals[proposalId].id != 0, "Proposal does not exist");
         require(
-            proposals[_proposalId].isExecuted == false,
+            proposals[proposalId].isExecuted == false,
             "ProposalsHub::Proposal already executed"
         );
         require(
-            proposals[_proposalId].collateralToken == _token,
+            proposals[proposalId].collateralToken == token,
             "Proposal does not include this token to be funded"
         );
-        require(_amount > 0, "Amount cannot be zero");
+        require(amount > 0, "Amount cannot be zero");
         require(
-            _amount + proposals[_proposalId].funding <=
-                proposals[_proposalId].fundingGoal,
+            amount + proposals[proposalId].funding <=
+                proposals[proposalId].fundingGoal,
             "Can't fund more than goal"
         );
 
-        proposals[_proposalId].funding += _amount;
-        funderAmountMap[_proposalId][msg.sender] += _amount;
+        proposals[proposalId].funding += amount;
+        funderAmountMap[proposalId][msg.sender] += amount;
 
         require(
-            _token.transferFrom(msg.sender, address(this), _amount),
+            token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
         );
     }
 
+    /**
+        @dev Called by user to remove their funding from a Proposal
+        @param proposalId ID of Proposal being defunded
+        @param token ERC20 token to be defunded
+        @param amount Amount to be defunded
+    */
     function defundProposal(
-        bytes32 _proposalId,
-        IERC20 _token,
-        uint256 _amount
+        bytes32 proposalId,
+        IERC20 token,
+        uint256 amount
     ) external {
-        require(proposals[_proposalId].id != 0, "Proposal does not exist");
+        require(proposals[proposalId].id != 0, "Proposal does not exist");
         require(
-            proposals[_proposalId].isExecuted == false,
+            proposals[proposalId].isExecuted == false,
             "ProposalsHub::Proposal already executed"
         );
         require(
-            proposals[_proposalId].collateralToken == _token,
+            proposals[proposalId].collateralToken == token,
             "Proposal does not include this token to be funded"
         );
-        require(_amount > 0, "Amount cannot be zero");
+        require(amount > 0, "Amount cannot be zero");
         require(
-            _amount <= funderAmountMap[_proposalId][msg.sender],
+            amount <= funderAmountMap[proposalId][msg.sender],
             "Committed funds is lower than amount."
         );
 
-        proposals[_proposalId].funding -= _amount;
-        funderAmountMap[_proposalId][msg.sender] -= _amount;
+        proposals[proposalId].funding -= amount;
+        funderAmountMap[proposalId][msg.sender] -= amount;
 
-        _token.transfer(msg.sender, _amount);
+        token.transfer(msg.sender, amount);
     }
 
     function getProposal(bytes32 _id)
@@ -197,37 +228,52 @@ contract ProposalsHub is ERC1155Receiver {
         return proposals[_id];
     }
 
-    function postReclaimableTokens(
-        bytes32 _proposalId,
-        uint256 _tokenId,
-        uint256 _amount
-    ) private {
-        reclaimableTokens[_proposalId][_tokenId] += _amount;
+    function isProposal(bytes32 id) external view returns (bool) {
+        return proposals[id].id != bytes32(0);
     }
 
-    function reclaimTokens(bytes32 _proposalId, uint256 _tokenId) external {
+    /**
+        @dev Called when contract receives ERC1155 with data referring to a proposalId
+        @param proposalId ID of proposal being referred to by tx
+        @param tokenId ID of ERC1155 token that was received
+        @param amount Amount of token received
+     */
+    function postReclaimableTokens(
+        bytes32 proposalId,
+        uint256 tokenId,
+        uint256 amount
+    ) private {
+        reclaimableTokens[proposalId][tokenId] += amount;
+    }
+
+    /**
+        @dev Transfers reclaimable CTs to a claimer and lowers their reclaimable balance for that token
+        @param proposalId ID of proposal being reclaimed from
+        @param tokenId ERC1155 token being reclaimed
+     */
+    function reclaimTokens(bytes32 proposalId, uint256 tokenId) external {
         require(
-            funderAmountMap[_proposalId][msg.sender] > 0,
+            funderAmountMap[proposalId][msg.sender] > 0,
             "ProposalsHub::msg.sender has no claim"
         );
-        uint256 _claimDenominator = proposals[_proposalId].funding /
-            funderAmountMap[_proposalId][msg.sender];
+        uint256 _claimDenominator = proposals[proposalId].funding /
+            funderAmountMap[proposalId][msg.sender];
 
-        uint256 _claimAmount = (reclaimableTokens[_proposalId][_tokenId] /
-            _claimDenominator) - reclaimedTokens[_tokenId][msg.sender];
+        uint256 _claimAmount = (reclaimableTokens[proposalId][tokenId] /
+            _claimDenominator) - reclaimedTokens[tokenId][msg.sender];
         require(_claimAmount > 0, "ProposalsHub::Claim is 0");
         require(
-            _claimAmount <= reclaimableTokens[_proposalId][_tokenId],
+            _claimAmount <= reclaimableTokens[proposalId][tokenId],
             "ProposalsHub::Claim is too large"
         );
-        reclaimedTokens[_tokenId][msg.sender] += _claimAmount;
+        reclaimedTokens[tokenId][msg.sender] += _claimAmount;
 
         conditionalTokens.safeTransferFrom(
             address(this),
             msg.sender,
-            _tokenId,
+            tokenId,
             _claimAmount,
-            abi.encode(_proposalId)
+            abi.encode(proposalId)
         );
     }
 
