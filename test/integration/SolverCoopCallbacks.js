@@ -40,7 +40,7 @@ describe("SolverCoopCallbacks", async function () {
     await this.ToyToken.mint(this.buyer.address, "100");
   });
 
-  it("Should execute two-solver Proposal with deferred proposal", async function () {
+  it("Should execute two-solver Proposal with callbacks", async function () {
     const ingests0 = [
       {
         executions: 0,
