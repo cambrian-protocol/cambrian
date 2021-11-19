@@ -19,7 +19,8 @@ const config = {
     },
     wlkrnet: {
       url: `http://198.74.50.28:8000`,
-      blockGasLimit: 1500000000000,
+      blockGasLimit: 150000000000000,
+      gasPrice: 8000000000, // default is 'auto' which breaks chains without the london hardfork
       accounts: [`0x${TESTNET_PRIVATE_KEY}`]
     }
   },
