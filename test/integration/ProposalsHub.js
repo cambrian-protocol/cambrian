@@ -55,7 +55,7 @@ describe("ProposalsHub", function () {
     await this.SolutionsHub.connect(this.keeper).createSolution(
       ...getSimpleSolutionConfig(
         this.solutionId,
-        this.amount,
+        100, // amount is a percentage now 2021-12-22
         this.Solver.address,
         this.keeper.address,
         this.arbitrator.address,

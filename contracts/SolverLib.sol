@@ -5,6 +5,8 @@ import "./Solver.sol";
 import "./interfaces/ISolver.sol";
 import "./interfaces/IConditionalTokens.sol";
 import "./interfaces/ISolverFactory.sol";
+import "./FullMath.sol";
+import "hardhat/console.sol";
 
 library SolverLib {
     // Ingest Types
@@ -164,26 +166,35 @@ library SolverLib {
         Condition calldata condition,
         uint256 amount
     ) public {
-        // uint256 _amount;
+        uint256 _balance;
+
+        IConditionalTokens ICT = IConditionalTokens(
+            0x5FbDB2315678afecb367f032d93F642f64180aa3
+        );
 
         if (chainParent == address(0)) {
-            // _amount = IERC20(base.collateralToken).balanceOf(address(this));
-            // require(_amount > 0, "No collateral.");
-
+            _balance = IERC20(base.collateralToken).balanceOf(address(this));
             base.collateralToken.approve(
                 address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
-                amount
+                percentFrom(amount, _balance)
+            );
+        } else {
+            _balance = ICT.balanceOf(
+                address(this),
+                ICT.getPositionId(
+                    base.collateralToken,
+                    condition.parentCollectionId
+                )
             );
         }
 
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .splitPosition(
-                base.collateralToken,
-                condition.parentCollectionId,
-                condition.conditionId,
-                base.partition,
-                amount
-            );
+        ICT.splitPosition(
+            base.collateralToken,
+            condition.parentCollectionId,
+            condition.conditionId,
+            base.partition,
+            percentFrom(amount, _balance)
+        );
     }
 
     function reportPayouts(Condition storage condition) public {
@@ -251,14 +262,29 @@ library SolverLib {
             );
         }
 
+        address[] memory _addressThis = new address[](_tokens.length);
+        for (uint256 i; i < _tokens.length; i++) {
+            _addressThis[i] = address(this);
+        }
+
+        uint256[] memory _balances = IConditionalTokens(
+            0x5FbDB2315678afecb367f032d93F642f64180aa3
+        ).balanceOfBatch(_addressThis, _tokens);
+
         for (uint256 i; i < base.recipientAddressSlots.length; i++) {
             _amounts[i] = new uint256[](base.partition.length);
 
             for (uint256 j; j < base.partition.length; j++) {
-                _amounts[i][j] = abi.decode(
+                uint256 _pctValue = abi.decode(
                     data.slots[base.recipientAmountSlots[j][i]],
                     (uint256)
                 );
+
+                if (_pctValue != 0) {
+                    _amounts[i][j] = percentFrom(_pctValue, _balances[j]);
+                } else {
+                    _amounts[i][j] = 0;
+                }
             }
         }
 
@@ -275,6 +301,14 @@ library SolverLib {
                     abi.encode(trackingId)
                 );
         }
+    }
+
+    function percentFrom(uint256 pct, uint256 num)
+        public
+        view
+        returns (uint256)
+    {
+        return FullMath.mulDiv(pct, num, 100);
     }
 
     function ingest(Ingest storage _ingest) public returns (bytes memory data) {

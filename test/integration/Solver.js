@@ -54,7 +54,6 @@ describe("Solver", function () {
       {
         executions: 0,
         ingestType: 1,
-
         slot: 2,
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
