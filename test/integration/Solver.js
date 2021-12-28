@@ -73,7 +73,7 @@ describe("Solver", function () {
         ingestType: 1,
         slot: 4,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 
@@ -200,21 +200,21 @@ describe("Solver", function () {
         ingestType: 1,
         slot: 4,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [1000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 5,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [9000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 6,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 
@@ -352,21 +352,21 @@ describe("Solver", function () {
         ingestType: 1,
         slot: 3,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [1000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 4,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [9000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 5,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 
@@ -502,21 +502,21 @@ describe("Solver", function () {
         ingestType: 1,
         slot: 4,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [1000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 5,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [90]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [9000]),
       },
       {
         executions: 0,
         ingestType: 1,
         slot: 6,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 

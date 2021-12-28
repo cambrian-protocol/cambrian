@@ -55,7 +55,7 @@ describe("ProposalsHub", function () {
     await this.SolutionsHub.connect(this.keeper).createSolution(
       ...getSimpleSolutionConfig(
         this.solutionId,
-        100, // amount is a percentage now 2021-12-22
+        10000, // amount is basis points now 2021-12-27
         this.Solver.address,
         this.keeper.address,
         this.arbitrator.address,
