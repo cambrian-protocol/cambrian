@@ -176,7 +176,7 @@ library SolverLib {
             _balance = IERC20(base.collateralToken).balanceOf(address(this));
             base.collateralToken.approve(
                 address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
-                percentFrom(amount, _balance)
+                bpToNum(amount, _balance)
             );
         } else {
             _balance = ICT.balanceOf(
@@ -193,7 +193,7 @@ library SolverLib {
             condition.parentCollectionId,
             condition.conditionId,
             base.partition,
-            percentFrom(amount, _balance)
+            bpToNum(amount, _balance)
         );
     }
 
@@ -281,7 +281,7 @@ library SolverLib {
                 );
 
                 if (_pctValue != 0) {
-                    _amounts[i][j] = percentFrom(_pctValue, _balances[j]);
+                    _amounts[i][j] = bpToNum(_pctValue, _balances[j]);
                 } else {
                     _amounts[i][j] = 0;
                 }
@@ -303,12 +303,8 @@ library SolverLib {
         }
     }
 
-    function percentFrom(uint256 pct, uint256 num)
-        public
-        view
-        returns (uint256)
-    {
-        return FullMath.mulDiv(pct, num, 100);
+    function bpToNum(uint256 bp, uint256 num) public pure returns (uint256) {
+        return FullMath.mulDiv(bp, num, 10000);
     }
 
     function ingest(Ingest storage _ingest) public returns (bytes memory data) {

@@ -72,7 +72,7 @@ describe("SolverCoop", function () {
         ingestType: 1,
         slot: 3,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 
@@ -131,7 +131,7 @@ describe("SolverCoop", function () {
         ingestType: 1,
         slot: 3,
         solverIndex: 0,
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [100]),
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
     ];
 
