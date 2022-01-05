@@ -192,7 +192,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function ingest(SolverLib.Ingest storage _ingest) private {
-        router(_ingest.slot, SolverLib.ingest(_ingest));
+        require(uint256(_ingest.ingestType) <= 3, "Invalid ingestType");
+        _ingest.executions++;
+
+        if (_ingest.ingestType != SolverLib.IngestType.Manual) {
+            router(_ingest.slot, SolverLib.ingest(_ingest));
+        }
     }
 
     /**
@@ -203,13 +208,18 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Allows keeper to manually add data to slot. Can't be a slot belonging to an ingest
+        @dev Allows keeper to manually add data to IngestType.Manual slots after executeIngests
         @param _slot Destination slot
         @param _data Data to be added
      */
     function addData(uint256 _slot, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        require(_slot >= (config.ingests.length), "Slot reserved by ingest");
+        require(_slot <= config.ingests.length, "Slot out of scope");
+        require(
+            config.ingests[_slot].ingestType == SolverLib.IngestType.Manual,
+            "only IngestType.Manual"
+        );
+
         router(_slot, _data);
     }
 

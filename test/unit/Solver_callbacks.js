@@ -12,7 +12,7 @@ const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
 const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
-describe("Solver.sol | executeIngests", function () {
+describe("Solver.sol | callbacks", function () {
   this.beforeEach(async function () {
     const [user1, user2, keeper, arbitrator] = await ethers.getSigners();
     this.user1 = user1;
@@ -131,7 +131,15 @@ describe("Solver.sol | executeIngests", function () {
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
         data: ethers.utils.formatBytes32String(""),
-        ingests: [],
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 3,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.constants.HashZero,
+          },
+        ],
         conditionBase: this.conditionBase,
       },
       {

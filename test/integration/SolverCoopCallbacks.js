@@ -73,6 +73,13 @@ describe("SolverCoopCallbacks", async function () {
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
+      {
+        executions: 0,
+        ingestType: 3,
+        slot: 4,
+        solverIndex: 0,
+        data: ethers.constants.HashZero,
+      },
     ];
 
     const conditionBase0 = {
