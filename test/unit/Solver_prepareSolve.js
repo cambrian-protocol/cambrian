@@ -283,7 +283,15 @@ describe("Solver.sol | prepareSolve", function () {
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
         data: ethers.utils.formatBytes32String(""),
-        ingests: [],
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 3,
+            slot: 0,
+            solverIndex: 0,
+            data: ethers.constants.HashZero,
+          },
+        ],
         conditionBase: this.conditionBase,
       },
       {

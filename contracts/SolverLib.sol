@@ -13,7 +13,8 @@ library SolverLib {
     enum IngestType {
         Callback,
         Constant,
-        Function
+        Function,
+        Manual
     }
 
     // Status state for Conditions
@@ -307,10 +308,19 @@ library SolverLib {
         return FullMath.mulDiv(bp, num, 10000);
     }
 
-    function ingest(Ingest storage _ingest) public returns (bytes memory data) {
-        _ingest.executions++;
+    function ingest(Ingest storage _ingest)
+        public
+        view
+        returns (bytes memory data)
+    {
+        require(
+            _ingest.ingestType != IngestType.Manual,
+            "Manual ingests should not get here"
+        );
 
-        if (_ingest.ingestType != IngestType.Constant) {
+        if (_ingest.ingestType == IngestType.Constant) {
+            data = _ingest.data;
+        } else {
             address _solver = ISolver(address(this)).addressFromChainIndex(
                 _ingest.solverIndex
             );
@@ -319,8 +329,6 @@ library SolverLib {
             );
             require(success, "Ingest staticcall failed");
             data = retData;
-        } else {
-            data = _ingest.data;
         }
     }
 
