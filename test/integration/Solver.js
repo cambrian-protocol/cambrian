@@ -542,15 +542,15 @@ describe("Solver", function () {
     };
 
     const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        ingests0,
-        canon0,
-      ],
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: 0,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: ingests0,
+        conditionBase: canon0,
+      },
     ];
 
     // Deploy solverChain
