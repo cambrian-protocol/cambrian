@@ -81,7 +81,7 @@ describe("SolverCoop", function () {
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
       amountSlot: 3,
-      partition: [2, 1],
+      partition: [1, 2],
       recipientAddressSlots: [0, 1],
       recipientAmountSlots: [
         [2, 3],
@@ -140,7 +140,7 @@ describe("SolverCoop", function () {
       outcomeSlots: 2,
       parentCollectionIndexSet: 1,
       amountSlot: 3,
-      partition: [2, 1],
+      partition: [1, 2],
       recipientAddressSlots: [0, 1],
       recipientAmountSlots: [
         [2, 3],
