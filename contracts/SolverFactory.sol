@@ -6,11 +6,15 @@ import "./ConditionalTokens.sol";
 import "./Solver.sol";
 import "./SolverLib.sol";
 
-// 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512  DEV_ADDRESS
 contract SolverFactory {
+    address immutable ctfAddress; // Conditional token framework address
     Solver[] public solvers;
 
     event SolverCreated(address newSolverAddress);
+
+    constructor(address _ctfAddress) {
+        ctfAddress = _ctfAddress;
+    }
 
     function createSolver(
         address chainParent,
@@ -30,7 +34,7 @@ contract SolverFactory {
         Solver clone = Solver(
             Clones.clone(address(solverConfig.implementation))
         );
-        Solver(clone).init(chainParent, chainIndex, solverConfig);
+        Solver(clone).init(ctfAddress, chainParent, chainIndex, solverConfig);
         solvers.push(clone);
 
         emit SolverCreated(address(clone));
