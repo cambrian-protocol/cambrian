@@ -13,6 +13,9 @@ import "./SolverLib.sol";
 import "hardhat/console.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
+    address factoryAddress; // Factory which creates Solver proxies
+    address ctfAddress; // Conditional token framework
+
     SolverLib.Multihash public uiURI; // Resource for Solver Front End
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
@@ -37,15 +40,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _solverConfig The configuration of this Solver
     */
     function init(
+        address _ctfAddress,
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
     ) external initializer {
-        require(
-            msg.sender == address(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512), // FACTORY DEV ADDRESS
-            "Only factory"
-        );
         require(_solverConfig.keeper != address(0), "Keeper invalid");
+        factoryAddress = msg.sender;
+        ctfAddress = _ctfAddress;
         chainParent = _chainParent;
         chainIndex = _chainIndex;
         config = _solverConfig;
@@ -73,6 +75,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         conditions.push(
             SolverLib.createCondition(
+                ctfAddress,
                 config.conditionBase,
                 chainParent,
                 conditions.length
@@ -101,6 +104,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         require(chainChild == address(0), "Solver has child");
 
         (chainChild, _solver) = SolverLib.deployChild(
+            factoryAddress,
             _config,
             address(this),
             chainIndex
@@ -127,12 +131,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         conditions[_index].status = SolverLib.Status.Executed;
 
         SolverLib.splitPosition(
+            ctfAddress,
             chainParent,
             config.conditionBase,
             conditions[_index],
             abi.decode(datas.slots[config.conditionBase.amountSlot], (uint256))
         );
+
         SolverLib.allocatePartition(
+            ctfAddress,
             conditions[_index],
             config.conditionBase,
             address(this),
@@ -386,7 +393,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             conditions[_index].status == SolverLib.Status.OutcomeProposed,
             "Outcome not proposed"
         );
-        SolverLib.confirmPayouts(conditions[_index]);
+        SolverLib.confirmPayouts(ctfAddress, conditions[_index]);
     }
 
     // ********************************************************************************** //
@@ -409,7 +416,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             payouts.length == config.conditionBase.outcomeSlots,
             "payouts.length must match outcomeSlots"
         );
-        SolverLib.arbitrate(conditions[_index], payouts);
+        SolverLib.arbitrate(ctfAddress, conditions[_index], payouts);
     }
 
     /**
@@ -516,13 +523,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         uint256[] calldata _indexSets
     ) external {
         require(msg.sender == config.keeper, "Only Keeper");
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .redeemPositions(
-                _collateralToken,
-                _parentCollectionId,
-                _conditionId,
-                _indexSets
-            );
+        IConditionalTokens(ctfAddress).redeemPositions(
+            _collateralToken,
+            _parentCollectionId,
+            _conditionId,
+            _indexSets
+        );
     }
 
     function onERC1155Received(

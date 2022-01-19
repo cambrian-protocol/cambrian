@@ -9,6 +9,8 @@ import "./interfaces/IProposalsHub.sol";
 // 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 DEV_ADDRESS
 
 contract SolutionsHub {
+    address immutable factoryAddress;
+
     struct Solution {
         bool executed;
         IERC20 collateralToken;
@@ -33,6 +35,10 @@ contract SolutionsHub {
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
 
+    constructor(address _factoryAddress) {
+        factoryAddress = _factoryAddress;
+    }
+
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
             IProposalsHub(msg.sender).isProposal(_proposalId),
@@ -48,12 +54,11 @@ contract SolutionsHub {
         for (uint256 i; i < solutions[_solutionId].solverConfigs.length; i++) {
             if (i == 0) {
                 _solver = Solver(
-                    ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
-                        .createSolver(
-                            address(0),
-                            i,
-                            solutions[_solutionId].solverConfigs[i]
-                        )
+                    ISolverFactory(factoryAddress).createSolver(
+                        address(0),
+                        i,
+                        solutions[_solutionId].solverConfigs[i]
+                    )
                 );
             } else {
                 _solver = _solver.deployChild(
