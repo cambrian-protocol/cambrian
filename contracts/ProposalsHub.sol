@@ -13,8 +13,7 @@ import "./IPFSSolutionsHub.sol";
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
     // Used to allow funders to reclaim conditional tokens sent to this address
-    IConditionalTokens public immutable conditionalTokens =
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3); // ConditionalTokens contract dev address
+    IConditionalTokens public immutable conditionalTokens;
 
     // Increment for unique proposal IDs
     uint256 nonce;
@@ -39,6 +38,10 @@ contract ProposalsHub is ERC1155Receiver {
 
     event CreateProposal(bytes32 id);
     event ExecuteProposal(bytes32 id);
+
+    constructor(address _ctfAddress) {
+        conditionalTokens = IConditionalTokens(_ctfAddress);
+    }
 
     /**
         @dev Executes a proposal for Solutions where Solver configs are stored on-chain
