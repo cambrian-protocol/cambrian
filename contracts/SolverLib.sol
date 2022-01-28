@@ -89,6 +89,7 @@ library SolverLib {
     }
 
     function createCondition(
+        address ctfAddress,
         ConditionBase calldata base,
         address chainParent,
         uint256 conditionIdx
@@ -109,48 +110,49 @@ library SolverLib {
             );
 
             condition.parentCollectionId = getCollectionId(
+                ctfAddress,
                 _chainParentConditions[_chainParentConditions.length - 1],
                 base.parentCollectionIndexSet
             );
         }
 
-        condition.conditionId = IConditionalTokens(
-            0x5FbDB2315678afecb367f032d93F642f64180aa3
-        ).getConditionId(
-                address(this), // Solver is Oracle
-                condition.questionId,
-                base.outcomeSlots
-            );
+        condition.conditionId = IConditionalTokens(ctfAddress).getConditionId(
+            address(this), // Solver is Oracle
+            condition.questionId,
+            base.outcomeSlots
+        );
 
         condition.collateralToken = base.collateralToken;
 
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .prepareCondition(
-                address(this),
-                condition.questionId,
-                base.outcomeSlots
-            );
+        IConditionalTokens(ctfAddress).prepareCondition(
+            address(this),
+            condition.questionId,
+            base.outcomeSlots
+        );
     }
 
     function deployChild(
+        address factoryAddress,
         Config calldata config,
         address solver,
         uint256 solverIndex
     ) public returns (address child, Solver) {
-        child = ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
-            .createSolver(solver, solverIndex + 1, config);
+        child = ISolverFactory(factoryAddress).createSolver(
+            solver,
+            solverIndex + 1,
+            config
+        );
 
         return (child, Solver(child));
     }
 
     function getPositionId(
+        address ctfAddress,
         Condition memory condition,
         IERC20 collateralToken,
         uint256 partition
     ) public view returns (uint256 positionId) {
-        IConditionalTokens ct = IConditionalTokens(
-            0x5FbDB2315678afecb367f032d93F642f64180aa3
-        );
+        IConditionalTokens ct = IConditionalTokens(ctfAddress);
         positionId = ct.getPositionId(
             collateralToken,
             ct.getCollectionId(
@@ -162,6 +164,7 @@ library SolverLib {
     }
 
     function splitPosition(
+        address ctfAddress,
         address chainParent,
         ConditionBase calldata base,
         Condition calldata condition,
@@ -169,16 +172,11 @@ library SolverLib {
     ) public {
         uint256 _balance;
 
-        IConditionalTokens ICT = IConditionalTokens(
-            0x5FbDB2315678afecb367f032d93F642f64180aa3
-        );
+        IConditionalTokens ICT = IConditionalTokens(ctfAddress);
 
         if (chainParent == address(0)) {
             _balance = IERC20(base.collateralToken).balanceOf(address(this));
-            base.collateralToken.approve(
-                address(0x5FbDB2315678afecb367f032d93F642f64180aa3),
-                bpToNum(amount, _balance)
-            );
+            base.collateralToken.approve(ctfAddress, bpToNum(amount, _balance));
         } else {
             _balance = ICT.balanceOf(
                 address(this),
@@ -198,9 +196,24 @@ library SolverLib {
         );
     }
 
-    function reportPayouts(Condition storage condition) public {
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .reportPayouts(condition.questionId, condition.payouts);
+    function reportPayouts(address ctfAddress, Condition storage condition)
+        public
+    {
+        IConditionalTokens(ctfAddress).reportPayouts(
+            condition.questionId,
+            condition.payouts
+        );
+    }
+
+    function reportPayouts(
+        address ctfAddress,
+        Condition storage condition,
+        uint256[] memory payouts
+    ) public {
+        IConditionalTokens(ctfAddress).reportPayouts(
+            condition.questionId,
+            payouts
+        );
     }
 
     function proposePayouts(
@@ -211,17 +224,11 @@ library SolverLib {
         condition.payouts = _payouts;
     }
 
-    function confirmPayouts(Condition storage condition) public {
+    function confirmPayouts(address ctfAddress, Condition storage condition)
+        public
+    {
         condition.status = Status.OutcomeReported;
-        reportPayouts(condition);
-    }
-
-    function reportPayouts(
-        Condition storage condition,
-        uint256[] memory payouts
-    ) public {
-        IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-            .reportPayouts(condition.questionId, payouts);
+        reportPayouts(ctfAddress, condition);
     }
 
     function arbitrationPending(Condition storage condition) public {
@@ -236,14 +243,17 @@ library SolverLib {
         condition.status = Status.OutcomeProposed;
     }
 
-    function arbitrate(Condition storage condition, uint256[] memory payouts)
-        public
-    {
+    function arbitrate(
+        address ctfAddress,
+        Condition storage condition,
+        uint256[] memory payouts
+    ) public {
         condition.status = Status.ArbitrationDelivered;
-        reportPayouts(condition, payouts);
+        reportPayouts(ctfAddress, condition, payouts);
     }
 
     function allocatePartition(
+        address ctfAddress,
         Condition calldata condition,
         ConditionBase calldata base,
         address solver,
@@ -257,6 +267,7 @@ library SolverLib {
 
         for (uint256 i; i < base.partition.length; i++) {
             _tokens[i] = getPositionId(
+                ctfAddress,
                 condition,
                 base.collateralToken,
                 base.partition[i]
@@ -268,9 +279,8 @@ library SolverLib {
             _addressThis[i] = address(this);
         }
 
-        uint256[] memory _balances = IConditionalTokens(
-            0x5FbDB2315678afecb367f032d93F642f64180aa3
-        ).balanceOfBatch(_addressThis, _tokens);
+        uint256[] memory _balances = IConditionalTokens(ctfAddress)
+            .balanceOfBatch(_addressThis, _tokens);
 
         for (uint256 i; i < base.recipientAddressSlots.length; i++) {
             _amounts[i] = new uint256[](base.partition.length);
@@ -290,17 +300,16 @@ library SolverLib {
         }
 
         for (uint256 i; i < base.recipientAddressSlots.length; i++) {
-            IConditionalTokens(0x5FbDB2315678afecb367f032d93F642f64180aa3)
-                .safeBatchTransferFrom(
-                    solver,
-                    abi.decode(
-                        data.slots[base.recipientAddressSlots[i]],
-                        (address)
-                    ),
-                    _tokens,
-                    _amounts[i],
-                    abi.encode(trackingId)
-                );
+            IConditionalTokens(ctfAddress).safeBatchTransferFrom(
+                solver,
+                abi.decode(
+                    data.slots[base.recipientAddressSlots[i]],
+                    (address)
+                ),
+                _tokens,
+                _amounts[i],
+                abi.encode(trackingId)
+            );
         }
     }
 
@@ -346,17 +355,15 @@ library SolverLib {
         return true;
     }
 
-    function getCollectionId(Condition memory condition, uint256 partition)
-        public
-        view
-        returns (bytes32 collectionId)
-    {
-        collectionId = IConditionalTokens(
-            0x5FbDB2315678afecb367f032d93F642f64180aa3
-        ).getCollectionId(
-                condition.parentCollectionId,
-                condition.conditionId,
-                partition
-            );
+    function getCollectionId(
+        address ctfAddress,
+        Condition memory condition,
+        uint256 partition
+    ) public view returns (bytes32 collectionId) {
+        collectionId = IConditionalTokens(ctfAddress).getCollectionId(
+            condition.parentCollectionId,
+            condition.conditionId,
+            partition
+        );
     }
 }

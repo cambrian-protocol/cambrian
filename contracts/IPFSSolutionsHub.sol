@@ -9,6 +9,8 @@ import "./interfaces/IProposalsHub.sol";
 // 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 DEV_ADDRESS
 
 contract IPFSSolutionsHub {
+    address immutable factoryAddress;
+
     struct Solution {
         bool executed;
         IERC20 collateralToken;
@@ -33,6 +35,10 @@ contract IPFSSolutionsHub {
 
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
+
+    constructor(address _factoryAddress) {
+        factoryAddress = _factoryAddress;
+    }
 
     function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
         require(
