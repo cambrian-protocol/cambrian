@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@cambrian/core/*": ["./packages/core/src/*"],
+            "@cambrian/app/*": ["./packages/app/src/*"],
+            "@artifacts/*": ["./packages/core/artifacts/*"],
+            },
+        "target": "es5",
+        "module": "commonjs",
+        "strict": true,
+        "esModuleInterop": true,
+        "jsx": "react",
+        "outDir": "dist",
+        "resolveJsonModule": true
+    },
+    "references": [{"path": "./packages/core"}, {"path": "./packages/app"}],
+    "include": ["packages"],
+    "exclude": ["**/node_modules", "node_modules"]
+}
