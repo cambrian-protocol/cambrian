@@ -1,42 +1,8 @@
 {
-  "dependencies": {
-    "@daostack/arc": "0.0.1-rc.57",
-    "@ethersproject/hardware-wallets": "^5.0.14",
-    "@gnosis.pm/conditional-tokens-contracts": "^1.0.3",
-    "@nomiclabs/hardhat-waffle": "2.0.1",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/contracts": "4.3.2",
-    "@openzeppelin/test-helpers": "^0.5.12",
-    "@typechain/ethers-v5": "7.0.0",
-    "@typechain/hardhat": "2.0.1",
-    "@types/mocha": "8.2.2",
-    "@types/node": "15.3.0",
-    "ansi-regex": "5.0.1",
-    "bs58": "^4.0.1",
-    "chai": "4.3.4",
-    "chai-as-promised": "^7.1.1",
-    "ethereum-waffle": "3.3.0",
-    "glob-parent": "5.1.2",
-    "hardhat": "2.5.0",
-    "hardhat-deploy": "0.8.11",
-    "hardhat-gas-reporter": "^1.0.4",
-    "ipfs-only-hash": "^4.0.0",
-    "lodash": "4.17.21",
-    "mem": "4.0.0",
-    "node-fetch": "2.6.1",
-    "set-value": "4.0.1",
-    "ts-generator": "0.1.1",
-    "ts-node": "9.1.1",
-    "typechain": "5.0.0",
-    "typescript": "4.2.4",
-    "underscore": "1.12.1",
-    "web3": "^1.5.1",
-    "yargs-parser": "13.1.2"
-  },
-  "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
-    "ethers": "^5.4.7",
-    "hardhat-contract-sizer": "2.0.3",
-    "hardhat-log-remover": "^2.0.2"
-  }
+  "private": true,
+  "name": "cambrian",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {}
 }

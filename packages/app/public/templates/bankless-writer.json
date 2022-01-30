@@ -1,0 +1,302 @@
+{
+    "flowElements": [
+        {
+            "id": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+            "type": "solver",
+            "position": { "x": 300, "y": 200 },
+            "data": { "label": "MVP Writer" },
+            "style": { "border": "white 2px solid", "borderRadius": "15px" }
+        },
+        {
+            "id": "01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP76J4J0A82D7AZ272MCME8",
+            "type": "oc",
+            "position": { "x": 180, "y": 420 },
+            "data": { "label": "Outcome Collection #1" },
+            "style": { "border": "none", "borderRadius": "15px" }
+        },
+        {
+            "id": "e01FSP76J4HE1ZK4M0C8W4RDH5A-01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP76J4J0A82D7AZ272MCME8",
+            "source": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+            "type": "step",
+            "target": "01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP76J4J0A82D7AZ272MCME8",
+            "style": { "border": "none" }
+        },
+        {
+            "id": "01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP7H7CAR321SYQN3VD0JMF3",
+            "type": "oc",
+            "position": { "x": 460, "y": 420 },
+            "data": { "label": "Outcome Collection" },
+            "style": { "border": "none", "borderRadius": "15px" }
+        },
+        {
+            "id": "e01FSP76J4HE1ZK4M0C8W4RDH5A-01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP7H7CAR321SYQN3VD0JMF3",
+            "source": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+            "target": "01FSP76J4HE1ZK4M0C8W4RDH5A/01FSP7H7CAR321SYQN3VD0JMF3",
+            "type": "step",
+            "style": { "border": "none" }
+        }
+    ],
+    "solvers": [
+        {
+            "id": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+            "title": "MVP Writer",
+            "iface": {},
+            "config": {
+                "keeperAddress": {
+                    "address": "bankless.keeper.eth",
+                    "linkedSlots": ["01FSP77T8YCZ3TK50BMB6NCC5W"]
+                },
+                "arbitratorAddress": { "address": "", "linkedSlots": [] },
+                "timelockSeconds": 0,
+                "data": "",
+                "slots": {
+                    "01FSP76J4J37AQM1WRZDY85CY3": {
+                        "id": "01FSP76J4J37AQM1WRZDY85CY3",
+                        "slotType": 1,
+                        "dataTypes": ["uint256"],
+                        "data": [0]
+                    },
+                    "01FSP76J4J9N3905P6M7JQFBD2": {
+                        "id": "01FSP76J4J9N3905P6M7JQFBD2",
+                        "slotType": 1,
+                        "dataTypes": ["uint256"],
+                        "data": [10000]
+                    },
+                    "01FSP77T8YCZ3TK50BMB6NCC5W": {
+                        "id": "01FSP77T8YCZ3TK50BMB6NCC5W",
+                        "data": ["bankless.keeper.eth"],
+                        "slotType": 1,
+                        "dataTypes": ["address"],
+                        "solverConfigAddress": {
+                            "type": "Keeper",
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A"
+                        }
+                    },
+                    "01FSP78E4KMM5HEQB09BD8T253": {
+                        "id": "01FSP78E4KMM5HEQB09BD8T253",
+                        "data": [""],
+                        "slotType": 3,
+                        "dataTypes": ["address"],
+                        "description": "Writer (Bankless)"
+                    },
+                    "01FSP79JH6NFA733XX2DB5W5YT": {
+                        "id": "01FSP79JH6NFA733XX2DB5W5YT",
+                        "data": ["bankless.treasury.eth"],
+                        "slotType": 1,
+                        "dataTypes": ["address"],
+                        "description": "Treasury (Bankless)"
+                    },
+                    "01FSP7A5ZZEXTNAMK5D8MHY93F": {
+                        "id": "01FSP7A5ZZEXTNAMK5D8MHY93F",
+                        "data": ["cambrian.eth"],
+                        "slotType": 1,
+                        "dataTypes": ["address"],
+                        "description": "Cambrians"
+                    },
+                    "01FSP7AJHMVFKHKTTCVX5MVCA7": {
+                        "id": "01FSP7AJHMVFKHKTTCVX5MVCA7",
+                        "data": ["buyer.eth"],
+                        "slotType": 1,
+                        "dataTypes": ["address"],
+                        "description": "Buyer"
+                    },
+                    "01FSP93R1E6ZV9QAB66PPDFDE3": {
+                        "id": "01FSP93R1E6ZV9QAB66PPDFDE3",
+                        "data": [9000],
+                        "slotType": 1,
+                        "dataTypes": ["uint256"]
+                    },
+                    "01FSP971A4PH6PSEC6SDHYB3R0": {
+                        "id": "01FSP971A4PH6PSEC6SDHYB3R0",
+                        "data": [400],
+                        "slotType": 1,
+                        "dataTypes": ["uint256"]
+                    },
+                    "01FSP97S7T6S6E98BZ7FQJJY20": {
+                        "id": "01FSP97S7T6S6E98BZ7FQJJY20",
+                        "data": [200],
+                        "slotType": 1,
+                        "dataTypes": ["uint256"]
+                    }
+                },
+                "condition": {
+                    "outcomes": [
+                        {
+                            "id": "01FSP7H2S0NA1M25ZZB3D04WTS",
+                            "title": "Success",
+                            "uri": "uri",
+                            "description": "desc"
+                        },
+                        {
+                            "id": "01FSP7HMH2ZVKH2JARGMJ6PBZ4",
+                            "title": "Failure",
+                            "uri": "uri",
+                            "description": "desc"
+                        }
+                    ],
+                    "partition": [
+                        {
+                            "id": "01FSP76J4J0A82D7AZ272MCME8",
+                            "outcomes": [
+                                {
+                                    "id": "01FSP7H2S0NA1M25ZZB3D04WTS",
+                                    "title": "Success",
+                                    "uri": "uri",
+                                    "description": "desc"
+                                }
+                            ]
+                        },
+                        {
+                            "id": "01FSP7H7CAR321SYQN3VD0JMF3",
+                            "outcomes": [
+                                {
+                                    "id": "01FSP7HMH2ZVKH2JARGMJ6PBZ4",
+                                    "title": "Failure",
+                                    "uri": "uri",
+                                    "description": "desc"
+                                }
+                            ]
+                        }
+                    ],
+                    "recipients": [
+                        {
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                            "slotId": "01FSP77T8YCZ3TK50BMB6NCC5W"
+                        },
+                        {
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                            "slotId": "01FSP78E4KMM5HEQB09BD8T253"
+                        },
+                        {
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                            "slotId": "01FSP79JH6NFA733XX2DB5W5YT"
+                        },
+                        {
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                            "slotId": "01FSP7A5ZZEXTNAMK5D8MHY93F"
+                        },
+                        {
+                            "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                            "slotId": "01FSP7AJHMVFKHKTTCVX5MVCA7"
+                        }
+                    ],
+                    "recipientAmountSlots": {
+                        "01FSP76J4J0A82D7AZ272MCME8": [
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP77T8YCZ3TK50BMB6NCC5W"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP971A4PH6PSEC6SDHYB3R0"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP78E4KMM5HEQB09BD8T253"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP93R1E6ZV9QAB66PPDFDE3"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP79JH6NFA733XX2DB5W5YT"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP971A4PH6PSEC6SDHYB3R0"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP7A5ZZEXTNAMK5D8MHY93F"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP97S7T6S6E98BZ7FQJJY20"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP7AJHMVFKHKTTCVX5MVCA7"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP76J4J37AQM1WRZDY85CY3"
+                                }
+                            }
+                        ],
+                        "01FSP7H7CAR321SYQN3VD0JMF3": [
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP77T8YCZ3TK50BMB6NCC5W"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP971A4PH6PSEC6SDHYB3R0"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP78E4KMM5HEQB09BD8T253"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP76J4J37AQM1WRZDY85CY3"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP79JH6NFA733XX2DB5W5YT"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP971A4PH6PSEC6SDHYB3R0"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP7A5ZZEXTNAMK5D8MHY93F"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP97S7T6S6E98BZ7FQJJY20"
+                                }
+                            },
+                            {
+                                "recipient": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP7AJHMVFKHKTTCVX5MVCA7"
+                                },
+                                "amount": {
+                                    "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+                                    "slotId": "01FSP93R1E6ZV9QAB66PPDFDE3"
+                                }
+                            }
+                        ]
+                    },
+                    "amountSlot": "01FSP76J4J9N3905P6M7JQFBD2"
+                },
+                "collateralToken": "toytoken"
+            }
+        }
+    ],
+    "currentElement": {
+        "id": "01FSP76J4HE1ZK4M0C8W4RDH5A",
+        "type": "solver",
+        "position": { "x": 300, "y": 200 },
+        "data": { "label": "MVP Writer" }
+    },
+    "currentIdPath": { "solverId": "01FSP76J4HE1ZK4M0C8W4RDH5A" }
+}
