@@ -32,6 +32,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     event DeployedChild(address chainChild);
     event PreparedSolve(address solver, uint256 solveIndex);
+    event IngestedData(); // Emited on executeIngests(), handleCallback(), addData()
 
     /**
         @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
@@ -196,6 +197,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 );
             }
         }
+
+        emit IngestedData();
     }
 
     function ingest(SolverLib.Ingest storage _ingest) private {
@@ -228,6 +231,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
 
         router(_slot, _data);
+        emit IngestedData();
     }
 
     function getData(uint256 _slot) public view returns (bytes memory data) {
@@ -314,6 +318,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
         delete callbacks.incoming[_cb];
         callbacks.numIncoming--;
+
+        emit IngestedData();
     }
 
     /**
