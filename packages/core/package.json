@@ -1,4 +1,6 @@
 {
+  "name": "@cambrian/core",
+  "version": "0.1.0",
   "dependencies": {
     "@daostack/arc": "0.0.1-rc.57",
     "@ethersproject/hardware-wallets": "^5.0.14",
