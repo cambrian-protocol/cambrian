@@ -1,3 +1,5 @@
 .env
 .solcx*
 node_modules
+cache
+typechain-types

@@ -1,17 +1,24 @@
-require("@nomiclabs/hardhat-waffle");
-require("@typechain/hardhat");
-require("hardhat-contract-sizer");
-require("@nomiclabs/hardhat-ethers");
-require("hardhat-deploy");
-require("@nomiclabs/hardhat-web3");
-// require('hardhat-log-remover');
-// require("hardhat-gas-reporter");
-const { HardhatUserConfig } = require("hardhat/types");
+import "@nomiclabs/hardhat-waffle";
+import "@typechain/hardhat";
+import "hardhat-contract-sizer";
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-deploy";
+import "@nomiclabs/hardhat-web3";
+import "tsconfig-paths/register";
+// import 'hardhat-log-remover'
+// import "hardhat-gas-reporter"
+import { HardhatUserConfig } from "hardhat/types";
 
 const TESTNET_PRIVATE_KEY =
   "33b3817e6e42e55a00c425e0a081dbf3e9a8672600d6527f3d0849f9c19b91c6";
 
 const config = {
+  paths: {
+    root: "./packages/core",
+    deploy: "deploy",
+    sources: "contracts",
+    artifacts: "artifacts",
+  },
   networks: {
     hardhat: {
       blockGasLimit: 15000000,
@@ -45,6 +52,10 @@ const config = {
     currency: "USD",
     gasPrice: 32,
     coinmarketcap: "5dc6d6fd-09c5-4c48-8296-9e2b44dde46a",
+  },
+  typechain: {
+    outDir: "./typechain-types",
+    target: "ethers-v5",
   },
   // contractSizer: {
   //   alphaSort: true,
