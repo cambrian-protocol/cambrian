@@ -107,7 +107,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         (chainChild, _solver) = SolverLib.deployChild(
             factoryAddress,
             _config,
-            address(this),
             chainIndex
         );
 
@@ -131,6 +130,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         conditions[_index].status = SolverLib.Status.Executed;
 
+        require(
+            SolverLib.allocationValid(_index, datas, config.conditionBase),
+            "Recipient slot requires updating"
+        );
+
         SolverLib.splitPosition(
             ctfAddress,
             chainParent,
@@ -143,7 +147,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             ctfAddress,
             conditions[_index],
             config.conditionBase,
-            address(this),
             datas,
             trackingId
         );
@@ -197,7 +200,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                 );
             }
         }
-
         emit IngestedData();
     }
 
@@ -496,6 +498,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         returns (SolverLib.Condition[] memory)
     {
         return conditions;
+    }
+
+    function getConfig() public view returns (SolverLib.Config memory) {
+        return config;
     }
 
     function setTrackingId(bytes32 _trackingId) public {

@@ -5,3 +5,4 @@ contracts/.solcx-lock-0.8.0
 .solcx-lock-0.8.0
 yarn-error.log
 .env
+artifacts

@@ -81,10 +81,9 @@ describe('Solver', function () {
             parentCollectionIndexSet: 0,
             amountSlot: 4,
             partition: [1, 2],
-            recipientAddressSlots: [1, 2],
-            recipientAmountSlots: [
-                [3, 4],
-                [4, 3],
+            allocations: [
+                { recipientAddressSlot: 1, recipientAmountSlots: [3, 4] },
+                { recipientAddressSlot: 2, recipientAmountSlots: [4, 3] },
             ],
             outcomeURIs: [
                 getBytes32FromMultihash(
@@ -96,22 +95,20 @@ describe('Solver', function () {
             ],
         }
 
-        const solverConfigs = [
-            [
-                Solver.address,
-                keeper.address,
-                arbitrator.address,
-                0,
-                ethers.utils.formatBytes32String(''),
-                ingests0,
-                canon0,
-            ],
-        ]
+        const solverConfig = {
+            implementation: Solver.address,
+            keeper: keeper.address,
+            arbitrator: arbitrator.address,
+            timelockSeconds: 0,
+            data: ethers.utils.formatBytes32String(''),
+            ingests: ingests0,
+            conditionBase: canon0,
+        }
 
         let deployedAddress = await SolverFactory.createSolver(
             ethers.constants.AddressZero,
             0,
-            solverConfigs[0]
+            solverConfig
         )
             .then((tx: any) => tx.wait())
             .then(
@@ -122,9 +119,6 @@ describe('Solver', function () {
                     )[0]
             )
 
-        console.log(deployedAddress)
-
-        // Deploy solverChain
         let solver = new SolverContract(
             deployedAddress,
             SOLVER_ABI,
@@ -165,17 +159,3 @@ describe('Solver', function () {
         expect(sellerERC20Balance).to.equal(100)
     })
 })
-
-function loopEntries(obj: any): any {
-    if (Array.isArray(obj)) {
-        obj.forEach((v, i) => {
-            loopEntries(v)
-        })
-    } else if (typeof obj == 'object') {
-        for (const [k, v] of Object.entries(obj)) {
-            loopEntries(v)
-        }
-    } else {
-        console.log(obj)
-    }
-}

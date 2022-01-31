@@ -53,18 +53,6 @@ library SolverLib {
         Status status; // Status of this condition
     }
 
-    // Immutable data regarding conditions which may be created
-    struct ConditionBase {
-        IERC20 collateralToken;
-        uint256 outcomeSlots; // Num outcome slots
-        uint256 parentCollectionIndexSet; // IndexSet to get parentCollectionId from parent Solver
-        uint256 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
-        uint256[] partition; // Partition of positions for payouts
-        uint256[] recipientAddressSlots; // Arrays of [i] for addressSlots[i] containing CT recipients
-        uint256[][] recipientAmountSlots; // Arrays containing amount of CTs to send to each recipient for each partition
-        Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
-    }
-
     // Configuration of this Solver
     struct Config {
         Solver implementation; // The implementation address for this Solver
@@ -86,6 +74,22 @@ library SolverLib {
         uint256 numOutgoing;
         mapping(uint256 => address[]) outgoing; // This Slot => Solver expecting callback
         mapping(bytes32 => uint256) incoming; // keccack256(Address, CallerSlot) => ingest index
+    }
+
+    // Immutable data regarding conditions which may be created
+    struct ConditionBase {
+        IERC20 collateralToken;
+        uint256 outcomeSlots; // Num outcome slots
+        uint256 parentCollectionIndexSet; // IndexSet to get parentCollectionId from parent Solver
+        uint256 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
+        uint256[] partition; // Partition of positions for payouts
+        Allocation[] allocations; // Allocations for each partition
+        Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
+    }
+
+    struct Allocation {
+        uint256 recipientAddressSlot; // Slot containing address of recipient
+        uint256[] recipientAmountSlots; // recipientAmountSlots[i] => amount for partition[i]
     }
 
     function createCondition(
@@ -134,11 +138,10 @@ library SolverLib {
     function deployChild(
         address factoryAddress,
         Config calldata config,
-        address solver,
         uint256 solverIndex
     ) public returns (address child, Solver) {
         child = ISolverFactory(factoryAddress).createSolver(
-            solver,
+            address(this),
             solverIndex + 1,
             config
         );
@@ -252,18 +255,34 @@ library SolverLib {
         reportPayouts(ctfAddress, condition, payouts);
     }
 
+    function allocationValid(
+        uint256 conditionVer,
+        Datas storage datas,
+        ConditionBase storage conditionBase
+    ) public view returns (bool valid) {
+        valid = true;
+
+        for (uint256 i = 0; i < conditionBase.allocations.length; i++) {
+            if (
+                datas.slotVersions[
+                    conditionBase.allocations[i].recipientAddressSlot
+                ] != (conditionVer + 1)
+            ) {
+                valid = false;
+            }
+        }
+    }
+
     function allocatePartition(
         address ctfAddress,
         Condition calldata condition,
         ConditionBase calldata base,
-        address solver,
         Datas storage data,
         bytes32 trackingId
     ) public {
         uint256[] memory _tokens = new uint256[](base.partition.length);
-        uint256[][] memory _amounts = new uint256[][](
-            base.recipientAddressSlots.length
-        );
+        uint256[] memory _balances = new uint256[](base.partition.length);
+        address[] memory _addressThis = new address[](base.partition.length);
 
         for (uint256 i; i < base.partition.length; i++) {
             _tokens[i] = getPositionId(
@@ -272,42 +291,41 @@ library SolverLib {
                 base.collateralToken,
                 base.partition[i]
             );
+            _addressThis[i] = address(this); // For more efficient balanceOfBatch call
         }
 
-        address[] memory _addressThis = new address[](_tokens.length);
-        for (uint256 i; i < _tokens.length; i++) {
-            _addressThis[i] = address(this);
-        }
+        _balances = IConditionalTokens(ctfAddress).balanceOfBatch(
+            _addressThis,
+            _tokens
+        );
 
-        uint256[] memory _balances = IConditionalTokens(ctfAddress)
-            .balanceOfBatch(_addressThis, _tokens);
+        for (uint256 i; i < base.allocations.length; i++) {
+            uint256[] memory _amounts = new uint256[](base.partition.length);
 
-        for (uint256 i; i < base.recipientAddressSlots.length; i++) {
-            _amounts[i] = new uint256[](base.partition.length);
-
-            for (uint256 j; j < base.partition.length; j++) {
+            for (
+                uint256 j;
+                j < base.allocations[i].recipientAmountSlots.length;
+                j++
+            ) {
                 uint256 _pctValue = abi.decode(
-                    data.slots[base.recipientAmountSlots[j][i]],
+                    data.slots[base.allocations[i].recipientAmountSlots[j]],
                     (uint256)
                 );
-
-                if (_pctValue != 0) {
-                    _amounts[i][j] = bpToNum(_pctValue, _balances[j]);
+                if (_pctValue == 0) {
+                    _amounts[j] = 0;
                 } else {
-                    _amounts[i][j] = 0;
+                    _amounts[j] = bpToNum(_pctValue, _balances[j]);
                 }
             }
-        }
 
-        for (uint256 i; i < base.recipientAddressSlots.length; i++) {
             IConditionalTokens(ctfAddress).safeBatchTransferFrom(
-                solver,
+                address(this),
                 abi.decode(
-                    data.slots[base.recipientAddressSlots[i]],
+                    data.slots[base.allocations[i].recipientAddressSlot],
                     (address)
                 ),
                 _tokens,
-                _amounts[i],
+                _amounts,
                 abi.encode(trackingId)
             );
         }
