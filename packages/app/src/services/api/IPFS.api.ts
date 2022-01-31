@@ -1,7 +1,8 @@
+import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import fetch from 'node-fetch'
 
 export const IPFSAPI = {
-    getFromCID: async (cid: string) => {
+    getFromCID: async (cid: string): Promise<any> => {
         let pinata = undefined
         let infura = undefined
         let local = undefined
@@ -26,8 +27,27 @@ export const IPFSAPI = {
 
         if (infura || pinata || local) {
             return pinata || infura || local
+        } else {
+            return undefined
         }
     },
+}
+
+export const outcomeFromIPFS = async (
+    cid: string
+): Promise<OutcomeModel | undefined> => {
+    let outcome
+    try {
+        outcome = await IPFSAPI.getFromCID(cid)
+        outcome = JSON.parse(outcome)
+    } catch (e) {
+        try {
+            if (outcome) {
+                outcome = String(outcome)
+            }
+        } catch (e) {}
+    }
+    return outcome
 }
 
 const wait = (ms: number) => new Promise((res) => setTimeout(res, ms))

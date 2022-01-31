@@ -5,9 +5,10 @@ import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSign
 import {
     ParsedAllocationModel,
     Multihash,
+    OutcomeModel,
 } from '@cambrian/app/models/ConditionModel'
 import { GetSlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { IPFSAPI, outcomeFromIPFS } from '@cambrian/app/services/api/IPFS.api'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/helpers/transformer'
 
@@ -225,6 +226,7 @@ export default class SolverContract {
         slots: any,
         outcomeCollections: any[]
     ) => {
+        console.log(config)
         return config.conditionBase.allocations.map(
             async (x: ParsedAllocationModel) => {
                 console.log('Slots: ', slots)
@@ -260,14 +262,14 @@ export default class SolverContract {
             (x: Multihash) => getMultihashFromBytes32(x)
         )
 
-        const outcomes = await Promise.all(
-            outcomeURIs.map((x: string) => IPFSAPI.getFromCID(x))
-        )
+        const outcomes = (await Promise.all(
+            outcomeURIs.map((x: string) => outcomeFromIPFS(x))
+        )) as (OutcomeModel | undefined)[]
 
         const outcomeCollections = config.conditionBase.partition.map(
             (indexSet: BigNumber) => {
                 {
-                    const oc = <any>[]
+                    const oc = <(OutcomeModel | undefined)[]>[]
                     const oneHot = binaryArrayFromIndexSet(
                         indexSet.toNumber(),
                         config.conditionBase.outcomeSlots

@@ -7,6 +7,12 @@ export const bs58 = require('bs58')
  * @property {number} size The length of digest
  */
 
+export type MultihashType = {
+    digest: string
+    hashFunction: number
+    size: number
+}
+
 /**
  * Partition multihash string into object representing multihash
  *
@@ -29,7 +35,9 @@ export const getBytes32FromMultihash = (multihash: any) => {
  * @param {Multihash} multihash
  * @returns {(string|null)} base58 encoded multihash string
  */
-export const getMultihashFromBytes32 = (multihash: any) => {
+export const getMultihashFromBytes32 = (
+    multihash: MultihashType
+): string | null => {
     const { digest, hashFunction, size } = multihash
     if (size === 0) return null
 
