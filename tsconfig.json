@@ -17,6 +17,6 @@
     },
     "include": ["packages"],
     "exclude": ["**/node_modules", "node_modules"],
-    "files": ["./hardhat.config.ts"],
+    "files": ["./hardhat.config.ts", "./packages/core/deploy"],
 
 }
