@@ -125,10 +125,7 @@ describe('Solver', function () {
             ethers.provider
         )
         await solver.prepareSolve(0)
-        await solver.updateData()
 
-        const parent = await solver.getChainParent()
-        console.log(parent)
         //Fund Solver
         await ToyToken.connect(buyer).transfer(solver.address, 100)
         await solver.executeSolve(0)
