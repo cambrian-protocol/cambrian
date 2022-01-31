@@ -39,6 +39,11 @@ export default class SolverContract {
         if (!(this.address && this.iface && this.provider && this.contract)) {
             throw new Error('Error constructing SolverContract')
         }
+
+        this.data = {}
+
+        this.updateData()
+        this.initListeners()
     }
 
     /***********************************************/
@@ -288,9 +293,10 @@ export default class SolverContract {
             allocations: allocations,
             conditions: conditions,
             timelocks: timelocks,
+            slots: slots,
         }
 
-        console.log(this.data)
+        return this.data
     }
 
     initListeners = async () => {
@@ -300,7 +306,10 @@ export default class SolverContract {
             fromBlock: 'latest',
         }
 
-        this.provider.on(filter, () => this.updateData())
+        this.provider.on(filter, () => {
+            console.log('Heard IngestedData event')
+            this.updateData()
+        })
     }
 }
 
