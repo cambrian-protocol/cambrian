@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
+        "baseUrl": "./",
         "paths": {
             "@cambrian/core/*": ["./packages/core/src/*"],
             "@cambrian/app/*": ["./packages/app/src/*"],
@@ -15,5 +15,7 @@
         "resolveJsonModule": true,
     },
     "include": ["packages"],
-    "exclude": ["**/node_modules", "node_modules"]
+    "exclude": ["**/node_modules", "node_modules"],
+    "files": ["./hardhat.config.ts"],
+
 }
