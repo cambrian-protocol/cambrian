@@ -254,8 +254,6 @@ export default class SolverContract {
 
     updateData = async () => {
         const config = await this.getConfig()
-        console.log(config)
-
         const slots = await this.getSlots(config)
 
         const outcomeURIs = config.conditionBase.outcomeURIs.map(
