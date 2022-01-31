@@ -1,6 +1,6 @@
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { JsonFragmentType } from '@ethersproject/abi'
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber, ethers, EventFilter } from 'ethers'
 import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSigner'
 import {
     ParsedAllocationModel,
@@ -24,7 +24,8 @@ export default class SolverContract {
     constructor(
         address: SolidityDataTypes.Address,
         abi: JsonFragmentType[],
-        provider: ethers.providers.BaseProvider
+        provider: ethers.providers.BaseProvider,
+        block?: number
     ) {
         this.address = address
         this.iface = new ethers.utils.Interface(abi)
@@ -221,33 +222,15 @@ export default class SolverContract {
         return slots
     }
 
-    getAllocations = async (
-        config: any,
-        slots: any,
-        outcomeCollections: any[]
-    ) => {
-        console.log(config)
+    getAllocations = (config: any, slots: any, outcomeCollections: any[]) => {
         return config.conditionBase.allocations.map(
-            async (x: ParsedAllocationModel) => {
-                console.log('Slots: ', slots)
-
-                const address = decodeData(
-                    [SolidityDataTypes.Address],
-                    slots[x.recipientAddressSlot].data
-                )
-
-                const amounts = x.recipientAmountSlots.map((y) =>
-                    decodeData([SolidityDataTypes.Uint256], slots[y].data)
-                )
-
+            (x: ParsedAllocationModel) => {
+                const amounts = x.recipientAmountSlots.map((y) => slots[y].data)
                 const allocations = amounts.map((x, i) => {
                     return { oc: outcomeCollections[i], amount: x }
                 })
-
-                // TODO Reverse resolve ENS name/NFT
-
                 return {
-                    address: address,
+                    address: slots[x.recipientAddressSlot].data,
                     allocations: allocations,
                 }
             }
@@ -306,6 +289,18 @@ export default class SolverContract {
             conditions: conditions,
             timelocks: timelocks,
         }
+
+        console.log(this.data)
+    }
+
+    initListeners = async () => {
+        const filter = <EventFilter>{
+            address: this.address,
+            topics: [ethers.utils.id('IngestedData()')],
+            fromBlock: 'latest',
+        }
+
+        this.provider.on(filter, () => this.updateData())
     }
 }
 
