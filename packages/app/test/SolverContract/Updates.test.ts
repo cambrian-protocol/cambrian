@@ -9,8 +9,8 @@ const {
 const ctHelpers = require('@cambrian/core/helpers/ConditionalTokens.js')
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 
-describe('Solver', function () {
-    it('Should execute single-solver Proposal with two outcomes', async function () {
+describe('Data Update', function () {
+    it('Should update SolverContract data after certain events', async function () {
         await deployments.fixture([
             'ConditionalTokens',
             'SolverFactory',
@@ -73,6 +73,13 @@ describe('Solver', function () {
                 solverIndex: 0,
                 data: ethers.utils.defaultAbiCoder.encode(['uint256'], [10000]),
             },
+            {
+                executions: 0,
+                ingestType: 3,
+                slot: 5,
+                solverIndex: 0,
+                data: ethers.constants.HashZero,
+            },
         ]
 
         const canon0 = {
@@ -124,35 +131,21 @@ describe('Solver', function () {
             SOLVER_ABI,
             ethers.provider
         )
-        await solver.prepareSolve(0)
 
-        //Fund Solver
-        await ToyToken.connect(buyer).transfer(solver.address, 100)
-        await solver.executeSolve(0)
+        await solver.updateData()
+        expect(solver.data.slots[4].data).to.equal('0x') // Slot hasn't been ingested yet
+        expect(solver.data.slots[4].data).to.equal('0x') // Slot hasn't been ingested yet
+        await solver.prepareSolve(0).then((tx: any) => tx.wait())
 
-        // Seller should have all the success tokens
-        const indexSetSuccess = ctHelpers.getIndexSetFromBinaryArray([1, 0]) // If success
-        const indexSetFailure = ctHelpers.getIndexSetFromBinaryArray([0, 1]) // If failure
-
-        // Keeper proposes payouts
-        await solver.proposePayouts(0, [1, 0])
-
-        const conditions = await solver.getConditions()
-        const payouts = conditions[0].payouts
-        expect(payouts[0]).to.equal(1)
-        expect(payouts[1]).to.equal(0)
-
-        // We set timelock to 0, so confirm right away
-        await solver.confirmPayouts(0)
-
-        // Seller redeems tokens
-        await CT.connect(seller).redeemPositions(
-            ToyToken.address,
-            ethers.constants.HashZero,
-            conditions[conditions.length - 1].conditionId,
-            [indexSetSuccess, indexSetFailure]
+        expect(solver.data.slots[4].data).to.equal(
+            '0x0000000000000000000000000000000000000000000000000000000000002710'
         )
-        const sellerERC20Balance = await ToyToken.balanceOf(seller.address)
-        expect(sellerERC20Balance).to.equal(100)
+
+        // //Fund Solver
+        // await ToyToken.connect(buyer).transfer(solver.address, 100)
+
+        // await solver.executeSolve(0)
+        // await solver.updateData()
+        // expect(solver.data.slots[5].data).to.equal(1)
     })
 })
