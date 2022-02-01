@@ -8,33 +8,33 @@ import {
     OutcomeModel,
 } from '@cambrian/app/models/ConditionModel'
 import { GetSlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
-import { IPFSAPI, outcomeFromIPFS } from '@cambrian/app/services/api/IPFS.api'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/helpers/transformer'
+import React from 'react'
 
-const hh = require('hardhat')
-
-export default class SolverContract {
+export default class SolverContract extends React.Component {
     address: SolidityDataTypes.Address
     iface: ethers.utils.Interface
     provider: ethers.providers.BaseProvider
     contract: ethers.Contract
     data: any
+    ipfs: IPFSAPI
+    UI: any
 
-    constructor(
-        address: SolidityDataTypes.Address,
-        abi: JsonFragmentType[],
-        provider: ethers.providers.BaseProvider,
-        block?: number
-    ) {
-        this.address = address
-        this.iface = new ethers.utils.Interface(abi)
-        this.provider = provider
+    constructor(props: any) {
+        super(props)
+
+        this.address = props.address
+        this.iface = new ethers.utils.Interface(props.abi)
+        this.provider = props.provider
         this.contract = new ethers.Contract(
             this.address,
             this.iface,
             this.provider
         )
+
+        this.ipfs = new IPFSAPI()
 
         if (!(this.address && this.iface && this.provider && this.contract)) {
             throw new Error('Error constructing SolverContract')
@@ -42,73 +42,72 @@ export default class SolverContract {
 
         this.data = {}
 
-        this.updateData()
-        this.initListeners()
+        this.init()
     }
 
     /***********************************************/
     /***************** INTERACT *******************/
     /*********************************************/
 
-    prepareSolve = async (newConditionIndex: number) => {
-        // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
-        const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
-        if (!currentSigner) {
-            return undefined
-        }
-        try {
-            return this.contract
-                .connect(currentSigner)
-                .prepareSolve(newConditionIndex)
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    // prepareSolve = async (newConditionIndex: number) => {
+    //     // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
+    //     const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
+    //     if (!currentSigner) {
+    //         return undefined
+    //     }
+    //     try {
+    //         return this.contract
+    //             .connect(currentSigner)
+    //             .prepareSolve(newConditionIndex)
+    //     } catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
-    executeSolve = async (conditionIndex: number) => {
-        // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
-        const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
-        if (!currentSigner) {
-            return undefined
-        }
-        try {
-            return this.contract
-                .connect(currentSigner)
-                .executeSolve(conditionIndex)
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    // executeSolve = async (conditionIndex: number) => {
+    //     // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
+    //     const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
+    //     if (!currentSigner) {
+    //         return undefined
+    //     }
+    //     try {
+    //         return this.contract
+    //             .connect(currentSigner)
+    //             .executeSolve(conditionIndex)
+    //     } catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
-    proposePayouts = async (conditionIndex: number, payouts: number[]) => {
-        // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
-        const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
-        if (!currentSigner) {
-            return undefined
-        }
-        try {
-            return this.contract
-                .connect(currentSigner)
-                .proposePayouts(conditionIndex, payouts)
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    // proposePayouts = async (conditionIndex: number, payouts: number[]) => {
+    //     // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
+    //     const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
+    //     if (!currentSigner) {
+    //         return undefined
+    //     }
+    //     try {
+    //         return this.contract
+    //             .connect(currentSigner)
+    //             .proposePayouts(conditionIndex, payouts)
+    //     } catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
-    confirmPayouts = async (conditionIndex: number) => {
-        // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
-        const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
-        if (!currentSigner) {
-            return undefined
-        }
-        try {
-            return this.contract
-                .connect(currentSigner)
-                .confirmPayouts(conditionIndex)
-        } catch (e) {
-            console.error(e)
-        }
-    }
+    // confirmPayouts = async (conditionIndex: number) => {
+    //     // const { currentSigner } = useCurrentUserOrSigner()  TEMP: Using ethers for testing, can't use hook in non-component
+    //     const [_, _1, currentSigner] = await hh.ethers.getSigners() // Keeper's Signer
+    //     if (!currentSigner) {
+    //         return undefined
+    //     }
+    //     try {
+    //         return this.contract
+    //             .connect(currentSigner)
+    //             .confirmPayouts(conditionIndex)
+    //     } catch (e) {
+    //         console.error(e)
+    //     }
+    // }
 
     /***************** ******* *******************/
     /***************** GETTERS *******************/
@@ -251,13 +250,13 @@ export default class SolverContract {
         )
 
         const outcomes = (await Promise.all(
-            outcomeURIs.map((x: string) => outcomeFromIPFS(x))
+            outcomeURIs.map((x: string) => this.ipfs.getFromCID(x))
         )) as (OutcomeModel | undefined)[]
 
         const outcomeCollections = config.conditionBase.partition.map(
             (indexSet: BigNumber) => {
                 {
-                    const oc = <(OutcomeModel | undefined)[]>[]
+                    const oc = [] as (OutcomeModel | undefined)[]
                     const oneHot = binaryArrayFromIndexSet(
                         indexSet.toNumber(),
                         config.conditionBase.outcomeSlots
@@ -299,17 +298,49 @@ export default class SolverContract {
         return this.data
     }
 
+    init = async () => {
+        // await this.updateData()
+        this.initUI()
+        // this.initListeners()
+    }
+
     initListeners = async () => {
-        const filter = <EventFilter>{
+        const filter = {
             address: this.address,
             topics: [ethers.utils.id('IngestedData()')],
             fromBlock: 'latest',
-        }
+        } as EventFilter
 
         this.provider.on(filter, () => {
             console.log('Heard IngestedData event')
             this.updateData()
         })
+
+        // TODO Status listeners
+    }
+
+    initUI = () => {
+        // const uiURI = await this.contract.uiURI()
+        // if (uiURI) {
+        //     const UIComponentString = await this.ipfs.getFromCID(uiURI)
+        //     if (UIComponentString) {
+        //         const UIComponent = React.lazy(() => UIComponentString)
+        //     }
+        // }
+
+        this.UI = new Function(
+            'props',
+            `
+        return props.React.createElement('div',null,"HELLOOO")`
+        )
+    }
+
+    render() {
+        return (
+            <div>
+                <this.UI React={React} />
+            </div>
+        )
     }
 }
 
