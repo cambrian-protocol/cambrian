@@ -1,18 +1,18 @@
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import fetch from 'node-fetch'
 const Hash = require('ipfs-only-hash')
+const CID = require('cids')
 
 export class IPFSAPI {
     gateways: string[]
 
     constructor() {
         this.gateways = [
-            'ipfs.io',
-            'gateway.ipfs.io',
-            'cloudflare-ipfs.com',
-            'ipfs.fleek.co',
-            'infura-ipfs.io',
-            'gateway.pinata.cloud',
+            'ipfs.dweb.link',
+            'ipfs.infura-ipfs.io',
+            // 'ipfs.fleek.co',
+            // 'infura-ipfs.io',
+            // 'gateway.pinata.cloud',
         ]
     }
 
@@ -27,11 +27,16 @@ export class IPFSAPI {
         const gateIdx = gatewayIndex || 0
         const gateway = this.gateways[gateIdx]
 
+        const base32 = new CID(cid).toV1().toString('base32')
+
         try {
-            const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
-                (r) => r.text()
+            // const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
+            //     (r) => r.text()
+            // )
+            const result = await fetch(`https://${cid}.${gateway}`).then((r) =>
+                r.text()
             )
-            const isMatch = await this.isMatchingCID(cid, result)
+            const isMatch = await this.isMatchingCID(base32, result)
             if (isMatch) {
                 return result
             } else {
@@ -45,7 +50,8 @@ export class IPFSAPI {
     isMatchingCID = async (expected: string, data: any): Promise<boolean> => {
         try {
             const actual = await Hash.of(data)
-            if (actual == expected) {
+            const base32 = new CID(actual).toV1().toString('base32')
+            if (base32 == expected) {
                 return true
             } else {
                 return false
