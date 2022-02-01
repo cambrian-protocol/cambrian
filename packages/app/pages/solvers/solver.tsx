@@ -1,29 +1,30 @@
-import SolverContract from '@cambrian/app/classes/SolverContract'
+import Solver from '@cambrian/app/components/solver/Solver'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import React from 'react'
-import { ethers } from 'ethers'
+import { UserContext } from '@cambrian/app/store/UserContext'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 const SOLVER_FACTORY_ABI =
     require('@artifacts/contracts/SolverFactory.sol/SolverFactory.json').abi
 
-export default function Solver() {
-    const [contractProps, setContractProps] = React.useState({
-        address: undefined,
-        abi: SOLVER_ABI,
-        provider: new ethers.providers.JsonRpcProvider(
-            'http://127.0.0.1:8545/' // TEMP Of course. local hardhat
-        ),
-    })
+export default function SolverPage() {
+    const user = React.useContext(UserContext)
+    const address = '0xTODO'
 
-    // React.useEffect get address/ABI
+    // new ethers.providers.JsonRpcProvider(
+    //     'http://127.0.0.1:8545/' // local hardhat
+    // )
 
-    if (contractProps.address) {
+    if (user.currentSigner) {
         return (
             <>
                 <div>HELLO</div>
-                <SolverContract {...contractProps} />
+                <Solver
+                    address={address}
+                    abi={SOLVER_ABI}
+                    signer={user.currentSigner}
+                />
             </>
         )
     } else {

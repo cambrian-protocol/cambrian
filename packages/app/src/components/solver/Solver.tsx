@@ -353,6 +353,8 @@ export const Solver = ({
                 methods={methods}
             />
         )
+    } else {
+        return null
     }
 }
 
@@ -365,3 +367,5 @@ export const decodeData = (types: SolidityDataTypes[], data: any) => {
         console.log(`Error decoding "${data}"`, e)
     }
 }
+
+export default Solver
