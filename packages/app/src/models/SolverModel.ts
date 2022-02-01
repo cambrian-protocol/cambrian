@@ -1,7 +1,11 @@
 import { ConditionModel, ParsedConditionModel } from './ConditionModel'
 
-import { SlotModel } from './SlotModel'
+import { ParsedSlotModel, SlotModel } from './SlotModel'
 import { ethers } from 'ethers'
+
+/**
+ * Solution Composer
+ **/
 
 export type IdPathType = { solverId?: string; ocId?: string }
 
@@ -30,6 +34,10 @@ export type SolverModel = {
     config: SolverConfig
 }
 
+/**
+ * Solver Config
+ **/
+
 export type ParsedSolverModel = {
     implementation: string
     keeper: string
@@ -37,4 +45,51 @@ export type ParsedSolverModel = {
     timelockSeconds: number
     data: string
     conditionBase: ParsedConditionModel
+}
+
+/**
+ * Contract-interaction Solver Component
+ **/
+
+export type SolverComponentConfig = {
+    implementation: string
+    keeper: string
+    arbitrator: string
+    timelockSeconds: number
+    data: string
+    ingests: ParsedSlotModel[]
+    conditionBase: ParsedConditionModel
+}
+
+export type SolverComponentOC = {
+    indexSet: number
+    outcomes: JSON[]
+}
+
+export enum ConditionStatus {
+    Initiated,
+    Executed,
+    OutcomeProposed,
+    ArbitrationRequested,
+    ArbitrationPending,
+    ArbitrationDelivered,
+    OutcomeReported,
+}
+
+export type SolverComponentCondition = {
+    collateralToken: string
+    questionId: string
+    parentCollectionId: string
+    conditionId: string
+    payouts: number[]
+    status: ConditionStatus
+}
+
+export type SolverComponentData = {
+    config: SolverComponentConfig
+    outcomeCollections: SolverComponentOC[]
+    allocations: { address: string; allocations: SolverComponentOC }
+    conditions: SolverComponentCondition[]
+    timelocks: number[]
+    slots: { [slot: number]: ParsedSlotModel }
 }
