@@ -12,7 +12,7 @@ import { HardhatUserConfig } from "hardhat/types";
 const TESTNET_PRIVATE_KEY =
   "33b3817e6e42e55a00c425e0a081dbf3e9a8672600d6527f3d0849f9c19b91c6";
 
-const config = {
+export const config = {
   paths: {
     root: "./packages/core",
     deploy: "deploy",
