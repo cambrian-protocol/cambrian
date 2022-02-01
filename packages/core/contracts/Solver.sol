@@ -128,12 +128,12 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
         require(ingestsValid() == true, "ingests invalid");
 
-        conditions[_index].status = SolverLib.Status.Executed;
-
         require(
             SolverLib.allocationValid(_index, datas, config.conditionBase),
             "Recipient slot requires updating"
         );
+
+        conditions[_index].status = SolverLib.Status.Executed;
 
         SolverLib.splitPosition(
             ctfAddress,

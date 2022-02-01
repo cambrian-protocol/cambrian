@@ -126,11 +126,11 @@ describe('Data Update', function () {
                     )[0]
             )
 
-        let solver = new SolverContract(
-            deployedAddress,
-            SOLVER_ABI,
-            ethers.provider
-        )
+        let solver = new SolverContract({
+            address: deployedAddress,
+            abi: SOLVER_ABI,
+            provider: ethers.provider,
+        })
 
         await solver.updateData()
         expect(solver.data.slots[4].data).to.equal('0x') // Slot hasn't been ingested yet
