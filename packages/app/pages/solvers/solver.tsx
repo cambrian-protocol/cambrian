@@ -13,9 +13,11 @@ export default function Solver() {
         address: undefined,
         abi: SOLVER_ABI,
         provider: new ethers.providers.JsonRpcProvider(
-            'http://127.0.0.1:8545/'
+            'http://127.0.0.1:8545/' // TEMP Of course. local hardhat
         ),
     })
+
+    // React.useEffect get address/ABI
 
     if (contractProps.address) {
         return (
