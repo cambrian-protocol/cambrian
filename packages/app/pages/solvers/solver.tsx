@@ -18,14 +18,11 @@ export default function SolverPage() {
 
     if (user.currentSigner) {
         return (
-            <>
-                <div>HELLO</div>
-                <Solver
-                    address={address}
-                    abi={SOLVER_ABI}
-                    signer={user.currentSigner}
-                />
-            </>
+            <Solver
+                address={address}
+                abi={SOLVER_ABI}
+                signer={user.currentSigner}
+            />
         )
     } else {
         return <>NOPE</>
