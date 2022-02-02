@@ -40,7 +40,7 @@ const colors: any = {
         light: '#63b1ba',
         dark: '#63b1ba',
     },
-    background: '#000000',
+    background: '#212121',
     veryDark: '#0e0e0e',
     darkBlue:
         'linear-gradient(167deg, rgba(31,31,45,1) 0%, rgba(16,54,57,1) 80%)',
@@ -48,6 +48,11 @@ const colors: any = {
         'linear-gradient(167deg, rgba(100,161,168,1) 0%, rgba(44,72,74,1) 80%)',
     brandGradient:
         'linear-gradient(167deg, rgba(198,237,241,1) 0%, rgba(79,163,172,1) 80%)',
+    primaryGradient:
+        'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
+    secondaryGradient:
+        'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
+    itemHighlight: 'rgba(122, 122, 122, 0.16)',
 }
 
 export const cpTheme = deepFreeze({
@@ -59,6 +64,16 @@ export const cpTheme = deepFreeze({
         },
         input: {
             weight: 'normal',
+        },
+        elevation: {
+            dark: {
+                none: 'none',
+                xsmall: '0px 2px 2px rgba(0, 0, 0, 0.40)',
+                small: '0px 4px 4px rgba(0, 0, 0, 0.40)',
+                medium: '0px 6px 8px rgba(0, 0, 0, 0.40)',
+                large: '0px 8px 16px rgba(0, 0, 0, 0.40)',
+                xlarge: '0px 10px 24px rgba(0, 0, 0, 0.40)',
+            },
         },
     },
     paragraph: {
@@ -80,11 +95,6 @@ export const cpTheme = deepFreeze({
         },
         border: {
             color: colors.brand.light,
-        },
-    },
-    rangeInput: {
-        thumb: {
-            color: 'brand',
         },
     },
     formField: {
