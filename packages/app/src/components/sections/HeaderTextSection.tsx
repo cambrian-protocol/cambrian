@@ -18,7 +18,7 @@ const HeaderTextSection = ({
                 {subTitle}
             </Heading>
         </Box>
-        <Paragraph size="small" color="dark-3">
+        <Paragraph fill color="dark-6">
             {paragraph}
         </Paragraph>
     </Box>
