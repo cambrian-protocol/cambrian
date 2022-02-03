@@ -38,7 +38,7 @@ library SolverLib {
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
         IngestType ingestType;
-        uint256 slot; // Destination slot for data
+        bytes32 slot; // Destination slot for data
         uint256 solverIndex; // Index of the Solver in the chain to make function call to or register callback
         bytes data; // Raw when isConstant=true, slot index of upstream solver data when callback, else an encoded function call
     }
@@ -65,15 +65,16 @@ library SolverLib {
     }
 
     struct Datas {
-        mapping(uint256 => bytes) slots;
-        mapping(uint256 => uint256) slotVersions;
+        mapping(bytes32 => bytes) slots;
+        mapping(bytes32 => uint256) slotVersions;
+        mapping(bytes32 => uint256) slotIngestIdx;
     }
 
     struct Callbacks {
         uint256 numIncoming;
         uint256 numOutgoing;
-        mapping(uint256 => address[]) outgoing; // This Slot => Solver expecting callback
-        mapping(bytes32 => uint256) incoming; // keccack256(Address, CallerSlot) => ingest index
+        mapping(bytes32 => address[]) outgoing; // This Slot => Solver expecting callback
+        mapping(bytes32 => uint256) incoming; // keccack256(Address, CallerSlot) => Receiving Ingest
     }
 
     // Immutable data regarding conditions which may be created
@@ -81,15 +82,15 @@ library SolverLib {
         IERC20 collateralToken;
         uint256 outcomeSlots; // Num outcome slots
         uint256 parentCollectionIndexSet; // IndexSet to get parentCollectionId from parent Solver
-        uint256 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
+        bytes32 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
         Allocation[] allocations; // Allocations for each partition
         Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
     }
 
     struct Allocation {
-        uint256 recipientAddressSlot; // Slot containing address of recipient
-        uint256[] recipientAmountSlots; // recipientAmountSlots[i] => amount for partition[i]
+        bytes32 recipientAddressSlot; // Slot containing address of recipient
+        bytes32[] recipientAmountSlots; // recipientAmountSlots[i] => amount for partition[i]
     }
 
     function createCondition(
