@@ -15,7 +15,7 @@ import React from 'react'
 import { Fragment } from 'ethers/lib/utils'
 import { SolverComponentData } from '@cambrian/app/models/SolverModel'
 
-export const Solver = ({
+const Solver = ({
     address,
     abi,
     signer,
@@ -33,8 +33,8 @@ export const Solver = ({
         )
     )
     const [data, setData] = React.useState<SolverComponentData | undefined>()
-    const [UI, setUI] = React.useState<Function>()
-    const [customUI, setCustomUI] = React.useState<boolean>(false)
+    const [CustomUI, setCustomUI] = React.useState<Function>()
+    const [hasCustomUI, setHasCustomUI] = React.useState<boolean | null>(null)
 
     React.useEffect(() => {
         setContract(
@@ -302,22 +302,16 @@ export const Solver = ({
             try {
                 const UIComponentString = await ipfs.getFromCID(uiURI)
                 if (UIComponentString) {
-                    setCustomUI(true)
-                    setUI(new Function('props', UIComponentString))
-                    return
+                    setCustomUI(new Function('props', UIComponentString))
+                    setHasCustomUI(true)
                 }
             } catch (e) {
                 console.log(e)
+                setHasCustomUI(false)
             }
+        } else {
+            setHasCustomUI(false)
         }
-
-        // SET DEFAULT UI
-        setUI(
-            new Function(
-                'props',
-                `return props.React.createElement('div',null,"HELLOOO")`
-            )
-        )
     }
 
     const methods = {
@@ -338,14 +332,14 @@ export const Solver = ({
         getConfig: getConfig,
     }
 
-    if (!customUI && !UI) {
+    if (hasCustomUI === null) {
         return null // TODO LOADING
-    } else if (!customUI && UI) {
+    } else if (!hasCustomUI) {
         // TODO DEFAULT COMPONENT
         return <div>Hey Ho Henso</div>
-    } else if (customUI && UI) {
+    } else if (hasCustomUI && CustomUI) {
         return (
-            <UI
+            <CustomUI
                 React={React}
                 data={data}
                 contract={contract}
