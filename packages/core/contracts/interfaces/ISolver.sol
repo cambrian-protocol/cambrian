@@ -25,18 +25,18 @@ interface ISolver {
 
     // DATA
 
-    function addData(uint256 _slot, bytes memory _data) external;
+    function addData(bytes32 _slot, bytes memory _data) external;
 
-    function getData(uint256 _slot) external view returns (bytes memory data);
+    function getData(bytes32 _slot) external view returns (bytes memory data);
 
     // CALLBACKS
 
-    function registerOutgoingCallback(uint256 _slot, uint256 _chainIndex)
+    function registerOutgoingCallback(bytes32 _slot, uint256 _chainIndex)
         external;
 
-    function handleCallback(uint256 _slot) external;
+    function handleCallback(bytes32 _slot) external;
 
-    function getCallbackOutput(uint256 _slot)
+    function getCallbackOutput(bytes32 _slot)
         external
         view
         returns (bytes memory data);
