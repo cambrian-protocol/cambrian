@@ -34,7 +34,7 @@ describe("Solver", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["bytes32"],
@@ -44,7 +44,7 @@ describe("Solver", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -54,7 +54,7 @@ describe("Solver", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 2,
+        slot: ethers.utils.formatBytes32String("2"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -64,14 +64,14 @@ describe("Solver", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 3,
+        slot: ethers.utils.formatBytes32String("3"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 4,
+        slot: ethers.utils.formatBytes32String("4"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
@@ -81,12 +81,23 @@ describe("Solver", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 4,
+      amountSlot: ethers.utils.formatBytes32String("4"),
       partition: [1, 2],
-      recipientAddressSlots: [1, 2],
-      recipientAmountSlots: [
-        [3, 4],
-        [4, 3],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("3"),
+            ethers.utils.formatBytes32String("4"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("2"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("4"),
+            ethers.utils.formatBytes32String("3"),
+          ],
+        },
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
