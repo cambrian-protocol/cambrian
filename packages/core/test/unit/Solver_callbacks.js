@@ -41,10 +41,17 @@ describe("Solver.sol | callbacks", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 0,
+      amountSlot: ethers.utils.formatBytes32String("0"),
       partition: [0, 0],
-      recipientAddressSlots: [0],
-      recipientAmountSlots: [[0, 0]],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+      ],
       outcomeURIs: [
         getBytes32FromMultihash(
           "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
@@ -76,7 +83,9 @@ describe("Solver.sol | callbacks", function () {
     );
 
     return expectRevert(
-      solvers[0].connect(this.keeper).registerOutgoingCallback(0, 0),
+      solvers[0]
+        .connect(this.keeper)
+        .registerOutgoingCallback(ethers.utils.formatBytes32String("0"), 0),
       "msg.sender not solver"
     );
   });
@@ -102,7 +111,7 @@ describe("Solver.sol | callbacks", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
             data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
           },
@@ -118,7 +127,9 @@ describe("Solver.sol | callbacks", function () {
     );
 
     return expectRevert(
-      solvers[1].connect(this.keeper).handleCallback(0),
+      solvers[1]
+        .connect(this.keeper)
+        .handleCallback(ethers.utils.formatBytes32String("0")),
       "msg.sender not solver"
     );
   });
@@ -135,7 +146,7 @@ describe("Solver.sol | callbacks", function () {
           {
             executions: 0,
             ingestType: 3,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
             data: ethers.constants.HashZero,
           },
@@ -152,7 +163,7 @@ describe("Solver.sol | callbacks", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
             data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
           },
@@ -170,12 +181,18 @@ describe("Solver.sol | callbacks", function () {
     await solvers[0].connect(this.keeper).prepareSolve(0);
     await solvers[0]
       .connect(this.keeper)
-      .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42]));
+      .addData(
+        ethers.utils.formatBytes32String("0"),
+        ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
+      );
 
     return expectRevert(
       solvers[0]
         .connect(this.keeper)
-        .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42])),
+        .addData(
+          ethers.utils.formatBytes32String("0"),
+          ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
+        ),
       "Slot version invalid"
     );
   });
@@ -203,8 +220,69 @@ describe("Solver.sol | callbacks", function () {
     return expectRevert(
       solvers[0]
         .connect(this.user1)
-        .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42])),
+        .addData(
+          ethers.utils.formatBytes32String("0"),
+          ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
+        ),
       "OnlyKeeper"
     );
+  });
+
+  it("Receives callback", async function () {
+    const solverConfigs = [
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 3,
+            slot: ethers.utils.formatBytes32String("0"),
+            solverIndex: 0,
+            data: ethers.constants.HashZero,
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+      {
+        implementation: this.Solver.address,
+        keeper: this.keeper.address,
+        arbitrator: this.arbitrator.address,
+        timelockSeconds: this.timelockSeconds,
+        data: ethers.utils.formatBytes32String(""),
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 0,
+            slot: ethers.utils.formatBytes32String("0"),
+            solverIndex: 0,
+            data: ethers.utils.formatBytes32String("0"),
+          },
+        ],
+        conditionBase: this.conditionBase,
+      },
+    ];
+
+    const solvers = await testHelpers.deploySolverChain(
+      solverConfigs,
+      this.SolverFactory,
+      this.keeper
+    );
+
+    await solvers[0].connect(this.keeper).prepareSolve(0);
+    await solvers[0]
+      .connect(this.keeper)
+      .addData(
+        ethers.utils.formatBytes32String("0"),
+        ethers.utils.formatBytes32String("Test")
+      );
+
+    const data = await solvers[1]
+      .connect(this.user1)
+      .getData(ethers.utils.formatBytes32String("0"));
+    return expect(data).to.equal(ethers.utils.formatBytes32String("Test"));
   });
 });

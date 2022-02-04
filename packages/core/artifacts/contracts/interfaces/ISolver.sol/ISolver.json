@@ -6,9 +6,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bytes32",
           "name": "_slot",
-          "type": "uint256"
+          "type": "bytes32"
         },
         {
           "internalType": "bytes",
@@ -152,9 +152,9 @@
                   "type": "uint8"
                 },
                 {
-                  "internalType": "uint256",
+                  "internalType": "bytes32",
                   "name": "slot",
-                  "type": "uint256"
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "uint256",
@@ -189,9 +189,9 @@
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
+                  "internalType": "bytes32",
                   "name": "amountSlot",
-                  "type": "uint256"
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "uint256[]",
@@ -201,14 +201,14 @@
                 {
                   "components": [
                     {
-                      "internalType": "uint256",
+                      "internalType": "bytes32",
                       "name": "recipientAddressSlot",
-                      "type": "uint256"
+                      "type": "bytes32"
                     },
                     {
-                      "internalType": "uint256[]",
+                      "internalType": "bytes32[]",
                       "name": "recipientAmountSlots",
-                      "type": "uint256[]"
+                      "type": "bytes32[]"
                     }
                   ],
                   "internalType": "struct SolverLib.Allocation[]",
@@ -275,9 +275,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bytes32",
           "name": "_slot",
-          "type": "uint256"
+          "type": "bytes32"
         }
       ],
       "name": "getCallbackOutput",
@@ -339,9 +339,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bytes32",
           "name": "_slot",
-          "type": "uint256"
+          "type": "bytes32"
         }
       ],
       "name": "getData",
@@ -377,9 +377,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bytes32",
           "name": "_slot",
-          "type": "uint256"
+          "type": "bytes32"
         }
       ],
       "name": "handleCallback",
@@ -452,9 +452,9 @@
                   "type": "uint8"
                 },
                 {
-                  "internalType": "uint256",
+                  "internalType": "bytes32",
                   "name": "slot",
-                  "type": "uint256"
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "uint256",
@@ -489,9 +489,9 @@
                   "type": "uint256"
                 },
                 {
-                  "internalType": "uint256",
+                  "internalType": "bytes32",
                   "name": "amountSlot",
-                  "type": "uint256"
+                  "type": "bytes32"
                 },
                 {
                   "internalType": "uint256[]",
@@ -501,14 +501,14 @@
                 {
                   "components": [
                     {
-                      "internalType": "uint256",
+                      "internalType": "bytes32",
                       "name": "recipientAddressSlot",
-                      "type": "uint256"
+                      "type": "bytes32"
                     },
                     {
-                      "internalType": "uint256[]",
+                      "internalType": "bytes32[]",
                       "name": "recipientAmountSlots",
-                      "type": "uint256[]"
+                      "type": "bytes32[]"
                     }
                   ],
                   "internalType": "struct SolverLib.Allocation[]",
@@ -628,9 +628,9 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
+          "internalType": "bytes32",
           "name": "_slot",
-          "type": "uint256"
+          "type": "bytes32"
         },
         {
           "internalType": "uint256",
