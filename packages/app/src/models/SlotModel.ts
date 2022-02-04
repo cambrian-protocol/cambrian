@@ -32,13 +32,13 @@ export type SlotModel = {
 export type ParsedSlotModel = {
     executions: number
     ingestType: SlotTypes
-    slot: number
+    slot: string
     solverIndex: number
     data: string
 }
 
 export type GetSlotModel = {
-    slot: BigNumber
+    slot: string
     executions: BigNumber
     ingestType: SlotTypes
     solverIndex: BigNumber

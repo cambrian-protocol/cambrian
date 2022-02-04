@@ -54,6 +54,6 @@ export type ParsedConditionModel = {
 }
 
 export type ParsedAllocationModel = {
-    recipientAddressSlot: number
-    recipientAmountSlots: number[]
+    recipientAddressSlot: string
+    recipientAmountSlots: string[]
 }

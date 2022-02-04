@@ -52,6 +52,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         chainParent = _chainParent;
         chainIndex = _chainIndex;
         config = _solverConfig;
+
+        for (uint256 i = 0; i < _solverConfig.ingests.length; i++) {
+            datas.slotIngestIdx[_solverConfig.ingests[i].slot] = i;
+        }
     }
 
     // ********************************************************************************** //
@@ -172,7 +176,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _slot Destination slot
         @param _data Data added to slot
      */
-    function router(uint256 _slot, bytes memory _data) private {
+    function router(bytes32 _slot, bytes memory _data) private {
         require(
             datas.slotVersions[_slot] == (conditions.length - 1),
             "Slot version invalid"
@@ -195,7 +199,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
                     .addressFromChainIndex(config.ingests[i].solverIndex);
                 registerIncomingCallback(_cbSolver, i);
                 ISolver(_cbSolver).registerOutgoingCallback(
-                    abi.decode(config.ingests[i].data, (uint256)),
+                    abi.decode(config.ingests[i].data, (bytes32)),
                     chainIndex
                 );
             }
@@ -224,11 +228,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _slot Destination slot
         @param _data Data to be added
      */
-    function addData(uint256 _slot, bytes memory _data) external {
+    function addData(bytes32 _slot, bytes memory _data) external {
         require(msg.sender == config.keeper, "OnlyKeeper");
-        require(_slot <= config.ingests.length, "Slot out of scope");
         require(
-            config.ingests[_slot].ingestType == SolverLib.IngestType.Manual,
+            config.ingests[datas.slotIngestIdx[_slot]].ingestType ==
+                SolverLib.IngestType.Manual,
             "only IngestType.Manual"
         );
 
@@ -236,7 +240,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         emit IngestedData();
     }
 
-    function getData(uint256 _slot) public view returns (bytes memory data) {
+    function getData(bytes32 _slot) public view returns (bytes memory data) {
         data = datas.slots[_slot];
     }
 
@@ -256,7 +260,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             keccak256(
                 abi.encodePacked(
                     _cbSolver,
-                    abi.decode(config.ingests[_ingestIndex].data, (uint256))
+                    abi.decode(config.ingests[_ingestIndex].data, (bytes32))
                 )
             )
         ] = _ingestIndex;
@@ -268,7 +272,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _slot Slot being waited on by downstream Solver
         @param _chainIndex Index of the Solver requesting this callback
      */
-    function registerOutgoingCallback(uint256 _slot, uint256 _chainIndex)
+    function registerOutgoingCallback(bytes32 _slot, uint256 _chainIndex)
         external
     {
         require(
@@ -292,7 +296,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @dev Handle upstream Solver making callback and ingest the data
         @param _slot Destination slot for the data being sent
      */
-    function handleCallback(uint256 _slot) external {
+    function handleCallback(bytes32 _slot) external {
         bytes32 _cb = keccak256(abi.encodePacked(msg.sender, _slot));
         require(
             msg.sender ==
@@ -314,7 +318,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             ISolver(msg.sender).getCallbackOutput(
                 abi.decode(
                     config.ingests[callbacks.incoming[_cb]].data,
-                    (uint256)
+                    (bytes32)
                 )
             )
         );
@@ -328,7 +332,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @dev Make any callbacks that were waiting on _slot
         @param _slot Slot being waited on by downstream Solvers
      */
-    function callback(uint256 _slot) private {
+    function callback(bytes32 _slot) private {
         for (uint256 i; i < callbacks.outgoing[_slot].length; i++) {
             if (address(callbacks.outgoing[_slot][i]) != address(0)) {
                 ISolver(address(callbacks.outgoing[_slot][i])).handleCallback(
@@ -344,7 +348,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @dev A simple getter that requires upstream slot ver. == our condition ver.
         @param _slot Slot containing data
      */
-    function getCallbackOutput(uint256 _slot)
+    function getCallbackOutput(bytes32 _slot)
         public
         view
         returns (bytes memory data)
@@ -357,7 +361,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         data = datas.slots[_slot];
     }
 
-    function getOutgoingCallbacks(uint256 slot)
+    function getOutgoingCallbacks(bytes32 slot)
         public
         view
         returns (address[] memory)

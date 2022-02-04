@@ -10,12 +10,12 @@ import {
 import { GetSlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/helpers/transformer'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import React from 'react'
 import { Fragment } from 'ethers/lib/utils'
 import { SolverComponentData } from '@cambrian/app/models/SolverModel'
 
-export const Solver = ({
+const Solver = ({
     address,
     abi,
     signer,
@@ -33,8 +33,8 @@ export const Solver = ({
         )
     )
     const [data, setData] = React.useState<SolverComponentData | undefined>()
-    const [UI, setUI] = React.useState<Function>()
-    const [customUI, setCustomUI] = React.useState<boolean>(false)
+    const [CustomUI, setCustomUI] = React.useState<Function>()
+    const [hasCustomUI, setHasCustomUI] = React.useState<boolean | null>(null)
 
     React.useEffect(() => {
         setContract(
@@ -46,6 +46,102 @@ export const Solver = ({
         )
         init()
     }, [])
+
+    const init = () => {
+        updateData()
+        initUI()
+        initListeners()
+    }
+
+    const initListeners = async () => {
+        const filter = {
+            address: address,
+            topics: [ethers.utils.id('IngestedData()')],
+            fromBlock: 'latest',
+        } as EventFilter
+
+        signer.provider.on(filter, () => {
+            console.log('Heard IngestedData event')
+            updateData()
+        })
+
+        // TODO Status listeners
+    }
+
+    const initUI = async () => {
+        const uiURI = await getUIUri()
+        if (uiURI) {
+            try {
+                const UIComponentString = await ipfs.getFromCID(uiURI)
+                if (UIComponentString) {
+                    setCustomUI(new Function('props', UIComponentString))
+                    setHasCustomUI(true)
+                }
+            } catch (e) {
+                console.log(e)
+                setHasCustomUI(false)
+            }
+        } else {
+            setHasCustomUI(false)
+        }
+    }
+
+    const updateData = async () => {
+        const config = await getConfig()
+        const slots = await getSlots(config)
+
+        const outcomeURIs = config.conditionBase.outcomeURIs.map(
+            (x: Multihash) => getMultihashFromBytes32(x)
+        )
+
+        const outcomes = (await Promise.all(
+            outcomeURIs.map((x: string) => ipfs.getFromCID(x))
+        )) as (OutcomeModel | undefined)[]
+
+        const outcomeCollections = config.conditionBase.partition.map(
+            (indexSet: BigNumber) => {
+                {
+                    const oc = [] as (OutcomeModel | undefined)[]
+                    const oneHot = binaryArrayFromIndexSet(
+                        indexSet.toNumber(),
+                        config.conditionBase.outcomeSlots
+                    )
+                    oneHot.forEach((x, i) => {
+                        if (x === 1) {
+                            oc.push(outcomes[i])
+                        }
+                    })
+                    return {
+                        indexSet: indexSet.toNumber(),
+                        outcomes: oc,
+                    }
+                }
+            }
+        )
+
+        const allocations = await getAllocations(
+            config,
+            slots,
+            outcomeCollections
+        )
+
+        const conditions = await getConditions()
+
+        const timelocks = (await Promise.all(
+            conditions.map((_: any, i: number) => getTimelock(i))
+        )) as number[]
+
+        const data = {
+            config: config,
+            outcomeCollections: outcomeCollections,
+            allocations: allocations,
+            conditions: conditions,
+            timelocks: timelocks,
+            slots: slots,
+        } as SolverComponentData
+
+        setData(data)
+    }
 
     const prepareSolve = async (newConditionIndex: number) => {
         try {
@@ -133,9 +229,9 @@ export const Solver = ({
         }
     }
 
-    const getData = (index: number) => {
+    const getData = (slotId: string) => {
         try {
-            return contract.getData(index)
+            return contract.getData(slotId)
         } catch (e) {
             console.error(e)
         }
@@ -184,7 +280,7 @@ export const Solver = ({
             config.ingests.map(async (x: GetSlotModel) => {
                 const data = await contract.getData(x.slot)
                 return {
-                    slot: x.slot.toNumber(),
+                    slot: x.slot,
                     executions: x.executions.toNumber(),
                     solverIndex: x.solverIndex.toNumber(),
                     ingestType: x.ingestType,
@@ -218,108 +314,6 @@ export const Solver = ({
         )
     }
 
-    const updateData = async () => {
-        const config = await getConfig()
-        const slots = await getSlots(config)
-
-        const outcomeURIs = config.conditionBase.outcomeURIs.map(
-            (x: Multihash) => getMultihashFromBytes32(x)
-        )
-
-        const outcomes = (await Promise.all(
-            outcomeURIs.map((x: string) => ipfs.getFromCID(x))
-        )) as (OutcomeModel | undefined)[]
-
-        const outcomeCollections = config.conditionBase.partition.map(
-            (indexSet: BigNumber) => {
-                {
-                    const oc = [] as (OutcomeModel | undefined)[]
-                    const oneHot = binaryArrayFromIndexSet(
-                        indexSet.toNumber(),
-                        config.conditionBase.outcomeSlots
-                    )
-                    oneHot.forEach((x, i) => {
-                        if (x === 1) {
-                            oc.push(outcomes[i])
-                        }
-                    })
-                    return {
-                        indexSet: indexSet.toNumber(),
-                        outcomes: oc,
-                    }
-                }
-            }
-        )
-
-        const allocations = await getAllocations(
-            config,
-            slots,
-            outcomeCollections
-        )
-
-        const conditions = await getConditions()
-
-        const timelocks = (await Promise.all(
-            conditions.map((_: any, i: number) => getTimelock(i))
-        )) as number[]
-
-        const data = {
-            config: config,
-            outcomeCollections: outcomeCollections,
-            allocations: allocations,
-            conditions: conditions,
-            timelocks: timelocks,
-            slots: slots,
-        } as SolverComponentData
-
-        setData(data)
-    }
-
-    const init = () => {
-        updateData()
-        initUI()
-        initListeners()
-    }
-
-    const initListeners = async () => {
-        const filter = {
-            address: address,
-            topics: [ethers.utils.id('IngestedData()')],
-            fromBlock: 'latest',
-        } as EventFilter
-
-        signer.provider.on(filter, () => {
-            console.log('Heard IngestedData event')
-            updateData()
-        })
-
-        // TODO Status listeners
-    }
-
-    const initUI = async () => {
-        const uiURI = await getUIUri()
-        if (uiURI) {
-            try {
-                const UIComponentString = await ipfs.getFromCID(uiURI)
-                if (UIComponentString) {
-                    setCustomUI(true)
-                    setUI(new Function('props', UIComponentString))
-                    return
-                }
-            } catch (e) {
-                console.log(e)
-            }
-        }
-
-        // SET DEFAULT UI
-        setUI(
-            new Function(
-                'props',
-                `return props.React.createElement('div',null,"HELLOOO")`
-            )
-        )
-    }
-
     const methods = {
         prepareSolve: prepareSolve,
         executeSolve: executeSolve,
@@ -338,14 +332,14 @@ export const Solver = ({
         getConfig: getConfig,
     }
 
-    if (!customUI && !UI) {
+    if (hasCustomUI === null) {
         return null // TODO LOADING
-    } else if (!customUI && UI) {
+    } else if (!hasCustomUI) {
         // TODO DEFAULT COMPONENT
         return <div>Hey Ho Henso</div>
-    } else if (customUI && UI) {
+    } else if (hasCustomUI && CustomUI) {
         return (
-            <UI
+            <CustomUI
                 React={React}
                 data={data}
                 contract={contract}
