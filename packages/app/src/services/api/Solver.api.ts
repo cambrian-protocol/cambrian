@@ -1,7 +1,7 @@
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
 import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSigner'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/helpers/transformer'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { IPFSAPI } from './IPFS.api'
 import {
     Multihash,

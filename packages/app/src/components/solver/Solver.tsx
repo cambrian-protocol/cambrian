@@ -10,7 +10,7 @@ import {
 import { GetSlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/helpers/transformer'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import React from 'react'
 import { Fragment } from 'ethers/lib/utils'
 import { SolverComponentData } from '@cambrian/app/models/SolverModel'
@@ -229,9 +229,9 @@ const Solver = ({
         }
     }
 
-    const getData = (index: number) => {
+    const getData = (slotId: string) => {
         try {
-            return contract.getData(index)
+            return contract.getData(slotId)
         } catch (e) {
             console.error(e)
         }
@@ -280,7 +280,7 @@ const Solver = ({
             config.ingests.map(async (x: GetSlotModel) => {
                 const data = await contract.getData(x.slot)
                 return {
-                    slot: x.slot.toNumber(),
+                    slot: x.slot,
                     executions: x.executions.toNumber(),
                     solverIndex: x.solverIndex.toNumber(),
                     ingestType: x.ingestType,

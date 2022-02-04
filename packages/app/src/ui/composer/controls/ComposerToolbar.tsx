@@ -10,7 +10,7 @@ import SolutionSettingsModal from './solution/SolutionSettingsModal'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-import { parseSolvers } from '@cambrian/app/utils/helpers/transformer'
+import { parseSolvers } from '@cambrian/app/utils/transformers/SolverConfig'
 
 const ComposerToolbar = () => {
     const { composer } = useComposerContext()
