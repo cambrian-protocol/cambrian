@@ -16,7 +16,7 @@ import {
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
-import { getSolverHierarchy } from './solverHelpers'
+import { getSolverHierarchy } from '../helpers/solverHelpers'
 
 import Solver from '@cambrian/app/classes/Solver'
 
@@ -42,15 +42,9 @@ export function parseSolver(
     currentSolverIndex: number,
     sortedSolvers: Solver[]
 ): ParsedSolverModel {
-    const ingests = Object.keys(graphSolver.config.slots)
-        .sort((a, b) => a.localeCompare(b)) // Order slots by ULID
-        .map((slotId, slotIndex) =>
-            parseSlot(
-                graphSolver.config.slots[slotId],
-                slotIndex,
-                sortedSolvers
-            )
-        )
+    const ingests = Object.keys(graphSolver.config.slots).map((slotId) =>
+        parseSlot(graphSolver.config.slots[slotId], sortedSolvers)
+    )
 
     const conditionBase = parseCondition(
         graphSolver.config.condition,
@@ -84,13 +78,12 @@ export function parseSolver(
 
 export function parseSlot(
     inSlot: SlotModel,
-    slotIndex: number,
     sortedSolvers: Solver[]
 ): ParsedSlotModel {
     const outSlot = <ParsedSlotModel>{
         executions: 0,
         ingestType: inSlot.slotType,
-        slot: slotIndex,
+        slot: ethers.utils.parseBytes32String(inSlot.id),
     }
 
     switch (inSlot.slotType) {
@@ -98,10 +91,10 @@ export function parseSlot(
             if (
                 inSlot.data.length !== 1 ||
                 inSlot.dataTypes.length !== 1 ||
-                inSlot.dataTypes[0] !== SolidityDataTypes.Uint256
+                inSlot.dataTypes[0] !== SolidityDataTypes.Bytes32
             ) {
                 throw new Error(
-                    'Callback slots should have exactly 1 Uint256 data element'
+                    'Callback slots should have exactly 1 Bytes32 data element'
                 )
             }
             if (inSlot.targetSolverId === undefined) {
@@ -111,23 +104,7 @@ export function parseSlot(
             outSlot.solverIndex = sortedSolvers.findIndex(
                 (x) => x.id === inSlot.targetSolverId
             )
-
-            const sortedTargetSolverSlotIds = Object.keys(
-                sortedSolvers[outSlot.solverIndex].config.slots
-            ).sort((a, b) => a.localeCompare(b))
-
-            const targetSlotIndex = sortedTargetSolverSlotIds.findIndex(
-                (x) => x === inSlot.data[0]
-            )
-
-            if (targetSlotIndex > -1) {
-                outSlot.data = ethers.utils.defaultAbiCoder.encode(
-                    ['uint256'],
-                    [targetSlotIndex]
-                )
-            } else {
-                throw new Error("Couldn't find target slot index from Id")
-            }
+            outSlot.data = ethers.utils.formatBytes32String(inSlot.data[0])
             break
 
         case 1: // Constant slot
@@ -277,20 +254,12 @@ export function parseCondition(
         (x) => x === inCondition.amountSlot
     )
 
-    outCondition.allocations = []
+    outCondition.allocations = [] as ParsedAllocationModel[]
 
     inCondition.recipients.forEach((slotPath, i) => {
-        console.log(
-            'slotData: ',
-            sortedSolvers[currentSolverIndex].config.slots[slotPath.slotId]
-                .data,
-            'slotIndex: ',
-            orderedSlotIds.findIndex((x) => x === slotPath.slotId)
-        )
-
         outCondition.allocations.push(<ParsedAllocationModel>{
-            recipientAddressSlot: orderedSlotIds.findIndex(
-                (x) => x === slotPath.slotId
+            recipientAddressSlot: ethers.utils.formatBytes32String(
+                slotPath.slotId
             ),
             recipientAmountSlots: outCondition.partition.map((indexSet, j) => {
                 const ocId = inCondition.partition.find(
@@ -307,12 +276,8 @@ export function parseCondition(
                         (alloc) => alloc.recipient.slotId === slotPath.slotId
                     )?.amount.slotId
 
-                    const amountSlot = orderedSlotIds.findIndex(
-                        (x) => x === amountSlotId
-                    )
-
-                    if (amountSlot > -1) {
-                        return amountSlot
+                    if (amountSlotId) {
+                        return amountSlotId
                     } else {
                         throw new Error(
                             'Could not find slot for allocation amount'
@@ -328,9 +293,9 @@ export function parseCondition(
     })
 
     if (
-        outCondition.allocations.find((x) => x.recipientAddressSlot === -1) ||
+        outCondition.allocations.find((x) => !x.recipientAddressSlot) ||
         outCondition.allocations.find((x) =>
-            x.recipientAmountSlots.includes(-1)
+            x.recipientAmountSlots.find((y) => !y)
         )
     ) {
         throw new Error(
