@@ -6,7 +6,7 @@ import React from 'react'
 interface RecipientAvatarProps {
     icon?: JSX.Element
     pfpPath?: string
-    onClick: () => void
+    onClick?: () => void
 }
 
 const RecipientAvatar = ({ icon, pfpPath, onClick }: RecipientAvatarProps) => {
@@ -21,7 +21,7 @@ const RecipientAvatar = ({ icon, pfpPath, onClick }: RecipientAvatarProps) => {
             <Box
                 width={{ min: 'xxsmall', max: 'xxsmall' }}
                 height={{ min: 'xxsmall', max: 'xxsmall' }}
-                background="darkBlue"
+                background="accent-2"
                 justify="center"
                 align="center"
                 round="small"

@@ -13,7 +13,7 @@ import {
     SpinnerGap,
 } from 'phosphor-react'
 
-import PlainMenuListItem from '../buttons/PlainMenuListItem'
+import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import React from 'react'
 import SidebarSolverItem from './SidebarSolverItem'
@@ -29,6 +29,7 @@ const Sidebar = ({}: SidebarProps) => {
                     flex
                     elevation="small"
                     direction="row"
+                    height={{ min: 'auto' }}
                     width={
                         screenSize === 'small'
                             ? { min: '90vw', max: '90vw' }
@@ -36,7 +37,7 @@ const Sidebar = ({}: SidebarProps) => {
                     }
                 >
                     <Box
-                        background="secondaryGradient"
+                        background="secondary-gradient"
                         fill="vertical"
                         pad={{ vertical: 'large' }}
                         justify="between"
@@ -59,10 +60,11 @@ const Sidebar = ({}: SidebarProps) => {
                         fill
                         round="small"
                         margin={{ horizontal: 'small' }}
-                        background="itemHighlight"
+                        background="background-front"
+                        height={{ min: 'auto' }}
                     >
                         <CardHeader pad="medium" elevation="small">
-                            <Text>Solver Title</Text>
+                            <Text>Solver Title {screenSize}</Text>
                             <Text size="small" color="dark-3">
                                 v1.0
                             </Text>
@@ -70,7 +72,9 @@ const Sidebar = ({}: SidebarProps) => {
                         <CardBody pad="medium" gap="large">
                             <Box gap="medium">
                                 <Box direction="row" gap="small">
-                                    <SpinnerGap size="24" />
+                                    <Box>
+                                        <SpinnerGap size="24" />
+                                    </Box>
                                     <Text>Current</Text>
                                 </Box>
                                 <Text size="small" color="dark-6">
@@ -80,8 +84,8 @@ const Sidebar = ({}: SidebarProps) => {
                                     enim blandit pharetra. Nam nec justo
                                     ultricies, tristique justo ege.
                                 </Text>
-                                <PlainMenuListItem
-                                    label="Executed"
+                                <BaseMenuListItem
+                                    title="Executed"
                                     icon={<Rocket />}
                                     onClick={() => {}}
                                     isActive
@@ -90,7 +94,9 @@ const Sidebar = ({}: SidebarProps) => {
                             <Box gap="medium">
                                 <PlainSectionDivider />
                                 <Box direction="row" gap="small">
-                                    <ClockCounterClockwise size="24" />
+                                    <Box>
+                                        <ClockCounterClockwise size="24" />
+                                    </Box>
                                     <Text>History</Text>
                                 </Box>
                                 <Text size="small" color="dark-6">
@@ -99,13 +105,13 @@ const Sidebar = ({}: SidebarProps) => {
                                     adipiscing elit. Suspendisse vel erat et
                                     enim blandit pharetra.
                                 </Text>
-                                <PlainMenuListItem
-                                    label="Outcome reported"
+                                <BaseMenuListItem
+                                    title="Outcome reported"
                                     icon={<Handshake />}
                                     onClick={() => {}}
                                 />
-                                <PlainMenuListItem
-                                    label="Outcome reported"
+                                <BaseMenuListItem
+                                    title="Outcome reported"
                                     icon={<Handshake />}
                                     onClick={() => {}}
                                 />

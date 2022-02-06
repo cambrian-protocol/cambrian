@@ -26,25 +26,25 @@ export const SolverNode = memo((props: FlowElement) => {
         <>
             <Handle position={Position.Top} type="target" id="a" />
             <Box
-                background="brandGradient"
+                background="primary-gradient"
                 pad="medium"
                 round="small"
                 width={{ min: 'small' }}
                 gap="small"
             >
                 <Box direction="row" gap="small">
-                    <PuzzlePiece color="black" size="24" />
-                    <Heading color="black" level="4">
+                    <PuzzlePiece color="white" size="24" />
+                    <Heading color="white" level="4">
                         {props.data?.label}
                     </Heading>
                 </Box>
                 <Box>
                     <Box direction="row" gap="small">
-                        <UsersThree color="black" size="18" />
-                        <Text color="black" size="small">
+                        <UsersThree color="white" size="18" />
+                        <Text color="white" size="small">
                             Recipients
                         </Text>
-                        <Text color="black" size="small">
+                        <Text color="white" size="small">
                             {
                                 currentSolverNode?.config.condition.recipients
                                     .length
@@ -52,11 +52,11 @@ export const SolverNode = memo((props: FlowElement) => {
                         </Text>
                     </Box>
                     <Box direction="row" gap="small">
-                        <TreeStructure color="black" size="18" />
-                        <Text color="black" size="small">
+                        <TreeStructure color="white" size="18" />
+                        <Text color="white" size="small">
                             Outcomes
                         </Text>
-                        <Text color="black" size="small">
+                        <Text color="white" size="small">
                             {
                                 currentSolverNode?.config.condition.outcomes
                                     .length
@@ -64,11 +64,11 @@ export const SolverNode = memo((props: FlowElement) => {
                         </Text>
                     </Box>
                     <Box direction="row" gap="small">
-                        <ArrowSquareIn color="black" size="18" />
-                        <Text color="black" size="small">
+                        <ArrowSquareIn color="white" size="18" />
+                        <Text color="white" size="small">
                             Slots
                         </Text>
-                        <Text color="black" size="small">
+                        <Text color="white" size="small">
                             {currentSolverNode &&
                                 Object.keys(currentSolverNode.config.slots)
                                     .length}

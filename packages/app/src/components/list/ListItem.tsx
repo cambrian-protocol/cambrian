@@ -1,4 +1,4 @@
-import { Box, Heading, Paragraph, Text } from 'grommet'
+import { Box, Heading, Text } from 'grommet'
 import {
     ChartPieSlice,
     CheckSquare,
@@ -41,21 +41,18 @@ const ListItem = ({
             round="small"
             gap="small"
             height={{ min: 'auto' }}
-            background={isActive ? 'selected' : 'darkBlue'}
+            background={isActive ? 'primary-gradient' : 'background-contrast'}
         >
             <Box direction="row" justify="between" align="center">
                 <Box direction="row" gap="small">
-                    <Box
-                        width={{ min: 'xxsmall' }}
-                        pad="small"
-                        round="small"
-                        background="veryDark"
-                    >
+                    <Box width={{ min: 'xxsmall' }} pad="small">
                         {icon}
                     </Box>
                     <Box>
-                        <Paragraph size="small">{description}</Paragraph>
-                        <Text truncate="tip" weight={'bold'}>
+                        <Text color="white" size="small">
+                            {description}
+                        </Text>
+                        <Text color="white" truncate="tip" weight={'bold'}>
                             {title}
                         </Text>
                     </Box>
@@ -84,7 +81,7 @@ const ListItem = ({
                         label="Remove"
                         icon={
                             <StackedIcon
-                                stackBackground="darkBlue"
+                                stackBackground="background-contrast"
                                 icon={icon}
                                 stackedIcon={<Trash />}
                             />
@@ -97,7 +94,7 @@ const ListItem = ({
                         label="Edit"
                         icon={
                             <StackedIcon
-                                stackBackground="darkBlue"
+                                stackBackground="background-contrast"
                                 icon={icon}
                             />
                         }
@@ -107,13 +104,7 @@ const ListItem = ({
                     <ListItemButton
                         onClick={onSelect}
                         label={isActive ? 'Deselect' : 'Select'}
-                        icon={
-                            isActive ? (
-                                <CheckSquare size="24" />
-                            ) : (
-                                <Square size="24" />
-                            )
-                        }
+                        icon={isActive ? <CheckSquare /> : <Square />}
                     />
                 )}
                 {onAllocate && (
@@ -122,7 +113,7 @@ const ListItem = ({
                         label={'Edit BPS'}
                         icon={
                             <StackedIcon
-                                stackBackground="darkBlue"
+                                stackBackground="background-contrast"
                                 icon={<ChartPieSlice />}
                             />
                         }

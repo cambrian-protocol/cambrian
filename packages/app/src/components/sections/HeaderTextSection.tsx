@@ -11,12 +11,17 @@ const HeaderTextSection = ({
     subTitle,
     paragraph,
 }: HeaderTextSectionProps) => (
-    <Box height={{ min: 'auto' }} gap="small" pad={{ bottom: 'medium' }}>
+    <Box
+        height={{ min: 'auto' }}
+        gap="small"
+        pad={{ bottom: 'medium' }}
+        fill="horizontal"
+    >
         <Box gap="xsmall">
-            <Heading level="3">{title}</Heading>
             <Heading level="5" color="brand">
                 {subTitle}
             </Heading>
+            <Heading level="2">{title}</Heading>
         </Box>
         <Paragraph fill color="dark-6">
             {paragraph}

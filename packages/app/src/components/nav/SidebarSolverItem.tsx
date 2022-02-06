@@ -19,7 +19,7 @@ const SidebarSolverItem = ({ onClick, active }: SidebarSolverItemProps) => (
                 <Box
                     pad={screenSize === 'small' ? 'medium' : 'small'}
                     margin={{ horizontal: 'small' }}
-                    background="primaryGradient"
+                    background="primary-gradient"
                     round="small"
                 >
                     <PuzzlePiece size="24" />

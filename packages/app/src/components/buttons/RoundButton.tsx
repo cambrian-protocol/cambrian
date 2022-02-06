@@ -10,13 +10,13 @@ const RoundButton = ({ disabled, onClick, icon }: RoundButtonProps) => (
     <Box
         round="full"
         overflow="hidden"
-        background={disabled ? 'dark-1' : 'brandGradient'}
+        background={disabled ? 'background-contrast' : 'primary-gradient'}
         width={{ min: 'xxsmall' }}
     >
         <Button
+            color="white"
             disabled={disabled}
             icon={icon}
-            color="black"
             hoverIndicator
             onClick={() => onClick()}
         />
