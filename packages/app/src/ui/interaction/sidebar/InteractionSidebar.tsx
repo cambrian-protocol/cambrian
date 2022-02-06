@@ -13,55 +13,36 @@ import {
     SpinnerGap,
 } from 'phosphor-react'
 
-import BaseMenuListItem from '../buttons/BaseMenuListItem'
-import PlainSectionDivider from '../sections/PlainSectionDivider'
-import React from 'react'
-import SidebarSolverItem from './SidebarSolverItem'
-import UserMenu from './UserMenu'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import SideNav from '@cambrian/app/components/nav/SideNav'
+import SidebarSolverItem from '@cambrian/app/components/nav/SidebarSolverItem'
 
-interface SidebarProps {}
+interface InteractionSidebarProps {}
 
-const Sidebar = ({}: SidebarProps) => {
+const InteractionSidebar = ({}: InteractionSidebarProps) => {
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => (
                 <Box
                     flex
-                    elevation="small"
                     direction="row"
-                    height={{ min: 'auto' }}
+                    height="100vh"
                     width={
                         screenSize === 'small'
                             ? { min: '90vw', max: '90vw' }
-                            : { min: '30vw', max: '30vw' }
+                            : { min: '50vw', max: '50vw' }
                     }
                 >
-                    <Box
-                        background="secondary-gradient"
-                        fill="vertical"
-                        pad={{ vertical: 'large' }}
-                        justify="between"
-                        width={{ min: 'auto' }}
-                        round={{ corner: 'right', size: 'small' }}
-                    >
-                        <Box gap="large">
-                            <SidebarSolverItem active onClick={() => {}} />
-                            <SidebarSolverItem
-                                active={false}
-                                onClick={() => {}}
-                            />
-                        </Box>
-                        <Box>
-                            <PlainSectionDivider margin="medium" />
-                            <UserMenu />
-                        </Box>
-                    </Box>
+                    <SideNav>
+                        <SidebarSolverItem active onClick={() => {}} />
+                        <SidebarSolverItem active={false} onClick={() => {}} />
+                    </SideNav>
                     <Card
                         fill
                         round="small"
-                        margin={{ horizontal: 'small' }}
+                        margin={{ right: 'small' }}
                         background="background-front"
-                        height={{ min: 'auto' }}
                     >
                         <CardHeader pad="medium" elevation="small">
                             <Text>Solver Title {screenSize}</Text>
@@ -69,8 +50,12 @@ const Sidebar = ({}: SidebarProps) => {
                                 v1.0
                             </Text>
                         </CardHeader>
-                        <CardBody pad="medium" gap="large">
-                            <Box gap="medium">
+                        <CardBody
+                            pad="medium"
+                            gap="small"
+                            overflow={{ vertical: 'scroll' }}
+                        >
+                            <Box gap="medium" height={{ min: 'auto' }}>
                                 <Box direction="row" gap="small">
                                     <Box>
                                         <SpinnerGap size="24" />
@@ -91,7 +76,7 @@ const Sidebar = ({}: SidebarProps) => {
                                     isActive
                                 />
                             </Box>
-                            <Box gap="medium">
+                            <Box gap="medium" height={{ min: 'auto' }}>
                                 <PlainSectionDivider />
                                 <Box direction="row" gap="small">
                                     <Box>
@@ -124,4 +109,4 @@ const Sidebar = ({}: SidebarProps) => {
     )
 }
 
-export default Sidebar
+export default InteractionSidebar
