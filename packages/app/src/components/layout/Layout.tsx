@@ -2,17 +2,18 @@ import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
 import React, { PropsWithChildren, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
+import DefaultSidebar from '../nav/DefaultSidebar'
 import Head from 'next/head'
-import Sidebar from '../nav/Sidebar'
 import SolverConfigModal from '../modals/SolverConfigModal'
 
 export const siteTitle = 'Cambrian Protocol'
 
 type LayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
+    sidebar?: JSX.Element
 }
 
-export const Layout = ({ children, contextTitle }: LayoutProps) => {
+export const Layout = ({ sidebar, children, contextTitle }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
     const [showSolverConfig, setShowSolverConfig] = useState(false)
@@ -21,7 +22,6 @@ export const Layout = ({ children, contextTitle }: LayoutProps) => {
     const toggleHelp = () => setShowHelp(!showHelp)
     const toggleSolverConfig = () => setShowSolverConfig(!showSolverConfig)
 
-    // TODO Determine and extract content of Sidebar and SolverConfigs
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => (
@@ -49,7 +49,9 @@ export const Layout = ({ children, contextTitle }: LayoutProps) => {
                                     direction="horizontal"
                                     open={showSidebar}
                                 >
-                                    <Sidebar />
+                                    <Box elevation="small" fill>
+                                        {sidebar ? sidebar : <DefaultSidebar />}
+                                    </Box>
                                 </Collapsible>
                                 <Box flex>
                                     <Appbar
