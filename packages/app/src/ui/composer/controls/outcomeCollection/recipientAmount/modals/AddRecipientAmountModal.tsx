@@ -1,7 +1,8 @@
 import { Box, Button } from 'grommet'
 import { Cursor, PuzzlePiece, UserPlus } from 'phosphor-react'
 
-import BaseModal from '@cambrian/app/src/components/modals/BaseModal'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import CreateRecipientAmountForm from '../forms/CreateRecipientAmountForm'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import SelectRecipientAmountForm from '../forms/SelectRecipientAmountForm'
@@ -12,15 +13,16 @@ type AddRecipientAmountModalProps = {
     onClose: () => void
 }
 
-type AddRecipientAmountControllerType =
-    | 'MainControl'
-    | 'CreateRecipientAmountControl'
-    | 'SelectRecipientAmountControl'
-
 const AddRecipientAmountModal = ({ onClose }: AddRecipientAmountModalProps) => {
     const { dispatch } = useComposerContext()
-    const [controller, setController] =
-        useState<AddRecipientAmountControllerType>('MainControl')
+    const [showSelectRecipient, setShowSelectRecipient] = useState(false)
+    const [showCreateRecipient, setShowCreateRecipient] = useState(false)
+
+    const toggleShowSelectRecipient = () =>
+        setShowSelectRecipient(!showSelectRecipient)
+
+    const toggleShowCreateRecipient = () =>
+        setShowCreateRecipient(!showCreateRecipient)
 
     //TODO Ask for solver allocation
     const createNewSolver = () => {
@@ -28,53 +30,44 @@ const AddRecipientAmountModal = ({ onClose }: AddRecipientAmountModalProps) => {
         onClose()
     }
 
-    function renderControl() {
-        switch (controller) {
-            case 'CreateRecipientAmountControl':
-                return <CreateRecipientAmountForm onClose={onClose} />
-            case 'SelectRecipientAmountControl':
-                return <SelectRecipientAmountForm onClose={onClose} />
-            default:
-                return <></>
-        }
-    }
-
     return (
-        <BaseModal onClose={onClose}>
-            {controller === 'MainControl' ? (
-                <Box gap="small">
-                    <HeaderTextSection
-                        title="Add recipient"
-                        subTitle="Who else deserves a share?"
-                        paragraph="You can choose between existent recipients and solvers, or create a new ones"
+        <>
+            <BaseLayerModal onBack={onClose}>
+                <HeaderTextSection
+                    title="Add recipient"
+                    subTitle="Who else deserves a share?"
+                    paragraph="You can choose between existent recipients and solvers, or create a new ones"
+                />
+                <Box gap="small" fill>
+                    <BaseMenuListItem
+                        title="Select recipient"
+                        icon={<Cursor />}
+                        onClick={toggleShowSelectRecipient}
                     />
-                    <Button
-                        primary
-                        label="Select recipient"
-                        icon={<Cursor size="24" />}
-                        onClick={() =>
-                            setController('SelectRecipientAmountControl')
-                        }
-                    />
-                    <Button
-                        primary
-                        label="Create recipient"
-                        icon={<UserPlus size="24" />}
-                        onClick={() =>
-                            setController('CreateRecipientAmountControl')
-                        }
+                    <BaseMenuListItem
+                        title="Create recipient"
+                        icon={<UserPlus />}
+                        onClick={toggleShowCreateRecipient}
                     />
                     <Button
                         primary
                         label="Attach new Solver"
-                        icon={<PuzzlePiece size="24" />}
+                        icon={<PuzzlePiece color="white" />}
                         onClick={createNewSolver}
                     />
                 </Box>
-            ) : (
-                renderControl()
+            </BaseLayerModal>
+            {showCreateRecipient && (
+                <BaseLayerModal onClose={toggleShowCreateRecipient}>
+                    <CreateRecipientAmountForm onClose={onClose} />
+                </BaseLayerModal>
             )}
-        </BaseModal>
+            {showSelectRecipient && (
+                <BaseLayerModal onClose={toggleShowSelectRecipient}>
+                    <SelectRecipientAmountForm onClose={onClose} />
+                </BaseLayerModal>
+            )}
+        </>
     )
 }
 

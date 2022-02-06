@@ -2,18 +2,17 @@ import {
     ArrowSquareIn,
     CaretLeft,
     Gear,
-    PuzzlePiece,
     StackSimple,
     TreeStructure,
     UserList,
 } from 'phosphor-react'
-import { Box, Text } from 'grommet'
+import { Box, Card, CardBody, CardFooter, CardHeader, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import NavigationButton from '@cambrian/app/components/buttons/NavigationButton'
 import OutcomeList from './outcomeList/OutcomeList'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecipientList from './recipientList/RecipientList'
 import RoundButtonWithLabel from '@cambrian/app/components/buttons/RoundButtonWithLabel'
 import SlotList from './slotList/SlotList'
@@ -65,76 +64,77 @@ export const SolverControl = () => {
     if (currentSolver === undefined) return null
 
     return (
-        <Box fill gap="small" pad="small">
-            <Box
-                align="center"
-                direction="row"
-                gap="small"
-                height={{ min: 'xsmall' }}
-            >
-                <Box width={{ min: 'xxsmall' }}>
+        <Card background="background-front" fill>
+            <CardHeader pad={'medium'} elevation="small" height={'5em'}>
+                <Box width={'2em'}>
                     {controller !== 'MainControl' && (
-                        <NavigationButton
-                            icon={<CaretLeft size="24" />}
+                        <Box
                             onClick={() => setController('MainControl')}
-                        />
+                            focusIndicator={false}
+                        >
+                            <CaretLeft size="24" />
+                        </Box>
                     )}
                 </Box>
-                <PuzzlePiece size="24" />
-                <Box>
+                <Box flex>
                     <Text weight="bold" size="small">
                         {currentSolver?.title}
                     </Text>
                 </Box>
-            </Box>
+            </CardHeader>
             {controller === 'MainControl' ? (
                 <>
-                    <Box gap="small" fill overflow={{ vertical: 'auto' }}>
-                        <HeaderTextSection
-                            title="Solver"
-                            subTitle="Fine tune your Solver"
-                            paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
-                        />
-                        <Box gap="small">
-                            <BaseMenuListItem
-                                icon={<Gear />}
-                                title="Settings"
-                                onClick={() =>
-                                    setController('SolverSettingsControl')
-                                }
+                    <CardBody pad="small">
+                        <Box gap="small" fill overflow={{ vertical: 'auto' }}>
+                            <HeaderTextSection
+                                title="Solver"
+                                subTitle="Fine tune your Solver"
+                                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
                             />
-                            <BaseMenuListItem
-                                icon={<TreeStructure />}
-                                title="Outcome list"
-                                onClick={() =>
-                                    setController('OutcomeListControl')
-                                }
-                            />
-                            <BaseMenuListItem
-                                icon={<UserList />}
-                                title={'Recipient list'}
-                                onClick={() =>
-                                    setController('RecipientListControl')
-                                }
-                            />
-                            <BaseMenuListItem
-                                icon={<ArrowSquareIn />}
-                                title={'Slot list'}
-                                onClick={() => setController('SlotControl')}
-                            />
+                            <Box gap="small">
+                                <BaseMenuListItem
+                                    icon={<Gear />}
+                                    title="Settings"
+                                    onClick={() =>
+                                        setController('SolverSettingsControl')
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <BaseMenuListItem
+                                    icon={<TreeStructure />}
+                                    title="Outcome list"
+                                    onClick={() =>
+                                        setController('OutcomeListControl')
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <BaseMenuListItem
+                                    icon={<UserList />}
+                                    title={'Recipient list'}
+                                    onClick={() =>
+                                        setController('RecipientListControl')
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <BaseMenuListItem
+                                    icon={<ArrowSquareIn />}
+                                    title={'Slot list'}
+                                    onClick={() => setController('SlotControl')}
+                                />
+                            </Box>
                         </Box>
-                    </Box>
-                    <Box pad="small">
-                        <RoundButtonWithLabel
-                            onClick={handleAttachOutcomeCollection}
-                            label="Attach Outcome collection"
-                            icon={<StackSimple size="24" />}
-                        />
-                    </Box>
+                        <CardFooter justify="end">
+                            <RoundButtonWithLabel
+                                onClick={handleAttachOutcomeCollection}
+                                label="Attach Outcome collection"
+                                icon={<StackSimple size="24" />}
+                            />
+                        </CardFooter>
+                    </CardBody>
                 </>
             ) : (
-                <Box fill>{renderControl()}</Box>
+                <CardBody pad="small">{renderControl()}</CardBody>
             )}
-        </Box>
+        </Card>
     )
 }

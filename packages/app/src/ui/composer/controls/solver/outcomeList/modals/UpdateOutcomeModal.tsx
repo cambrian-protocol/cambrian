@@ -1,8 +1,7 @@
 import { Box, FormExtendedEvent } from 'grommet'
 import React, { useEffect, useState } from 'react'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
-import { FloppyDisk } from 'phosphor-react'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeConfigForm from '../forms/OutcomeConfigForm'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
@@ -36,22 +35,21 @@ const UpdateOutcomeModal = ({ outcome, onClose }: UpdateOutcomeModalProps) => {
     }
 
     return (
-        <BaseModal onClose={onClose}>
-            <Box gap="small">
-                <HeaderTextSection
-                    title="Update outcome"
-                    subTitle="Configurate your outcome"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
-                />
+        <BaseLayerModal onClose={onClose}>
+            <HeaderTextSection
+                title="Update outcome"
+                subTitle="Configurate your outcome"
+                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+            />
+            <Box fill>
                 <OutcomeConfigForm
                     onSubmit={onSubmit}
                     outcomeInput={input}
                     setOutcomeInput={setInput}
-                    submitIcon={<FloppyDisk />}
-                    submitLabel="Save outcome"
+                    submitLabel="Save"
                 />
             </Box>
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 

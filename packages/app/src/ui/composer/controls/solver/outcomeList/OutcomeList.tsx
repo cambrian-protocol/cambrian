@@ -1,6 +1,6 @@
+import { Box, CardFooter } from 'grommet'
 import React, { useState } from 'react'
 
-import { Box } from 'grommet'
 import CreateOutcomeModal from '@cambrian/app/ui/composer/controls/solver/outcomeList/modals/CreateOutcomeModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeListItem from './OutcomeListItem'
@@ -39,13 +39,13 @@ const OutcomeList = () => {
                         )}
                     </Box>
                 </Box>
-                <Box pad="small">
+                <CardFooter justify="end">
                     <RoundButtonWithLabel
                         icon={<Plus size="24" />}
                         label="Create new Outcome"
                         onClick={toggleCreateOutcomeModal}
                     />
-                </Box>
+                </CardFooter>
             </Box>
             {showCreateOutcomeModal && (
                 <CreateOutcomeModal onClose={toggleCreateOutcomeModal} />

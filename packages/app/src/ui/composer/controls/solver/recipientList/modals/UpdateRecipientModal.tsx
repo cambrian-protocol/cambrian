@@ -1,8 +1,7 @@
 import { Box, FormExtendedEvent } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
-import { FloppyDisk } from 'phosphor-react'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientConfigForm from '../forms/RecipientConfigForm'
 import { RecipientFormType } from '../forms/CreateRecipientForm'
@@ -53,22 +52,21 @@ const UpdateRecipientModal = ({
     }
 
     return (
-        <BaseModal onClose={onClose}>
-            <Box gap="small">
-                <HeaderTextSection
-                    title="Edit recipient"
-                    subTitle="Changed your mind?"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
-                />
+        <BaseLayerModal onBack={onClose}>
+            <HeaderTextSection
+                title="Edit recipient"
+                subTitle="Changed your mind?"
+                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+            />
+            <Box fill>
                 <RecipientConfigForm
                     onSubmit={onSubmit}
                     setRecipientInput={setInput}
                     recipientInput={input}
-                    submitIcon={<FloppyDisk />}
                     submitLabel="Save"
                 />
             </Box>
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 

@@ -7,13 +7,7 @@ import {
     Text,
     TextInput,
 } from 'grommet'
-import {
-    ClipboardText,
-    FloppyDisk,
-    Scales,
-    Shield,
-    Timer,
-} from 'phosphor-react'
+import { ClipboardText, Scales, Shield, Timer } from 'phosphor-react'
 import React, { useEffect, useState } from 'react'
 
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
@@ -131,7 +125,7 @@ const SolverSettingsControl = () => {
     }
 
     return (
-        <Box gap="small">
+        <Box gap="small" overflow={{ vertical: 'auto' }}>
             <HeaderTextSection
                 title="Solver settings"
                 subTitle="Lorem Ipsum"
@@ -200,8 +194,7 @@ const SolverSettingsControl = () => {
                         disabled={_.isEqual(initialInput, input)}
                         primary
                         type="submit"
-                        label={'Save changes'}
-                        icon={<FloppyDisk size="24" />}
+                        label={'Save'}
                     />
                 </Box>
             </Form>

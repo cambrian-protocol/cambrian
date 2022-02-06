@@ -1,7 +1,8 @@
-import { Box, Button } from 'grommet'
 import { Cursor, UserPlus } from 'phosphor-react'
 
-import BaseModal from '@cambrian/app/src/components/modals/BaseModal'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import { Box } from 'grommet'
 import CreateRecipientForm from '../forms/CreateRecipientForm'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SelectRecipientForm from '../forms/SelectRecipientForm'
@@ -11,52 +12,48 @@ type AddRecipientModalProps = {
     onClose: () => void
 }
 
-type AddRecipientControllerType =
-    | 'MainControl'
-    | 'CreateRecipientControl'
-    | 'SelectRecipientControl'
-
 const AddRecipientModal = ({ onClose }: AddRecipientModalProps) => {
-    const [controller, setController] =
-        useState<AddRecipientControllerType>('MainControl')
+    const [showCreateRecipient, setShowCreateRecipient] = useState(false)
+    const [showSelectRecipient, setShowSelectRecipient] = useState(false)
 
-    function renderControl() {
-        switch (controller) {
-            case 'CreateRecipientControl':
-                return <CreateRecipientForm onClose={onClose} />
-            case 'SelectRecipientControl':
-                return <SelectRecipientForm onClose={onClose} />
-            default:
-                return <></>
-        }
-    }
+    const toggleShowCreateRecipient = () =>
+        setShowCreateRecipient(!showCreateRecipient)
+
+    const toggleShowSelectRecipient = () =>
+        setShowSelectRecipient(!showSelectRecipient)
 
     return (
-        <BaseModal onClose={onClose}>
-            {controller === 'MainControl' ? (
-                <Box gap="small">
-                    <HeaderTextSection
-                        title="Add recipient"
-                        subTitle="Who else deserves a share?"
-                        paragraph="You can choose between existent recipients and solvers, or create a new ones"
-                    />
-                    <Button
-                        primary
-                        label="Select recipient"
+        <>
+            <BaseLayerModal onBack={onClose}>
+                <HeaderTextSection
+                    title="Add recipient"
+                    subTitle="Who else deserves a share?"
+                    paragraph="You can choose between existent recipients and solvers, or create a new ones"
+                />
+                <Box gap="small" fill>
+                    <BaseMenuListItem
+                        title="Select recipient"
                         icon={<Cursor size="24" />}
-                        onClick={() => setController('SelectRecipientControl')}
+                        onClick={toggleShowSelectRecipient}
                     />
-                    <Button
-                        primary
-                        label="Create recipient"
+                    <BaseMenuListItem
+                        title="Create recipient"
                         icon={<UserPlus size="24" />}
-                        onClick={() => setController('CreateRecipientControl')}
+                        onClick={toggleShowCreateRecipient}
                     />
                 </Box>
-            ) : (
-                renderControl()
+            </BaseLayerModal>
+            {showCreateRecipient && (
+                <BaseLayerModal onClose={toggleShowCreateRecipient}>
+                    <CreateRecipientForm onClose={onClose} />
+                </BaseLayerModal>
             )}
-        </BaseModal>
+            {showSelectRecipient && (
+                <BaseLayerModal onClose={toggleShowSelectRecipient}>
+                    <SelectRecipientForm onClose={onClose} />
+                </BaseLayerModal>
+            )}
+        </>
     )
 }
 

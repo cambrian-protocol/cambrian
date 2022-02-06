@@ -4,10 +4,9 @@ import SlotConfigForm, {
     mapSlotConfigFormToSlotActionPayload,
 } from '../forms/SlotConfigForm'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { Plus } from 'phosphor-react'
 import { SlotTypes } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import _uniqueId from 'lodash/uniqueId'
@@ -49,7 +48,7 @@ const CreateSlotFormModal = ({ onClose }: CreateSlotModalProps) => {
     }
 
     return (
-        <BaseModal onClose={onClose}>
+        <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
                 title="Create new Slot"
                 subTitle="Manual slot configuration"
@@ -60,9 +59,8 @@ const CreateSlotFormModal = ({ onClose }: CreateSlotModalProps) => {
                 slotInput={slotInput}
                 setSlotInput={setSlotInput}
                 submitLabel="Create slot"
-                submitIcon={<Plus />}
             />
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 

@@ -1,7 +1,7 @@
 import { Box, Button } from 'grommet'
 import { Export, FloppyDisk, FolderOpen } from 'phosphor-react'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { ComposerStateType } from '@cambrian/app/store/composer/composer.types'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import RoundButtonWithLabel from '@cambrian/app/src/components/buttons/RoundButtonWithLabel'
@@ -92,24 +92,19 @@ const LoadPresetModal = ({ onClose }: LoadPresetModalProps) => {
     }
 
     return (
-        <BaseModal onClose={onClose}>
-            <Box gap="small">
-                <HeaderTextSection
-                    title="Load Solution"
-                    subTitle="Manual slot configuration"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
-                />
+        <BaseLayerModal onClose={onClose}>
+            <HeaderTextSection
+                title="Load Solution"
+                subTitle="Manual slot configuration"
+                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+            />
+            <Box gap="small" fill>
                 <SelectSolution
                     selectedSolution={selectedSolution}
                     updateSolution={handleUpdateSolution}
                 />
-                <Button
-                    primary
-                    onClick={handleOnLoad}
-                    icon={<FolderOpen size="24" />}
-                    label="Load Solution"
-                />
+                <Button primary onClick={handleOnLoad} label="Load Solution" />
             </Box>
-        </BaseModal>
+        </BaseLayerModal>
     )
 }

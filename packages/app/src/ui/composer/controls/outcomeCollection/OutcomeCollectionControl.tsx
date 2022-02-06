@@ -1,10 +1,9 @@
-import { Box, Text } from 'grommet'
+import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
 import { CaretLeft, ListPlus, StackSimple, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import NavigationButton from '@cambrian/app/src/components/buttons/NavigationButton'
 import OutcomeSelectionList from './outcomeSelection/OutcomeSelectionList'
 import RecipientAmountList from './recipientAmount/RecipientAmountList'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
@@ -43,59 +42,57 @@ const OutcomeCollectionControl = () => {
     }
 
     return (
-        <Box gap="small" fill pad="small">
-            <Box
-                align="center"
-                direction="row"
-                gap="small"
-                height={{ min: 'xsmall' }}
-            >
-                <Box width={{ min: 'xxsmall' }}>
+        <Card background="background-front" fill>
+            <CardHeader pad={'medium'} elevation="small" height={'5em'}>
+                <Box width={'2em'}>
                     {controller !== 'MainControl' && (
-                        <NavigationButton
-                            icon={<CaretLeft size="24" />}
+                        <Box
                             onClick={() => setController('MainControl')}
-                        />
+                            focusIndicator={false}
+                        >
+                            <CaretLeft size="24" />
+                        </Box>
                     )}
                 </Box>
-                <StackSimple size="24" />
-                <Box>
+                <Box flex>
                     <Text weight="bold" size="small">
                         {currentSolver?.title}
                     </Text>
-                    <Text color="dark-5" size="small">
+                    <Text color="light-2" size="small">
                         Outcome Collection
                     </Text>
                 </Box>
-            </Box>
+            </CardHeader>
             {controller === 'MainControl' ? (
-                <Box gap="medium">
-                    <HeaderTextSection
-                        title="Outcome Collection"
-                        subTitle="Fine tune your Outcome Collection"
-                        paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
-                    />
-                    <Box gap="small">
-                        <BaseMenuListItem
-                            icon={<ListPlus />}
-                            title={'Outcome selection'}
-                            onClick={() =>
-                                setController('OutcomeSelectionControl')
-                            }
+                <CardBody pad="small">
+                    <Box gap="medium">
+                        <HeaderTextSection
+                            title="Outcome collection"
+                            subTitle="Fine tune your Outcome Collection"
+                            paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
                         />
-                        <BaseMenuListItem
-                            icon={<UsersThree />}
-                            title={'Allocation'}
-                            onClick={() =>
-                                setController('RecipientAmountControl')
-                            }
-                        />
+                        <Box gap="small">
+                            <BaseMenuListItem
+                                icon={<ListPlus />}
+                                title={'Outcome selection'}
+                                onClick={() =>
+                                    setController('OutcomeSelectionControl')
+                                }
+                            />
+                            <BaseMenuListItem
+                                icon={<UsersThree />}
+                                title={'Allocation'}
+                                onClick={() =>
+                                    setController('RecipientAmountControl')
+                                }
+                            />
+                        </Box>
                     </Box>
-                </Box>
+                </CardBody>
             ) : (
-                renderControl()
+                <CardBody pad="small">{renderControl()}</CardBody>
             )}
-        </Box>
+        </Card>
     )
 }
 

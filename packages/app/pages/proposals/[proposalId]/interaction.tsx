@@ -1,5 +1,5 @@
-import { Box } from 'grommet'
-import InteractionSidebar from '@cambrian/app/ui/interaction/sidebar/InteractionSidebar'
+import InteractionCTAbar from '@cambrian/app/ui/interaction/bars/InteractionCTAbar'
+import InteractionSidebar from '@cambrian/app/ui/interaction/bars/InteractionSidebar'
 import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { useCurrentSolver } from '@cambrian/app/src/hooks/useCurrentSolver'
@@ -33,8 +33,7 @@ export default function InteractionPage() {
             contextTitle="Interact"
             sidebar={<InteractionSidebar />}
             config={<SolverConfigInfo />}
-        >
-            <Box>Interaction UI</Box>
-        </Layout>
+            ctaBar={<InteractionCTAbar />}
+        ></Layout>
     )
 }

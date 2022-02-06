@@ -10,14 +10,12 @@ interface RecipientConfigFormProps {
     recipientInput: RecipientFormType
     setRecipientInput: React.Dispatch<SetStateAction<RecipientFormType>>
     submitLabel: string
-    submitIcon: JSX.Element
 }
 
 const RecipientConfigForm = ({
     onSubmit,
     recipientInput,
     setRecipientInput,
-    submitIcon,
     submitLabel,
 }: RecipientConfigFormProps) => {
     return (
@@ -32,12 +30,7 @@ const RecipientConfigForm = ({
             <FormField name="description" label="Descriptive Name (Optional)" />
             <Box>
                 <IconContext.Provider value={{ size: '24' }}>
-                    <Button
-                        primary
-                        type="submit"
-                        label={submitLabel}
-                        icon={submitIcon}
-                    />
+                    <Button primary type="submit" label={submitLabel} />
                 </IconContext.Provider>
             </Box>
         </Form>

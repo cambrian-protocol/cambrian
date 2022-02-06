@@ -3,7 +3,6 @@ import SelectRecipient, {
     SelectRecipientType,
 } from '@cambrian/app/components/selects/SelectRecipient'
 
-import { FloppyDisk } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -46,12 +45,7 @@ const SelectRecipientForm = ({ onClose }: SelectRecipientFormProps) => {
                     />
                 </FormField>
                 <Box>
-                    <Button
-                        primary
-                        type="submit"
-                        label="Save"
-                        icon={<FloppyDisk size="24" />}
-                    />
+                    <Button primary type="submit" label="Add" />
                 </Box>
             </Form>
         </Box>

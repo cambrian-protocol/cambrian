@@ -5,8 +5,7 @@ import SlotConfigForm, {
 } from '../forms/SlotConfigForm'
 import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
-import { FloppyDisk } from 'phosphor-react'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import _uniqueId from 'lodash/uniqueId'
@@ -74,7 +73,7 @@ const UpdateSlotFormModal = ({
     }
 
     return (
-        <BaseModal onClose={onClose}>
+        <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
                 title="Edit Slot"
                 subTitle="Manual slot configuration"
@@ -85,9 +84,8 @@ const UpdateSlotFormModal = ({
                 slotInput={slotInput}
                 setSlotInput={setSlotInput}
                 submitLabel="Save slot"
-                submitIcon={<FloppyDisk />}
             />
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 
