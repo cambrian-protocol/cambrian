@@ -40,7 +40,6 @@ const ActiveNav = ({}: ActiveNavProps) => {
             <PositionedNav
                 width={'100%'}
                 direction="row"
-                background="veryDark"
                 pad="xsmall"
                 justify="center"
             >

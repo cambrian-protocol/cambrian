@@ -1,4 +1,4 @@
-import { Box, Paragraph } from 'grommet'
+import { Box, Text } from 'grommet'
 import RoundButton, { RoundButtonProps } from './RoundButton'
 
 type RoundButtonWithLabelProps = RoundButtonProps & {
@@ -11,7 +11,7 @@ const RoundButtonWithLabel = ({
     icon,
 }: RoundButtonWithLabelProps) => (
     <Box direction="row" alignSelf="end" align="center" gap="small">
-        <Paragraph>{label}</Paragraph>
+        <Text size="small">{label}</Text>
         <RoundButton icon={icon} onClick={() => onClick()} />
     </Box>
 )

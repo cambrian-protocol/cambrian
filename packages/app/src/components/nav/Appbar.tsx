@@ -1,5 +1,5 @@
 import { Box, Nav, ResponsiveContext, Text } from 'grommet'
-import { DotsThreeVertical, IconContext, List, Question } from 'phosphor-react'
+import { Gear, IconContext, List, Question } from 'phosphor-react'
 
 import styled from 'styled-components'
 
@@ -24,10 +24,10 @@ const Appbar = ({
 }: AppbarProps) => (
     <ResponsiveContext.Consumer>
         {(screenSize) => (
-            <IconContext.Provider value={{ size: '24' }}>
+            <IconContext.Provider value={{ size: '24', color: 'white' }}>
                 <PositionedNav
                     direction="row"
-                    background="secondaryGradient"
+                    background="secondary-gradient"
                     width={screenSize === 'small' ? { min: '100vw' } : '100%'}
                     tag="header"
                     justify="between"
@@ -35,12 +35,14 @@ const Appbar = ({
                 >
                     <Box direction="row" gap="large" align="center">
                         <AppbarItem icon={<List />} onClick={toggleSidebar} />
-                        <Text>{title ? title : 'Solver Title'}</Text>
+                        <Text color="white">
+                            {title ? title : 'Solver Title'}
+                        </Text>
                     </Box>
                     <Box direction="row" gap="medium">
                         <AppbarItem icon={<Question />} onClick={toggleHelp} />
                         <AppbarItem
-                            icon={<DotsThreeVertical />}
+                            icon={<Gear />}
                             onClick={toggleSolverConfig}
                         />
                     </Box>

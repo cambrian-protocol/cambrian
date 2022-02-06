@@ -10,7 +10,6 @@ const NavigationButton = ({ onClick, icon }: NavigationButtonProps) => (
     <Box
         height={{ min: 'xxsmall', max: 'xxsmall' }}
         width={{ min: 'xxsmall', max: 'xxsmall' }}
-        background="darkBlue"
         round="small"
         justify="center"
         align="center"

@@ -2,8 +2,8 @@ import { Box, Text } from 'grommet'
 import { CaretLeft, ListPlus, StackSimple, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import MenuButton from '@cambrian/app/src/components/buttons/MenuButton'
 import NavigationButton from '@cambrian/app/src/components/buttons/NavigationButton'
 import OutcomeSelectionList from './outcomeSelection/OutcomeSelectionList'
 import RecipientAmountList from './recipientAmount/RecipientAmountList'
@@ -76,16 +76,16 @@ const OutcomeCollectionControl = () => {
                         paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
                     />
                     <Box gap="small">
-                        <MenuButton
+                        <BaseMenuListItem
                             icon={<ListPlus />}
-                            label={'Outcome selection'}
+                            title={'Outcome selection'}
                             onClick={() =>
                                 setController('OutcomeSelectionControl')
                             }
                         />
-                        <MenuButton
+                        <BaseMenuListItem
                             icon={<UsersThree />}
-                            label={'Allocation'}
+                            title={'Allocation'}
                             onClick={() =>
                                 setController('RecipientAmountControl')
                             }

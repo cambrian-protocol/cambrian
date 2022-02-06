@@ -28,7 +28,7 @@ const ParticipantAvatar = ({
                 width={{ min: 'xxsmall', max: 'xxsmall' }}
                 height={{ min: 'xxsmall', max: 'xxsmall' }}
                 border={{ color: 'white', size: 'small' }}
-                background="darkBlue"
+                background="accent-2"
                 justify="center"
                 align="center"
             >

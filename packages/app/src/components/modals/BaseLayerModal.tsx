@@ -1,11 +1,12 @@
-import { Box, Layer, Text } from 'grommet'
+import { Box, Layer, LayerProps, Text } from 'grommet'
 import { CaretLeft, IconContext, X } from 'phosphor-react'
 
 import { PropsWithChildren } from 'react'
 
-type BaseLayerModalProps = PropsWithChildren<{}> & {
-    title?: string
-} & (
+export type BaseLayerModalProps = PropsWithChildren<{}> &
+    LayerProps & {
+        title?: string
+    } & (
         | { onBack: () => void; onClose?: never }
         | { onClose: () => void; onBack?: never }
     )
@@ -15,42 +16,54 @@ const BaseLayerModal = ({
     title,
     onBack,
     onClose,
+    ...props
 }: BaseLayerModalProps) => (
     <Layer
+        {...props}
         responsive
         onEsc={onBack || onClose}
         onClickOutside={onBack || onClose}
         full="vertical"
         position="bottom"
         margin={{ top: 'small' }}
-        background="background"
+        background="background-popup"
     >
-        <Box align="center" fill>
+        <Box align="center" flex width="large">
             <Box
                 width="100%"
                 direction="row"
-                round="full"
-                justify={onClose !== undefined ? 'end' : 'start'}
+                justify="start"
+                align="center"
+                pad="medium"
+                elevation="small"
+                height={{ max: 'xxsmall' }}
             >
                 <IconContext.Provider value={{ size: '24' }}>
-                    <Box
-                        pad="medium"
-                        onClick={onBack || onClose}
-                        focusIndicator={false}
-                    >
+                    {onClose && (
+                        <Text size="small" weight="bold">
+                            {title}
+                        </Text>
+                    )}
+                    <Box onClick={onBack || onClose} focusIndicator={false}>
                         {onClose !== undefined ? <X /> : <CaretLeft />}
                     </Box>
+                    {onBack && (
+                        <Text size="small" weight="bold">
+                            {title}
+                        </Text>
+                    )}
                 </IconContext.Provider>
-                <Text>{title}</Text>
             </Box>
             <Box
                 pad="medium"
-                fill="vertical"
+                fill
                 align="center"
                 height={{ min: 'auto' }}
+                overflow={{ vertical: 'auto' }}
             >
                 {children}
             </Box>
+            <Box pad={'medium'} />
         </Box>
     </Layer>
 )

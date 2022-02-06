@@ -10,8 +10,8 @@ import {
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import MenuButton from '@cambrian/app/components/buttons/MenuButton'
 import NavigationButton from '@cambrian/app/components/buttons/NavigationButton'
 import OutcomeList from './outcomeList/OutcomeList'
 import RecipientList from './recipientList/RecipientList'
@@ -96,30 +96,30 @@ export const SolverControl = () => {
                             paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
                         />
                         <Box gap="small">
-                            <MenuButton
+                            <BaseMenuListItem
                                 icon={<Gear />}
-                                label="Settings"
+                                title="Settings"
                                 onClick={() =>
                                     setController('SolverSettingsControl')
                                 }
                             />
-                            <MenuButton
+                            <BaseMenuListItem
                                 icon={<TreeStructure />}
-                                label="Outcome list"
+                                title="Outcome list"
                                 onClick={() =>
                                     setController('OutcomeListControl')
                                 }
                             />
-                            <MenuButton
+                            <BaseMenuListItem
                                 icon={<UserList />}
-                                label={'Recipient list'}
+                                title={'Recipient list'}
                                 onClick={() =>
                                     setController('RecipientListControl')
                                 }
                             />
-                            <MenuButton
+                            <BaseMenuListItem
                                 icon={<ArrowSquareIn />}
-                                label={'Slot list'}
+                                title={'Slot list'}
                                 onClick={() => setController('SlotControl')}
                             />
                         </Box>

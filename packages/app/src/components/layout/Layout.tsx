@@ -21,6 +21,7 @@ export const Layout = ({ children, contextTitle }: LayoutProps) => {
     const toggleHelp = () => setShowHelp(!showHelp)
     const toggleSolverConfig = () => setShowSolverConfig(!showSolverConfig)
 
+    // TODO Determine and extract content of Sidebar and SolverConfigs
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => (
@@ -38,47 +39,53 @@ export const Layout = ({ children, contextTitle }: LayoutProps) => {
                         />
                     </Head>
                     <Main>
-                        <Box
-                            direction="row"
-                            flex
-                            overflow={{ horizontal: 'hidden' }}
-                        >
-                            <Collapsible
-                                direction="horizontal"
-                                open={showSidebar}
+                        <Box fill background="background-back">
+                            <Box
+                                direction="row"
+                                flex
+                                overflow={{ horizontal: 'hidden' }}
                             >
-                                <Sidebar />
-                            </Collapsible>
-                            <Box flex>
-                                <Appbar
-                                    toggleHelp={toggleHelp}
-                                    toggleSidebar={toggleSidebar}
-                                    toggleSolverConfig={toggleSolverConfig}
-                                />
-                                <Box
-                                    fill
-                                    justify="center"
-                                    align="center"
-                                    gap="small"
-                                    width={
-                                        screenSize === 'small'
-                                            ? { min: '100vw' }
-                                            : '100%'
-                                    }
-                                    onClick={
-                                        showSidebar && screenSize === 'small'
-                                            ? toggleSidebar
-                                            : undefined
-                                    }
-                                    focusIndicator={false}
+                                <Collapsible
+                                    direction="horizontal"
+                                    open={showSidebar}
                                 >
-                                    {children}
+                                    <Sidebar />
+                                </Collapsible>
+                                <Box flex>
+                                    <Appbar
+                                        toggleHelp={toggleHelp}
+                                        toggleSidebar={toggleSidebar}
+                                        toggleSolverConfig={toggleSolverConfig}
+                                    />
+                                    <Box
+                                        fill
+                                        justify="center"
+                                        align="center"
+                                        gap="small"
+                                        width={
+                                            screenSize === 'small'
+                                                ? { min: '100vw' }
+                                                : '100%'
+                                        }
+                                        onClick={
+                                            showSidebar &&
+                                            screenSize === 'small'
+                                                ? toggleSidebar
+                                                : undefined
+                                        }
+                                        focusIndicator={false}
+                                        pad="small"
+                                    >
+                                        {children}
+                                    </Box>
                                 </Box>
                             </Box>
+                            {showSolverConfig && (
+                                <SolverConfigModal
+                                    onClose={toggleSolverConfig}
+                                />
+                            )}
                         </Box>
-                        {showSolverConfig && (
-                            <SolverConfigModal onClose={toggleSolverConfig} />
-                        )}
                     </Main>
                 </>
             )}

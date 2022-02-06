@@ -31,7 +31,7 @@ export default function UserMenu({}: UserMenuProps) {
                     size: 'small',
                 },
             }}
-            dropBackground="veryDark"
+            dropBackground="background-popup"
             items={[
                 {
                     label: (

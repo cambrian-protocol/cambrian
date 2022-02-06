@@ -1,65 +1,91 @@
-import { Coin, Coins, Timer, UsersThree } from 'phosphor-react'
+import {
+    ArrowSquareIn,
+    Coin,
+    Coins,
+    Timer,
+    TreeStructure,
+    UsersThree,
+} from 'phosphor-react'
+import React, { useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
+import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import PlainListInfoItem from '../list/PlainListInfoItem'
-import PlainMenuListItem from '../buttons/PlainMenuListItem'
+import KeeperInputsModal from './KeeperInputsModal'
+import OutcomeCollectionModal from './OutcomeCollectionModal'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
-import React from 'react'
+import RecipientsModal from './RecipientsModal'
 
 interface SolverConfigModalProps {
     onClose: () => void
 }
 
 const SolverConfigModal = ({ onClose }: SolverConfigModalProps) => {
+    const [showRecipientModal, setShowRecipientModal] = useState(false)
+    const [showOutcomeModal, setShowOutcomeModal] = useState(false)
+    const [showKeeperInputModal, setShowKeeperInputModal] = useState(false)
+
+    const toggleShowOutcomeModal = () => setShowOutcomeModal(!showOutcomeModal)
+    const toggleShowKeeperInputModal = () =>
+        setShowKeeperInputModal(!showKeeperInputModal)
+    const toggleShowRecipientModal = () =>
+        setShowRecipientModal(!showRecipientModal)
+
     return (
-        <BaseLayerModal onClose={onClose}>
-            <Box gap="medium">
+        <>
+            <BaseLayerModal onClose={onClose}>
                 <HeaderTextSection
                     title="Solver configuration"
+                    subTitle="Details about the"
                     paragraph="Configuration Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
                 />
-                <Box gap="small" height={{ min: 'auto' }}>
-                    <PlainMenuListItem
+                <Box gap="small" fill="horizontal">
+                    <BaseMenuListItem
                         icon={<UsersThree />}
-                        label="Recipients"
-                        onClick={() => {}}
+                        title="Recipients"
+                        onClick={toggleShowRecipientModal}
                     />
                     <PlainSectionDivider />
-                    <PlainMenuListItem
-                        icon={<UsersThree />}
-                        label="Outcomes"
-                        onClick={() => {}}
+                    <BaseMenuListItem
+                        icon={<TreeStructure />}
+                        title="Outcomes"
+                        onClick={toggleShowOutcomeModal}
                     />
                     <PlainSectionDivider />
-                    <PlainMenuListItem
-                        icon={<UsersThree />}
-                        label="Keeper Inputs"
-                        onClick={() => {}}
+                    <BaseMenuListItem
+                        icon={<ArrowSquareIn />}
+                        title="Keeper Inputs"
+                        onClick={toggleShowKeeperInputModal}
                     />
                     <PlainSectionDivider />
-                </Box>
-                <Box gap="medium">
-                    <PlainListInfoItem
-                        label="Timelock"
+                    <BaseMenuListItem
+                        title="Timelock"
                         icon={<Timer />}
-                        info="4 Days - 12 hours"
+                        subTitle="4 Days - 12 hours"
                     />
-                    <PlainListInfoItem
-                        label="Token address"
+                    <BaseMenuListItem
+                        title="Token address"
                         icon={<Coin />}
-                        showTip
-                        info="0x0917901850928y92857921875928759827b9287b592875b92"
+                        subTitle="0x0917901850928y92857921875928759827b9287b592875b92"
                     />
-                    <PlainListInfoItem
-                        label="Balance"
+                    <BaseMenuListItem
+                        title="Balance"
                         icon={<Coins />}
-                        info="1000"
+                        subTitle="1000"
                     />
                 </Box>
-            </Box>
-        </BaseLayerModal>
+            </BaseLayerModal>
+            {showRecipientModal && (
+                <RecipientsModal onBack={toggleShowRecipientModal} />
+            )}
+            {showKeeperInputModal && (
+                <KeeperInputsModal onBack={toggleShowKeeperInputModal} />
+            )}
+            {showOutcomeModal && (
+                <OutcomeCollectionModal onBack={toggleShowOutcomeModal} />
+            )}
+        </>
     )
 }
 
