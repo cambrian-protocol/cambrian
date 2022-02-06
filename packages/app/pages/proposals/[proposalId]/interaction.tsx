@@ -1,6 +1,7 @@
 import { Box } from 'grommet'
 import InteractionSidebar from '@cambrian/app/ui/interaction/sidebar/InteractionSidebar'
 import { Layout } from '@cambrian/app/src/components/layout/Layout'
+import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { useCurrentSolver } from '@cambrian/app/src/hooks/useCurrentSolver'
 import { useCurrentUserOrSigner } from '@cambrian/app/src/hooks/useCurrentUserOrSigner'
 import { useEffect } from 'react'
@@ -28,7 +29,11 @@ export default function InteractionPage() {
     }, [])
 
     return (
-        <Layout contextTitle="Interact" sidebar={<InteractionSidebar />}>
+        <Layout
+            contextTitle="Interact"
+            sidebar={<InteractionSidebar />}
+            config={<SolverConfigInfo />}
+        >
             <Box>Interaction UI</Box>
         </Layout>
     )
