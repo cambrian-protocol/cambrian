@@ -2,14 +2,7 @@ import { Box, Nav, ResponsiveContext, Text } from 'grommet'
 import { Gear, IconContext, List, Question } from 'phosphor-react'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
-import styled from 'styled-components'
 import { useState } from 'react'
-
-const PositionedNav = styled(Nav)`
-    position: sticky;
-    top: 0;
-    left: 0;
-`
 
 interface AppbarProps {
     title?: string
@@ -30,7 +23,7 @@ const Appbar = ({ title, toggleSidebar, toggleHelp, config }: AppbarProps) => {
                     <IconContext.Provider
                         value={{ size: '24', color: 'white' }}
                     >
-                        <PositionedNav
+                        <Nav
                             direction="row"
                             background="secondary-gradient"
                             width={
@@ -63,7 +56,7 @@ const Appbar = ({ title, toggleSidebar, toggleHelp, config }: AppbarProps) => {
                                     />
                                 )}
                             </Box>
-                        </PositionedNav>
+                        </Nav>
                     </IconContext.Provider>
                 )}
             </ResponsiveContext.Consumer>

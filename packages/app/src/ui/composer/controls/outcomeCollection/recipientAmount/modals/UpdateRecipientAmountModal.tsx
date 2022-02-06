@@ -1,15 +1,13 @@
+import { Box, Button } from 'grommet'
 import SelectOrCreateAmount, {
     SelectAmountDataType,
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
 import { SlotModel, SlotPath } from '@cambrian/app/src/models/SlotModel'
 import { useEffect, useState } from 'react'
 
-import BaseModal from '@cambrian/app/src/components/modals/BaseModal'
-import { Box } from 'grommet'
-import { FloppyDisk } from 'phosphor-react'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { RecipientAmountModel } from '@cambrian/app/models/ConditionModel'
-import RoundButton from '@cambrian/app/src/components/buttons/RoundButton'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 type UpdateRecipientAmountModalProps = {
@@ -68,33 +66,30 @@ const UpdateRecipientAmountModal = ({
     }
 
     return (
-        <BaseModal onClose={onClose}>
-            <Box gap="medium">
-                <HeaderTextSection
-                    title="Define share"
-                    subTitle="Choose an existant amount to save gas"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
-                />
-                <Box direction="row" gap="small">
-                    <Box flex>
-                        <SelectOrCreateAmount
-                            amountData={amountData}
-                            setAmountData={setAmountData}
-                        />
-                    </Box>
-                    <Box justify="center">
-                        <RoundButton
-                            icon={<FloppyDisk size="24" />}
-                            disabled={
-                                amountData.amount ===
-                                recipientAmountModels.amountModel?.data.toString()
-                            }
-                            onClick={onSave}
-                        />
-                    </Box>
+        <BaseLayerModal onClose={onClose}>
+            <HeaderTextSection
+                title="Define share"
+                subTitle="Choose an existant amount to save gas"
+                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
+            />
+            <Box gap="small" fill="horizontal">
+                <Box flex>
+                    <SelectOrCreateAmount
+                        amountData={amountData}
+                        setAmountData={setAmountData}
+                    />
                 </Box>
+                <Button
+                    primary
+                    disabled={
+                        amountData.amount ===
+                        recipientAmountModels.amountModel?.data.toString()
+                    }
+                    label="Save"
+                    onClick={onSave}
+                />
             </Box>
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 

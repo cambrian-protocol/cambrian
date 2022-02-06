@@ -1,13 +1,12 @@
 import { Box, FormExtendedEvent } from 'grommet'
 import React, { useState } from 'react'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
+import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeConfigForm from '../forms/OutcomeConfigForm'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
-import { PlusCircle } from 'phosphor-react'
-import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { ulid } from 'ulid'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export const initialOutcomeInput: OutcomeModel = {
     id: ulid(),
@@ -31,22 +30,21 @@ const CreateOutcomeModal = ({ onClose }: CreateOutcomeModalProps) => {
     }
 
     return (
-        <BaseModal onClose={onClose}>
-            <Box gap="small">
-                <HeaderTextSection
-                    title="Create new outcome"
-                    subTitle="What could happen?"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
-                />
+        <BaseLayerModal onClose={onClose}>
+            <HeaderTextSection
+                title="Create new outcome"
+                subTitle="What could happen?"
+                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+            />
+            <Box fill>
                 <OutcomeConfigForm
                     onSubmit={onSubmit}
                     outcomeInput={input}
                     setOutcomeInput={setInput}
-                    submitIcon={<PlusCircle />}
-                    submitLabel="Create outcome"
+                    submitLabel="Create"
                 />
             </Box>
-        </BaseModal>
+        </BaseLayerModal>
     )
 }
 

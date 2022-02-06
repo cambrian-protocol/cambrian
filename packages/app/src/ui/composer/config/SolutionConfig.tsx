@@ -8,8 +8,6 @@ import {
 } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import BaseModal from '@cambrian/app/components/modals/BaseModal'
-import { FloppyDisk } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 

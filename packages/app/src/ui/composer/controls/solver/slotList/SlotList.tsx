@@ -1,4 +1,5 @@
-import { Box } from 'grommet'
+import { Box, CardFooter } from 'grommet'
+
 import CreateSlotFormModal from './modals/CreateSlotModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
@@ -39,13 +40,13 @@ const SlotList = () => {
                         )}
                     </Box>
                 </Box>
-                <Box pad="small">
+                <CardFooter justify="end">
                     <RoundButtonWithLabel
                         icon={<Plus size="24" />}
                         label="Create new Slot"
                         onClick={toggleCreateSlotModal}
                     />
-                </Box>
+                </CardFooter>
             </Box>
             {showCreateSlotModal && (
                 <CreateSlotFormModal onClose={toggleCreateSlotModal} />

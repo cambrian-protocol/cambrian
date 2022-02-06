@@ -109,14 +109,7 @@ export const Composer = () => {
                         >
                             <>
                                 {composer.currentElement !== undefined && (
-                                    <Box
-                                        fill
-                                        background="background-front"
-                                        round="small"
-                                        pad="small"
-                                    >
-                                        {renderControl()}
-                                    </Box>
+                                    <>{renderControl()}</>
                                 )}
                             </>
                         </Box>
@@ -146,14 +139,7 @@ export const Composer = () => {
                             <Box fill pad="small" gap="small">
                                 <>
                                     {composer.currentElement !== undefined && (
-                                        <Box
-                                            background="background-front"
-                                            round="small"
-                                            pad="small"
-                                            fill
-                                        >
-                                            {renderControl()}
-                                        </Box>
+                                        <>{renderControl()}</>
                                     )}
                                 </>
                             </Box>

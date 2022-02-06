@@ -13,7 +13,7 @@ declare global {
 export default function App({ Component, pageProps }: AppProps) {
     return (
         <Store>
-            <Grommet full theme={cpTheme}>
+            <Grommet full theme={cpTheme} themeMode="dark">
                 <GlobalStyle />
                 <Component {...pageProps} />
             </Grommet>

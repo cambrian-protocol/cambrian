@@ -2,7 +2,6 @@ import { Box, FormExtendedEvent } from 'grommet'
 
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientConfigForm from './RecipientConfigForm'
-import { UserPlus } from 'phosphor-react'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
@@ -33,20 +32,21 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
     }
 
     return (
-        <Box gap="small">
+        <>
             <HeaderTextSection
                 title="Create new recipient"
                 subTitle="Who else deserves a share?"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
-            <RecipientConfigForm
-                onSubmit={onSubmit}
-                setRecipientInput={setInput}
-                recipientInput={input}
-                submitIcon={<UserPlus />}
-                submitLabel="Create recipient"
-            />
-        </Box>
+            <Box fill>
+                <RecipientConfigForm
+                    onSubmit={onSubmit}
+                    setRecipientInput={setInput}
+                    recipientInput={input}
+                    submitLabel="Create"
+                />
+            </Box>
+        </>
     )
 }
 

@@ -19,7 +19,6 @@ type SlotConfigFormProps = {
     slotInput: SlotConfigFormType
     setSlotInput: React.Dispatch<SetStateAction<SlotConfigFormType>>
     submitLabel: string
-    submitIcon: JSX.Element
 }
 export type SlotConfigFormType = {
     slotType: SlotTypes
@@ -35,7 +34,6 @@ const SlotConfigForm = ({
     slotInput,
     setSlotInput,
     submitLabel,
-    submitIcon,
 }: SlotConfigFormProps) => {
     const handleUpdateDataInputField = (
         updatedDataInput: SlotDataInputType
@@ -143,10 +141,7 @@ const SlotConfigForm = ({
     }
 
     return (
-        <Box
-            overflow={{ vertical: 'auto' }}
-            width={{ min: 'medium', max: 'medium' }}
-        >
+        <Box fill>
             <Form<SlotConfigFormType>
                 value={slotInput}
                 onSubmit={(event) => onSubmit(event)}
@@ -160,12 +155,7 @@ const SlotConfigForm = ({
                 {FormFields}
                 <Box>
                     <IconContext.Provider value={{ size: '24' }}>
-                        <Button
-                            primary
-                            type="submit"
-                            label={submitLabel}
-                            icon={submitIcon}
-                        />
+                        <Button primary type="submit" label={submitLabel} />
                     </IconContext.Provider>
                 </Box>
             </Form>
