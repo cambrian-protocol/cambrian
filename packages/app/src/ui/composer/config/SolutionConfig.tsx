@@ -49,35 +49,37 @@ const SolutionConfig = () => {
     }
 
     return (
-        <Box gap="small">
+        <>
             <HeaderTextSection
                 title="Solution Settings"
                 subTitle="Global settings"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
             />
-            <Form<SolutionConfigFormType>
-                value={input}
-                onSubmit={(event) => onSubmit(event)}
-                onChange={(nextValue: SolutionConfigFormType) => {
-                    setInput(nextValue)
-                }}
-            >
-                <FormField label="Collateral token address">
-                    <TextInput name="collateralToken" />
-                </FormField>
-                <Box flex>
-                    <Button
-                        disabled={
-                            composer.solvers[0].config.collateralToken ===
-                            input.collateralToken
-                        }
-                        type="submit"
-                        primary
-                        label="Save"
-                    />
-                </Box>
-            </Form>
-        </Box>
+            <Box fill>
+                <Form<SolutionConfigFormType>
+                    value={input}
+                    onSubmit={(event) => onSubmit(event)}
+                    onChange={(nextValue: SolutionConfigFormType) => {
+                        setInput(nextValue)
+                    }}
+                >
+                    <FormField label="Collateral token address">
+                        <TextInput name="collateralToken" />
+                    </FormField>
+                    <Box flex>
+                        <Button
+                            disabled={
+                                composer.solvers[0].config.collateralToken ===
+                                input.collateralToken
+                            }
+                            type="submit"
+                            primary
+                            label="Save"
+                        />
+                    </Box>
+                </Form>
+            </Box>
+        </>
     )
 }
 
