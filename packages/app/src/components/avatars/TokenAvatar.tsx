@@ -24,7 +24,7 @@ const TokenAvatar = ({ token }: TokenAvatar) => {
                     width={{ min: 'xxsmall', max: 'xxsmall' }}
                     height={{ min: 'xxsmall', max: 'xxsmall' }}
                     border={{ color: 'brand', size: 'small' }}
-                    background="darkBlue"
+                    background="accent-2"
                     justify="center"
                     align="center"
                     round="full"

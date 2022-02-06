@@ -27,15 +27,15 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
         <>
             <Handle position={Position.Top} type="target" id="a" />
             <Box
-                background="darkBlue"
+                background="secondary-gradient"
                 pad="small"
                 width={{ min: 'small', max: 'small' }}
                 round="small"
                 gap="small"
             >
                 <Box align="center" gap="small">
-                    <StackSimple size="24" />
-                    <Text weight="bold" size="small">
+                    <StackSimple color="white" size="24" />
+                    <Text color="white" weight="bold" size="small">
                         Outcome Collection
                     </Text>
                 </Box>
@@ -51,11 +51,13 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
                             }}
                             margin={'xsmall'}
                             align="center"
-                            round="medium"
-                            background="selected"
+                            round="small"
+                            background="background-contrast"
                         >
-                            <TreeStructure size="18" />
-                            {outcome.title}
+                            <TreeStructure color="white" size="18" />
+                            <Text color="white" size="small">
+                                {outcome.title}
+                            </Text>
                         </Box>
                     ))}
                 </Box>

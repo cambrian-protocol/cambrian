@@ -105,20 +105,13 @@ export const Composer = () => {
                         </ReactFlow>
                         <Box
                             width={{ min: 'medium', max: 'medium' }}
-                            background={'veryDark'}
-                            border={{
-                                color: 'brand',
-                                side: 'left',
-                                size: 'small',
-                            }}
-                            pad="small"
                             gap="small"
                         >
                             <>
                                 {composer.currentElement !== undefined && (
                                     <Box
                                         fill
-                                        background="black"
+                                        background="background-front"
                                         round="small"
                                         pad="small"
                                     >
@@ -150,16 +143,11 @@ export const Composer = () => {
                                 </ReactFlow>
                             </Box>
                         ) : (
-                            <Box
-                                fill
-                                background={'veryDark'}
-                                pad="small"
-                                gap="small"
-                            >
+                            <Box fill pad="small" gap="small">
                                 <>
                                     {composer.currentElement !== undefined && (
                                         <Box
-                                            background="black"
+                                            background="background-front"
                                             round="small"
                                             pad="small"
                                             fill
@@ -171,7 +159,6 @@ export const Composer = () => {
                             </Box>
                         )}
                         <Box
-                            background={'darkBlue'}
                             width={'100%'}
                             height={{ min: 'auto' }}
                             direction="row"
@@ -179,27 +166,35 @@ export const Composer = () => {
                         >
                             <IconContext.Provider value={{ size: '24' }}>
                                 <Box
+                                    round="small"
                                     width={'50%'}
                                     justify="center"
                                     align="center"
                                     onClick={() => setShowDiagram(true)}
                                     pad="medium"
                                     background={
-                                        showDiagram ? 'selected' : 'none'
+                                        showDiagram
+                                            ? 'background-contrast'
+                                            : 'none'
                                     }
+                                    focusIndicator={false}
                                 >
                                     <TreeStructure />
                                     <Text size="xsmall">Diagram</Text>
                                 </Box>
                                 <Box
+                                    round="small"
                                     width={'50%'}
                                     justify="center"
                                     align="center"
                                     onClick={() => setShowDiagram(false)}
                                     pad="medium"
                                     background={
-                                        !showDiagram ? 'selected' : 'none'
+                                        !showDiagram
+                                            ? 'background-contrast'
+                                            : 'none'
                                     }
+                                    focusIndicator={false}
                                 >
                                     <Faders />
                                     <Text size="xsmall">Details</Text>

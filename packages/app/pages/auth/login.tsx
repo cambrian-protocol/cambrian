@@ -32,9 +32,8 @@ export default function LoginPage() {
                     direction="row"
                     align="center"
                     gap="medium"
-                    background="darkBlue"
+                    background="primary-gradient"
                     round="small"
-                    hoverIndicator="selected"
                     focusIndicator={false}
                     width="100%"
                     pad="small"

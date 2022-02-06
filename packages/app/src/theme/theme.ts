@@ -1,61 +1,33 @@
-const isObject = (item: any) =>
-    item && typeof item === 'object' && !Array.isArray(item)
-
-const deepFreeze = (obj: any) => {
-    Object.keys(obj).forEach(
-        (key) => key && isObject(obj[key]) && Object.freeze(obj[key])
-    )
-    return Object.freeze(obj)
-}
-
-const accentColors = ['#23A6f0', '#614767', '#810E21', '#FF8D35']
-const neutralColors = ['#EBF2EA', '#F0E8E7', '#80746E', '#767676']
-const darkColors = [
-    '#333333',
-    '#555555',
-    '#777777',
-    '#999999',
-    '#999999',
-    '#999999',
-]
-const lightColors = [
-    '#F8F8F8',
-    '#F2F2F2',
-    '#EDEDED',
-    '#DADADA',
-    '#DADADA',
-    '#DADADA',
-]
-const statusColors: any = {
-    critical: '#b70014',
-    error: '#FA0606',
-    warning: '#FFD144',
-    ok: '#27AE60',
-    unknown: '#CCCCCC',
-    disabled: '#CCCCCC',
-}
+import { deepMerge } from 'grommet/utils'
+import { grommet } from 'grommet'
 
 const colors: any = {
     brand: {
-        light: '#63b1ba',
-        dark: '#63b1ba',
+        light: '#799AB8',
+        dark: '#799AB8',
     },
-    background: '#212121',
-    veryDark: '#0e0e0e',
-    darkBlue:
-        'linear-gradient(167deg, rgba(31,31,45,1) 0%, rgba(16,54,57,1) 80%)',
-    selected:
-        'linear-gradient(167deg, rgba(100,161,168,1) 0%, rgba(44,72,74,1) 80%)',
-    brandGradient:
-        'linear-gradient(167deg, rgba(198,237,241,1) 0%, rgba(79,163,172,1) 80%)',
-    primaryGradient:
+    active: '#799AB850',
+    'background-back': { dark: '#212121', light: '#EFEFEF' },
+    'background-front': {
+        dark: '#2f2f2f',
+        light: '#FFFFFF',
+    },
+    'background-contrast': {
+        dark: '#FFFFFF08',
+        light: '#11111108',
+    },
+    'background-popup': { dark: '#262626', light: '#EFEFEF' },
+    'primary-gradient':
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
-    secondaryGradient:
+    'secondary-gradient':
         'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
-    itemHighlight: 'rgba(122, 122, 122, 0.16)',
+    'accent-1': '#003457',
+    'accent-2': '#0064a4',
 }
 
-export const cpTheme = deepFreeze({
+// TODO Button primary, secondary
+export const cpTheme = deepMerge(grommet, {
+    defaultMode: 'dark',
     global: {
         colors,
         font: {
@@ -89,12 +61,10 @@ export const cpTheme = deepFreeze({
         },
     },
     button: {
-        color: 'black',
-        primary: {
-            color: colors.brandGradient,
-        },
+        primary: { color: 'primary-gradient' },
+        padding: { vertical: '13px' },
         border: {
-            color: colors.brand.light,
+            radius: '14px',
         },
     },
     formField: {
@@ -111,5 +81,9 @@ export const cpTheme = deepFreeze({
     },
     meter: {
         color: 'brand',
+    },
+    layer: {
+        overlay: { background: 'none' },
+        container: { elevation: 'large' },
     },
 })

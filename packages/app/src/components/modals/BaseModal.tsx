@@ -9,13 +9,12 @@ type BaseModalProps = PropsWithChildren<{}> & {
 }
 
 const BaseModal = ({ children, onClose }: BaseModalProps) => (
-    <Layer onClickOutside={onClose} onEsc={onClose}>
-        <Box
-            width={{ min: 'auto' }}
-            background="veryDark"
-            pad="medium"
-            round="small"
-        >
+    <Layer
+        onClickOutside={onClose}
+        onEsc={onClose}
+        background="background-popup"
+    >
+        <Box width={{ min: 'auto' }} pad="medium" round="small">
             <Box alignSelf="end">
                 <NavigationButton icon={<X />} onClick={onClose} />
             </Box>

@@ -8,7 +8,6 @@ import {
 } from 'grommet'
 import React, { useState } from 'react'
 
-import { RocketLaunch } from 'phosphor-react'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 
 interface CreateProposalFormProps {
@@ -101,12 +100,7 @@ const CreateProposalForm = ({
                     </Box>
                 </Box>
                 <Box pad={{ top: 'medium' }}>
-                    <Button
-                        primary
-                        type="submit"
-                        label="Create Proposal"
-                        icon={<RocketLaunch size="24" />}
-                    />
+                    <Button primary type="submit" label="Create Proposal" />
                 </Box>
             </Form>
         </>
