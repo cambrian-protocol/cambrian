@@ -4,23 +4,26 @@ import React, { PropsWithChildren, useState } from 'react'
 import Appbar from '../nav/Appbar'
 import DefaultSidebar from '../nav/DefaultSidebar'
 import Head from 'next/head'
-import SolverConfigModal from '../modals/SolverConfigModal'
 
 export const siteTitle = 'Cambrian Protocol'
 
 type LayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     sidebar?: JSX.Element
+    config?: JSX.Element
 }
 
-export const Layout = ({ sidebar, children, contextTitle }: LayoutProps) => {
+export const Layout = ({
+    sidebar,
+    children,
+    contextTitle,
+    config,
+}: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
-    const [showSolverConfig, setShowSolverConfig] = useState(false)
 
     const toggleSidebar = () => setShowSidebar(!showSidebar)
     const toggleHelp = () => setShowHelp(!showHelp)
-    const toggleSolverConfig = () => setShowSolverConfig(!showSolverConfig)
 
     return (
         <ResponsiveContext.Consumer>
@@ -57,7 +60,7 @@ export const Layout = ({ sidebar, children, contextTitle }: LayoutProps) => {
                                     <Appbar
                                         toggleHelp={toggleHelp}
                                         toggleSidebar={toggleSidebar}
-                                        toggleSolverConfig={toggleSolverConfig}
+                                        config={config}
                                     />
                                     <Box
                                         fill
@@ -82,11 +85,6 @@ export const Layout = ({ sidebar, children, contextTitle }: LayoutProps) => {
                                     </Box>
                                 </Box>
                             </Box>
-                            {showSolverConfig && (
-                                <SolverConfigModal
-                                    onClose={toggleSolverConfig}
-                                />
-                            )}
                         </Box>
                     </Main>
                 </>

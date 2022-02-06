@@ -1,12 +1,12 @@
 import { Elements, FlowElement, Node } from 'react-flow-renderer'
-import { IdPathType, SolverModel } from '@cambrian/app/models/SolverModel'
 import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
+import { IdPathType } from '@cambrian/app/models/SolverModel'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { SolutionSettingsFormType } from '@cambrian/app/ui/composer/controls/solution/SolutionSettingsModal'
+import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import Solver from '@cambrian/app/classes/Solver'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { ethers } from 'ethers'
@@ -149,5 +149,5 @@ type DragNodeActionType = {
 
 type UpdateSolutionSettingsActionType = {
     type: 'UPDATE_SOLUTION_SETTINGS'
-    payload: SolutionSettingsFormType
+    payload: SolutionConfigFormType
 }
