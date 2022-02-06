@@ -53,39 +53,45 @@ const CreateRecipientAmountForm = ({
     }
 
     return (
-        <Box gap="small">
+        <>
             <HeaderTextSection
                 title="Create new recipient"
                 subTitle="and allocate amount"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
-            <Form<RecipientFormType>
-                value={input}
-                onSubmit={(event) => onSubmit(event)}
-                onChange={(nextValue: RecipientFormType) => {
-                    setInput(nextValue)
-                }}
-            >
-                <FormField
-                    name="address"
-                    label="Address*"
-                    validate={required}
-                />
-                <FormField
-                    name="description"
-                    label="Descriptive Name (Optional)"
-                />
-                <FormField>
-                    <SelectOrCreateAmount
-                        amountData={amountData}
-                        setAmountData={setAmountData}
+            <Box fill>
+                <Form<RecipientFormType>
+                    value={input}
+                    onSubmit={(event) => onSubmit(event)}
+                    onChange={(nextValue: RecipientFormType) => {
+                        setInput(nextValue)
+                    }}
+                >
+                    <FormField
+                        name="address"
+                        label="Address*"
+                        validate={required}
                     />
-                </FormField>
-                <Box>
-                    <Button primary type="submit" label="Create Recipient" />
-                </Box>
-            </Form>
-        </Box>
+                    <FormField
+                        name="description"
+                        label="Descriptive Name (Optional)"
+                    />
+                    <FormField>
+                        <SelectOrCreateAmount
+                            amountData={amountData}
+                            setAmountData={setAmountData}
+                        />
+                    </FormField>
+                    <Box>
+                        <Button
+                            primary
+                            type="submit"
+                            label="Create Recipient"
+                        />
+                    </Box>
+                </Form>
+            </Box>
+        </>
     )
 }
 
