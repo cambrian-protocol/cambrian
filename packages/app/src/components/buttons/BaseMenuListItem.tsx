@@ -28,7 +28,7 @@ const BaseMenuListItem = ({
                 onClick={onClick}
                 focusIndicator={false}
                 height={{ min: 'auto' }}
-                width={{ min: 'small' }}
+                width={{ min: 'auto' }}
             >
                 <Box direction="row" gap="large" align="center">
                     <Box width={{ min: '2em' }}>{icon}</Box>
