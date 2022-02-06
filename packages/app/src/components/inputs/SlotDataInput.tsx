@@ -62,15 +62,19 @@ const SlotDataInputField = ({
                 height={{ min: 'auto' }}
                 pad="xsmall"
             >
-                <Box direction="row" align="center" gap="small">
-                    <TextInput
-                        icon={validationIcon}
-                        required={required}
-                        value={value.data}
-                        onChange={(event) => onUpdateData(event.target.value)}
-                        reverse
-                    />
-                    <Box width={'small'}>
+                <Box direction="row" gap="small" fill>
+                    <Box flex>
+                        <TextInput
+                            icon={validationIcon}
+                            required={required}
+                            value={value.data}
+                            onChange={(event) =>
+                                onUpdateData(event.target.value)
+                            }
+                            reverse
+                        />
+                    </Box>
+                    <Box>
                         <SelectDataType
                             disabled={required}
                             selectedSolidityDataType={value.dataType}

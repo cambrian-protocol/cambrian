@@ -1,7 +1,7 @@
+import { Box, CardFooter } from 'grommet'
 import React, { useState } from 'react'
 
 import AddRecipientModal from './modals/AddRecipientModal'
-import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
 import RecipientListItem from './RecipientListItem'
@@ -40,13 +40,13 @@ const RecipientList = () => {
                         )}
                     </Box>
                 </Box>
-                <Box pad="small">
+                <CardFooter justify="end">
                     <RoundButtonWithLabel
                         icon={<Plus size="24" />}
                         label="Create new Recipient"
                         onClick={toggleAddRecipientModal}
                     />
-                </Box>
+                </CardFooter>
             </Box>
             {showAddRecipientModal && (
                 <AddRecipientModal onClose={toggleAddRecipientModal} />

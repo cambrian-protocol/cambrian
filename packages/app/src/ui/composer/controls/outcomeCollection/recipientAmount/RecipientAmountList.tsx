@@ -1,5 +1,6 @@
+import { Box, CardFooter } from 'grommet'
+
 import AddRecipientAmountModal from '@cambrian/app/ui/composer/controls/outcomeCollection/recipientAmount/modals/AddRecipientAmountModal'
-import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientAmountListItem from './RecipientAmountListItem'
 import RoundButtonWithLabel from '@cambrian/app/src/components/buttons/RoundButtonWithLabel'
@@ -52,13 +53,13 @@ const RecipientAmountList = () => {
                         )}
                     </Box>
                 </Box>
-                <Box pad="small">
+                <CardFooter justify="end">
                     <RoundButtonWithLabel
                         icon={<UserPlus size="24" />}
                         label="Add Recipient"
                         onClick={toggleAddRecipientModal}
                     />
-                </Box>
+                </CardFooter>
             </Box>
             {showAddRecipientModal && (
                 <AddRecipientAmountModal onClose={toggleAddRecipientModal} />

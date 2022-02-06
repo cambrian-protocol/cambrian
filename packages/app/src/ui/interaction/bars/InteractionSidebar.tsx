@@ -45,7 +45,7 @@ const InteractionSidebar = ({}: InteractionSidebarProps) => {
                         background="background-front"
                     >
                         <CardHeader pad="medium" elevation="small">
-                            <Text>Solver Title {screenSize}</Text>
+                            <Text>Solver Title</Text>
                             <Text size="small" color="dark-3">
                                 v1.0
                             </Text>

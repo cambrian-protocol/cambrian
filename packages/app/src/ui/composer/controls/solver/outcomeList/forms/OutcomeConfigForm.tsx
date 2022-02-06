@@ -10,7 +10,6 @@ interface OutcomeConfigFormProps {
     outcomeInput: OutcomeModel
     setOutcomeInput: React.Dispatch<SetStateAction<OutcomeModel>>
     submitLabel: string
-    submitIcon: JSX.Element
 }
 
 const OutcomeConfigForm = ({
@@ -18,7 +17,6 @@ const OutcomeConfigForm = ({
     outcomeInput,
     setOutcomeInput,
     submitLabel,
-    submitIcon,
 }: OutcomeConfigFormProps) => (
     <Form<OutcomeModel>
         value={outcomeInput}
@@ -37,12 +35,7 @@ const OutcomeConfigForm = ({
         <FormField name="context" label="Context" />
         <IconContext.Provider value={{ size: '24' }}>
             <Box>
-                <Button
-                    primary
-                    type="submit"
-                    label={submitLabel}
-                    icon={submitIcon}
-                />
+                <Button primary type="submit" label={submitLabel} />
             </Box>
         </IconContext.Provider>
     </Form>

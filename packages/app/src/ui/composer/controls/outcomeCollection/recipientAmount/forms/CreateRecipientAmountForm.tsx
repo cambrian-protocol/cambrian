@@ -6,7 +6,6 @@ import SelectOrCreateAmount, {
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { RecipientFormType } from '../../../solver/recipientList/forms/CreateRecipientForm'
 import { SlotModel } from '@cambrian/app/models/SlotModel'
-import { UserPlus } from 'phosphor-react'
 import { required } from '@cambrian/app/src/utils/helpers/validation'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -83,12 +82,7 @@ const CreateRecipientAmountForm = ({
                     />
                 </FormField>
                 <Box>
-                    <Button
-                        primary
-                        type="submit"
-                        label="Create Recipient"
-                        icon={<UserPlus size="24" />}
-                    />
+                    <Button primary type="submit" label="Create Recipient" />
                 </Box>
             </Form>
         </Box>

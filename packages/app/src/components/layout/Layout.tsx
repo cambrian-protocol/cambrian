@@ -11,6 +11,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     sidebar?: JSX.Element
     config?: JSX.Element
+    ctaBar?: JSX.Element
 }
 
 export const Layout = ({
@@ -18,6 +19,7 @@ export const Layout = ({
     children,
     contextTitle,
     config,
+    ctaBar,
 }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
@@ -66,7 +68,6 @@ export const Layout = ({
                                         fill
                                         justify="center"
                                         align="center"
-                                        gap="small"
                                         width={
                                             screenSize === 'small'
                                                 ? { min: '100vw' }
@@ -79,10 +80,15 @@ export const Layout = ({
                                                 : undefined
                                         }
                                         focusIndicator={false}
-                                        pad="small"
+                                        pad={{
+                                            horizontal: 'small',
+                                            vertical: 'medium',
+                                        }}
+                                        overflow={{ vertical: 'auto' }}
                                     >
                                         {children}
                                     </Box>
+                                    {ctaBar && ctaBar}
                                 </Box>
                             </Box>
                         </Box>

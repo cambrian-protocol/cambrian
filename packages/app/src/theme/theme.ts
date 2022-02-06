@@ -25,7 +25,6 @@ const colors: any = {
     'accent-2': '#0064a4',
 }
 
-// TODO Button primary, secondary
 export const cpTheme = deepMerge(grommet, {
     defaultMode: 'dark',
     global: {
@@ -61,7 +60,17 @@ export const cpTheme = deepMerge(grommet, {
         },
     },
     button: {
-        primary: { color: 'primary-gradient' },
+        size: {
+            small: {
+                border: {
+                    radius: '8px',
+                },
+            },
+        },
+
+        primary: {
+            color: 'primary-gradient',
+        },
         padding: { vertical: '13px' },
         border: {
             radius: '14px',
