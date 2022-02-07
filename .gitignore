@@ -1,4 +1,5 @@
 .env
+.env*
 .solcx*
 node_modules
 cache
