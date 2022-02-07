@@ -8,9 +8,18 @@ import {
 import { ethers } from 'ethers'
 import { requestMetaMaskProvider } from '@cambrian/app/wallets/metamask/metamask'
 
+import Web3Modal from 'web3modal'
+import { CeramicProvider, Networks } from 'use-ceramic'
+import {
+    AuthProvider,
+    EthereumAuthProvider,
+} from '@ceramicnetwork/blockchain-utils-linking'
+import { requestWalletConnectProvider } from '../wallets/metamask/walletconnect'
+
 export type UserContextType = {
     currentUser: UserType | null
     currentSigner: ethers.providers.JsonRpcSigner | null
+    currentProvider: ethers.providers.Web3Provider | null
     setCurrentUserRole: (role: UserRole) => void
     logout: () => void
     login: () => void
@@ -19,6 +28,7 @@ export type UserContextType = {
 export const UserContext = React.createContext<UserContextType>({
     currentUser: null,
     currentSigner: null,
+    currentProvider: null,
     setCurrentUserRole: () => {},
     logout: () => {},
     login: () => {},
@@ -27,18 +37,28 @@ export const UserContext = React.createContext<UserContextType>({
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     // Used for FE and IPFS CRUD
     const [currentUser, setCurrentUser] = useState<UserType | null>(null)
+    const [currentProvider, setCurrentProvider] =
+        useState<ethers.providers.Web3Provider | null>(null)
 
     // Used to sign tx's - Generally open for discussions if separation is good practice.
     const [currentSigner, setCurrentSigner] =
         useState<ethers.providers.JsonRpcSigner | null>(null)
 
     useEffect(() => {
-        // Connecting MetaMask eventEmitter
-        if (typeof window.ethereum !== 'undefined') {
-            window.ethereum.on('accountsChanged', (accounts: string[]) =>
+        if (currentProvider) {
+            currentProvider.on('accountsChanged', (accounts: string[]) =>
                 handleAccountChanged(accounts)
             )
-            window.ethereum.on('chainChanged', handleChainChanged)
+
+            // Subscribe to chainId change
+            currentProvider.on('chainChanged', (chainId: number) =>
+                handleChainChanged()
+            )
+
+            // Subscribe to session disconnection
+            currentProvider.on('disconnect', (code: number, reason: string) =>
+                onLogout()
+            )
         }
 
         const storedCurrentUser = UserAPI.getSessionUser()
@@ -49,18 +69,23 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         }
 
         return () => {
-            if (typeof window.ethereum !== 'undefined') {
-                window.ethereum.on('accountsChanged', () => {})
-                window.ethereum.on('chainChanged', () => {})
+            if (currentProvider) {
+                currentProvider.on('accountsChanged', () => {})
+                currentProvider.on('chainChanged', () => {})
+                currentProvider.on('disconnect', () => {})
             }
         }
-    }, [])
+    }, [currentProvider])
 
     const handleAccountChanged = async (accounts: string[]) => {
         if (accounts.length === 0) {
             // Disconnected
             onLogout()
         } else {
+            if (currentProvider) {
+                const signer = currentProvider.getSigner()
+                setCurrentSigner(signer)
+            }
             const user = await UserAPI.authenticateSession(accounts[0])
             setCurrentUser(user)
         }
@@ -72,13 +97,14 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     }
 
     const onLogin = async () => {
-        const provider = await requestMetaMaskProvider()
+        const provider = await requestWalletConnectProvider()
         if (provider) {
             const signer = provider.getSigner()
-            setCurrentSigner(signer)
             const address = await signer.getAddress()
             const user = await UserAPI.authenticateSession(address)
+            setCurrentSigner(signer)
             setCurrentUser(user)
+            setCurrentProvider(provider)
         }
     }
 
@@ -102,6 +128,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             value={{
                 currentUser: currentUser,
                 currentSigner: currentSigner,
+                currentProvider: currentProvider,
                 setCurrentUserRole: updateRole,
                 logout: onLogout,
                 login: onLogin,
