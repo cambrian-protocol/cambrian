@@ -40,7 +40,6 @@ const InteractionSidebar = ({}: InteractionSidebarProps) => {
                     </SideNav>
                     <Card
                         fill
-                        round="small"
                         margin={{ right: 'small' }}
                         background="background-front"
                     >
@@ -53,7 +52,7 @@ const InteractionSidebar = ({}: InteractionSidebarProps) => {
                         <CardBody
                             pad="medium"
                             gap="small"
-                            overflow={{ vertical: 'scroll' }}
+                            overflow={{ vertical: 'auto' }}
                         >
                             <Box gap="medium" height={{ min: 'auto' }}>
                                 <Box direction="row" gap="small">
