@@ -44,12 +44,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _solverConfig The configuration of this Solver
     */
     function init(
+        address _deployer,
         address _ctfAddress,
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
     ) external initializer {
         require(_solverConfig.keeper != address(0), "Keeper invalid");
+        deployerAddress = _deployer;
         factoryAddress = msg.sender;
         ctfAddress = _ctfAddress;
         chainParent = _chainParent;
@@ -143,10 +145,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
         require(ingestsValid() == true, "ingests invalid");
 
-        require(
-            SolverLib.allocationValid(_index, datas, config.conditionBase),
-            "Recipient slot requires updating"
-        );
+        require(allocationsValid(_index), "Recipient slot requires updating");
 
         conditions[_index].status = SolverLib.Status.Executed;
 
@@ -173,7 +172,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function postroll(uint256 _index) internal virtual;
 
     function cascade(uint256 _index) internal {
-        if (chainChild != address(0) && ISolver(chainChild).ingestsValid()) {
+        if (
+            chainChild != address(0) &&
+            ISolver(chainChild).ingestsValid() &&
+            ISolver(chainChild).allocationsValid(_index)
+        ) {
             ISolver(chainChild).executeSolve(_index);
         }
     }
@@ -232,6 +235,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
      */
     function ingestsValid() public view returns (bool) {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
+    }
+
+    /**
+        @dev Verifies that all slots corresponding to recipients have been filled before CT allocation
+     */
+    function allocationsValid(uint256 _index) public view returns (bool) {
+        return SolverLib.allocationValid(_index, datas, config.conditionBase);
     }
 
     /**
