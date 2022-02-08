@@ -34,7 +34,13 @@ contract SolverFactory {
         Solver clone = Solver(
             Clones.clone(address(solverConfig.implementation))
         );
-        Solver(clone).init(ctfAddress, chainParent, chainIndex, solverConfig);
+        Solver(clone).init(
+            msg.sender,
+            ctfAddress,
+            chainParent,
+            chainIndex,
+            solverConfig
+        );
         solvers.push(clone);
 
         emit SolverCreated(address(clone));
