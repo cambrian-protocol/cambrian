@@ -84,6 +84,25 @@
           "internalType": "uint256",
           "name": "_index",
           "type": "uint256"
+        }
+      ],
+      "name": "allocationsValid",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
         },
         {
           "internalType": "uint256[]",
@@ -778,6 +797,11 @@
     },
     {
       "inputs": [
+        {
+          "internalType": "address",
+          "name": "_deployer",
+          "type": "address"
+        },
         {
           "internalType": "address",
           "name": "_ctfAddress",

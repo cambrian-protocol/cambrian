@@ -250,6 +250,8 @@ describe("ProposalsHub", function () {
       SOLVER_ABI,
       ethers.provider
     );
+
+    await solver.connect(this.keeper).executeSolve(0);
     const conditions = await solver.getConditions();
     const condition = await conditions[conditions.length - 1];
     const conditionId = condition["conditionId"];
@@ -308,6 +310,9 @@ describe("ProposalsHub", function () {
       SOLVER_ABI,
       ethers.provider
     );
+
+    await solver.connect(this.keeper).executeSolve(0);
+
     const conditions = await solver.getConditions();
     const condition = await conditions[conditions.length - 1];
     const conditionId = condition["conditionId"];
@@ -397,6 +402,9 @@ describe("ProposalsHub", function () {
       SOLVER_ABI,
       ethers.provider
     );
+
+    await solver.connect(this.keeper).executeSolve(0);
+
     const conditions = await solver.getConditions();
     const condition = await conditions[conditions.length - 1];
     const conditionId = condition["conditionId"];
@@ -571,6 +579,9 @@ describe("ProposalsHub", function () {
       SOLVER_ABI,
       ethers.provider
     );
+
+    await solver.connect(this.keeper).executeSolve(0);
+
     const conditions = await solver.getConditions();
     const condition = await conditions[conditions.length - 1];
     const conditionId = condition["conditionId"];
@@ -674,6 +685,9 @@ describe("ProposalsHub", function () {
       SOLVER_ABI,
       ethers.provider
     );
+
+    await solver.connect(this.keeper).executeSolve(0);
+
     const conditions = await solver.getConditions();
     const condition = await conditions[conditions.length - 1];
     const conditionId = condition["conditionId"];

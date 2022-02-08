@@ -17,7 +17,7 @@ const getSimpleSolverConfig = (
     {
       executions: 0,
       ingestType: 1,
-      slot: 0,
+      slot: ethers.utils.formatBytes32String("0"),
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(
         ["bytes32"],
@@ -27,28 +27,28 @@ const getSimpleSolverConfig = (
     {
       executions: 0,
       ingestType: 1,
-      slot: 1,
+      slot: ethers.utils.formatBytes32String("1"),
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["address"], [buyerAddress]),
     },
     {
       executions: 0,
       ingestType: 1,
-      slot: 2,
+      slot: ethers.utils.formatBytes32String("2"),
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["address"], [sellerAddress]),
     },
     {
       executions: 0,
       ingestType: 1,
-      slot: 3,
+      slot: ethers.utils.formatBytes32String("3"),
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
     },
     {
       executions: 0,
       ingestType: 1,
-      slot: 4,
+      slot: ethers.utils.formatBytes32String("4"),
       solverIndex: 0,
       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [amount]),
     },
@@ -58,12 +58,23 @@ const getSimpleSolverConfig = (
     collateralToken: collateralAddress,
     outcomeSlots: 2,
     parentCollectionIndexSet: 0,
-    amountSlot: 4,
+    amountSlot: ethers.utils.formatBytes32String("4"),
     partition: [1, 2],
-    recipientAddressSlots: [1, 2],
-    recipientAmountSlots: [
-      [3, 4],
-      [4, 3],
+    allocations: [
+      {
+        recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+        recipientAmountSlots: [
+          ethers.utils.formatBytes32String("3"),
+          ethers.utils.formatBytes32String("4"),
+        ],
+      },
+      {
+        recipientAddressSlot: ethers.utils.formatBytes32String("2"),
+        recipientAmountSlots: [
+          ethers.utils.formatBytes32String("4"),
+          ethers.utils.formatBytes32String("3"),
+        ],
+      },
     ],
     outcomeURIs: [
       getBytes32FromMultihash("QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"),

@@ -46,7 +46,7 @@ describe("SolverCoop", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -56,21 +56,21 @@ describe("SolverCoop", function () {
       {
         executions: 0,
         ingestType: 2,
-        slot: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [1]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 2,
+        slot: ethers.utils.formatBytes32String("2"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 3,
+        slot: ethers.utils.formatBytes32String("3"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
@@ -80,12 +80,23 @@ describe("SolverCoop", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 3,
+      amountSlot: ethers.utils.formatBytes32String("3"),
       partition: [1, 2],
-      recipientAddressSlots: [0, 1],
-      recipientAmountSlots: [
-        [2, 3],
-        [3, 2],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("2"),
+            ethers.utils.formatBytes32String("3"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("3"),
+            ethers.utils.formatBytes32String("2"),
+          ],
+        },
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
@@ -102,7 +113,7 @@ describe("SolverCoop", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -112,7 +123,7 @@ describe("SolverCoop", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -122,14 +133,14 @@ describe("SolverCoop", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 2,
+        slot: ethers.utils.formatBytes32String("2"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 3,
+        slot: ethers.utils.formatBytes32String("3"),
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
       },
@@ -139,12 +150,23 @@ describe("SolverCoop", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 1,
-      amountSlot: 3,
+      amountSlot: ethers.utils.formatBytes32String("3"),
       partition: [1, 2],
-      recipientAddressSlots: [0, 1],
-      recipientAmountSlots: [
-        [2, 3],
-        [3, 2],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("2"),
+            ethers.utils.formatBytes32String("3"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("3"),
+            ethers.utils.formatBytes32String("2"),
+          ],
+        },
       ],
       outcomeURIs: [
         getBytes32FromMultihash(
