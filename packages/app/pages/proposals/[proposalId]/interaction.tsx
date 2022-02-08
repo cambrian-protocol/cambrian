@@ -1,14 +1,24 @@
-import InteractionCTAbar from '@cambrian/app/ui/interaction/bars/InteractionCTAbar'
+import { useEffect, useState } from 'react'
+
+import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ChatModal from '@cambrian/app/components/modals/ChatModal'
+import { Chats } from 'phosphor-react'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import InteractionSidebar from '@cambrian/app/ui/interaction/bars/InteractionSidebar'
 import { Layout } from '@cambrian/app/src/components/layout/Layout'
+import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
+import { Text } from 'grommet'
 import { useCurrentSolver } from '@cambrian/app/src/hooks/useCurrentSolver'
 import { useCurrentUserOrSigner } from '@cambrian/app/src/hooks/useCurrentUserOrSigner'
-import { useEffect } from 'react'
 
 export default function InteractionPage() {
     const { currentUser, setCurrentUserRole } = useCurrentUserOrSigner()
     const { currentSolverConfig } = useCurrentSolver()
+    const [showChatModal, setShowChatModal] = useState(false)
+
+    const toggleShowChatModal = () => setShowChatModal(!showChatModal)
 
     useEffect(() => {
         // Set role
@@ -29,11 +39,87 @@ export default function InteractionPage() {
     }, [])
 
     return (
-        <Layout
-            contextTitle="Interact"
-            sidebar={<InteractionSidebar />}
-            config={<SolverConfigInfo />}
-            ctaBar={<InteractionCTAbar />}
-        ></Layout>
+        <>
+            <Layout
+                contextTitle="Interact"
+                sidebar={<InteractionSidebar />}
+                config={<SolverConfigInfo />}
+                actionBar={<Actionbar />}
+                floatingActionButton={
+                    <FloatingActionButton
+                        icon={<Chats />}
+                        onClick={toggleShowChatModal}
+                    />
+                }
+            >
+                <OutcomeNotification
+                    title="Outcome has been proposed!"
+                    message="Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                    canRequestArbitration
+                    outcomeCollection={{
+                        id: '123141',
+                        outcomes: [
+                            {
+                                id: '91874fgaga391875',
+                                title: 'Success',
+                                description:
+                                    'Success description. Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis.',
+                                uri: 'URI',
+                                context: ' context',
+                            },
+                            {
+                                id: '9187491awfawf875',
+                                title: 'Time exceeded',
+                                description:
+                                    'Time exceeded description. Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis.',
+                                uri: 'URI',
+                                context: ' context',
+                            },
+                        ],
+                    }}
+                />
+                <></>
+                <HeaderTextSection
+                    title="Work Content"
+                    subTitle="Interaction screen"
+                    paragraph="Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                />
+                <Text>
+                    Lorem Ipsum dolor sit amet consectetur adipisicing elit.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.Lorem
+                    Ipsum dolor sit amet consectetur adipisicing elit. Lorem
+                    ipsum dolor sit amet, consectetur adipiscing elit.
+                    Suspendisse vel erat et enim blandit pharetra. Nam nec justo
+                    ultricies, tristique justo eget, dignissim turpis.
+                </Text>
+            </Layout>
+            {showChatModal && <ChatModal onBack={toggleShowChatModal} />}
+        </>
     )
 }
