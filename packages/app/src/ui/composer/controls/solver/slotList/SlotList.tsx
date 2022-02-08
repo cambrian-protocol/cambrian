@@ -1,9 +1,9 @@
 import { Box, CardFooter } from 'grommet'
 
 import CreateSlotFormModal from './modals/CreateSlotModal'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
-import RoundButtonWithLabel from '@cambrian/app/components/buttons/RoundButtonWithLabel'
 import SlotListItem from './SlotListItem'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
@@ -41,7 +41,7 @@ const SlotList = () => {
                     </Box>
                 </Box>
                 <CardFooter justify="end">
-                    <RoundButtonWithLabel
+                    <FloatingActionButton
                         icon={<Plus size="24" />}
                         label="Create new Slot"
                         onClick={toggleCreateSlotModal}

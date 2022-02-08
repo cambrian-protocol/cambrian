@@ -1,10 +1,10 @@
 import { Box, CardFooter } from 'grommet'
 
 import CreateOutcomeModal from '@cambrian/app/ui/composer/controls/solver/outcomeList/modals/CreateOutcomeModal'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import OutcomeSelectionListItem from './OutcomeSelectionListItem'
 import { Plus } from 'phosphor-react'
-import RoundButtonWithLabel from '@cambrian/app/src/components/buttons/RoundButtonWithLabel'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
@@ -49,7 +49,7 @@ const OutcomeSelectionList = () => {
                     </Box>
                 </Box>
                 <CardFooter justify="end">
-                    <RoundButtonWithLabel
+                    <FloatingActionButton
                         icon={<Plus size="24" />}
                         label="Create new Outcome"
                         onClick={toggleCreateOutcomeModal}

@@ -10,11 +10,11 @@ import { Box, Card, CardBody, CardFooter, CardHeader, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeList from './outcomeList/OutcomeList'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecipientList from './recipientList/RecipientList'
-import RoundButtonWithLabel from '@cambrian/app/components/buttons/RoundButtonWithLabel'
 import SlotList from './slotList/SlotList'
 import SolverSettingsControl from './general/SolverSettingsControl'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
@@ -124,7 +124,7 @@ export const SolverControl = () => {
                             </Box>
                         </Box>
                         <CardFooter justify="end">
-                            <RoundButtonWithLabel
+                            <FloatingActionButton
                                 onClick={handleAttachOutcomeCollection}
                                 label="Attach Outcome collection"
                                 icon={<StackSimple size="24" />}

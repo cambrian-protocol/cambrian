@@ -4,6 +4,7 @@ import React, { PropsWithChildren, useState } from 'react'
 import Appbar from '../nav/Appbar'
 import DefaultSidebar from '../nav/DefaultSidebar'
 import Head from 'next/head'
+import styled from 'styled-components'
 
 export const siteTitle = 'Cambrian Protocol'
 
@@ -11,7 +12,9 @@ type LayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     sidebar?: JSX.Element
     config?: JSX.Element
-    ctaBar?: JSX.Element
+    actionBar?: JSX.Element
+    floatingActionButton?: JSX.Element
+    fill?: boolean // Needed for React Flow
 }
 
 export const Layout = ({
@@ -19,7 +22,9 @@ export const Layout = ({
     children,
     contextTitle,
     config,
-    ctaBar,
+    actionBar,
+    floatingActionButton,
+    fill,
 }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
@@ -66,13 +71,10 @@ export const Layout = ({
                                     />
                                     <Box
                                         fill
-                                        justify="center"
+                                        overflow={{
+                                            vertical: 'auto',
+                                        }}
                                         align="center"
-                                        width={
-                                            screenSize === 'small'
-                                                ? { min: '100vw' }
-                                                : '100%'
-                                        }
                                         onClick={
                                             showSidebar &&
                                             screenSize === 'small'
@@ -80,15 +82,42 @@ export const Layout = ({
                                                 : undefined
                                         }
                                         focusIndicator={false}
-                                        pad={{
-                                            horizontal: 'small',
-                                            vertical: 'medium',
-                                        }}
-                                        overflow={{ vertical: 'auto' }}
+                                        width={
+                                            screenSize === 'small'
+                                                ? { min: '100vw' }
+                                                : undefined
+                                        }
                                     >
-                                        {children}
+                                        <Box
+                                            fill={fill}
+                                            height={{
+                                                min: 'auto',
+                                            }}
+                                            width={
+                                                screenSize !== 'small'
+                                                    ? 'large'
+                                                    : '100%'
+                                            }
+                                            pad={'small'}
+                                        >
+                                            {children}
+                                            {floatingActionButton && (
+                                                <PositionedFABBox
+                                                    width={{
+                                                        min: 'xxsmall',
+                                                        max: 'xxsmall',
+                                                    }}
+                                                    height={{
+                                                        min: 'xxsmall',
+                                                        max: 'xxsmall',
+                                                    }}
+                                                >
+                                                    {floatingActionButton}
+                                                </PositionedFABBox>
+                                            )}
+                                        </Box>
                                     </Box>
-                                    {ctaBar && ctaBar}
+                                    {actionBar && actionBar}
                                 </Box>
                             </Box>
                         </Box>
@@ -98,3 +127,10 @@ export const Layout = ({
         </ResponsiveContext.Consumer>
     )
 }
+
+const PositionedFABBox = styled(Box)`
+    position: sticky;
+    margin-left: 100%;
+    transform: translateX(-100%);
+    bottom: 15px;
+`

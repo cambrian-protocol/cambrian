@@ -3,32 +3,29 @@ import { Handshake, IconContext } from 'phosphor-react'
 
 import { useState } from 'react'
 
-interface InteractionCTAbarProps {}
-
-type InterActionCTAType = {
+type ActionbarType = {
     ctaFunction: () => void
     ctaLabel: string
     ctaDisabled?: boolean
 }
 
-type InterActionCTAInfoType = {
+type ActionbarInfoType = {
     icon?: JSX.Element
     label: string
     descLabel?: string
     onClick?: () => void
 }
 
-const InteractionCTAbar = ({}: InteractionCTAbarProps) => {
-    const [currentCTA, setCurrentCTA] = useState<InterActionCTAType>({
+const Actionbar = () => {
+    const [currentCTA, setCurrentCTA] = useState<ActionbarType>({
         ctaFunction: () => {},
         ctaLabel: 'Propose Outcome',
     })
-    const [currentCTAInfo, setCurrentCTAInfo] =
-        useState<InterActionCTAInfoType>({
-            icon: <Handshake />,
-            label: '400 WRK',
-            descLabel: 'You have earned',
-        })
+    const [currentCTAInfo, setCurrentCTAInfo] = useState<ActionbarInfoType>({
+        icon: <Handshake />,
+        label: '400 WRK',
+        descLabel: 'You have earned',
+    })
 
     return (
         <ResponsiveContext.Consumer>
@@ -42,7 +39,12 @@ const InteractionCTAbar = ({}: InteractionCTAbarProps) => {
                     border={{ side: 'top', color: 'background-contrast' }}
                     height={{ min: 'auto' }}
                 >
-                    <Box width="large" direction="row" align="center">
+                    <Box
+                        width="large"
+                        direction="row"
+                        align="center"
+                        pad={{ horizontal: 'small' }}
+                    >
                         <Box flex>
                             {currentCTAInfo && (
                                 <Box
@@ -84,4 +86,4 @@ const InteractionCTAbar = ({}: InteractionCTAbarProps) => {
     )
 }
 
-export default InteractionCTAbar
+export default Actionbar
