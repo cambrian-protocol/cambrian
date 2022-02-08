@@ -98,7 +98,15 @@ describe("Solver.sol | callbacks", function () {
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
         data: ethers.utils.formatBytes32String(""),
-        ingests: [],
+        ingests: [
+          {
+            executions: 0,
+            ingestType: 1,
+            slot: ethers.utils.formatBytes32String("0"),
+            solverIndex: 0,
+            data: ethers.utils.formatBytes32String("0"),
+          },
+        ],
         conditionBase: this.conditionBase,
       },
       {
@@ -113,7 +121,7 @@ describe("Solver.sol | callbacks", function () {
             ingestType: 0,
             slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,

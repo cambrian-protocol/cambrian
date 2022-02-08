@@ -34,10 +34,17 @@ describe("Solver | deployChild", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 0,
+      amountSlot: ethers.utils.formatBytes32String("0"),
       partition: [0, 0],
-      recipientAddressSlots: [0],
-      recipientAmountSlots: [[0, 0]],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+      ],
       outcomeURIs: [
         getBytes32FromMultihash(
           "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
