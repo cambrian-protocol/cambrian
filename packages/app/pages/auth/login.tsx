@@ -13,7 +13,7 @@ export default function LoginPage() {
     const onConnectWallet = () => {
         // TODO Shouldn't be back - for now sends the user where he came from after login
         login()
-        router.back()
+        // router.back()
     }
 
     // Sending User home if already logged in

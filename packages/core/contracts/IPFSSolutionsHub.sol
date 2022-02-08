@@ -14,7 +14,6 @@ contract IPFSSolutionsHub {
     struct Solution {
         bool executed;
         IERC20 collateralToken;
-        address keeper;
         address proposalHub;
         bytes32 proposalId;
         bytes32 id;
@@ -24,14 +23,6 @@ contract IPFSSolutionsHub {
     }
 
     mapping(bytes32 => Solution) public solutions;
-
-    modifier onlyKeeper(bytes32 _solutionId) {
-        require(
-            msg.sender == solutions[_solutionId].keeper,
-            "SolutionsHub: onlyKeeper"
-        );
-        _;
-    }
 
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
@@ -126,6 +117,10 @@ contract IPFSSolutionsHub {
             solutions[_solutionId].solverAddresses[0]
         );
 
+        SolverLib.Multihash context = IProposalsHub(msg.sender).getContext(
+            _proposalId
+        );
+
         for (
             uint256 i;
             i < solutions[_solutionId].solverAddresses.length;
@@ -135,10 +130,10 @@ contract IPFSSolutionsHub {
                 solutions[_solutionId].solverAddresses[i]
             );
             _solver.setTrackingId(solutions[_solutionId].proposalId);
+            _solver.setContext(context);
         }
-        // Execute first Solver
+        // Prepare first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
-        ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve(0);
 
         emit ExecuteSolution(_solutionId);
     }
