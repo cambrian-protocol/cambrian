@@ -117,8 +117,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             chainIndex
         );
 
-        _solver.setTrackingId(trackingId);
-        _solver.setContext(context);
+        if (trackingId != bytes32("")) {
+            _solver.setTrackingId(trackingId);
+        }
+
+        if (context.size > 0) {
+            _solver.setContext(context);
+        }
 
         emit DeployedChild(chainChild);
     }

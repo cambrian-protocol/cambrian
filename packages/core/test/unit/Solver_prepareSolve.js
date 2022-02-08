@@ -37,10 +37,17 @@ describe("Solver.sol | prepareSolve", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 0,
+      amountSlot: ethers.utils.formatBytes32String("0"),
       partition: [0, 0],
-      recipientAddressSlots: [0],
-      recipientAmountSlots: [[0, 0]],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+      ],
       outcomeURIs: [
         getBytes32FromMultihash(
           "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
@@ -83,11 +90,11 @@ describe("Solver.sol | prepareSolve", function () {
   it("Prepares one solve and emits event", async function () {
     let tx = await this.solver.connect(this.keeper).prepareSolve(0);
     let rc = await tx.wait();
-    expect(rc.events[1].event).to.equal("PreparedSolve");
+    expect(rc.events[2].event).to.equal("PreparedSolve");
     expect(
       ethers.utils.defaultAbiCoder.decode(
         ["address", "uint256"],
-        rc.events[1].data
+        rc.events[2].data
       )
     ).to.eql([this.solver.address, ethers.BigNumber.from(0)]);
   });
@@ -99,16 +106,16 @@ describe("Solver.sol | prepareSolve", function () {
     let rc = await tx.wait();
     let childAddress = ethers.utils.defaultAbiCoder.decode(
       ["address"],
-      rc.events[0].data
+      rc.events[1].data
     )[0];
 
     tx = await this.solver.connect(this.keeper).prepareSolve(0);
     rc = await tx.wait();
-    expect(rc.events[3].event).to.equal("PreparedSolve");
+    expect(rc.events[5].event).to.equal("PreparedSolve");
     expect(
       ethers.utils.defaultAbiCoder.decode(
         ["address", "uint256"],
-        rc.events[3].data
+        rc.events[5].data
       )
     ).to.eql([childAddress, ethers.BigNumber.from(0)]);
   });
@@ -118,11 +125,11 @@ describe("Solver.sol | prepareSolve", function () {
     let tx = await this.solver.connect(this.keeper).prepareSolve(1);
     let rc = await tx.wait();
 
-    expect(rc.events[1].event).to.equal("PreparedSolve");
+    expect(rc.events[2].event).to.equal("PreparedSolve");
     expect(
       ethers.utils.defaultAbiCoder.decode(
         ["address", "uint256"],
-        rc.events[1].data
+        rc.events[2].data
       )
     ).to.eql([this.solver.address, ethers.BigNumber.from(1)]);
   });
@@ -168,9 +175,9 @@ describe("Solver.sol | prepareSolve", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -211,9 +218,9 @@ describe("Solver.sol | prepareSolve", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -254,9 +261,9 @@ describe("Solver.sol | prepareSolve", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -287,7 +294,7 @@ describe("Solver.sol | prepareSolve", function () {
           {
             executions: 0,
             ingestType: 3,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
             data: ethers.constants.HashZero,
           },
@@ -304,9 +311,9 @@ describe("Solver.sol | prepareSolve", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -323,7 +330,10 @@ describe("Solver.sol | prepareSolve", function () {
 
     await solvers[0]
       .connect(this.keeper)
-      .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42]));
+      .addData(
+        ethers.utils.formatBytes32String("0"),
+        ethers.utils.formatBytes32String("42")
+      );
 
     await solvers[1].connect(this.keeper).prepareSolve(1);
     expect(await solvers[1].ingestsValid()).to.equal(true);

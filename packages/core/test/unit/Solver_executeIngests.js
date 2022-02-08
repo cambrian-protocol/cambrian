@@ -41,10 +41,17 @@ describe("Solver.sol | executeIngests", function () {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
-      amountSlot: 0,
+      amountSlot: ethers.utils.formatBytes32String("0"),
       partition: [0, 0],
-      recipientAddressSlots: [0],
-      recipientAmountSlots: [[0, 0]],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+      ],
       outcomeURIs: [
         getBytes32FromMultihash(
           "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
@@ -61,16 +68,16 @@ describe("Solver.sol | executeIngests", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 0, // Ignored for ingestType.constant
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [42]),
+        data: ethers.utils.formatBytes32String("42"),
       },
       {
         executions: 0,
         ingestType: 1,
-        slot: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 0, // Ignored for ingestType.constant
-        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [69]),
+        data: ethers.utils.formatBytes32String("69"),
       },
     ];
 
@@ -103,12 +110,16 @@ describe("Solver.sol | executeIngests", function () {
     );
 
     await solver.connect(this.keeper).prepareSolve(0); // calls executeIngests
-    expect(await solver.connect(this.user1).getData(0)).to.equal(
-      ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
-    );
-    expect(await solver.connect(this.user1).getData(1)).to.equal(
-      ethers.utils.defaultAbiCoder.encode(["uint256"], [69])
-    );
+    expect(
+      await solver
+        .connect(this.user1)
+        .getData(ethers.utils.formatBytes32String("0"))
+    ).to.equal(ethers.utils.formatBytes32String("42"));
+    expect(
+      await solver
+        .connect(this.user1)
+        .getData(ethers.utils.formatBytes32String("1"))
+    ).to.equal(ethers.utils.formatBytes32String("69"));
   });
 
   it("Ingests local function data", async function () {
@@ -116,7 +127,7 @@ describe("Solver.sol | executeIngests", function () {
       {
         executions: 0,
         ingestType: 2,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 0,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [0]),
       },
@@ -160,7 +171,11 @@ describe("Solver.sol | executeIngests", function () {
     );
 
     await solver.connect(this.keeper).prepareSolve(0); // calls executeIngests
-    expect(await solver.connect(this.user1).getData(0)).to.equal(
+    expect(
+      await solver
+        .connect(this.user1)
+        .getData(ethers.utils.formatBytes32String("0"))
+    ).to.equal(
       ethers.utils.defaultAbiCoder.encode(["address"], [solver.address])
     );
   });
@@ -170,7 +185,7 @@ describe("Solver.sol | executeIngests", function () {
       {
         executions: 0,
         ingestType: 2,
-        slot: 0,
+        slot: ethers.utils.formatBytes32String("0"),
         solverIndex: 1,
         data: this.ISolver.encodeFunctionData("addressFromChainIndex", [0]),
       },
@@ -205,7 +220,11 @@ describe("Solver.sol | executeIngests", function () {
 
     await solvers[0].connect(this.keeper).prepareSolve(0); // calls executeIngests
 
-    expect(await solvers[1].connect(this.user1).getData(0)).to.equal(
+    expect(
+      await solvers[1]
+        .connect(this.user1)
+        .getData(ethers.utils.formatBytes32String("0"))
+    ).to.equal(
       ethers.utils.defaultAbiCoder.encode(["address"], [solvers[0].address])
     );
   });
@@ -231,9 +250,9 @@ describe("Solver.sol | executeIngests", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -247,9 +266,11 @@ describe("Solver.sol | executeIngests", function () {
     );
 
     await solvers[0].connect(this.keeper).prepareSolve(0); // calls executeIngests
-    expect(await solvers[0].connect(this.user1).getOutgoingCallbacks(0)).to.eql(
-      [solvers[1].address]
-    );
+    expect(
+      await solvers[0]
+        .connect(this.user1)
+        .getOutgoingCallbacks(ethers.utils.formatBytes32String("0"))
+    ).to.eql([solvers[1].address]);
   });
 
   it("Ingests callback ingests", async function () {
@@ -264,7 +285,7 @@ describe("Solver.sol | executeIngests", function () {
           {
             executions: 0,
             ingestType: 3,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
             data: ethers.constants.HashZero,
           },
@@ -281,9 +302,9 @@ describe("Solver.sol | executeIngests", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
@@ -299,12 +320,17 @@ describe("Solver.sol | executeIngests", function () {
     await solvers[0].connect(this.keeper).prepareSolve(0); // calls executeIngests
     await solvers[0]
       .connect(this.keeper)
-      .addData(0, ethers.utils.defaultAbiCoder.encode(["uint256"], [42]));
+      .addData(
+        ethers.utils.formatBytes32String("0"),
+        ethers.utils.formatBytes32String("42")
+      );
 
     expect(await solvers[1].connect(this.user1).ingestsValid()).to.equal(true);
-    expect(await solvers[1].connect(this.user1).getData(0)).to.equal(
-      ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
-    );
+    expect(
+      await solvers[1]
+        .connect(this.user1)
+        .getData(ethers.utils.formatBytes32String("0"))
+    ).to.equal(ethers.utils.formatBytes32String("42"));
   });
 
   it("ingestsValid() == false when callbacks not fulfilled", async function () {
@@ -328,9 +354,9 @@ describe("Solver.sol | executeIngests", function () {
           {
             executions: 0,
             ingestType: 0,
-            slot: 0,
+            slot: ethers.utils.formatBytes32String("0"),
             solverIndex: 0,
-            data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+            data: ethers.utils.formatBytes32String("0"),
           },
         ],
         conditionBase: this.conditionBase,
