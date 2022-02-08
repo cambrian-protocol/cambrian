@@ -77,7 +77,6 @@ contract IPFSSolutionsHub {
         Solution storage solution = solutions[_id];
 
         solution.id = _id;
-        solution.keeper = msg.sender;
         solution.collateralToken = _collateralToken;
         solution.solverConfigsHash = keccak256(abi.encode(_solverConfigs));
         solution.solverConfigsCID = _solverConfigsCID;

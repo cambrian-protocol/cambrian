@@ -235,7 +235,7 @@ contract ProposalsHub is ERC1155Receiver {
     function getContext(bytes32 id)
         external
         view
-        returns (SolverLib.Multihash)
+        returns (SolverLib.Multihash memory)
     {
         return proposals[id].context;
     }
