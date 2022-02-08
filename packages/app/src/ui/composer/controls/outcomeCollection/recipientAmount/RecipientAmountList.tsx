@@ -1,9 +1,9 @@
 import { Box, CardFooter } from 'grommet'
 
 import AddRecipientAmountModal from '@cambrian/app/ui/composer/controls/outcomeCollection/recipientAmount/modals/AddRecipientAmountModal'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientAmountListItem from './RecipientAmountListItem'
-import RoundButtonWithLabel from '@cambrian/app/src/components/buttons/RoundButtonWithLabel'
 import { UserPlus } from 'phosphor-react'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -54,7 +54,7 @@ const RecipientAmountList = () => {
                     </Box>
                 </Box>
                 <CardFooter justify="end">
-                    <RoundButtonWithLabel
+                    <FloatingActionButton
                         icon={<UserPlus size="24" />}
                         label="Add Recipient"
                         onClick={toggleAddRecipientModal}

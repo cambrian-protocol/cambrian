@@ -3,8 +3,8 @@ import { Export, FloppyDisk, FolderOpen } from 'phosphor-react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { ComposerStateType } from '@cambrian/app/store/composer/composer.types'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import RoundButtonWithLabel from '@cambrian/app/src/components/buttons/RoundButtonWithLabel'
 import SelectSolution from '@cambrian/app/components/selects/SelectSolution'
 import { parseSolvers } from '@cambrian/app/utils/transformers/SolverConfig'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
@@ -36,24 +36,24 @@ const ComposerToolbar = () => {
     return (
         <>
             <Box gap="small" pad="small">
-                <RoundButtonWithLabel
+                <FloatingActionButton
                     icon={<Export size="24" />}
                     label="Log solvers"
                     onClick={() => {
                         console.log('Solvers: ', composer.solvers)
                     }}
                 />
-                <RoundButtonWithLabel
+                <FloatingActionButton
                     icon={<FloppyDisk size="24" />}
                     label="Log composer JSON"
                     onClick={handleSaveSolution}
                 />
-                <RoundButtonWithLabel
+                <FloatingActionButton
                     icon={<FloppyDisk size="24" />}
                     label="Log Solver Configs"
                     onClick={handleLogSolverConfigs}
                 />
-                <RoundButtonWithLabel
+                <FloatingActionButton
                     icon={<FolderOpen size="24" />}
                     label="Load solution"
                     onClick={toggleShowLoadPresetModal}
