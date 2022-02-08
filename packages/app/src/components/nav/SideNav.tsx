@@ -31,7 +31,7 @@ const SideNav = ({ children }: SideNavProps) => {
                     <Box flex gap="medium">
                         {children}
                     </Box>
-                    <Box gap="medium">
+                    <Box gap="medium" fill="horizontal">
                         <PlainSectionDivider />
                         <UserMenu />
                     </Box>
