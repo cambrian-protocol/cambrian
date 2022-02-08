@@ -25,6 +25,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             round={'small'}
             width={{ max: 'medium' }}
             elevation="small"
+            height={{ min: 'auto' }}
         >
             {!isSender && (
                 <Text size="xsmall" color="brand" weight={'bold'}>
