@@ -44,7 +44,10 @@ interface IProposalsHub {
         uint256 amount
     ) external;
 
-    function getContext(bytes32 id) external view;
+    function getContext(bytes32 id)
+        external
+        view
+        returns (SolverLib.Multihash memory);
 
     function isProposal(bytes32 id) external view returns (bool);
 
