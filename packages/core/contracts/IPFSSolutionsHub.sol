@@ -117,9 +117,8 @@ contract IPFSSolutionsHub {
             solutions[_solutionId].solverAddresses[0]
         );
 
-        SolverLib.Multihash context = IProposalsHub(msg.sender).getContext(
-            _proposalId
-        );
+        SolverLib.Multihash memory context = IProposalsHub(msg.sender)
+            .getContext(_proposalId);
 
         for (
             uint256 i;
