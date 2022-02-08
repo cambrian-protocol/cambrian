@@ -7,6 +7,11 @@ import { CircleDashed } from 'phosphor-react'
 const ChatContent = () => {
     const [messages, setMessages] = useState<ChatMessageType[]>([])
 
+    // Keep user at the most recent message
+    useEffect(() => {
+        document.getElementById('end')?.scrollIntoView({ behavior: 'smooth' })
+    }, [messages])
+
     // Fetch messages
     useEffect(() => {
         const messagesDummy: ChatMessageType[] = [
@@ -21,6 +26,78 @@ const ChatContent = () => {
                 id: '1',
                 message: 'Sure, give me a couple of hours',
                 sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                message: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                message: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                message: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                message: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                message: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+            {
+                id: '0',
+                message:
+                    'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
                 timestamp: new Date(),
             },
         ]
@@ -47,6 +124,7 @@ const ChatContent = () => {
                     {messages.map((message) => (
                         <ChatMessage key={message.id} message={message} />
                     ))}
+                    <Box id="end" pad="small" />
                 </Box>
             )}
         </Box>
