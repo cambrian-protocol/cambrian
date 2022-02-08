@@ -68,7 +68,11 @@ const OutcomeCollectionModal = (props: OutcomeCollectionModalProps) => {
             />
             <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                 {dummyOcs.map((oc) => (
-                    <OutcomeCollectionCard outcomeCollection={oc} proposable />
+                    <OutcomeCollectionCard
+                        key={oc.id}
+                        outcomeCollection={oc}
+                        proposable
+                    />
                 ))}
             </Box>
         </BaseLayerModal>
