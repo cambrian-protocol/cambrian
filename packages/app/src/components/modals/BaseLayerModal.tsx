@@ -63,7 +63,7 @@ const BaseLayerModal = ({
             >
                 {children}
             </Box>
-            <Box pad={'medium'} />
+            <Box pad={'small'} />
         </Box>
     </Layer>
 )
