@@ -58,7 +58,7 @@ export default function UserMenu({}: UserMenuProps) {
             ]}
         >
             <IconContext.Provider value={{ size: '32' }}>
-                <RecipientAvatar onClick={() => {}} />
+                <RecipientAvatar />
             </IconContext.Provider>
         </Menu>
     )
