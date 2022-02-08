@@ -99,6 +99,7 @@ export const Layout = ({
                                                     : '100%'
                                             }
                                             pad={'small'}
+                                            gap="small"
                                         >
                                             {children}
                                             {floatingActionButton && (
