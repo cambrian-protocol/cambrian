@@ -44,6 +44,8 @@ interface IProposalsHub {
         uint256 amount
     ) external;
 
+    function getContext(bytes32 id) external view;
+
     function isProposal(bytes32 id) external view returns (bool);
 
     function transferERC20(bytes32 proposalId, address solver) external;

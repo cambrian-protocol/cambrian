@@ -14,7 +14,6 @@ contract SolutionsHub {
     struct Solution {
         bool executed;
         IERC20 collateralToken;
-        address keeper;
         address proposalHub;
         bytes32 proposalId;
         bytes32 id;
@@ -23,14 +22,6 @@ contract SolutionsHub {
     }
 
     mapping(bytes32 => Solution) solutions;
-
-    modifier onlyKeeper(bytes32 _solutionId) {
-        require(
-            msg.sender == solutions[_solutionId].keeper,
-            "SolutionsHub: onlyKeeper"
-        );
-        _;
-    }
 
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
@@ -100,9 +91,8 @@ contract SolutionsHub {
             );
             _solver.setTrackingId(solutions[_solutionId].proposalId);
         }
-        // Execute first Solver
+        // Prepare first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
-        ISolver(solutions[_solutionId].solverAddresses[0]).executeSolve(0);
 
         emit ExecuteSolution(_solutionId);
     }
@@ -120,7 +110,6 @@ contract SolutionsHub {
         Solution storage solution = solutions[_id];
 
         solution.id = _id;
-        solution.keeper = msg.sender;
         solution.collateralToken = _collateralToken;
 
         for (uint256 i; i < _solverConfigs.length; i++) {

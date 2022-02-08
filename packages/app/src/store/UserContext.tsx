@@ -97,14 +97,19 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     }
 
     const onLogin = async () => {
-        const provider = await requestWalletConnectProvider()
-        if (provider) {
-            const signer = provider.getSigner()
-            const address = await signer.getAddress()
-            const user = await UserAPI.authenticateSession(address)
-            setCurrentSigner(signer)
-            setCurrentUser(user)
-            setCurrentProvider(provider)
+        try {
+            const provider = await requestWalletConnectProvider()
+            if (provider) {
+                const signer = provider.getSigner()
+                const address = await signer.getAddress()
+                const user = await UserAPI.authenticateSession(address)
+                setCurrentSigner(signer)
+                setCurrentUser(user)
+                setCurrentProvider(provider)
+            }
+        } catch (e) {
+            // TODO ERROR MESSAGE
+            console.error(e)
         }
     }
 

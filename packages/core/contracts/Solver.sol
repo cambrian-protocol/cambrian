@@ -15,6 +15,7 @@ import "hardhat/console.sol";
 abstract contract Solver is Initializable, ERC1155Receiver {
     address factoryAddress; // Factory which creates Solver proxies
     address ctfAddress; // Conditional token framework
+    address deployerAddress; // Address which called SolverFactory to deploy this Solver
 
     SolverLib.Multihash public uiURI; // Resource for Solver Front End
     SolverLib.Config public config; // Primary config of the Solver
@@ -26,6 +27,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     uint256[] public timelocks; // Current timelock, indexed by condition
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
+
+    SolverLib.Multihash context;
 
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
@@ -113,6 +116,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             _config,
             chainIndex
         );
+
+        _solver.setTrackingId(trackingId);
+        _solver.setContext(context);
 
         emit DeployedChild(chainChild);
     }
@@ -510,7 +516,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     function setTrackingId(bytes32 _trackingId) public {
         require(trackingId == bytes32(0), "TrackingId set");
+        require(msg.sender == deployerAddress);
         trackingId = _trackingId;
+    }
+
+    function setContext(SolverLib.Multihash calldata _context) external {
+        require(msg.sender == deployerAddress);
+        context = _context;
     }
 
     function updateTimelock(uint256 _index) internal {
