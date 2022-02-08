@@ -1,15 +1,17 @@
-export type TaggedInput = {
-    tagId: string
-    inputType: 'text' | 'textbox' | 'number' | 'address'
-}
-
 export type Tag = {
     id: string
-    elementId: string
-    elementType: 'slot' | 'recipient' | 'solver'
-    icon: any
     text: string
-    isLocked: boolean
+    elementId: string // ElementId | Data | Job Description | Keeper | Arbitrator
+    isAwaitingInput: boolean
+}
+
+export type SolverMetadata = {
+    id: string
+    title: string
+    description: string
+    avatar: string
+    banner: string
+    tags: Tag[]
 }
 
 export type SolutionMetadata = {
@@ -28,22 +30,12 @@ export type StrategyMetadata = {
     banner: string
 }
 
-export type SolverMetadata = {
-    id: string
-    title: string
-    description: string
-    avatar: string
-    banner: string
-    templateRequiredInputs: string[] // Tag IDs
-}
-
 export type TemplateMetadata = {
     id: string
     title: string
     description: string
     avatar: string
     banner: string
-    proposerRequiredInputs: [] // Tag IDs
 }
 
 export type ProposalMetadata = {

@@ -83,7 +83,7 @@ export function parseSlot(
     const outSlot = <ParsedSlotModel>{
         executions: 0,
         ingestType: inSlot.slotType,
-        slot: ethers.utils.parseBytes32String(inSlot.id),
+        slot: ethers.utils.formatBytes32String(inSlot.id),
     }
 
     switch (inSlot.slotType) {

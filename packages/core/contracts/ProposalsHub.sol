@@ -27,6 +27,7 @@ contract ProposalsHub is ERC1155Receiver {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
+        SolverLib.Multihash context;
     }
 
     mapping(bytes32 => Proposal) public proposals;
@@ -223,12 +224,20 @@ contract ProposalsHub is ERC1155Receiver {
         token.transfer(msg.sender, amount);
     }
 
-    function getProposal(bytes32 _id)
+    function getProposal(bytes32 id)
         external
         view
         returns (Proposal memory proposal)
     {
-        return proposals[_id];
+        return proposals[id];
+    }
+
+    function getContext(bytes32 id)
+        external
+        view
+        returns (SolverLib.Multihash)
+    {
+        return proposals[id].context;
     }
 
     function isProposal(bytes32 id) external view returns (bool) {
