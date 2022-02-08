@@ -67,6 +67,8 @@ interface ISolver {
 
     function ingestsValid() external view returns (bool);
 
+    function allocationsValid(uint256 _index) external view returns (bool);
+
     function addressFromChainIndex(uint256 _index)
         external
         view
