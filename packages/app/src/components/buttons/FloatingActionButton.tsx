@@ -23,6 +23,7 @@ const FloatingActionButton = ({
                 background={disabled ? 'background-front' : 'primary-gradient'}
                 height={{ min: 'xxsmall', max: 'xxsmall' }}
                 width={{ min: 'xxsmall', max: 'xxsmall' }}
+                elevation="medium"
             >
                 <Button
                     disabled={disabled}
@@ -30,7 +31,7 @@ const FloatingActionButton = ({
                     hoverIndicator
                     onClick={onClick}
                 />
-            </Box>{' '}
+            </Box>
         </IconContext.Provider>
     )
 
