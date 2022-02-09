@@ -37,13 +37,6 @@ const Solver = ({
     const [hasCustomUI, setHasCustomUI] = React.useState<boolean | null>(null)
 
     React.useEffect(() => {
-        setContract(
-            new ethers.Contract(
-                address,
-                new ethers.utils.Interface(abi),
-                signer.provider
-            )
-        )
         init()
     }, [])
 

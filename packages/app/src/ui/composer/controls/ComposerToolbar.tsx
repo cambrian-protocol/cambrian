@@ -33,6 +33,15 @@ const ComposerToolbar = () => {
         }
     }
 
+    const handleExportStrategy = () => {
+        try {
+            const solverConfigs = parseSolvers(composer.solvers)
+            console.log(solverConfigs)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     return (
         <>
             <Box gap="small" pad="small">
@@ -52,6 +61,11 @@ const ComposerToolbar = () => {
                     icon={<FloppyDisk size="24" />}
                     label="Log Solver Configs"
                     onClick={handleLogSolverConfigs}
+                />
+                <FloatingActionButton
+                    icon={<FloppyDisk size="24" />}
+                    label="Export Strategy"
+                    onClick={handleExportStrategy}
                 />
                 <FloatingActionButton
                     icon={<FolderOpen size="24" />}

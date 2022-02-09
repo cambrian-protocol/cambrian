@@ -16,6 +16,7 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 type SolverSettingsControlInputType = {
     title: string
+    description: string
     keeperAddress: string
     arbitratorAddress: string
     timelockDays: number
@@ -25,6 +26,7 @@ type SolverSettingsControlInputType = {
 
 const initialSolverSettingsInput: SolverSettingsControlInputType = {
     title: '',
+    description: '',
     keeperAddress: '',
     arbitratorAddress: '',
     timelockDays: 0,
@@ -82,6 +84,7 @@ const SolverSettingsControl = () => {
                 : { weeks: 0, days: 0, hours: 0, minutes: 0 }
             const loadedInput = {
                 title: currentSolver.title,
+                description: currentSolver.description,
                 keeperAddress: currentSolver.config.keeperAddress.address,
                 arbitratorAddress:
                     currentSolver.config.arbitratorAddress.address,
@@ -106,6 +109,7 @@ const SolverSettingsControl = () => {
                 arbitratorAddress: input.arbitratorAddress,
                 keeperAddress: input.keeperAddress,
                 title: input.title,
+                description: input.description,
                 timelockSeconds: parseInputToSeconds({
                     days: input.timelockDays,
                     hours: input.timelockHours,
@@ -116,6 +120,7 @@ const SolverSettingsControl = () => {
 
         setInitialInput({
             title: input.title,
+            description: input.description,
             keeperAddress: input.keeperAddress,
             arbitratorAddress: input.arbitratorAddress,
             timelockDays: input.timelockDays,
