@@ -329,7 +329,7 @@ const Solver = ({
         return null // TODO LOADING
     } else if (!hasCustomUI) {
         // TODO DEFAULT COMPONENT
-        return <div>Hey Ho Henso</div>
+        return <div>{JSON.stringify(data)}</div>
     } else if (hasCustomUI && CustomUI) {
         return (
             <CustomUI
@@ -341,7 +341,11 @@ const Solver = ({
             />
         )
     } else {
-        return null
+        return (
+            <div>
+                <p>Null</p>
+            </div>
+        )
     }
 }
 
