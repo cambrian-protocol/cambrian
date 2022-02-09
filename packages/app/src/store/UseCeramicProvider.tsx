@@ -5,16 +5,8 @@ import {
     UserType,
 } from '@cambrian/app/services/api/User.api'
 
-import { ethers } from 'ethers'
-import { requestMetaMaskProvider } from '@cambrian/app/wallets/metamask/metamask'
-
-import Web3Modal from 'web3modal'
 import { CeramicProvider, Networks } from 'use-ceramic'
-import {
-    AuthProvider,
-    EthereumAuthProvider,
-} from '@ceramicnetwork/blockchain-utils-linking'
-import { requestWalletConnectProvider } from '../wallets/metamask/walletconnect'
+import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import { UserContext } from './UserContext'
 
 export const UseCeramicProvider = ({ children }: PropsWithChildren<{}>) => {

@@ -1,16 +1,14 @@
 export type Tag = {
-    id: string
     text: string
-    elementId: string // ElementId | Data | Job Description | Keeper | Arbitrator
+    elementId: string // <slotId> | data | keeper | arbitrator | timelock | collateralToken
     isAwaitingInput: boolean
 }
 
 export type SolverMetadata = {
     id: string
+    chainIndex: number
     title: string
     description: string
-    avatar: string
-    banner: string
     tags: Tag[]
 }
 

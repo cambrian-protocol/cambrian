@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 export type SolverMainConfigType = {
     title: string
+    description: string
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds: number

@@ -31,6 +31,7 @@ import _ from 'lodash'
 export default class Solver {
     id: string
     title: string
+    description: string
     iface: ethers.utils.Interface
     config: SolverConfig
 
@@ -43,17 +44,27 @@ export default class Solver {
         this.id = id ? id : ulid()
         this.iface = iface
         this.title = title
+        this.description = ''
         this.config = config ? config : this.getDefaultConfig()
     }
 
     /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
-        const { title, keeperAddress, arbitratorAddress, timelockSeconds } =
-            mainConfig
+        const {
+            title,
+            description,
+            keeperAddress,
+            arbitratorAddress,
+            timelockSeconds,
+        } = mainConfig
 
         if (title !== this.title) {
             this.updateTitle(title)
+        }
+
+        if (description !== this.description) {
+            this.updateDescription(description)
         }
 
         if (keeperAddress !== this.config.keeperAddress.address) {
@@ -71,6 +82,10 @@ export default class Solver {
 
     updateTitle(title: string) {
         this.title = title
+    }
+
+    updateDescription(description: string) {
+        this.description = description
     }
 
     updateKeeper(address: string) {
