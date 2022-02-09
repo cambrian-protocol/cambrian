@@ -3,8 +3,8 @@ import { grommet } from 'grommet'
 
 const colors: any = {
     brand: {
-        light: '#799AB8',
-        dark: '#799AB8',
+        light: '#4e94bd',
+        dark: '#4e94bd',
     },
     active: '#799AB850',
     'background-back': { dark: '#212121', light: '#EFEFEF' },
@@ -21,7 +21,7 @@ const colors: any = {
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
     'secondary-gradient':
         'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
-    'accent-1': '#003457',
+    'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
 }
 
@@ -60,20 +60,38 @@ export const cpTheme = deepMerge(grommet, {
         },
     },
     button: {
+        default: {
+            color: 'white',
+            padding: {
+                vertical: '12px',
+                horizontal: '24px',
+            },
+        },
+        border: {
+            radius: '10px',
+        },
+        primary: {
+            background: { color: 'brand' },
+            color: 'white',
+            padding: {
+                vertical: '12px',
+                horizontal: '24px',
+            },
+        },
+        secondary: {
+            background: { color: 'accent-1' },
+            padding: {
+                vertical: '12px',
+                horizontal: '24px',
+            },
+        },
+        hover: { background: { color: '#3F4C55' } },
         size: {
             small: {
                 border: {
-                    radius: '8px',
+                    radius: '10px',
                 },
             },
-        },
-
-        primary: {
-            color: 'primary-gradient',
-        },
-        padding: { vertical: '13px' },
-        border: {
-            radius: '14px',
         },
     },
     formField: {

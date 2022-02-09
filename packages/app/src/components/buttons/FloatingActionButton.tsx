@@ -5,7 +5,7 @@ import { IconContext } from 'phosphor-react'
 export type FloatingActionButtonProps = ButtonProps & {
     disabled?: boolean
     icon: JSX.Element
-    onClick: () => void
+    onClick?: () => void
     label?: string
 }
 
@@ -20,15 +20,15 @@ const FloatingActionButton = ({
             <Box
                 round="full"
                 overflow="hidden"
-                background={disabled ? 'background-front' : 'primary-gradient'}
                 height={{ min: 'xxsmall', max: 'xxsmall' }}
                 width={{ min: 'xxsmall', max: 'xxsmall' }}
                 elevation="medium"
+                align="center"
             >
                 <Button
+                    primary
                     disabled={disabled}
                     icon={icon}
-                    hoverIndicator
                     onClick={onClick}
                 />
             </Box>
