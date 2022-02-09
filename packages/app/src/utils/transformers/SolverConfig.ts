@@ -245,13 +245,9 @@ export function parseCondition(
         outCondition.parentCollectionIndexSet = 0
     }
 
-    const orderedSlotIds = Object.keys(
-        sortedSolvers[currentSolverIndex].config.slots
-    ).sort((a, b) => a.localeCompare(b))
-
     outCondition.partition = parsePartition(inCondition.partition)
-    outCondition.amountSlot = orderedSlotIds.findIndex(
-        (x) => x === inCondition.amountSlot
+    outCondition.amountSlot = ethers.utils.formatBytes32String(
+        inCondition.amountSlot
     )
 
     outCondition.allocations = [] as ParsedAllocationModel[]
@@ -277,7 +273,7 @@ export function parseCondition(
                     )?.amount.slotId
 
                     if (amountSlotId) {
-                        return amountSlotId
+                        return ethers.utils.formatBytes32String(amountSlotId)
                     } else {
                         throw new Error(
                             'Could not find slot for allocation amount'

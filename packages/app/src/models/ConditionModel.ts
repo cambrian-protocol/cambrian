@@ -47,7 +47,7 @@ export type ParsedConditionModel = {
     collateralToken: string
     outcomeSlots: number
     parentCollectionIndexSet: number
-    amountSlot: number
+    amountSlot: string
     partition: number[]
     allocations: ParsedAllocationModel[]
     outcomeURIs: Multihash[]
