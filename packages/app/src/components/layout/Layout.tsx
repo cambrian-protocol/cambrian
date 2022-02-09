@@ -2,6 +2,7 @@ import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
 import React, { PropsWithChildren, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
+import ContextHelpModal from '../modals/ContextHelp'
 import DefaultSidebar from '../nav/DefaultSidebar'
 import Head from 'next/head'
 import styled from 'styled-components'
@@ -123,6 +124,7 @@ export const Layout = ({
                             </Box>
                         </Box>
                     </Main>
+                    {showHelp && <ContextHelpModal onClose={toggleHelp} />}
                 </>
             )}
         </ResponsiveContext.Consumer>
