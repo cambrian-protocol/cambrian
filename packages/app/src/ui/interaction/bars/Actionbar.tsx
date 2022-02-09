@@ -1,32 +1,23 @@
-import { Box, Button, ResponsiveContext, Text } from 'grommet'
-import { Handshake, IconContext } from 'phosphor-react'
+import { Box, Button, ResponsiveContext } from 'grommet'
 
-import { useState } from 'react'
+import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
+import { ButtonProps } from 'grommet'
 
-type ActionbarType = {
-    ctaFunction: () => void
-    ctaLabel: string
-    ctaDisabled?: boolean
+export type ActionbarActionsType = {
+    primaryAction?: ButtonProps
+} & (
+    | { secondaryAction: ButtonProps; info?: never }
+    | {
+          info: { icon: JSX.Element; label: string; descLabel: string }
+          secondaryAction?: never
+      }
+)
+
+interface ActionbarProps {
+    actions: ActionbarActionsType
 }
 
-type ActionbarInfoType = {
-    icon?: JSX.Element
-    label: string
-    descLabel?: string
-    onClick?: () => void
-}
-
-const Actionbar = () => {
-    const [currentCTA, setCurrentCTA] = useState<ActionbarType>({
-        ctaFunction: () => {},
-        ctaLabel: 'Propose Outcome',
-    })
-    const [currentCTAInfo, setCurrentCTAInfo] = useState<ActionbarInfoType>({
-        icon: <Handshake />,
-        label: '400 WRK',
-        descLabel: 'You have earned',
-    })
-
+const Actionbar = ({ actions }: ActionbarProps) => {
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => (
@@ -45,37 +36,27 @@ const Actionbar = () => {
                         align="center"
                         pad={{ horizontal: 'small' }}
                     >
-                        <Box flex>
-                            {currentCTAInfo && (
-                                <Box
-                                    direction="row"
-                                    onClick={currentCTAInfo.onClick}
-                                    focusIndicator={false}
-                                    gap="small"
-                                    align="center"
-                                >
-                                    <IconContext.Provider
-                                        value={{ size: '24' }}
-                                    >
-                                        <Box>{currentCTAInfo.icon}</Box>
-                                    </IconContext.Provider>
-                                    <Box>
-                                        <Text size="xsmall">
-                                            {currentCTAInfo.descLabel}
-                                        </Text>
-                                        <Text>{currentCTAInfo.label}</Text>
-                                    </Box>
-                                </Box>
-                            )}
-                        </Box>
-                        <Box>
-                            {currentCTA && (
+                        {actions.info && (
+                            <Box flex>
+                                <ActionbarInfo {...actions.info} />
+                            </Box>
+                        )}
+                        {actions.secondaryAction && (
+                            <>
                                 <Button
-                                    disabled={currentCTA?.ctaDisabled}
-                                    onClick={currentCTA?.ctaFunction}
-                                    primary
-                                    label={currentCTA?.ctaLabel}
                                     size="small"
+                                    secondary
+                                    {...actions.secondaryAction}
+                                />
+                                <Box flex />
+                            </>
+                        )}
+                        <Box>
+                            {actions.primaryAction && (
+                                <Button
+                                    size="small"
+                                    primary
+                                    {...actions.primaryAction}
                                 />
                             )}
                         </Box>

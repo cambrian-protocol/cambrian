@@ -1,8 +1,10 @@
+import Actionbar, {
+    ActionbarActionsType,
+} from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { Chats, Handshake } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import ChatModal from '@cambrian/app/components/modals/ChatModal'
-import { Chats } from 'phosphor-react'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import InteractionSidebar from '@cambrian/app/ui/interaction/bars/InteractionSidebar'
@@ -17,6 +19,15 @@ export default function InteractionPage() {
     const { currentUser, setCurrentUserRole } = useCurrentUserOrSigner()
     const { currentSolverConfig } = useCurrentSolver()
     const [showChatModal, setShowChatModal] = useState(false)
+
+    const [currentActions, setCurrentActions] = useState<ActionbarActionsType>({
+        primaryAction: { label: 'Claim tokens' },
+        info: {
+            icon: <Handshake />,
+            descLabel: 'You have earned',
+            label: '400 WRK',
+        },
+    })
 
     const toggleShowChatModal = () => setShowChatModal(!showChatModal)
 
@@ -44,7 +55,7 @@ export default function InteractionPage() {
                 contextTitle="Interact"
                 sidebar={<InteractionSidebar />}
                 config={<SolverConfigInfo />}
-                actionBar={<Actionbar />}
+                actionBar={<Actionbar actions={currentActions} />}
                 floatingActionButton={
                     <FloatingActionButton
                         icon={<Chats />}
