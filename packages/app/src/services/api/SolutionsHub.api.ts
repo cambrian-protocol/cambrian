@@ -1,5 +1,12 @@
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
-import { fetchTokenModelFromAddress } from './etherscan/ERC20TokenTransferEvents'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { ethers } from 'ethers'
+
+const ERC20_ABI =
+    require('@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json').abi
+
+const IPFSSOLUTIONSHUB_ABI =
+    require('@cambrian/core/artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json').abi
 
 export type SolutionResponseType = {
     solution: SolutionModel
@@ -7,14 +14,39 @@ export type SolutionResponseType = {
 
 export const SolutionsHubAPI = {
     getSolutionFromSolutionId: async (
-        solutionId: string
+        solutionId: string,
+        provider: ethers.providers.Web3Provider
     ): Promise<SolutionResponseType> => {
-        // TODO fetch solution
-
-        // Fetch collateralToken name and symbol
-        const collateralToken = await fetchTokenModelFromAddress(
-            '0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2'
+        const solutionsHubContract = new ethers.Contract(
+            '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
+            new ethers.utils.Interface(IPFSSOLUTIONSHUB_ABI),
+            provider
         )
+
+        const solution = await solutionsHubContract.solutions(solutionId)
+
+        const erc20Contract = new ethers.Contract(
+            solution.collateralToken,
+            new ethers.utils.Interface(ERC20_ABI),
+            provider
+        )
+
+        const collateralToken = <TokenModel>{
+            tokenName: '',
+            tokenSymbol: '',
+            address: solution.collateralToken,
+        }
+
+        try {
+            collateralToken.tokenName = await erc20Contract.name()
+        } catch (e) {
+            console.log(e)
+        }
+        try {
+            collateralToken.tokenSymbol = await erc20Contract.symbol()
+        } catch (e) {
+            console.log(e)
+        }
 
         // Dummy
         const response = {

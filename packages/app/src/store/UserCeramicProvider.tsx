@@ -9,7 +9,7 @@ import { CeramicProvider, Networks } from 'use-ceramic'
 import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import { UserContext } from './UserContext'
 
-export const UseCeramicProvider = ({ children }: PropsWithChildren<{}>) => {
+export const UserCeramicProvider = ({ children }: PropsWithChildren<{}>) => {
     const user = React.useContext(UserContext)
 
     if (user?.currentProvider?.provider && user?.currentUser) {
