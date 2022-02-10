@@ -27,6 +27,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
+import { Tags } from '../models/TagModels'
 
 export default class ComposerSolver {
     id: string
@@ -34,6 +35,7 @@ export default class ComposerSolver {
     description: string
     iface: ethers.utils.Interface
     config: SolverConfig
+    tags: Tags
 
     constructor(
         title = 'New Solver',
@@ -46,7 +48,10 @@ export default class ComposerSolver {
         this.title = title
         this.description = ''
         this.config = config ? config : this.getDefaultConfig()
+        this.tags = {}
     }
+
+    // TODO, ADD TAG FUNCTIONS
 
     /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
 
