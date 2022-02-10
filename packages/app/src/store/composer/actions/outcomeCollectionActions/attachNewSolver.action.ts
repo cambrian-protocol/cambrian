@@ -1,5 +1,5 @@
 import { ComposerStateType } from '../../composer.types'
-import Solver from '@cambrian/app/classes/Solver'
+import Solver from '@cambrian/app/classes/ComposerSolver'
 import { isNode } from 'react-flow-renderer'
 
 const attachNewSolverAction = (state: ComposerStateType): ComposerStateType => {

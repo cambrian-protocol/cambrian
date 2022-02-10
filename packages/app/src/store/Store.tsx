@@ -2,14 +2,14 @@ import React, { PropsWithChildren } from 'react'
 
 import { SolverContextProvider } from './SolverConfigContext'
 import { UserContextProvider } from './UserContext'
-import { UseCeramicProvider } from './UseCeramicProvider'
+import { UserCeramicProvider } from './UserCeramicProvider'
 
 export const Store = ({ children }: PropsWithChildren<{}>) => {
     return (
         <UserContextProvider>
-            <UseCeramicProvider>
+            <UserCeramicProvider>
                 <SolverContextProvider>{children}</SolverContextProvider>
-            </UseCeramicProvider>
+            </UserCeramicProvider>
         </UserContextProvider>
     )
 }

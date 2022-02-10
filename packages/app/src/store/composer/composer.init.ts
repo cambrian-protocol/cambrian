@@ -1,6 +1,6 @@
 import { ComposerStateType } from './composer.types'
 import { Elements } from 'react-flow-renderer'
-import Solver from '@cambrian/app/classes/Solver'
+import Solver from '@cambrian/app/classes/ComposerSolver'
 
 function initComposer(): ComposerStateType {
     const defaultSolver = new Solver()

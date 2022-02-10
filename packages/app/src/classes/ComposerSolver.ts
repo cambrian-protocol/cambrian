@@ -28,7 +28,7 @@ import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
 
-export default class Solver {
+export default class ComposerSolver {
     id: string
     title: string
     description: string
@@ -206,7 +206,7 @@ export default class Solver {
 
     addRecipient(
         type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot',
-        data: string | SlotModel | Solver,
+        data: string | SlotModel | ComposerSolver,
         targetSolverId?: string | null | undefined,
         description?: string,
         solverConfigAdress?: SolverConfigAddress
