@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 
 import { OutcomeCollectionModel } from '@cambrian/app/src/models/ConditionModel'
-import Solver from '@cambrian/app/classes/Solver'
+import Solver from '@cambrian/app/classes/ComposerSolver'
 import { composerReducer } from './composer.reducer'
 import initialComposer from './composer.init'
 
@@ -54,7 +54,8 @@ const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
             ) {
                 setCurrentOutcomeCollection(
                     currentSolver?.config.condition.partition.find(
-                        (oc) => oc.id === composer.currentIdPath?.ocId
+                        (oc: OutcomeCollectionModel) =>
+                            oc.id === composer.currentIdPath?.ocId
                     )
                 )
             } else {
