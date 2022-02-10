@@ -2,6 +2,7 @@ import { ConditionModel, ParsedConditionModel } from './ConditionModel'
 
 import { ParsedSlotModel, SlotModel } from './SlotModel'
 import { ethers } from 'ethers'
+import { Tag, Tags } from './TagModels'
 
 /**
  * Solution Composer
@@ -32,6 +33,7 @@ export type SolverModel = {
     title: string
     iface: ethers.utils.Interface
     config: SolverConfig
+    tags: Tags
 }
 
 /**
