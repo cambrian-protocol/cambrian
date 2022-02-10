@@ -1,22 +1,27 @@
 const { deployments } = require("hardhat");
 const hre = require("hardhat");
 const ethers = hre.ethers;
+const FACTORY_ABI =
+  require("../artifacts/contracts/SolverFactory.sol/SolverFactory.json").abi;
+const ERC20_ABI =
+  require("../artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
 
 async function main() {
-  await deployments.fixture([
-    "ConditionalTokens",
-    "SolverFactory",
-    "SolutionsHub",
-    "ProposalsHub",
-    "ToyToken",
-    "BasicSolverV1",
-    "IPFSSolutionsHub",
-  ]);
-
   const [user1] = await ethers.getSigners();
-  const SolverFactory = await ethers.getContract("SolverFactory");
-  const ToyToken = await ethers.getContract("ToyToken");
-  await ToyToken.mint(user1.address, "100");
+
+  const SolverFactory = new ethers.Contract(
+    "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
+    new ethers.utils.Interface(FACTORY_ABI),
+    ethers.getDefaultProvider()
+  );
+
+  const ToyToken = new ethers.Contract(
+    "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+    new ethers.utils.Interface(ERC20_ABI),
+    ethers.getDefaultProvider()
+  );
+
+  await ToyToken.connect(user1).mint(user1.address, "100");
 
   const solverConfigs = [
     {
@@ -164,11 +169,8 @@ async function main() {
     },
   ];
 
-  let deployedAddress = await SolverFactory.createSolver(
-    ethers.constants.AddressZero,
-    0,
-    solverConfigs[0]
-  )
+  let deployedAddress = await SolverFactory.connect(user1)
+    .createSolver(ethers.constants.AddressZero, 0, solverConfigs[0])
     .then((tx) => tx.wait())
     .then(
       (rc) =>
