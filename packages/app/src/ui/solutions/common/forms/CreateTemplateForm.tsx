@@ -2,6 +2,8 @@ import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Tag, Tags, TemplateMetadata } from '@cambrian/app/models/TagModels'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { CheckBox, Header } from 'grommet'
 import {
     Box,
@@ -15,7 +17,7 @@ import React, { useState } from 'react'
 
 interface CreateTemplateFormProps {
     composition: SolverModel[]
-    onSuccess: () => void
+    onSuccess: (cid: string) => void
     onFailure: () => void
 }
 
@@ -24,6 +26,9 @@ type CreateTemplateFormType = {
     name: string
     title: string
     description: string
+    askingAmount: number
+    denominationToken: string // Token address for which to calculate equivalent value
+    preferredTokens: 'any' | string[]
     awaitingInputs: {
         [solverId: string]: {
             [tagId: string]: TaggedInput
@@ -32,7 +37,7 @@ type CreateTemplateFormType = {
 }
 
 type TaggedInput = Tag & {
-    value: string | number | undefined
+    value: string | undefined
 }
 
 const initialInput = {
@@ -40,6 +45,9 @@ const initialInput = {
     name: '',
     title: '',
     description: '',
+    askingAmount: 0,
+    denominationToken: '0xc778417e063141139fce010982780140aa0cd5ab', // Ropsten wETH // TODO
+    preferredTokens: 'any' as 'any',
     awaitingInputs: {},
 }
 
@@ -49,6 +57,18 @@ const CreateTemplateForm = ({
     onFailure,
 }: CreateTemplateFormProps) => {
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
+    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
+        string | undefined
+    >('')
+    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
+        (string | undefined)[] | undefined
+    >([])
+
+    const ipfs = new IPFSAPI()
+
+    React.useEffect(() => {
+        console.log(input)
+    }, [input])
 
     React.useEffect(() => {
         const awaitingInputs = {} as {
@@ -80,7 +100,7 @@ const CreateTemplateForm = ({
     const setAwaitedInputValue = (
         solverId: string,
         tagId: string,
-        value: string | number | undefined
+        value: string | undefined
     ) => {
         const inputs: CreateTemplateFormType = { ...input }
         inputs.awaitingInputs[solverId][tagId].value = value
@@ -102,11 +122,12 @@ const CreateTemplateForm = ({
         return Object.keys(input.awaitingInputs).map((solverId) => {
             return Object.keys(input.awaitingInputs[solverId]).map((tagId) => {
                 return (
-                    <Box direction="row">
+                    <Box direction="row" key={`${solverId}-${tagId}`}>
                         <Box basis="3/4">
                             <FormField
                                 name={tagId}
-                                label={
+                                label={tagId}
+                                help={
                                     input.awaitingInputs[solverId][tagId].text
                                 }
                                 type={getInputType(
@@ -165,7 +186,55 @@ const CreateTemplateForm = ({
         }
     }
 
-    const onSubmit = (event: FormExtendedEvent) => {
+    const validate = (value: string | number, field: object) => {
+        console.log(value, field)
+    }
+
+    const fetchTokenSymbols = async (addresses: string) => {
+        if (addresses === 'any') {
+            return
+        } else {
+            const addressArray = addresses.split(',')
+            const tokenResponses = await Promise.allSettled(
+                addressArray.map((address) => TokenAPI.getTokenInfo(address))
+            )
+            const tokenSymbols = tokenResponses.map((res) =>
+                res.status === 'fulfilled' ? res.value?.symbol : undefined
+            )
+            return tokenSymbols
+        }
+    }
+
+    const updateDenominationTokenSymbol = async (address: string) => {
+        if (address.length === 42) {
+            const symbols = await fetchTokenSymbols(address)
+            if (symbols) {
+                setDenominationTokenSymbol(symbols[0])
+            } else {
+                setDenominationTokenSymbol(undefined)
+            }
+        }
+    }
+
+    const updatePreferredTokenSymbols = async (addresses: string) => {
+        if (addresses === 'any') {
+            setPreferredTokenSymbols(undefined)
+        }
+
+        const arr = addresses.split(',')
+        if (arr[0] !== '' && !arr.find((address) => address.length !== 42)) {
+            const symbols = await fetchTokenSymbols(addresses)
+            if (symbols) {
+                setPreferredTokenSymbols(symbols)
+            } else {
+                setPreferredTokenSymbols(undefined)
+            }
+        } else {
+            setPreferredTokenSymbols(undefined)
+        }
+    }
+
+    const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
 
         const newComposition = composition.map((x) => x)
@@ -180,7 +249,7 @@ const CreateTemplateForm = ({
                     isAwaitingInput: taggedInput.isAwaitingInput,
                 }
 
-                if (typeof taggedInput.value === 'string') {
+                if (typeof taggedInput.value !== 'undefined') {
                     switch (tagId) {
                         case 'keeper':
                             newComposition[i].config['keeperAddress'].address =
@@ -202,16 +271,8 @@ const CreateTemplateForm = ({
                                 taggedInput.value
                             break
 
-                        default:
-                            // SlotID
-                            newComposition[i].config.slots[tagId].data = [
-                                taggedInput.value,
-                            ]
-                    }
-                } else if (typeof taggedInput.value === 'number') {
-                    switch (tagId) {
                         case 'timelockSeconds':
-                            newComposition[i].config['timelockSeconds'] =
+                            newComposition[i].config['collateralToken'] =
                                 taggedInput.value
                             break
 
@@ -233,12 +294,18 @@ const CreateTemplateForm = ({
             description: input.description,
         } as TemplateMetadata
 
-        /* 
+        try {
+            /* 
         Create template and save template data to ipfs
-
         */
-        onSuccess()
-        console.log('Created Template', template, input)
+            const res = await ipfs.pin(template)
+            console.log(res.IpfsHash)
+            onSuccess(res.IpfsHash)
+            console.log('Created Template', res.IpfsHash, template, input)
+        } catch (e) {
+            console.log(e)
+            onFailure()
+        }
     }
     return (
         <>
@@ -258,6 +325,42 @@ const CreateTemplateForm = ({
                 <FormField name="title" label="Title" required />
                 <FormField name="description" label="Description" required>
                     <TextArea name="description" rows={5} resize={false} />
+                </FormField>
+                <FormField name="price" label="Asking Price" required>
+                    <FormField
+                        name="denominationToken"
+                        label="Denomination token"
+                        help={denominationTokenSymbol || 'Contract address'}
+                        type="string"
+                        validate={validate}
+                        onChange={(event) =>
+                            updateDenominationTokenSymbol(event.target.value)
+                        }
+                        required
+                    />
+                    <FormField
+                        name="askingAmount"
+                        label="Amount (in the denomination token)"
+                        help="eg. 1.0042"
+                        type="number"
+                        required
+                    />
+                    <FormField
+                        name="preferredTokens"
+                        label="Preferred tokens for payment"
+                        help={
+                            Array.isArray(preferredTokenSymbols)
+                                ? preferredTokenSymbols
+                                      .map((x) => x || 'error')
+                                      .join(',')
+                                : 'Comma-seperated list of token contract addresses, or "any"'
+                        }
+                        type="string"
+                        onChange={(event) =>
+                            updatePreferredTokenSymbols(event.target.value)
+                        }
+                        required
+                    />
                 </FormField>
                 <Header>Awaiting Inputs</Header>
                 <Box gap="small">{renderAwaitedInputs()}</Box>
