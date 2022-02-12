@@ -1,3 +1,4 @@
+import { PIN_ENDPOINT } from '@cambrian/app/constants'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import fetch from 'node-fetch'
 const Hash = require('ipfs-only-hash')
@@ -59,6 +60,23 @@ export class IPFSAPI {
         } catch (e) {
             console.log(e)
             return false
+        }
+    }
+
+    pin = async (data: object) => {
+        try {
+            const res = await fetch(PIN_ENDPOINT, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+
+            return res.json()
+        } catch (e) {
+            console.log(e)
         }
     }
 }
