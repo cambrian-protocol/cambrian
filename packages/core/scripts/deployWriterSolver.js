@@ -5,6 +5,7 @@ const FACTORY_ABI =
   require("../artifacts/contracts/SolverFactory.sol/SolverFactory.json").abi;
 const ERC20_ABI =
   require("../artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
+const { getBytes32FromMultihash } = require("../helpers/multihash.js");
 
 async function main() {
   const [user1] = await ethers.getSigners();
@@ -152,18 +153,12 @@ async function main() {
           },
         ],
         outcomeURIs: [
-          {
-            digest:
-              "0x97ca31806fc612ce2ef23118037b94846ae79148da7310686f1dadcc5bbbf136",
-            hashFunction: 18,
-            size: 32,
-          },
-          {
-            digest:
-              "0x168880916cd84cd88599b75417697c6703e7ca2a24c8d03578e08f2efef62de2",
-            hashFunction: 18,
-            size: 32,
-          },
+          getBytes32FromMultihash(
+            "QmdgzwhGvmfDspsUnznnijbQLP9rEBZKCUU1yykUXpv4CZ"
+          ),
+          getBytes32FromMultihash(
+            "QmaNcVRBZfFypLi4tKLyt7jqmzV3DU96QFPhzjs84tJAZa"
+          ),
         ],
       },
     },
