@@ -40,9 +40,7 @@ const Appbar = ({ title, toggleSidebar, toggleHelp, config }: AppbarProps) => {
                                     icon={<List />}
                                     onClick={toggleSidebar}
                                 />
-                                <Text color="white">
-                                    {title ? title : 'Solver Title'}
-                                </Text>
+                                <Text color="white">{title && title}</Text>
                             </Box>
                             <Box direction="row" gap="medium">
                                 <AppbarItem
