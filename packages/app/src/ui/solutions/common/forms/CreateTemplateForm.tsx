@@ -186,10 +186,6 @@ const CreateTemplateForm = ({
         }
     }
 
-    const validate = (value: string | number, field: object) => {
-        console.log(value, field)
-    }
-
     const fetchTokenSymbols = async (addresses: string) => {
         if (addresses === 'any') {
             return
@@ -292,6 +288,11 @@ const CreateTemplateForm = ({
             name: input.name,
             title: input.title,
             description: input.description,
+            price: {
+                amount: input.askingAmount,
+                denominationToken: input.denominationToken,
+                preferredTokens: input.preferredTokens,
+            },
         } as TemplateMetadata
 
         try {
@@ -307,6 +308,7 @@ const CreateTemplateForm = ({
             onFailure()
         }
     }
+
     return (
         <>
             <Form<CreateTemplateFormType>
