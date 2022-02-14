@@ -35,7 +35,7 @@ const BaseSlotInputItem = ({
                 <Box gap="medium" direction="row">
                     <RecipientAvatar />
                     <Box justify="center">
-                        <Text>{title}</Text>
+                        <Text truncate>{title}</Text>
                         <Text size="small" color="dark-4" truncate>
                             {subTitle}
                         </Text>
