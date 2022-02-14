@@ -16,6 +16,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     actionBar?: JSX.Element
     floatingActionButton?: JSX.Element
     fill?: boolean // Needed for React Flow
+    appbarTitle?: string
 }
 
 export const Layout = ({
@@ -26,6 +27,7 @@ export const Layout = ({
     actionBar,
     floatingActionButton,
     fill,
+    appbarTitle,
 }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
@@ -66,6 +68,7 @@ export const Layout = ({
                                 </Collapsible>
                                 <Box flex>
                                     <Appbar
+                                        title={appbarTitle}
                                         toggleHelp={toggleHelp}
                                         toggleSidebar={toggleSidebar}
                                         config={config}
@@ -90,7 +93,7 @@ export const Layout = ({
                                         }
                                     >
                                         <Box
-                                            fill={fill}
+                                            fill={fill ? fill : 'vertical'}
                                             height={{
                                                 min: 'auto',
                                             }}
@@ -104,18 +107,21 @@ export const Layout = ({
                                         >
                                             {children}
                                             {floatingActionButton && (
-                                                <PositionedFABBox
-                                                    width={{
-                                                        min: 'xxsmall',
-                                                        max: 'xxsmall',
-                                                    }}
-                                                    height={{
-                                                        min: 'xxsmall',
-                                                        max: 'xxsmall',
-                                                    }}
-                                                >
-                                                    {floatingActionButton}
-                                                </PositionedFABBox>
+                                                <>
+                                                    <Box flex />
+                                                    <PositionedFABBox
+                                                        width={{
+                                                            min: 'xxsmall',
+                                                            max: 'xxsmall',
+                                                        }}
+                                                        height={{
+                                                            min: 'xxsmall',
+                                                            max: 'xxsmall',
+                                                        }}
+                                                    >
+                                                        {floatingActionButton}
+                                                    </PositionedFABBox>
+                                                </>
                                             )}
                                         </Box>
                                     </Box>
