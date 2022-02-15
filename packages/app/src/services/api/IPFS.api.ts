@@ -15,6 +15,10 @@ export class IPFSAPI {
             // 'infura-ipfs.io',
             // 'gateway.pinata.cloud',
         ]
+
+        if (process.env.LOCAL_IPFS) {
+            this.gateways.unshift('http://127.0.0.1:8080/ipfs/')
+        }
     }
 
     getFromCID = async (
@@ -26,11 +30,19 @@ export class IPFSAPI {
         }
 
         const gateway = this.gateways[gatewayIndex]
-
         const base32 = new CID(cid).toV1().toString('base32')
 
+        const timeout = setTimeout(() => {
+            console.log('Local gateway timed out')
+            return this.getFromCID(cid, gatewayIndex + 1)
+        }, 3000)
+
         try {
-            const result = await fetch(`https://${base32}.${gateway}`)
+            const result =
+                process.env.LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
+                    ? await fetch(`${gateway}${cid}`)
+                    : await fetch(`https://${base32}.${gateway}`) // Otherwise try domain-based gateway
+
             const data = await result.text()
 
             const isMatch = await this.isMatchingCID(base32, data)
@@ -41,6 +53,8 @@ export class IPFSAPI {
             }
         } catch (e) {
             return this.getFromCID(cid, gatewayIndex + 1)
+        } finally {
+            clearTimeout(timeout)
         }
     }
 
