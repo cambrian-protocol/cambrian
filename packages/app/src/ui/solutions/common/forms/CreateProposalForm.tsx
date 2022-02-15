@@ -8,10 +8,10 @@ import {
 } from 'grommet'
 import React, { useState } from 'react'
 
-import { SolutionModel } from '@cambrian/app/models/SolutionModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface CreateProposalFormProps {
-    solution: SolutionModel
+    template: TemplateModel
     onSuccess: () => void
     onFailure: () => void
 }
@@ -31,7 +31,7 @@ const initialInput = {
 }
 
 const CreateProposalForm = ({
-    solution,
+    template,
     onSuccess,
     onFailure,
 }: CreateProposalFormProps) => {
@@ -67,7 +67,7 @@ const CreateProposalForm = ({
         Display CTA to view proposal via proposalId
         */
         onSuccess()
-        console.log('Create Proposal', solution, input)
+        console.log('Create Proposal', template, input)
     }
     return (
         <>

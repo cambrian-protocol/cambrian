@@ -1,4 +1,4 @@
-import { Tag, Tags } from '../models/TagModels'
+import { Tag, Tags } from '../models/TagModel'
 
 export const configs = {
     implementation: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
