@@ -21,7 +21,12 @@ export const TokenAPI = {
             erc20Contract = new ethers.Contract(
                 address,
                 new ethers.utils.Interface(ERC20_ABI),
-                ethers.getDefaultProvider()
+                process.env.LOCAL_NETWORK
+                    ? new ethers.providers.JsonRpcProvider(
+                          process.env.LOCAL_NETWORK,
+                          'mainnet'
+                      )
+                    : ethers.getDefaultProvider()
             )
         } catch (e) {
             return

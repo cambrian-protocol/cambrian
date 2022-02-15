@@ -1,7 +1,7 @@
 import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { Tag } from '@cambrian/app/models/TagModel'
+import { FlexInputs, Tag, TaggedInput } from '@cambrian/app/models/TagModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
@@ -30,15 +30,7 @@ type CreateTemplateFormType = {
     askingAmount: number
     denominationToken: string // Token address for which to calculate equivalent value
     preferredTokens: 'any' | string[]
-    awaitingInputs: {
-        [solverId: string]: {
-            [tagId: string]: TaggedInput
-        }
-    }
-}
-
-type TaggedInput = Tag & {
-    value: string | undefined
+    flexInputs: FlexInputs
 }
 
 const initialInput = {
@@ -49,7 +41,7 @@ const initialInput = {
     askingAmount: 0,
     denominationToken: '0xc778417e063141139fce010982780140aa0cd5ab', // Ropsten wETH // TODO
     preferredTokens: 'any' as 'any',
-    awaitingInputs: {},
+    flexInputs: {} as FlexInputs,
 }
 
 const CreateTemplateForm = ({
@@ -63,16 +55,15 @@ const CreateTemplateForm = ({
     >('')
     const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
         (string | undefined)[] | undefined
-    >([])
+    >()
 
     const ipfs = new IPFSAPI()
 
+    /**
+     * Initialize input.flexInputs from composition
+     */
     React.useEffect(() => {
-        console.log(input)
-    }, [input])
-
-    React.useEffect(() => {
-        const awaitingInputs = {} as {
+        const flexInputs = {} as {
             [solverId: string]: {
                 [tagId: string]: TaggedInput
             }
@@ -80,12 +71,12 @@ const CreateTemplateForm = ({
 
         composition.forEach((solver) => {
             Object.keys(solver.tags).forEach((tagId) => {
-                if (solver.tags[tagId].isAwaitingInput === true) {
-                    if (typeof awaitingInputs[solver.id] === 'undefined') {
-                        awaitingInputs[solver.id] = {}
+                if (solver.tags[tagId].isFlex === true) {
+                    if (typeof flexInputs[solver.id] === 'undefined') {
+                        flexInputs[solver.id] = {}
                     }
 
-                    awaitingInputs[solver.id][tagId] = {
+                    flexInputs[solver.id][tagId] = {
                         ...solver.tags[tagId],
                         value: undefined,
                     }
@@ -94,49 +85,48 @@ const CreateTemplateForm = ({
         })
 
         const inputs = { ...input }
-        inputs.awaitingInputs = awaitingInputs
+        inputs.flexInputs = flexInputs
         setInput(inputs)
     }, [])
 
-    const setAwaitedInputValue = (
+    const setFlexInputValue = (
         solverId: string,
         tagId: string,
         value: string | undefined
     ) => {
         const inputs: CreateTemplateFormType = { ...input }
-        inputs.awaitingInputs[solverId][tagId].value = value
-        inputs.awaitingInputs[solverId][tagId].isAwaitingInput = false
+        inputs.flexInputs[solverId][tagId].value = value
         setInput(inputs)
+        setIsFlex(solverId, tagId, !value)
     }
 
-    const setIsAwaitingInput = (
-        solverId: string,
-        tagId: string,
-        bool: boolean
-    ) => {
+    const setIsFlex = (solverId: string, tagId: string, bool: boolean) => {
         const inputs: CreateTemplateFormType = { ...input }
-        inputs.awaitingInputs[solverId][tagId].isAwaitingInput = bool
+        inputs.flexInputs[solverId][tagId].isFlex = bool
         setInput(inputs)
     }
 
-    const renderAwaitedInputs = () => {
-        return Object.keys(input.awaitingInputs).map((solverId) => {
-            return Object.keys(input.awaitingInputs[solverId]).map((tagId) => {
+    /**
+     * Render an input for any fields in a Solver where "isFlex" == true
+     * Flex inputs are provided by the template or proposal
+     * These fields may be provided by the template or left "isFlex" for the Proposal stage
+     */
+    const renderFlexInputs = () => {
+        return Object.keys(input.flexInputs).map((solverId) => {
+            return Object.keys(input.flexInputs[solverId]).map((tagId) => {
                 return (
                     <Box direction="row" key={`${solverId}-${tagId}`}>
                         <Box basis="3/4">
                             <FormField
                                 name={tagId}
                                 label={tagId}
-                                help={
-                                    input.awaitingInputs[solverId][tagId].text
-                                }
-                                type={getInputType(
+                                help={input.flexInputs[solverId][tagId].text}
+                                type={getFlexInputType(
                                     composition,
-                                    input.awaitingInputs[solverId][tagId]
+                                    input.flexInputs[solverId][tagId]
                                 )}
                                 onChange={(event) =>
-                                    setAwaitedInputValue(
+                                    setFlexInputValue(
                                         solverId,
                                         tagId,
                                         event.target.value
@@ -147,9 +137,12 @@ const CreateTemplateForm = ({
 
                         <Box align="end">
                             <CheckBox
+                                checked={
+                                    input.flexInputs[solverId][tagId].isFlex
+                                }
                                 label="Leave Unfilled"
                                 onChange={(event) =>
-                                    setIsAwaitingInput(
+                                    setIsFlex(
                                         solverId,
                                         tagId,
                                         event.target.checked
@@ -163,7 +156,7 @@ const CreateTemplateForm = ({
         })
     }
 
-    const getInputType = (composition: SolverModel[], tag: TaggedInput) => {
+    const getFlexInputType = (composition: SolverModel[], tag: TaggedInput) => {
         if (
             tag.id === 'keeper' ||
             tag.id === 'arbitrator' ||
@@ -231,19 +224,35 @@ const CreateTemplateForm = ({
         }
     }
 
+    /**
+     * Checks if "collateralToken" is flagged as isFlex
+     * If so, it should be provided.
+     * If it's not provided, the templater can SUGGEST a few tokens they would prefer
+     */
+    const isUncertainCollateral = () => {
+        let bool = false
+        Object.keys(input.flexInputs).forEach((solverId) => {
+            if (input.flexInputs[solverId]['collateralToken']?.isFlex) {
+                bool = true
+            }
+        })
+        return bool
+    }
+
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
 
         const newComposition = composition.map((x) => x)
 
+        // Update our composition with new flexInput values
         newComposition.forEach((solver: SolverModel, i: number) => {
             for (const [tagId, taggedInput] of Object.entries(
-                input.awaitingInputs[solver.id]
+                input.flexInputs[solver.id]
             )) {
                 newComposition[i].tags[tagId] = {
                     id: taggedInput.id,
                     text: taggedInput.text,
-                    isAwaitingInput: taggedInput.isAwaitingInput,
+                    isFlex: taggedInput.isFlex,
                 }
 
                 if (typeof taggedInput.value !== 'undefined') {
@@ -283,8 +292,9 @@ const CreateTemplateForm = ({
             }
         })
 
+        // Construct template object
         const template = {
-            composition: composition,
+            composition: newComposition,
             pfp: input.pfp,
             name: input.name,
             title: input.title,
@@ -296,12 +306,9 @@ const CreateTemplateForm = ({
             },
         } as TemplateModel
 
+        // Pin template to ipfs
         try {
-            /* 
-        Create template and save template data to ipfs
-        */
             const res = await ipfs.pin(template)
-            console.log(res.IpfsHash)
             onSuccess(res.IpfsHash)
             console.log('Created Template', res.IpfsHash, template, input)
         } catch (e) {
@@ -329,43 +336,48 @@ const CreateTemplateForm = ({
                 <FormField name="description" label="Description" required>
                     <TextArea name="description" rows={5} resize={false} />
                 </FormField>
-                <FormField name="price" label="Asking Price" required>
-                    <FormField
-                        name="denominationToken"
-                        label="Denomination token"
-                        help={denominationTokenSymbol || 'Contract address'}
-                        type="string"
-                        onChange={(event) =>
-                            updateDenominationTokenSymbol(event.target.value)
-                        }
-                        required
-                    />
-                    <FormField
-                        name="askingAmount"
-                        label="Amount (in the denomination token)"
-                        help="eg. 1.0042"
-                        type="number"
-                        required
-                    />
-                    <FormField
-                        name="preferredTokens"
-                        label="Preferred tokens for payment"
-                        help={
-                            Array.isArray(preferredTokenSymbols)
-                                ? preferredTokenSymbols
-                                      .map((x) => x || 'error')
-                                      .join(',')
-                                : 'Comma-seperated list of token contract addresses, or "any"'
-                        }
-                        type="string"
-                        onChange={(event) =>
-                            updatePreferredTokenSymbols(event.target.value)
-                        }
-                        required
-                    />
-                </FormField>
                 <Header>Awaiting Inputs</Header>
-                <Box gap="small">{renderAwaitedInputs()}</Box>
+                <Box gap="small">{renderFlexInputs()}</Box>
+                <Box gap="small">
+                    <FormField name="price" label="Asking Price">
+                        <FormField
+                            name="denominationToken"
+                            label="Denomination token"
+                            help={denominationTokenSymbol || 'Contract address'}
+                            type="string"
+                            onChange={(event) =>
+                                updateDenominationTokenSymbol(
+                                    event.target.value
+                                )
+                            }
+                        />
+                        <FormField
+                            name="askingAmount"
+                            label="Amount (in the denomination token)"
+                            help="eg. 1.0042"
+                            type="number"
+                        />
+                        {isUncertainCollateral() && (
+                            <FormField
+                                name="preferredTokens"
+                                label="Preferred tokens for payment"
+                                help={
+                                    Array.isArray(preferredTokenSymbols)
+                                        ? preferredTokenSymbols
+                                              .map((x) => x || 'error')
+                                              .join(',')
+                                        : 'Comma-seperated list of token contract addresses, or "any"'
+                                }
+                                type="string"
+                                onChange={(event) =>
+                                    updatePreferredTokenSymbols(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        )}
+                    </FormField>
+                </Box>
                 <Box pad={{ top: 'medium' }}>
                     <Button primary type="submit" label="Create Template" />
                 </Box>
