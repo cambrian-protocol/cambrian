@@ -8,54 +8,39 @@ export class IPFSAPI {
     gateways: string[]
 
     constructor() {
-        this.gateways = process.env.LOCAL_IPFS
-            ? ['ipfs://']
-            : [
-                  'ipfs.dweb.link',
-                  'ipfs.infura-ipfs.io',
-                  // 'ipfs.fleek.co',
-                  // 'infura-ipfs.io',
-                  // 'gateway.pinata.cloud',
-              ]
-
-        if (process.env.LOCAL_IPFS) {
-            console.log('Using local IPFS')
-        } else {
-            console.log('Using remote ipfs')
-        }
+        this.gateways = [
+            'ipfs.dweb.link',
+            'ipfs.infura-ipfs.io',
+            // 'ipfs.fleek.co',
+            // 'infura-ipfs.io',
+            // 'gateway.pinata.cloud',
+        ]
     }
 
     getFromCID = async (
         cid: string,
-        gatewayIndex?: number
+        gatewayIndex = 0
     ): Promise<string | undefined> => {
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
 
-        const gateIdx = gatewayIndex || 0
-        const gateway = this.gateways[gateIdx]
+        const gateway = this.gateways[gatewayIndex]
 
         const base32 = new CID(cid).toV1().toString('base32')
 
         try {
-            // const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
-            //     (r) => r.text()
-            // )
-            const result = process.env.LOCAL_IPFS
-                ? await fetch(`${gateway}${cid}`)
-                : await fetch(`https://${base32}.${gateway}`)
-
+            const result = await fetch(`https://${base32}.${gateway}`)
             const data = await result.text()
 
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
                 return data
             } else {
-                return this.getFromCID(cid, gateIdx + 1)
+                return this.getFromCID(cid, gatewayIndex + 1)
             }
         } catch (e) {
-            return this.getFromCID(cid, gateIdx + 1)
+            return this.getFromCID(cid, gatewayIndex + 1)
         }
     }
 

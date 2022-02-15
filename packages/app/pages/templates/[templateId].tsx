@@ -35,6 +35,7 @@ export default function TemplatePage() {
             if (templateId) {
                 const template = await ipfs.getFromCID(templateId)
                 if (template) {
+                    console.log('Loaded template: ', JSON.parse(template))
                     setCurrentTemplate(JSON.parse(template))
                 }
             }
