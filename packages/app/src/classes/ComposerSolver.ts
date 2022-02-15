@@ -27,7 +27,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
-import { Tags } from '../models/TagModels'
+import { Tags } from '../models/TagModel'
 
 export default class ComposerSolver {
     id: string

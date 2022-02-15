@@ -8,7 +8,7 @@ export class IPFSAPI {
     gateways: string[]
 
     constructor() {
-        this.gateways = process.env['local']
+        this.gateways = process.env.LOCAL_IPFS
             ? ['ipfs://']
             : [
                   'ipfs.dweb.link',
@@ -17,6 +17,12 @@ export class IPFSAPI {
                   // 'infura-ipfs.io',
                   // 'gateway.pinata.cloud',
               ]
+
+        if (process.env.LOCAL_IPFS) {
+            console.log('Using local IPFS')
+        } else {
+            console.log('Using remote ipfs')
+        }
     }
 
     getFromCID = async (
@@ -36,9 +42,9 @@ export class IPFSAPI {
             // const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
             //     (r) => r.text()
             // )
-            const result = process.env.local
+            const result = process.env.LOCAL_IPFS
                 ? await fetch(`${gateway}${cid}`)
-                : await fetch(`https://${cid}.${gateway}`)
+                : await fetch(`https://${base32}.${gateway}`)
 
             const data = await result.text()
 
@@ -69,7 +75,7 @@ export class IPFSAPI {
     }
 
     pin = async (data: object) => {
-        const endpoint = process.env['local']
+        const endpoint = process.env.LOCAL_IPFS
             ? LOCAL_PIN_ENDPOINT
             : PIN_ENDPOINT
 
