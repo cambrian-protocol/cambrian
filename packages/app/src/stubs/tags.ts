@@ -145,91 +145,91 @@ export const tags = <Tags>{
     keeper: {
         id: 'keeper',
         text: 'The Keeper is responsible for selecting the Writer, executing & reporting the outcome of this solve.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     arbitrator: {
         id: 'arbitrator',
         text: 'This Solver has no arbitrator.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     data: {
         id: 'data',
         text: 'This solver takes no data field',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     collateralToken: {
         id: 'collateralToken',
         text: 'ERC20 token being used as payment.',
-        isAwaitingInput: true,
+        isFlex: true,
     },
 
     timelockSeconds: {
         id: 'timelockSeconds',
         text: 'The number of seconds which must pass between proposing and confirming outcome results without dispute.',
-        isAwaitingInput: true,
+        isFlex: true,
     },
 
     '01FSP76J4J37AQM1WRZDY85CY3': {
         id: '01FSP76J4J37AQM1WRZDY85CY3',
         text: '0% (0 basis points). Used in allocations.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP76J4J9N3905P6M7JQFBD2': {
         id: '01FSP76J4J9N3905P6M7JQFBD2',
         text: '100% (10000 basis points). Used to specify all of the collateral in the Solver should be allocated.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP77T8YCZ3TK50BMB6NCC5W': {
         id: '01FSP77T8YCZ3TK50BMB6NCC5W',
         text: 'Contains the address of the Keeper for receiving payment.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP78E4KMM5HEQB09BD8T253': {
         id: '01FSP78E4KMM5HEQB09BD8T253',
         text: 'To contain the address of the specified Writer. Must be added by the Keeper before solve can be executed.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP79JH6NFA733XX2DB5W5YT': {
         id: '01FSP79JH6NFA733XX2DB5W5YT',
         text: 'Contains the address of the BanklessDAO treasury for receiving payment.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP7A5ZZEXTNAMK5D8MHY93F': {
         id: '01FSP7A5ZZEXTNAMK5D8MHY93F',
         text: 'Contains the address of the Cambrian treasury for receiving payment.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP7AJHMVFKHKTTCVX5MVCA7': {
         id: '01FSP7AJHMVFKHKTTCVX5MVCA7',
         text: 'Contains the address of the Buyer for receiving refunds.',
-        isAwaitingInput: true,
+        isFlex: true,
     },
 
     '01FSP93R1E6ZV9QAB66PPDFDE3': {
         id: '01FSP93R1E6ZV9QAB66PPDFDE3',
         text: '90% (9000 basis points). Used in allocations.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP971A4PH6PSEC6SDHYB3R0': {
         id: '01FSP971A4PH6PSEC6SDHYB3R0',
         text: '4% (400 basis points). Used in allocations.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 
     '01FSP97S7T6S6E98BZ7FQJJY20': {
         id: '01FSP97S7T6S6E98BZ7FQJJY20',
         text: '2% (200 basis points). Used in allocations.',
-        isAwaitingInput: false,
+        isFlex: false,
     },
 }
 

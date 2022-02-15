@@ -1,4 +1,5 @@
 import { SolverModel } from './SolverModel'
+import { FlexInputs } from './TagModel'
 
 export type TemplateModel = {
     pfp: string
@@ -6,4 +7,9 @@ export type TemplateModel = {
     title: string
     description: string
     composition: SolverModel[]
+    price?: {
+        amount: number
+        denominationToken: string
+        preferredTokens?: 'any' | string[]
+    }
 }
