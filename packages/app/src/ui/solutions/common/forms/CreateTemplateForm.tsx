@@ -1,7 +1,8 @@
 import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { Tag, Tags, TemplateMetadata } from '@cambrian/app/models/TagModels'
+import { Tag } from '@cambrian/app/models/TagModels'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { CheckBox, Header } from 'grommet'
@@ -283,7 +284,7 @@ const CreateTemplateForm = ({
         })
 
         const template = {
-            composition: newComposition,
+            composition: composition,
             pfp: input.pfp,
             name: input.name,
             title: input.title,
@@ -293,7 +294,7 @@ const CreateTemplateForm = ({
                 denominationToken: input.denominationToken,
                 preferredTokens: input.preferredTokens,
             },
-        } as TemplateMetadata
+        } as TemplateModel
 
         try {
             /* 
@@ -334,7 +335,6 @@ const CreateTemplateForm = ({
                         label="Denomination token"
                         help={denominationTokenSymbol || 'Contract address'}
                         type="string"
-                        validate={validate}
                         onChange={(event) =>
                             updateDenominationTokenSymbol(event.target.value)
                         }

@@ -6,7 +6,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "test": "jest"
+        "test": "jest",
+        "dev-local": "set NODE_ENV=local& next dev"
     },
     "dependencies": {
         "@babel/core": "7.0.0",
