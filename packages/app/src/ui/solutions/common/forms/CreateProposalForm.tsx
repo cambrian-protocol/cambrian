@@ -195,7 +195,6 @@ const CreateProposalForm = ({
     /**
      * Checks if "collateralToken" is flagged as isFlex
      * If so, it should be provided.
-     * If it's not provided, the templater can SUGGEST a few tokens they would prefer
      */
     const isUncertainCollateral = () => {
         let bool = false
