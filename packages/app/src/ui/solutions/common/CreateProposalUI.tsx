@@ -7,6 +7,8 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import Link from 'next/link'
 import ParticipantAvatar from '@cambrian/app/components/avatars/AvatarWithTitle'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
+import { useRouter } from 'next/router'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface CreateProposalUIProps {
     solution: SolutionModel
@@ -18,6 +20,9 @@ const createdProposalId = '9187491875'
 const CreateProposalUI = ({ solution }: CreateProposalUIProps) => {
     const [showSuccess, setShowSuccess] = useState(false)
     const [showFailure, setShowFailure] = useState(false)
+    const [currentTemplate, setCurrentTemplate] = useState<TemplateModel>()
+    const router = useRouter()
+    const { templateId } = router.query
 
     return (
         <>
@@ -40,7 +45,7 @@ const CreateProposalUI = ({ solution }: CreateProposalUIProps) => {
                     />
                     <Box fill>
                         <CreateProposalForm
-                            solution={solution}
+                            template={template}
                             onSuccess={() => setShowSuccess(true)}
                             onFailure={() => setShowFailure(true)}
                         />

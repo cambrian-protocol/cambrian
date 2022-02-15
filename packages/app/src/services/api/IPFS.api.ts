@@ -1,4 +1,4 @@
-import { PIN_ENDPOINT } from '@cambrian/app/constants'
+import { LOCAL_PIN_ENDPOINT, PIN_ENDPOINT } from '@cambrian/app/constants'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import fetch from 'node-fetch'
 const Hash = require('ipfs-only-hash')
@@ -8,13 +8,15 @@ export class IPFSAPI {
     gateways: string[]
 
     constructor() {
-        this.gateways = [
-            'ipfs.dweb.link',
-            'ipfs.infura-ipfs.io',
-            // 'ipfs.fleek.co',
-            // 'infura-ipfs.io',
-            // 'gateway.pinata.cloud',
-        ]
+        this.gateways = process.env['local']
+            ? ['ipfs://']
+            : [
+                  'ipfs.dweb.link',
+                  'ipfs.infura-ipfs.io',
+                  // 'ipfs.fleek.co',
+                  // 'infura-ipfs.io',
+                  // 'gateway.pinata.cloud',
+              ]
     }
 
     getFromCID = async (
@@ -34,12 +36,15 @@ export class IPFSAPI {
             // const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
             //     (r) => r.text()
             // )
-            const result = await fetch(`https://${cid}.${gateway}`).then((r) =>
-                r.text()
-            )
-            const isMatch = await this.isMatchingCID(base32, result)
+            const result = process.env.local
+                ? await fetch(`${gateway}${cid}`)
+                : await fetch(`https://${cid}.${gateway}`)
+
+            const data = await result.text()
+
+            const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
-                return result
+                return data
             } else {
                 return this.getFromCID(cid, gateIdx + 1)
             }
@@ -64,8 +69,12 @@ export class IPFSAPI {
     }
 
     pin = async (data: object) => {
+        const endpoint = process.env['local']
+            ? LOCAL_PIN_ENDPOINT
+            : PIN_ENDPOINT
+
         try {
-            const res = await fetch(PIN_ENDPOINT, {
+            const res = await fetch(endpoint, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
