@@ -44,7 +44,7 @@ const CreateProposalForm = ({
 }: CreateProposalFormProps) => {
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [preferredTokensString, setPreferredTokensString] = useState('')
-    const [askingPriceString, setAskingPriceString] = useState('')
+    const [suggestedPriceString, setSuggestedPriceString] = useState('')
 
     const ipfs = new IPFSAPI()
 
@@ -58,30 +58,29 @@ const CreateProposalForm = ({
             }
         }
 
-        console.log(template.composition)
+        template.composition.forEach((solver) => {
+            Object.keys(solver.tags).forEach((tagId) => {
+                if (solver.tags[tagId].isFlex === true) {
+                    if (typeof flexInputs[solver.id] === 'undefined') {
+                        flexInputs[solver.id] = {}
+                    }
 
-        // template.composition.forEach((solver) => {
-        //     Object.keys(solver.tags).forEach((tagId) => {
-        //         if (solver.tags[tagId].isFlex === true) {
-        //             if (typeof flexInputs[solver.id] === 'undefined') {
-        //                 flexInputs[solver.id] = {}
-        //             }
+                    flexInputs[solver.id][tagId] = {
+                        ...solver.tags[tagId],
+                        value: undefined,
+                    }
+                }
+            })
+        })
 
-        //             flexInputs[solver.id][tagId] = {
-        //                 ...solver.tags[tagId],
-        //                 value: undefined,
-        //             }
-        //         }
-        //     })
-        // })
-
-        // const inputs = { ...input }
-        // inputs.flexInputs = flexInputs
-        // setInput(inputs)
+        const inputs = { ...input }
+        inputs.flexInputs = flexInputs
+        setInput(inputs)
     }, [])
 
     useEffect(() => {
         getPreferredTokensString()
+        getSuggestedPriceString()
     }, [])
 
     const getPreferredTokensString = async () => {
@@ -114,11 +113,11 @@ const CreateProposalForm = ({
             const tokenSymbol = tokenResponse?.symbol
 
             if (tokenSymbol) {
-                setAskingPriceString(
-                    `Asking Price: ${template.price.amount} ${tokenSymbol}`
+                setSuggestedPriceString(
+                    `Asking Price: ${template.price.amount} ${tokenSymbol} Equivalent`
                 )
             } else {
-                setAskingPriceString('')
+                setSuggestedPriceString('')
             }
         } else {
             setPreferredTokensString('')
@@ -160,6 +159,7 @@ const CreateProposalForm = ({
                                         event.target.value
                                     )
                                 }
+                                required
                             />
                         </Box>
                     </Box>
@@ -252,13 +252,14 @@ const CreateProposalForm = ({
                 <FormField name="description" label="Description" required>
                     <TextArea name="description" rows={5} resize={false} />
                 </FormField>
+                <Box>{renderFlexInputs()}</Box>
                 <Box direction="row" gap="small">
                     <Box width={{ max: 'medium' }}>
                         <FormField
                             name="price"
                             label="Price"
                             type="number"
-                            help={`${askingPriceString}`}
+                            help={`${suggestedPriceString}`}
                             required
                         />
                     </Box>
@@ -274,8 +275,12 @@ const CreateProposalForm = ({
                             <FormField
                                 name="tokenAddress"
                                 label="Payment Token address"
-                                help={`${preferredTokensString}`}
-                                required
+                                value={
+                                    template.composition[0].config[
+                                        'collateralToken'
+                                    ]
+                                }
+                                disabled
                             />
                         )}
                     </Box>

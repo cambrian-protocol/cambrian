@@ -95,6 +95,7 @@ const CreateTemplateForm = ({
         value: string | undefined
     ) => {
         const inputs: CreateTemplateFormType = { ...input }
+        console.log(value)
         inputs.flexInputs[solverId][tagId].value = value
         setInput(inputs)
         setIsFlex(solverId, tagId, !value)
