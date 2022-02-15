@@ -24,7 +24,7 @@ export class IPFSAPI {
     getFromCID = async (
         cid: string,
         gatewayIndex = 0
-    ): Promise<string | undefined> => {
+    ): Promise<Object | undefined> => {
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
@@ -38,16 +38,15 @@ export class IPFSAPI {
         }, 3000)
 
         try {
-            const result =
+            const response =
                 process.env.LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
                     ? await fetch(`${gateway}${cid}`)
                     : await fetch(`https://${base32}.${gateway}`) // Otherwise try domain-based gateway
 
-            const data = await result.text()
-
+            const data = await response.text()
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
-                return data
+                return this.tryParseJson(data)
             } else {
                 return this.getFromCID(cid, gatewayIndex + 1)
             }
@@ -56,6 +55,16 @@ export class IPFSAPI {
         } finally {
             clearTimeout(timeout)
         }
+    }
+
+    tryParseJson = (str: string): object => {
+        let o
+        try {
+            o = JSON.parse(JSON.parse(str))
+        } catch (e) {
+            o = JSON.parse(str)
+        }
+        return o
     }
 
     isMatchingCID = async (expected: string, data: any): Promise<boolean> => {

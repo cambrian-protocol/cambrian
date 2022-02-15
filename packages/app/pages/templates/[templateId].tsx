@@ -33,10 +33,12 @@ export default function TemplatePage() {
         try {
             const templateId = router.query.templateId as string
             if (templateId) {
-                const template = await ipfs.getFromCID(templateId)
+                const template = (await ipfs.getFromCID(
+                    templateId
+                )) as TemplateModel
                 if (template) {
-                    console.log('Loaded template: ', JSON.parse(template))
-                    setCurrentTemplate(JSON.parse(template))
+                    console.log('Loaded template: ', template)
+                    setCurrentTemplate(template)
                 }
             }
         } catch (e) {

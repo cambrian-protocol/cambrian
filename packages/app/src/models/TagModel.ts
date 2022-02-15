@@ -5,5 +5,15 @@ export type Tags = {
 export type Tag = {
     id: string
     text: string
-    isAwaitingInput: boolean
+    isFlex?: boolean
+}
+
+export type TaggedInput = Tag & {
+    value: string | undefined
+}
+
+export type FlexInputs = {
+    [solverId: string]: {
+        [tagId: string]: TaggedInput
+    }
 }
