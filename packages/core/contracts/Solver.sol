@@ -154,10 +154,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             chainParent,
             config.conditionBase,
             conditions[_index],
-            abi.decode(datas.slots[config.conditionBase.amountSlot], (uint256))
+            abi.decode(
+                datas.slots[config.conditionBase.amountSlot][_index],
+                (uint256)
+            )
         );
 
         SolverLib.allocatePartition(
+            _index,
             ctfAddress,
             conditions[_index],
             config.conditionBase,
@@ -192,11 +196,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
      */
     function router(bytes32 _slot, bytes memory _data) private {
         require(
-            datas.slotVersions[_slot] == (conditions.length - 1),
+            datas.slots[_slot].length == (conditions.length - 1),
             "Slot version invalid"
         );
-        datas.slotVersions[_slot]++;
-        datas.slots[_slot] = _data;
+        datas.slots[_slot].push(_data);
 
         callback(_slot);
     }
@@ -262,6 +265,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     function getData(bytes32 _slot) public view returns (bytes memory data) {
+        data = datas.slots[_slot][datas.slots[_slot].length - 1];
+    }
+
+    function getAllData(bytes32 _slot)
+        public
+        view
+        returns (bytes[] memory data)
+    {
         data = datas.slots[_slot];
     }
 
@@ -302,8 +313,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
 
         if (
-            datas.slotVersions[_slot] > 0 &&
-            datas.slotVersions[_slot] == conditions.length
+            datas.slots[_slot].length > 0 &&
+            datas.slots[_slot].length == conditions.length
         ) {
             // Downchain Solver is preparing a new condition before us and is happy with the existing data
             ISolver(msg.sender).handleCallback(_slot);
@@ -375,11 +386,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         returns (bytes memory data)
     {
         require(
-            datas.slotVersions[_slot] == conditions.length,
+            datas.slots[_slot].length == conditions.length,
             "Slot invalid ver."
         );
 
-        data = datas.slots[_slot];
+        data = datas.slots[_slot][datas.slots[_slot].length - 1];
     }
 
     function getOutgoingCallbacks(bytes32 slot)
