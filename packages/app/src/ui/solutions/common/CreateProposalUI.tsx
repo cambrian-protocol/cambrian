@@ -41,6 +41,7 @@ const CreateProposalUI = ({ template }: CreateProposalUIProps) => {
                     <Box fill>
                         <CreateProposalForm
                             template={template}
+                            templateId={templateId}
                             onSuccess={() => setShowSuccess(true)}
                             onFailure={() => setShowFailure(true)}
                         />
