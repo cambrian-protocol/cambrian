@@ -65,8 +65,7 @@ library SolverLib {
     }
 
     struct Datas {
-        mapping(bytes32 => bytes) slots;
-        mapping(bytes32 => uint256) slotVersions;
+        mapping(bytes32 => bytes[]) slots;
         mapping(bytes32 => uint256) slotIngestIdx;
     }
 
@@ -265,9 +264,9 @@ library SolverLib {
 
         for (uint256 i = 0; i < conditionBase.allocations.length; i++) {
             if (
-                datas.slotVersions[
-                    conditionBase.allocations[i].recipientAddressSlot
-                ] != (conditionVer + 1)
+                datas
+                    .slots[conditionBase.allocations[i].recipientAddressSlot]
+                    .length != (conditionVer + 1)
             ) {
                 valid = false;
             }
@@ -275,6 +274,7 @@ library SolverLib {
     }
 
     function allocatePartition(
+        uint256 conditionVer,
         address ctfAddress,
         Condition calldata condition,
         ConditionBase calldata base,
@@ -309,7 +309,9 @@ library SolverLib {
                 j++
             ) {
                 uint256 _pctValue = abi.decode(
-                    data.slots[base.allocations[i].recipientAmountSlots[j]],
+                    data.slots[base.allocations[i].recipientAmountSlots[j]][
+                        conditionVer
+                    ],
                     (uint256)
                 );
                 if (_pctValue == 0) {
@@ -322,7 +324,9 @@ library SolverLib {
             IConditionalTokens(ctfAddress).safeBatchTransferFrom(
                 address(this),
                 abi.decode(
-                    data.slots[base.allocations[i].recipientAddressSlot],
+                    data.slots[base.allocations[i].recipientAddressSlot][
+                        conditionVer
+                    ],
                     (address)
                 ),
                 _tokens,
