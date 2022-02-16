@@ -532,6 +532,25 @@
           "type": "bytes32"
         }
       ],
+      "name": "getAllData",
+      "outputs": [
+        {
+          "internalType": "bytes[]",
+          "name": "data",
+          "type": "bytes[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "_slot",
+          "type": "bytes32"
+        }
+      ],
       "name": "getCallbackOutput",
       "outputs": [
         {
