@@ -98,7 +98,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const onLogin = async () => {
         try {
-            const provider = await requestWalletConnectProvider()
+            const provider = process.env.LOCAL_NETWORK
+                ? new ethers.providers.Web3Provider({ isMetaMask: true })
+                : await requestMetaMaskProvider()
+
             if (provider) {
                 const signer = provider.getSigner()
                 const address = await signer.getAddress()

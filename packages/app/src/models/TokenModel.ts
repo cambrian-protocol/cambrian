@@ -1,5 +1,7 @@
 export type TokenModel = {
-    tokenName: string
-    tokenSymbol: string
     address: string
+    decimals?: number
+    name?: string
+    symbol?: string
+    totalSupply: number
 }
