@@ -2,7 +2,10 @@ import { ethers } from 'ethers'
 import _ from 'lodash'
 
 // Types
-import { ParsedSolverModel } from '@cambrian/app/models/SolverModel'
+import {
+    ParsedSolverModel,
+    SolverModel,
+} from '@cambrian/app/models/SolverModel'
 import {
     ConditionModel,
     ParsedAllocationModel,
@@ -18,12 +21,10 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 
-import Solver from '@cambrian/app/classes/Solver'
+export function parseSolvers(composition: SolverModel[]) {
+    const sortedSolvers = getSolverHierarchy(composition[0], composition)
 
-export function parseSolvers(graphSolvers: Solver[]) {
-    const sortedSolvers = getSolverHierarchy(graphSolvers[0], graphSolvers)
-
-    if (graphSolvers.length !== sortedSolvers.length) {
+    if (composition.length !== sortedSolvers.length) {
         console.error(
             'Error building hierarchy of Solvers. Is every Solver connected?'
         ) // Todo error context?
@@ -38,9 +39,9 @@ export function parseSolvers(graphSolvers: Solver[]) {
 }
 
 export function parseSolver(
-    graphSolver: Solver,
+    graphSolver: SolverModel,
     currentSolverIndex: number,
-    sortedSolvers: Solver[]
+    sortedSolvers: SolverModel[]
 ): ParsedSolverModel {
     const ingests = Object.keys(graphSolver.config.slots).map((slotId) =>
         parseSlot(graphSolver.config.slots[slotId], sortedSolvers)
@@ -78,7 +79,7 @@ export function parseSolver(
 
 export function parseSlot(
     inSlot: SlotModel,
-    sortedSolvers: Solver[]
+    sortedSolvers: SolverModel[]
 ): ParsedSlotModel {
     const outSlot = <ParsedSlotModel>{
         executions: 0,
@@ -161,7 +162,7 @@ export function parseSlot(
 export function parseCondition(
     inCondition: ConditionModel,
     currentSolverIndex: number,
-    sortedSolvers: Solver[]
+    sortedSolvers: SolverModel[]
 ): ParsedConditionModel {
     const outCondition = <ParsedConditionModel>{}
 

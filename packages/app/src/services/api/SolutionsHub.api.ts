@@ -14,13 +14,12 @@ export type SolutionResponseType = {
 
 export const SolutionsHubAPI = {
     getSolutionFromSolutionId: async (
-        solutionId: string,
-        provider: ethers.providers.Web3Provider
+        solutionId: string
     ): Promise<SolutionResponseType> => {
         const solutionsHubContract = new ethers.Contract(
             '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
             new ethers.utils.Interface(IPFSSOLUTIONSHUB_ABI),
-            provider
+            ethers.getDefaultProvider()
         )
 
         const solution = await solutionsHubContract.solutions(solutionId)
@@ -28,7 +27,7 @@ export const SolutionsHubAPI = {
         const erc20Contract = new ethers.Contract(
             solution.collateralToken,
             new ethers.utils.Interface(ERC20_ABI),
-            provider
+            ethers.getDefaultProvider()
         )
 
         const collateralToken = <TokenModel>{

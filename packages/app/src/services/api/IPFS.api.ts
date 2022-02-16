@@ -1,3 +1,4 @@
+import { LOCAL_PIN_ENDPOINT, PIN_ENDPOINT } from '@cambrian/app/constants'
 import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import fetch from 'node-fetch'
 const Hash = require('ipfs-only-hash')
@@ -14,37 +15,56 @@ export class IPFSAPI {
             // 'infura-ipfs.io',
             // 'gateway.pinata.cloud',
         ]
+
+        if (process.env.LOCAL_IPFS) {
+            this.gateways.unshift(process.env.LOCAL_IPFS)
+        }
     }
 
     getFromCID = async (
         cid: string,
-        gatewayIndex?: number
-    ): Promise<string | undefined> => {
+        gatewayIndex = 0
+    ): Promise<Object | undefined> => {
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
 
-        const gateIdx = gatewayIndex || 0
-        const gateway = this.gateways[gateIdx]
-
+        const gateway = this.gateways[gatewayIndex]
         const base32 = new CID(cid).toV1().toString('base32')
 
+        const timeout = setTimeout(() => {
+            console.log('Local gateway timed out')
+            return this.getFromCID(cid, gatewayIndex + 1)
+        }, 3000)
+
         try {
-            // const result = await fetch(`https://${gateway}/ipfs/${cid}`).then(
-            //     (r) => r.text()
-            // )
-            const result = await fetch(`https://${cid}.${gateway}`).then((r) =>
-                r.text()
-            )
-            const isMatch = await this.isMatchingCID(base32, result)
+            const response =
+                process.env.LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
+                    ? await fetch(`${gateway}${cid}`)
+                    : await fetch(`https://${base32}.${gateway}`) // Otherwise try domain-based gateway
+
+            const data = await response.text()
+            const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
-                return result
+                return this.tryParseJson(data)
             } else {
-                return this.getFromCID(cid, gateIdx + 1)
+                return this.getFromCID(cid, gatewayIndex + 1)
             }
         } catch (e) {
-            return this.getFromCID(cid, gateIdx + 1)
+            return this.getFromCID(cid, gatewayIndex + 1)
+        } finally {
+            clearTimeout(timeout)
         }
+    }
+
+    tryParseJson = (str: string): object => {
+        let o
+        try {
+            o = JSON.parse(JSON.parse(str))
+        } catch (e) {
+            o = JSON.parse(str)
+        }
+        return o
     }
 
     isMatchingCID = async (expected: string, data: any): Promise<boolean> => {
@@ -59,6 +79,27 @@ export class IPFSAPI {
         } catch (e) {
             console.log(e)
             return false
+        }
+    }
+
+    pin = async (data: object) => {
+        const endpoint = process.env.LOCAL_IPFS
+            ? LOCAL_PIN_ENDPOINT
+            : PIN_ENDPOINT
+
+        try {
+            const res = await fetch(endpoint, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+
+            return res.json()
+        } catch (e) {
+            console.log(e)
         }
     }
 }
