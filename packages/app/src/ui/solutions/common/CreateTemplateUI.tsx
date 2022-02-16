@@ -16,6 +16,14 @@ interface CreateTemplateUIProps {
 const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {
     const [showSuccess, setShowSuccess] = useState(false)
     const [showFailure, setShowFailure] = useState(false)
+    const [createdTemplateId, setCreatedTemplateId] = useState<string | null>(
+        null
+    )
+
+    const onSuccess = (createdTemplateId: string) => {
+        setCreatedTemplateId(createdTemplateId)
+        setShowSuccess(true)
+    }
 
     return (
         <>
@@ -29,7 +37,7 @@ const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {
                     <Box fill>
                         <CreateTemplateForm
                             composition={composition}
-                            onSuccess={() => setShowSuccess(true)}
+                            onSuccess={(cid: string) => onSuccess(cid)}
                             onFailure={() => setShowFailure(true)}
                         />
                     </Box>
@@ -43,10 +51,10 @@ const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {
                         paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
                     />
                     <Box fill>
-                        <Link href={`/proposals/${createdProposalId}`}>
+                        <Link href={`/templates/${createdTemplateId}`}>
                             <a>
                                 <Button
-                                    label="View Proposal"
+                                    label="View Template"
                                     primary
                                     icon={<ClipboardText size="24" />}
                                 />

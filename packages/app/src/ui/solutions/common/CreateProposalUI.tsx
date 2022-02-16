@@ -7,17 +7,18 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import Link from 'next/link'
 import ParticipantAvatar from '@cambrian/app/components/avatars/AvatarWithTitle'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
+import { useRouter } from 'next/router'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 
 interface CreateProposalUIProps {
-    solution: SolutionModel
+    template: TemplateModel
 }
 
-// TODO get freshly created proposalID
-const createdProposalId = '9187491875'
-
-const CreateProposalUI = ({ solution }: CreateProposalUIProps) => {
+const CreateProposalUI = ({ template }: CreateProposalUIProps) => {
     const [showSuccess, setShowSuccess] = useState(false)
     const [showFailure, setShowFailure] = useState(false)
+    const [createdProposalId, setCreatedProposalId] = useState('')
 
     return (
         <>
@@ -29,9 +30,8 @@ const CreateProposalUI = ({ solution }: CreateProposalUIProps) => {
                         paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
                     />
                     <ParticipantAvatar
-                        title={solution.seller.name}
-                        pfpPath={solution.seller.pfp}
-                        icon={solution.seller.icon}
+                        title={template.name}
+                        pfpPath={template.pfp}
                         role="Seller"
                     />
                     <HeaderTextSection
@@ -40,7 +40,8 @@ const CreateProposalUI = ({ solution }: CreateProposalUIProps) => {
                     />
                     <Box fill>
                         <CreateProposalForm
-                            solution={solution}
+                            template={template}
+                            templateId={templateId}
                             onSuccess={() => setShowSuccess(true)}
                             onFailure={() => setShowFailure(true)}
                         />

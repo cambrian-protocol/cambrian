@@ -2,7 +2,7 @@ import { ConditionModel, ParsedConditionModel } from './ConditionModel'
 
 import { ParsedSlotModel, SlotModel } from './SlotModel'
 import { ethers } from 'ethers'
-import { Tag, Tags } from './TagModels'
+import { Tag, Tags } from './TagModel'
 
 /**
  * Solution Composer
