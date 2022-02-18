@@ -5,11 +5,12 @@ import RecipientAllocationItem from '../list/RecipientAllocationItem'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
+    allocations: { address: string; amount: string }[]
 }
 
-// TODO Map recipients and allocations
 const RecipientAllocationModal = ({
     onClose,
+    allocations,
 }: RecipientAllocationModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
@@ -19,29 +20,13 @@ const RecipientAllocationModal = ({
                 paragraph={'Lorem Ipsum'}
             />
             <Box gap="medium" fill>
-                <RecipientAllocationItem
-                    role="Keeper"
-                    title="Henso.eth"
-                    subTitle="0x90187450198501785"
-                    amount="10"
-                />
-                <RecipientAllocationItem
-                    role="Arbitrator"
-                    title="Joe.eth"
-                    subTitle="0x90187450198501785"
-                    amount="10"
-                />
-                <RecipientAllocationItem
-                    role="Others"
-                    title="Jon.eth"
-                    subTitle="0x90187450198501785"
-                    amount="10"
-                />
-                <RecipientAllocationItem
-                    title="whoever.eth"
-                    subTitle="0x90187450198501785"
-                    amount="10"
-                />
+                {allocations.map((allocation, idx) => (
+                    <RecipientAllocationItem
+                        key={idx}
+                        title={allocation.address}
+                        amount={allocation.amount}
+                    />
+                ))}
             </Box>
         </BaseLayerModal>
     )

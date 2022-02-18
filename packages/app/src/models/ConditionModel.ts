@@ -1,5 +1,6 @@
 import { SlotModel, SlotPath } from './SlotModel'
 
+import { BigNumber } from 'ethers'
 import { IdPathType } from './SolverModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
@@ -56,4 +57,17 @@ export type ParsedConditionModel = {
 export type ParsedAllocationModel = {
     recipientAddressSlot: string
     recipientAmountSlots: string[]
+}
+
+/* 
+    Contract responses with BigNumbers
+*/
+export type ConditionResponseType = {
+    collateralToken: string
+    outcomeSlots: number
+    parentCollectionIndexSet: number
+    amountSlot: string
+    partition: BigNumber[]
+    allocations: ParsedAllocationModel[]
+    outcomeURIs: Multihash[]
 }

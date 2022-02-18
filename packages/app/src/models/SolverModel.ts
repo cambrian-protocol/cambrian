@@ -1,8 +1,12 @@
-import { ConditionModel, ParsedConditionModel } from './ConditionModel'
-
-import { ParsedSlotModel, SlotModel } from './SlotModel'
-import { ethers } from 'ethers'
+import {
+    ConditionModel,
+    ConditionResponseType,
+    ParsedConditionModel,
+} from './ConditionModel'
+import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
+
+import { ethers } from 'ethers'
 
 /**
  * Solution Composer
@@ -53,7 +57,7 @@ export type ParsedSolverModel = {
  * Contract-interaction Solver Component
  **/
 
-export type SolverComponentConfig = {
+export type SolverContractConfigModel = {
     implementation: string
     keeper: string
     arbitrator: string
@@ -63,9 +67,10 @@ export type SolverComponentConfig = {
     conditionBase: ParsedConditionModel
 }
 
-export type SolverComponentOC = {
-    indexSet: number
-    outcomes: JSON[]
+export type IPFSOutcomeModel = {
+    title: string
+    description: string
+    context: string
 }
 
 export enum ConditionStatus {
@@ -78,7 +83,41 @@ export enum ConditionStatus {
     OutcomeReported,
 }
 
-export type SolverComponentCondition = {
+export type SolverContractData = {
+    config: SolverContractConfigModel
+    conditions: SolverContractCondition[]
+    outcomeCollections: SolverComponentOC[]
+    allocationsHistory: SolverContractAllocationsHistoryType
+    slotsHistory: SlotsHistoryHashMapType
+    timelocksHistory: TimeLocksHashMap
+}
+
+export type SolverComponentOC = {
+    indexSet: number
+    outcomes: IPFSOutcomeModel[]
+}
+
+export type TimeLocksHashMap = {
+    [conditionId: string]: number
+}
+
+export type SlotsHistoryHashMapType = {
+    [conditionId: string]: SlotsHashMapType
+}
+
+export type SlotsHashMapType = { [slot: string]: ParsedSlotModel }
+
+export type SolverContractAllocationsHistoryType = {
+    [conditionId: string]: SolverContractAllocationsType
+}
+
+export type SolverContractAllocationsType = {
+    address: string
+    allocations: { amount: string; outcomeCollectionIndexSet: number }[]
+}[]
+
+export type SolverContractCondition = {
+    executions: number
     collateralToken: string
     questionId: string
     parentCollectionId: string
@@ -87,11 +126,15 @@ export type SolverComponentCondition = {
     status: ConditionStatus
 }
 
-export type SolverComponentData = {
-    config: SolverComponentConfig
-    outcomeCollections: SolverComponentOC[]
-    allocations: { address: string; allocations: SolverComponentOC }
-    conditions: SolverComponentCondition[]
-    timelocks: number[]
-    slots: { [slot: number]: ParsedSlotModel }
+/* 
+    Contract Responses with BigNumbers
+*/
+export type SolverContractConfigResponseType = {
+    implementation: string
+    keeper: string
+    arbitrator: string
+    timelockSeconds: number
+    data: string
+    ingests: SlotResponseType[]
+    conditionBase: ConditionResponseType
 }

@@ -1,9 +1,9 @@
 import BaseLayerModal from './BaseLayerModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { IPFSOutcomeModel } from '@cambrian/app/models/SolverModel'
 
 interface OutcomeDetailModalProps {
-    outcome: OutcomeModel
+    outcome: IPFSOutcomeModel
     onClose: () => void
 }
 
@@ -15,7 +15,6 @@ const OutcomeDetailModal = ({ onClose, outcome }: OutcomeDetailModalProps) => {
                 subTitle={'Outcome Detail'}
                 paragraph={outcome.description}
             />
-            <HeaderTextSection subTitle={'URI'} paragraph={outcome.uri} />
             <HeaderTextSection
                 subTitle={'Context'}
                 paragraph={outcome.context}

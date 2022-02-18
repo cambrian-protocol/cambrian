@@ -14,7 +14,7 @@ export type ActionbarActionsType = {
 )
 
 interface ActionbarProps {
-    actions: ActionbarActionsType
+    actions?: ActionbarActionsType
 }
 
 const Actionbar = ({ actions }: ActionbarProps) => {
@@ -36,12 +36,12 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         align="center"
                         pad={{ horizontal: 'small' }}
                     >
-                        {actions.info && (
+                        {actions?.info && (
                             <Box flex>
                                 <ActionbarInfo {...actions.info} />
                             </Box>
                         )}
-                        {actions.secondaryAction && (
+                        {actions?.secondaryAction && (
                             <>
                                 <Button
                                     size="small"
@@ -52,7 +52,7 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                             </>
                         )}
                         <Box>
-                            {actions.primaryAction && (
+                            {actions?.primaryAction && (
                                 <Button
                                     size="small"
                                     primary

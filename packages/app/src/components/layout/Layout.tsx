@@ -2,15 +2,17 @@ import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
 import React, { PropsWithChildren, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
+import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import ContextHelpModal from '../modals/ContextHelp'
-import DefaultSidebar from '../nav/DefaultSidebar'
 import Head from 'next/head'
+import SideNav from '../nav/SideNav'
 import styled from 'styled-components'
 
 export const siteTitle = 'Cambrian Protocol'
 
 type LayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
+    sideNav?: JSX.Element
     sidebar?: JSX.Element
     config?: JSX.Element
     actionBar?: JSX.Element
@@ -19,7 +21,9 @@ type LayoutProps = PropsWithChildren<{}> & {
     appbarTitle?: string
 }
 
+// TODO Rename to BaseLayout
 export const Layout = ({
+    sideNav,
     sidebar,
     children,
     contextTitle,
@@ -63,7 +67,38 @@ export const Layout = ({
                                     open={showSidebar}
                                 >
                                     <Box elevation="small" fill>
-                                        {sidebar ? sidebar : <DefaultSidebar />}
+                                        <ConditionalWrapper
+                                            condition={sidebar !== undefined}
+                                            wrapper={(children) => (
+                                                <Box
+                                                    flex
+                                                    direction="row"
+                                                    height="100vh"
+                                                    width={
+                                                        screenSize === 'small'
+                                                            ? {
+                                                                  min: '90vw',
+                                                                  max: '90vw',
+                                                              }
+                                                            : {
+                                                                  min: '50vw',
+                                                                  max: '50vw',
+                                                              }
+                                                    }
+                                                >
+                                                    {children}
+                                                </Box>
+                                            )}
+                                        >
+                                            <>
+                                                {sideNav ? (
+                                                    sideNav
+                                                ) : (
+                                                    <SideNav />
+                                                )}
+                                                {sidebar && sidebar}
+                                            </>
+                                        </ConditionalWrapper>
                                     </Box>
                                 </Collapsible>
                                 <Box flex>
