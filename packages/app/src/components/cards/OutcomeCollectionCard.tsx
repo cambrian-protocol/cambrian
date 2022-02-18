@@ -1,23 +1,42 @@
 import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
 import React, { useState } from 'react'
+import {
+    SolverComponentOC,
+    SolverContractAllocationsType,
+} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
-import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 
 interface OutcomeCollectionCardProps {
-    outcomeCollection: OutcomeCollectionModel
+    outcomeCollection: SolverComponentOC
     proposable?: boolean
+    allocations: SolverContractAllocationsType
 }
 
 const OutcomeCollectionCard = ({
     outcomeCollection,
     proposable,
+    allocations,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
+
+    const currentAllocations: { address: string; amount: string }[] =
+        allocations.map((allocation) => {
+            const amount = allocation.allocations.find(
+                (alloc) =>
+                    alloc.outcomeCollectionIndexSet ===
+                    outcomeCollection.indexSet
+            )
+
+            return {
+                address: allocation.address,
+                amount: amount?.amount || 'No amount found',
+            }
+        })
 
     const toggleShowAllocationModal = () =>
         setShowAllocationModal(!showAllocationModal)
@@ -31,12 +50,12 @@ const OutcomeCollectionCard = ({
                     background="background-contrast"
                 >
                     <Text truncate>
-                        Outcome collection {outcomeCollection.id}
+                        Outcome collection {outcomeCollection.indexSet}
                     </Text>
                 </CardHeader>
                 <CardBody>
-                    {outcomeCollection.outcomes.map((outcome) => (
-                        <OutcomeListItem key={outcome.id} outcome={outcome} />
+                    {outcomeCollection.outcomes.map((outcome, idx) => (
+                        <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
                     <PlainSectionDivider margin="small" />
                     <BaseMenuListItem
@@ -53,7 +72,10 @@ const OutcomeCollectionCard = ({
                 </CardBody>
             </Card>
             {showAllocationModal && (
-                <RecipientAllocationModal onClose={toggleShowAllocationModal} />
+                <RecipientAllocationModal
+                    onClose={toggleShowAllocationModal}
+                    allocations={currentAllocations}
+                />
             )}
         </>
     )

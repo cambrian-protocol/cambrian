@@ -5,7 +5,7 @@ import RecipientAvatar from '../avatars/RecipientAvatar'
 
 export type BaseSlotInputItemProps = PropsWithChildren<{}> & {
     label?: string
-    title: string
+    title?: string
     subTitle?: string
     onClick?: () => void
 }

@@ -1,5 +1,6 @@
-import { SolidityDataTypes } from './SolidityDataTypes'
 import { BigNumber, ethers } from 'ethers'
+
+import { SolidityDataTypes } from './SolidityDataTypes'
 
 export enum SlotTypes {
     Callback = 0,
@@ -29,6 +30,7 @@ export type SlotModel = {
     solverConfigAddress?: SolverConfigAddress
 }
 
+// TODO Renaming and organizing Types, separate Composer and Interaction Types
 export type ParsedSlotModel = {
     executions: number
     ingestType: SlotTypes
@@ -37,7 +39,7 @@ export type ParsedSlotModel = {
     data: string
 }
 
-export type GetSlotModel = {
+export type SlotResponseType = {
     slot: string
     executions: BigNumber
     ingestType: SlotTypes

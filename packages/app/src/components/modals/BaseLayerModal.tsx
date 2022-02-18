@@ -39,19 +39,12 @@ const BaseLayerModal = ({
                 height={{ max: 'xxsmall' }}
             >
                 <IconContext.Provider value={{ size: '24' }}>
-                    {onClose && (
-                        <Text size="small" weight="bold">
-                            {title}
-                        </Text>
-                    )}
                     <Box onClick={onBack || onClose} focusIndicator={false}>
                         {onClose !== undefined ? <X /> : <CaretLeft />}
                     </Box>
-                    {onBack && (
-                        <Text size="small" weight="bold">
-                            {title}
-                        </Text>
-                    )}
+                    <Text size="small" weight="bold">
+                        {title}
+                    </Text>
                 </IconContext.Provider>
             </Box>
             <Box
