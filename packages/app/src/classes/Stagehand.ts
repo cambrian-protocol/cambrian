@@ -7,7 +7,7 @@ import { IPFSAPI } from '../services/api/IPFS.api'
 import { CreateTemplateFormType } from '../ui/solutions/common/forms/CreateTemplateForm'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 
-enum Stages {
+enum StageNames {
     composition = 'composition',
     template = 'template',
     solution = 'solution',
@@ -22,33 +22,67 @@ type StageModel =
     | ProposalModel
 
 type StageIds = {
-    [key in Stages]: string
+    [key in StageNames]: string
+}
+
+type Stages = {
+    [key in StageNames]: StageModel
 }
 
 export default class Stagehand {
     ipfs: IPFSAPI
     stageIds: StageIds
-    composition?: CompositionModel
-    template?: TemplateModel
-    solution?: SolutionModel
-    proposal?: ProposalModel
+    stages: Stages
 
     constructor() {
         this.ipfs = new IPFSAPI()
         this.stageIds = {} as StageIds
+        this.stages = {} as Stages
+    }
+
+    get composition() {
+        return this.stages.composition
+    }
+
+    get template() {
+        return this.stages.template
+    }
+
+    get solution() {
+        return this.stages.solution
+    }
+
+    get proposal() {
+        return this.stages.proposal
+    }
+
+    get compositionId() {
+        return this.stageIds.composition
+    }
+
+    get templateId() {
+        return this.stageIds.template
+    }
+
+    get solutionId() {
+        return this.stageIds.solution
+    }
+
+    get proposalId() {
+        return this.stageIds.proposal
     }
 
     /**
-     * Create a template by applying CreateTemplateForm to loaded composition
+     * Create a template by applying CreateTemplateForm to a loaded composition
      */
     createTemplate = async (createTemplateForm: CreateTemplateFormType) => {
-        if (!this.composition) {
-            console.error('')
+        if (!this.stages.composition) {
+            console.error('Error: Load a composition into Stagehand first')
             return undefined
         }
 
         const newComposition = mergeFlexIntoComposition(
-            this.composition,
+            <CompositionModel>this.stages.composition,
             createTemplateForm.flexInputs
         )
 
@@ -65,7 +99,13 @@ export default class Stagehand {
                     preferredTokens: createTemplateForm.preferredTokens,
                 },
             }
-            this.template = template
+            if (!this.isStageSchema(template, StageNames.template)) {
+                console.error(
+                    'Error: Generated template does not satisfy template schema'
+                )
+                return undefined
+            }
+            this.stages['template'] = template
             return template
         } else {
             console.error('Error merging provided flex inputs into composition')
@@ -73,7 +113,32 @@ export default class Stagehand {
         }
     }
 
-    loadStage = async (stageId: string, stageType: Stages) => {
+    /**
+     * Publish Stage by pinning to IPFS
+     */
+    publishStage = async (stageType: StageNames) => {
+        if (
+            !this.stages[stageType] ||
+            !this.isStageSchema(this.stages[stageType], StageNames.template)
+        ) {
+            console.error(
+                `Error: ${stageType} does not satisfy ${stageType} schema`
+            )
+            return undefined
+        }
+
+        try {
+            const res = await this.ipfs.pin(this.stages[stageType])
+            return res
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    /**
+     * Load stage from IPFS
+     */
+    loadStage = async (stageId: string, stageType: StageNames) => {
         try {
             const stage = (await this.ipfs.getFromCID(stageId)) as StageModel
             return this.setStage(stage, stageId, stageType)
@@ -83,45 +148,20 @@ export default class Stagehand {
         }
     }
 
-    setStage = (stage: StageModel, stageId: string, stageType: Stages) => {
+    /**
+     * Set internal stage variable
+     */
+    setStage = (stage: StageModel, stageId: string, stageType: StageNames) => {
         if (!stage || !this.isStageSchema(stage, stageType)) {
             return undefined
         }
-
-        switch (stageType) {
-            case Stages.composition:
-                this.composition = stage as CompositionModel
-                this.stageIds['composition'] = stageId
-                return this.composition
-
-            case Stages.template:
-                this.template = stage as TemplateModel
-                return this.template
-
-            case Stages.solution:
-                this.solution = stage as SolutionModel
-                return this.solution
-
-            case Stages.proposal:
-                this.proposal = stage as ProposalModel
-                return this.proposal
-        }
+        this.stageIds[stageType] = stageId
+        this.stages[stageType] = stage
+        return this.stages[stageType]
     }
 
     // TODO
-    isStageSchema = (data: StageModel, stage: Stages) => {
-        switch (stage) {
-            case Stages.composition:
-                return true
-
-            case Stages.template:
-                return true
-
-            case Stages.solution:
-                return true
-
-            case Stages.composition:
-                return true
-        }
+    isStageSchema = (data: StageModel, stage: StageNames) => {
+        return true
     }
 }
