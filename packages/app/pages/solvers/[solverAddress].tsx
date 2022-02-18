@@ -1,8 +1,8 @@
-import Solver from '@cambrian/app/components/solver/Solver'
 import React from 'react'
-import { useRouter } from 'next/router'
+import Solver from '@cambrian/app/components/solver/Solver'
 import { UserContext } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
+import { useRouter } from 'next/router'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 
@@ -29,7 +29,7 @@ export default function SolverPage() {
     ) {
         return (
             <Solver
-                address={ethers.utils.getAddress(solverAddress)}
+                address={solverAddress}
                 abi={SOLVER_ABI}
                 signer={user.currentSigner}
             />

@@ -1,32 +1,39 @@
-import { Box, ResponsiveContext } from 'grommet'
+import { Anchor, Box, ResponsiveContext } from 'grommet'
 
 import { PuzzlePiece } from 'phosphor-react'
 
 interface SidebarSolverItemProps {
-    active: boolean
-    onClick: () => void
+    isActive?: boolean
+    solverAddress: string
 }
 
-const SidebarSolverItem = ({ onClick, active }: SidebarSolverItemProps) => (
-    <ResponsiveContext.Consumer>
-        {(screenSize) => (
-            <Box direction="row" onClick={onClick} focusIndicator={false}>
-                <Box
-                    width="3px"
-                    background={active ? 'white' : 'transparent'}
-                    round="small"
-                />
-                <Box
-                    pad={screenSize === 'small' ? 'medium' : 'small'}
-                    margin={{ horizontal: 'small' }}
-                    background="primary-gradient"
-                    round="small"
-                >
-                    <PuzzlePiece size="24" />
-                </Box>
-            </Box>
-        )}
-    </ResponsiveContext.Consumer>
-)
+const SidebarSolverItem = ({
+    isActive,
+    solverAddress,
+}: SidebarSolverItemProps) => {
+    return (
+        <ResponsiveContext.Consumer>
+            {(screenSize) => (
+                <Anchor href={`/solvers/${solverAddress}`}>
+                    <Box direction="row">
+                        <Box
+                            width="3px"
+                            background={isActive ? 'white' : 'transparent'}
+                            round="small"
+                        />
+                        <Box
+                            pad={screenSize === 'small' ? 'medium' : 'small'}
+                            margin={{ horizontal: 'small' }}
+                            background="brand"
+                            round="small"
+                        >
+                            <PuzzlePiece size="24" color="white" />
+                        </Box>
+                    </Box>
+                </Anchor>
+            )}
+        </ResponsiveContext.Consumer>
+    )
+}
 
 export default SidebarSolverItem

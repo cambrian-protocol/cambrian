@@ -1,48 +1,103 @@
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { JsonFragmentType } from '@ethersproject/abi'
-import { BigNumber, Contract, ethers, EventFilter } from 'ethers'
-import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSigner'
+import { Contract, EventFilter, ethers } from 'ethers'
 import {
-    ParsedAllocationModel,
-    Multihash,
-    OutcomeModel,
-} from '@cambrian/app/models/ConditionModel'
-import { GetSlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
-import React from 'react'
-import { Fragment } from 'ethers/lib/utils'
-import { SolverComponentData } from '@cambrian/app/models/SolverModel'
+    IPFSOutcomeModel,
+    SlotsHashMapType,
+    SlotsHistoryHashMapType,
+    SolverComponentOC,
+    SolverContractAllocationsHistoryType,
+    SolverContractCondition,
+    SolverContractConfigModel,
+    SolverContractConfigResponseType,
+    TimeLocksHashMap,
+} from '@cambrian/app/models/SolverModel'
+import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import React, { useEffect } from 'react'
 
-const Solver = ({
-    address,
-    abi,
-    signer,
-}: {
+import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
+import { Fragment } from 'ethers/lib/utils'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { JsonFragmentType } from '@ethersproject/abi'
+import { Multihash } from '@cambrian/app/models/ConditionModel'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
+import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
+import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
+
+export type BasicSolverMethodsType = {
+    prepareSolve: (newConditionIndex: number) => Promise<any>
+    executeSolve: (conditionIndex: number) => Promise<any>
+    proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
+    confirmPayouts: (conditionIndex: number) => Promise<any>
+    getChainParent: () => {}
+    getChainChild: () => {}
+    getChainIndex: () => {}
+    getTimelock: (conditionIndex: number) => Promise<any>
+    getTrackingID: () => {}
+    getUIUri: () => {}
+    getData: (slotId: string) => any
+    getCurrentSlots: (ingests: ParsedSlotModel[]) => Promise<any[]> | undefined
+    getCondition: (index: number) => any
+    getConditions: () => {}
+    getConfig: () => {}
+    getRecipientAddresses: (
+        condition: SolverContractCondition
+    ) => (string | undefined)[]
+    getManualInputs: (
+        condition: SolverContractCondition
+    ) => (ParsedSlotModel | undefined)[]
+}
+
+interface SolverProps {
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
     signer: ethers.providers.JsonRpcSigner
-}) => {
+}
+
+const Solver = ({ address, abi, signer }: SolverProps) => {
     const ipfs = new IPFSAPI()
     const [contract, setContract] = React.useState<Contract>(
-        new ethers.Contract(
-            address,
-            new ethers.utils.Interface(abi),
-            signer.provider
-        )
+        new ethers.Contract(address, new ethers.utils.Interface(abi), signer)
     )
-    const [data, setData] = React.useState<SolverComponentData | undefined>()
-    const [CustomUI, setCustomUI] = React.useState<Function>()
-    const [hasCustomUI, setHasCustomUI] = React.useState<boolean | null>(null)
+    const { currentSolverData, setCurrentSolverData } = useCurrentSolver()
 
-    React.useEffect(() => {
+    useEffect(() => {
         init()
     }, [])
 
+    const testExecute = async () => {
+        // Testing
+        await prepareSolve(0)
+        await contract
+            .connect(signer)
+            .addData(
+                '0x3031465350373845344b4d4d3548455142303942443854323533000000000000',
+                ethers.utils.defaultAbiCoder.encode(
+                    ['address'],
+                    ['0xA33e7CAb1a8Bf213DC060c237BF6817785C1b5da']
+                )
+            )
+        await executeSolve(0)
+        // Testing
+        await prepareSolve(1)
+        await contract
+            .connect(signer)
+            .addData(
+                '0x3031465350373845344b4d4d3548455142303942443854323533000000000000',
+                ethers.utils.defaultAbiCoder.encode(
+                    ['address'],
+                    ['0x82dBf1444b9344658f9036c5b51B4d93E4a4aAa5']
+                )
+            )
+        await executeSolve(1)
+    }
+
+    useEffect(() => {
+        testExecute()
+    }, [contract])
+
     const init = () => {
         updateData()
-        initUI()
         initListeners()
     }
 
@@ -61,79 +116,30 @@ const Solver = ({
         // TODO Status listeners
     }
 
-    const initUI = async () => {
-        const uiURI = await getUIUri()
-        if (uiURI) {
-            try {
-                const UIComponentString = await ipfs.getFromCID(uiURI)
-                if (UIComponentString) {
-                    setCustomUI(new Function('props', UIComponentString))
-                    setHasCustomUI(true)
-                }
-            } catch (e) {
-                console.log(e)
-                setHasCustomUI(false)
-            }
-        } else {
-            setHasCustomUI(false)
-        }
-    }
-
     const updateData = async () => {
         const config = await getConfig()
-        const slots = await getSlots(config)
+        const conditions = await getConditions()
 
-        const outcomeURIs = config.conditionBase.outcomeURIs.map(
-            (x: Multihash) => getMultihashFromBytes32(x)
-        )
+        const outcomeCollections = await getOutcomeCollections(config)
 
-        const outcomes = (await Promise.all(
-            outcomeURIs.map((x: string) => ipfs.getFromCID(x))
-        )) as (OutcomeModel | undefined)[]
+        const timelocksHistory = await getTimelocksHistory(conditions)
+        const slotsHistory = await getSlotsHistory(config.ingests, conditions)
 
-        const outcomeCollections = config.conditionBase.partition.map(
-            (indexSet: BigNumber) => {
-                {
-                    const oc = [] as (OutcomeModel | undefined)[]
-                    const oneHot = binaryArrayFromIndexSet(
-                        indexSet.toNumber(),
-                        config.conditionBase.outcomeSlots
-                    )
-                    oneHot.forEach((x, i) => {
-                        if (x === 1) {
-                            oc.push(outcomes[i])
-                        }
-                    })
-                    return {
-                        indexSet: indexSet.toNumber(),
-                        outcomes: oc,
-                    }
-                }
-            }
-        )
-
-        const allocations = await getAllocations(
+        const allocationHistory = getAllocationHistory(
+            conditions,
+            slotsHistory,
             config,
-            slots,
             outcomeCollections
         )
 
-        const conditions = await getConditions()
-
-        const timelocks = (await Promise.all(
-            conditions.map((_: any, i: number) => getTimelock(i))
-        )) as number[]
-
-        const data = {
+        setCurrentSolverData({
             config: config,
             outcomeCollections: outcomeCollections,
-            allocations: allocations,
+            allocationsHistory: allocationHistory,
             conditions: conditions,
-            timelocks: timelocks,
-            slots: slots,
-        } as SolverComponentData
-
-        setData(data)
+            timelocksHistory: timelocksHistory,
+            slotsHistory: slotsHistory,
+        })
     }
 
     const prepareSolve = async (newConditionIndex: number) => {
@@ -198,9 +204,9 @@ const Solver = ({
         }
     }
 
-    const getTimelock = (index: number) => {
+    const getTimelock = async (index: number) => {
         try {
-            return contract.timelocks(index)
+            return await contract.timelocks(index)
         } catch (e) {
             console.error(e)
         }
@@ -246,19 +252,53 @@ const Solver = ({
         }
     }
 
-    const getConditions = () => {
+    const getConditions = async (): Promise<SolverContractCondition[]> => {
         try {
-            return contract.getConditions()
+            const res: Omit<SolverContractCondition, 'executions'>[] =
+                await contract.getConditions()
+
+            const conditionsWithExecutions = res.map((condition, idx) => {
+                return {
+                    ...condition,
+                    executions: idx + 1,
+                }
+            })
+            return conditionsWithExecutions
         } catch (e) {
             console.error(e)
+            return Promise.reject()
         }
     }
 
-    const getConfig = () => {
+    const getConfig = async (): Promise<SolverContractConfigModel> => {
         try {
-            return contract.getConfig()
+            const res: SolverContractConfigResponseType =
+                await contract.getConfig()
+
+            const parsedIngests = res.ingests.map((ingest) => {
+                return {
+                    ...ingest,
+                    executions: ingest.executions.toNumber(),
+                    solverIndex: ingest.solverIndex.toNumber(),
+                }
+            })
+
+            const parsedPartition = res.conditionBase.partition.map(
+                (indexSet) => indexSet.toNumber()
+            )
+            const parsedCondition = {
+                ...res.conditionBase,
+                partition: parsedPartition,
+            }
+
+            return {
+                ...res,
+                ingests: parsedIngests,
+                conditionBase: parsedCondition,
+            }
         } catch (e) {
             console.error(e)
+            return Promise.reject()
         }
     }
 
@@ -266,48 +306,177 @@ const Solver = ({
     /****** ********************************** ***/
     /***************** ******* *******************/
 
-    const getSlots = async (config: any) => {
-        const slots = {} as any
-
-        const currentSlotData = await Promise.all(
-            config.ingests.map(async (x: GetSlotModel) => {
-                const data = await contract.getData(x.slot)
-                return {
-                    slot: x.slot,
-                    executions: x.executions.toNumber(),
-                    solverIndex: x.solverIndex.toNumber(),
-                    ingestType: x.ingestType,
-                    data: data,
-                } as ParsedSlotModel
-            }) as ParsedSlotModel[]
-        )
-
-        currentSlotData.forEach((x) => {
-            slots[x.slot] = x
+    const getTimelocksHistory = async (
+        conditions: SolverContractCondition[]
+    ): Promise<TimeLocksHashMap> => {
+        const timeLocksHashMap: TimeLocksHashMap = {}
+        conditions.forEach(async (condition, idx) => {
+            const timelock = await getTimelock(idx)
+            timeLocksHashMap[condition.conditionId] = timelock.toNumber()
         })
-        return slots
+
+        return timeLocksHashMap
     }
 
-    const getAllocations = (
-        config: any,
-        slots: any,
-        outcomeCollections: any[]
-    ) => {
-        return config.conditionBase.allocations.map(
-            (x: ParsedAllocationModel) => {
-                const amounts = x.recipientAmountSlots.map((y) => slots[y].data)
-                const allocation = amounts.map((x, i) => {
-                    return { oc: outcomeCollections[i], amount: x }
-                })
-                return {
-                    address: slots[x.recipientAddressSlot].data,
-                    allocation: allocation,
-                }
-            }
+    const getOutcomeCollections = async (
+        config: SolverContractConfigModel
+    ): Promise<SolverComponentOC[]> => {
+        const outcomeURIs = config.conditionBase.outcomeURIs.map(
+            (multiHash: Multihash) => getMultihashFromBytes32(multiHash)
         )
+
+        const outcomes = (await Promise.all(
+            outcomeURIs.map((outcomeURI: string | null) => {
+                if (outcomeURI) return ipfs.getFromCID(outcomeURI)
+            })
+        )) as IPFSOutcomeModel[]
+
+        return config.conditionBase.partition.map((indexSet) => {
+            const outcomeCollection: IPFSOutcomeModel[] = []
+            const binaryArray = binaryArrayFromIndexSet(
+                indexSet,
+                config.conditionBase.outcomeSlots
+            )
+            binaryArray.forEach((binary, idx) => {
+                if (binary === 1) {
+                    outcomeCollection.push(outcomes[idx])
+                }
+            })
+            return {
+                indexSet: indexSet,
+                outcomes: outcomeCollection,
+            }
+        })
     }
 
-    const methods = {
+    const getSlotsHistory = async (
+        ingests: ParsedSlotModel[],
+        conditions: SolverContractCondition[]
+    ): Promise<SlotsHistoryHashMapType> => {
+        const slotsHistory: SlotsHistoryHashMapType = {}
+        const currentSlotData = await Promise.all(
+            ingests.map(async (ingest: ParsedSlotModel) => {
+                const dataArr: any[] = await contract.getAllData(ingest.slot)
+                const slotHistory = dataArr.map((data, idx) => {
+                    return {
+                        slot: ingest.slot,
+                        executions: idx + 1,
+                        solverIndex: ingest.solverIndex,
+                        ingestType: ingest.ingestType,
+                        data: data,
+                    }
+                })
+                return slotHistory
+            })
+        )
+        conditions.forEach((condition) => {
+            const data: SlotsHashMapType = {}
+            currentSlotData.forEach((slot) => {
+                const rightVersionSlot = slot.find(
+                    (el) => el.executions === condition.executions
+                )
+                if (rightVersionSlot)
+                    data[rightVersionSlot?.slot] = rightVersionSlot
+            })
+            slotsHistory[condition.conditionId] = data
+        })
+        return slotsHistory
+    }
+
+    const getAllocationHistory = (
+        conditions: SolverContractCondition[],
+        slotsHistory: SlotsHistoryHashMapType,
+        config: SolverContractConfigModel,
+        outcomeCollections: SolverComponentOC[]
+    ): SolverContractAllocationsHistoryType => {
+        const allocationHistory: SolverContractAllocationsHistoryType = {}
+        conditions.forEach((condition) => {
+            config.conditionBase.allocations.forEach((allocation) => {
+                try {
+                    const allocations = allocation.recipientAmountSlots?.map(
+                        (recipientAmountSlot, idx) => {
+                            const amountData =
+                                slotsHistory[condition.conditionId][
+                                    recipientAmountSlot
+                                ].data
+
+                            return {
+                                outcomeCollectionIndexSet:
+                                    outcomeCollections[idx].indexSet,
+                                amount: amountData || 'Undefined amount',
+                            }
+                        }
+                    )
+
+                    if (!allocationHistory[condition.conditionId])
+                        allocationHistory[condition.conditionId] = []
+                    allocationHistory[condition.conditionId].push({
+                        address: ethers.utils.defaultAbiCoder
+                            .decode(
+                                ['address'],
+                                slotsHistory[condition.conditionId][
+                                    allocation.recipientAddressSlot
+                                ].data
+                            )
+                            .toString(),
+                        allocations: allocations,
+                    })
+                } catch (e) {
+                    console.error(e)
+                    throw new Error('Error while retreiving allocation History')
+                }
+            })
+        })
+
+        return allocationHistory
+    }
+
+    const getRecipientAddresses = (
+        condition: SolverContractCondition
+    ): string[] => {
+        if (currentSolverData) {
+            const recipientAddressSlots =
+                currentSolverData.config.conditionBase.allocations.map(
+                    (allocation) => allocation.recipientAddressSlot
+                )
+            return recipientAddressSlots.map((recipientAddressSlot) => {
+                const addressData =
+                    currentSolverData.slotsHistory[condition.conditionId][
+                        recipientAddressSlot
+                    ].data
+
+                try {
+                    return ethers.utils.defaultAbiCoder
+                        .decode(['address'], addressData)
+                        .toString()
+                } catch {
+                    throw new Error('Error while decoding recipient address')
+                }
+            })
+        } else {
+            throw new Error('No solver data existent')
+        }
+    }
+
+    const getManualInputs = (
+        condition: SolverContractCondition
+    ): ParsedSlotModel[] => {
+        if (currentSolverData) {
+            const manualSlots = Object.values(
+                currentSolverData.slotsHistory[condition.conditionId]
+            ).filter((slot) => slot.ingestType === SlotTypes.Manual)
+            return manualSlots.map(
+                (manualSlot) =>
+                    currentSolverData.slotsHistory[condition.conditionId][
+                        manualSlot.slot
+                    ]
+            )
+        } else {
+            throw new Error('No solver data existent')
+        }
+    }
+
+    const basicSolverMethods: BasicSolverMethodsType = {
         prepareSolve: prepareSolve,
         executeSolve: executeSolve,
         proposePayouts: proposePayouts,
@@ -323,29 +492,34 @@ const Solver = ({
         getCondition: getCondition,
         getConditions: getConditions,
         getConfig: getConfig,
+        getRecipientAddresses: getRecipientAddresses,
+        getManualInputs: getManualInputs,
     }
 
-    if (hasCustomUI === null) {
-        return null // TODO LOADING
-    } else if (!hasCustomUI) {
-        // TODO DEFAULT COMPONENT
-        return <div>{JSON.stringify(data)}</div>
-    } else if (hasCustomUI && CustomUI) {
-        return (
-            <CustomUI
-                React={React}
-                data={data}
-                contract={contract}
-                signer={signer}
-                methods={methods}
-            />
-        )
+    // TODO Loading / determine SolverUI
+    const loadWriter = true
+    if (currentSolverData) {
+        if (loadWriter) {
+            return (
+                <WriterSolverUI
+                    solverData={currentSolverData}
+                    solverContract={contract}
+                    signer={signer}
+                    solverMethods={basicSolverMethods}
+                />
+            )
+        } else {
+            return (
+                <DefaultSolverUI
+                    solverData={currentSolverData}
+                    solverContract={contract}
+                    signer={signer}
+                    solverMethods={basicSolverMethods}
+                />
+            )
+        }
     } else {
-        return (
-            <div>
-                <p>Null</p>
-            </div>
-        )
+        return <>Loading</>
     }
 }
 

@@ -4,15 +4,16 @@ import ChatContent from '../chat/ChatContent'
 import ChatInput from '../chat/ChatInput'
 
 interface ChatModalProps {
+    solverAddress: string
     onBack: () => void
 }
 
-const ChatModal = ({ onBack }: ChatModalProps) => {
+const ChatModal = ({ onBack, solverAddress }: ChatModalProps) => {
     return (
         <BaseLayerModal onBack={onBack}>
             <Box fill gap="small">
-                <ChatContent />
-                <ChatInput />
+                <ChatContent solverAddress={solverAddress} />
+                <ChatInput solverAddress={solverAddress} />
             </Box>
         </BaseLayerModal>
     )

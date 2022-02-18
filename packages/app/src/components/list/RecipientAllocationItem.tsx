@@ -2,26 +2,24 @@ import BaseSlotInputItem, { BaseSlotInputItemProps } from './BaseSlotInputItem'
 import { Box, Text } from 'grommet'
 
 type RecipientAllocationItemProps = BaseSlotInputItemProps & {
-    role?: string
     amount: string
 }
 
-// TODO Slot Prop
+// TODO Calculate actual amount
 const RecipientAllocationItem = ({
     amount,
-    role,
+    title,
+    subTitle,
 }: RecipientAllocationItemProps) => {
+    const amountPercentage = parseInt(amount) / 100
+
     return (
-        <BaseSlotInputItem
-            label={role}
-            title="jon.eth"
-            subTitle="0x90187450198501785"
-        >
+        <BaseSlotInputItem title={title} subTitle={subTitle}>
             <Box align="end">
-                <Text>{amount}</Text>
-                <Text size="small" color="dark-6">
+                <Text>{amountPercentage} %</Text>
+                {/*  <Text size="small" color="dark-6">
                     {amount}
-                </Text>
+                </Text> */}
             </Box>
         </BaseSlotInputItem>
     )

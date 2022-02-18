@@ -9,14 +9,30 @@ import {
 import React, { useState } from 'react'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
+import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
+import { SolverContractData } from '@cambrian/app/models/SolverModel'
+import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
 
-const SolverConfigInfo = () => {
+interface SolverConfigInfoProps {
+    solverData: SolverContractData
+    solverMethods: BasicSolverMethodsType
+}
+
+const SolverConfigInfo = ({
+    solverData,
+    solverMethods,
+}: SolverConfigInfoProps) => {
+    const { currentCondition } = useCurrentSolver()
+
+    // TODO Error handling
+    if (!currentCondition) return null
+
     const [showRecipientModal, setShowRecipientModal] = useState(false)
     const [showOutcomeModal, setShowOutcomeModal] = useState(false)
     const [showKeeperInputModal, setShowKeeperInputModal] = useState(false)
@@ -56,27 +72,45 @@ const SolverConfigInfo = () => {
                 <BaseMenuListItem
                     title="Timelock"
                     icon={<Timer />}
-                    subTitle="4 Days - 12 hours"
+                    subTitle={solverData.config.timelockSeconds.toString()}
                 />
                 <BaseMenuListItem
                     title="Token address"
                     icon={<Coin />}
-                    subTitle="0x0917901850928y92857921875928759827b9287b592875b92"
+                    subTitle={solverData.config.conditionBase.collateralToken}
                 />
                 <BaseMenuListItem
                     title="Balance"
                     icon={<Coins />}
-                    subTitle="1000"
+                    subTitle={''}
                 />
             </Box>
             {showRecipientModal && (
-                <RecipientsModal onBack={toggleShowRecipientModal} />
+                <RecipientsModal
+                    onBack={toggleShowRecipientModal}
+                    recipientAddresses={solverMethods.getRecipientAddresses(
+                        currentCondition
+                    )}
+                />
             )}
             {showKeeperInputModal && (
-                <KeeperInputsModal onBack={toggleShowKeeperInputModal} />
+                <KeeperInputsModal
+                    onBack={toggleShowKeeperInputModal}
+                    manualInputs={solverMethods.getManualInputs(
+                        currentCondition
+                    )}
+                />
             )}
             {showOutcomeModal && (
-                <OutcomeCollectionModal onBack={toggleShowOutcomeModal} />
+                <OutcomeCollectionModal
+                    onBack={toggleShowOutcomeModal}
+                    allocations={
+                        solverData.allocationsHistory[
+                            currentCondition.conditionId
+                        ]
+                    }
+                    outcomeCollections={solverData.outcomeCollections}
+                />
             )}
         </>
     )

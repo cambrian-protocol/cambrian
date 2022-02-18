@@ -10,7 +10,9 @@ import {
 import { PaperPlaneRight } from 'phosphor-react'
 import { useState } from 'react'
 
-interface ChatInputProps {}
+interface ChatInputProps {
+    solverAddress: string
+}
 
 type ChatInputFormType = {
     message: string
@@ -20,7 +22,7 @@ const initalInput = {
     message: '',
 }
 
-const ChatInput = ({}: ChatInputProps) => {
+const ChatInput = ({ solverAddress }: ChatInputProps) => {
     const [input, setInput] = useState(initalInput)
 
     const onSubmit = (event: FormExtendedEvent) => {

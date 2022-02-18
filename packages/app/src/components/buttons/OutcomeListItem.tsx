@@ -1,11 +1,11 @@
 import BaseMenuListItem from './BaseMenuListItem'
+import { IPFSOutcomeModel } from '@cambrian/app/models/SolverModel'
 import OutcomeDetailModal from '../modals/OutcomeDetailModal'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
 import { TreeStructure } from 'phosphor-react'
 import { useState } from 'react'
 
 interface OutcomeListItemProps {
-    outcome: OutcomeModel
+    outcome: IPFSOutcomeModel
 }
 
 const OutcomeListItem = ({ outcome }: OutcomeListItemProps) => {

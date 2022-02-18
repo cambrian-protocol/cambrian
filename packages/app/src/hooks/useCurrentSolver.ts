@@ -1,7 +1,7 @@
 import {
     SolverContext,
     SolverContextType,
-} from '@cambrian/app/store/SolverConfigContext'
+} from '@cambrian/app/store/SolverContext'
 
 import { useContext } from 'react'
 
