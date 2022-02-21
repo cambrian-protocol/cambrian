@@ -58,9 +58,7 @@ const WriterSolverUI = ({
             floatingActionButton={
                 <ChatFAB solverAddress={solverContract.address} />
             }
-        >
-            {JSON.stringify(solverData)}
-        </Layout>
+        ></Layout>
     )
 }
 

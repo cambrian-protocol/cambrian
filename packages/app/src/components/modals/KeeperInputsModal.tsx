@@ -4,7 +4,8 @@ import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { ParsedSlotModel } from '@cambrian/app/models/SlotModel'
-import { ethers } from 'ethers'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
     manualInputs: (ParsedSlotModel | undefined)[]
@@ -24,15 +25,14 @@ const KeeperInputsModal = ({
             <Box gap="medium" fill>
                 {manualInputs.map((manualSlot) => {
                     if (manualSlot !== undefined) {
-                        // TODO doesn't have to be an address
-                        const address = ethers.utils.defaultAbiCoder
-                            .decode(['address'], manualSlot.data)
-                            .toString()
-
+                        // TODO determite type of manual Input to decode it
                         return (
                             <BaseSlotInputItem
                                 key={manualSlot.slot}
-                                title={address}
+                                title={decodeData(
+                                    [SolidityDataTypes.Address],
+                                    manualSlot.data
+                                )}
                             />
                         )
                     }
