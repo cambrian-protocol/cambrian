@@ -1,13 +1,8 @@
 import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
-import {
-    CircleDashed,
-    ClockCounterClockwise,
-    Handshake,
-    Rocket,
-    SpinnerGap,
-} from 'phosphor-react'
+import { CircleDashed, ClockCounterClockwise, SpinnerGap } from 'phosphor-react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
 
@@ -19,7 +14,6 @@ interface ConditionVersionSidebarProps {
     currentCondition?: SolverContractCondition
 }
 
-// TODO Condition Status Icon
 const ConditionVersionSidebar = ({
     solverTitle,
     solverMetaVersion,
@@ -57,8 +51,16 @@ const ConditionVersionSidebar = ({
                                 justo ege.
                             </Text>
                             <BaseMenuListItem
-                                title={newestCondition.status.toString()}
-                                icon={<Rocket />}
+                                title={
+                                    CONDITION_STATUS_DETAILS[
+                                        newestCondition.status
+                                    ].label
+                                }
+                                icon={
+                                    CONDITION_STATUS_DETAILS[
+                                        newestCondition.status
+                                    ].icon
+                                }
                                 onClick={() => updateCondition(newestCondition)}
                                 isActive={currentCondition === newestCondition}
                             />
@@ -80,8 +82,16 @@ const ConditionVersionSidebar = ({
                                     {conditions.map((condition, idx) => (
                                         <BaseMenuListItem
                                             key={idx}
-                                            title={condition.status.toString()}
-                                            icon={<Handshake />}
+                                            title={
+                                                CONDITION_STATUS_DETAILS[
+                                                    condition.status
+                                                ].label
+                                            }
+                                            icon={
+                                                CONDITION_STATUS_DETAILS[
+                                                    condition.status
+                                                ].icon
+                                            }
                                             onClick={() =>
                                                 updateCondition(condition)
                                             }
