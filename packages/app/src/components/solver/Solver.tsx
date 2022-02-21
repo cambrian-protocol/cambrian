@@ -17,6 +17,7 @@ import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
 import { Fragment } from 'ethers/lib/utils'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { JsonFragmentType } from '@ethersproject/abi'
+import LoadingScreen from '../info/LoadingScreen'
 import { Multihash } from '@cambrian/app/models/ConditionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
@@ -461,7 +462,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         getManualInputs: getManualInputs,
     }
 
-    // TODO Loading / determine SolverUI
+    // TODO Determine SolverUI
     const loadWriter = true
     if (currentSolverData) {
         if (loadWriter) {
@@ -484,7 +485,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
             )
         }
     } else {
-        return <>Loading</>
+        return <LoadingScreen />
     }
 }
 
