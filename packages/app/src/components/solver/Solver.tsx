@@ -21,6 +21,7 @@ import { Multihash } from '@cambrian/app/models/ConditionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
 
@@ -64,37 +65,6 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
     useEffect(() => {
         init()
     }, [])
-
-    const testExecute = async () => {
-        // Testing
-        await prepareSolve(0)
-        await contract
-            .connect(signer)
-            .addData(
-                '0x3031465350373845344b4d4d3548455142303942443854323533000000000000',
-                ethers.utils.defaultAbiCoder.encode(
-                    ['address'],
-                    ['0xA33e7CAb1a8Bf213DC060c237BF6817785C1b5da']
-                )
-            )
-        await executeSolve(0)
-        // Testing
-        await prepareSolve(1)
-        await contract
-            .connect(signer)
-            .addData(
-                '0x3031465350373845344b4d4d3548455142303942443854323533000000000000',
-                ethers.utils.defaultAbiCoder.encode(
-                    ['address'],
-                    ['0x82dBf1444b9344658f9036c5b51B4d93E4a4aAa5']
-                )
-            )
-        await executeSolve(1)
-    }
-
-    useEffect(() => {
-        testExecute()
-    }, [contract])
 
     const init = () => {
         updateData()
@@ -257,13 +227,12 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
             const res: Omit<SolverContractCondition, 'executions'>[] =
                 await contract.getConditions()
 
-            const conditionsWithExecutions = res.map((condition, idx) => {
+            return res.map((condition, idx) => {
                 return {
                     ...condition,
                     executions: idx + 1,
                 }
             })
-            return conditionsWithExecutions
         } catch (e) {
             console.error(e)
             return Promise.reject()
@@ -349,6 +318,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         })
     }
 
+    // Improvement - reference by conditionId instead of executions
     const getSlotsHistory = async (
         ingests: ParsedSlotModel[],
         conditions: SolverContractCondition[]
@@ -403,22 +373,23 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                             return {
                                 outcomeCollectionIndexSet:
                                     outcomeCollections[idx].indexSet,
-                                amount: amountData || 'Undefined amount',
+                                amount: amountData,
                             }
                         }
                     )
 
                     if (!allocationHistory[condition.conditionId])
                         allocationHistory[condition.conditionId] = []
+
+                    const decodedAddress = decodeData(
+                        [SolidityDataTypes.Address],
+                        slotsHistory[condition.conditionId][
+                            allocation.recipientAddressSlot
+                        ].data
+                    )
+
                     allocationHistory[condition.conditionId].push({
-                        address: ethers.utils.defaultAbiCoder
-                            .decode(
-                                ['address'],
-                                slotsHistory[condition.conditionId][
-                                    allocation.recipientAddressSlot
-                                ].data
-                            )
-                            .toString(),
+                        address: decodedAddress,
                         allocations: allocations,
                     })
                 } catch (e) {
@@ -439,20 +410,14 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                 currentSolverData.config.conditionBase.allocations.map(
                     (allocation) => allocation.recipientAddressSlot
                 )
-            return recipientAddressSlots.map((recipientAddressSlot) => {
-                const addressData =
+            return recipientAddressSlots.map((recipientAddressSlot) =>
+                decodeData(
+                    [SolidityDataTypes.Address],
                     currentSolverData.slotsHistory[condition.conditionId][
                         recipientAddressSlot
                     ].data
-
-                try {
-                    return ethers.utils.defaultAbiCoder
-                        .decode(['address'], addressData)
-                        .toString()
-                } catch {
-                    throw new Error('Error while decoding recipient address')
-                }
-            })
+                )
+            )
         } else {
             throw new Error('No solver data existent')
         }
@@ -520,16 +485,6 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         }
     } else {
         return <>Loading</>
-    }
-}
-
-export const decodeData = (types: SolidityDataTypes[], data: any) => {
-    let decoded
-    try {
-        decoded = ethers.utils.defaultAbiCoder.decode(types, data)
-    } catch (e) {
-        decoded = [`Invalid decoding`]
-        console.log(`Error decoding "${data}"`, e)
     }
 }
 
