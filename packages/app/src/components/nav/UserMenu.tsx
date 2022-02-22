@@ -3,13 +3,13 @@ import { IconContext, SignIn, SignOut, UserCircle } from 'phosphor-react'
 
 import React from 'react'
 import RecipientAvatar from '../avatars/RecipientAvatar'
-import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSigner'
 import { useRouter } from 'next/dist/client/router'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface UserMenuProps {}
 
 export default function UserMenu({}: UserMenuProps) {
-    const { currentUser, logout } = useCurrentUserOrSigner()
+    const { currentUser, logout } = useCurrentUser()
     const router = useRouter()
 
     const onLogout = () => {

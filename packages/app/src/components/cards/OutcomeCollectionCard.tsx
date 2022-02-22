@@ -13,13 +13,13 @@ import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 
 interface OutcomeCollectionCardProps {
     outcomeCollection: SolverComponentOC
-    proposable?: boolean
+    proposeMethod?: (indexSet: number) => void
     allocations: SolverContractAllocationsType
 }
 
 const OutcomeCollectionCard = ({
     outcomeCollection,
-    proposable,
+    proposeMethod,
     allocations,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
@@ -63,10 +63,16 @@ const OutcomeCollectionCard = ({
                         icon={<Coins />}
                         onClick={toggleShowAllocationModal}
                     />
-                    {proposable && (
+                    {proposeMethod && (
                         <Box pad="small" gap="small">
                             <PlainSectionDivider />
-                            <Button primary label="Propose Outcome" />
+                            <Button
+                                onClick={() =>
+                                    proposeMethod(outcomeCollection.indexSet)
+                                }
+                                primary
+                                label="Propose Outcome"
+                            />
                         </Box>
                     )}
                 </CardBody>

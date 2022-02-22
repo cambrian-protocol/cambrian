@@ -1,13 +1,23 @@
+import {
+    SolverContractCondition,
+    SolverContractData,
+} from '@cambrian/app/models/SolverModel'
+
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { Layout } from '@cambrian/app/components/layout/Layout'
-import { SolverContractData } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'
+import { SetStateAction } from 'react'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export interface DefaultSolverUIProps {
     solverData: SolverContractData
     solverContract: ethers.Contract
     solverMethods: BasicSolverMethodsType
-    signer: ethers.providers.JsonRpcSigner
+    currentUser: UserType
+    currentCondition: SolverContractCondition
+    setCurrentCondition: React.Dispatch<
+        SetStateAction<SolverContractCondition | undefined>
+    >
 }
 
 const DefaultSolverUI = ({ solverData }: DefaultSolverUIProps) => {

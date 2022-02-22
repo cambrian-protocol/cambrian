@@ -2,17 +2,17 @@ import SideNav from './SideNav'
 import SidebarSolverItem from './SidebarSolverItem'
 
 interface SolutionSideNavProps {
-    solverAddressChain: string[]
     activeSolverAddress: string
+    solverChain: string[]
 }
 
 const SolutionSideNav = ({
-    solverAddressChain,
+    solverChain,
     activeSolverAddress,
 }: SolutionSideNavProps) => {
     return (
         <SideNav>
-            {solverAddressChain.map((solverAddress) => (
+            {solverChain.map((solverAddress) => (
                 <SidebarSolverItem
                     key={solverAddress}
                     solverAddress={solverAddress}

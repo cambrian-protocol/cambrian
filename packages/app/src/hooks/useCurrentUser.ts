@@ -2,6 +2,6 @@ import { UserContext, UserContextType } from '@cambrian/app/store/UserContext'
 
 import { useContext } from 'react'
 
-export const useCurrentUserOrSigner = () => {
+export const useCurrentUser = () => {
     return useContext<UserContextType>(UserContext)
 }
