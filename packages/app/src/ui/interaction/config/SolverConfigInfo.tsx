@@ -16,23 +16,22 @@ import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
-import { SolverContractData } from '@cambrian/app/models/SolverModel'
-import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
+import {
+    SolverContractCondition,
+    SolverContractData,
+} from '@cambrian/app/models/SolverModel'
 
 interface SolverConfigInfoProps {
     solverData: SolverContractData
     solverMethods: BasicSolverMethodsType
+    currentCondition: SolverContractCondition
 }
 
 const SolverConfigInfo = ({
     solverData,
     solverMethods,
+    currentCondition,
 }: SolverConfigInfoProps) => {
-    const { currentCondition } = useCurrentSolver()
-
-    // TODO Error handling
-    if (!currentCondition) return null
-
     const [showRecipientModal, setShowRecipientModal] = useState(false)
     const [showOutcomeModal, setShowOutcomeModal] = useState(false)
     const [showKeeperInputModal, setShowKeeperInputModal] = useState(false)

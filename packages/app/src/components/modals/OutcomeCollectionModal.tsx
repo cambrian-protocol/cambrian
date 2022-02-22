@@ -11,17 +11,19 @@ import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: SolverComponentOC[]
     allocations: SolverContractAllocationsType
+    proposeMethod?: (indexSet: number) => void
 }
 
 const OutcomeCollectionModal = ({
     outcomeCollections,
     allocations,
+    proposeMethod,
     ...rest
 }: OutcomeCollectionModalProps) => {
     return (
         <BaseLayerModal {...rest}>
             <HeaderTextSection
-                title="Outcomes"
+                title={proposeMethod ? 'Propose an outcome' : 'Outcomes'}
                 subTitle="What can happen?"
                 paragraph="Outcome description. Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
             />
@@ -32,6 +34,7 @@ const OutcomeCollectionModal = ({
                             key={outcomeCollection.indexSet}
                             outcomeCollection={outcomeCollection}
                             allocations={allocations}
+                            proposeMethod={proposeMethod}
                         />
                     )
                 })}
