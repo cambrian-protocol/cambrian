@@ -4,9 +4,7 @@ import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { PropsWithChildren } from 'react'
 import UserMenu from './UserMenu'
 
-type SideNavProps = PropsWithChildren<{}>
-
-const SideNav = ({ children }: SideNavProps) => {
+const SideNav = ({ children }: PropsWithChildren<{}>) => {
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => (
@@ -28,7 +26,7 @@ const SideNav = ({ children }: SideNavProps) => {
                             <Image src="/images/cambrian_protocol_logo_400x400.png" />
                         </Box>
                     </Box>
-                    <Box flex gap="medium">
+                    <Box overflow={{ vertical: 'auto' }} flex gap="medium">
                         {children}
                     </Box>
                     <Box gap="medium" fill="horizontal">

@@ -8,10 +8,11 @@ import {
     SolverContractCondition,
     SolverContractConfigModel,
     SolverContractConfigResponseType,
+    SolverContractData,
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
 import { Fragment } from 'ethers/lib/utils'
@@ -24,15 +25,16 @@ import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { useCurrentSolver } from '@cambrian/app/hooks/useCurrentSolver'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
     executeSolve: (conditionIndex: number) => Promise<any>
     proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
     confirmPayouts: (conditionIndex: number) => Promise<any>
-    getChainParent: () => {}
-    getChainChild: () => {}
+    getChainParent: () => Promise<any>
+    getChainChild: () => Promise<any>
+    getSolverChain: () => Promise<string[]>
     getChainIndex: () => {}
     getTimelock: (conditionIndex: number) => Promise<any>
     getTrackingID: () => {}
@@ -53,23 +55,38 @@ export type BasicSolverMethodsType = {
 interface SolverProps {
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
-    signer: ethers.providers.JsonRpcSigner
+    currentUser: UserType
 }
 
-const Solver = ({ address, abi, signer }: SolverProps) => {
+const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const ipfs = new IPFSAPI()
     const [contract, setContract] = React.useState<Contract>(
-        new ethers.Contract(address, new ethers.utils.Interface(abi), signer)
+        new ethers.Contract(
+            address,
+            new ethers.utils.Interface(abi),
+            currentUser.signer
+        )
     )
-    const { currentSolverData, setCurrentSolverData } = useCurrentSolver()
+
+    const [currentSolverData, setCurrentSolverData] =
+        useState<SolverContractData>()
+
+    const [currentCondition, setCurrentCondition] =
+        useState<SolverContractCondition>()
 
     useEffect(() => {
         init()
+        initListeners()
     }, [])
 
-    const init = () => {
-        updateData()
-        initListeners()
+    const init = async () => {
+        const updatedData = await getUpdatedData()
+        setCurrentSolverData(updatedData)
+
+        // Default to latest condition
+        setCurrentCondition(
+            updatedData.conditions[updatedData.conditions.length - 1]
+        )
     }
 
     const initListeners = async () => {
@@ -79,15 +96,16 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
             fromBlock: 'latest',
         } as EventFilter
 
-        signer.provider.on(filter, () => {
+        currentUser.signer.provider.on(filter, async () => {
             console.log('Heard IngestedData event')
-            updateData()
+            const updatedData = await getUpdatedData()
+            setCurrentSolverData(updatedData)
         })
 
         // TODO Status listeners
     }
 
-    const updateData = async () => {
+    const getUpdatedData = async (): Promise<SolverContractData> => {
         const config = await getConfig()
         const conditions = await getConditions()
 
@@ -103,14 +121,14 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
             outcomeCollections
         )
 
-        setCurrentSolverData({
+        return {
             config: config,
             outcomeCollections: outcomeCollections,
             allocationsHistory: allocationHistory,
             conditions: conditions,
             timelocksHistory: timelocksHistory,
             slotsHistory: slotsHistory,
-        })
+        }
     }
 
     const prepareSolve = async (newConditionIndex: number) => {
@@ -151,7 +169,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
     /***************** ******* *******************/
     /***************** GETTERS *******************/
     /***************** ******* *******************/
-    const getChainParent = () => {
+    const getChainParent = async () => {
         try {
             return contract.chainParent()
         } catch (e) {
@@ -165,6 +183,31 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         } catch (e) {
             console.error(e)
         }
+    }
+
+    const getSolverChain = async () => {
+        const children = await fetchSolverChain(getChainChild)
+        const parents = await fetchSolverChain(getChainParent)
+
+        return [...children, contract.address, ...parents]
+    }
+
+    const fetchSolverChain = async (getMethod: () => Promise<any>) => {
+        const addresses: string[] = []
+        let fetchedAddress = await getMethod()
+        while (
+            fetchedAddress !== '0x0000000000000000000000000000000000000000' &&
+            ethers.utils.isAddress(fetchedAddress)
+        ) {
+            addresses.push(fetchedAddress)
+            const childContract = new ethers.Contract(
+                fetchedAddress,
+                new ethers.utils.Interface(abi),
+                currentUser.signer
+            )
+            fetchedAddress = await childContract.getChainParent()
+        }
+        return addresses
     }
 
     const getChainIndex = () => {
@@ -272,10 +315,6 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         }
     }
 
-    /***************** ******* *******************/
-    /****** ********************************** ***/
-    /***************** ******* *******************/
-
     const getTimelocksHistory = async (
         conditions: SolverContractCondition[]
     ): Promise<TimeLocksHashMap> => {
@@ -369,7 +408,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                             const amountData =
                                 slotsHistory[condition.conditionId][
                                     recipientAmountSlot
-                                ].data
+                                ]?.data
 
                             return {
                                 outcomeCollectionIndexSet:
@@ -386,7 +425,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                         [SolidityDataTypes.Address],
                         slotsHistory[condition.conditionId][
                             allocation.recipientAddressSlot
-                        ].data
+                        ]?.data
                     )
 
                     allocationHistory[condition.conditionId].push({
@@ -416,7 +455,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                     [SolidityDataTypes.Address],
                     currentSolverData.slotsHistory[condition.conditionId][
                         recipientAddressSlot
-                    ].data
+                    ]?.data
                 )
             )
         } else {
@@ -449,6 +488,7 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
         confirmPayouts: confirmPayouts,
         getChainParent: getChainParent,
         getChainChild: getChainChild,
+        getSolverChain: getSolverChain,
         getChainIndex: getChainIndex,
         getTimelock: getTimelock,
         getTrackingID: getTrackingID,
@@ -464,14 +504,16 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
 
     // TODO Determine SolverUI
     const loadWriter = true
-    if (currentSolverData) {
+    if (currentSolverData && currentCondition && currentUser) {
         if (loadWriter) {
             return (
                 <WriterSolverUI
                     solverData={currentSolverData}
                     solverContract={contract}
-                    signer={signer}
+                    currentUser={currentUser}
                     solverMethods={basicSolverMethods}
+                    currentCondition={currentCondition}
+                    setCurrentCondition={setCurrentCondition}
                 />
             )
         } else {
@@ -479,8 +521,10 @@ const Solver = ({ address, abi, signer }: SolverProps) => {
                 <DefaultSolverUI
                     solverData={currentSolverData}
                     solverContract={contract}
-                    signer={signer}
+                    currentUser={currentUser}
+                    currentCondition={currentCondition}
                     solverMethods={basicSolverMethods}
+                    setCurrentCondition={setCurrentCondition}
                 />
             )
         }

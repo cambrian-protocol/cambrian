@@ -6,22 +6,22 @@ import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import { SolutionModel } from '@cambrian/app/src/models/SolutionModel'
 import { SolutionsHubAPI } from '@cambrian/app/src/services/api/SolutionsHub.api'
 import { useRouter } from 'next/dist/client/router'
-import { UserContext } from '@cambrian/app/store/UserContext'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export default function SolutionPage() {
-    const user = useContext(UserContext)
+    const { currentUser, currentProvider, login } = useCurrentUser()
     const router = useRouter()
     const { solutionId } = router.query
     const [currentSolution, setCurrentSolution] = useState<SolutionModel>()
 
     useEffect(() => {
         async function getLogin() {
-            await user.login()
+            await login()
         }
-        if (!user.currentProvider) {
+        if (!currentProvider) {
             getLogin()
         } else {
-            console.log(user.currentProvider)
+            console.log(currentProvider)
         }
     }, [])
 
@@ -29,14 +29,11 @@ export default function SolutionPage() {
         if (!router.isReady) return
 
         if (
-            user.currentProvider &&
+            currentProvider &&
             solutionId !== undefined &&
             typeof solutionId === 'string'
         ) {
-            SolutionsHubAPI.getSolutionFromSolutionId(
-                solutionId,
-                user.currentProvider
-            )
+            SolutionsHubAPI.getSolutionFromSolutionId(solutionId)
                 .then((res) => setCurrentSolution(res.solution))
                 .catch((err) => {
                     console.error('Error while loading solution', err)
@@ -46,7 +43,7 @@ export default function SolutionPage() {
             console.error('No solution identifier found')
             //router.push('/404')
         }
-    }, [user, router])
+    }, [currentUser, router])
 
     return (
         <>

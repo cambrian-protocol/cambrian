@@ -1,3 +1,4 @@
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import {
     PROPOSALS_HUB_ABI,
     PROPOSALS_HUB_ADDRESS,
@@ -6,7 +7,6 @@ import {
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ethers } from 'ethers'
 import { fetchTokenModelFromAddress } from './etherscan/ERC20TokenTransferEvents'
-import { useCurrentUserOrSigner } from '@cambrian/app/hooks/useCurrentUserOrSigner'
 
 export type ProposalResponseType = {
     proposal: ProposalModel
@@ -20,16 +20,16 @@ export const ProposalsHubAPI = {
         collateralTokenAddress: string,
         amount: number
     ) => {
-        const { currentSigner } = useCurrentUserOrSigner()
+        const { currentUser } = useCurrentUser()
 
-        if (currentSigner) {
+        if (currentUser) {
             const proposalsHubContract = new ethers.Contract(
                 PROPOSALS_HUB_ADDRESS,
                 PROPOSALS_HUB_ABI,
-                currentSigner
+                currentUser.signer
             )
             proposalsHubContract
-                .connect(currentSigner)
+                .connect(currentUser.signer)
                 .defundProposal(proposalId, collateralTokenAddress, amount)
                 .then((res: any) => {})
         }
@@ -39,16 +39,16 @@ export const ProposalsHubAPI = {
         collateralTokenAddress: string,
         amount: number
     ) => {
-        const { currentSigner } = useCurrentUserOrSigner()
+        const { currentUser } = useCurrentUser()
 
-        if (currentSigner) {
+        if (currentUser) {
             const proposalsHubContract = new ethers.Contract(
                 PROPOSALS_HUB_ADDRESS,
                 PROPOSALS_HUB_ABI,
-                currentSigner
+                currentUser.signer
             )
             proposalsHubContract
-                .connect(currentSigner)
+                .connect(currentUser.signer)
                 .fundProposal(proposalId, collateralTokenAddress, amount)
                 .then((res: any) => {})
         }
@@ -60,7 +60,6 @@ export const ProposalsHubAPI = {
         // const response = await cambrianClient.get<ProposalResponseType>()
 
         // TODO fetch proposal from chain
-        const { currentSigner } = useCurrentUserOrSigner()
 
         // proposalsHubContract.connect(currentSigner).get
 

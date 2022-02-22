@@ -1,40 +1,42 @@
+import LoginScreen from '@cambrian/app/ui/auth/LoginScreen'
 import React from 'react'
 import Solver from '@cambrian/app/components/solver/Solver'
-import { UserContext } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 
 export default function SolverPage() {
-    const user = React.useContext(UserContext)
+    const { currentUser, login } = useCurrentUser()
     const router = useRouter()
     const { solverAddress } = router.query // 0x8aCd85898458400f7Db866d53FCFF6f0D49741FF
 
     React.useEffect(() => {
-        async function getLogin() {
-            await user.login()
-        }
-        if (!user.currentSigner) {
+        if (!currentUser) {
             getLogin()
         } else {
-            console.log(user.currentSigner)
+            console.log(currentUser)
         }
-    }, [user])
+    }, [currentUser])
+
+    const getLogin = async () => {
+        await login()
+    }
 
     if (
         typeof solverAddress == 'string' &&
         ethers.utils.isAddress(solverAddress) &&
-        user.currentSigner
+        currentUser
     ) {
         return (
             <Solver
                 address={solverAddress}
                 abi={SOLVER_ABI}
-                signer={user.currentSigner}
+                currentUser={currentUser}
             />
         )
     } else {
-        return <p>Please log in</p>
+        return <LoginScreen onConnectWallet={getLogin} />
     }
 }

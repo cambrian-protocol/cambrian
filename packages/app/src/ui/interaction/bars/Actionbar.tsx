@@ -1,20 +1,19 @@
-import { Box, Button, ResponsiveContext } from 'grommet'
+import { Box, Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
 
 import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
-import { ButtonProps } from 'grommet'
 
 export type ActionbarActionsType = {
-    primaryAction?: ButtonProps
+    primaryAction?: ButtonExtendedProps
 } & (
-    | { secondaryAction: ButtonProps; info?: never }
+    | { secondaryAction?: ButtonExtendedProps; info?: never }
     | {
-          info: { icon: JSX.Element; label: string; descLabel: string }
+          info?: { icon: JSX.Element; label: string; descLabel: string }
           secondaryAction?: never
       }
 )
 
 interface ActionbarProps {
-    actions?: ActionbarActionsType
+    actions: ActionbarActionsType
 }
 
 const Actionbar = ({ actions }: ActionbarProps) => {
@@ -36,23 +35,21 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         align="center"
                         pad={{ horizontal: 'small' }}
                     >
-                        {actions?.info && (
+                        {actions.info && (
                             <Box flex>
                                 <ActionbarInfo {...actions.info} />
                             </Box>
                         )}
-                        {actions?.secondaryAction && (
-                            <>
-                                <Button
-                                    size="small"
-                                    secondary
-                                    {...actions.secondaryAction}
-                                />
-                                <Box flex />
-                            </>
+                        {actions.secondaryAction && (
+                            <Button
+                                size="small"
+                                secondary
+                                {...actions.secondaryAction}
+                            />
                         )}
+                        <Box flex />
                         <Box>
-                            {actions?.primaryAction && (
+                            {actions.primaryAction && (
                                 <Button
                                     size="small"
                                     primary

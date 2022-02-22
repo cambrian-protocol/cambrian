@@ -5,13 +5,16 @@ import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
+import { SetStateAction } from 'react'
 
 interface ConditionVersionSidebarProps {
     solverTitle: string
     solverMetaVersion?: string
     solverConditions: SolverContractCondition[]
-    updateCondition: (updatedCondition: SolverContractCondition) => void
-    currentCondition?: SolverContractCondition
+    currentCondition: SolverContractCondition
+    setCurrentCondition: React.Dispatch<
+        SetStateAction<SolverContractCondition | undefined>
+    >
 }
 
 const ConditionVersionSidebar = ({
@@ -19,7 +22,7 @@ const ConditionVersionSidebar = ({
     solverMetaVersion,
     solverConditions,
     currentCondition,
-    updateCondition,
+    setCurrentCondition,
 }: ConditionVersionSidebarProps) => {
     const conditions = [...solverConditions]
 
@@ -61,8 +64,13 @@ const ConditionVersionSidebar = ({
                                         newestCondition.status
                                     ].icon
                                 }
-                                onClick={() => updateCondition(newestCondition)}
-                                isActive={currentCondition === newestCondition}
+                                onClick={() =>
+                                    setCurrentCondition(newestCondition)
+                                }
+                                isActive={
+                                    currentCondition.conditionId ===
+                                    newestCondition.conditionId
+                                }
                             />
                             {conditions.length > 0 && (
                                 <Box gap="medium" height={{ min: 'auto' }}>
@@ -93,10 +101,10 @@ const ConditionVersionSidebar = ({
                                                 ].icon
                                             }
                                             onClick={() =>
-                                                updateCondition(condition)
+                                                setCurrentCondition(condition)
                                             }
                                             isActive={
-                                                currentCondition?.conditionId ===
+                                                currentCondition.conditionId ===
                                                 condition.conditionId
                                             }
                                         />
@@ -107,7 +115,7 @@ const ConditionVersionSidebar = ({
                     ) : (
                         <Box fill justify="center" align="center" gap="medium">
                             <CircleDashed size="32" />
-                            <Text>No condition history found</Text>
+                            <Text>No conditions found</Text>
                         </Box>
                     )}
                 </Box>

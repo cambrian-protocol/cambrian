@@ -115,8 +115,7 @@ export const Layout = ({
                                         }}
                                         align="center"
                                         onClick={
-                                            showSidebar &&
-                                            screenSize === 'small'
+                                            showSidebar
                                                 ? toggleSidebar
                                                 : undefined
                                         }
