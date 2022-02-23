@@ -14,6 +14,7 @@ import SolverConfigInfo from '../interaction/config/SolverConfigInfo'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { BigNumber } from 'ethers'
 
 const WriterSolverUI = ({
     currentUser,
@@ -24,6 +25,10 @@ const WriterSolverUI = ({
     setCurrentCondition,
 }: DefaultSolverUIProps) => {
     const [solverChain, setSolverChain] = useState([solverContract.address])
+
+    const [currentTimelock, setCurrentTimelock] = useState(0)
+    const [isTimelockActive, setIsTimelockActive] = useState(true)
+
     const [showProposeOutcomeModal, setShowProposeOutcomeModal] =
         useState(false)
     const [showInitNewWriterModal, setShowInitNewWriterModal] = useState(false)
@@ -35,7 +40,30 @@ const WriterSolverUI = ({
 
     useEffect(() => {
         initSolverChain()
+        initTimelock()
     }, [])
+
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout
+        if (
+            currentCondition.status === ConditionStatus.OutcomeProposed &&
+            isTimelockActive
+        ) {
+            intervalId = setInterval(() => {
+                setIsTimelockActive(new Date().getTime() < currentTimelock)
+            }, 1000)
+        }
+        return () => clearInterval(intervalId)
+    }, [currentTimelock, isTimelockActive])
+
+    const initTimelock = async () => {
+        const timeLockResponse: BigNumber = await solverMethods.getTimelock(
+            currentCondition.executions - 1
+        )
+        const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
+        setCurrentTimelock(timeLockMilliseconds)
+        setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
+    }
 
     const initSolverChain = async () => {
         const solverChain = await solverMethods.getSolverChain()
@@ -96,8 +124,6 @@ const WriterSolverUI = ({
                 }
                 break
             case ConditionStatus.OutcomeProposed:
-                // TODO Check Timelock
-                const isTimelockActive = false
                 if (isTimelockActive) {
                     return {
                         primaryAction: {
@@ -106,7 +132,9 @@ const WriterSolverUI = ({
                         },
                         info: {
                             icon: <Timer />,
-                            label: '12.02.2022 - 10:00AM',
+                            label: `${new Date(
+                                currentTimelock
+                            ).toLocaleString()}`,
                             descLabel: 'Timelock active until',
                         },
                     }
