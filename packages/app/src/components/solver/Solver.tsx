@@ -1,4 +1,4 @@
-import { Contract, EventFilter, ethers } from 'ethers'
+import { Contract, EventFilter, ethers, Wallet } from 'ethers'
 import {
     IPFSOutcomeModel,
     SlotsHashMapType,
@@ -26,12 +26,16 @@ import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/Solver
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { Box, Text } from 'grommet'
+import HeaderTextSection from '../sections/HeaderTextSection'
+import { Layout } from '../layout/Layout'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
     executeSolve: (conditionIndex: number) => Promise<any>
     proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
     confirmPayouts: (conditionIndex: number) => Promise<any>
+    addData: (slotId: string, data: string) => Promise<any>
     getChainParent: () => Promise<any>
     getChainChild: () => Promise<any>
     getSolverChain: () => Promise<string[]>
@@ -84,6 +88,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         setCurrentSolverData(updatedData)
 
         // Default to latest condition
+        // May be undefined. Solvers deployed manually (instead of through SolutionsHub) also need their first solve prepared manually
+
         setCurrentCondition(
             updatedData.conditions[updatedData.conditions.length - 1]
         )
@@ -103,6 +109,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         })
 
         // TODO Status listeners
+    }
+
+    const addData = async (slotId: string, data: string) => {
+        return contract.addData(slotId, data)
     }
 
     const getUpdatedData = async (): Promise<SolverContractData> => {
@@ -459,7 +469,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 )
             )
         } else {
-            throw new Error('No solver data existent')
+            throw new Error('No solver data exists')
         }
     }
 
@@ -477,7 +487,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     ]
             )
         } else {
-            throw new Error('No solver data existent')
+            throw new Error('No solver data exists')
         }
     }
 
@@ -486,6 +496,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         executeSolve: executeSolve,
         proposePayouts: proposePayouts,
         confirmPayouts: confirmPayouts,
+        addData: addData,
         getChainParent: getChainParent,
         getChainChild: getChainChild,
         getSolverChain: getSolverChain,
@@ -504,7 +515,38 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     // TODO Determine SolverUI
     const loadWriter = true
-    if (currentSolverData && currentCondition && currentUser) {
+    if (currentSolverData && currentUser) {
+        if (currentCondition === undefined) {
+            return (
+                <Layout contextTitle="Login">
+                    <Box
+                        pad="small"
+                        width="medium"
+                        gap="small"
+                        fill
+                        justify="center"
+                    >
+                        <HeaderTextSection
+                            title="Uninitialized Solve"
+                            paragraph="You must manually prepare the first Solve."
+                        />
+                        <Box
+                            direction="row"
+                            align="center"
+                            gap="medium"
+                            background="primary-gradient"
+                            round="small"
+                            focusIndicator={false}
+                            width="100%"
+                            pad="small"
+                            onClick={() => basicSolverMethods.prepareSolve(0)}
+                        >
+                            <Text>Prepare Solve</Text>
+                        </Box>
+                    </Box>
+                </Layout>
+            )
+        }
         if (loadWriter) {
             return (
                 <WriterSolverUI

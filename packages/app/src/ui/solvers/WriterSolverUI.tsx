@@ -204,7 +204,7 @@ const WriterSolverUI = ({
             )}
             {showInitNewWriterModal && (
                 <BaseLayerModal onBack={toggleShowInitNewWriterModal}>
-                    Please input a Writers address
+                    Please input a Writer's address
                 </BaseLayerModal>
             )}
         </>
