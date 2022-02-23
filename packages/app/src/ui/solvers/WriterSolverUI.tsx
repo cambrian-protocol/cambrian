@@ -1,5 +1,8 @@
 import Actionbar, { ActionbarActionsType } from '../interaction/bars/Actionbar'
-import { ConditionStatus } from '@cambrian/app/models/SolverModel'
+import {
+    ConditionStatus,
+    SolverComponentOC,
+} from '@cambrian/app/models/SolverModel'
 import { Handshake, Timer, WarningCircle } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
@@ -11,10 +14,14 @@ import { Layout } from '@cambrian/app/components/layout/Layout'
 import OutcomeCollectionModal from '@cambrian/app/components/modals/OutcomeCollectionModal'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
 import SolverConfigInfo from '../interaction/config/SolverConfigInfo'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
+import {
+    binaryArrayFromIndexSet,
+    getIndexSetFromBinaryArray,
+} from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { BigNumber } from 'ethers'
+import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 
 const WriterSolverUI = ({
     currentUser,
@@ -29,6 +36,8 @@ const WriterSolverUI = ({
     const [currentTimelock, setCurrentTimelock] = useState(0)
     const [isTimelockActive, setIsTimelockActive] = useState(true)
 
+    const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
+
     const [showProposeOutcomeModal, setShowProposeOutcomeModal] =
         useState(false)
     const [showInitNewWriterModal, setShowInitNewWriterModal] = useState(false)
@@ -40,7 +49,10 @@ const WriterSolverUI = ({
 
     useEffect(() => {
         initSolverChain()
-        initTimelock()
+        if (currentCondition.payouts.length > 0) {
+            initTimelock()
+            initProposedOutcome()
+        }
     }, [])
 
     useEffect(() => {
@@ -63,6 +75,14 @@ const WriterSolverUI = ({
         const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
         setCurrentTimelock(timeLockMilliseconds)
         setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
+    }
+
+    const initProposedOutcome = () => {
+        const indexSet = getIndexSetFromBinaryArray(currentCondition.payouts)
+        const oc = solverData.outcomeCollections.find(
+            (outcomeCollection) => outcomeCollection.indexSet === indexSet
+        )
+        setProposedOutcome(oc)
     }
 
     const initSolverChain = async () => {
@@ -217,7 +237,30 @@ const WriterSolverUI = ({
                     <ChatFAB solverAddress={solverContract.address} />
                 }
                 actionBar={<Actionbar actions={getCurrentAction()} />}
-            ></Layout>
+            >
+                {proposedOutcome && (
+                    <OutcomeNotification
+                        title={
+                            currentCondition.status ===
+                            ConditionStatus.OutcomeProposed
+                                ? 'Outcome has been proposed'
+                                : 'Outcome has been confirmed'
+                        }
+                        message="Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis.Lorem Ipsum dolor sit amet consectetur adipisicing elit."
+                        allocations={
+                            solverData.allocationsHistory[
+                                currentCondition.conditionId
+                            ]
+                        }
+                        outcomeCollection={proposedOutcome}
+                        //TODO just allow buyer, seller and writer to request arbitration
+                        canRequestArbitration={
+                            currentCondition.status ===
+                            ConditionStatus.OutcomeProposed
+                        }
+                    />
+                )}
+            </Layout>
             {showProposeOutcomeModal && (
                 <OutcomeCollectionModal
                     onBack={toggleShowProposeOutcomeModal}
