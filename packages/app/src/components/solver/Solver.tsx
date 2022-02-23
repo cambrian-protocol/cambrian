@@ -106,6 +106,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             console.log('Heard IngestedData event')
             const updatedData = await getUpdatedData()
             setCurrentSolverData(updatedData)
+            if (currentCondition === undefined) {
+                setCurrentCondition(
+                    updatedData.conditions[updatedData.conditions.length - 1]
+                )
+            }
         })
 
         // TODO Status listeners
