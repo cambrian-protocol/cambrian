@@ -41,6 +41,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
+  await deploy("WriterSolverV1", {
+    from: deployer,
+    args: [],
+    libraries: {
+      SolverLib: solverLib.address,
+    },
+    log: true,
+  });
+
   await deploy("ToyToken", {
     from: deployer,
     args: ["TOY", "TOY"],
@@ -66,6 +75,7 @@ module.exports.tags = [
   "IPFSSolutionsHub",
   "SolverLib",
   "BasicSolverV1",
+  "WriterSolverV1",
   "ToyToken",
   "SolutionsHub",
 ];
