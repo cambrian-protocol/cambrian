@@ -93,7 +93,7 @@ library SolverLib {
     }
 
     event DeployedChild(address child);
-    event ChangedStatus(bytes32 conditionId, Status status);
+    event ChangedStatus(bytes32 conditionId);
     event DeliveredNullArbitration(bytes32 conditionId);
 
     function createCondition(
@@ -222,10 +222,7 @@ library SolverLib {
             condition.questionId,
             condition.payouts
         );
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.OutcomeReported
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function reportPayouts(
@@ -237,10 +234,7 @@ library SolverLib {
             condition.questionId,
             payouts
         );
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.OutcomeReported
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function proposePayouts(
@@ -250,10 +244,7 @@ library SolverLib {
         condition.status = Status.OutcomeProposed;
         condition.payouts = _payouts;
 
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.OutcomeProposed
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function confirmPayouts(address ctfAddress, Condition storage condition)
@@ -265,26 +256,17 @@ library SolverLib {
 
     function arbitrationPending(Condition storage condition) public {
         condition.status = Status.ArbitrationPending;
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.ArbitrationPending
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function arbitrationRequested(Condition storage condition) public {
         condition.status = Status.ArbitrationRequested;
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.ArbitrationRequested
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function arbitrateNull(Condition storage condition) public {
         condition.status = Status.OutcomeProposed;
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.OutcomeProposed
-        );
+        emit ChangedStatus(condition.conditionId);
         emit DeliveredNullArbitration(condition.conditionId);
     }
 
@@ -295,10 +277,7 @@ library SolverLib {
     ) public {
         condition.status = Status.ArbitrationDelivered;
         reportPayouts(ctfAddress, condition, payouts);
-        emit ChangedStatus(
-            condition.conditionId,
-            SolverLib.Status.ArbitrationDelivered
-        );
+        emit ChangedStatus(condition.conditionId);
     }
 
     function allocationsValid(
