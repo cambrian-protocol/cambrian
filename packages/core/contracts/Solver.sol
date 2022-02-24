@@ -33,9 +33,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
 
-    event DeployedChild(address chainChild);
-    event PreparedSolve(address solver, uint256 solveIndex);
+    event ChangedStatus(uint256 conditionIndex, SolverLib.Status status);
+
+    event DeployedChild(address child);
+
+    event DeliveredNullArbitration(bytes32 conditionId);
+
     event IngestedData(); // Emited on executeIngests(), handleCallback(), addData()
+
+    event PreparedSolve(address solver, uint256 solveIndex);
+
+    event UpdatedTimelock(uint256 timelockIndex);
 
     /**
         @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
@@ -108,26 +116,20 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     */
     function deployChild(SolverLib.Config calldata _config)
         public
-        returns (Solver _solver)
+        returns (address)
     {
         require(msg.sender == config.keeper, "Only keeper");
         require(chainChild == address(0), "Solver has child");
 
-        (chainChild, _solver) = SolverLib.deployChild(
+        chainChild = SolverLib.deployChild(
             factoryAddress,
             _config,
-            chainIndex
+            chainIndex,
+            trackingId,
+            context
         );
 
-        if (trackingId != bytes32("")) {
-            _solver.setTrackingId(trackingId);
-        }
-
-        if (context.size > 0) {
-            _solver.setContext(context);
-        }
-
-        emit DeployedChild(chainChild);
+        return chainChild;
     }
 
     // ********************************************************************************** //
@@ -171,6 +173,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         postroll(_index);
         cascade(_index);
+
+        emit ChangedStatus(_index, SolverLib.Status.Executed);
     }
 
     function postroll(uint256 _index) internal virtual;
@@ -244,7 +248,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @dev Verifies that all slots corresponding to recipients have been filled before CT allocation
      */
     function allocationsValid(uint256 _index) public view returns (bool) {
-        return SolverLib.allocationValid(_index, datas, config.conditionBase);
+        return SolverLib.allocationsValid(_index, datas, config.conditionBase);
     }
 
     /**
@@ -445,6 +449,35 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
+        @dev Sets condition.status to ArbitrationRequested.
+        @param _index Index of condition
+     */
+    function arbitrationRequested(uint256 _index) external {
+        require(msg.sender == config.arbitrator, "Only arbitrator");
+        require(
+            conditions[_index].status == SolverLib.Status.OutcomeProposed,
+            "Not OutcomeProposed"
+        );
+
+        SolverLib.arbitrationRequested(conditions[_index]);
+        updateTimelock(_index);
+    }
+
+    /**
+        @dev Sets condition.status to ArbitrationPending.
+        @param _index Index of condition
+     */
+    function arbitrationPending(uint256 _index) external {
+        require(msg.sender == config.arbitrator, "Only arbitrator");
+        require(
+            conditions[_index].status == SolverLib.Status.ArbitrationRequested,
+            "Not ArbitrationRequested"
+        );
+        SolverLib.arbitrationPending(conditions[_index]);
+        updateTimelock(_index);
+    }
+
+    /**
         @dev Allows arbitrator to unilaterally make a payout report.
         @param _index Index of condition
         @param payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
@@ -474,35 +507,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "Not ArbitrationPending"
         );
         SolverLib.arbitrateNull(conditions[_index]);
-        updateTimelock(_index);
-    }
-
-    /**
-        @dev Sets condition.status to ArbitrationRequested.
-        @param _index Index of condition
-     */
-    function arbitrationRequested(uint256 _index) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
-        require(
-            conditions[_index].status == SolverLib.Status.OutcomeProposed,
-            "Not OutcomeProposed"
-        );
-
-        SolverLib.arbitrationRequested(conditions[_index]);
-        updateTimelock(_index);
-    }
-
-    /**
-        @dev Sets condition.status to ArbitrationPending.
-        @param _index Index of condition
-     */
-    function arbitrationPending(uint256 _index) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
-        require(
-            conditions[_index].status == SolverLib.Status.ArbitrationRequested,
-            "Not ArbitrationRequested"
-        );
-        SolverLib.arbitrationPending(conditions[_index]);
         updateTimelock(_index);
     }
 
@@ -555,6 +559,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         timelocks[_index] =
             block.timestamp +
             (config.timelockSeconds * 1 seconds);
+
+        emit UpdatedTimelock(_index);
     }
 
     function collateralBalance() public view returns (uint256 balance) {

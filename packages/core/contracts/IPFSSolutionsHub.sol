@@ -44,22 +44,24 @@ contract IPFSSolutionsHub {
         bytes32 _solutionId,
         SolverLib.Config[] calldata solverConfigs
     ) private {
-        Solver _solver;
+        address _solverAddress;
 
         for (uint256 i; i < solverConfigs.length; i++) {
             if (i == 0) {
-                _solver = Solver(
-                    ISolverFactory(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
-                        .createSolver(address(0), i, solverConfigs[i])
-                );
+                _solverAddress = ISolverFactory(
+                    0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+                ).createSolver(address(0), i, solverConfigs[i]);
+
                 require(
-                    address(_solver) != address(0),
+                    _solverAddress != address(0),
                     "Invalid address for Solver"
                 );
             } else {
-                _solver = _solver.deployChild(solverConfigs[i]);
+                _solverAddress = Solver(_solverAddress).deployChild(
+                    solverConfigs[i]
+                );
             }
-            solutions[_solutionId].solverAddresses.push(address(_solver));
+            solutions[_solutionId].solverAddresses.push(_solverAddress);
         }
     }
 

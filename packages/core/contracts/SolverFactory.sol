@@ -8,7 +8,7 @@ import "./SolverLib.sol";
 
 contract SolverFactory {
     address immutable ctfAddress; // Conditional token framework address
-    Solver[] public solvers;
+    address[] public solvers;
 
     event SolverCreated(address newSolverAddress);
 
@@ -31,9 +31,8 @@ contract SolverFactory {
             "Invalid chain parent/index"
         );
 
-        Solver clone = Solver(
-            Clones.clone(address(solverConfig.implementation))
-        );
+        address clone = Clones.clone(address(solverConfig.implementation));
+
         Solver(clone).init(
             msg.sender,
             ctfAddress,
@@ -41,9 +40,10 @@ contract SolverFactory {
             chainIndex,
             solverConfig
         );
+
         solvers.push(clone);
 
-        emit SolverCreated(address(clone));
-        return address(clone);
+        emit SolverCreated(clone);
+        return clone;
     }
 }

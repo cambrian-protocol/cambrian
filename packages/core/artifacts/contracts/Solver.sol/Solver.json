@@ -8,8 +8,40 @@
       "inputs": [
         {
           "indexed": false,
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "enum SolverLib.Status",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "name": "ChangedStatus",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "conditionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "DeliveredNullArbitration",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
           "internalType": "address",
-          "name": "chainChild",
+          "name": "child",
           "type": "address"
         }
       ],
@@ -39,6 +71,19 @@
         }
       ],
       "name": "PreparedSolve",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "timelockIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "UpdatedTimelock",
       "type": "event"
     },
     {
@@ -503,8 +548,8 @@
       "name": "deployChild",
       "outputs": [
         {
-          "internalType": "contract Solver",
-          "name": "_solver",
+          "internalType": "address",
+          "name": "",
           "type": "address"
         }
       ],

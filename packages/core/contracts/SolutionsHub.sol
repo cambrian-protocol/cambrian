@@ -40,23 +40,28 @@ contract SolutionsHub {
     }
 
     function deploySolverChain(bytes32 _solutionId) private {
-        Solver _solver;
+        address _solverAddress;
 
         for (uint256 i; i < solutions[_solutionId].solverConfigs.length; i++) {
             if (i == 0) {
-                _solver = Solver(
-                    ISolverFactory(factoryAddress).createSolver(
+                _solverAddress = ISolverFactory(
+                    0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+                ).createSolver(
                         address(0),
                         i,
                         solutions[_solutionId].solverConfigs[i]
-                    )
+                    );
+
+                require(
+                    _solverAddress != address(0),
+                    "Invalid address for Solver"
                 );
             } else {
-                _solver = _solver.deployChild(
+                _solverAddress = Solver(_solverAddress).deployChild(
                     solutions[_solutionId].solverConfigs[i]
                 );
             }
-            solutions[_solutionId].solverAddresses.push(address(_solver));
+            solutions[_solutionId].solverAddresses.push(_solverAddress);
         }
     }
 
