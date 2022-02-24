@@ -109,8 +109,6 @@ const WriterSolverUI = ({
             triggerUpdate()
             const work = await ipfs.getFromCID(cid)
             console.log(work)
-
-            // const allWorkCids = await currentSolver.getWork()
         })
     }
 
