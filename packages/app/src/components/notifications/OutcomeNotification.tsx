@@ -5,12 +5,16 @@ import SolverStatusNotification, {
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
 import { Warning } from 'phosphor-react'
+import {
+    SolverComponentOC,
+    SolverContractAllocationsType,
+} from '@cambrian/app/models/SolverModel'
 
 type OutcomeNotificationProps = SolverStatusNotificationProps & {
-    outcomeCollection: OutcomeCollectionModel
+    outcomeCollection: SolverComponentOC
     canRequestArbitration?: boolean
+    allocations: SolverContractAllocationsType
 }
 
 const OutcomeNotification = ({
@@ -18,10 +22,14 @@ const OutcomeNotification = ({
     title,
     message,
     canRequestArbitration,
+    allocations,
 }: OutcomeNotificationProps) => {
     return (
         <SolverStatusNotification title={title} message={message}>
-            <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
+            <OutcomeCollectionCard
+                allocations={allocations}
+                outcomeCollection={outcomeCollection}
+            />
             {canRequestArbitration && (
                 <>
                     <Box pad="small">
