@@ -325,7 +325,7 @@ describe("Solver.sol | executeIngests", function () {
         ethers.utils.formatBytes32String("42")
       );
 
-    expect(await solvers[1].connect(this.user1).ingestsValid()).to.equal(true);
+    // expect(await solvers[1].connect(this.user1).ingestsValid()).to.equal(true);
     expect(
       await solvers[1]
         .connect(this.user1)

@@ -88,7 +88,7 @@ describe("Solver | deployChild", function () {
 
     tx = await solver.connect(this.keeper).deployChild(this.solverConfigs[0]);
     rc = await tx.wait();
-    expect(rc.events[1].event).to.equal("DeployedChild");
+    expect(rc.events.find((e) => e.event === "DeployedChild")).to.exist;
   });
 
   it("Can't deploy a second child", async function () {

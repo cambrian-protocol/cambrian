@@ -92,6 +92,10 @@ library SolverLib {
         bytes32[] recipientAmountSlots; // recipientAmountSlots[i] => amount for partition[i]
     }
 
+    event DeployedChild(address child);
+    event ChangedStatus(bytes32 conditionId, Status status);
+    event DeliveredNullArbitration(bytes32 conditionId);
+
     function createCondition(
         address ctfAddress,
         ConditionBase calldata base,
@@ -138,15 +142,27 @@ library SolverLib {
     function deployChild(
         address factoryAddress,
         Config calldata config,
-        uint256 solverIndex
-    ) public returns (address child, Solver) {
+        uint256 solverIndex,
+        bytes32 trackingId,
+        Multihash calldata context
+    ) public returns (address child) {
         child = ISolverFactory(factoryAddress).createSolver(
             address(this),
             solverIndex + 1,
             config
         );
 
-        return (child, Solver(child));
+        if (trackingId != bytes32("")) {
+            ISolver(child).setTrackingId(trackingId);
+        }
+
+        if (context.size > 0) {
+            ISolver(child).setContext(context);
+        }
+
+        emit DeployedChild(child);
+
+        return child;
     }
 
     function getPositionId(
@@ -206,6 +222,10 @@ library SolverLib {
             condition.questionId,
             condition.payouts
         );
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.OutcomeReported
+        );
     }
 
     function reportPayouts(
@@ -217,6 +237,10 @@ library SolverLib {
             condition.questionId,
             payouts
         );
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.OutcomeReported
+        );
     }
 
     function proposePayouts(
@@ -225,6 +249,11 @@ library SolverLib {
     ) public {
         condition.status = Status.OutcomeProposed;
         condition.payouts = _payouts;
+
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.OutcomeProposed
+        );
     }
 
     function confirmPayouts(address ctfAddress, Condition storage condition)
@@ -236,14 +265,27 @@ library SolverLib {
 
     function arbitrationPending(Condition storage condition) public {
         condition.status = Status.ArbitrationPending;
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.ArbitrationPending
+        );
     }
 
     function arbitrationRequested(Condition storage condition) public {
         condition.status = Status.ArbitrationRequested;
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.ArbitrationRequested
+        );
     }
 
     function arbitrateNull(Condition storage condition) public {
         condition.status = Status.OutcomeProposed;
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.OutcomeProposed
+        );
+        emit DeliveredNullArbitration(condition.conditionId);
     }
 
     function arbitrate(
@@ -253,9 +295,13 @@ library SolverLib {
     ) public {
         condition.status = Status.ArbitrationDelivered;
         reportPayouts(ctfAddress, condition, payouts);
+        emit ChangedStatus(
+            condition.conditionId,
+            SolverLib.Status.ArbitrationDelivered
+        );
     }
 
-    function allocationValid(
+    function allocationsValid(
         uint256 conditionVer,
         Datas storage datas,
         ConditionBase storage conditionBase

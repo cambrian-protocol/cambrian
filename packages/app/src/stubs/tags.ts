@@ -1,11 +1,15 @@
 import { Tag, Tags } from '../models/TagModel'
+import { ethers } from 'ethers'
 
 export const configs = {
-    implementation: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+    implementation: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
     keeper: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
     arbitrator: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
     timelockSeconds: 0,
-    data: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    data: ethers.utils.defaultAbiCoder.encode(
+        ['bytes32', 'bytes32'],
+        ['01FSP78E4KMM5HEQB09BD8T253', '01FSP7AJHMVFKHKTTCVX5MVCA7']
+    ),
     ingests: [
         {
             executions: 0,
@@ -156,7 +160,7 @@ export const tags = <Tags>{
 
     data: {
         id: 'data',
-        text: 'This solver takes no data field',
+        text: 'The slot IDs containing the chosen Writer (1st) and Buyer (2nd)',
         isFlex: false,
     },
 
@@ -240,6 +244,7 @@ export const solvers = [
         iface: {},
         tags: {},
         config: {
+            // implementation: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
             keeperAddress: {
                 address: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
                 linkedSlots: ['01FSP77T8YCZ3TK50BMB6NCC5W'],
@@ -249,7 +254,10 @@ export const solvers = [
                 linkedSlots: [],
             },
             timelockSeconds: 0,
-            data: '',
+            data: ethers.utils.defaultAbiCoder.encode(
+                ['bytes32', 'bytes32'],
+                ['01FSP78E4KMM5HEQB09BD8T253', '01FSP7AJHMVFKHKTTCVX5MVCA7']
+            ),
             slots: {
                 '01FSP76J4J37AQM1WRZDY85CY3': {
                     id: '01FSP76J4J37AQM1WRZDY85CY3',
