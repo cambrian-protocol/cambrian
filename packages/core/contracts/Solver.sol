@@ -139,40 +139,24 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition to execute on
      */
     function executeSolve(uint256 _index) public {
-        require(
-            conditions[_index].status == SolverLib.Status.Initiated,
-            "not Initiated"
-        );
         require(ingestsValid() == true, "ingests invalid");
 
-        require(allocationsValid(_index), "Recipient slot requires updating");
-
-        conditions[_index].status = SolverLib.Status.Executed;
-
-        SolverLib.splitPosition(
+        SolverLib.executeSolve(
+            _index,
             ctfAddress,
-            chainParent,
-            config.conditionBase,
             conditions[_index],
+            config.conditionBase,
+            datas,
+            trackingId,
+            chainParent,
             abi.decode(
                 datas.slots[config.conditionBase.amountSlot][_index],
                 (uint256)
             )
         );
 
-        SolverLib.allocatePartition(
-            _index,
-            ctfAddress,
-            conditions[_index],
-            config.conditionBase,
-            datas,
-            trackingId
-        );
-
         postroll(_index);
         cascade(_index);
-
-        emit ChangedStatus(conditions[_index].conditionId);
     }
 
     function postroll(uint256 _index) internal virtual;
