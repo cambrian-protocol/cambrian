@@ -6,6 +6,7 @@ import "./Solver.sol";
 contract WriterSolverV1 is Solver {
     address writer;
     address buyer;
+    SolverLib.Multihash[] submittedWork;
 
     event SentMessage(SolverLib.Multihash cid, address sender);
     event SubmittedWork(SolverLib.Multihash cid, address submitter);
@@ -44,6 +45,15 @@ contract WriterSolverV1 is Solver {
                 SolverLib.Status.Executed,
             "Disabled"
         );
+        submittedWork.push(cid);
         emit SubmittedWork(cid, msg.sender);
+    }
+
+    function getWork()
+        external
+        view
+        returns (SolverLib.Multihash[] memory work)
+    {
+        return submittedWork;
     }
 }

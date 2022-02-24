@@ -79,41 +79,34 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         useState<SolverContractCondition>()
 
     useEffect(() => {
-        init()
+        triggerUpdate()
         initListeners()
     }, [])
-
-    const init = async () => {
-        const updatedData = await getUpdatedData()
-        setCurrentSolverData(updatedData)
-
-        // Default to latest condition
-        // May be undefined. Solvers deployed manually (instead of through SolutionsHub) also need their first solve prepared manually
-
-        setCurrentCondition(
-            updatedData.conditions[updatedData.conditions.length - 1]
-        )
-    }
 
     const initListeners = async () => {
         const filter = {
             address: address,
-            topics: [ethers.utils.id('IngestedData()')],
+            topics: [
+                ethers.utils.id('IngestedData()'),
+                ethers.utils.id('ChangedStatus(uint256)'),
+            ],
             fromBlock: 'latest',
         } as EventFilter
 
         currentUser.signer.provider.on(filter, async () => {
-            console.log('Heard IngestedData event')
-            const updatedData = await getUpdatedData()
-            setCurrentSolverData(updatedData)
-            if (currentCondition === undefined) {
-                setCurrentCondition(
-                    updatedData.conditions[updatedData.conditions.length - 1]
-                )
-            }
+            console.log('Heard IngestedData or ChangedStatus event')
+            triggerUpdate()
         })
+    }
 
-        // TODO Status listeners
+    const triggerUpdate = async () => {
+        const updatedData = await getUpdatedData()
+        setCurrentSolverData(updatedData)
+        if (currentCondition === undefined) {
+            setCurrentCondition(
+                updatedData.conditions[updatedData.conditions.length - 1]
+            )
+        }
     }
 
     const addData = async (slotId: string, data: string) => {
@@ -561,6 +554,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     solverMethods={basicSolverMethods}
                     currentCondition={currentCondition}
                     setCurrentCondition={setCurrentCondition}
+                    triggerUpdate={triggerUpdate}
                 />
             )
         } else {
@@ -572,6 +566,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     currentCondition={currentCondition}
                     solverMethods={basicSolverMethods}
                     setCurrentCondition={setCurrentCondition}
+                    triggerUpdate={triggerUpdate}
                 />
             )
         }
