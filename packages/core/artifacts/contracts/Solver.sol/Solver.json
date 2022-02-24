@@ -8,15 +8,9 @@
       "inputs": [
         {
           "indexed": false,
-          "internalType": "uint256",
-          "name": "conditionIndex",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "enum SolverLib.Status",
-          "name": "status",
-          "type": "uint8"
+          "internalType": "bytes32",
+          "name": "conditionId",
+          "type": "bytes32"
         }
       ],
       "name": "ChangedStatus",
@@ -71,19 +65,6 @@
         }
       ],
       "name": "PreparedSolve",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "timelockIndex",
-          "type": "uint256"
-        }
-      ],
-      "name": "UpdatedTimelock",
       "type": "event"
     },
     {
