@@ -20,8 +20,9 @@ import {
 } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers, EventFilter } from 'ethers'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 
 const WriterSolverUI = ({
     currentUser,
@@ -30,7 +31,10 @@ const WriterSolverUI = ({
     solverMethods,
     currentCondition,
     setCurrentCondition,
+    triggerUpdate,
 }: DefaultSolverUIProps) => {
+    const ipfs = new IPFSAPI()
+
     const [solverChain, setSolverChain] = useState([solverContract.address])
 
     const [currentTimelock, setCurrentTimelock] = useState(0)
@@ -49,6 +53,8 @@ const WriterSolverUI = ({
 
     useEffect(() => {
         initSolverChain()
+        initChatListener()
+        initWorkListener()
         if (currentCondition.payouts.length > 0) {
             initTimelock()
             initProposedOutcome()
@@ -67,6 +73,46 @@ const WriterSolverUI = ({
         }
         return () => clearInterval(intervalId)
     }, [currentTimelock, isTimelockActive])
+
+    const initChatListener = async () => {
+        const chatFilter = {
+            address: solverContract.address,
+            topics: [
+                ethers.utils.id(
+                    'SentMessage((bytes32, uint8, uint8), address)'
+                ),
+            ],
+            fromBlock: 0,
+        } as EventFilter
+
+        currentUser.signer.provider.on(chatFilter, async (cid, sender) => {
+            console.log(cid, sender)
+            triggerUpdate()
+            const chatMsg = await ipfs.getFromCID(cid)
+            console.log(chatMsg)
+        })
+    }
+
+    const initWorkListener = async () => {
+        const workFilter = {
+            address: solverContract.address,
+            topics: [
+                ethers.utils.id(
+                    'SubmittedWork((bytes32, uint8, uint8), address)'
+                ),
+            ],
+            fromBlock: 0,
+        } as EventFilter
+
+        currentUser.signer.provider.on(workFilter, async (cid, submitter) => {
+            console.log(cid, submitter)
+            triggerUpdate()
+            const work = await ipfs.getFromCID(cid)
+            console.log(work)
+
+            // const allWorkCids = await currentSolver.getWork()
+        })
+    }
 
     const initTimelock = async () => {
         const timeLockResponse: BigNumber = await solverMethods.getTimelock(

@@ -33,7 +33,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
 
-    event ChangedStatus(uint256 conditionIndex, SolverLib.Status status);
+    event ChangedStatus(bytes32 conditionId);
 
     event DeployedChild(address child);
 
@@ -42,8 +42,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     event IngestedData(); // Emited on executeIngests(), handleCallback(), addData()
 
     event PreparedSolve(address solver, uint256 solveIndex);
-
-    event UpdatedTimelock(uint256 timelockIndex);
 
     /**
         @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
@@ -174,7 +172,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         postroll(_index);
         cascade(_index);
 
-        emit ChangedStatus(_index, SolverLib.Status.Executed);
+        emit ChangedStatus(conditions[_index].conditionId);
     }
 
     function postroll(uint256 _index) internal virtual;
@@ -559,8 +557,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         timelocks[_index] =
             block.timestamp +
             (config.timelockSeconds * 1 seconds);
-
-        emit UpdatedTimelock(_index);
     }
 
     function collateralBalance() public view returns (uint256 balance) {
