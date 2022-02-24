@@ -96,6 +96,39 @@ library SolverLib {
     event ChangedStatus(bytes32 conditionId);
     event DeliveredNullArbitration(bytes32 conditionId);
 
+    function executeSolve(
+        uint256 index,
+        address ctfAddress,
+        Condition storage condition,
+        ConditionBase storage base,
+        Datas storage datas,
+        bytes32 trackingId,
+        address chainParent,
+        uint256 amount
+    ) public {
+        require(
+            condition.status == SolverLib.Status.Initiated,
+            "not Initiated"
+        );
+        require(
+            allocationsValid(index, datas, base),
+            "Recipient slot requires updating"
+        );
+
+        condition.status = SolverLib.Status.Executed;
+        emit ChangedStatus(condition.conditionId);
+
+        splitPosition(ctfAddress, chainParent, base, condition, amount);
+        allocatePartition(
+            index,
+            ctfAddress,
+            condition,
+            base,
+            datas,
+            trackingId
+        );
+    }
+
     function createCondition(
         address ctfAddress,
         ConditionBase calldata base,
@@ -185,8 +218,8 @@ library SolverLib {
     function splitPosition(
         address ctfAddress,
         address chainParent,
-        ConditionBase calldata base,
-        Condition calldata condition,
+        ConditionBase storage base,
+        Condition storage condition,
         uint256 amount
     ) public {
         uint256 _balance;
@@ -301,8 +334,8 @@ library SolverLib {
     function allocatePartition(
         uint256 conditionVer,
         address ctfAddress,
-        Condition calldata condition,
-        ConditionBase calldata base,
+        Condition storage condition,
+        ConditionBase storage base,
         Datas storage data,
         bytes32 trackingId
     ) public {
