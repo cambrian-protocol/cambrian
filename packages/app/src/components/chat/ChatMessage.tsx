@@ -7,9 +7,9 @@ interface ChatMessageProps {
 }
 
 export type ChatMessageType = {
-    id: string
+    id?: string
     sender: ParticipantModel
-    message: string
+    text: string
     timestamp: Date
 }
 
@@ -29,13 +29,13 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
         >
             {!isSender && (
                 <Text size="xsmall" color="brand" weight={'bold'}>
-                    {message.sender.name}
+                    {message.sender.name || message.sender.address}
                 </Text>
             )}
-            <Text size="small">{message.message}</Text>
+            <Text size="small">{message.text}</Text>
             <Box align="end">
                 <Text size="xsmall" color="light-6">
-                    {message.timestamp.toLocaleTimeString([], {
+                    {new Date(message.timestamp).toLocaleTimeString([], {
                         hour: '2-digit',
                         minute: '2-digit',
                     })}

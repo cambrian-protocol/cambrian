@@ -6,6 +6,8 @@ import { useRouter } from 'next/router'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
+const WRITER_ABI =
+    require('@artifacts/contracts/WriterSolverV1.sol/WriterSolverV1.json').abi
 
 export default function SolverPage() {
     const { currentUser, login } = useCurrentUser()
@@ -24,6 +26,7 @@ export default function SolverPage() {
         await login()
     }
 
+    const USE_WRITER = true // TODO TEMP
     if (
         typeof solverAddress == 'string' &&
         ethers.utils.isAddress(solverAddress) &&
@@ -32,7 +35,7 @@ export default function SolverPage() {
         return (
             <Solver
                 address={solverAddress}
-                abi={SOLVER_ABI}
+                abi={USE_WRITER ? WRITER_ABI : SOLVER_ABI}
                 currentUser={currentUser}
             />
         )

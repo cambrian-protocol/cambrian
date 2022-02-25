@@ -1,6 +1,6 @@
 export type ParticipantModel = {
-    name: string
-    address?: string
+    address: string
+    name?: string
     pfp?: string
     icon?: JSX.Element
 }

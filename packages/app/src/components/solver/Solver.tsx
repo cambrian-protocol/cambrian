@@ -84,17 +84,25 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }, [])
 
     const initListeners = async () => {
-        const filter = {
+        const ingestedDataFilter = {
             address: address,
-            topics: [
-                ethers.utils.id('IngestedData()'),
-                ethers.utils.id('ChangedStatus(uint256)'),
-            ],
+            topics: [ethers.utils.id('IngestedData()')],
             fromBlock: 'latest',
         } as EventFilter
 
-        currentUser.signer.provider.on(filter, async () => {
-            console.log('Heard IngestedData or ChangedStatus event')
+        contract.on(ingestedDataFilter, async () => {
+            console.log('Heard IngestedData event')
+            triggerUpdate()
+        })
+
+        const changedStatusFilter = {
+            address: address,
+            topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
+            fromBlock: 'latest',
+        } as EventFilter
+
+        contract.on(changedStatusFilter, async () => {
+            console.log('Heard ChangedStatus event')
             triggerUpdate()
         })
     }
