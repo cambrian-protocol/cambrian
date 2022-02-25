@@ -43,7 +43,7 @@ export const CONDITION_STATUS_DETAILS: ConditionStatusDetailsType = {
     },
     6: {
         name: 'OutcomeReported',
-        label: 'Outcome reported',
+        label: 'Outcome confirmed',
         icon: <Handshake />,
     },
 }
