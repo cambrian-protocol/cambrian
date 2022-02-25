@@ -49,6 +49,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             if (window.ethereum) {
                 window.ethereum.on('accountsChanged', () => {})
                 window.ethereum.on('chainChanged', () => {})
+                window.ethereum.on('connect', () => {})
                 window.ethereum.on('disconnect', () => {})
             }
         }

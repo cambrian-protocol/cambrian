@@ -4,6 +4,12 @@ import fetch from 'node-fetch'
 const Hash = require('ipfs-only-hash')
 const CID = require('cids')
 
+type PinResponse = {
+    IpfsHash: string
+    PinSize: number
+    Timestamp: Date
+    isDuplicate: boolean
+}
 export class IPFSAPI {
     gateways: string[]
 
@@ -35,7 +41,7 @@ export class IPFSAPI {
         const timeout = setTimeout(() => {
             console.log('Local gateway timed out')
             return this.getFromCID(cid, gatewayIndex + 1)
-        }, 3000)
+        }, 5000)
 
         try {
             const response =
@@ -55,6 +61,16 @@ export class IPFSAPI {
         } finally {
             clearTimeout(timeout)
         }
+    }
+
+    getManyFromCID = async (cids: string[]) => {
+        const responses = await Promise.allSettled(
+            cids.map((cid) => this.getFromCID(cid))
+        )
+
+        return responses
+            .map((res) => res.status === 'fulfilled' && res.value)
+            .filter(Boolean)
     }
 
     tryParseJson = (str: string): object => {
@@ -82,7 +98,7 @@ export class IPFSAPI {
         }
     }
 
-    pin = async (data: object) => {
+    pin = async (data: object): Promise<PinResponse | undefined> => {
         const endpoint = process.env.LOCAL_IPFS
             ? LOCAL_PIN_ENDPOINT
             : PIN_ENDPOINT
@@ -97,7 +113,7 @@ export class IPFSAPI {
                 body: JSON.stringify(data),
             })
 
-            return res.json()
+            return res.json() as Promise<PinResponse>
         } catch (e) {
             console.log(e)
         }

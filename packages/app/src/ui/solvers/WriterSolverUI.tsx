@@ -23,6 +23,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { BigNumber, ethers, EventFilter } from 'ethers'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
 
 const WriterSolverUI = ({
     currentUser,
@@ -46,10 +47,32 @@ const WriterSolverUI = ({
         useState(false)
     const [showInitNewWriterModal, setShowInitNewWriterModal] = useState(false)
 
+    const [messages, setMessages] = useState<ChatMessageType[]>([])
+
     const toggleShowInitNewWriterModal = () =>
         setShowInitNewWriterModal(!showInitNewWriterModal)
     const toggleShowProposeOutcomeModal = () =>
         setShowProposeOutcomeModal(!showProposeOutcomeModal)
+
+    // TEMP
+    useEffect(() => {
+        const messagesDummy: ChatMessageType[] = [
+            {
+                id: '0',
+                text: 'Love it so far, but could you go a little more into detail?',
+                sender: { name: 'You', address: '0x12345' },
+                timestamp: new Date(),
+            },
+            {
+                id: '1',
+                text: 'Sure, give me a couple of hours',
+                sender: { name: 'Writer', address: '0x54321' },
+                timestamp: new Date(),
+            },
+        ]
+
+        setMessages(messagesDummy)
+    }, [])
 
     useEffect(() => {
         initSolverChain()
@@ -75,41 +98,51 @@ const WriterSolverUI = ({
     }, [currentTimelock, isTimelockActive])
 
     const initChatListener = async () => {
-        const chatFilter = {
-            address: solverContract.address,
-            topics: [
-                ethers.utils.id(
-                    'SentMessage((bytes32, uint8, uint8), address)'
-                ),
-            ],
-            fromBlock: 0,
-        } as EventFilter
+        const logs = await solverContract.queryFilter(
+            solverContract.filters.SentMessage()
+        )
 
-        currentUser.signer.provider.on(chatFilter, async (cid, sender) => {
-            console.log(cid, sender)
-            triggerUpdate()
-            const chatMsg = await ipfs.getFromCID(cid)
-            console.log(chatMsg)
-        })
+        const cids = logs.map((l) => l.args?.cid).filter(Boolean)
+
+        const newMessages = (await ipfs.getManyFromCID(
+            cids
+        )) as ChatMessageType[]
+
+        console.log(newMessages)
+
+        setMessages(
+            (prevMessages) =>
+                [...prevMessages, ...newMessages] as ChatMessageType[]
+        )
+
+        solverContract.on(
+            solverContract.filters.SentMessage(),
+            async (cid, sender) => {
+                console.log('Got message event')
+                try {
+                    const chatMsg = await ipfs.getFromCID(cid)
+                    if (chatMsg) {
+                        console.log('message: ', chatMsg)
+                        setMessages(
+                            (prevMessages) =>
+                                [...prevMessages, chatMsg] as ChatMessageType[]
+                        )
+                    }
+                } catch (error) {
+                    console.error(error)
+                }
+            }
+        )
     }
 
     const initWorkListener = async () => {
-        const workFilter = {
-            address: solverContract.address,
-            topics: [
-                ethers.utils.id(
-                    'SubmittedWork((bytes32, uint8, uint8), address)'
-                ),
-            ],
-            fromBlock: 0,
-        } as EventFilter
-
-        currentUser.signer.provider.on(workFilter, async (cid, submitter) => {
-            console.log(cid, submitter)
-            triggerUpdate()
-            const work = await ipfs.getFromCID(cid)
-            console.log(work)
-        })
+        solverContract.on(
+            solverContract.filters.SubmittedWork(),
+            async (cid, submitter) => {
+                const work = await ipfs.getFromCID(cid)
+                console.log(work)
+            }
+        )
     }
 
     const initTimelock = async () => {
@@ -161,7 +194,7 @@ const WriterSolverUI = ({
                     return {
                         primaryAction: {
                             label: 'Execute Solver',
-                            onClick: toggleShowInitNewWriterModal,
+                            onClick: () => solverMethods.executeSolve(0),
                         },
                     }
                 }
@@ -252,6 +285,23 @@ const WriterSolverUI = ({
         )
     }
 
+    const onSubmitChat = async (input: string): Promise<void> => {
+        const messageObj = {
+            text: input,
+            sender: { address: currentUser.address },
+            timestamp: new Date(),
+        }
+
+        try {
+            const response = await ipfs.pin(messageObj)
+            if (response?.IpfsHash) {
+                await solverContract.sendMessage(response.IpfsHash)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
         <>
             <Layout
@@ -278,7 +328,13 @@ const WriterSolverUI = ({
                     />
                 }
                 floatingActionButton={
-                    <ChatFAB solverAddress={solverContract.address} />
+                    <ChatFAB
+                        solverAddress={solverContract.address}
+                        messages={messages}
+                        onSubmitChat={(message: string) =>
+                            onSubmitChat(message)
+                        }
+                    />
                 }
                 actionBar={<Actionbar actions={getCurrentAction()} />}
             >
