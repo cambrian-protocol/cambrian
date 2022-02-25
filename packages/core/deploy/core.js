@@ -41,15 +41,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("WriterSolverV1", {
-    from: deployer,
-    args: [],
-    libraries: {
-      SolverLib: solverLib.address,
-    },
-    log: true,
-  });
-
   await deploy("ToyToken", {
     from: deployer,
     args: ["TOY", "TOY"],
@@ -67,6 +58,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     args: [solverFactory.address],
     log: true,
   });
+
+  await deploy("WriterSolverV1", {
+    from: deployer,
+    args: [],
+    libraries: {
+      SolverLib: solverLib.address,
+    },
+    log: true,
+  });
 };
 module.exports.tags = [
   "ConditionalTokens",
@@ -75,7 +75,7 @@ module.exports.tags = [
   "IPFSSolutionsHub",
   "SolverLib",
   "BasicSolverV1",
-  "WriterSolverV1",
   "ToyToken",
   "SolutionsHub",
+  "WriterSolverV1",
 ];

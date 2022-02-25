@@ -26,11 +26,17 @@ async function main() {
 
   const solverConfigs = [
     {
-      implementation: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      implementation: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
       keeper: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
       arbitrator: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      timelockSeconds: 0,
-      data: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      timelockSeconds: 10,
+      data: ethers.utils.defaultAbiCoder.encode(
+        ["bytes32", "bytes32"],
+        [
+          ethers.utils.formatBytes32String("01FSP78E4KMM5HEQB09BD8T253"),
+          ethers.utils.formatBytes32String("01FSP7AJHMVFKHKTTCVX5MVCA7"),
+        ]
+      ),
       ingests: [
         {
           executions: 0,

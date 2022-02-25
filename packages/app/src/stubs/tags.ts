@@ -1,14 +1,18 @@
 import { Tag, Tags } from '../models/TagModel'
 import { ethers } from 'ethers'
+import { getBytes32FromMultihash } from '../utils/helpers/multihash'
 
 export const configs = {
-    implementation: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
+    implementation: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
     keeper: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
     arbitrator: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-    timelockSeconds: 0,
+    timelockSeconds: 10,
     data: ethers.utils.defaultAbiCoder.encode(
         ['bytes32', 'bytes32'],
-        ['01FSP78E4KMM5HEQB09BD8T253', '01FSP7AJHMVFKHKTTCVX5MVCA7']
+        [
+            ethers.utils.formatBytes32String('01FSP78E4KMM5HEQB09BD8T253'),
+            ethers.utils.formatBytes32String('01FSP7AJHMVFKHKTTCVX5MVCA7'),
+        ]
     ),
     ingests: [
         {
@@ -87,60 +91,57 @@ export const configs = {
         outcomeSlots: 2,
         parentCollectionIndexSet: 0,
         partition: [1, 2],
-        amountSlot: 1,
+        amountSlot:
+            '0x303146535037364a344a394e3339303550364d374a5146424432000000000000',
         allocations: [
             {
                 recipientAddressSlot:
                     '0x30314653503737543859435a33544b3530424d42364e43433557000000000000',
                 recipientAmountSlots: [
-                    '01FSP971A4PH6PSEC6SDHYB3R0',
-                    '01FSP971A4PH6PSEC6SDHYB3R0',
+                    '0x3031465350393731413450483650534543365344485942335230000000000000',
+                    '0x3031465350393731413450483650534543365344485942335230000000000000',
                 ],
             },
             {
                 recipientAddressSlot:
                     '0x3031465350373845344b4d4d3548455142303942443854323533000000000000',
                 recipientAmountSlots: [
-                    '01FSP93R1E6ZV9QAB66PPDFDE3',
-                    '01FSP76J4J37AQM1WRZDY85CY3',
+                    '0x30314653503933523145365a5639514142363650504446444533000000000000',
+                    '0x303146535037364a344a333741514d3157525a44593835435933000000000000',
                 ],
             },
             {
                 recipientAddressSlot:
                     '0x303146535037394a48364e464137333358583244423557355954000000000000',
                 recipientAmountSlots: [
-                    '01FSP971A4PH6PSEC6SDHYB3R0',
-                    '01FSP971A4PH6PSEC6SDHYB3R0',
+                    '0x3031465350393731413450483650534543365344485942335230000000000000',
+                    '0x3031465350393731413450483650534543365344485942335230000000000000',
                 ],
             },
             {
                 recipientAddressSlot:
                     '0x30314653503741355a5a4558544e414d4b3544384d4859393346000000000000',
                 recipientAmountSlots: [
-                    '01FSP97S7T6S6E98BZ7FQJJY20',
-                    '01FSP97S7T6S6E98BZ7FQJJY20',
+                    '0x30314653503937533754365336453938425a3746514a4a593230000000000000',
+                    '0x30314653503937533754365336453938425a3746514a4a593230000000000000',
                 ],
             },
             {
                 recipientAddressSlot:
                     '0x303146535037414a484d56464b484b5454435658354d56434137000000000000',
                 recipientAmountSlots: [
-                    '01FSP76J4J37AQM1WRZDY85CY3',
-                    '01FSP93R1E6ZV9QAB66PPDFDE3',
+                    '0x303146535037364a344a333741514d3157525a44593835435933000000000000',
+                    '0x30314653503933523145365a5639514142363650504446444533000000000000',
                 ],
             },
         ],
         outcomeURIs: [
-            {
-                digest: '0x97ca31806fc612ce2ef23118037b94846ae79148da7310686f1dadcc5bbbf136',
-                hashFunction: 18,
-                size: 32,
-            },
-            {
-                digest: '0x168880916cd84cd88599b75417697c6703e7ca2a24c8d03578e08f2efef62de2',
-                hashFunction: 18,
-                size: 32,
-            },
+            getBytes32FromMultihash(
+                'QmdgzwhGvmfDspsUnznnijbQLP9rEBZKCUU1yykUXpv4CZ'
+            ),
+            getBytes32FromMultihash(
+                'QmaNcVRBZfFypLi4tKLyt7jqmzV3DU96QFPhzjs84tJAZa'
+            ),
         ],
     },
 }
@@ -256,7 +257,14 @@ export const solvers = [
             timelockSeconds: 0,
             data: ethers.utils.defaultAbiCoder.encode(
                 ['bytes32', 'bytes32'],
-                ['01FSP78E4KMM5HEQB09BD8T253', '01FSP7AJHMVFKHKTTCVX5MVCA7']
+                [
+                    ethers.utils.formatBytes32String(
+                        '01FSP78E4KMM5HEQB09BD8T253'
+                    ),
+                    ethers.utils.formatBytes32String(
+                        '01FSP7AJHMVFKHKTTCVX5MVCA7'
+                    ),
+                ]
             ),
             slots: {
                 '01FSP76J4J37AQM1WRZDY85CY3': {
