@@ -5,10 +5,13 @@ const FACTORY_ABI =
   require("../artifacts/contracts/SolverFactory.sol/SolverFactory.json").abi;
 const ERC20_ABI =
   require("../artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
+
+const WRITER_ABI =
+  require("../artifacts/contracts/WriterSolverV1.sol/WriterSolverV1.json").abi;
 const { getBytes32FromMultihash } = require("../helpers/multihash.js");
 
 async function main() {
-  const [user1] = await ethers.getSigners();
+  const [user0, user1, keeper] = await ethers.getSigners();
 
   const SolverFactory = new ethers.Contract(
     "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",
@@ -22,7 +25,7 @@ async function main() {
     ethers.getDefaultProvider()
   );
 
-  await ToyToken.connect(user1).mint(user1.address, "100");
+  await ToyToken.connect(user0).mint(user0.address, "100");
 
   const solverConfigs = [
     {
@@ -170,7 +173,7 @@ async function main() {
     },
   ];
 
-  let deployedAddress = await SolverFactory.connect(user1)
+  let deployedAddress = await SolverFactory.connect(user0)
     .createSolver(ethers.constants.AddressZero, 0, solverConfigs[0])
     .then((tx) => tx.wait())
     .then(
@@ -179,6 +182,21 @@ async function main() {
     );
 
   console.log("Writing Solver deployed to: ", deployedAddress);
+
+  const WriterSolver = new ethers.Contract(
+    deployedAddress,
+    new ethers.utils.Interface(WRITER_ABI),
+    ethers.getDefaultProvider()
+  );
+
+  await WriterSolver.connect(keeper).prepareSolve(0);
+  await WriterSolver.connect(keeper).addData(
+    "0x3031465350373845344b4d4d3548455142303942443854323533000000000000",
+    ethers.utils.defaultAbiCoder.encode(
+      ["address"],
+      ["0x676d41fedD0f24f282a4579C6d0C8E3B2099f0EF"]
+    )
+  );
 }
 
 main()

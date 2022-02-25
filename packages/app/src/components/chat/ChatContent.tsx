@@ -5,37 +5,14 @@ import { useEffect, useState } from 'react'
 import { CircleDashed } from 'phosphor-react'
 
 interface ChatContentProps {
-    solverAddress: string
+    messages: ChatMessageType[]
 }
 
-const ChatContent = ({ solverAddress }: ChatContentProps) => {
-    const [messages, setMessages] = useState<ChatMessageType[]>([])
-
+const ChatContent = ({ messages }: ChatContentProps) => {
     // Keep user at the most recent message
     useEffect(() => {
         document.getElementById('end')?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
-
-    // TODO Fetch messages
-    useEffect(() => {
-        const messagesDummy: ChatMessageType[] = [
-            {
-                id: '0',
-                message:
-                    'Love it so far, but could you go a little more into detail?',
-                sender: { name: 'You', address: '0x12345' },
-                timestamp: new Date(),
-            },
-            {
-                id: '1',
-                message: 'Sure, give me a couple of hours',
-                sender: { name: 'Writer', address: '0x54321' },
-                timestamp: new Date(),
-            },
-        ]
-
-        setMessages(messagesDummy)
-    }, [])
 
     return (
         <Box

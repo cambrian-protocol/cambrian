@@ -8,26 +8,22 @@ import {
 } from 'grommet'
 
 import { PaperPlaneRight } from 'phosphor-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface ChatInputProps {
-    solverAddress: string
+    onSubmitChat: (text: string) => Promise<void>
 }
 
 type ChatInputFormType = {
-    message: string
+    text: string
 }
 
-const initalInput = {
-    message: '',
+const initialInput = {
+    text: '',
 }
 
-const ChatInput = ({ solverAddress }: ChatInputProps) => {
-    const [input, setInput] = useState(initalInput)
-
-    const onSubmit = (event: FormExtendedEvent) => {
-        // TODO Post message
-    }
+const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
+    const [input, setInput] = useState(initialInput)
 
     return (
         <Form<ChatInputFormType>
@@ -35,7 +31,10 @@ const ChatInput = ({ solverAddress }: ChatInputProps) => {
                 setInput(nextValue)
             }}
             value={input}
-            onSubmit={(event) => onSubmit(event)}
+            onSubmit={() => {
+                onSubmitChat(input.text)
+                setInput(initialInput)
+            }}
         >
             <Box
                 direction="row"
@@ -46,10 +45,24 @@ const ChatInput = ({ solverAddress }: ChatInputProps) => {
             >
                 <Box flex>
                     <FormField>
-                        <TextInput placeholder="Write a message here" />
+                        <TextInput
+                            value={input.text}
+                            onChange={(event) => {
+                                setInput({
+                                    text: event.target.value,
+                                })
+                            }}
+                            placeholder="Write a message here"
+                        />
                     </FormField>
                 </Box>
-                <Button icon={<PaperPlaneRight size="24" />} />
+                <Button
+                    icon={<PaperPlaneRight size="24" />}
+                    onClick={() => {
+                        onSubmitChat(input.text)
+                        setInput(initialInput)
+                    }}
+                />
             </Box>
         </Form>
     )
