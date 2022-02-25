@@ -24,6 +24,13 @@ import { BigNumber, ethers, EventFilter } from 'ethers'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
+import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
+
+type SubmissionModel = {
+    submission: string
+    sender: ParticipantModel
+    timestamp: Date
+}
 
 const WriterSolverUI = ({
     currentUser,
@@ -286,7 +293,7 @@ const WriterSolverUI = ({
     }
 
     const onSubmitChat = async (input: string): Promise<void> => {
-        const messageObj = {
+        const messageObj: ChatMessageType = {
             text: input,
             sender: { address: currentUser.address },
             timestamp: new Date(),
@@ -296,6 +303,23 @@ const WriterSolverUI = ({
             const response = await ipfs.pin(messageObj)
             if (response?.IpfsHash) {
                 await solverContract.sendMessage(response.IpfsHash)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const onSubmitWork = async (input: string): Promise<void> => {
+        const workObj: SubmissionModel = {
+            submission: input,
+            sender: { address: currentUser.address },
+            timestamp: new Date(),
+        }
+
+        try {
+            const response = await ipfs.pin(workObj)
+            if (response?.IpfsHash) {
+                await solverContract.submitWork(response.IpfsHash)
             }
         } catch (error) {
             console.error(error)
