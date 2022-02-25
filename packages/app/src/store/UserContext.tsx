@@ -27,7 +27,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [currentProvider, setCurrentProvider] =
         useState<ethers.providers.Web3Provider | null>(null)
 
-    // TODO attach listeners when window is available...
     useEffect(() => {
         if (window.ethereum) {
             window.ethereum.on('accountsChanged', (accounts: string[]) =>
@@ -60,10 +59,15 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             // Disconnected
             onLogout()
         } else {
-            if (currentProvider) {
-                const signer = currentProvider.getSigner()
+            const provider = process.env.LOCAL_NETWORK
+                ? new ethers.providers.Web3Provider({ isMetaMask: true })
+                : await requestMetaMaskProvider()
+
+            if (provider) {
+                const signer = provider.getSigner()
                 const address = await signer.getAddress()
                 setCurrentUser({ address: address, signer: signer })
+                setCurrentProvider(provider)
             }
         }
     }
