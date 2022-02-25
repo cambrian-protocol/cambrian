@@ -1,10 +1,18 @@
-import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
-import { CircleDashed, ClockCounterClockwise, SpinnerGap } from 'phosphor-react'
+import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
+import {
+    CircleDashed,
+    Clipboard,
+    ClockCounterClockwise,
+    RepeatOnce,
+} from 'phosphor-react'
+import {
+    ConditionStatus,
+    SolverContractCondition,
+} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
 import { SetStateAction } from 'react'
 
 interface ConditionVersionSidebarProps {
@@ -15,6 +23,7 @@ interface ConditionVersionSidebarProps {
     setCurrentCondition: React.Dispatch<
         SetStateAction<SolverContractCondition | undefined>
     >
+    onRetryCondition: () => void
 }
 
 const ConditionVersionSidebar = ({
@@ -23,6 +32,7 @@ const ConditionVersionSidebar = ({
     solverConditions,
     currentCondition,
     setCurrentCondition,
+    onRetryCondition,
 }: ConditionVersionSidebarProps) => {
     const conditions = [...solverConditions]
 
@@ -42,9 +52,9 @@ const ConditionVersionSidebar = ({
                         <Box gap="medium">
                             <Box direction="row" gap="small">
                                 <Box>
-                                    <SpinnerGap size="24" />
+                                    <Clipboard size="24" />
                                 </Box>
-                                <Text>Current</Text>
+                                <Text>Current Solve</Text>
                             </Box>
                             <Text size="small" color="dark-6">
                                 Current solver version description text, Lorem
@@ -72,6 +82,21 @@ const ConditionVersionSidebar = ({
                                     newestCondition.conditionId
                                 }
                             />
+                            {newestCondition.status ===
+                                ConditionStatus.OutcomeReported && (
+                                <Box gap="medium" height={{ min: 'auto' }}>
+                                    <Text size="small" color="dark-6">
+                                        You can start a retry of this solver
+                                        with new settings
+                                    </Text>
+                                    <Button
+                                        icon={<RepeatOnce size="24" />}
+                                        secondary
+                                        label="Retry"
+                                        onClick={onRetryCondition}
+                                    />
+                                </Box>
+                            )}
                             {conditions.length > 0 && (
                                 <Box gap="medium" height={{ min: 'auto' }}>
                                     <PlainSectionDivider />
@@ -79,7 +104,7 @@ const ConditionVersionSidebar = ({
                                         <Box>
                                             <ClockCounterClockwise size="24" />
                                         </Box>
-                                        <Text>History</Text>
+                                        <Text>Last Solves</Text>
                                     </Box>
                                     <Text size="small" color="dark-6">
                                         History solver version description text,

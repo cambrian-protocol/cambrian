@@ -3,8 +3,8 @@ import { Box, Text } from 'grommet'
 import { PropsWithChildren } from 'react'
 
 export type SolverStatusNotificationProps = PropsWithChildren<{}> & {
-    title: string
-    message: string
+    title?: string
+    message?: string
 }
 
 const SolverStatusNotification = ({
