@@ -1,4 +1,5 @@
-import { Contract, EventFilter, ethers, Wallet } from 'ethers'
+import { Box, Text } from 'grommet'
+import { Contract, EventFilter, ethers } from 'ethers'
 import {
     IPFSOutcomeModel,
     SlotsHashMapType,
@@ -15,20 +16,21 @@ import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 import React, { useEffect, useState } from 'react'
 
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
+import ExecuteSolverActionbar from '../actionbars/ExecuteSolverActionbar'
 import { Fragment } from 'ethers/lib/utils'
+import HeaderTextSection from '../sections/HeaderTextSection'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { JsonFragmentType } from '@ethersproject/abi'
+import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { Multihash } from '@cambrian/app/models/ConditionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { Box, Text } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import { Layout } from '../layout/Layout'
+import { solvers } from '@cambrian/app/stubs/tags'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -51,9 +53,8 @@ export type BasicSolverMethodsType = {
     getRecipientAddresses: (
         condition: SolverContractCondition
     ) => (string | undefined)[]
-    getManualInputs: (
-        condition: SolverContractCondition
-    ) => (ParsedSlotModel | undefined)[]
+    getManualInputs: (condition: SolverContractCondition) => ParsedSlotModel[]
+    getManualSlots: () => ParsedSlotModel[]
 }
 
 interface SolverProps {
@@ -497,6 +498,16 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
+    const getManualSlots = (): ParsedSlotModel[] => {
+        if (currentSolverData) {
+            return currentSolverData.config.ingests.filter(
+                (ingest) => ingest.ingestType === SlotTypes.Manual
+            )
+        } else {
+            throw new Error('No solver data exists')
+        }
+    }
+
     const basicSolverMethods: BasicSolverMethodsType = {
         prepareSolve: prepareSolve,
         executeSolve: executeSolve,
@@ -517,38 +528,29 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         getConfig: getConfig,
         getRecipientAddresses: getRecipientAddresses,
         getManualInputs: getManualInputs,
+        getManualSlots: getManualSlots,
     }
-
     // TODO Determine SolverUI
     const loadWriter = true
     if (currentSolverData && currentUser) {
         if (currentCondition === undefined) {
             return (
-                <Layout contextTitle="Login">
-                    <Box
-                        pad="small"
-                        width="medium"
-                        gap="small"
-                        fill
-                        justify="center"
-                    >
-                        <HeaderTextSection
-                            title="Uninitialized Solve"
-                            paragraph="You must manually prepare the first Solve."
+                <Layout
+                    contextTitle="Uninitialzed Solve"
+                    actionBar={
+                        <ExecuteSolverActionbar
+                            manualSlots={getManualSlots()}
+                            solverData={currentSolverData}
+                            solverMethods={basicSolverMethods}
                         />
-                        <Box
-                            direction="row"
-                            align="center"
-                            gap="medium"
-                            background="primary-gradient"
-                            round="small"
-                            focusIndicator={false}
-                            width="100%"
-                            pad="small"
-                            onClick={() => basicSolverMethods.prepareSolve(0)}
-                        >
-                            <Text>Prepare Solve</Text>
-                        </Box>
+                    }
+                >
+                    <Box fill justify="center">
+                        <HeaderTextSection
+                            title="Uninitialized solve"
+                            subTitle="Looks pretty empty here"
+                            paragraph="You must manually prepare and execute the first Solve. Click on Execute Solver and follow the quest..."
+                        />
                     </Box>
                 </Layout>
             )
