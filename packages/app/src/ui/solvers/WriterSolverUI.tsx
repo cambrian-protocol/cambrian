@@ -22,7 +22,6 @@ import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/Propose
 import RedeemTokensActionbar from '@cambrian/app/components/actionbars/RedeemTokensActionbar'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
 import SolverConfigInfo from '../interaction/config/SolverConfigInfo'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/SolverConfig'
 
 type SubmissionModel = {
@@ -30,6 +29,8 @@ type SubmissionModel = {
     sender: ParticipantModel
     timestamp: Date
 }
+
+type WriterSolverRole = 'WRITER' | 'KEEPER' | 'BUYER' | 'ARBITRATOR' | 'OTHER'
 
 const WriterSolverUI = ({
     currentUser,
@@ -45,6 +46,8 @@ const WriterSolverUI = ({
     const [solverChain, setSolverChain] = useState([solverContract.address])
     const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
     const [messages, setMessages] = useState<ChatMessageType[]>([])
+
+    const [role, setRole] = useState<WriterSolverRole>('OTHER')
 
     // TEMP
     useEffect(() => {
@@ -73,8 +76,34 @@ const WriterSolverUI = ({
     }, [])
 
     useEffect(() => {
+        initRole()
+    }, [currentUser])
+
+    useEffect(() => {
         initProposedOutcome(currentCondition.payouts)
     }, [currentCondition])
+
+    const initRole = async () => {
+        const writerResponse = await solverContract.writer()
+        const buyerResponse = await solverContract.buyer()
+
+        switch (currentUser.address) {
+            case writerResponse:
+                setRole('WRITER')
+                break
+            case buyerResponse:
+                setRole('BUYER')
+                break
+            case solverData.config.keeper:
+                setRole('KEEPER')
+                break
+            case solverData.config.arbitrator:
+                setRole('ARBITRATOR')
+                break
+            default:
+                setRole('OTHER')
+        }
+    }
 
     const initProposedOutcome = (conditionPayouts: number[]) => {
         if (conditionPayouts.length === 0) {
@@ -215,10 +244,10 @@ const WriterSolverUI = ({
                     />
                 }
                 actionBar={
-                    <WriterActionbar
+                    <WriterSolverActionbar
                         solverData={solverData}
                         currentCondition={currentCondition}
-                        currentUser={currentUser}
+                        role={role}
                         solverMethods={solverMethods}
                     />
                 }
@@ -234,8 +263,7 @@ const WriterSolverUI = ({
                         }
                         outcomeCollection={proposedOutcome}
                         canRequestArbitration={
-                            currentCondition.status ===
-                            ConditionStatus.OutcomeProposed
+                            role === 'BUYER' || role === 'WRITER'
                         }
                     />
                 )}
@@ -250,35 +278,40 @@ interface WriterActionbarProps {
     solverData: SolverContractData
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
-    currentUser: UserType
+    role: WriterSolverRole
 }
 
-// TODO Role checking
 // TODO Arbitration
-const WriterActionbar = ({
+const WriterSolverActionbar = ({
     solverData,
     solverMethods,
     currentCondition,
+    role,
 }: WriterActionbarProps) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
-            return (
-                <ExecuteSolverActionbar
-                    solverData={solverData}
-                    currentCondition={currentCondition}
-                    solverMethods={solverMethods}
-                    manualSlots={solverMethods.getManualSlots()}
-                />
-            )
+            if (role === 'KEEPER') {
+                return (
+                    <ExecuteSolverActionbar
+                        solverData={solverData}
+                        currentCondition={currentCondition}
+                        solverMethods={solverMethods}
+                        manualSlots={solverMethods.getManualSlots()}
+                    />
+                )
+            }
         case ConditionStatus.Executed:
-            // TODO Writer-Work interface
-            return (
-                <ProposeOutcomeActionbar
-                    solverData={solverData}
-                    solverMethods={solverMethods}
-                    currentCondition={currentCondition}
-                />
-            )
+            if (role === 'KEEPER') {
+                return (
+                    <ProposeOutcomeActionbar
+                        solverData={solverData}
+                        solverMethods={solverMethods}
+                        currentCondition={currentCondition}
+                    />
+                )
+            } else if (role === 'WRITER') {
+                return <>TODO WriterActionbar</>
+            }
         case ConditionStatus.OutcomeProposed:
             return (
                 <ConfirmOutcomeActionbar
@@ -287,7 +320,9 @@ const WriterActionbar = ({
                 />
             )
         case ConditionStatus.OutcomeReported:
-            return <RedeemTokensActionbar />
+            if (role !== 'OTHER') {
+                return <RedeemTokensActionbar />
+            }
     }
 
     return <DefaultActionbar />
