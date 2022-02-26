@@ -24,6 +24,7 @@ interface ConditionVersionSidebarProps {
         SetStateAction<SolverContractCondition | undefined>
     >
     onRetryCondition: () => void
+    isKeeper: boolean
 }
 
 const ConditionVersionSidebar = ({
@@ -33,6 +34,7 @@ const ConditionVersionSidebar = ({
     currentCondition,
     setCurrentCondition,
     onRetryCondition,
+    isKeeper,
 }: ConditionVersionSidebarProps) => {
     const conditions = [...solverConditions]
 
@@ -83,20 +85,21 @@ const ConditionVersionSidebar = ({
                                 }
                             />
                             {newestCondition.status ===
-                                ConditionStatus.OutcomeReported && (
-                                <Box gap="medium" height={{ min: 'auto' }}>
-                                    <Text size="small" color="dark-6">
-                                        You can start a retry of this solver
-                                        with new settings
-                                    </Text>
-                                    <Button
-                                        icon={<RepeatOnce size="24" />}
-                                        secondary
-                                        label="Retry"
-                                        onClick={onRetryCondition}
-                                    />
-                                </Box>
-                            )}
+                                ConditionStatus.OutcomeReported &&
+                                isKeeper && (
+                                    <Box gap="medium" height={{ min: 'auto' }}>
+                                        <Text size="small" color="dark-6">
+                                            You can start a retry of this solver
+                                            with new settings
+                                        </Text>
+                                        <Button
+                                            icon={<RepeatOnce size="24" />}
+                                            secondary
+                                            label="Retry"
+                                            onClick={onRetryCondition}
+                                        />
+                                    </Box>
+                                )}
                             {conditions.length > 0 && (
                                 <Box gap="medium" height={{ min: 'auto' }}>
                                     <PlainSectionDivider />

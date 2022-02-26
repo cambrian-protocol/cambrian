@@ -4,16 +4,21 @@ import {
     SolverContractCondition,
     SolverContractData,
 } from '@cambrian/app/models/SolverModel'
+import { Paragraph, Text, TextArea } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import Actionbar from '../interaction/bars/Actionbar'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
+import { Box } from 'grommet'
 import ChatFAB from '@cambrian/app/components/chat/ChatFAB'
 import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
+import { CircleDashed } from 'phosphor-react'
 import ConditionVersionSidebar from '../interaction/bars/ConditionVersionSidebar'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/ConfirmOutcomeActionbar'
 import DefaultActionbar from '@cambrian/app/components/actionbars/DefaultActionbar'
 import { DefaultSolverUIProps } from './DefaultSolverUI'
 import ExecuteSolverActionbar from '@cambrian/app/components/actionbars/ExecuteSolverActionbar'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { Layout } from '@cambrian/app/components/layout/Layout'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
@@ -30,7 +35,7 @@ type SubmissionModel = {
     timestamp: Date
 }
 
-type WriterSolverRole = 'WRITER' | 'KEEPER' | 'BUYER' | 'ARBITRATOR' | 'OTHER'
+type WriterSolverRole = 'Writer' | 'Keeper' | 'Buyer' | 'Arbitrator' | 'Other'
 
 const WriterSolverUI = ({
     currentUser,
@@ -46,8 +51,13 @@ const WriterSolverUI = ({
     const [solverChain, setSolverChain] = useState([solverContract.address])
     const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
     const [messages, setMessages] = useState<ChatMessageType[]>([])
+    const [workInput, setWorkInput] = useState<SubmissionModel>({
+        sender: { address: '' },
+        submission: '',
+        timestamp: new Date(),
+    })
 
-    const [role, setRole] = useState<WriterSolverRole>('OTHER')
+    const [roles, setRoles] = useState<WriterSolverRole[]>(['Other'])
 
     // TEMP
     useEffect(() => {
@@ -76,34 +86,27 @@ const WriterSolverUI = ({
     }, [])
 
     useEffect(() => {
-        initRole()
+        initRoles()
     }, [currentUser])
 
     useEffect(() => {
         initProposedOutcome(currentCondition.payouts)
     }, [currentCondition])
 
-    const initRole = async () => {
+    const initRoles = async () => {
         const writerResponse = await solverContract.writer()
         const buyerResponse = await solverContract.buyer()
 
-        switch (currentUser.address) {
-            case writerResponse:
-                setRole('WRITER')
-                break
-            case buyerResponse:
-                setRole('BUYER')
-                break
-            case solverData.config.keeper:
-                setRole('KEEPER')
-                break
-            case solverData.config.arbitrator:
-                setRole('ARBITRATOR')
-                break
-            default:
-                setRole('OTHER')
-        }
+        setRoles(['Other'])
+        if (currentUser.address === writerResponse) addRole('Writer')
+        if (currentUser.address === buyerResponse) addRole('Buyer')
+        if (currentUser.address === solverData.config.keeper) addRole('Keeper')
+        if (currentUser.address === solverData.config.arbitrator)
+            addRole('Arbitrator')
     }
+
+    const addRole = (role: WriterSolverRole) =>
+        setRoles((prev) => [...prev, role])
 
     const initProposedOutcome = (conditionPayouts: number[]) => {
         if (conditionPayouts.length === 0) {
@@ -156,11 +159,28 @@ const WriterSolverUI = ({
     }
 
     const initWorkListener = async () => {
+        const logs = await solverContract.queryFilter(
+            solverContract.filters.SubmittedWork()
+        )
+
+        const cids = logs.map((l) => l.args?.cid).filter(Boolean)
+        const latestSubmission = (await ipfs.getFromCID(
+            cids[cids.length - 1]
+        )) as SubmissionModel
+
+        setWorkInput({
+            sender: latestSubmission.sender,
+            submission: latestSubmission.submission,
+            timestamp: new Date(latestSubmission.timestamp),
+        })
+
         solverContract.on(
             solverContract.filters.SubmittedWork(),
             async (cid, submitter) => {
                 const work = await ipfs.getFromCID(cid)
-                console.log(work)
+                if (work) {
+                    setWorkInput(work as SubmissionModel)
+                }
             }
         )
     }
@@ -187,9 +207,9 @@ const WriterSolverUI = ({
         }
     }
 
-    const onSubmitWork = async (input: string): Promise<void> => {
+    const onSubmitWork = async (): Promise<void> => {
         const workObj: SubmissionModel = {
-            submission: input,
+            submission: workInput.submission,
             sender: { address: currentUser.address },
             timestamp: new Date(),
         }
@@ -205,6 +225,7 @@ const WriterSolverUI = ({
     }
 
     const onRetryCondition = async () => {
+        // TODO reset work from keeper address
         solverMethods.prepareSolve(currentCondition.executions)
     }
 
@@ -221,11 +242,12 @@ const WriterSolverUI = ({
                 }
                 sidebar={
                     <ConditionVersionSidebar
-                        solverTitle="TODO Solver Tag - Title"
+                        solverTitle={`Current Role: ${roles}`}
                         currentCondition={currentCondition}
                         setCurrentCondition={setCurrentCondition}
                         solverConditions={solverData.conditions}
                         onRetryCondition={onRetryCondition}
+                        isKeeper={roles.includes('Keeper')}
                     />
                 }
                 sideNav={
@@ -247,9 +269,10 @@ const WriterSolverUI = ({
                     <WriterSolverActionbar
                         solverData={solverData}
                         currentCondition={currentCondition}
-                        role={role}
+                        roles={roles}
                         solverMethods={solverMethods}
                         solverChain={solverChain}
+                        onSubmitWork={() => onSubmitWork()}
                     />
                 }
             >
@@ -264,9 +287,69 @@ const WriterSolverUI = ({
                         }
                         outcomeCollection={proposedOutcome}
                         canRequestArbitration={
-                            role === 'BUYER' || role === 'WRITER'
+                            roles.includes('Buyer') || roles.includes('Writer')
                         }
                     />
+                )}
+                {roles.includes('Writer') &&
+                currentCondition.status === ConditionStatus.Executed ? (
+                    <Box fill>
+                        <HeaderTextSection
+                            title="Article title"
+                            subTitle="Most recent state of"
+                            paragraph={'Arcticle description'}
+                        />
+                        <TextArea
+                            fill
+                            size="medium"
+                            resize={false}
+                            value={workInput.submission}
+                            onChange={(event) =>
+                                setWorkInput({
+                                    ...workInput,
+                                    submission: event.target.value,
+                                })
+                            }
+                        />
+                    </Box>
+                ) : (
+                    <Box gap="small" height={{ min: 'auto' }}>
+                        <HeaderTextSection
+                            title="Article title"
+                            subTitle="Most recent state of"
+                            paragraph={'Arcticle description'}
+                        />
+                        <Box
+                            background={'background-front'}
+                            height={{ min: 'auto' }}
+                            pad="medium"
+                            round="small"
+                            elevation="small"
+                        >
+                            {workInput.submission === '' ? (
+                                <Box
+                                    fill
+                                    justify="center"
+                                    align="center"
+                                    gap="small"
+                                >
+                                    <CircleDashed size="36" />
+                                    <Text textAlign="center">
+                                        Nothing has been submitted yet
+                                    </Text>
+                                </Box>
+                            ) : (
+                                <Text wordBreak="break-all">
+                                    {workInput.submission}
+                                </Text>
+                            )}
+                        </Box>
+                        <Paragraph
+                            fill
+                            textAlign="end"
+                            color={'dark-6'}
+                        >{`Last submission: ${workInput.timestamp.toLocaleString()}`}</Paragraph>
+                    </Box>
                 )}
             </Layout>
         </>
@@ -275,12 +358,13 @@ const WriterSolverUI = ({
 
 export default WriterSolverUI
 
-interface WriterActionbarProps {
+interface WriterSolverActionbarProps {
     solverData: SolverContractData
     solverMethods: BasicSolverMethodsType
     solverChain: string[]
     currentCondition: SolverContractCondition
-    role: WriterSolverRole
+    roles: WriterSolverRole[]
+    onSubmitWork: () => Promise<void>
 }
 
 // TODO Arbitration
@@ -289,11 +373,12 @@ const WriterSolverActionbar = ({
     solverMethods,
     solverChain,
     currentCondition,
-    role,
-}: WriterActionbarProps) => {
+    roles,
+    onSubmitWork,
+}: WriterSolverActionbarProps) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
-            if (role === 'KEEPER') {
+            if (roles.includes('Keeper')) {
                 return (
                     <ExecuteSolverActionbar
                         solverData={solverData}
@@ -303,8 +388,10 @@ const WriterSolverActionbar = ({
                     />
                 )
             }
+            break
         case ConditionStatus.Executed:
-            if (role === 'KEEPER') {
+            // TODO Multiple roles
+            if (roles.includes('Keeper')) {
                 return (
                     <ProposeOutcomeActionbar
                         solverData={solverData}
@@ -312,9 +399,11 @@ const WriterSolverActionbar = ({
                         currentCondition={currentCondition}
                     />
                 )
-            } else if (role === 'WRITER') {
-                return <>TODO WriterActionbar</>
             }
+            if (roles.includes('Writer')) {
+                return <WriterActionbar onSubmitWork={onSubmitWork} />
+            }
+            break
         case ConditionStatus.OutcomeProposed:
             return (
                 <ConfirmOutcomeActionbar
@@ -323,7 +412,7 @@ const WriterSolverActionbar = ({
                 />
             )
         case ConditionStatus.OutcomeReported:
-            if (role !== 'OTHER') {
+            if (roles.length > 1) {
                 return (
                     <RedeemTokensActionbar
                         solverData={solverData}
@@ -334,4 +423,22 @@ const WriterSolverActionbar = ({
     }
 
     return <DefaultActionbar />
+}
+
+interface WriterActionbarProps {
+    onSubmitWork: () => Promise<void>
+}
+const WriterActionbar = ({ onSubmitWork }: WriterActionbarProps) => {
+    return (
+        <>
+            <Actionbar
+                actions={{
+                    primaryAction: {
+                        label: 'Submit work',
+                        onClick: onSubmitWork,
+                    },
+                }}
+            />
+        </>
+    )
 }
