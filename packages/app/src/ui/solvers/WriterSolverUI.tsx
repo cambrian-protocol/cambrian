@@ -249,6 +249,7 @@ const WriterSolverUI = ({
                         currentCondition={currentCondition}
                         role={role}
                         solverMethods={solverMethods}
+                        solverChain={solverChain}
                     />
                 }
             >
@@ -277,6 +278,7 @@ export default WriterSolverUI
 interface WriterActionbarProps {
     solverData: SolverContractData
     solverMethods: BasicSolverMethodsType
+    solverChain: string[]
     currentCondition: SolverContractCondition
     role: WriterSolverRole
 }
@@ -285,6 +287,7 @@ interface WriterActionbarProps {
 const WriterSolverActionbar = ({
     solverData,
     solverMethods,
+    solverChain,
     currentCondition,
     role,
 }: WriterActionbarProps) => {
@@ -321,7 +324,12 @@ const WriterSolverActionbar = ({
             )
         case ConditionStatus.OutcomeReported:
             if (role !== 'OTHER') {
-                return <RedeemTokensActionbar />
+                return (
+                    <RedeemTokensActionbar
+                        solverData={solverData}
+                        solverChain={solverChain}
+                    />
+                )
             }
     }
 

@@ -25,7 +25,8 @@ export const requestWalletConnectProvider =
                 walletconnect: {
                     package: WalletConnectProvider,
                     options: {
-                        infuraId: process.env.INFURA_ROPSTEN_PROJECTID, // TODO CHANGE FOR PROD
+                        infuraId:
+                            process.env.NEXT_PUBLIC_INFURA_ROPSTEN_PROJECTID, // TODO CHANGE FOR PROD
                     },
                 },
             },

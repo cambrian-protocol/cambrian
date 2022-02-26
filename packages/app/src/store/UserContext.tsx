@@ -29,6 +29,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
     useEffect(() => {
         if (window.ethereum) {
+            window.ethereum.on('connect', () => {
+                handleEthereumConnect()
+            })
+
             window.ethereum.on('accountsChanged', (accounts: string[]) =>
                 handleAccountChanged(accounts)
             )
@@ -54,14 +58,20 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         }
     }, [])
 
+    const handleEthereumConnect = async () => {
+        console.log('Handle connect')
+        const accounts = await window.ethereum.request({
+            method: 'eth_requestAccounts',
+        })
+        handleAccountChanged(accounts)
+    }
+
     const handleAccountChanged = async (accounts: string[]) => {
         if (accounts.length === 0) {
             // Disconnected
             onLogout()
         } else {
-            const provider = process.env.LOCAL_NETWORK
-                ? new ethers.providers.Web3Provider({ isMetaMask: true })
-                : await requestMetaMaskProvider()
+            const provider = await requestMetaMaskProvider()
 
             if (provider) {
                 const signer = provider.getSigner()
@@ -79,9 +89,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const onLogin = async () => {
         try {
-            const provider = process.env.LOCAL_NETWORK
-                ? new ethers.providers.Web3Provider({ isMetaMask: true })
-                : await requestMetaMaskProvider()
+            const provider = await requestMetaMaskProvider()
 
             if (provider) {
                 const signer = provider.getSigner()

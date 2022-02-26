@@ -21,10 +21,9 @@ export const TokenAPI = {
             erc20Contract = new ethers.Contract(
                 address,
                 new ethers.utils.Interface(ERC20_ABI),
-                process.env.LOCAL_NETWORK
+                process.env.NEXT_PUBLIC_LOCAL_NETWORK
                     ? new ethers.providers.JsonRpcProvider(
-                          process.env.LOCAL_NETWORK,
-                          'mainnet'
+                          process.env.NEXT_PUBLIC_LOCAL_NETWORK
                       )
                     : ethers.getDefaultProvider()
             )
@@ -33,7 +32,7 @@ export const TokenAPI = {
         }
 
         if (erc20Contract) {
-            const [decimals, name, symbol, totalSupply] =
+            const [name, decimals, symbol, totalSupply] =
                 await Promise.allSettled([
                     erc20Contract.name(),
                     erc20Contract.decimals(),

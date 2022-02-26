@@ -22,8 +22,8 @@ export class IPFSAPI {
             // 'gateway.pinata.cloud',
         ]
 
-        if (process.env.LOCAL_IPFS) {
-            this.gateways.unshift(process.env.LOCAL_IPFS)
+        if (process.env.NEXT_PUBLIC_LOCAL_IPFS) {
+            this.gateways.unshift(process.env.NEXT_PUBLIC_LOCAL_IPFS)
         }
     }
 
@@ -45,7 +45,7 @@ export class IPFSAPI {
 
         try {
             const response =
-                process.env.LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
+                process.env.NEXT_PUBLIC_LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
                     ? await fetch(`${gateway}${cid}`)
                     : await fetch(`https://${base32}.${gateway}`) // Otherwise try domain-based gateway
 
@@ -99,7 +99,7 @@ export class IPFSAPI {
     }
 
     pin = async (data: object): Promise<PinResponse | undefined> => {
-        const endpoint = process.env.LOCAL_IPFS
+        const endpoint = process.env.NEXT_PUBLIC_LOCAL_IPFS
             ? LOCAL_PIN_ENDPOINT
             : PIN_ENDPOINT
 
