@@ -25,7 +25,7 @@ async function main() {
     ethers.getDefaultProvider()
   );
 
-  await ToyToken.connect(user0).mint(user0.address, "100");
+  await ToyToken.connect(user0).mint(user0.address, "1000");
 
   const solverConfigs = [
     {
@@ -183,20 +183,9 @@ async function main() {
 
   console.log("Writing Solver deployed to: ", deployedAddress);
 
-  const WriterSolver = new ethers.Contract(
-    deployedAddress,
-    new ethers.utils.Interface(WRITER_ABI),
-    ethers.getDefaultProvider()
-  );
+  await ToyToken.connect(user0).transfer(deployedAddress, "1000");
 
-  await WriterSolver.connect(keeper).prepareSolve(0);
-  await WriterSolver.connect(keeper).addData(
-    "0x3031465350373845344b4d4d3548455142303942443854323533000000000000",
-    ethers.utils.defaultAbiCoder.encode(
-      ["address"],
-      ["0x676d41fedD0f24f282a4579C6d0C8E3B2099f0EF"]
-    )
-  );
+  console.log("Transferred 1000 ToyTokens to Solver");
 }
 
 main()
