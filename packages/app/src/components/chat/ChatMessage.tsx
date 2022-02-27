@@ -10,6 +10,7 @@ export type ChatMessageType = {
     id?: string
     sender: ParticipantModel
     text: string
+    conditionId: string
     timestamp: Date
 }
 

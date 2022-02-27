@@ -32,6 +32,7 @@ import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/Sol
 type SubmissionModel = {
     submission: string
     sender: ParticipantModel
+    conditionId: string
     timestamp: Date
 }
 
@@ -51,33 +52,16 @@ const WriterSolverUI = ({
     const [solverChain, setSolverChain] = useState([solverContract.address])
     const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
     const [messages, setMessages] = useState<ChatMessageType[]>([])
+    const [submittedWork, setSubmittedWork] = useState<SubmissionModel[]>([])
+
     const [workInput, setWorkInput] = useState<SubmissionModel>({
-        sender: { address: '' },
+        conditionId: currentCondition.conditionId,
+        sender: { address: currentUser.address },
         submission: '',
         timestamp: new Date(),
     })
 
     const [roles, setRoles] = useState<WriterSolverRole[]>(['Other'])
-
-    // TEMP
-    useEffect(() => {
-        const messagesDummy: ChatMessageType[] = [
-            {
-                id: '0',
-                text: 'Love it so far, but could you go a little more into detail?',
-                sender: { name: 'You', address: '0x12345' },
-                timestamp: new Date(),
-            },
-            {
-                id: '1',
-                text: 'Sure, give me a couple of hours',
-                sender: { name: 'Writer', address: '0x54321' },
-                timestamp: new Date(),
-            },
-        ]
-
-        setMessages(messagesDummy)
-    }, [])
 
     useEffect(() => {
         initSolverChain()
@@ -143,8 +127,11 @@ const WriterSolverUI = ({
             async (cid, sender) => {
                 console.log('Got message event')
                 try {
-                    const chatMsg = await ipfs.getFromCID(cid)
-                    if (chatMsg) {
+                    const chatMsg = (await ipfs.getFromCID(
+                        cid
+                    )) as ChatMessageType
+
+                    if (chatMsg && chatMsg.conditionId) {
                         console.log('message: ', chatMsg)
                         setMessages(
                             (prevMessages) =>
@@ -162,24 +149,26 @@ const WriterSolverUI = ({
         const logs = await solverContract.queryFilter(
             solverContract.filters.SubmittedWork()
         )
-
         const cids = logs.map((l) => l.args?.cid).filter(Boolean)
-        const latestSubmission = (await ipfs.getFromCID(
-            cids[cids.length - 1]
-        )) as SubmissionModel
 
-        setWorkInput({
-            sender: latestSubmission.sender,
-            submission: latestSubmission.submission,
-            timestamp: new Date(latestSubmission.timestamp),
-        })
+        const prevSubmissions = (await ipfs.getManyFromCID(
+            cids
+        )) as SubmissionModel[]
+
+        const currentConditionSubmissions = prevSubmissions.filter(
+            (x) => x.conditionId === currentCondition.conditionId
+        )
+
+        setSubmittedWork(currentConditionSubmissions)
 
         solverContract.on(
             solverContract.filters.SubmittedWork(),
             async (cid, submitter) => {
-                const work = await ipfs.getFromCID(cid)
+                const work = (await ipfs.getFromCID(cid)) as SubmissionModel
                 if (work) {
-                    setWorkInput(work as SubmissionModel)
+                    setSubmittedWork(
+                        () => [...submittedWork, work] as SubmissionModel[]
+                    )
                 }
             }
         )
@@ -193,6 +182,7 @@ const WriterSolverUI = ({
     const onSubmitChat = async (input: string): Promise<void> => {
         const messageObj: ChatMessageType = {
             text: input,
+            conditionId: currentCondition.conditionId,
             sender: { address: currentUser.address },
             timestamp: new Date(),
         }
@@ -208,19 +198,23 @@ const WriterSolverUI = ({
     }
 
     const onSubmitWork = async (): Promise<void> => {
-        const workObj: SubmissionModel = {
-            submission: workInput.submission,
-            sender: { address: currentUser.address },
-            timestamp: new Date(),
-        }
-
-        try {
-            const response = await ipfs.pin(workObj)
-            if (response?.IpfsHash) {
-                await solverContract.submitWork(response.IpfsHash)
+        if (workInput) {
+            const workObj: SubmissionModel = {
+                submission: workInput.submission,
+                conditionId: currentCondition.conditionId,
+                sender: { address: currentUser.address },
+                timestamp: new Date(),
             }
-        } catch (error) {
-            console.error(error)
+
+            try {
+                const response = await ipfs.pin(workObj)
+                console.log(response)
+                if (response?.IpfsHash) {
+                    await solverContract.submitWork(response.IpfsHash)
+                }
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -326,7 +320,7 @@ const WriterSolverUI = ({
                             round="small"
                             elevation="small"
                         >
-                            {workInput.submission === '' ? (
+                            {submittedWork.length < 1 ? (
                                 <Box
                                     fill
                                     justify="center"
@@ -340,15 +334,21 @@ const WriterSolverUI = ({
                                 </Box>
                             ) : (
                                 <Text wordBreak="break-all">
-                                    {workInput.submission}
+                                    {
+                                        submittedWork[submittedWork.length - 1]
+                                            .submission
+                                    }
                                 </Text>
                             )}
                         </Box>
-                        <Paragraph
-                            fill
-                            textAlign="end"
-                            color={'dark-6'}
-                        >{`Last submission: ${workInput.timestamp.toLocaleString()}`}</Paragraph>
+                        <Paragraph fill textAlign="end" color={'dark-6'}>
+                            {submittedWork.length > 0 &&
+                                `Last submission: ${new Date(
+                                    submittedWork[
+                                        submittedWork.length - 1
+                                    ].timestamp
+                                ).toLocaleString()}`}
+                        </Paragraph>
                     </Box>
                 )}
             </Layout>

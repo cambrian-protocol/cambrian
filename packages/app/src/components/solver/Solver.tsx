@@ -65,13 +65,14 @@ interface SolverProps {
 
 const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const ipfs = new IPFSAPI()
-    const [contract, setContract] = React.useState<Contract>(
+    const [contract, setContract] = useState<Contract>(
         new ethers.Contract(
             address,
             new ethers.utils.Interface(abi),
             currentUser.signer
         )
     )
+    const [isDeployed, setIsDeployed] = useState<boolean | undefined>(undefined)
 
     const [currentSolverData, setCurrentSolverData] =
         useState<SolverContractData>()
@@ -80,9 +81,29 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         useState<SolverContractCondition>()
 
     useEffect(() => {
-        triggerUpdate()
-        initListeners()
+        init()
     }, [])
+
+    const init = async () => {
+        initListeners()
+
+        const deployed = await hasDeployedCode()
+        if (deployed) {
+            setIsDeployed(true)
+            triggerUpdate()
+        } else {
+            setIsDeployed(false)
+        }
+    }
+
+    const hasDeployedCode = async () => {
+        const code = await contract.provider.getCode(contract.address)
+        if (code && code != '0x') {
+            return true
+        } else {
+            return false
+        }
+    }
 
     const initListeners = async () => {
         const ingestedDataFilter = {
@@ -115,6 +136,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             setCurrentCondition(
                 updatedData.conditions[updatedData.conditions.length - 1]
             )
+        }
+
+        if (!isDeployed) {
+            setIsDeployed(true)
         }
     }
 
@@ -532,7 +557,19 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
     // TODO Determine SolverUI
     const loadWriter = true
-    if (currentSolverData && currentUser) {
+    if (isDeployed === false) {
+        return (
+            <Layout contextTitle="Not found">
+                <Box fill justify="center">
+                    <HeaderTextSection
+                        title="Solver Not Found"
+                        subTitle="Looks pretty empty here"
+                        paragraph="Smart contract unreachable. Perhaps the Solver has not finished deploying yet. Try refreshing in a minute."
+                    />
+                </Box>
+            </Layout>
+        )
+    } else if (currentSolverData && currentUser) {
         if (currentCondition === undefined) {
             return (
                 <Layout
@@ -547,9 +584,9 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title="Uninitialized solve"
-                            subTitle="Looks pretty empty here"
-                            paragraph="You must manually prepare and execute the first Solve. Click on Execute Solver and follow the quest..."
+                            title="Uninitialized"
+                            subTitle="Further setup required"
+                            paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
                     </Box>
                 </Layout>
