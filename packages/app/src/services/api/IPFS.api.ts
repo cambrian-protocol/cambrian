@@ -21,10 +21,6 @@ export class IPFSAPI {
             // 'infura-ipfs.io',
             // 'gateway.pinata.cloud',
         ]
-
-        if (process.env.NEXT_PUBLIC_LOCAL_IPFS) {
-            this.gateways.unshift(process.env.NEXT_PUBLIC_LOCAL_IPFS)
-        }
     }
 
     getFromCID = async (
@@ -39,16 +35,12 @@ export class IPFSAPI {
         const base32 = new CID(cid).toV1().toString('base32')
 
         const timeout = setTimeout(() => {
-            console.log('Local gateway timed out')
+            console.log('Gateway timed out')
             return this.getFromCID(cid, gatewayIndex + 1)
         }, 5000)
 
         try {
-            const response =
-                process.env.NEXT_PUBLIC_LOCAL_IPFS && gatewayIndex === 0 // Try local gateway first
-                    ? await fetch(`${gateway}${cid}`)
-                    : await fetch(`https://${base32}.${gateway}`) // Otherwise try domain-based gateway
-
+            const response = await fetch(`https://${base32}.${gateway}`)
             const data = await response.text()
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
@@ -99,12 +91,34 @@ export class IPFSAPI {
     }
 
     pin = async (data: object): Promise<PinResponse | undefined> => {
-        const endpoint = process.env.NEXT_PUBLIC_LOCAL_IPFS
-            ? LOCAL_PIN_ENDPOINT
-            : PIN_ENDPOINT
+        // if (process.env.NEXT_PUBLIC_LOCAL_IPFS_API) {
+        //     return this.pinLocal(data)
+        // } else {
+        //     return this.pinRemote(data)
+        // }
+        return this.pinRemote(data)
+    }
 
+    pinLocal = async (data: object): Promise<PinResponse | undefined> => {
         try {
-            const res = await fetch(endpoint, {
+            const res = await fetch(`${LOCAL_PIN_ENDPOINT}?pin=true`, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+                body: JSON.stringify(data),
+            })
+
+            return res.json() as Promise<PinResponse>
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    pinRemote = async (data: object): Promise<PinResponse | undefined> => {
+        try {
+            const res = await fetch(PIN_ENDPOINT, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',

@@ -8,4 +8,4 @@ export const CERAMIC_NETWORK = 'https://127.0.0.1:7001'
 export const PIN_ENDPOINT =
     'https://kdjzxk3x7a.execute-api.us-east-1.amazonaws.com/pinPinata'
 
-export const LOCAL_PIN_ENDPOINT = 'http://127.0.0.1:5001/api/v0/swarm/peers'
+export const LOCAL_PIN_ENDPOINT = 'http://127.0.0.1:5002/api/v0/add'
