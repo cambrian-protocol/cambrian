@@ -1,4 +1,7 @@
-import AddDataModal, { ManualInputsFormType } from '../modals/AddDataModal'
+import AddDataModal, {
+    ManualInputsFormType,
+    ManualInputType,
+} from '../modals/AddDataModal'
 import {
     SolverContractCondition,
     SolverContractData,
@@ -42,7 +45,7 @@ const ExecuteSolverActionbar = ({
             })
             setHasAllManualFields(allManualFieldsFilled)
         }
-    }, [])
+    }, [solverData, currentCondition, manualSlots])
 
     const onExecuteSolve = async () => {
         const conditionIndex =
@@ -50,29 +53,49 @@ const ExecuteSolverActionbar = ({
         await solverMethods.executeSolve(conditionIndex)
     }
 
-    const onAddData = async (manualInputs: ManualInputsFormType) => {
+    const onAddData = async (input: ManualInputType) => {
         if (currentCondition === undefined) {
             await solverMethods.prepareSolve(0)
         }
-        manualInputs.manualInputs.forEach(async (manualInput) => {
-            // TODO Encode the right type (tags)
-            const encodedData = ethers.utils.defaultAbiCoder.encode(
-                ['address'],
-                [manualInput.input]
-            )
-            await solverMethods.addData(manualInput.slot.slot, encodedData)
-        })
+        // TODO Encode the right type (tags)
+        const encodedData = ethers.utils.defaultAbiCoder.encode(
+            ['address'],
+            [input.data]
+        )
+        await solverMethods.addData(input.slot.slot, encodedData)
         toggleShowAddDataModal()
     }
 
+    if (currentCondition === undefined) {
+        return (
+            <Actionbar
+                actions={{
+                    primaryAction: {
+                        label: 'Prepare Solve',
+                        onClick: () => solverMethods.prepareSolve(0),
+                    },
+                    info: {
+                        icon: <WarningCircle />,
+                        descLabel: 'Info',
+                        label: 'Click Prepare Solve to continue.',
+                    },
+                }}
+            />
+        )
+    }
     return (
         <>
             {hasAllManualFields ? (
                 <Actionbar
                     actions={{
                         primaryAction: {
-                            label: 'Execute Solver',
+                            label: 'Execute Solve',
                             onClick: onExecuteSolve,
+                        },
+                        info: {
+                            icon: <WarningCircle />,
+                            descLabel: 'Info',
+                            label: 'Solve is ready to execute',
                         },
                     }}
                 />
@@ -80,13 +103,13 @@ const ExecuteSolverActionbar = ({
                 <Actionbar
                     actions={{
                         primaryAction: {
-                            label: 'Prepare Solver',
+                            label: 'Add Data',
                             onClick: toggleShowAddDataModal,
                         },
                         info: {
                             icon: <WarningCircle />,
                             descLabel: 'Info',
-                            label: 'Please prepare the solver',
+                            label: 'Additional data required',
                         },
                     }}
                 />

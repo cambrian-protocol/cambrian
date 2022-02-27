@@ -1,4 +1,11 @@
-import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import {
+    Box,
+    Button,
+    Form,
+    FormExtendedEvent,
+    FormField,
+    TextInput,
+} from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
@@ -8,12 +15,12 @@ import { ParsedSlotModel } from '@cambrian/app/models/SlotModel'
 interface ExecuteSolverModalProps {
     onBack: () => void
     manualSlots: ParsedSlotModel[]
-    onAddData: (data: ManualInputsFormType) => void
+    onAddData: (data: ManualInputType) => void
 }
 
-export type ManualInputsFormType = {
-    manualInputs: { input: string; slot: ParsedSlotModel }[]
-}
+export type ManualInputsFormType = { manualInputs: ManualInputType[] }
+
+export type ManualInputType = { data: any; slot: ParsedSlotModel }
 
 const AddDataModal = ({
     onBack,
@@ -24,52 +31,54 @@ const AddDataModal = ({
 
     useEffect(() => {
         const manualInputs = manualSlots.map((slot) => {
-            return { input: '', slot: slot }
+            return { data: '', slot: slot }
         })
+
         setManualInputs({ manualInputs: manualInputs })
     }, [])
-
-    const onSubmit = (
-        event: FormExtendedEvent<ManualInputsFormType, Element>
-    ) => {
-        event.preventDefault()
-        if (manualInputs !== undefined) {
-            onAddData(manualInputs)
-        }
-    }
 
     // TODO Tags / Slot Input descripiton
     let ManualInputGroup = null
     if (manualInputs !== undefined) {
-        ManualInputGroup = manualInputs.manualInputs.map((manualInput, idx) => (
-            <FormField
-                key={manualInput.slot.slot}
-                required
-                name={`manualInputs[${idx}].input`}
-            />
+        ManualInputGroup = manualInputs.manualInputs.map((input, idx) => (
+            <Box direction="row" gap="medium" key={input.slot.slot}>
+                <FormField
+                    style={{ width: '100%' }}
+                    name={`manualInputs[${idx}].data`}
+                    label="Selected Writer"
+                    required
+                />
+                <Box>
+                    <Button
+                        primary
+                        type="submit"
+                        label="Add Data"
+                        onClick={() =>
+                            onAddData(manualInputs.manualInputs[idx])
+                        }
+                    />
+                </Box>
+            </Box>
         ))
     }
 
     return (
         <BaseLayerModal onBack={onBack}>
             <HeaderTextSection
-                title="Prepare and execute solve"
-                subTitle="Let's set up this solver"
-                paragraph="Please input the following mandatory fields and click on Add Data. After you have added the data the Solver will be ready to execute."
+                title="Data Required"
+                subTitle="Add solve data"
+                paragraph='This Solver requires the following data. Fields marked "*" must be added before execution.'
             />
             <Box gap="medium" fill>
                 {ManualInputGroup && (
                     <Form<ManualInputsFormType>
+                        onSubmit={(e) => e.preventDefault()}
                         value={manualInputs}
-                        onSubmit={(event) => onSubmit(event)}
                         onChange={(newFormState) =>
                             setManualInputs(newFormState)
                         }
                     >
                         {ManualInputGroup}
-                        <Box>
-                            <Button primary type="submit" label="Add data" />
-                        </Box>
                     </Form>
                 )}
             </Box>
