@@ -1,9 +1,10 @@
-import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
-import React, { useState } from 'react'
 import {
+    AddressWithMetaDataType,
     SolverComponentOC,
     SolverContractAllocationsType,
 } from '@cambrian/app/models/SolverModel'
+import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
+import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
@@ -24,19 +25,20 @@ const OutcomeCollectionCard = ({
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
-    const currentAllocations: { address: string; amount: string }[] =
-        allocations.map((allocation) => {
-            const amount = allocation.allocations.find(
-                (alloc) =>
-                    alloc.outcomeCollectionIndexSet ===
-                    outcomeCollection.indexSet
-            )
+    const currentAllocations: {
+        address: AddressWithMetaDataType
+        amount: string
+    }[] = allocations.map((allocation) => {
+        const amount = allocation.allocations.find(
+            (alloc) =>
+                alloc.outcomeCollectionIndexSet === outcomeCollection.indexSet
+        )
 
-            return {
-                address: allocation.address,
-                amount: amount?.amount || 'No amount found',
-            }
-        })
+        return {
+            address: allocation.address,
+            amount: amount?.amount || 'No amount found',
+        }
+    })
 
     const toggleShowAllocationModal = () =>
         setShowAllocationModal(!showAllocationModal)

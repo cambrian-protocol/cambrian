@@ -16,7 +16,7 @@ const RecipientAllocationItem = ({
     return (
         <BaseSlotInputItem title={title} subTitle={subTitle}>
             <Box align="end">
-                <Text>{amountPercentage} %</Text>
+                <Text>{amountPercentage}%</Text>
                 {/*  <Text size="small" color="dark-6">
                     {amount}
                 </Text> */}

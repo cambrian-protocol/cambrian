@@ -3,9 +3,12 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
+import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type RecipientsModalProps = BaseLayerModalProps & {
-    recipientAddresses: (string | undefined)[]
+    recipientAddresses: SlotWithMetaDataModel[]
 }
 
 const RecipientsModal = ({
@@ -16,13 +19,22 @@ const RecipientsModal = ({
         <BaseLayerModal {...rest}>
             <HeaderTextSection
                 title="Recipients"
-                subTitle="Short description"
-                paragraph="Recipients description. Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                paragraph="The following addresses are eligible to collect tokens based on outcomes."
             />
             <Box gap="medium" fill>
-                {recipientAddresses.map((recipientAddress, idx) => (
-                    <BaseSlotInputItem key={idx} title={recipientAddress} />
-                ))}
+                {recipientAddresses.map((recipientAddress, idx) => {
+                    return (
+                        <BaseSlotInputItem
+                            info={recipientAddress.tag.text}
+                            key={idx}
+                            title={recipientAddress.description}
+                            subTitle={decodeData(
+                                [SolidityDataTypes.Address],
+                                recipientAddress.slot.data
+                            )}
+                        />
+                    )
+                })}
             </Box>
         </BaseLayerModal>
     )

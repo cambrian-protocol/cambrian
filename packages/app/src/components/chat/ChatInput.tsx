@@ -1,14 +1,7 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextInput,
-} from 'grommet'
+import { Box, Button, Form, FormField, TextInput } from 'grommet'
 
 import { PaperPlaneRight } from 'phosphor-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface ChatInputProps {
     onSubmitChat: (text: string) => Promise<void>
@@ -42,6 +35,7 @@ const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
                 pad="small"
                 round="small"
                 background="background-contrast"
+                gap="small"
             >
                 <Box flex>
                     <FormField>

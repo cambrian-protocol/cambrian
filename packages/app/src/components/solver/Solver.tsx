@@ -1,6 +1,7 @@
 import {
     AllocationType,
     IPFSOutcomeModel,
+    SlotWithMetaDataModel,
     SlotsHashMapType,
     SlotsHistoryHashMapType,
     SolverComponentOC,
@@ -9,6 +10,7 @@ import {
     SolverContractConfigModel,
     SolverContractConfigResponseType,
     SolverContractData,
+    SolverModel,
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
@@ -32,7 +34,7 @@ import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolver
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { solvers } from '@cambrian/app/stubs/tags'
+import { solversMetaData } from '@cambrian/app/stubs/tags'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -52,11 +54,13 @@ export type BasicSolverMethodsType = {
     getCondition: (index: number) => any
     getConditions: () => {}
     getConfig: () => {}
-    getRecipientAddresses: (
+    getManualInputs: (
         condition: SolverContractCondition
-    ) => (string | undefined)[]
-    getManualInputs: (condition: SolverContractCondition) => ParsedSlotModel[]
-    getManualSlots: () => ParsedSlotModel[]
+    ) => SlotWithMetaDataModel[]
+    getManualSlots: () => SlotWithMetaDataModel[]
+    getRecipientSlots: (
+        condition: SolverContractCondition
+    ) => SlotWithMetaDataModel[]
 }
 
 interface SolverProps {
@@ -159,11 +163,15 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const timelocksHistory = await getTimelocksHistory(conditions)
         const slotsHistory = await getSlotsHistory(config.ingests, conditions)
 
+        // TODO TEMP
+        const metaData = solversMetaData
+
         const allocationHistory = getAllocationHistory(
             conditions,
             slotsHistory,
             config,
-            outcomeCollections
+            outcomeCollections,
+            metaData
         )
 
         const numMintedTokensByCondition =
@@ -180,6 +188,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             timelocksHistory: timelocksHistory,
             slotsHistory: slotsHistory,
             numMintedTokensByCondition: numMintedTokensByCondition,
+            metaData: metaData,
         }
     }
 
@@ -471,7 +480,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         conditions: SolverContractCondition[],
         slotsHistory: SlotsHistoryHashMapType,
         config: SolverContractConfigModel,
-        outcomeCollections: SolverComponentOC[]
+        outcomeCollections: SolverComponentOC[],
+        metaData: SolverModel[]
     ): SolverContractAllocationsHistoryType => {
         const allocationHistory: SolverContractAllocationsHistoryType = {}
         conditions.forEach((condition) => {
@@ -510,8 +520,17 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                         ]?.data
                     )
 
+                    const ulid = ethers.utils.parseBytes32String(
+                        allocation.recipientAddressSlot
+                    )
+                    const description = metaData[0].config.slots[ulid]
+
                     allocationHistory[condition.conditionId].push({
-                        address: decodedAddress,
+                        address: {
+                            address: decodedAddress,
+                            tag: metaData[0].tags[ulid],
+                            description: description.description || '',
+                        },
                         allocations: allocations,
                     })
                 } catch (e) {
@@ -520,26 +539,50 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 }
             })
         })
-
         return allocationHistory
     }
 
-    const getRecipientAddresses = (
+    const getRecipientSlots = (
         condition: SolverContractCondition
-    ): string[] => {
+    ): SlotWithMetaDataModel[] => {
         if (currentSolverData) {
             const recipientAddressSlots =
                 currentSolverData.config.conditionBase.allocations.map(
                     (allocation) => allocation.recipientAddressSlot
                 )
-            return recipientAddressSlots.map((recipientAddressSlot) =>
-                decodeData(
-                    [SolidityDataTypes.Address],
+
+            return recipientAddressSlots.map((recipientAddressSlot) => {
+                const slotFromCondition =
                     currentSolverData.slotsHistory[condition.conditionId][
                         recipientAddressSlot
-                    ]?.data
-                )
-            )
+                    ]
+                if (slotFromCondition) {
+                    return getMetaData(slotFromCondition)
+                } else {
+                    const ingestSlot = currentSolverData.config.ingests.find(
+                        (ingest) => ingest.slot === recipientAddressSlot
+                    )
+                    if (ingestSlot) {
+                        return getMetaData(ingestSlot)
+                    } else {
+                        throw new Error('Error while finding recipient slot')
+                    }
+                }
+            })
+        } else {
+            throw new Error('No solver data exists')
+        }
+    }
+
+    const getMetaData = (slot: ParsedSlotModel): SlotWithMetaDataModel => {
+        if (currentSolverData) {
+            const ulid = ethers.utils.parseBytes32String(slot.slot)
+            const metaSlot = currentSolverData.metaData[0].config.slots[ulid]
+            return {
+                slot: slot,
+                tag: currentSolverData.metaData[0].tags[ulid],
+                description: metaSlot.description || '',
+            }
         } else {
             throw new Error('No solver data exists')
         }
@@ -547,27 +590,31 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getManualInputs = (
         condition: SolverContractCondition
-    ): ParsedSlotModel[] => {
+    ): SlotWithMetaDataModel[] => {
         if (currentSolverData) {
             const manualSlots = Object.values(
                 currentSolverData.slotsHistory[condition.conditionId]
             ).filter((slot) => slot.ingestType === SlotTypes.Manual)
-            return manualSlots.map(
-                (manualSlot) =>
+
+            return manualSlots.map((manualSlot) =>
+                getMetaData(
                     currentSolverData.slotsHistory[condition.conditionId][
                         manualSlot.slot
                     ]
+                )
             )
         } else {
             throw new Error('No solver data exists')
         }
     }
 
-    const getManualSlots = (): ParsedSlotModel[] => {
+    const getManualSlots = (): SlotWithMetaDataModel[] => {
         if (currentSolverData) {
-            return currentSolverData.config.ingests.filter(
+            const manualIngests = currentSolverData.config.ingests.filter(
                 (ingest) => ingest.ingestType === SlotTypes.Manual
             )
+
+            return manualIngests.map((ingest) => getMetaData(ingest))
         } else {
             throw new Error('No solver data exists')
         }
@@ -660,9 +707,9 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         getCondition: getCondition,
         getConditions: getConditions,
         getConfig: getConfig,
-        getRecipientAddresses: getRecipientAddresses,
         getManualInputs: getManualInputs,
         getManualSlots: getManualSlots,
+        getRecipientSlots: getRecipientSlots,
     }
     // TODO Determine SolverUI
     const loadWriter = true
@@ -693,8 +740,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title="Uninitialized"
-                            subTitle="Further setup required"
+                            title={solversMetaData[0]?.title}
+                            subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
                     </Box>
