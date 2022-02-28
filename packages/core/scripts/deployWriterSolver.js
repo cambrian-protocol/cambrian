@@ -25,7 +25,7 @@ async function main() {
     ethers.getDefaultProvider()
   );
 
-  await ToyToken.connect(user0).mint(user0.address, "1000");
+  await ToyToken.connect(user0).mint(user0.address, "1000000000000000000000");
 
   const solverConfigs = [
     {
@@ -183,9 +183,12 @@ async function main() {
 
   console.log("Writing Solver deployed to: ", deployedAddress);
 
-  await ToyToken.connect(user0).transfer(deployedAddress, "1000");
+  await ToyToken.connect(user0).transfer(
+    deployedAddress,
+    "1000000000000000000000"
+  );
 
-  console.log("Transferred 1000 ToyTokens to Solver");
+  console.log("Transferred 1000000000000000000000 Toy to Solver");
 }
 
 main()

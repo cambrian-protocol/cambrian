@@ -90,6 +90,9 @@ export type SolverContractData = {
     allocationsHistory: SolverContractAllocationsHistoryType
     slotsHistory: SlotsHistoryHashMapType
     timelocksHistory: TimeLocksHashMap
+    numMintedTokensByCondition?: {
+        [conditionId: string]: number
+    }
 }
 
 export type SolverComponentOC = {
@@ -113,8 +116,14 @@ export type SolverContractAllocationsHistoryType = {
 
 export type SolverContractAllocationsType = {
     address: string
-    allocations: { amount: string; outcomeCollectionIndexSet: number }[]
+    allocations: AllocationType[]
 }[]
+
+export type AllocationType = {
+    amount: string
+    outcomeCollectionIndexSet: number
+    positionId: string
+}
 
 export type SolverContractCondition = {
     executions: number
