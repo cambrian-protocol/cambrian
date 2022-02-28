@@ -376,6 +376,7 @@ library SolverLib {
                     _amounts[j] = 0;
                 } else {
                     _amounts[j] = bpToNum(_pctValue, _balances[j]);
+                    console.log(_amounts[j]);
                 }
             }
 

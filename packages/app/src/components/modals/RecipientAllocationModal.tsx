@@ -12,6 +12,7 @@ const RecipientAllocationModal = ({
     onClose,
     allocations,
 }: RecipientAllocationModalProps) => {
+    console.log(allocations)
     return (
         <BaseLayerModal onClose={onClose}>
             <HeaderTextSection

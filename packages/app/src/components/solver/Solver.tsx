@@ -1,11 +1,14 @@
 import { Box, Text } from 'grommet'
 import { Contract, EventFilter, ethers } from 'ethers'
 import {
+    AllocationType,
+    ConditionStatus,
     IPFSOutcomeModel,
     SlotsHashMapType,
     SlotsHistoryHashMapType,
     SolverComponentOC,
     SolverContractAllocationsHistoryType,
+    SolverContractAllocationsType,
     SolverContractCondition,
     SolverContractConfigModel,
     SolverContractConfigResponseType,
@@ -13,7 +16,7 @@ import {
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
 import ExecuteSolverActionbar from '../actionbars/ExecuteSolverActionbar'
@@ -31,6 +34,7 @@ import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/Solver
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solvers } from '@cambrian/app/stubs/tags'
+import { CTFContext } from '@cambrian/app/store/CTFContext'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -64,6 +68,7 @@ interface SolverProps {
 }
 
 const Solver = ({ address, abi, currentUser }: SolverProps) => {
+    const ctf = useContext(CTFContext)
     const ipfs = new IPFSAPI()
     const [contract, setContract] = useState<Contract>(
         new ethers.Contract(
@@ -163,6 +168,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             outcomeCollections
         )
 
+        const numMintedTokensByCondition =
+            await getNumMintedTokensForConditions(
+                conditions,
+                config.conditionBase.collateralToken
+            )
+
         return {
             config: config,
             outcomeCollections: outcomeCollections,
@@ -170,6 +181,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             conditions: conditions,
             timelocksHistory: timelocksHistory,
             slotsHistory: slotsHistory,
+            numMintedTokensByCondition: numMintedTokensByCondition,
         }
     }
 
@@ -316,6 +328,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             return res.map((condition, idx) => {
                 return {
                     ...condition,
+                    payouts: condition.payouts.map((x) => Number(x.toString())),
                     executions: idx + 1,
                 }
             })
@@ -355,6 +368,27 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             console.error(e)
             return Promise.reject()
         }
+    }
+
+    const calculatePositionId = (
+        collateralTokenAddress: string,
+        collectionId: string
+    ) => {
+        return ethers.utils.keccak256(
+            ethers.utils.defaultAbiCoder.encode(
+                ['address', 'bytes32'],
+                [collateralTokenAddress, collectionId]
+            )
+        )
+    }
+
+    const calculateCollectionId = (conditionId: string, indexSet: number) => {
+        return ethers.utils.keccak256(
+            ethers.utils.defaultAbiCoder.encode(
+                ['bytes32', 'uint256'],
+                [conditionId, indexSet]
+            )
+        )
     }
 
     const getTimelocksHistory = async (
@@ -445,20 +479,28 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         conditions.forEach((condition) => {
             config.conditionBase.allocations.forEach((allocation) => {
                 try {
-                    const allocations = allocation.recipientAmountSlots?.map(
-                        (recipientAmountSlot, idx) => {
-                            const amountData =
-                                slotsHistory[condition.conditionId][
-                                    recipientAmountSlot
-                                ]?.data
+                    const allocations: AllocationType[] =
+                        allocation.recipientAmountSlots?.map(
+                            (recipientAmountSlot, idx) => {
+                                const amountData =
+                                    slotsHistory[condition.conditionId][
+                                        recipientAmountSlot
+                                    ]?.data
 
-                            return {
-                                outcomeCollectionIndexSet:
-                                    outcomeCollections[idx].indexSet,
-                                amount: amountData,
+                                return {
+                                    outcomeCollectionIndexSet:
+                                        outcomeCollections[idx].indexSet,
+                                    amount: amountData,
+                                    positionId: calculatePositionId(
+                                        config.conditionBase.collateralToken,
+                                        calculateCollectionId(
+                                            condition.conditionId,
+                                            outcomeCollections[idx].indexSet
+                                        )
+                                    ),
+                                }
                             }
-                        }
-                    )
+                        )
 
                     if (!allocationHistory[condition.conditionId])
                         allocationHistory[condition.conditionId] = []
@@ -530,6 +572,75 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             )
         } else {
             throw new Error('No solver data exists')
+        }
+    }
+
+    const listenNumMintedTokens = () => {
+        if (ctf && currentSolverData?.conditions) {
+            currentSolverData.conditions.forEach((condition) => {
+                ctf.on(
+                    ctf.filters.PositionSplit(
+                        null,
+                        null,
+                        condition.parentCollectionId,
+                        condition.conditionId,
+                        null,
+                        null
+                    ),
+                    (log, event) => {
+                        if (log.args?.payout) {
+                            const newMinted = JSON.parse(
+                                JSON.stringify(
+                                    currentSolverData.numMintedTokensByCondition
+                                )
+                            )
+                            newMinted[condition.conditionId] = log.args.payout
+
+                            setCurrentSolverData({
+                                ...currentSolverData,
+                                numMintedTokensByCondition: newMinted,
+                            } as SolverContractData)
+                        }
+                    }
+                )
+            })
+        }
+    }
+
+    const getNumMintedTokensForConditions = async (
+        conditions: SolverContractCondition[],
+        collateralToken: string
+    ) => {
+        if (ctf) {
+            const numMintedByCondition = {} as { [conditionId: string]: number }
+
+            await Promise.all(
+                conditions.map(async (condition) => {
+                    const logs = await ctf.queryFilter(
+                        ctf.filters.PositionSplit(
+                            null,
+                            null,
+                            condition.parentCollectionId,
+                            condition.conditionId,
+                            null,
+                            null
+                        )
+                    )
+                    const amount = logs
+                        .filter(
+                            (l) => l.args?.collateralToken === collateralToken
+                        )
+                        .map((l) => l.args?.amount)
+                        .filter(Boolean)
+                        .reduce((x, y) => x + y)
+
+                    numMintedByCondition[condition.conditionId] = amount
+                })
+            )
+
+            listenNumMintedTokens()
+
+            return numMintedByCondition
         }
     }
 
