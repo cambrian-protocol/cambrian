@@ -26,7 +26,6 @@ const OutcomeCollectionCard = ({
 
     const currentAllocations: { address: string; amount: string }[] =
         allocations.map((allocation) => {
-            console.log(allocation)
             const amount = allocation.allocations.find(
                 (alloc) =>
                     alloc.outcomeCollectionIndexSet ===

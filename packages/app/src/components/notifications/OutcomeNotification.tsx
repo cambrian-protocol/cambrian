@@ -10,7 +10,6 @@ import SolverStatusNotification, {
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { Warning } from 'phosphor-react'
 
 type OutcomeNotificationProps = SolverStatusNotificationProps & {
@@ -18,7 +17,6 @@ type OutcomeNotificationProps = SolverStatusNotificationProps & {
     canRequestArbitration?: boolean
     allocations: SolverContractAllocationsType
     status: ConditionStatus
-    currentUser: UserType
 }
 
 const OutcomeNotification = ({
@@ -26,9 +24,7 @@ const OutcomeNotification = ({
     canRequestArbitration,
     allocations,
     status,
-    currentUser,
 }: OutcomeNotificationProps) => {
-    //TODO just allow buyer, seller and writer to request arbitration
     if (status === ConditionStatus.OutcomeProposed) {
         return (
             <SolverStatusNotification

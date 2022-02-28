@@ -1,23 +1,22 @@
-import { Box, Text } from 'grommet'
-import { Contract, EventFilter, ethers } from 'ethers'
 import {
     AllocationType,
-    ConditionStatus,
     IPFSOutcomeModel,
     SlotsHashMapType,
     SlotsHistoryHashMapType,
     SolverComponentOC,
     SolverContractAllocationsHistoryType,
-    SolverContractAllocationsType,
     SolverContractCondition,
     SolverContractConfigModel,
     SolverContractConfigResponseType,
     SolverContractData,
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
+import { Contract, EventFilter, ethers } from 'ethers'
 import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 import React, { useContext, useEffect, useState } from 'react'
 
+import { Box } from 'grommet'
+import { CTFContext } from '@cambrian/app/store/CTFContext'
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
 import ExecuteSolverActionbar from '../actionbars/ExecuteSolverActionbar'
 import { Fragment } from 'ethers/lib/utils'
@@ -29,12 +28,11 @@ import LoadingScreen from '../info/LoadingScreen'
 import { Multihash } from '@cambrian/app/models/ConditionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { UserType } from '@cambrian/app/store/UserContext'
-import WriterSolverUI from '@cambrian/app/ui/solvers/WriterSolverUI'
+import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solvers } from '@cambrian/app/stubs/tags'
-import { CTFContext } from '@cambrian/app/store/CTFContext'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>

@@ -1,11 +1,4 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextInput,
-} from 'grommet'
+import { Box, Button, Form, FormField } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
@@ -41,13 +34,19 @@ const AddDataModal = ({
     let ManualInputGroup = null
     if (manualInputs !== undefined) {
         ManualInputGroup = manualInputs.manualInputs.map((input, idx) => (
-            <Box direction="row" gap="medium" key={input.slot.slot}>
-                <FormField
-                    style={{ width: '100%' }}
-                    name={`manualInputs[${idx}].data`}
-                    label="Selected Writer"
-                    required
-                />
+            <Box
+                direction="row"
+                gap="medium"
+                key={input.slot.slot}
+                align="center"
+            >
+                <Box flex>
+                    <FormField
+                        name={`manualInputs[${idx}].data`}
+                        label="Selected Writer"
+                        required
+                    />
+                </Box>
                 <Box>
                     <Button
                         primary
