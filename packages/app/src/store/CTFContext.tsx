@@ -5,15 +5,11 @@ import React, {
     useState,
 } from 'react'
 
-import { ethers } from 'ethers'
 import { UserContext } from './UserContext'
+import { ethers } from 'ethers'
+
 const CTF_ABI =
     require('@artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json').abi
-
-export type UserType = {
-    address: string
-    signer: ethers.providers.JsonRpcSigner
-}
 
 export type CTFContextType = ethers.Contract | null
 

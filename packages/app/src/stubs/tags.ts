@@ -1,6 +1,9 @@
-import { Tag, Tags } from '../models/TagModel'
+import { DEFAULT_ABI } from './../constants/index'
+import { SolverModel } from './../models/SolverModel'
+import { Tags } from '../models/TagModel'
 import { ethers } from 'ethers'
 import { getBytes32FromMultihash } from '../utils/helpers/multihash'
+import { SolidityDataTypes } from '../models/SolidityDataTypes'
 
 export const configs = {
     implementation: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
@@ -238,12 +241,12 @@ export const tags = <Tags>{
     },
 }
 
-export const solvers = [
+export const solversMetaData: SolverModel[] = [
     {
         id: '01FSP76J4HE1ZK4M0C8W4RDH5A',
-        title: 'MVP Writer',
-        iface: {},
-        tags: {},
+        title: 'Write Article',
+        iface: new ethers.utils.Interface(DEFAULT_ABI),
+        tags: tags,
         config: {
             // implementation: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
             keeperAddress: {
@@ -270,20 +273,21 @@ export const solvers = [
                 '01FSP76J4J37AQM1WRZDY85CY3': {
                     id: '01FSP76J4J37AQM1WRZDY85CY3',
                     slotType: 1,
-                    dataTypes: ['uint256'],
+                    dataTypes: [SolidityDataTypes.Uint256],
                     data: [0],
                 },
                 '01FSP76J4J9N3905P6M7JQFBD2': {
                     id: '01FSP76J4J9N3905P6M7JQFBD2',
                     slotType: 1,
-                    dataTypes: ['uint256'],
+                    dataTypes: [SolidityDataTypes.Uint256],
                     data: [10000],
                 },
                 '01FSP77T8YCZ3TK50BMB6NCC5W': {
                     id: '01FSP77T8YCZ3TK50BMB6NCC5W',
                     data: ['0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC'],
                     slotType: 1,
-                    dataTypes: ['address'],
+                    dataTypes: [SolidityDataTypes.Address],
+                    description: 'Keeper',
                     solverConfigAddress: {
                         type: 'Keeper',
                         solverId: '01FSP76J4HE1ZK4M0C8W4RDH5A',
@@ -293,47 +297,47 @@ export const solvers = [
                     id: '01FSP78E4KMM5HEQB09BD8T253',
                     data: [''],
                     slotType: 3,
-                    dataTypes: ['address'],
+                    dataTypes: [SolidityDataTypes.Address],
                     description: 'Writer (Bankless)',
                 },
                 '01FSP79JH6NFA733XX2DB5W5YT': {
                     id: '01FSP79JH6NFA733XX2DB5W5YT',
                     data: ['0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc'],
                     slotType: 1,
-                    dataTypes: ['address'],
+                    dataTypes: [SolidityDataTypes.Address],
                     description: 'Treasury (Bankless)',
                 },
                 '01FSP7A5ZZEXTNAMK5D8MHY93F': {
                     id: '01FSP7A5ZZEXTNAMK5D8MHY93F',
                     data: ['0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65'],
                     slotType: 1,
-                    dataTypes: ['address'],
+                    dataTypes: [SolidityDataTypes.Address],
                     description: 'Cambrians',
                 },
                 '01FSP7AJHMVFKHKTTCVX5MVCA7': {
                     id: '01FSP7AJHMVFKHKTTCVX5MVCA7',
                     data: ['0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'],
                     slotType: 1,
-                    dataTypes: ['address'],
+                    dataTypes: [SolidityDataTypes.Address],
                     description: 'Buyer',
                 },
                 '01FSP93R1E6ZV9QAB66PPDFDE3': {
                     id: '01FSP93R1E6ZV9QAB66PPDFDE3',
                     data: [9000],
                     slotType: 1,
-                    dataTypes: ['uint256'],
+                    dataTypes: [SolidityDataTypes.Uint256],
                 },
                 '01FSP971A4PH6PSEC6SDHYB3R0': {
                     id: '01FSP971A4PH6PSEC6SDHYB3R0',
                     data: [400],
                     slotType: 1,
-                    dataTypes: ['uint256'],
+                    dataTypes: [SolidityDataTypes.Uint256],
                 },
                 '01FSP97S7T6S6E98BZ7FQJJY20': {
                     id: '01FSP97S7T6S6E98BZ7FQJJY20',
                     data: [200],
                     slotType: 1,
-                    dataTypes: ['uint256'],
+                    dataTypes: [SolidityDataTypes.Uint256],
                 },
             },
             condition: {

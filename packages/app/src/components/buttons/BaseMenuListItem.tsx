@@ -1,5 +1,5 @@
-import { Box, Text } from 'grommet'
-import { CaretRight, IconContext } from 'phosphor-react'
+import { Box, DropButton, Text } from 'grommet'
+import { CaretRight, IconContext, Info } from 'phosphor-react'
 
 export interface BaseMenuListItemProps {
     title: string
@@ -7,6 +7,7 @@ export interface BaseMenuListItemProps {
     icon: JSX.Element
     isActive?: boolean
     onClick?: () => void
+    info?: string
 }
 
 const BaseMenuListItem = ({
@@ -15,6 +16,7 @@ const BaseMenuListItem = ({
     icon,
     onClick,
     isActive,
+    info,
 }: BaseMenuListItemProps) => {
     return (
         <IconContext.Provider value={{ size: '24', color: 'white' }}>
@@ -39,6 +41,17 @@ const BaseMenuListItem = ({
                         </Text>
                     </Box>
                 </Box>
+                {info && (
+                    <DropButton
+                        icon={<Info size={32} />}
+                        dropAlign={{ top: 'bottom', right: 'right' }}
+                        dropContent={
+                            <Box pad="medium" width={{ max: 'medium' }}>
+                                <Text size="small">{info}</Text>
+                            </Box>
+                        }
+                    />
+                )}
                 {onClick && (
                     <Box>
                         <CaretRight />

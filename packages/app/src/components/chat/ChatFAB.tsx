@@ -1,16 +1,17 @@
+import { ChatMessageType } from './ChatMessage'
 import ChatModal from '../modals/ChatModal'
 import { Chats } from 'phosphor-react'
 import FloatingActionButton from '../buttons/FloatingActionButton'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { useState } from 'react'
-import { ChatMessageType } from './ChatMessage'
 
 interface ChatFABProps {
-    solverAddress: string
+    currentUser: UserType
     messages: ChatMessageType[]
     onSubmitChat: (message: string) => Promise<void>
 }
 
-const ChatFAB = ({ messages, onSubmitChat }: ChatFABProps) => {
+const ChatFAB = ({ messages, onSubmitChat, currentUser }: ChatFABProps) => {
     const [showChatModal, setShowChatModal] = useState(false)
 
     const toggleShowChatModal = () => setShowChatModal(!showChatModal)
@@ -23,6 +24,7 @@ const ChatFAB = ({ messages, onSubmitChat }: ChatFABProps) => {
             />
             {showChatModal && (
                 <ChatModal
+                    currentUser={currentUser}
                     messages={messages}
                     onSubmitChat={onSubmitChat}
                     onBack={toggleShowChatModal}

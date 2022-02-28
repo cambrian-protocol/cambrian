@@ -32,6 +32,7 @@ export type SolverConfig = {
     condition: ConditionModel
 }
 
+// TODO Individual Solver description
 export type SolverModel = {
     id: string
     title: string
@@ -93,6 +94,7 @@ export type SolverContractData = {
     numMintedTokensByCondition?: {
         [conditionId: string]: number
     }
+    metaData: SolverModel[]
 }
 
 export type SolverComponentOC = {
@@ -115,9 +117,21 @@ export type SolverContractAllocationsHistoryType = {
 }
 
 export type SolverContractAllocationsType = {
-    address: string
+    address: AddressWithMetaDataType
     allocations: AllocationType[]
 }[]
+
+export type AddressWithMetaDataType = {
+    address: string
+    description: string
+    tag: Tag
+}
+
+export type SlotWithMetaDataModel = {
+    slot: ParsedSlotModel
+    description: string
+    tag: Tag
+}
 
 export type AllocationType = {
     amount: string
