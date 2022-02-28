@@ -20,6 +20,7 @@ const SolverStatusNotification = ({
             gap="medium"
             elevation="small"
             height={{ min: 'auto' }}
+            margin={{ bottom: 'medium' }}
         >
             <Box pad="small">
                 <Text weight={'bold'}>{title}</Text>
