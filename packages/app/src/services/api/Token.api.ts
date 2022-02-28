@@ -43,11 +43,19 @@ export const TokenAPI = {
             try {
                 const token = <TokenModel>{
                     address: address,
-                    decimals: decimals.status === 'fulfilled' && decimals.value,
-                    name: name.status === 'fulfilled' && name.value,
-                    symbol: symbol.status === 'fulfilled' && symbol.value,
+                    decimals:
+                        decimals.status === 'fulfilled'
+                            ? decimals.value
+                            : undefined,
+                    name: name.status === 'fulfilled' ? name.value : undefined,
+                    symbol:
+                        symbol.status === 'fulfilled'
+                            ? symbol.value
+                            : undefined,
                     totalSupply:
-                        totalSupply.status === 'fulfilled' && totalSupply.value,
+                        totalSupply.status === 'fulfilled'
+                            ? totalSupply.value
+                            : undefined,
                 }
 
                 return token

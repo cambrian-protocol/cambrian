@@ -415,6 +415,7 @@ const WriterSolverActionbar = ({
             if (roles.length > 1) {
                 return (
                     <RedeemTokensActionbar
+                        currentCondition={currentCondition}
                         solverData={solverData}
                         solverChain={solverChain}
                     />
