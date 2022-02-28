@@ -5,9 +5,9 @@ import {
 
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { Layout } from '@cambrian/app/components/layout/Layout'
-import { ethers } from 'ethers'
 import { SetStateAction } from 'react'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
 
 export interface DefaultSolverUIProps {
     solverData: SolverContractData

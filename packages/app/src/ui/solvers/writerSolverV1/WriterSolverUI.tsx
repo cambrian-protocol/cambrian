@@ -1,3 +1,7 @@
+import {
+    ConditionStatus,
+    SolverComponentOC,
+} from '@cambrian/app/models/SolverModel'
 import { useEffect, useState } from 'react'
 
 import ChatFAB from '@cambrian/app/components/chat/ChatFAB'
@@ -8,7 +12,6 @@ import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { Layout } from '@cambrian/app/components/layout/Layout'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
-import { SolverComponentOC } from '@cambrian/app/models/SolverModel'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'
@@ -59,7 +62,6 @@ const WriterSolverUI = ({
     useEffect(() => {
         initSolverChain()
         initChatListener()
-        initWorkListener()
     }, [])
 
     useEffect(() => {
@@ -69,6 +71,7 @@ const WriterSolverUI = ({
     useEffect(() => {
         initProposedOutcome(currentCondition.payouts)
         initWorkListener()
+        initChat()
     }, [currentCondition])
 
     const initRoles = async () => {
@@ -99,24 +102,10 @@ const WriterSolverUI = ({
     }
 
     const initChatListener = async () => {
-        const logs = await solverContract.queryFilter(
-            solverContract.filters.SentMessage()
-        )
-
-        const cids = logs.map((l) => l.args?.cid).filter(Boolean)
-
-        const newMessages = (await ipfs.getManyFromCID(
-            cids
-        )) as ChatMessageType[]
-
-        setMessages(
-            (prevMessages) =>
-                [...prevMessages, ...newMessages] as ChatMessageType[]
-        )
-
         solverContract.on(
             solverContract.filters.SentMessage(),
             async (cid, sender) => {
+                // TODO Event gets fired too often on first chat message
                 console.log('Got message event')
                 try {
                     const chatMsg = (await ipfs.getFromCID(
@@ -137,6 +126,25 @@ const WriterSolverUI = ({
         )
     }
 
+    const initChat = async () => {
+        const logs = await solverContract.queryFilter(
+            solverContract.filters.SentMessage()
+        )
+
+        const cids = logs.map((l) => l.args?.cid).filter(Boolean)
+
+        const newMessages = (await ipfs.getManyFromCID(
+            cids
+        )) as ChatMessageType[]
+
+        const currentConditionMessages = newMessages.filter(
+            (message) => message.conditionId === currentCondition.conditionId
+        )
+
+        setMessages([...currentConditionMessages] as ChatMessageType[])
+    }
+
+    // TODO Seperate Listener and submission fetch
     const initWorkListener = async () => {
         const logs = await solverContract.queryFilter(
             solverContract.filters.SubmittedWork()
@@ -191,7 +199,10 @@ const WriterSolverUI = ({
         try {
             const response = await ipfs.pin(messageObj)
             if (response?.IpfsHash) {
-                await solverContract.sendMessage(response.IpfsHash)
+                await solverContract.sendMessage(
+                    response.IpfsHash,
+                    currentCondition.conditionId
+                )
             }
         } catch (error) {
             console.error(error)
@@ -238,7 +249,8 @@ const WriterSolverUI = ({
                 }
                 sidebar={
                     <ConditionVersionSidebar
-                        solverTitle={`Current Role: ${roles}`}
+                        solverTitle={`Solver: ${solverData.metaData[0]?.title}`}
+                        solverMetaVersion={'v1.0'}
                         currentCondition={currentCondition}
                         setCurrentCondition={setCurrentCondition}
                         solverConditions={solverData.conditions}
@@ -253,13 +265,15 @@ const WriterSolverUI = ({
                     />
                 }
                 floatingActionButton={
-                    <ChatFAB
-                        solverAddress={solverContract.address}
-                        messages={messages}
-                        onSubmitChat={(message: string) =>
-                            onSubmitChat(message)
-                        }
-                    />
+                    currentCondition.status !== ConditionStatus.Initiated ? (
+                        <ChatFAB
+                            currentUser={currentUser}
+                            messages={messages}
+                            onSubmitChat={(message: string) =>
+                                onSubmitChat(message)
+                            }
+                        />
+                    ) : undefined
                 }
                 actionBar={
                     <WriterSolverActionbar

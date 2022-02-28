@@ -7,6 +7,10 @@ import {
     UsersThree,
 } from 'phosphor-react'
 import React, { useState } from 'react'
+import {
+    SolverContractCondition,
+    SolverContractData,
+} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
@@ -16,10 +20,6 @@ import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
-import {
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 
 interface SolverConfigInfoProps {
     solverData: SolverContractData
@@ -27,6 +27,7 @@ interface SolverConfigInfoProps {
     currentCondition: SolverContractCondition
 }
 
+// TODO Dynamic solver description
 const SolverConfigInfo = ({
     solverData,
     solverMethods,
@@ -45,9 +46,9 @@ const SolverConfigInfo = ({
     return (
         <>
             <HeaderTextSection
-                title="Solver configuration"
-                subTitle="Details about the"
-                paragraph="Configuration Description. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                title={solverData.metaData[0]?.title}
+                subTitle="Solver configuration"
+                paragraph="This Solver is designed for a buyer to source articles for the purposes of content marketing. "
             />
             <Box gap="small" fill="horizontal">
                 <BaseMenuListItem
@@ -69,11 +70,13 @@ const SolverConfigInfo = ({
                 />
                 <PlainSectionDivider />
                 <BaseMenuListItem
+                    info={solverData.metaData[0]?.tags['timelockSeconds']?.text}
                     title="Timelock"
                     icon={<Timer />}
                     subTitle={solverData.config.timelockSeconds.toString()}
                 />
                 <BaseMenuListItem
+                    info={solverData.metaData[0]?.tags['collateralToken']?.text}
                     title="Token address"
                     icon={<Coin />}
                     subTitle={solverData.config.conditionBase.collateralToken}
@@ -87,7 +90,7 @@ const SolverConfigInfo = ({
             {showRecipientModal && (
                 <RecipientsModal
                     onBack={toggleShowRecipientModal}
-                    recipientAddresses={solverMethods.getRecipientAddresses(
+                    recipientAddresses={solverMethods.getRecipientSlots(
                         currentCondition
                     )}
                 />

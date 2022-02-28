@@ -1,8 +1,6 @@
-import AddDataModal, {
-    ManualInputsFormType,
-    ManualInputType,
-} from '../modals/AddDataModal'
+import AddDataModal, { ManualInputType } from '../modals/AddDataModal'
 import {
+    SlotWithMetaDataModel,
     SolverContractCondition,
     SolverContractData,
 } from '@cambrian/app/models/SolverModel'
@@ -10,15 +8,14 @@ import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { BasicSolverMethodsType } from '../solver/Solver'
-import { ParsedSlotModel } from '@cambrian/app/models/SlotModel'
-import { WarningCircle } from 'phosphor-react'
+import { Info } from 'phosphor-react'
 import { ethers } from 'ethers'
 
 interface ExecuteSolverActionbarProps {
     solverMethods: BasicSolverMethodsType
     solverData: SolverContractData
     currentCondition?: SolverContractCondition
-    manualSlots: ParsedSlotModel[]
+    manualSlots: SlotWithMetaDataModel[]
 }
 
 const ExecuteSolverActionbar = ({
@@ -34,10 +31,10 @@ const ExecuteSolverActionbar = ({
     useEffect(() => {
         if (currentCondition !== undefined) {
             let allManualFieldsFilled = true
-            manualSlots.forEach((field) => {
+            manualSlots.forEach((manualSlot) => {
                 const data =
                     solverData.slotsHistory[currentCondition.conditionId][
-                        field.slot
+                        manualSlot.slot.slot
                     ]?.data
                 if (!data) {
                     allManualFieldsFilled = false
@@ -62,7 +59,10 @@ const ExecuteSolverActionbar = ({
             ['address'],
             [input.data]
         )
-        await solverMethods.addData(input.slot.slot, encodedData)
+        await solverMethods.addData(
+            input.slotWithMetaData.slot.slot,
+            encodedData
+        )
         toggleShowAddDataModal()
     }
 
@@ -75,9 +75,9 @@ const ExecuteSolverActionbar = ({
                         onClick: () => solverMethods.prepareSolve(0),
                     },
                     info: {
-                        icon: <WarningCircle />,
+                        icon: <Info />,
                         descLabel: 'Info',
-                        label: 'Click Prepare Solve to continue.',
+                        label: 'Click Prepare Solve to continue',
                     },
                 }}
             />
@@ -93,7 +93,7 @@ const ExecuteSolverActionbar = ({
                             onClick: onExecuteSolve,
                         },
                         info: {
-                            icon: <WarningCircle />,
+                            icon: <Info />,
                             descLabel: 'Info',
                             label: 'Solve is ready to execute',
                         },
@@ -107,7 +107,7 @@ const ExecuteSolverActionbar = ({
                             onClick: toggleShowAddDataModal,
                         },
                         info: {
-                            icon: <WarningCircle />,
+                            icon: <Info />,
                             descLabel: 'Info',
                             label: 'Additional data required',
                         },

@@ -25,7 +25,6 @@ const OutcomeCollectionModal = ({
             <HeaderTextSection
                 title={proposeMethod ? 'Propose an outcome' : 'Outcomes'}
                 subTitle="What can happen?"
-                paragraph="Outcome description. Lorem Ipsum dolor sit amet consectetur adipisicing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
             />
             <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                 {outcomeCollections.map((outcomeCollection) => {

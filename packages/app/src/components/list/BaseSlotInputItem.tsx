@@ -1,17 +1,18 @@
-import { Box, Text } from 'grommet'
+import { Box, DropButton, Text } from 'grommet'
 
+import { Info } from 'phosphor-react'
 import { PropsWithChildren } from 'react'
 import RecipientAvatar from '../avatars/RecipientAvatar'
 
 export type BaseSlotInputItemProps = PropsWithChildren<{}> & {
-    label?: string
+    info?: string
     title?: string
     subTitle?: string
     onClick?: () => void
 }
 
 const BaseSlotInputItem = ({
-    label,
+    info,
     title,
     onClick,
     subTitle,
@@ -19,7 +20,6 @@ const BaseSlotInputItem = ({
 }: BaseSlotInputItemProps) => {
     return (
         <Box gap="xsmall" height={{ min: 'auto' }}>
-            <Text weight="bold">{label}</Text>
             <Box
                 round="small"
                 background="background-front"
@@ -33,7 +33,9 @@ const BaseSlotInputItem = ({
                 justify="between"
             >
                 <Box gap="medium" direction="row">
-                    <RecipientAvatar />
+                    <Box width={{ min: 'xxsmall' }}>
+                        <RecipientAvatar />
+                    </Box>
                     <Box justify="center">
                         <Text truncate>{title}</Text>
                         <Text size="small" color="dark-4" truncate>
@@ -42,6 +44,17 @@ const BaseSlotInputItem = ({
                     </Box>
                 </Box>
                 {children}
+                {info && (
+                    <DropButton
+                        icon={<Info size={32} />}
+                        dropAlign={{ top: 'bottom', right: 'right' }}
+                        dropContent={
+                            <Box pad="medium" width={{ max: 'medium' }}>
+                                <Text size="small">{info}</Text>
+                            </Box>
+                        }
+                    />
+                )}
             </Box>
         </Box>
     )

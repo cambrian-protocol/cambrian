@@ -31,6 +31,9 @@ const WriterSolverContentUI = ({
     submittedWork,
     proposedOutcome,
 }: WriterSolverContentUI) => {
+    const dummyArticleTitle = 'Uniswap Brand update'
+    const dummyArticleDescription = 'TODO Detailed Article description'
+
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
             if (roles.includes('Keeper')) {
@@ -58,9 +61,9 @@ const WriterSolverContentUI = ({
                 return (
                     <Box fill>
                         <HeaderTextSection
-                            title="Article title"
+                            title={dummyArticleTitle}
                             subTitle="Most recent state of"
-                            paragraph={'Arcticle description'}
+                            paragraph={dummyArticleDescription}
                         />
                         <TextArea
                             fill
@@ -79,6 +82,8 @@ const WriterSolverContentUI = ({
             } else {
                 return (
                     <WorkContentContainer
+                        title={dummyArticleTitle}
+                        description={dummyArticleDescription}
                         submittedWork={submittedWork[submittedWork.length - 1]}
                     />
                 )
@@ -102,6 +107,8 @@ const WriterSolverContentUI = ({
                         />
                     )}
                     <WorkContentContainer
+                        title={dummyArticleTitle}
+                        description={dummyArticleDescription}
                         submittedWork={submittedWork[submittedWork.length - 1]}
                     />
                 </>
@@ -121,6 +128,8 @@ const WriterSolverContentUI = ({
                         />
                     )}
                     <WorkContentContainer
+                        title={dummyArticleTitle}
+                        description={dummyArticleDescription}
                         submittedWork={submittedWork[submittedWork.length - 1]}
                     />
                 </>
@@ -133,14 +142,20 @@ export default WriterSolverContentUI
 
 interface WorkContentContainerProps {
     submittedWork?: SubmissionModel
+    title: string
+    description: string
 }
 
-const WorkContentContainer = ({ submittedWork }: WorkContentContainerProps) => (
+const WorkContentContainer = ({
+    submittedWork,
+    title,
+    description,
+}: WorkContentContainerProps) => (
     <Box gap="small" height={{ min: 'auto' }}>
         <HeaderTextSection
-            title="Article title"
+            title={title}
             subTitle="Most recent state of"
-            paragraph={'Arcticle description'}
+            paragraph={description}
         />
         <Box
             fill

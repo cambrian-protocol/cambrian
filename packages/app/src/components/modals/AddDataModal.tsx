@@ -1,19 +1,22 @@
-import { Box, Button, Form, FormField } from 'grommet'
+import { Box, Button, Form, FormField, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { ParsedSlotModel } from '@cambrian/app/models/SlotModel'
+import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
 
 interface ExecuteSolverModalProps {
     onBack: () => void
-    manualSlots: ParsedSlotModel[]
+    manualSlots: SlotWithMetaDataModel[]
     onAddData: (data: ManualInputType) => void
 }
 
 export type ManualInputsFormType = { manualInputs: ManualInputType[] }
 
-export type ManualInputType = { data: any; slot: ParsedSlotModel }
+export type ManualInputType = {
+    data: any
+    slotWithMetaData: SlotWithMetaDataModel
+}
 
 const AddDataModal = ({
     onBack,
@@ -24,41 +27,42 @@ const AddDataModal = ({
 
     useEffect(() => {
         const manualInputs = manualSlots.map((slot) => {
-            return { data: '', slot: slot }
+            return { data: '', slotWithMetaData: slot }
         })
 
         setManualInputs({ manualInputs: manualInputs })
     }, [])
 
-    // TODO Tags / Slot Input descripiton
     let ManualInputGroup = null
     if (manualInputs !== undefined) {
-        ManualInputGroup = manualInputs.manualInputs.map((input, idx) => (
-            <Box
-                direction="row"
-                gap="medium"
-                key={input.slot.slot}
-                align="center"
-            >
-                <Box flex>
-                    <FormField
-                        name={`manualInputs[${idx}].data`}
-                        label="Selected Writer"
-                        required
-                    />
+        ManualInputGroup = manualInputs.manualInputs?.map((input, idx) => {
+            return (
+                <Box key={input.slotWithMetaData.slot.slot}>
+                    <Box direction="row" gap="medium" align="center">
+                        <Box flex>
+                            <FormField
+                                name={`manualInputs[${idx}].data`}
+                                label={input.slotWithMetaData.description}
+                                required
+                            />
+                        </Box>
+                        <Box>
+                            <Button
+                                primary
+                                type="submit"
+                                label="Add Data"
+                                onClick={() =>
+                                    onAddData(manualInputs.manualInputs[idx])
+                                }
+                            />
+                        </Box>
+                    </Box>
+                    <Text size="small" color="dark-6">
+                        {input.slotWithMetaData.tag.text}
+                    </Text>
                 </Box>
-                <Box>
-                    <Button
-                        primary
-                        type="submit"
-                        label="Add Data"
-                        onClick={() =>
-                            onAddData(manualInputs.manualInputs[idx])
-                        }
-                    />
-                </Box>
-            </Box>
-        ))
+            )
+        })
     }
 
     return (

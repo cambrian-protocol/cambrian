@@ -46,6 +46,10 @@ export const cpTheme = deepMerge(grommet, {
                 xlarge: '0px 10px 24px rgba(0, 0, 0, 0.40)',
             },
         },
+        drop: {
+            background: 'background-front',
+            border: { radius: '10px' },
+        },
     },
     paragraph: {
         small: {

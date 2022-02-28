@@ -1,9 +1,11 @@
 import { Box, Text } from 'grommet'
 
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 interface ChatMessageProps {
     message: ChatMessageType
+    currentUser: UserType
 }
 
 export type ChatMessageType = {
@@ -14,9 +16,8 @@ export type ChatMessageType = {
     timestamp: Date
 }
 
-const ChatMessage = ({ message }: ChatMessageProps) => {
-    // TODO compare with current User
-    const isSender = '0x12345' === message.sender.address
+const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
+    const isSender = currentUser.address === message.sender.address
 
     return (
         <Box
