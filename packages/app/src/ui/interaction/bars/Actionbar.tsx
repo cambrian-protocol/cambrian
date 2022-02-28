@@ -35,19 +35,19 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         align="center"
                         pad={{ horizontal: 'small' }}
                     >
-                        {actions.info && (
+                        {actions.info ? (
                             <Box flex>
                                 <ActionbarInfo {...actions.info} />
                             </Box>
-                        )}
-                        {actions.secondaryAction && (
+                        ) : actions.secondaryAction ? (
                             <Button
                                 size="small"
                                 secondary
                                 {...actions.secondaryAction}
                             />
+                        ) : (
+                            <Box flex />
                         )}
-                        <Box flex />
                         <Box>
                             {actions.primaryAction && (
                                 <Button

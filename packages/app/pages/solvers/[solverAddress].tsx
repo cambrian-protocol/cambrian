@@ -2,8 +2,8 @@ import LoginScreen from '@cambrian/app/ui/auth/LoginScreen'
 import React from 'react'
 import Solver from '@cambrian/app/components/solver/Solver'
 import { ethers } from 'ethers'
-import { useRouter } from 'next/router'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useRouter } from 'next/router'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 const WRITER_ABI =
@@ -17,8 +17,6 @@ export default function SolverPage() {
     React.useEffect(() => {
         if (!currentUser) {
             getLogin()
-        } else {
-            console.log(currentUser)
         }
     }, [currentUser])
 
