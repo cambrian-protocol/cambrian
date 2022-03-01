@@ -19,7 +19,6 @@ interface WriterSolverActionbarProps {
     currentCondition: SolverContractCondition
     roles: WriterSolverRole[]
     onSubmitWork: () => Promise<void>
-    isSubmittingWork: boolean
     hasWorkChanged: boolean
 }
 
@@ -30,7 +29,6 @@ const WriterSolverActionbar = ({
     currentCondition,
     roles,
     onSubmitWork,
-    isSubmittingWork,
     hasWorkChanged,
 }: WriterSolverActionbarProps) => {
     switch (currentCondition.status) {
@@ -61,7 +59,6 @@ const WriterSolverActionbar = ({
                 return (
                     <WriterActionbar
                         hasWorkChanged={hasWorkChanged}
-                        isLoading={isSubmittingWork}
                         onSubmitWork={onSubmitWork}
                     />
                 )

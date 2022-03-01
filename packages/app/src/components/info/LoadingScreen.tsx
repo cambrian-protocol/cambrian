@@ -13,7 +13,7 @@ const LoadingScreen = ({ context }: LoadingScreenProps) => (
             background={'background-back'}
             gap="medium"
         >
-            <Spinner color="light-1" size="medium" />
+            <Spinner size="medium" />
             <Box width={'medium'}>
                 <Text textAlign="center" size="small" color="dark-4">
                     {context}
