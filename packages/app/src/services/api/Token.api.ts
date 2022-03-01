@@ -13,9 +13,7 @@ export type TokenResponseType = {
 }
 
 export const TokenAPI = {
-    getTokenInfo: async (
-        address: string
-    ): Promise<TokenResponseType | undefined> => {
+    getTokenInfo: async (address: string): Promise<TokenResponseType> => {
         let erc20Contract
         try {
             erc20Contract = new ethers.Contract(
@@ -27,9 +25,7 @@ export const TokenAPI = {
                       )
                     : ethers.getDefaultProvider()
             )
-        } catch (e) {
-            return
-        }
+        } catch (e) {}
 
         if (erc20Contract) {
             const [name, decimals, symbol, totalSupply] =
@@ -61,8 +57,11 @@ export const TokenAPI = {
                 return token
             } catch (e) {
                 console.log(e)
-                return
             }
+        }
+
+        return <TokenModel>{
+            address: address,
         }
     },
 }

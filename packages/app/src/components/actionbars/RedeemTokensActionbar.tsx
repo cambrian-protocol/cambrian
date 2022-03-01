@@ -39,6 +39,8 @@ const RedeemTokensActionbar = ({
     const [isRedeemed, setIsRedeemed] = useState<boolean>(false)
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
 
+    console.log(solverData.numMintedTokensByCondition)
+
     useEffect(() => {
         if (ctf && user.currentUser) {
             listenIsRedeemed()
@@ -81,9 +83,9 @@ const RedeemTokensActionbar = ({
                 const amount = logs
                     .map((l) => l.args?.payout)
                     .filter(Boolean)
-                    .reduce((x, y) => x + y)
-
-                console.log(Number(amount))
+                    .reduce((x, y) => {
+                        return x + y
+                    }, 0)
                 setRedeemedAmount(amount)
             }
 
@@ -96,12 +98,17 @@ const RedeemTokensActionbar = ({
                     null,
                     null
                 ),
-                (log, event) => {
-                    if (log) {
-                        const amount = log.args?.payout
-                        setIsRedeemed(true)
-                        setRedeemedAmount(amount)
-                    }
+                (
+                    redeemer,
+                    collateralToken,
+                    parentCollectionId,
+                    conditionId,
+                    indexSets,
+                    payout
+                ) => {
+                    const amount = payout
+                    setIsRedeemed(true)
+                    setRedeemedAmount(amount)
                 }
             )
         }
@@ -158,7 +165,7 @@ const RedeemTokensActionbar = ({
     const getUserAllocs = () => {
         const userAllocs = solverData.allocationsHistory[
             currentCondition.conditionId
-        ].find((alloc) => alloc.address === user.currentUser?.address)
+        ].find((alloc) => alloc.address.address === user.currentUser?.address)
 
         if (userAllocs !== undefined) {
             setUserAllocations(userAllocs.allocations)
