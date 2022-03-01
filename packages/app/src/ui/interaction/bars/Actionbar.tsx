@@ -62,7 +62,10 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                             {actions.primaryAction && (
                                 <Button
                                     {...actions.primaryAction}
-                                    disabled={actions.primaryAction.isLoading}
+                                    disabled={
+                                        actions.primaryAction.isLoading ||
+                                        actions.primaryAction.disabled
+                                    }
                                     label={
                                         <Stack anchor="center">
                                             {actions.primaryAction.label}
