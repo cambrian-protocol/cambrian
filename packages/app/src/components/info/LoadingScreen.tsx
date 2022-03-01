@@ -1,9 +1,26 @@
-import { Box, Spinner } from 'grommet'
+import { Box, Layer, Spinner, Text } from 'grommet'
 
-const LoadingScreen = () => (
-    <Box fill justify="center" align="center" background={'background-back'}>
-        <Spinner size="medium" color={'brand'} />
-    </Box>
+interface LoadingScreenProps {
+    context?: string
+}
+
+const LoadingScreen = ({ context }: LoadingScreenProps) => (
+    <Layer full animation="fadeIn">
+        <Box
+            fill
+            justify="center"
+            align="center"
+            background={'background-back'}
+            gap="medium"
+        >
+            <Spinner color="light-1" size="medium" />
+            <Box width={'medium'}>
+                <Text textAlign="center" size="small" color="dark-4">
+                    {context}
+                </Text>
+            </Box>
+        </Box>
+    </Layer>
 )
 
 export default LoadingScreen

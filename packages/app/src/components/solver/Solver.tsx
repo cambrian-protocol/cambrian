@@ -15,7 +15,7 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
 import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-import React, { SetStateAction, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
@@ -38,8 +38,6 @@ import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solversMetaData } from '@cambrian/app/stubs/tags'
 
 export type BasicSolverMethodsType = {
-    isLoading: boolean
-    setIsLoading: React.Dispatch<SetStateAction<boolean>>
     prepareSolve: (newConditionIndex: number) => Promise<any>
     executeSolve: (conditionIndex: number) => Promise<any>
     proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
@@ -133,6 +131,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         contract.on(ingestedDataFilter, async () => {
             console.log('Heard IngestedData event')
             triggerUpdate()
+            setIsLoading(false)
         })
 
         const changedStatusFilter = {
@@ -144,6 +143,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         contract.on(changedStatusFilter, async () => {
             console.log('Heard ChangedStatus event')
             triggerUpdate()
+            setIsLoading(false)
         })
     }
 
@@ -162,9 +162,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const addData = async (slotId: string, data: string) => {
+        setIsLoading(true)
         try {
-            return contract.addData(slotId, data)
+            await contract.addData(slotId, data)
         } catch (e) {
+            setIsLoading(false)
             console.log(e)
         }
     }
@@ -224,17 +226,21 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const prepareSolve = async (newConditionIndex: number) => {
+        setIsLoading(true)
         try {
-            return contract.prepareSolve(newConditionIndex)
+            await contract.prepareSolve(newConditionIndex)
         } catch (e) {
+            setIsLoading(false)
             console.error(e)
         }
     }
 
     const executeSolve = async (conditionIndex: number) => {
+        setIsLoading(true)
         try {
-            return contract.executeSolve(conditionIndex)
+            await contract.executeSolve(conditionIndex)
         } catch (e) {
+            setIsLoading(false)
             console.error(e)
         }
     }
@@ -243,17 +249,21 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         conditionIndex: number,
         payouts: number[]
     ) => {
+        setIsLoading(true)
         try {
-            return contract.proposePayouts(conditionIndex, payouts)
+            await contract.proposePayouts(conditionIndex, payouts)
         } catch (e) {
+            setIsLoading(false)
             console.error(e)
         }
     }
 
     const confirmPayouts = async (conditionIndex: number) => {
+        setIsLoading(true)
         try {
-            return contract.confirmPayouts(conditionIndex)
+            await contract.confirmPayouts(conditionIndex)
         } catch (e) {
+            setIsLoading(false)
             console.error(e)
         }
     }
@@ -690,8 +700,6 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const basicSolverMethods: BasicSolverMethodsType = {
-        isLoading: isLoading,
-        setIsLoading: setIsLoading,
         prepareSolve: prepareSolve,
         executeSolve: executeSolve,
         proposePayouts: proposePayouts,
@@ -754,14 +762,19 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
         if (loadWriter) {
             return (
-                <WriterSolverUI
-                    solverData={currentSolverData}
-                    solverContract={contract}
-                    currentUser={currentUser}
-                    solverMethods={basicSolverMethods}
-                    currentCondition={currentCondition}
-                    setCurrentCondition={setCurrentCondition}
-                />
+                <>
+                    <WriterSolverUI
+                        solverData={currentSolverData}
+                        solverContract={contract}
+                        currentUser={currentUser}
+                        solverMethods={basicSolverMethods}
+                        currentCondition={currentCondition}
+                        setCurrentCondition={setCurrentCondition}
+                    />
+                    {isLoading && (
+                        <LoadingScreen context="Please confirm this transaction" />
+                    )}
+                </>
             )
         } else {
             return (
@@ -776,7 +789,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             )
         }
     } else {
-        return <LoadingScreen />
+        return <LoadingScreen context="Loading Solver" />
     }
 }
 

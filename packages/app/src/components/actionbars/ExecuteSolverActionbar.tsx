@@ -41,6 +41,9 @@ const ExecuteSolverActionbar = ({
                 }
             })
             setHasAllManualFields(allManualFieldsFilled)
+            if (allManualFieldsFilled) {
+                setShowAddDataModal(false)
+            }
         }
     }, [solverData, currentCondition, manualSlots])
 
@@ -63,7 +66,6 @@ const ExecuteSolverActionbar = ({
             input.slotWithMetaData.slot.slot,
             encodedData
         )
-        toggleShowAddDataModal()
     }
 
     if (currentCondition === undefined) {
