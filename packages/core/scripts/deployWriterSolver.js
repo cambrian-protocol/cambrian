@@ -189,6 +189,14 @@ async function main() {
   );
 
   console.log("Transferred 1000000000000000000000 Toy to Solver");
+
+  const solver = new ethers.Contract(
+    deployedAddress,
+    new ethers.utils.Interface(WRITER_ABI),
+    ethers.getDefaultProvider()
+  );
+
+  await solver.connect(keeper).prepareSolve(0);
 }
 
 main()
