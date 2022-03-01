@@ -115,46 +115,54 @@ const WriterSolverContentUI = ({
             return (
                 <>
                     {proposedOutcome && (
-                        <OutcomeNotification
-                            status={currentCondition.status}
-                            allocations={
-                                solverData.allocationsHistory[
-                                    currentCondition.conditionId
-                                ]
-                            }
-                            outcomeCollection={proposedOutcome}
-                            canRequestArbitration={
-                                roles.includes('Buyer') ||
-                                roles.includes('Writer')
-                            }
-                        />
+                        <>
+                            <OutcomeNotification
+                                status={currentCondition.status}
+                                allocations={
+                                    solverData.allocationsHistory[
+                                        currentCondition.conditionId
+                                    ]
+                                }
+                                outcomeCollection={proposedOutcome!!}
+                                canRequestArbitration={
+                                    roles.includes('Buyer') ||
+                                    roles.includes('Writer')
+                                }
+                            />
+                            <WorkContentContainer
+                                title={dummyArticleTitle}
+                                description={dummyArticleDescription}
+                                submittedWork={
+                                    submittedWork[submittedWork.length - 1]
+                                }
+                            />
+                        </>
                     )}
-                    <WorkContentContainer
-                        title={dummyArticleTitle}
-                        description={dummyArticleDescription}
-                        submittedWork={submittedWork[submittedWork.length - 1]}
-                    />
                 </>
             )
         case ConditionStatus.OutcomeReported:
             return (
                 <>
                     {proposedOutcome && (
-                        <OutcomeNotification
-                            status={currentCondition.status}
-                            allocations={
-                                solverData.allocationsHistory[
-                                    currentCondition.conditionId
-                                ]
-                            }
-                            outcomeCollection={proposedOutcome}
-                        />
+                        <>
+                            <OutcomeNotification
+                                status={currentCondition.status}
+                                allocations={
+                                    solverData.allocationsHistory[
+                                        currentCondition.conditionId
+                                    ]
+                                }
+                                outcomeCollection={proposedOutcome}
+                            />
+                            <WorkContentContainer
+                                title={dummyArticleTitle}
+                                description={dummyArticleDescription}
+                                submittedWork={
+                                    submittedWork[submittedWork.length - 1]
+                                }
+                            />
+                        </>
                     )}
-                    <WorkContentContainer
-                        title={dummyArticleTitle}
-                        description={dummyArticleDescription}
-                        submittedWork={submittedWork[submittedWork.length - 1]}
-                    />
                 </>
             )
     }
