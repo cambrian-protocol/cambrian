@@ -10,6 +10,7 @@ import ConditionVersionSidebar from '../../interaction/bars/ConditionVersionSide
 import { DefaultSolverUIProps } from '../DefaultSolverUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { Layout } from '@cambrian/app/components/layout/Layout'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
@@ -56,8 +57,7 @@ const WriterSolverUI = ({
     const [workInput, setWorkInput] =
         useState<SubmissionModel>(initialSubmission)
 
-    const [isSubmittingChat, setIsSubmittingChat] = useState(false)
-    const [isSubmittingWork, setIsSubmittingWork] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const [roles, setRoles] = useState<WriterSolverRole[]>(['Other'])
 
@@ -119,7 +119,7 @@ const WriterSolverUI = ({
                             (prevMessages) =>
                                 [...prevMessages, chatMsg] as ChatMessageType[]
                         )
-                        setIsSubmittingChat(false)
+                        setIsLoading(false)
                     }
                 } catch (error) {
                     console.error(error)
@@ -181,7 +181,7 @@ const WriterSolverUI = ({
                     setSubmittedWork(
                         () => [...submittedWork, work] as SubmissionModel[]
                     )
-                    setIsSubmittingWork(false)
+                    setIsLoading(false)
                 }
             }
         )
@@ -193,7 +193,7 @@ const WriterSolverUI = ({
     }
 
     const onSubmitChat = async (input: string): Promise<void> => {
-        setIsSubmittingChat(true)
+        setIsLoading(true)
         const messageObj: ChatMessageType = {
             text: input,
             conditionId: currentCondition.conditionId,
@@ -210,14 +210,14 @@ const WriterSolverUI = ({
                 )
             }
         } catch (error) {
-            setIsSubmittingChat(false)
+            setIsLoading(false)
             console.error(error)
         }
     }
 
     const onSubmitWork = async (): Promise<void> => {
         if (workInput) {
-            setIsSubmittingWork(true)
+            setIsLoading(true)
             const workObj: SubmissionModel = {
                 submission: workInput.submission,
                 conditionId: currentCondition.conditionId,
@@ -234,7 +234,7 @@ const WriterSolverUI = ({
                     )
                 }
             } catch (error) {
-                setIsSubmittingWork(false)
+                setIsLoading(false)
                 console.error(error)
             }
         }
@@ -280,7 +280,6 @@ const WriterSolverUI = ({
                             onSubmitChat={(message: string) =>
                                 onSubmitChat(message)
                             }
-                            isLoading={isSubmittingChat}
                         />
                     ) : undefined
                 }
@@ -291,7 +290,6 @@ const WriterSolverUI = ({
                         roles={roles}
                         solverMethods={solverMethods}
                         onSubmitWork={() => onSubmitWork()}
-                        isSubmittingWork={isSubmittingWork}
                         hasWorkChanged={
                             workInput.submission ===
                             submittedWork[submittedWork.length - 1]?.submission
@@ -300,7 +298,6 @@ const WriterSolverUI = ({
                 }
             >
                 <WriterSolverContentUI
-                    isLoading={isSubmittingWork}
                     solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}
@@ -310,6 +307,9 @@ const WriterSolverUI = ({
                     proposedOutcome={proposedOutcome}
                 />
             </Layout>
+            {isLoading && (
+                <LoadingScreen context="Please confirm this transaction" />
+            )}
         </>
     )
 }

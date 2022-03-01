@@ -10,7 +10,6 @@ interface ChatModalProps {
     currentUser: UserType
     onBack: () => void
     onSubmitChat: (message: string) => Promise<void>
-    isLoading: boolean
 }
 
 const ChatModal = ({
@@ -18,13 +17,12 @@ const ChatModal = ({
     messages,
     onSubmitChat,
     currentUser,
-    isLoading,
 }: ChatModalProps) => {
     return (
         <BaseLayerModal onBack={onBack}>
             <Box fill gap="small">
                 <ChatContent currentUser={currentUser} messages={messages} />
-                <ChatInput isLoading={isLoading} onSubmitChat={onSubmitChat} />
+                <ChatInput onSubmitChat={onSubmitChat} />
             </Box>
         </BaseLayerModal>
     )
