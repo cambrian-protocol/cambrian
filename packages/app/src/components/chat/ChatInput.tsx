@@ -5,7 +5,6 @@ import { useState } from 'react'
 
 interface ChatInputProps {
     onSubmitChat: (text: string) => Promise<void>
-    isLoading: boolean
 }
 
 type ChatInputFormType = {
@@ -16,7 +15,7 @@ const initialInput = {
     text: '',
 }
 
-const ChatInput = ({ onSubmitChat, isLoading }: ChatInputProps) => {
+const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
     const [input, setInput] = useState(initialInput)
 
     const onSubmit = async () => {
@@ -46,7 +45,6 @@ const ChatInput = ({ onSubmitChat, isLoading }: ChatInputProps) => {
                 <Box flex>
                     <FormField>
                         <TextInput
-                            disabled={isLoading}
                             value={input.text}
                             onChange={(event) => {
                                 setInput({
@@ -58,14 +56,7 @@ const ChatInput = ({ onSubmitChat, isLoading }: ChatInputProps) => {
                     </FormField>
                 </Box>
                 <Button
-                    disabled={isLoading}
-                    icon={
-                        isLoading ? (
-                            <Spinner size="xsmall" />
-                        ) : (
-                            <PaperPlaneRight size="26" />
-                        )
-                    }
+                    icon={<PaperPlaneRight size="26" />}
                     onClick={onSubmit}
                 />
             </Box>

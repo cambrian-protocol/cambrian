@@ -13,7 +13,6 @@ import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeN
 import { SetStateAction } from 'react'
 
 interface WriterSolverContentUI {
-    isLoading: boolean
     solverData: SolverContractData
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
@@ -24,7 +23,6 @@ interface WriterSolverContentUI {
 }
 
 const WriterSolverContentUI = ({
-    isLoading,
     solverData,
     roles,
     setWorkInput,
@@ -74,7 +72,6 @@ const WriterSolverContentUI = ({
                                 size="medium"
                                 resize={false}
                                 value={workInput.submission}
-                                disabled={isLoading}
                                 onChange={(event) =>
                                     setWorkInput({
                                         ...workInput,
@@ -82,24 +79,18 @@ const WriterSolverContentUI = ({
                                     })
                                 }
                             />
-                            {isLoading && (
-                                <Box gap="small" align="center">
-                                    <Lock size="32" />
-                                    <Text size="small" textAlign="center">
-                                        Input is locked until work has been
-                                        submitted
-                                    </Text>
-                                </Box>
-                            )}
                         </Stack>
-                        <Text size="small" color="dark-4">
-                            Last submission:{' '}
-                            {new Date(
-                                submittedWork[
-                                    submittedWork.length - 1
-                                ]?.timestamp
-                            ).toLocaleString()}
-                        </Text>
+                        {submittedWork !== undefined &&
+                            submittedWork.length > 0 && (
+                                <Text size="small" color="dark-4">
+                                    Last submission:{' '}
+                                    {new Date(
+                                        submittedWork[
+                                            submittedWork.length - 1
+                                        ]?.timestamp
+                                    ).toLocaleString()}
+                                </Text>
+                            )}
                     </Box>
                 )
             } else {
@@ -209,11 +200,13 @@ const WorkContentContainer = ({
                 </Text>
             )}
         </Box>
-        <Text size="small" color="dark-4">
-            {submittedWork &&
-                `Last submission: ${new Date(
-                    submittedWork.timestamp
-                ).toLocaleString()}`}
-        </Text>
+        {submittedWork !== undefined && (
+            <Text size="small" color="dark-4">
+                {submittedWork &&
+                    `Last submission: ${new Date(
+                        submittedWork.timestamp
+                    ).toLocaleString()}`}
+            </Text>
+        )}
     </Box>
 )

@@ -10,10 +10,10 @@ import {
 import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
 
 export type ActionbarActionsType = {
-    primaryAction?: ButtonExtendedProps & { isLoading?: boolean }
+    primaryAction?: ButtonExtendedProps
 } & (
     | {
-          secondaryAction?: ButtonExtendedProps & { isLoading?: boolean }
+          secondaryAction?: ButtonExtendedProps
           info?: never
       }
     | {
@@ -62,19 +62,8 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                             {actions.primaryAction && (
                                 <Button
                                     {...actions.primaryAction}
-                                    disabled={
-                                        actions.primaryAction.isLoading ||
-                                        actions.primaryAction.disabled
-                                    }
-                                    label={
-                                        <Stack anchor="center">
-                                            {actions.primaryAction.label}
-                                            {actions.primaryAction
-                                                .isLoading && (
-                                                <Spinner color="light-1" />
-                                            )}
-                                        </Stack>
-                                    }
+                                    disabled={actions.primaryAction.disabled}
+                                    label={actions.primaryAction.label}
                                     size="small"
                                     primary
                                 />
