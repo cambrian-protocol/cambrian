@@ -9,9 +9,15 @@ interface ChatFABProps {
     currentUser: UserType
     messages: ChatMessageType[]
     onSubmitChat: (message: string) => Promise<void>
+    isLoading: boolean
 }
 
-const ChatFAB = ({ messages, onSubmitChat, currentUser }: ChatFABProps) => {
+const ChatFAB = ({
+    messages,
+    onSubmitChat,
+    currentUser,
+    isLoading,
+}: ChatFABProps) => {
     const [showChatModal, setShowChatModal] = useState(false)
 
     const toggleShowChatModal = () => setShowChatModal(!showChatModal)
@@ -28,6 +34,7 @@ const ChatFAB = ({ messages, onSubmitChat, currentUser }: ChatFABProps) => {
                     messages={messages}
                     onSubmitChat={onSubmitChat}
                     onBack={toggleShowChatModal}
+                    isLoading={isLoading}
                 />
             )}
         </>

@@ -54,7 +54,12 @@ const WriterSolverActionbar = ({
                 )
             }
             if (roles.includes('Writer')) {
-                return <WriterActionbar onSubmitWork={onSubmitWork} />
+                return (
+                    <WriterActionbar
+                        isLoading={solverMethods.isLoading}
+                        onSubmitWork={onSubmitWork}
+                    />
+                )
             }
             break
         case ConditionStatus.OutcomeProposed:
