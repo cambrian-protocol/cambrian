@@ -56,6 +56,9 @@ const WriterSolverUI = ({
     const [workInput, setWorkInput] =
         useState<SubmissionModel>(initialSubmission)
 
+    const [isSubmittingChat, setIsSubmittingChat] = useState(false)
+    const [isSubmittingWork, setIsSubmittingWork] = useState(false)
+
     const [roles, setRoles] = useState<WriterSolverRole[]>(['Other'])
 
     useEffect(() => {
@@ -116,7 +119,7 @@ const WriterSolverUI = ({
                             (prevMessages) =>
                                 [...prevMessages, chatMsg] as ChatMessageType[]
                         )
-                        solverMethods.setIsLoading(false)
+                        setIsSubmittingChat(false)
                     }
                 } catch (error) {
                     console.error(error)
@@ -178,7 +181,7 @@ const WriterSolverUI = ({
                     setSubmittedWork(
                         () => [...submittedWork, work] as SubmissionModel[]
                     )
-                    solverMethods.setIsLoading(false)
+                    setIsSubmittingWork(false)
                 }
             }
         )
@@ -190,7 +193,7 @@ const WriterSolverUI = ({
     }
 
     const onSubmitChat = async (input: string): Promise<void> => {
-        solverMethods.setIsLoading(true)
+        setIsSubmittingChat(true)
         const messageObj: ChatMessageType = {
             text: input,
             conditionId: currentCondition.conditionId,
@@ -207,14 +210,14 @@ const WriterSolverUI = ({
                 )
             }
         } catch (error) {
-            solverMethods.setIsLoading(false)
+            setIsSubmittingChat(false)
             console.error(error)
         }
     }
 
     const onSubmitWork = async (): Promise<void> => {
         if (workInput) {
-            solverMethods.setIsLoading(true)
+            setIsSubmittingWork(true)
             const workObj: SubmissionModel = {
                 submission: workInput.submission,
                 conditionId: currentCondition.conditionId,
@@ -231,7 +234,7 @@ const WriterSolverUI = ({
                     )
                 }
             } catch (error) {
-                solverMethods.setIsLoading(false)
+                setIsSubmittingWork(false)
                 console.error(error)
             }
         }
@@ -277,7 +280,7 @@ const WriterSolverUI = ({
                             onSubmitChat={(message: string) =>
                                 onSubmitChat(message)
                             }
-                            isLoading={solverMethods.isLoading}
+                            isLoading={isSubmittingChat}
                         />
                     ) : undefined
                 }
@@ -288,11 +291,16 @@ const WriterSolverUI = ({
                         roles={roles}
                         solverMethods={solverMethods}
                         onSubmitWork={() => onSubmitWork()}
+                        isSubmittingWork={isSubmittingWork}
+                        hasWorkChanged={
+                            workInput.submission ===
+                            submittedWork[submittedWork.length - 1]?.submission
+                        }
                     />
                 }
             >
                 <WriterSolverContentUI
-                    isLoading={solverMethods.isLoading}
+                    isLoading={isSubmittingWork}
                     solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}
