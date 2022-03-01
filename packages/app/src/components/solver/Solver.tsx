@@ -15,7 +15,7 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
 import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
@@ -29,16 +29,17 @@ import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { Multihash } from '@cambrian/app/models/ConditionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solversMetaData } from '@cambrian/app/stubs/tags'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { FactoryContext } from '@cambrian/app/store/FactoryContext'
 
 export type BasicSolverMethodsType = {
+    isLoading: boolean
+    setIsLoading: React.Dispatch<SetStateAction<boolean>>
     prepareSolve: (newConditionIndex: number) => Promise<any>
     executeSolve: (conditionIndex: number) => Promise<any>
     proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
@@ -85,6 +86,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     )
     const [initialized, setInitialized] = useState(false)
     const [isDeployed, setIsDeployed] = useState<boolean | undefined>(undefined)
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const [currentSolverData, setCurrentSolverData] =
         useState<SolverContractData>()
@@ -682,13 +685,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 })
             )
 
-            console.log('numMinted: ', numMintedByCondition)
-
             return numMintedByCondition
         }
     }
 
     const basicSolverMethods: BasicSolverMethodsType = {
+        isLoading: isLoading,
+        setIsLoading: setIsLoading,
         prepareSolve: prepareSolve,
         executeSolve: executeSolve,
         proposePayouts: proposePayouts,
@@ -711,6 +714,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         getManualSlots: getManualSlots,
         getRecipientSlots: getRecipientSlots,
     }
+
     // TODO Determine SolverUI
     const loadWriter = true
     if (isDeployed === false) {
@@ -757,7 +761,6 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     solverMethods={basicSolverMethods}
                     currentCondition={currentCondition}
                     setCurrentCondition={setCurrentCondition}
-                    triggerUpdate={triggerUpdate}
                 />
             )
         } else {
@@ -769,7 +772,6 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     currentCondition={currentCondition}
                     solverMethods={basicSolverMethods}
                     setCurrentCondition={setCurrentCondition}
-                    triggerUpdate={triggerUpdate}
                 />
             )
         }

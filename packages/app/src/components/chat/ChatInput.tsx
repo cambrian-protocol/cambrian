@@ -1,10 +1,11 @@
-import { Box, Button, Form, FormField, TextInput } from 'grommet'
+import { Box, Button, Form, FormField, Spinner, TextInput } from 'grommet'
 
 import { PaperPlaneRight } from 'phosphor-react'
 import { useState } from 'react'
 
 interface ChatInputProps {
     onSubmitChat: (text: string) => Promise<void>
+    isLoading: boolean
 }
 
 type ChatInputFormType = {
@@ -15,8 +16,13 @@ const initialInput = {
     text: '',
 }
 
-const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
+const ChatInput = ({ onSubmitChat, isLoading }: ChatInputProps) => {
     const [input, setInput] = useState(initialInput)
+
+    const onSubmit = async () => {
+        await onSubmitChat(input.text)
+        setInput(initialInput)
+    }
 
     return (
         <Form<ChatInputFormType>
@@ -40,6 +46,7 @@ const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
                 <Box flex>
                     <FormField>
                         <TextInput
+                            disabled={isLoading}
                             value={input.text}
                             onChange={(event) => {
                                 setInput({
@@ -51,11 +58,15 @@ const ChatInput = ({ onSubmitChat }: ChatInputProps) => {
                     </FormField>
                 </Box>
                 <Button
-                    icon={<PaperPlaneRight size="24" />}
-                    onClick={() => {
-                        onSubmitChat(input.text)
-                        setInput(initialInput)
-                    }}
+                    disabled={isLoading}
+                    icon={
+                        isLoading ? (
+                            <Spinner size="xsmall" />
+                        ) : (
+                            <PaperPlaneRight size="26" />
+                        )
+                    }
+                    onClick={onSubmit}
                 />
             </Box>
         </Form>
