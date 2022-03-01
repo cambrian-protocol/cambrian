@@ -18,7 +18,6 @@ export interface DefaultSolverUIProps {
     setCurrentCondition: React.Dispatch<
         SetStateAction<SolverContractCondition | undefined>
     >
-    triggerUpdate: Function
 }
 
 const DefaultSolverUI = ({ solverData }: DefaultSolverUIProps) => {

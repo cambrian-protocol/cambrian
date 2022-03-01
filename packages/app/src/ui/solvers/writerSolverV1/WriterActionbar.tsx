@@ -2,13 +2,15 @@ import Actionbar from '../../interaction/bars/Actionbar'
 
 interface WriterActionbarProps {
     onSubmitWork: () => Promise<void>
+    isLoading: boolean
 }
-const WriterActionbar = ({ onSubmitWork }: WriterActionbarProps) => {
+const WriterActionbar = ({ onSubmitWork, isLoading }: WriterActionbarProps) => {
     return (
         <>
             <Actionbar
                 actions={{
                     primaryAction: {
+                        isLoading: isLoading,
                         label: 'Submit work',
                         onClick: onSubmitWork,
                     },

@@ -45,7 +45,6 @@ const WriterSolverUI = ({
     solverMethods,
     currentCondition,
     setCurrentCondition,
-    triggerUpdate,
 }: DefaultSolverUIProps) => {
     const ipfs = new IPFSAPI()
 
@@ -62,6 +61,7 @@ const WriterSolverUI = ({
     useEffect(() => {
         initSolverChain()
         initChatListener()
+        initSubmissionListener()
     }, [])
 
     useEffect(() => {
@@ -70,7 +70,7 @@ const WriterSolverUI = ({
 
     useEffect(() => {
         initProposedOutcome(currentCondition.payouts)
-        initWorkListener()
+        initSubmission()
         initChat()
     }, [currentCondition])
 
@@ -105,19 +105,18 @@ const WriterSolverUI = ({
         solverContract.on(
             solverContract.filters.SentMessage(),
             async (cid, sender) => {
-                // TODO Event gets fired too often on first chat message
-                console.log('Got message event')
+                // TODO Bugfix Event gets fired too often on first chat message
                 try {
                     const chatMsg = (await ipfs.getFromCID(
                         cid
                     )) as ChatMessageType
 
                     if (chatMsg && chatMsg.conditionId) {
-                        console.log('message: ', chatMsg)
                         setMessages(
                             (prevMessages) =>
                                 [...prevMessages, chatMsg] as ChatMessageType[]
                         )
+                        solverMethods.setIsLoading(false)
                     }
                 } catch (error) {
                     console.error(error)
@@ -144,8 +143,7 @@ const WriterSolverUI = ({
         setMessages([...currentConditionMessages] as ChatMessageType[])
     }
 
-    // TODO Seperate Listener and submission fetch
-    const initWorkListener = async () => {
+    const initSubmission = async () => {
         const logs = await solverContract.queryFilter(
             solverContract.filters.SubmittedWork()
         )
@@ -169,7 +167,9 @@ const WriterSolverUI = ({
         } else {
             setWorkInput(initialSubmission)
         }
+    }
 
+    const initSubmissionListener = async () => {
         solverContract.on(
             solverContract.filters.SubmittedWork(),
             async (cid, submitter) => {
@@ -178,6 +178,7 @@ const WriterSolverUI = ({
                     setSubmittedWork(
                         () => [...submittedWork, work] as SubmissionModel[]
                     )
+                    solverMethods.setIsLoading(false)
                 }
             }
         )
@@ -189,6 +190,7 @@ const WriterSolverUI = ({
     }
 
     const onSubmitChat = async (input: string): Promise<void> => {
+        solverMethods.setIsLoading(true)
         const messageObj: ChatMessageType = {
             text: input,
             conditionId: currentCondition.conditionId,
@@ -205,12 +207,14 @@ const WriterSolverUI = ({
                 )
             }
         } catch (error) {
+            solverMethods.setIsLoading(false)
             console.error(error)
         }
     }
 
     const onSubmitWork = async (): Promise<void> => {
         if (workInput) {
+            solverMethods.setIsLoading(true)
             const workObj: SubmissionModel = {
                 submission: workInput.submission,
                 conditionId: currentCondition.conditionId,
@@ -227,6 +231,7 @@ const WriterSolverUI = ({
                     )
                 }
             } catch (error) {
+                solverMethods.setIsLoading(false)
                 console.error(error)
             }
         }
@@ -272,6 +277,7 @@ const WriterSolverUI = ({
                             onSubmitChat={(message: string) =>
                                 onSubmitChat(message)
                             }
+                            isLoading={solverMethods.isLoading}
                         />
                     ) : undefined
                 }
@@ -286,6 +292,7 @@ const WriterSolverUI = ({
                 }
             >
                 <WriterSolverContentUI
+                    isLoading={solverMethods.isLoading}
                     solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}

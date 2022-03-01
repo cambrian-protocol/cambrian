@@ -1,11 +1,21 @@
-import { Box, Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
+import {
+    Box,
+    Button,
+    ButtonExtendedProps,
+    ResponsiveContext,
+    Spinner,
+    Stack,
+} from 'grommet'
 
 import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
 
 export type ActionbarActionsType = {
-    primaryAction?: ButtonExtendedProps
+    primaryAction?: ButtonExtendedProps & { isLoading?: boolean }
 } & (
-    | { secondaryAction?: ButtonExtendedProps; info?: never }
+    | {
+          secondaryAction?: ButtonExtendedProps & { isLoading?: boolean }
+          info?: never
+      }
     | {
           info?: { icon: JSX.Element; label: string; descLabel: string }
           secondaryAction?: never
@@ -51,9 +61,19 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         <Box>
                             {actions.primaryAction && (
                                 <Button
+                                    {...actions.primaryAction}
+                                    disabled={actions.primaryAction.isLoading}
+                                    label={
+                                        <Stack anchor="center">
+                                            {actions.primaryAction.label}
+                                            {actions.primaryAction
+                                                .isLoading && (
+                                                <Spinner color="light-1" />
+                                            )}
+                                        </Stack>
+                                    }
                                     size="small"
                                     primary
-                                    {...actions.primaryAction}
                                 />
                             )}
                         </Box>
