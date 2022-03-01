@@ -7,6 +7,7 @@ import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
 import { ethers } from 'ethers'
+import { TokenModel } from './TokenModel'
 
 /**
  * Solution Composer
@@ -94,6 +95,8 @@ export type SolverContractData = {
     numMintedTokensByCondition?: {
         [conditionId: string]: number
     }
+    collateralToken: TokenModel
+    collateralBalance: number
     metaData: SolverModel[]
 }
 
