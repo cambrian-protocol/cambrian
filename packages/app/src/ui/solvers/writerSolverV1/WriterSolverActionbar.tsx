@@ -19,6 +19,8 @@ interface WriterSolverActionbarProps {
     currentCondition: SolverContractCondition
     roles: WriterSolverRole[]
     onSubmitWork: () => Promise<void>
+    isSubmittingWork: boolean
+    hasWorkChanged: boolean
 }
 
 // TODO Arbitration
@@ -28,6 +30,8 @@ const WriterSolverActionbar = ({
     currentCondition,
     roles,
     onSubmitWork,
+    isSubmittingWork,
+    hasWorkChanged,
 }: WriterSolverActionbarProps) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
@@ -56,7 +60,8 @@ const WriterSolverActionbar = ({
             if (roles.includes('Writer')) {
                 return (
                     <WriterActionbar
-                        isLoading={solverMethods.isLoading}
+                        hasWorkChanged={hasWorkChanged}
+                        isLoading={isSubmittingWork}
                         onSubmitWork={onSubmitWork}
                     />
                 )
