@@ -36,6 +36,7 @@ const ProposeOutcomeActionbar = ({
             currentCondition.executions - 1,
             binaryArray
         )
+        setShowProposeOutcomeModal(false)
     }
 
     return (
