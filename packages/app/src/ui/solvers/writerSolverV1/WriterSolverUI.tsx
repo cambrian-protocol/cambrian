@@ -256,21 +256,29 @@ const WriterSolverUI = ({
                     />
                 }
                 sidebar={
-                    <ConditionVersionSidebar
-                        solverTitle={`Solver: ${solverData.metaData[0]?.title}`}
-                        solverMetaVersion={'v1.0'}
-                        currentCondition={currentCondition}
-                        setCurrentCondition={setCurrentCondition}
-                        solverConditions={solverData.conditions}
-                        onRetryCondition={onRetryCondition}
-                        isKeeper={roles.includes('Keeper')}
-                    />
+                    roles.includes('Keeper') ||
+                    roles.includes('Buyer') ||
+                    roles.includes('Arbitrator') ? (
+                        <ConditionVersionSidebar
+                            solverTitle={`Solver: ${solverData.metaData[0]?.title}`}
+                            solverMetaVersion={'v1.0'}
+                            currentCondition={currentCondition}
+                            setCurrentCondition={setCurrentCondition}
+                            solverConditions={solverData.conditions}
+                            onRetryCondition={onRetryCondition}
+                            isKeeper={roles.includes('Keeper')}
+                        />
+                    ) : undefined
                 }
                 sideNav={
-                    <SolutionSideNav
-                        solverChain={solverChain}
-                        activeSolverAddress={solverContract.address}
-                    />
+                    roles.includes('Keeper') ||
+                    roles.includes('Buyer') ||
+                    roles.includes('Arbitrator') ? (
+                        <SolutionSideNav
+                            solverChain={solverChain}
+                            activeSolverAddress={solverContract.address}
+                        />
+                    ) : undefined
                 }
                 floatingActionButton={
                     currentCondition.status !== ConditionStatus.Initiated ? (
