@@ -35,6 +35,8 @@ import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/Solver
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solversMetaData } from '@cambrian/app/stubs/tags'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { FactoryContext } from '@cambrian/app/store/FactoryContext'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -42,6 +44,7 @@ export type BasicSolverMethodsType = {
     proposePayouts: (conditionIndex: number, payouts: number[]) => Promise<any>
     confirmPayouts: (conditionIndex: number) => Promise<any>
     addData: (slotId: string, data: string) => Promise<any>
+    getCollateralBalance: () => Promise<number>
     getChainParent: () => Promise<any>
     getChainChild: () => Promise<any>
     getSolverChain: () => Promise<string[]>
@@ -72,6 +75,7 @@ interface SolverProps {
 const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const ctf = useContext(CTFContext)
     const ipfs = new IPFSAPI()
+
     const [contract, setContract] = useState<Contract>(
         new ethers.Contract(
             address,
@@ -79,6 +83,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             currentUser.signer
         )
     )
+    const [initialized, setInitialized] = useState(false)
     const [isDeployed, setIsDeployed] = useState<boolean | undefined>(undefined)
 
     const [currentSolverData, setCurrentSolverData] =
@@ -88,8 +93,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         useState<SolverContractCondition>()
 
     useEffect(() => {
-        init()
-    }, [])
+        if (ctf && contract && ipfs && !initialized) {
+            setInitialized(true)
+            init()
+        }
+    }, [ctf, contract, ipfs])
 
     const init = async () => {
         initListeners()
@@ -151,7 +159,19 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const addData = async (slotId: string, data: string) => {
-        return contract.addData(slotId, data)
+        try {
+            return contract.addData(slotId, data)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const getCollateralBalance = async () => {
+        try {
+            return contract.collateralBalance()
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     const getUpdatedData = async (): Promise<SolverContractData> => {
@@ -174,6 +194,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             metaData
         )
 
+        const collateralBalance = await getCollateralBalance()
+
+        const collateralToken = await TokenAPI.getTokenInfo(
+            config.conditionBase.collateralToken
+        )
+
         const numMintedTokensByCondition =
             await getNumMintedTokensForConditions(
                 conditions,
@@ -188,6 +214,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             timelocksHistory: timelocksHistory,
             slotsHistory: slotsHistory,
             numMintedTokensByCondition: numMintedTokensByCondition,
+            collateralBalance: collateralBalance,
+            collateralToken: collateralToken,
             metaData: metaData,
         }
     }
@@ -620,45 +648,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const listenNumMintedTokens = () => {
-        if (ctf && currentSolverData?.conditions) {
-            currentSolverData.conditions.forEach((condition) => {
-                ctf.on(
-                    ctf.filters.PositionSplit(
-                        null,
-                        null,
-                        condition.parentCollectionId,
-                        condition.conditionId,
-                        null,
-                        null
-                    ),
-                    (log, event) => {
-                        if (log.args?.payout) {
-                            const newMinted = JSON.parse(
-                                JSON.stringify(
-                                    currentSolverData.numMintedTokensByCondition
-                                )
-                            )
-                            newMinted[condition.conditionId] = log.args.payout
-
-                            setCurrentSolverData({
-                                ...currentSolverData,
-                                numMintedTokensByCondition: newMinted,
-                            } as SolverContractData)
-                        }
-                    }
-                )
-            })
-        }
-    }
-
     const getNumMintedTokensForConditions = async (
         conditions: SolverContractCondition[],
         collateralToken: string
     ) => {
         if (ctf) {
             const numMintedByCondition = {} as { [conditionId: string]: number }
-
             await Promise.all(
                 conditions.map(async (condition) => {
                     const logs = await ctf.queryFilter(
@@ -671,19 +666,23 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             null
                         )
                     )
+
                     const amount = logs
                         .filter(
                             (l) => l.args?.collateralToken === collateralToken
                         )
                         .map((l) => l.args?.amount)
                         .filter(Boolean)
-                        .reduce((x, y) => x + y)
+                        .reduce((x, y) => {
+                            return x + y
+                        }, 0)
 
-                    numMintedByCondition[condition.conditionId] = amount
+                    numMintedByCondition[condition.conditionId] =
+                        amount.toString()
                 })
             )
 
-            listenNumMintedTokens()
+            console.log('numMinted: ', numMintedByCondition)
 
             return numMintedByCondition
         }
@@ -695,6 +694,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         proposePayouts: proposePayouts,
         confirmPayouts: confirmPayouts,
         addData: addData,
+        getCollateralBalance: getCollateralBalance,
         getChainParent: getChainParent,
         getChainChild: getChainChild,
         getSolverChain: getSolverChain,

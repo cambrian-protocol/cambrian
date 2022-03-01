@@ -5,6 +5,7 @@ import {
     Timer,
     TreeStructure,
     UsersThree,
+    Handshake,
 } from 'phosphor-react'
 import React, { useState } from 'react'
 import {
@@ -20,6 +21,7 @@ import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
     solverData: SolverContractData
@@ -77,14 +79,35 @@ const SolverConfigInfo = ({
                 />
                 <BaseMenuListItem
                     info={solverData.metaData[0]?.tags['collateralToken']?.text}
-                    title="Token address"
+                    title="Token"
                     icon={<Coin />}
-                    subTitle={solverData.config.conditionBase.collateralToken}
+                    subTitle={`${solverData.collateralToken.address} ${
+                        solverData.collateralToken.symbol ||
+                        solverData.collateralToken.name ||
+                        ''
+                    }`}
                 />
                 <BaseMenuListItem
-                    title="Balance"
+                    title="Collateral Balance"
                     icon={<Coins />}
-                    subTitle={''}
+                    subTitle={`${formatDecimals(
+                        solverData.collateralToken,
+                        solverData.collateralBalance
+                    ).toString()}`}
+                />
+                <BaseMenuListItem
+                    title="Escrow Balance"
+                    icon={<Handshake />}
+                    subTitle={
+                        solverData.numMintedTokensByCondition
+                            ? `${formatDecimals(
+                                  solverData.collateralToken,
+                                  solverData.numMintedTokensByCondition[
+                                      currentCondition.conditionId
+                                  ]
+                              ).toString()}`
+                            : '0'
+                    }
                 />
             </Box>
             {showRecipientModal && (
