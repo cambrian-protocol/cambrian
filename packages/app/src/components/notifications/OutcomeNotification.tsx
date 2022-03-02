@@ -3,6 +3,8 @@ import {
     ConditionStatus,
     SolverComponentOC,
     SolverContractAllocationsType,
+    SolverContractCondition,
+    SolverContractData,
 } from '@cambrian/app/models/SolverModel'
 import SolverStatusNotification, {
     SolverStatusNotificationProps,
@@ -17,6 +19,8 @@ type OutcomeNotificationProps = SolverStatusNotificationProps & {
     canRequestArbitration?: boolean
     allocations: SolverContractAllocationsType
     status: ConditionStatus
+    solverData: SolverContractData
+    currentCondition: SolverContractCondition
 }
 
 const OutcomeNotification = ({
@@ -24,6 +28,8 @@ const OutcomeNotification = ({
     canRequestArbitration,
     allocations,
     status,
+    solverData,
+    currentCondition,
 }: OutcomeNotificationProps) => {
     if (status === ConditionStatus.OutcomeProposed) {
         return (
@@ -32,6 +38,8 @@ const OutcomeNotification = ({
                 // message="Proposed desciption text"
             >
                 <OutcomeCollectionCard
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                     allocations={allocations}
                     outcomeCollection={outcomeCollection}
                 />
@@ -60,6 +68,8 @@ const OutcomeNotification = ({
                 // message="Confirmed descripiton text"
             >
                 <OutcomeCollectionCard
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                     allocations={allocations}
                     outcomeCollection={outcomeCollection}
                 />
