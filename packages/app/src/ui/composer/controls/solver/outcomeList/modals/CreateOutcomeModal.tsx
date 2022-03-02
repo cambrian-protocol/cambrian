@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeConfigForm from '../forms/OutcomeConfigForm'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { ulid } from 'ulid'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 

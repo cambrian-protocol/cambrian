@@ -7,6 +7,7 @@ import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
 import { ConditionStatus } from './ConditionStatus'
+import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
@@ -71,12 +72,6 @@ export type SolverContractConfigModel = {
     conditionBase: ParsedConditionModel
 }
 
-export type IPFSOutcomeModel = {
-    title: string
-    description: string
-    context: string
-}
-
 export type SolverContractData = {
     config: SolverContractConfigModel
     conditions: SolverContractCondition[]
@@ -94,7 +89,7 @@ export type SolverContractData = {
 
 export type SolverComponentOC = {
     indexSet: number
-    outcomes: IPFSOutcomeModel[]
+    outcomes: OutcomeModel[]
 }
 
 export type TimeLocksHashMap = {
@@ -105,7 +100,7 @@ export type SlotsHistoryHashMapType = {
     [conditionId: string]: SlotsHashMapType
 }
 
-export type SlotsHashMapType = { [slot: string]: ParsedSlotModel }
+export type SlotsHashMapType = { [slot: string]: SlotWithMetaDataModel }
 
 export type SolverContractAllocationsHistoryType = {
     [conditionId: string]: SolverContractAllocationsType

@@ -2,7 +2,7 @@ import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 import React, { SetStateAction } from 'react'
 
 import { IconContext } from 'phosphor-react'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { required } from '@cambrian/app/utils/helpers/validation'
 
 interface OutcomeConfigFormProps {

@@ -1,6 +1,7 @@
 import { LOCAL_PIN_ENDPOINT, PIN_ENDPOINT } from '@cambrian/app/constants'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+
 import fetch from 'node-fetch'
+
 const Hash = require('ipfs-only-hash')
 const CID = require('cids')
 
