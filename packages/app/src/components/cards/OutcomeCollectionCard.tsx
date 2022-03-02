@@ -57,9 +57,7 @@ const OutcomeCollectionCard = ({
                     elevation="small"
                     background="background-contrast"
                 >
-                    <Text truncate>
-                        Outcome collection {outcomeCollection.indexSet}
-                    </Text>
+                    <Text truncate>Outcome #{outcomeCollection.indexSet}</Text>
                 </CardHeader>
                 <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (

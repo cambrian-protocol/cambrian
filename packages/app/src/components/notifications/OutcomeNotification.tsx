@@ -28,8 +28,8 @@ const OutcomeNotification = ({
     if (status === ConditionStatus.OutcomeProposed) {
         return (
             <SolverStatusNotification
-                title="Outcome proposed"
-                message="Proposed desciption text"
+                title="Outcome Proposed"
+                // message="Proposed desciption text"
             >
                 <OutcomeCollectionCard
                     allocations={allocations}
@@ -57,7 +57,7 @@ const OutcomeNotification = ({
         return (
             <SolverStatusNotification
                 title="Outcome confirmed"
-                message="Confirmed descripiton text"
+                // message="Confirmed descripiton text"
             >
                 <OutcomeCollectionCard
                     allocations={allocations}
