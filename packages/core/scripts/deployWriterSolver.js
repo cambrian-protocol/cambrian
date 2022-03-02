@@ -32,7 +32,7 @@ async function main() {
       implementation: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
       keeper: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
       arbitrator: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      timelockSeconds: 10,
+      timelockSeconds: 30,
       data: ethers.utils.defaultAbiCoder.encode(
         ["bytes32", "bytes32"],
         [
