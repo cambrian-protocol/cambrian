@@ -39,8 +39,6 @@ const RedeemTokensActionbar = ({
     const [isRedeemed, setIsRedeemed] = useState<boolean>(false)
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
 
-    console.log(solverData.numMintedTokensByCondition)
-
     useEffect(() => {
         if (ctf && user.currentUser) {
             listenIsRedeemed()
@@ -65,6 +63,13 @@ const RedeemTokensActionbar = ({
         }
     }, [userAllocations])
 
+    // address indexed redeemer,
+    // IERC20 indexed collateralToken,
+    // bytes32 indexed parentCollectionId,
+    // bytes32 conditionId,
+    // uint256[] indexSets,
+    // uint256 payout
+
     const listenIsRedeemed = async () => {
         if (ctf && user.currentUser) {
             const logs = await ctf.queryFilter(
@@ -78,14 +83,19 @@ const RedeemTokensActionbar = ({
                 )
             )
 
-            if (logs.length > 0) {
-                setIsRedeemed(true)
-                const amount = logs
+            const conditionLogs = logs.filter(
+                (l) => l.args?.conditionId == currentCondition.conditionId
+            )
+
+            if (conditionLogs.length > 0) {
+                const amount = conditionLogs
                     .map((l) => l.args?.payout)
                     .filter(Boolean)
                     .reduce((x, y) => {
                         return x + y
                     }, 0)
+
+                setIsRedeemed(true)
                 setRedeemedAmount(amount)
             }
 
@@ -106,9 +116,12 @@ const RedeemTokensActionbar = ({
                     indexSets,
                     payout
                 ) => {
-                    const amount = payout
-                    setIsRedeemed(true)
-                    setRedeemedAmount(amount)
+                    if (conditionId == currentCondition.conditionId) {
+                        console.log('sdasd')
+                        const amount = payout
+                        setIsRedeemed(true)
+                        setRedeemedAmount(amount)
+                    }
                 }
             )
         }
