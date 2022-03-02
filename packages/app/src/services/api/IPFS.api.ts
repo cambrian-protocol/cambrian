@@ -72,6 +72,7 @@ export class IPFSAPI {
         } catch (e) {
             o = JSON.parse(str)
         }
+
         return o
     }
 
