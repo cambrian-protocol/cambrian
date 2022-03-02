@@ -1,6 +1,5 @@
 import { Box, Text } from 'grommet'
 import {
-    ConditionStatus,
     SolverComponentOC,
     SolverContractAllocationsType,
 } from '@cambrian/app/models/SolverModel'
@@ -9,6 +8,7 @@ import SolverStatusNotification, {
 } from './SolverStatusNotification'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 import { Warning } from 'phosphor-react'
 

@@ -1,10 +1,10 @@
 import {
-    ConditionStatus,
     SolverContractCondition,
     SolverContractData,
 } from '@cambrian/app/models/SolverModel'
 
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/ConfirmOutcomeActionbar'
 import DefaultActionbar from '@cambrian/app/components/actionbars/DefaultActionbar'
 import ExecuteSolverActionbar from '@cambrian/app/components/actionbars/ExecuteSolverActionbar'
