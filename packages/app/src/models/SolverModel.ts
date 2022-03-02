@@ -7,6 +7,7 @@ import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
 import { ConditionStatus } from './ConditionStatus'
+import { SolidityDataTypes } from './SolidityDataTypes'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
 
@@ -111,20 +112,15 @@ export type SolverContractAllocationsHistoryType = {
 }
 
 export type SolverContractAllocationsType = {
-    address: AddressWithMetaDataType
+    address: SlotWithMetaDataModel
     allocations: AllocationType[]
 }[]
-
-export type AddressWithMetaDataType = {
-    address: string
-    description: string
-    tag: Tag
-}
 
 export type SlotWithMetaDataModel = {
     slot: ParsedSlotModel
     description: string
     tag: Tag
+    dataType: SolidityDataTypes
 }
 
 export type AllocationType = {

@@ -28,12 +28,10 @@ import { JsonFragmentType } from '@ethersproject/abi'
 import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { Multihash } from '@cambrian/app/models/ConditionModel'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
-import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { solversMetaData } from '@cambrian/app/stubs/tags'
 
@@ -554,24 +552,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     if (!allocationHistory[condition.conditionId])
                         allocationHistory[condition.conditionId] = []
 
-                    const decodedAddress = decodeData(
-                        [SolidityDataTypes.Address],
-                        slotsHistory[condition.conditionId][
-                            allocation.recipientAddressSlot
-                        ]?.data
-                    )
-
-                    const ulid = ethers.utils.parseBytes32String(
-                        allocation.recipientAddressSlot
-                    )
-                    const description = metaData[0].config.slots[ulid]
-
                     allocationHistory[condition.conditionId].push({
-                        address: {
-                            address: decodedAddress,
-                            tag: metaData[0].tags[ulid],
-                            description: description.description || '',
-                        },
+                        address: attachMetaData(
+                            slotsHistory[condition.conditionId][
+                                allocation.recipientAddressSlot
+                            ],
+                            metaData[0]
+                        ),
                         allocations: allocations,
                     })
                 } catch (e) {
@@ -598,13 +585,19 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                         recipientAddressSlot
                     ]
                 if (slotFromCondition) {
-                    return getMetaData(slotFromCondition)
+                    return attachMetaData(
+                        slotFromCondition,
+                        currentSolverData.metaData[0]
+                    )
                 } else {
                     const ingestSlot = currentSolverData.config.ingests.find(
                         (ingest) => ingest.slot === recipientAddressSlot
                     )
                     if (ingestSlot) {
-                        return getMetaData(ingestSlot)
+                        return attachMetaData(
+                            ingestSlot,
+                            currentSolverData.metaData[0]
+                        )
                     } else {
                         throw new Error('Error while finding recipient slot')
                     }
@@ -615,17 +608,18 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getMetaData = (slot: ParsedSlotModel): SlotWithMetaDataModel => {
-        if (currentSolverData) {
-            const ulid = ethers.utils.parseBytes32String(slot.slot)
-            const metaSlot = currentSolverData.metaData[0].config.slots[ulid]
-            return {
-                slot: slot,
-                tag: currentSolverData.metaData[0].tags[ulid],
-                description: metaSlot.description || '',
-            }
-        } else {
-            throw new Error('No solver data exists')
+    const attachMetaData = (
+        slot: ParsedSlotModel,
+        metaData: SolverModel
+    ): SlotWithMetaDataModel => {
+        const ulid = ethers.utils.parseBytes32String(slot.slot)
+        const metaSlot = metaData.config.slots[ulid]
+
+        return {
+            slot: slot,
+            tag: metaData.tags[ulid],
+            description: metaSlot.description || '',
+            dataType: metaSlot.dataTypes[0],
         }
     }
 
@@ -638,10 +632,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             ).filter((slot) => slot.ingestType === SlotTypes.Manual)
 
             return manualSlots.map((manualSlot) =>
-                getMetaData(
+                attachMetaData(
                     currentSolverData.slotsHistory[condition.conditionId][
                         manualSlot.slot
-                    ]
+                    ],
+                    currentSolverData.metaData[0]
                 )
             )
         } else {
@@ -655,7 +650,9 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 (ingest) => ingest.ingestType === SlotTypes.Manual
             )
 
-            return manualIngests.map((ingest) => getMetaData(ingest))
+            return manualIngests.map((ingest) =>
+                attachMetaData(ingest, currentSolverData.metaData[0])
+            )
         } else {
             throw new Error('No solver data exists')
         }

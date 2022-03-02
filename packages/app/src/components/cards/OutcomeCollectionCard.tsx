@@ -1,12 +1,12 @@
+import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
+import React, { useState } from 'react'
 import {
-    AddressWithMetaDataType,
+    SlotWithMetaDataModel,
     SolverComponentOC,
     SolverContractAllocationsType,
     SolverContractCondition,
     SolverContractData,
 } from '@cambrian/app/models/SolverModel'
-import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
-import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
@@ -32,7 +32,7 @@ const OutcomeCollectionCard = ({
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
     const currentAllocations: {
-        address: AddressWithMetaDataType
+        address: SlotWithMetaDataModel
         amount: string
     }[] = allocations.map((allocation) => {
         const amount = allocation.allocations.find(
