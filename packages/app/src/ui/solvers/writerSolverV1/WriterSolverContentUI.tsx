@@ -1,5 +1,4 @@
 import { Box, Stack, Text, TextArea } from 'grommet'
-import { CircleDashed, Lock } from 'phosphor-react'
 import {
     ConditionStatus,
     SolverComponentOC,
@@ -8,6 +7,7 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import { SubmissionModel, WriterSolverRole } from './WriterSolverUI'
 
+import { CircleDashed } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
@@ -108,6 +108,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                solverData={solverData}
+                                currentCondition={currentCondition}
                                 status={currentCondition.status}
                                 allocations={
                                     solverData.allocationsHistory[
@@ -137,6 +139,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                solverData={solverData}
+                                currentCondition={currentCondition}
                                 status={currentCondition.status}
                                 allocations={
                                     solverData.allocationsHistory[
