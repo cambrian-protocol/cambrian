@@ -35,7 +35,7 @@ const ExecuteSolverActionbar = ({
                 const data =
                     solverData.slotsHistory[currentCondition.conditionId][
                         manualSlot.slot.slot
-                    ]?.data
+                    ]?.slot.data
                 if (!data) {
                     allManualFieldsFilled = false
                 }
