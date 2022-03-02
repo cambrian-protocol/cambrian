@@ -4,7 +4,6 @@ import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type RecipientsModalProps = BaseLayerModalProps & {
@@ -29,7 +28,7 @@ const RecipientsModal = ({
                             key={idx}
                             title={recipientAddress.description}
                             subTitle={decodeData(
-                                [SolidityDataTypes.Address],
+                                [recipientAddress.dataType],
                                 recipientAddress.slot.data
                             )}
                         />
