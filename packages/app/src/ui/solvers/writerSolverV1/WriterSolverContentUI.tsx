@@ -108,6 +108,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                solverData={solverData}
+                                currentCondition={currentCondition}
                                 status={currentCondition.status}
                                 allocations={
                                     solverData.allocationsHistory[
@@ -137,6 +139,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                solverData={solverData}
+                                currentCondition={currentCondition}
                                 status={currentCondition.status}
                                 allocations={
                                     solverData.allocationsHistory[
