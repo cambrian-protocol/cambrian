@@ -1,7 +1,6 @@
-import { ArrowSquareIn, WarningCircle } from 'phosphor-react'
-import { Box, Text } from 'grommet'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
+import { ArrowSquareIn } from 'phosphor-react'
 import ListItem from '@cambrian/app/components/list/ListItem'
 import UpdateSlotFormModal from './modals/UpdateSlotModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -9,7 +8,7 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 import { useState } from 'react'
 
 interface SlotListItemProps {
-    slotModel: SlotModel
+    slotModel: ComposerSlotModel
 }
 
 const SlotListItem = ({ slotModel }: SlotListItemProps) => {

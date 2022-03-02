@@ -1,5 +1,9 @@
+import {
+    ComposerSlotModel,
+    SlotPath,
+    SlotTypes,
+} from '@cambrian/app/models/SlotModel'
 import { Elements, FlowElement, Node } from 'react-flow-renderer'
-import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { IdPathType } from '@cambrian/app/models/SolverModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
@@ -75,7 +79,7 @@ type CreateSlotActionType = {
 type DeleteSlotActionType = {
     type: 'DELETE_SLOT'
     payload: {
-        slotToDelete: SlotModel
+        slotToDelete: ComposerSlotModel
     }
 }
 
@@ -99,7 +103,7 @@ type UpdateRecipientAmountActionType = {
     type: 'UPDATE_RECIPIENT_AMOUNT'
     payload: {
         recipient: SlotPath
-        amount: SlotModel | number
+        amount: ComposerSlotModel | number
     }
 }
 
@@ -110,14 +114,17 @@ type CreateRecipientAction = {
 
 type CreateRecipientWithAmountAction = {
     type: 'CREATE_RECIPIENT_WITH_AMOUNT'
-    payload: { recipient: RecipientFormType; amount: SlotModel | number }
+    payload: {
+        recipient: RecipientFormType
+        amount: ComposerSlotModel | number
+    }
 }
 
 type AddRecipientWithAmountAction = {
     type: 'ADD_RECIPIENT_WITH_AMOUNT'
     payload: {
         recipient: SelectedRecipientAddressType
-        amount: SlotModel | number
+        amount: ComposerSlotModel | number
     }
 }
 type AddRecipientAction = {

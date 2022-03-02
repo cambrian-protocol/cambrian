@@ -1,8 +1,8 @@
 import { Box, Button } from 'grommet'
+import { ComposerSlotModel, SlotPath } from '@cambrian/app/src/models/SlotModel'
 import SelectOrCreateAmount, {
     SelectAmountDataType,
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
-import { SlotModel, SlotPath } from '@cambrian/app/src/models/SlotModel'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
@@ -40,7 +40,7 @@ const UpdateRecipientAmountModal = ({
     }, [])
 
     const onSave = () => {
-        let amountToSave: SlotModel | number | undefined
+        let amountToSave: ComposerSlotModel | number | undefined
 
         if (amountData.slotModel !== undefined) {
             amountToSave = amountData.slotModel

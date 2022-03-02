@@ -8,7 +8,7 @@ import {
     IdPathType,
 } from '@cambrian/app/models/SolverModel'
 import {
-    SlotModel,
+    ComposerSlotModel,
     SlotsObj,
     SlotPath,
     SlotTypes,
@@ -211,7 +211,7 @@ export default class ComposerSolver {
 
     addRecipient(
         type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot',
-        data: string | SlotModel | ComposerSolver,
+        data: string | ComposerSlotModel | ComposerSolver,
         targetSolverId?: string | null | undefined,
         description?: string,
         solverConfigAdress?: SolverConfigAddress
@@ -219,7 +219,7 @@ export default class ComposerSolver {
         if (!data) {
             throw new Error('Falsey recipient data')
         }
-        let slot = {} as SlotModel
+        let slot = {} as ComposerSlotModel
         switch (type) {
             case 'Arbitrator':
             case 'Keeper':
@@ -336,7 +336,7 @@ export default class ComposerSolver {
         id: string,
         address: string,
         description?: string
-    ): SlotModel {
+    ): ComposerSlotModel {
         if (!this.config.slots[id]) {
             throw new Error('Could not find slot for updating recipient')
         }
@@ -393,7 +393,7 @@ export default class ComposerSolver {
         targetSolverId?: string | null | undefined,
         solverFunction?: ethers.utils.FunctionFragment | null | undefined,
         description?: string | null | undefined
-    ): SlotModel {
+    ): ComposerSlotModel {
         const id = ulid()
         this.config.slots[id] = {
             id: id,
@@ -425,7 +425,7 @@ export default class ComposerSolver {
         targetSolverId?: string | null | undefined,
         solverFunction?: ethers.utils.FunctionFragment | null | undefined,
         description?: string | null | undefined
-    ): SlotModel {
+    ): ComposerSlotModel {
         const slot = this.config.slots[id]
         if (!slot) {
             throw new Error('Could not find slot for updating')
