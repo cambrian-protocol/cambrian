@@ -60,7 +60,7 @@ const addRecipientWithAmountAction = (
             // Link Entity to new slot
             if (
                 !sourceEntity?.linkedSlots.find(
-                    (x) => x === newRecipientSlot.id
+                    (x: string) => x === newRecipientSlot.id
                 )
             ) {
                 sourceEntity?.linkedSlots.push(newRecipientSlot.id)
