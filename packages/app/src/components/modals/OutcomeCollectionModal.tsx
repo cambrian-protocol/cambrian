@@ -2,6 +2,8 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import {
     SolverComponentOC,
     SolverContractAllocationsType,
+    SolverContractCondition,
+    SolverContractData,
 } from '@cambrian/app/models/SolverModel'
 
 import { Box } from 'grommet'
@@ -11,6 +13,8 @@ import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: SolverComponentOC[]
     allocations: SolverContractAllocationsType
+    solverData: SolverContractData
+    currentCondition: SolverContractCondition
     proposeMethod?: (indexSet: number) => void
 }
 
@@ -18,6 +22,8 @@ const OutcomeCollectionModal = ({
     outcomeCollections,
     allocations,
     proposeMethod,
+    solverData,
+    currentCondition,
     ...rest
 }: OutcomeCollectionModalProps) => {
     return (
@@ -33,7 +39,9 @@ const OutcomeCollectionModal = ({
                             key={outcomeCollection.indexSet}
                             outcomeCollection={outcomeCollection}
                             allocations={allocations}
+                            solverData={solverData}
                             proposeMethod={proposeMethod}
+                            currentCondition={currentCondition}
                         />
                     )
                 })}

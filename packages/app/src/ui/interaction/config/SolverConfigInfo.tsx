@@ -129,11 +129,13 @@ const SolverConfigInfo = ({
             {showOutcomeModal && (
                 <OutcomeCollectionModal
                     onBack={toggleShowOutcomeModal}
+                    solverData={solverData}
                     allocations={
                         solverData.allocationsHistory[
                             currentCondition.conditionId
                         ]
                     }
+                    currentCondition={currentCondition}
                     outcomeCollections={solverData.outcomeCollections}
                 />
             )}

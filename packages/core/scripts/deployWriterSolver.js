@@ -163,10 +163,10 @@ async function main() {
         ],
         outcomeURIs: [
           getBytes32FromMultihash(
-            "QmdgzwhGvmfDspsUnznnijbQLP9rEBZKCUU1yykUXpv4CZ"
+            "QmVKBPPFSfFbbaAYLsRYaELHjQRNrbboWqgiHV4npxxwTF"
           ),
           getBytes32FromMultihash(
-            "QmaNcVRBZfFypLi4tKLyt7jqmzV3DU96QFPhzjs84tJAZa"
+            "QmP4MRv3tYPrD4vQkxtaeLjy9Z8gsRETUfEKtupPk7PQSi"
           ),
         ],
       },
