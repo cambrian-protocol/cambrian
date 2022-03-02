@@ -1,5 +1,5 @@
 import { ComposerStateType } from '../../composer.types'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 const updateOutcomeAction = (
     state: ComposerStateType,

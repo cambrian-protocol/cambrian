@@ -2,19 +2,12 @@ import { SlotModel, SlotPath } from './SlotModel'
 
 import { BigNumber } from 'ethers'
 import { IdPathType } from './SolverModel'
+import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
 export type OutcomeCollectionModel = {
     id: string
     outcomes: OutcomeModel[]
-}
-
-export type OutcomeModel = {
-    id: string
-    title: string
-    uri: string
-    description: string
-    context?: string
 }
 
 export type ConditionModel = {

@@ -2,7 +2,7 @@ import { Elements, FlowElement, Node } from 'react-flow-renderer'
 import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { IdPathType } from '@cambrian/app/models/SolverModel'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'

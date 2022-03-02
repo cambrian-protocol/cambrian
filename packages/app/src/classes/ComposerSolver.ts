@@ -15,12 +15,12 @@ import {
     SolverConfigAddress,
 } from '@cambrian/app/models/SlotModel'
 import {
-    OutcomeModel,
     OutcomeCollectionModel,
     ConditionModel,
     RecipientAmountPath,
     OCAllocations,
 } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 import * as Constants from '@cambrian/app/constants'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
