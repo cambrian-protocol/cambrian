@@ -1,9 +1,13 @@
+import {
+    ComposerSlotModel,
+    SlotPath,
+    SlotTypes,
+} from '@cambrian/app/models/SlotModel'
 import React, { useEffect, useState } from 'react'
 import SlotConfigForm, {
     SlotConfigFormType,
     mapSlotConfigFormToSlotActionPayload,
 } from '../forms/SlotConfigForm'
-import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
@@ -13,7 +17,7 @@ import { initialSlotInput } from './CreateSlotModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 type UpdateSlotFormModalProps = {
-    slotModel: SlotModel
+    slotModel: ComposerSlotModel
     onClose: () => void
 }
 

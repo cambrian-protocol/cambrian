@@ -1,5 +1,5 @@
+import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 import { ComposerStateType, SlotActionPayload } from '../../composer.types'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 
@@ -55,7 +55,7 @@ export default createSlotAction
  *
  */
 export const addCallbackToTargetIncomingCallbacks = (
-    slot: SlotModel,
+    slot: ComposerSlotModel,
     currentSolverId: string,
     solvers: SolverModel[]
 ) => {

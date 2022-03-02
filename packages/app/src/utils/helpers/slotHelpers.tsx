@@ -1,19 +1,18 @@
 import { Box, Text } from 'grommet'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { WarningCircle } from 'phosphor-react'
-import { BytesLike, ethers } from 'ethers'
 
 /**
  * Determites if the passed parameter is a Slot
  * @returns true if it is a slot
  * */
 export function isSlot(
-    toBeDetermined: any | SlotModel
-): toBeDetermined is SlotModel {
-    if ((toBeDetermined as SlotModel).slotType) {
+    toBeDetermined: any | ComposerSlotModel
+): toBeDetermined is ComposerSlotModel {
+    if ((toBeDetermined as ComposerSlotModel).slotType) {
         return true
     }
     return false
@@ -22,8 +21,8 @@ export function isSlot(
 export const getSlotsByDatatype = (
     dataType: SolidityDataTypes,
     solver: SolverModel
-): SlotModel[] => {
-    const slots: SlotModel[] = []
+): ComposerSlotModel[] => {
+    const slots: ComposerSlotModel[] = []
 
     for (const [_, value] of Object.entries(solver.config.slots)) {
         switch (value.slotType) {
@@ -52,7 +51,7 @@ export const getAllSlotsByDataType = (
     dataType: SolidityDataTypes,
     solvers: SolverModel[]
 ) => {
-    const slots: SlotModel[] = []
+    const slots: ComposerSlotModel[] = []
 
     solvers.forEach((solver) => {
         for (const [_, value] of Object.entries(solver.config.slots)) {
@@ -83,7 +82,7 @@ export const getAllSlotsByDataType = (
  *
  *  */
 export const getSlotTitle = (
-    slotModel: SlotModel,
+    slotModel: ComposerSlotModel,
     solvers: SolverModel[]
 ): string | JSX.Element => {
     if (solvers) {

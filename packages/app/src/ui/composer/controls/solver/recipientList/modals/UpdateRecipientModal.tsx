@@ -2,15 +2,15 @@ import { Box, FormExtendedEvent } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientConfigForm from '../forms/RecipientConfigForm'
 import { RecipientFormType } from '../forms/CreateRecipientForm'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 interface UpdateRecipientModalProps {
     onClose: () => void
-    recipientModel: SlotModel
+    recipientModel: ComposerSlotModel
 }
 
 const UpdateRecipientModal = ({

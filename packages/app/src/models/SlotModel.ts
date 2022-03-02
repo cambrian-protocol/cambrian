@@ -11,14 +11,14 @@ export enum SlotTypes {
 
 export type SlotPath = { solverId: string; slotId: string }
 
-export type SlotsObj = { [key: string]: SlotModel }
+export type SlotsObj = { [key: string]: ComposerSlotModel }
 
 export type SolverConfigAddress = {
     type: 'Keeper' | 'Arbitrator'
     solverId: string
 }
 
-export type SlotModel = {
+export type ComposerSlotModel = {
     id: string
     slotType: SlotTypes
     dataTypes: SolidityDataTypes[]
@@ -30,8 +30,7 @@ export type SlotModel = {
     solverConfigAddress?: SolverConfigAddress
 }
 
-// TODO Renaming and organizing Types, separate Composer and Interaction Types
-export type ParsedSlotModel = {
+export type SlotModel = {
     executions: number
     ingestType: SlotTypes
     slot: string

@@ -1,4 +1,8 @@
-import { SlotModel, SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
+import {
+    ComposerSlotModel,
+    SlotPath,
+    SlotTypes,
+} from '@cambrian/app/models/SlotModel'
 
 import { ComposerStateType } from '../../composer.types'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -8,7 +12,7 @@ const updateRecipientAmountAction = (
     state: ComposerStateType,
     payload: {
         recipient: SlotPath
-        amount: SlotModel | number
+        amount: ComposerSlotModel | number
     }
 ): ComposerStateType => {
     if (

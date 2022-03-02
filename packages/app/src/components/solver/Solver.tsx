@@ -13,8 +13,8 @@ import {
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
-import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 import React, { useContext, useEffect, useState } from 'react'
+import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
@@ -50,7 +50,7 @@ export type BasicSolverMethodsType = {
     getTrackingID: () => {}
     getUIUri: () => {}
     getData: (slotId: string) => any
-    getCurrentSlots: (ingests: ParsedSlotModel[]) => Promise<any[]> | undefined
+    getCurrentSlots: (ingests: SlotModel[]) => Promise<any[]> | undefined
     getCondition: (index: number) => any
     getConditions: () => {}
     getConfig: () => {}
@@ -353,7 +353,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getCurrentSlots = (ingests: ParsedSlotModel[]) => {
+    const getCurrentSlots = (ingests: SlotModel[]) => {
         try {
             return Promise.all(ingests.map((x) => getData(x.slot)))
         } catch (e) {
@@ -485,13 +485,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     // Improvement - reference by conditionId instead of executions
     const getSlotsHistory = async (
-        ingests: ParsedSlotModel[],
+        ingests: SlotModel[],
         conditions: SolverContractCondition[],
         metaData: SolverModel
     ): Promise<SlotsHistoryHashMapType> => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
-            ingests.map(async (ingest: ParsedSlotModel) => {
+            ingests.map(async (ingest: SlotModel) => {
                 const dataArr: any[] = await contract.getAllData(ingest.slot)
                 const slotHistory = dataArr.map((data, idx) => {
                     return {
@@ -592,7 +592,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getIngestWithMetaData = (
         slotId: string,
-        ingests: ParsedSlotModel[],
+        ingests: SlotModel[],
         metaData: SolverModel
     ): SlotWithMetaDataModel => {
         const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)

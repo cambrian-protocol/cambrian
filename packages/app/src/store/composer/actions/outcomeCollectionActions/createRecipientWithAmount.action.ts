@@ -1,4 +1,4 @@
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { ComposerStateType } from '../../composer.types'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
@@ -9,7 +9,7 @@ const createRecipientWithAmountAction = (
     state: ComposerStateType,
     payload: {
         recipient: RecipientFormType
-        amount: number | SlotModel
+        amount: number | ComposerSlotModel
     }
 ): ComposerStateType => {
     if (
