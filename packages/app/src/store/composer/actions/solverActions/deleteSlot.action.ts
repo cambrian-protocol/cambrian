@@ -1,10 +1,10 @@
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerStateType } from '../../composer.types'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
 import _ from 'lodash'
 
 const deleteSlotAction = (
     state: ComposerStateType,
-    payload: { slotToDelete: SlotModel }
+    payload: { slotToDelete: ComposerSlotModel }
 ): ComposerStateType => {
     if (
         state.currentIdPath !== undefined &&

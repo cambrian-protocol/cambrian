@@ -3,9 +3,9 @@ import SelectOrCreateAmount, {
     SelectAmountDataType,
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
 
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { RecipientFormType } from '../../../solver/recipientList/forms/CreateRecipientForm'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { required } from '@cambrian/app/src/utils/helpers/validation'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -30,7 +30,7 @@ const CreateRecipientAmountForm = ({
     const onSubmit = (event: FormExtendedEvent<RecipientFormType, Element>) => {
         event.preventDefault()
 
-        let amountToSave: SlotModel | number | undefined
+        let amountToSave: ComposerSlotModel | number | undefined
         if (amountData.slotModel !== undefined) {
             amountToSave = amountData.slotModel
         } else {

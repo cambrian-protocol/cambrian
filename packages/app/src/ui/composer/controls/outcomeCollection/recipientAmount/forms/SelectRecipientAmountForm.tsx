@@ -6,8 +6,8 @@ import SelectRecipient, {
     SelectRecipientType,
 } from '@cambrian/app/components/selects/SelectRecipient'
 
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
@@ -32,7 +32,7 @@ const SelectRecipientAmountForm = ({
     const onSubmit = (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
         if (selectedRecipient.address !== undefined) {
-            let amountToSave: SlotModel | number | undefined
+            let amountToSave: ComposerSlotModel | number | undefined
             if (amountData.slotModel !== undefined) {
                 amountToSave = amountData.slotModel
             } else {

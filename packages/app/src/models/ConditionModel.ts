@@ -1,4 +1,4 @@
-import { SlotModel, SlotPath } from './SlotModel'
+import { ComposerSlotModel, SlotPath } from './SlotModel'
 
 import { BigNumber } from 'ethers'
 import { IdPathType } from './SolverModel'
@@ -27,8 +27,8 @@ export type OCAllocations = {
 export type RecipientAmountPath = { recipient: SlotPath; amount: SlotPath }
 
 export type RecipientAmountModel = {
-    recipientModel: SlotModel
-    amountModel: SlotModel
+    recipientModel: ComposerSlotModel
+    amountModel: ComposerSlotModel
 }
 
 export type Multihash = {

@@ -1,7 +1,7 @@
 import { Box, Select, Text } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
-import { SlotModel } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
 import { getSlotsByDatatype } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -26,7 +26,7 @@ const updateCreateOption = (text: string) => {
 
 export type SelectAmountDataType = {
     amount: string
-    slotModel?: SlotModel
+    slotModel?: ComposerSlotModel
 }
 
 const defaultAmountObjects: SelectAmountDataType[] = []

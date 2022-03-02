@@ -1,4 +1,4 @@
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 import { ComposerStateType } from '../../composer.types'
@@ -11,7 +11,7 @@ const addRecipientWithAmountAction = (
     state: ComposerStateType,
     payload: {
         recipient: SelectedRecipientAddressType
-        amount: number | SlotModel
+        amount: number | ComposerSlotModel
     }
 ): ComposerStateType => {
     if (
@@ -28,7 +28,7 @@ const addRecipientWithAmountAction = (
             throw new Error('Error finding current Solver')
         }
 
-        let newRecipientSlot = <SlotModel>{}
+        let newRecipientSlot = <ComposerSlotModel>{}
         if (
             payload.recipient.value === 'Keeper' ||
             payload.recipient.value === 'Arbitrator'

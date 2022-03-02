@@ -1,9 +1,9 @@
+import { ComposerSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import {
     ConditionModel,
     ConditionResponseType,
     ParsedConditionModel,
 } from './ConditionModel'
-import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
 import { ConditionStatus } from './ConditionStatus'
@@ -31,7 +31,7 @@ export type SolverConfig = {
     timelockSeconds?: number
     data?: string
     slots: {
-        [key: string]: SlotModel
+        [key: string]: ComposerSlotModel
     }
     condition: ConditionModel
 }
@@ -68,7 +68,7 @@ export type SolverContractConfigModel = {
     arbitrator: string
     timelockSeconds: number
     data: string
-    ingests: ParsedSlotModel[]
+    ingests: SlotModel[]
     conditionBase: ParsedConditionModel
 }
 
@@ -112,7 +112,7 @@ export type SolverContractAllocationsType = {
 }[]
 
 export type SlotWithMetaDataModel = {
-    slot: ParsedSlotModel
+    slot: SlotModel
     description: string
     tag: Tag
     dataType: SolidityDataTypes

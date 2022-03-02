@@ -11,7 +11,7 @@ import {
     ParsedAllocationModel,
     ParsedConditionModel,
 } from '@cambrian/app/models/ConditionModel'
-import { SlotModel, ParsedSlotModel } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -76,10 +76,10 @@ export function parseSolver(
 }
 
 export function parseSlot(
-    inSlot: SlotModel,
+    inSlot: ComposerSlotModel,
     sortedSolvers: SolverModel[]
-): ParsedSlotModel {
-    const outSlot = <ParsedSlotModel>{
+): SlotModel {
+    const outSlot = <SlotModel>{
         executions: 0,
         ingestType: inSlot.slotType,
         slot: ethers.utils.formatBytes32String(inSlot.id),

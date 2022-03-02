@@ -1,5 +1,8 @@
+import {
+    ComposerSlotModel,
+    SlotTypes,
+} from '@cambrian/app/src/models/SlotModel'
 import { SetStateAction, useEffect, useState } from 'react'
-import { SlotModel, SlotTypes } from '@cambrian/app/src/models/SlotModel'
 
 import { Select } from 'grommet'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -19,7 +22,7 @@ export type SelectRecipientType = {
 
 export type SelectedRecipientAddressType = {
     solverId: string
-    value: SlotModel | SolverModel | 'Keeper' | 'Arbitrator'
+    value: ComposerSlotModel | SolverModel | 'Keeper' | 'Arbitrator'
 }
 // TODO move select type here
 const SelectRecipient = ({
