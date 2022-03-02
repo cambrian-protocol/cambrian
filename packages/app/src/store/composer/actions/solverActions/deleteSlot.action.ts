@@ -34,7 +34,8 @@ const deleteSlotAction = (
 
             if (sourceEntity) {
                 sourceEntity.linkedSlots = sourceEntity.linkedSlots.filter(
-                    (linkedSlot) => linkedSlot !== payload.slotToDelete.id
+                    (linkedSlot: string) =>
+                        linkedSlot !== payload.slotToDelete.id
                 )
             } else {
                 throw new Error(

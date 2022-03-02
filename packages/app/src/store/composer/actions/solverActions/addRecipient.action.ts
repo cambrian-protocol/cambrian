@@ -42,7 +42,9 @@ const addRecipientAction = (
             )
 
             // Link Entity to new slot
-            if (!sourceEntity?.linkedSlots.find((x) => x === newSlot.id)) {
+            if (
+                !sourceEntity?.linkedSlots.find((x: string) => x === newSlot.id)
+            ) {
                 sourceEntity?.linkedSlots.push(newSlot.id)
             }
         } else if (isSlot(payload.value)) {
