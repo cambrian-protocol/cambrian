@@ -1,11 +1,6 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react'
-import {
-    UserAPI,
-    UserRole,
-    UserType,
-} from '@cambrian/app/services/api/User.api'
-
 import { CeramicProvider, Networks } from 'use-ceramic'
+import React, { PropsWithChildren } from 'react'
+
 import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import { UserContext } from './UserContext'
 

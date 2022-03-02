@@ -38,7 +38,7 @@ const updateSolverMainConfigAction = (
             updatedSolvers.forEach((solver) => {
                 if (keeperHasChanged) {
                     currentSolver.config.keeperAddress.linkedSlots.forEach(
-                        (linkedSlot) => {
+                        (linkedSlot: string) => {
                             const slot = solver.config.slots[linkedSlot]
                             if (slot !== undefined) {
                                 slot.data = [payload.keeperAddress]
@@ -48,7 +48,7 @@ const updateSolverMainConfigAction = (
                 }
                 if (arbitratorHasChanged) {
                     currentSolver.config.arbitratorAddress.linkedSlots.forEach(
-                        (linkedSlot) => {
+                        (linkedSlot: string) => {
                             const slot = solver.config.slots[linkedSlot]
                             if (slot !== undefined) {
                                 slot.data = [payload.arbitratorAddress]
