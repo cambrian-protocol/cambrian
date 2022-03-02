@@ -31,9 +31,9 @@ const WriterSolverContentUI = ({
     submittedWork,
     proposedOutcome,
 }: WriterSolverContentUI) => {
-    const dummyArticleTitle = 'Uniswap Brand update'
+    const dummyArticleTitle = 'Uniswap Treasury Diversification'
     const dummyArticleDescription =
-        'Write a detailed artcile about the Uniswap brand update, including graphics, current state analysis and vision statement.'
+        'Write an article about why Uniswap and other protocols with large treasuries should be diversifying their holdings.'
 
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
