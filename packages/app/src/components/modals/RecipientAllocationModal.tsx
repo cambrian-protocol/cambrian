@@ -1,17 +1,18 @@
 import {
-    AddressWithMetaDataType,
+    SlotWithMetaDataModel,
     SolverContractCondition,
     SolverContractData,
 } from '@cambrian/app/models/SolverModel'
+
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import RecipientAllocationItem from '../list/RecipientAllocationItem'
-import { solversMetaData } from '@cambrian/app/stubs/tags'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
-    allocations: { address: AddressWithMetaDataType; amount: string }[]
+    allocations: { address: SlotWithMetaDataModel; amount: string }[]
     solverData: SolverContractData
     currentCondition: SolverContractCondition
 }
@@ -30,16 +31,22 @@ const RecipientAllocationModal = ({
                 paragraph={'Payouts when the selected outcome is confirmed.'}
             />
             <Box gap="medium" fill>
-                {allocations.map((allocation, idx) => (
-                    <RecipientAllocationItem
-                        key={idx}
-                        title={allocation.address.description}
-                        subTitle={allocation.address.address}
-                        amount={allocation.amount}
-                        solverData={solverData}
-                        currentCondition={currentCondition}
-                    />
-                ))}
+                {allocations.map((allocation, idx) => {
+                    const decodedAddress = decodeData(
+                        [allocation.address.dataType],
+                        allocation.address.slot.data
+                    )
+                    return (
+                        <RecipientAllocationItem
+                            key={idx}
+                            title={allocation.address.description}
+                            subTitle={decodedAddress}
+                            amount={allocation.amount}
+                            solverData={solverData}
+                            currentCondition={currentCondition}
+                        />
+                    )
+                })}
             </Box>
         </BaseLayerModal>
     )
