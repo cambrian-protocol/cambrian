@@ -1,11 +1,8 @@
-import {
-    ConditionStatus,
-    SolverComponentOC,
-} from '@cambrian/app/models/SolverModel'
 import { useEffect, useState } from 'react'
 
 import ChatFAB from '@cambrian/app/components/chat/ChatFAB'
 import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '../../interaction/bars/ConditionVersionSidebar'
 import { DefaultSolverUIProps } from '../DefaultSolverUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -13,6 +10,7 @@ import { Layout } from '@cambrian/app/components/layout/Layout'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
+import { SolverComponentOC } from '@cambrian/app/models/SolverModel'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'

@@ -6,8 +6,9 @@ import {
 import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
-import { ethers } from 'ethers'
+import { ConditionStatus } from './ConditionStatus'
 import { TokenModel } from './TokenModel'
+import { ethers } from 'ethers'
 
 /**
  * Solution Composer
@@ -73,16 +74,6 @@ export type IPFSOutcomeModel = {
     title: string
     description: string
     context: string
-}
-
-export enum ConditionStatus {
-    Initiated,
-    Executed,
-    OutcomeProposed,
-    ArbitrationRequested,
-    ArbitrationPending,
-    ArbitrationDelivered,
-    OutcomeReported,
 }
 
 export type SolverContractData = {

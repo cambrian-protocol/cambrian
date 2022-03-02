@@ -5,15 +5,13 @@ import {
     ClockCounterClockwise,
     RepeatOnce,
 } from 'phosphor-react'
-import {
-    ConditionStatus,
-    SolverContractCondition,
-} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SetStateAction } from 'react'
+import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
 
 interface ConditionVersionSidebarProps {
     solverTitle: string
