@@ -62,7 +62,9 @@ const ProposeOutcomeActionbar = ({
                             currentCondition.conditionId
                         ]
                     }
+                    currentCondition={currentCondition}
                     outcomeCollections={solverData.outcomeCollections}
+                    solverData={solverData}
                     proposeMethod={onProposeOutcome}
                 />
             )}

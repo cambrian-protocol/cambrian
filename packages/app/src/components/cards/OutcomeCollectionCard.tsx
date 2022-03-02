@@ -2,6 +2,8 @@ import {
     AddressWithMetaDataType,
     SolverComponentOC,
     SolverContractAllocationsType,
+    SolverContractCondition,
+    SolverContractData,
 } from '@cambrian/app/models/SolverModel'
 import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
 import React, { useState } from 'react'
@@ -16,12 +18,16 @@ interface OutcomeCollectionCardProps {
     outcomeCollection: SolverComponentOC
     proposeMethod?: (indexSet: number) => void
     allocations: SolverContractAllocationsType
+    solverData: SolverContractData
+    currentCondition: SolverContractCondition
 }
 
 const OutcomeCollectionCard = ({
     outcomeCollection,
     proposeMethod,
     allocations,
+    solverData,
+    currentCondition,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -83,6 +89,8 @@ const OutcomeCollectionCard = ({
                 <RecipientAllocationModal
                     onClose={toggleShowAllocationModal}
                     allocations={currentAllocations}
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                 />
             )}
         </>
