@@ -6,7 +6,7 @@ import SolverStatusNotification, {
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { OutcomeCollectionModel } from '@cambrian/app/models/SolverModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { Warning } from 'phosphor-react'
 
 type OutcomeNotificationProps = SolverStatusNotificationProps & {

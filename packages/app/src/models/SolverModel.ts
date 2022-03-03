@@ -5,10 +5,9 @@ import {
 import { SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
-import { AllocationModel } from './AllocationModel'
 import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
-import { OutcomeModel } from './OutcomeModel'
+import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
@@ -29,16 +28,6 @@ export type SolverModel = {
     collateralToken: TokenModel
     collateralBalance: number
     metaData: ComposerSolverModel[]
-}
-
-export type OutcomeCollectionsHashMapType = {
-    [conditionId: string]: OutcomeCollectionModel[]
-}
-
-export type OutcomeCollectionModel = {
-    indexSet: number
-    outcomes: OutcomeModel[]
-    allocations: AllocationModel[]
 }
 
 export type TimeLocksHashMap = {
