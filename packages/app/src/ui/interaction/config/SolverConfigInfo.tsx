@@ -10,7 +10,7 @@ import {
 import React, { useState } from 'react'
 import {
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
@@ -24,7 +24,7 @@ import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
-    solverData: SolverDataModel
+    solverData: SolverModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
 }

@@ -3,7 +3,7 @@ import {
     SolverComponentOC,
     SolverContractAllocationsType,
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 
 import { Box } from 'grommet'
@@ -13,7 +13,7 @@ import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: SolverComponentOC[]
     allocations: SolverContractAllocationsType
-    solverData: SolverDataModel
+    solverData: SolverModel
     currentCondition: SolverContractCondition
     proposeMethod?: (indexSet: number) => void
 }
