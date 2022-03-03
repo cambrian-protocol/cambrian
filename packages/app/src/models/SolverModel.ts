@@ -2,16 +2,12 @@ import {
     ComposerSolverConfigModel,
     SolverConfigModel,
 } from './SolverConfigModel'
-import {
-    SlotModel,
-    SlotResponseType,
-    SlotsHistoryHashMapType,
-} from './SlotModel'
-import { TagModel, Tags } from './TagModel'
+import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
 import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
+import { Tags } from './TagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
@@ -34,6 +30,7 @@ export type SolverModel = {
     metaData: ComposerSolverModel[]
 }
 
+// TODO Extract into ConditionModel, refactor
 export type SolverContractCondition = {
     executions: number
     collateralToken: string
