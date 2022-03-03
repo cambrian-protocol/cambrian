@@ -9,9 +9,9 @@ import {
     ComposerSlotModel,
     ComposerSlotsHashMapType,
     ComposerSlotPathType,
-    SlotTypes,
     ComposerSolverConfigAddressType,
 } from '@cambrian/app/models/SlotModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { ComposerConditionModel } from '@cambrian/app/models/ConditionModel'
 import {
     OutcomeCollectionModel,
@@ -226,7 +226,7 @@ export default class ComposerSolver {
                 if (typeof data === 'string') {
                     slot = this.addSlot({
                         data: [data],
-                        slotType: SlotTypes.Constant,
+                        slotType: SlotType.Constant,
                         dataTypes: [SolidityDataTypes.Address],
                         solverConfigAddress: solverConfigAdress,
                     })
@@ -241,7 +241,7 @@ export default class ComposerSolver {
                     slot = this.addSlot(
                         {
                             data: [data.id],
-                            slotType: SlotTypes.Callback,
+                            slotType: SlotType.Callback,
                             dataTypes: [SolidityDataTypes.Uint256],
                         },
                         targetSolverId
@@ -256,7 +256,7 @@ export default class ComposerSolver {
                     slot = this.addSlot(
                         {
                             data: [data],
-                            slotType: SlotTypes.Function,
+                            slotType: SlotType.Function,
                             dataTypes: [SolidityDataTypes.Uint256],
                         },
                         targetSolverId,
@@ -275,7 +275,7 @@ export default class ComposerSolver {
                     slot = this.addSlot(
                         {
                             data: [data],
-                            slotType: SlotTypes.Constant,
+                            slotType: SlotType.Constant,
                             dataTypes: [SolidityDataTypes.Address],
                         },
                         null,
@@ -386,7 +386,7 @@ export default class ComposerSolver {
             solverConfigAddress,
         }: {
             data: string[] | number[]
-            slotType: SlotTypes
+            slotType: SlotType
             dataTypes: SolidityDataTypes[]
             solverConfigAddress?: ComposerSolverConfigAddressType
         },
@@ -418,7 +418,7 @@ export default class ComposerSolver {
             solverConfigAddress,
         }: {
             data: string[] | number[]
-            slotType: SlotTypes
+            slotType: SlotType
             dataTypes: SolidityDataTypes[]
             solverConfigAddress?: ComposerSolverConfigAddressType
         },
@@ -477,7 +477,7 @@ export default class ComposerSolver {
             ) ||
             this.addSlot({
                 data: [0],
-                slotType: SlotTypes.Constant,
+                slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
             }).id
 
@@ -518,14 +518,14 @@ export default class ComposerSolver {
     getDefaultSlots(): ComposerSlotsHashMapType {
         const zeroSlot = {
             id: ulid(),
-            slotType: SlotTypes.Constant,
+            slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [0],
         }
 
         const maxPointsSlot = {
             id: ulid(),
-            slotType: SlotTypes.Constant,
+            slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [Constants.MAX_POINTS],
         }

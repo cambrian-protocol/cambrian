@@ -1,10 +1,10 @@
 import {
     ComposerSlotModel,
     ComposerSlotPathType,
-    SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 
 import { ComposerStateType } from '../../composer.types'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
@@ -40,7 +40,7 @@ const updateRecipientAmountAction = (
         } else {
             const newAmountSlot = currentSolver.addSlot({
                 data: [payload.amount],
-                slotType: SlotTypes.Constant,
+                slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
             })
             currentSolver.updateRecipientAmount(
