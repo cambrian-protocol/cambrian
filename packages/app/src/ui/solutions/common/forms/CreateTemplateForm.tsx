@@ -1,11 +1,3 @@
-import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { FlexInputs, Tag, TaggedInput } from '@cambrian/app/models/TagModel'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { CheckBox, Header } from 'grommet'
 import {
     Box,
     Button,
@@ -14,10 +6,19 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
+import { CheckBox, Header } from 'grommet'
+import { FlexInputs, Tag, TaggedInput } from '@cambrian/app/models/TagModel'
 import React, { useState } from 'react'
 
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+
 interface CreateTemplateFormProps {
-    composition: SolverModel[]
+    composition: ComposerSolverModel[]
     onSuccess: (cid: string) => void
     onFailure: () => void
 }
@@ -156,7 +157,10 @@ const CreateTemplateForm = ({
         })
     }
 
-    const getFlexInputType = (composition: SolverModel[], tag: TaggedInput) => {
+    const getFlexInputType = (
+        composition: ComposerSolverModel[],
+        tag: TaggedInput
+    ) => {
         if (
             tag.id === 'keeper' ||
             tag.id === 'arbitrator' ||
@@ -245,7 +249,7 @@ const CreateTemplateForm = ({
         const newComposition = composition.map((x) => x)
 
         // Update our composition with new flexInput values
-        newComposition.forEach((solver: SolverModel, i: number) => {
+        newComposition.forEach((solver: ComposerSolverModel, i: number) => {
             for (const [tagId, taggedInput] of Object.entries(
                 input.flexInputs[solver.id]
             )) {

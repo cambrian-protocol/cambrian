@@ -2,15 +2,15 @@ import { Box, Button } from 'grommet'
 import React, { useState } from 'react'
 
 import { ClipboardText } from 'phosphor-react'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import CreateProposalForm from './forms/CreateProposalForm'
+import CreateTemplateForm from './forms/CreateTemplateForm'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import ParticipantAvatar from '@cambrian/app/components/avatars/AvatarWithTitle'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
-import CreateTemplateForm from './forms/CreateTemplateForm'
 
 interface CreateTemplateUIProps {
-    composition: SolverModel[]
+    composition: ComposerSolverModel[]
 }
 
 const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {

@@ -1,5 +1,5 @@
 import { DEFAULT_ABI } from './../constants/index'
-import { SolverModel } from './../models/SolverModel'
+import { ComposerSolverModel } from './../models/SolverModel'
 import { Tags } from '../models/TagModel'
 import { ethers } from 'ethers'
 import { getBytes32FromMultihash } from '../utils/helpers/multihash'
@@ -241,7 +241,7 @@ export const tags = <Tags>{
     },
 }
 
-export const solversMetaData: SolverModel[] = [
+export const solversMetaData: ComposerSolverModel[] = [
     {
         id: '01FSP76J4HE1ZK4M0C8W4RDH5A',
         title: 'Write Article',

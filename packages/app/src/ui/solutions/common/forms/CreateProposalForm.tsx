@@ -11,7 +11,7 @@ import React, { useEffect, useState } from 'react'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { ComposerSolverModelrom '@cambrian/app/services/api/IPFS.api'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
@@ -170,7 +170,7 @@ const CreateProposalForm = ({
                 )
             })
         })
-    }
+    }ComposerSolverModel
 
     const getFlexInputType = (composition: SolverModel[], tag: TaggedInput) => {
         if (
