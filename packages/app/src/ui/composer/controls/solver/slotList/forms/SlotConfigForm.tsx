@@ -1,5 +1,5 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
-import { ComposerSlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotPathType, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { IconContext } from 'phosphor-react'
 import SelectCallingSolver from '@cambrian/app/components/selects/SelectCallingSolver'
@@ -26,7 +26,7 @@ export type SlotConfigFormType = {
     slotDescription: string
     solverFunction?: ethers.utils.FunctionFragment | null
     targetSolverId?: string | null
-    callbackTargetSlotPath?: ComposerSlotPath
+    callbackTargetSlotPath?: ComposerSlotPathType
 }
 
 const SlotConfigForm = ({
@@ -65,7 +65,7 @@ const SlotConfigForm = ({
     }
 
     const handleUpdateCallbackSlotPath = (
-        updatedTargetSlotPath?: ComposerSlotPath
+        updatedTargetSlotPath?: ComposerSlotPathType
     ) => {
         setSlotInput((prev) => ({
             ...prev,

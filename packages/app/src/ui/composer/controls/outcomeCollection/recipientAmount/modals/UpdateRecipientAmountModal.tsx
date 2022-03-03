@@ -1,7 +1,7 @@
 import { Box, Button } from 'grommet'
 import {
     ComposerSlotModel,
-    ComposerSlotPath,
+    ComposerSlotPathType,
 } from '@cambrian/app/src/models/SlotModel'
 import SelectOrCreateAmount, {
     SelectAmountDataType,
@@ -15,7 +15,7 @@ import { useComposerContext } from '@cambrian/app/src/store/composer/composer.co
 
 type UpdateRecipientAmountModalProps = {
     recipientAmountModel: RecipientAmountModel
-    recipientSlotPath: ComposerSlotPath
+    recipientSlotPath: ComposerSlotPathType
     onClose: () => void
 }
 

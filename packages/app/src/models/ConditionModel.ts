@@ -1,4 +1,4 @@
-import { ComposerSlotModel, ComposerSlotPath } from './SlotModel'
+import { ComposerSlotModel, ComposerSlotPathType } from './SlotModel'
 
 import { BigNumber } from 'ethers'
 import { ComposerIdPathType } from './SolverModel'
@@ -14,7 +14,7 @@ export type ComposerConditionModel = {
     collateralToken?: SolidityDataTypes.Address
     outcomes: OutcomeModel[]
     partition: OutcomeCollectionModel[]
-    recipients: ComposerSlotPath[]
+    recipients: ComposerSlotPathType[]
     recipientAmountSlots: OCAllocations
     amountSlot: string
     parentCollection?: ComposerIdPathType
@@ -25,8 +25,8 @@ export type OCAllocations = {
 }
 
 export type RecipientAmountPath = {
-    recipient: ComposerSlotPath
-    amount: ComposerSlotPath
+    recipient: ComposerSlotPathType
+    amount: ComposerSlotPathType
 }
 
 export type RecipientAmountModel = {

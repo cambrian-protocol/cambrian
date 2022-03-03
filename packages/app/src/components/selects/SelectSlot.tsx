@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { ComposerSlotPath } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import { Select } from 'grommet'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
 import { getSolverHierarchy } from '@cambrian/app/utils/helpers/solverHelpers'
@@ -8,18 +8,18 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 interface SelectSlotProps {
     name: string
-    selectedCallbackTargetSlotPath?: ComposerSlotPath
-    updateCallbackSlotPath: (targetSlotPath?: ComposerSlotPath) => void
+    selectedCallbackTargetSlotPath?: ComposerSlotPathType
+    updateCallbackSlotPath: (targetSlotPath?: ComposerSlotPathType) => void
 }
 
 export type SelectSlotFormType = {
     label: string
-    callbackTargetSlotPath?: ComposerSlotPath
+    callbackTargetSlotPath?: ComposerSlotPathType
 }
 
 const defaultSlotObjects: SelectSlotFormType[] = []
 
-const findSelectSlotFormType = (slotPathToFind: ComposerSlotPath) => {
+const findSelectSlotFormType = (slotPathToFind: ComposerSlotPathType) => {
     const option = defaultSlotObjects.find(
         (el) =>
             el.callbackTargetSlotPath?.solverId === slotPathToFind.solverId &&

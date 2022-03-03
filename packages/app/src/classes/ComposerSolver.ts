@@ -7,8 +7,8 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import {
     ComposerSlotModel,
-    SlotsObj,
-    ComposerSlotPath,
+    ComposerSlotsHashMapType,
+    ComposerSlotPathType,
     SlotTypes,
     SolverConfigAddress,
 } from '@cambrian/app/models/SlotModel'
@@ -301,8 +301,8 @@ export default class ComposerSolver {
         this.config.condition.recipientAmountSlots[outcomeCollectionId] =
             this.config.condition.recipients.map((slotPath) => {
                 return {
-                    recipient: <ComposerSlotPath>slotPath,
-                    amount: <ComposerSlotPath>{
+                    recipient: <ComposerSlotPathType>slotPath,
+                    amount: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
@@ -317,11 +317,11 @@ export default class ComposerSolver {
                 this.config.condition.recipientAmountSlots[ocId].push(<
                     RecipientAmountPath
                 >{
-                    recipient: <ComposerSlotPath>{
+                    recipient: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: recipientSlotId,
                     },
-                    amount: <ComposerSlotPath>{
+                    amount: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
@@ -513,7 +513,7 @@ export default class ComposerSolver {
         return config
     }
 
-    getDefaultSlots(): SlotsObj {
+    getDefaultSlots(): ComposerSlotsHashMapType {
         const zeroSlot = {
             id: ulid(),
             slotType: SlotTypes.Constant,
@@ -528,7 +528,7 @@ export default class ComposerSolver {
             data: [Constants.MAX_POINTS],
         }
 
-        const slots = <SlotsObj>{}
+        const slots = <ComposerSlotsHashMapType>{}
 
         slots[zeroSlot.id] = zeroSlot
         slots[maxPointsSlot.id] = maxPointsSlot

@@ -1,6 +1,6 @@
 import {
     ComposerSlotModel,
-    ComposerSlotPath,
+    ComposerSlotPathType,
     SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 import React, { useEffect, useState } from 'react'
@@ -40,7 +40,7 @@ const UpdateSlotFormModal = ({
             }
         })
 
-        let callbackTargetSlotPath: ComposerSlotPath | undefined
+        let callbackTargetSlotPath: ComposerSlotPathType | undefined
         if (
             slotModel.slotType === SlotTypes.Callback &&
             slotModel.targetSolverId != undefined &&
