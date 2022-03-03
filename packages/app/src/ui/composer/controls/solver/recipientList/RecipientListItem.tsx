@@ -1,7 +1,6 @@
-import { ArrowArcLeft, PuzzlePiece, User, WarningCircle } from 'phosphor-react'
-import { Box, Text } from 'grommet'
+import { ArrowArcLeft, PuzzlePiece, User } from 'phosphor-react'
+import { ComposerSlotPath, SlotTypes } from '@cambrian/app/src/models/SlotModel'
 import React, { useState } from 'react'
-import { SlotPath, SlotTypes } from '@cambrian/app/src/models/SlotModel'
 
 import ListItem from '@cambrian/app/components/list/ListItem'
 import UpdateRecipientModal from './modals/UpdateRecipientModal'
@@ -9,7 +8,7 @@ import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface RecipientListItemProps {
-    recipientSlotPath: SlotPath
+    recipientSlotPath: ComposerSlotPath
 }
 
 const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
