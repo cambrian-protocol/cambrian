@@ -9,27 +9,6 @@ export enum SlotTypes {
     Manual = 3,
 }
 
-export type ComposerSlotPathType = { solverId: string; slotId: string }
-
-export type ComposerSlotsHashMapType = { [key: string]: ComposerSlotModel }
-
-export type SolverConfigAddress = {
-    type: 'Keeper' | 'Arbitrator'
-    solverId: string
-}
-
-export type ComposerSlotModel = {
-    id: string
-    slotType: SlotTypes
-    dataTypes: SolidityDataTypes[]
-    data: any[] // TODO
-    description?: string | null | undefined
-    targetSolverId?: string | null | undefined
-    solverFunction?: ethers.utils.FunctionFragment | null | undefined
-    incomingCallbacks?: ComposerSlotPathType[]
-    solverConfigAddress?: SolverConfigAddress
-}
-
 export type SlotModel = {
     executions: number
     ingestType: SlotTypes
@@ -44,4 +23,26 @@ export type SlotResponseType = {
     ingestType: SlotTypes
     solverIndex: BigNumber
     data: string
+}
+
+export type ComposerSlotModel = {
+    id: string
+    slotType: SlotTypes
+    dataTypes: SolidityDataTypes[]
+    data: any[] // TODO
+    description?: string | null | undefined
+    targetSolverId?: string | null | undefined
+    solverFunction?: ethers.utils.FunctionFragment | null | undefined
+    incomingCallbacks?: ComposerSlotPathType[]
+    solverConfigAddress?: ComposerSolverConfigAddressType
+}
+
+export type ComposerSlotPathType = { solverId: string; slotId: string }
+
+export type ComposerSlotsHashMapType = { [key: string]: ComposerSlotModel }
+
+// To check if a certain slot is a Keeper or Arbitrator address of another solver
+export type ComposerSolverConfigAddressType = {
+    type: 'Keeper' | 'Arbitrator'
+    solverId: string
 }
