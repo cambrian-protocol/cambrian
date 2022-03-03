@@ -10,7 +10,7 @@ import {
     ComposerSlotsHashMapType,
     ComposerSlotPathType,
     SlotTypes,
-    SolverConfigAddress,
+    ComposerSolverConfigAddressType,
 } from '@cambrian/app/models/SlotModel'
 import {
     OutcomeCollectionModel,
@@ -212,7 +212,7 @@ export default class ComposerSolver {
         data: string | ComposerSlotModel | ComposerSolver,
         targetSolverId?: string | null | undefined,
         description?: string,
-        solverConfigAdress?: SolverConfigAddress
+        solverConfigAdress?: ComposerSolverConfigAddressType
     ) {
         if (!data) {
             throw new Error('Falsey recipient data')
@@ -386,7 +386,7 @@ export default class ComposerSolver {
             data: string[] | number[]
             slotType: SlotTypes
             dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: SolverConfigAddress
+            solverConfigAddress?: ComposerSolverConfigAddressType
         },
         targetSolverId?: string | null | undefined,
         solverFunction?: ethers.utils.FunctionFragment | null | undefined,
@@ -418,7 +418,7 @@ export default class ComposerSolver {
             data: string[] | number[]
             slotType: SlotTypes
             dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: SolverConfigAddress
+            solverConfigAddress?: ComposerSolverConfigAddressType
         },
         targetSolverId?: string | null | undefined,
         solverFunction?: ethers.utils.FunctionFragment | null | undefined,
