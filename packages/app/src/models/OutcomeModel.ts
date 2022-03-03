@@ -5,3 +5,8 @@ export type OutcomeModel = {
     description: string
     context?: string
 }
+
+export type OutcomeCollectionModel = {
+    id: string
+    outcomes: OutcomeModel[]
+}
