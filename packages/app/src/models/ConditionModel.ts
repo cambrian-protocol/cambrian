@@ -10,7 +10,7 @@ export type OutcomeCollectionModel = {
     outcomes: OutcomeModel[]
 }
 
-export type ConditionModel = {
+export type ComposerConditionModel = {
     collateralToken?: SolidityDataTypes.Address
     outcomes: OutcomeModel[]
     partition: OutcomeCollectionModel[]

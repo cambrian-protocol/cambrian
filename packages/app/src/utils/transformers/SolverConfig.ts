@@ -7,7 +7,7 @@ import {
     SolverConfigModel,
 } from '@cambrian/app/models/SolverModel'
 import {
-    ConditionModel,
+    ComposerConditionModel,
     ParsedAllocationModel,
     ParsedConditionModel,
 } from '@cambrian/app/models/ConditionModel'
@@ -158,7 +158,7 @@ export function parseSlot(
 }
 
 export function parseCondition(
-    inCondition: ConditionModel,
+    inCondition: ComposerConditionModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
 ): ParsedConditionModel {
