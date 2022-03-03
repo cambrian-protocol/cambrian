@@ -1,5 +1,5 @@
 import { Select } from 'grommet'
-import { SlotTypes } from '@cambrian/app/src/models/SlotModel'
+import { SlotType } from '@cambrian/app/src/models/SlotType'
 
 interface SelectSlotTypeProps {
     name: string
@@ -7,14 +7,14 @@ interface SelectSlotTypeProps {
 
 export type SelectSlotTypeFormType = {
     label: string
-    slotType: SlotTypes
+    slotType: SlotType
 }
 
 const slotTypeOptions = [
-    { label: 'Callback', slotType: SlotTypes.Callback },
-    { label: 'Constant', slotType: SlotTypes.Constant },
-    { label: 'Function', slotType: SlotTypes.Function },
-    { label: 'Manual', slotType: SlotTypes.Manual },
+    { label: 'Callback', slotType: SlotType.Callback },
+    { label: 'Constant', slotType: SlotType.Constant },
+    { label: 'Function', slotType: SlotType.Function },
+    { label: 'Manual', slotType: SlotType.Manual },
 ]
 
 const SelectSlotType = ({ name }: SelectSlotTypeProps) => {

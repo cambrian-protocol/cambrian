@@ -1,13 +1,11 @@
 import { ArrowArcLeft, PuzzlePiece, User, WarningCircle } from 'phosphor-react'
-import {
-    ComposerSlotPathType,
-    SlotTypes,
-} from '@cambrian/app/src/models/SlotModel'
 import React, { useState } from 'react'
 
 import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
+import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
+import { SlotType } from '@cambrian/app/src/models/SlotType'
 import UpdateAllocationModal from './modals/UpdateAllocationModal'
 import UpdateRecipientModal from '../../solver/recipientList/modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -49,9 +47,9 @@ const AllocationListItem = ({
     }
 
     const currentIcon =
-        allocation.recipientModel.slotType === SlotTypes.Callback ? (
+        allocation.recipientModel.slotType === SlotType.Callback ? (
             <ArrowArcLeft size="24" />
-        ) : allocation.recipientModel.slotType === SlotTypes.Function ? (
+        ) : allocation.recipientModel.slotType === SlotType.Function ? (
             <PuzzlePiece size="24" />
         ) : (
             <User size="24" />
@@ -92,7 +90,7 @@ const AllocationListItem = ({
                 onAllocate={toggleShowEditAmountModal}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    allocation.recipientModel.slotType === SlotTypes.Constant &&
+                    allocation.recipientModel.slotType === SlotType.Constant &&
                     allocation.recipientModel.solverConfigAddress === undefined
                         ? toggleShowEditRecipientModal
                         : undefined

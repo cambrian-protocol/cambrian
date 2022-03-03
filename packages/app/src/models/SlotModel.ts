@@ -1,17 +1,11 @@
 import { BigNumber, ethers } from 'ethers'
 
+import { SlotType } from './SlotType'
 import { SolidityDataTypes } from './SolidityDataTypes'
-
-export enum SlotTypes {
-    Callback = 0,
-    Constant = 1,
-    Function = 2,
-    Manual = 3,
-}
 
 export type SlotModel = {
     executions: number
-    ingestType: SlotTypes
+    ingestType: SlotType
     slot: string
     solverIndex: number
     data: string
@@ -20,7 +14,7 @@ export type SlotModel = {
 export type SlotResponseType = {
     slot: string
     executions: BigNumber
-    ingestType: SlotTypes
+    ingestType: SlotType
     solverIndex: BigNumber
     data: string
 }
@@ -31,7 +25,7 @@ export type SlotResponseType = {
 
 export type ComposerSlotModel = {
     id: string
-    slotType: SlotTypes
+    slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[] // TODO
     description?: string | null | undefined

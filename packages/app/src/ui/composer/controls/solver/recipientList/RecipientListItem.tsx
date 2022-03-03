@@ -1,11 +1,9 @@
 import { ArrowArcLeft, PuzzlePiece, User } from 'phosphor-react'
-import {
-    ComposerSlotPathType,
-    SlotTypes,
-} from '@cambrian/app/src/models/SlotModel'
 import React, { useState } from 'react'
 
+import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
+import { SlotType } from '@cambrian/app/src/models/SlotType'
 import UpdateRecipientModal from './modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -31,9 +29,9 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
     }
 
     const currentIcon =
-        recipientModel.slotType === SlotTypes.Callback ? (
+        recipientModel.slotType === SlotType.Callback ? (
             <ArrowArcLeft size="24" />
-        ) : recipientModel.slotType === SlotTypes.Function ? (
+        ) : recipientModel.slotType === SlotType.Function ? (
             <PuzzlePiece size="24" />
         ) : (
             <User size="24" />
@@ -58,7 +56,7 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
                 title={currentTitle}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    recipientModel.slotType === SlotTypes.Constant &&
+                    recipientModel.slotType === SlotType.Constant &&
                     recipientModel.solverConfigAddress === undefined
                         ? toggleShowEditRecipientModal
                         : undefined

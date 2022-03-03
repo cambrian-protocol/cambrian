@@ -14,7 +14,6 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
@@ -28,6 +27,8 @@ import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { SlotModel } from '@cambrian/app/models/SlotModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
@@ -636,7 +637,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         if (currentSolverData) {
             return Object.values(
                 currentSolverData.slotsHistory[condition.conditionId]
-            ).filter((slot) => slot.slot.ingestType === SlotTypes.Manual)
+            ).filter((slot) => slot.slot.ingestType === SlotType.Manual)
         } else {
             throw new Error('No solver data exists')
         }
@@ -646,7 +647,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         if (currentSolverData) {
             return currentSolverData.config.ingests.reduce(
                 (filtered: SlotWithMetaDataModel[], ingest) => {
-                    if (ingest.ingestType === SlotTypes.Manual) {
+                    if (ingest.ingestType === SlotType.Manual) {
                         filtered.push(
                             getIngestWithMetaData(
                                 ingest.slot,
