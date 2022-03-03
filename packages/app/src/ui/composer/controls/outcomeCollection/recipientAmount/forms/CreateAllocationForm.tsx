@@ -10,13 +10,11 @@ import { required } from '@cambrian/app/src/utils/helpers/validation'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-type CreateRecipientAmountFormProps = {
+type CreateAllocationFormProps = {
     onClose: () => void
 }
 
-const CreateRecipientAmountForm = ({
-    onClose,
-}: CreateRecipientAmountFormProps) => {
+const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
     const { dispatch } = useComposerContext()
 
     const [input, setInput] = useState<RecipientFormType>({
@@ -95,4 +93,4 @@ const CreateRecipientAmountForm = ({
     )
 }
 
-export default CreateRecipientAmountForm
+export default CreateAllocationForm

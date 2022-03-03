@@ -11,13 +11,11 @@ import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextS
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-type SelectRecipientAmountFormProps = {
+type SelectAllocationFormProps = {
     onClose: () => void
 }
 
-const SelectRecipientAmountForm = ({
-    onClose,
-}: SelectRecipientAmountFormProps) => {
+const SelectAllocationForm = ({ onClose }: SelectAllocationFormProps) => {
     const { dispatch } = useComposerContext()
 
     const [selectedRecipient, setSelectedRecipient] =
@@ -83,4 +81,4 @@ const SelectRecipientAmountForm = ({
     )
 }
 
-export default SelectRecipientAmountForm
+export default SelectAllocationForm

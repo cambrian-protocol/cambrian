@@ -15,26 +15,41 @@ export type ConditionModel = {
     outcomeURIs: Multihash[]
 }
 
+// Contract responses with BigNumbers
+export type ConditionResponseType = {
+    collateralToken: string
+    outcomeSlots: number
+    parentCollectionIndexSet: number
+    amountSlot: string
+    partition: BigNumber[]
+    allocations: ParsedAllocationModel[]
+    outcomeURIs: Multihash[]
+}
+
+/* 
+    Composer specific types
+*/
+
 export type ComposerConditionModel = {
     collateralToken?: SolidityDataTypes.Address
     outcomes: OutcomeModel[]
     partition: OutcomeCollectionModel[]
     recipients: ComposerSlotPathType[]
-    recipientAmountSlots: OCAllocations
+    recipientAmountSlots: ComposerAllocationsHashMapType
     amountSlot: string
     parentCollection?: ComposerIdPathType
 }
 
-export type OCAllocations = {
-    [outcomeCollectionId: string]: RecipientAmountPath[]
+export type ComposerAllocationsHashMapType = {
+    [outcomeCollectionId: string]: ComposerAllocationPathsType[]
 }
 
-export type RecipientAmountPath = {
+export type ComposerAllocationPathsType = {
     recipient: ComposerSlotPathType
     amount: ComposerSlotPathType
 }
 
-export type RecipientAmountModel = {
+export type ComposerAllocationType = {
     recipientModel: ComposerSlotModel
     amountModel: ComposerSlotModel
 }
@@ -48,17 +63,4 @@ export type Multihash = {
 export type ParsedAllocationModel = {
     recipientAddressSlot: string
     recipientAmountSlots: string[]
-}
-
-/* 
-    Contract responses with BigNumbers
-*/
-export type ConditionResponseType = {
-    collateralToken: string
-    outcomeSlots: number
-    parentCollectionIndexSet: number
-    amountSlot: string
-    partition: BigNumber[]
-    allocations: ParsedAllocationModel[]
-    outcomeURIs: Multihash[]
 }
