@@ -1,14 +1,14 @@
 export type Tags = {
-    [elementId: string]: Tag
+    [elementId: string]: TagModel
 }
 
-export type Tag = {
+export type TagModel = {
     id: string
     text: string
     isFlex?: boolean
 }
 
-export type TaggedInput = Tag & {
+export type TaggedInput = TagModel & {
     value: string | undefined
 }
 
