@@ -1,9 +1,11 @@
-import { ComposerSlotModel, ComposerSlotPathType } from './SlotModel'
-
-import { SlotWithMetaDataModel } from './SolverModel'
+import {
+    ComposerSlotModel,
+    ComposerSlotPathType,
+    RichSlotModel,
+} from './SlotModel'
 
 export type AllocationModel = {
-    addressSlot: SlotWithMetaDataModel
+    addressSlot: RichSlotModel
     positionId: string
     amountPercentage: string
     amount?: string
