@@ -12,8 +12,10 @@ import {
     ConditionModel,
 } from '@cambrian/app/models/ConditionModel'
 import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
-import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
-import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import {
+    OutcomeCollectionModel,
+    OutcomeModel,
+} from '@cambrian/app/models/OutcomeModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'

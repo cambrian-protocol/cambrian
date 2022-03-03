@@ -1,13 +1,18 @@
 import { ComposerSlotModel, ComposerSlotPathType } from './SlotModel'
+import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
 
 import { BigNumber } from 'ethers'
 import { ComposerIdPathType } from './SolverModel'
-import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
-export type OutcomeCollectionModel = {
-    id: string
-    outcomes: OutcomeModel[]
+export type ConditionModel = {
+    collateralToken: string
+    outcomeSlots: number
+    parentCollectionIndexSet: number
+    amountSlot: string
+    partition: number[]
+    allocations: ParsedAllocationModel[]
+    outcomeURIs: Multihash[]
 }
 
 export type ComposerConditionModel = {
@@ -38,16 +43,6 @@ export type Multihash = {
     digest: string
     hashFunction: number
     size: number
-}
-
-export type ConditionModel = {
-    collateralToken: string
-    outcomeSlots: number
-    parentCollectionIndexSet: number
-    amountSlot: string
-    partition: number[]
-    allocations: ParsedAllocationModel[]
-    outcomeURIs: Multihash[]
 }
 
 export type ParsedAllocationModel = {

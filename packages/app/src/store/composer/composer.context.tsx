@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 
 import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
-import { OutcomeCollectionModel } from '@cambrian/app/src/models/ConditionModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeModel'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { composerReducer } from './composer.reducer'
 import initialComposer from './composer.init'
