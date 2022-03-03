@@ -5,9 +5,9 @@ import {
     SlotsHashMapType,
     SlotsHistoryHashMapType,
     SolverComponentOC,
+    SolverConfigModel,
     SolverContractAllocationsHistoryType,
     SolverContractCondition,
-    SolverContractConfigModel,
     SolverContractConfigResponseType,
     SolverContractData,
     TimeLocksHashMap,
@@ -387,7 +387,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getConfig = async (): Promise<SolverContractConfigModel> => {
+    const getConfig = async (): Promise<SolverConfigModel> => {
         try {
             const res: SolverContractConfigResponseType =
                 await contract.getConfig()
@@ -453,7 +453,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const getOutcomeCollections = async (
-        config: SolverContractConfigModel
+        config: SolverConfigModel
     ): Promise<SolverComponentOC[]> => {
         const outcomeURIs = config.conditionBase.outcomeURIs.map(
             (multiHash: Multihash) => getMultihashFromBytes32(multiHash)
@@ -535,7 +535,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getAllocationHistory = (
         conditions: SolverContractCondition[],
         slotsHistory: SlotsHistoryHashMapType,
-        config: SolverContractConfigModel,
+        config: SolverConfigModel,
         outcomeCollections: SolverComponentOC[],
         metaData: ComposerSolverModel
     ): SolverContractAllocationsHistoryType => {

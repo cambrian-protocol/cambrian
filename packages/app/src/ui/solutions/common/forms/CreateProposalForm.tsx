@@ -6,14 +6,14 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
+import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
 import React, { useEffect, useState } from 'react'
 
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
-import { ComposerSolverModelrom '@cambrian/app/services/api/IPFS.api'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
 
 interface CreateProposalFormProps {
@@ -170,9 +170,12 @@ const CreateProposalForm = ({
                 )
             })
         })
-    }ComposerSolverModel
+    }
 
-    const getFlexInputType = (composition: SolverModel[], tag: TaggedInput) => {
+    const getFlexInputType = (
+        composition: ComposerSolverModel[],
+        tag: TaggedInput
+    ) => {
         if (
             tag.id === 'keeper' ||
             tag.id === 'arbitrator' ||
@@ -210,7 +213,7 @@ const CreateProposalForm = ({
         return bool
     }
 
-    const onSubmit = (event: FormExtendedEvent) => {
+    const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
 
         const newComposition = mergeFlexIntoComposition(
@@ -243,7 +246,8 @@ const CreateProposalForm = ({
         // Pin template to ipfs
         try {
             const res = await ipfs.pin(template)
-            onSuccess(res.IpfsHash)
+            if (!res) throw 'No response received'
+            onSuccess()
             console.log('Created Template', res.IpfsHash, template, input)
         } catch (e) {
             console.log(e)

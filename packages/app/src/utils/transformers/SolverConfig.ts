@@ -3,8 +3,8 @@ import _ from 'lodash'
 
 // Types
 import {
-    ParsedSolverModel,
     ComposerSolverModel,
+    SolverConfigModel,
 } from '@cambrian/app/models/SolverModel'
 import {
     ConditionModel,
@@ -40,7 +40,7 @@ export function parseSolver(
     graphSolver: ComposerSolverModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
-): ParsedSolverModel {
+): SolverConfigModel {
     const ingests = Object.keys(graphSolver.config.slots).map((slotId) =>
         parseSlot(graphSolver.config.slots[slotId], sortedSolvers)
     )
