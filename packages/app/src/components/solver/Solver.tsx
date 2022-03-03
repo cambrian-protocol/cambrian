@@ -7,7 +7,6 @@ import {
     SolverContractCondition,
     SolverContractConfigResponseType,
     SolverModel,
-    TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import React, { useContext, useEffect, useState } from 'react'
 import {
@@ -32,6 +31,7 @@ import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
@@ -444,8 +444,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getTimelocksHistory = async (
         conditions: SolverContractCondition[]
-    ): Promise<TimeLocksHashMap> => {
-        const timeLocksHashMap: TimeLocksHashMap = {}
+    ): Promise<TimeLocksHashMapType> => {
+        const timeLocksHashMap: TimeLocksHashMapType = {}
         conditions.forEach(async (condition, idx) => {
             const timelock = await getTimelock(idx)
             timeLocksHashMap[condition.conditionId] = timelock.toNumber()
