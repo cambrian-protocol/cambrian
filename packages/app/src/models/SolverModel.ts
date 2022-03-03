@@ -3,7 +3,7 @@ import {
     SolverConfigModel,
 } from './SolverConfigModel'
 import { SlotModel, SlotResponseType } from './SlotModel'
-import { Tag, Tags } from './TagModel'
+import { TagModel, Tags } from './TagModel'
 
 import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
@@ -40,7 +40,7 @@ export type SlotsHashMapType = { [slot: string]: SlotWithMetaDataModel }
 export type SlotWithMetaDataModel = {
     slot: SlotModel
     description: string
-    tag: Tag
+    tag: TagModel
     dataType: SolidityDataTypes
 }
 
