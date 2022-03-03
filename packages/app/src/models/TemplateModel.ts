@@ -1,5 +1,4 @@
 import { SolverModel } from './SolverModel'
-import { FlexInputs } from './TagModel'
 
 export type TemplateModel = {
     pfp: string

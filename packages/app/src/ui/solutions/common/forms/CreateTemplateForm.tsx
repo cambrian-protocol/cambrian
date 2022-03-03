@@ -7,12 +7,11 @@ import {
     TextArea,
 } from 'grommet'
 import { CheckBox, Header } from 'grommet'
-import { FlexInputs, Tag, TaggedInput } from '@cambrian/app/models/TagModel'
+import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
 import React, { useState } from 'react'
 
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import KeeperInputsModal from '@cambrian/app/components/modals/KeeperInputsModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
