@@ -2,9 +2,7 @@ import { ethers } from 'ethers'
 import { ulid } from 'ulid'
 
 import {
-    SolverModel,
-    SolverConfig,
-    SolverConfigAddressType,
+    ComposerSolverConfigModel,
     IdPathType,
 } from '@cambrian/app/models/SolverModel'
 import {
@@ -34,14 +32,14 @@ export default class ComposerSolver {
     title: string
     description: string
     iface: ethers.utils.Interface
-    config: SolverConfig
+    config: ComposerSolverConfigModel
     tags: Tags
 
     constructor(
         title = 'New Solver',
         iface = new ethers.utils.Interface(Constants.DEFAULT_ABI),
         id?: string,
-        config?: SolverConfig
+        config?: ComposerSolverConfigModel
     ) {
         this.id = id ? id : ulid()
         this.iface = iface
@@ -490,7 +488,7 @@ export default class ComposerSolver {
 
     /*************************** Initialization ***************************/
 
-    getDefaultConfig(): SolverConfig {
+    getDefaultConfig(): ComposerSolverConfigModel {
         const config = {
             keeperAddress: { address: '', linkedSlots: [] },
             arbitratorAddress: { address: '', linkedSlots: [] },
