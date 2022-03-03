@@ -1,7 +1,7 @@
 import {
     ComposerConditionModel,
+    ConditionModel,
     ConditionResponseType,
-    ParsedConditionModel,
 } from './ConditionModel'
 import { ComposerSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
@@ -71,7 +71,7 @@ export type SolverConfigModel = {
     timelockSeconds: number
     data: string
     ingests: SlotModel[]
-    conditionBase: ParsedConditionModel
+    conditionBase: ConditionModel
 }
 
 export type SolverComponentOC = {

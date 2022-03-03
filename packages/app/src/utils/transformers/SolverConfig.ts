@@ -9,7 +9,7 @@ import {
 import {
     ComposerConditionModel,
     ParsedAllocationModel,
-    ParsedConditionModel,
+    ConditionModel,
 } from '@cambrian/app/models/ConditionModel'
 import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
@@ -161,8 +161,8 @@ export function parseCondition(
     inCondition: ComposerConditionModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
-): ParsedConditionModel {
-    const outCondition = <ParsedConditionModel>{}
+): ConditionModel {
+    const outCondition = <ConditionModel>{}
 
     if (inCondition.outcomes.length < 2) {
         throw 'Condition must have at least two outcomes'
