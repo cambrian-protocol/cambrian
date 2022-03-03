@@ -12,11 +12,7 @@ import {
     SlotTypes,
     ComposerSolverConfigAddressType,
 } from '@cambrian/app/models/SlotModel'
-import {
-    ComposerConditionModel,
-    ComposerAllocationPathsType,
-    ComposerAllocationsHashMapType,
-} from '@cambrian/app/models/ConditionModel'
+import { ComposerConditionModel } from '@cambrian/app/models/ConditionModel'
 import {
     OutcomeCollectionModel,
     OutcomeModel,
@@ -28,6 +24,10 @@ import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
 import { Tags } from '../models/TagModel'
+import {
+    ComposerAllocationPathsType,
+    ComposerAllocationsHashMapType,
+} from '../models/AllocationModel'
 
 export default class ComposerSolver {
     id: string
