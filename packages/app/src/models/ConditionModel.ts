@@ -37,7 +37,7 @@ export type Multihash = {
     size: number
 }
 
-export type ParsedConditionModel = {
+export type ConditionModel = {
     collateralToken: string
     outcomeSlots: number
     parentCollectionIndexSet: number
