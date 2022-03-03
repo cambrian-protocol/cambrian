@@ -1,7 +1,8 @@
 import { Box, Text } from 'grommet'
-import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { WarningCircle } from 'phosphor-react'
 
@@ -26,14 +27,14 @@ export const getSlotsByDatatype = (
 
     for (const [_, value] of Object.entries(solver.config.slots)) {
         switch (value.slotType) {
-            case SlotTypes.Constant:
+            case SlotType.Constant:
                 if (
                     value.dataTypes.length === 1 &&
                     value.dataTypes[0] == dataType
                 ) {
                     slots.push(value)
                 }
-            case SlotTypes.Function:
+            case SlotType.Function:
                 if (
                     value.solverFunction?.outputs?.length === 1 &&
                     value.solverFunction.outputs[0].type === dataType
@@ -56,14 +57,14 @@ export const getAllSlotsByDataType = (
     solvers.forEach((solver) => {
         for (const [_, value] of Object.entries(solver.config.slots)) {
             switch (value.slotType) {
-                case SlotTypes.Constant:
+                case SlotType.Constant:
                     if (
                         value.dataTypes.length === 1 &&
                         value.dataTypes[0] == dataType
                     ) {
                         slots.push(value)
                     }
-                case SlotTypes.Function:
+                case SlotType.Function:
                     if (
                         value.solverFunction?.outputs?.length === 1 &&
                         value.solverFunction.outputs[0].type === dataType
@@ -88,7 +89,7 @@ export const getSlotTitle = (
     if (solvers) {
         if (slotModel.targetSolverId !== undefined) {
             // Its either a callback or a function
-            if (slotModel.slotType === SlotTypes.Callback) {
+            if (slotModel.slotType === SlotType.Callback) {
                 const callingSolver = solvers.find(
                     (x) => x.id === slotModel.targetSolverId
                 )
@@ -110,7 +111,7 @@ export const getSlotTitle = (
                     }
                 }
             } else if (
-                slotModel.slotType === SlotTypes.Function &&
+                slotModel.slotType === SlotType.Function &&
                 slotModel.solverFunction?.name === 'addressFromChainIndex'
             ) {
                 // Get solver title
@@ -120,8 +121,8 @@ export const getSlotTitle = (
                 )
             }
         } else if (
-            slotModel.slotType === SlotTypes.Constant ||
-            slotModel.slotType === SlotTypes.Manual
+            slotModel.slotType === SlotType.Constant ||
+            slotModel.slotType === SlotType.Manual
         ) {
             // Display if its an Arbitrator or Keeper
             if (slotModel.solverConfigAddress !== undefined) {

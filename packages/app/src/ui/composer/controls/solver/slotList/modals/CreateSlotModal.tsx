@@ -7,7 +7,7 @@ import SlotConfigForm, {
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SlotTypes } from '@cambrian/app/models/SlotModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import _uniqueId from 'lodash/uniqueId'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -23,7 +23,7 @@ export type SlotDataInputType = {
 }
 
 export const initialSlotInput: SlotConfigFormType = {
-    slotType: SlotTypes.Constant,
+    slotType: SlotType.Constant,
     slotDescription: '',
     dataInputFields: [
         { id: _uniqueId(), data: '', dataType: SolidityDataTypes.Bytes },

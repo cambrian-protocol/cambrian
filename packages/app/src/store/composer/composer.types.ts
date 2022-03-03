@@ -1,7 +1,6 @@
 import {
     ComposerSlotModel,
     ComposerSlotPathType,
-    SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 import { Elements, FlowElement, Node } from 'react-flow-renderer'
 
@@ -10,6 +9,7 @@ import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
@@ -141,7 +141,7 @@ type UpdateRecipientActionType = {
 }
 
 export type SlotActionPayload = {
-    slotType: SlotTypes
+    slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[]
     description?: string

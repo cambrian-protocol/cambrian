@@ -1,11 +1,9 @@
-import {
-    ComposerSlotModel,
-    SlotTypes,
-} from '@cambrian/app/src/models/SlotModel'
 import { SetStateAction, useEffect, useState } from 'react'
 
+import { ComposerSlotModel } from '@cambrian/app/src/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { Select } from 'grommet'
+import { SlotType } from '@cambrian/app/src/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
@@ -140,9 +138,9 @@ const getAvailableParentAddresses = (
                     parentSolver.config.slots[key].dataTypes[0] ===
                         SolidityDataTypes.Address &&
                     (parentSolver.config.slots[key].slotType ===
-                        SlotTypes.Constant ||
+                        SlotType.Constant ||
                         parentSolver.config.slots[key].slotType ===
-                            SlotTypes.Manual)
+                            SlotType.Manual)
                 ) {
                     const currentTitle =
                         parentSolver.config.slots[key].description !==

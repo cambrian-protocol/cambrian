@@ -1,7 +1,7 @@
-import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-
 import { ArrowSquareIn } from 'phosphor-react'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import UpdateSlotFormModal from './modals/UpdateSlotModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -19,11 +19,11 @@ const SlotListItem = ({ slotModel }: SlotListItemProps) => {
         setShowUpdateSlotModal(!showUpdateSlotModal)
 
     const currentSlotTypeLabel =
-        slotModel.slotType === SlotTypes.Callback
+        slotModel.slotType === SlotType.Callback
             ? 'Callback'
-            : slotModel.slotType === SlotTypes.Function
+            : slotModel.slotType === SlotType.Function
             ? 'Function'
-            : slotModel.slotType === SlotTypes.Manual
+            : slotModel.slotType === SlotType.Manual
             ? 'Manual'
             : 'Constant'
 

@@ -1,7 +1,6 @@
 import {
     ComposerSlotModel,
     ComposerSlotPathType,
-    SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 import React, { useEffect, useState } from 'react'
 import SlotConfigForm, {
@@ -12,6 +11,7 @@ import SlotConfigForm, {
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import _uniqueId from 'lodash/uniqueId'
 import { initialSlotInput } from './CreateSlotModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -42,7 +42,7 @@ const UpdateSlotFormModal = ({
 
         let callbackTargetSlotPath: ComposerSlotPathType | undefined
         if (
-            slotModel.slotType === SlotTypes.Callback &&
+            slotModel.slotType === SlotType.Callback &&
             slotModel.targetSolverId != undefined &&
             slotModel.data.length === 1
         ) {
