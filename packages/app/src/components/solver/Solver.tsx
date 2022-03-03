@@ -1,14 +1,17 @@
 import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
 import {
     ComposerSolverModel,
-    SlotWithMetaDataModel,
-    SlotsHashMapType,
-    SlotsHistoryHashMapType,
     SolverContractCondition,
     SolverContractConfigResponseType,
     SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import React, { useContext, useEffect, useState } from 'react'
+import {
+    RichSlotModel,
+    RichSlotsHashMapType,
+    SlotModel,
+    SlotsHistoryHashMapType,
+} from '@cambrian/app/models/SlotModel'
 import {
     TokenAPI,
     TokenResponseType,
@@ -28,7 +31,6 @@ import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
@@ -59,13 +61,9 @@ export type BasicSolverMethodsType = {
     getCondition: (index: number) => any
     getConditions: () => {}
     getConfig: () => {}
-    getManualInputs: (
-        condition: SolverContractCondition
-    ) => SlotWithMetaDataModel[]
-    getManualSlots: () => SlotWithMetaDataModel[]
-    getRecipientSlots: (
-        condition: SolverContractCondition
-    ) => SlotWithMetaDataModel[]
+    getManualInputs: (condition: SolverContractCondition) => RichSlotModel[]
+    getManualSlots: () => RichSlotModel[]
+    getRecipientSlots: (condition: SolverContractCondition) => RichSlotModel[]
 }
 
 interface SolverProps {
@@ -580,7 +578,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             })
         )
         conditions.forEach((condition) => {
-            const data: SlotsHashMapType = {}
+            const data: RichSlotsHashMapType = {}
             currentSlotData.forEach((slot) => {
                 const currentSlot = slot.find(
                     (el) => el.executions === condition.executions
@@ -610,7 +608,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         slotId: string,
         ingests: SlotModel[],
         metaData: ComposerSolverModel
-    ): SlotWithMetaDataModel => {
+    ): RichSlotModel => {
         const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
         if (ingestSlot) {
             // Enrich with MetaData
@@ -629,7 +627,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getRecipientSlots = (
         condition: SolverContractCondition
-    ): SlotWithMetaDataModel[] => {
+    ): RichSlotModel[] => {
         if (currentSolverData) {
             return currentSolverData.config.conditionBase.allocations.map(
                 (allocation) =>
@@ -649,7 +647,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getManualInputs = (
         condition: SolverContractCondition
-    ): SlotWithMetaDataModel[] => {
+    ): RichSlotModel[] => {
         if (currentSolverData) {
             return Object.values(
                 currentSolverData.slotsHistory[condition.conditionId]
@@ -659,10 +657,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getManualSlots = (): SlotWithMetaDataModel[] => {
+    const getManualSlots = (): RichSlotModel[] => {
         if (currentSolverData) {
             return currentSolverData.config.ingests.reduce(
-                (filtered: SlotWithMetaDataModel[], ingest) => {
+                (filtered: RichSlotModel[], ingest) => {
                     if (ingest.ingestType === SlotType.Manual) {
                         filtered.push(
                             getIngestWithMetaData(
