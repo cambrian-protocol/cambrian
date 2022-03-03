@@ -59,7 +59,7 @@ export type SolverConfigModel = {
     conditionBase: ParsedConditionModel
 }
 
-export type SolverContractData = {
+export type SolverDataModel = {
     config: SolverConfigModel
     conditions: SolverContractCondition[]
     outcomeCollections: SolverComponentOC[]
