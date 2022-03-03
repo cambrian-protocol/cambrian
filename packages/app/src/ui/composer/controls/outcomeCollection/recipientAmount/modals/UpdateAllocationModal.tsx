@@ -9,7 +9,7 @@ import SelectOrCreateAmount, {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { ComposerAllocationType } from '@cambrian/app/models/ConditionModel'
+import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
