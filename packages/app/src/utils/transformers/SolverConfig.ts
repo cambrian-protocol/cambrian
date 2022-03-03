@@ -7,7 +7,7 @@ import {
     ComposerConditionModel,
     ConditionModel,
 } from '@cambrian/app/models/ConditionModel'
-import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import { AllocationPathsType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 import {
     OutcomeCollectionModel,
@@ -248,10 +248,10 @@ export function parseCondition(
         inCondition.amountSlot
     )
 
-    outCondition.allocations = [] as AllocationModel[]
+    outCondition.allocations = [] as AllocationPathsType[]
 
     inCondition.recipients.forEach((slotPath, i) => {
-        outCondition.allocations.push(<AllocationModel>{
+        outCondition.allocations.push(<AllocationPathsType>{
             recipientAddressSlot: ethers.utils.formatBytes32String(
                 slotPath.slotId
             ),

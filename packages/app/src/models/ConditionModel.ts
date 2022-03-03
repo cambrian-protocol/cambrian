@@ -1,5 +1,5 @@
 import {
-    AllocationModel,
+    AllocationPathsType,
     ComposerAllocationsHashMapType,
 } from './AllocationModel'
 import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
@@ -16,7 +16,7 @@ export type ConditionModel = {
     parentCollectionIndexSet: number
     amountSlot: string
     partition: number[]
-    allocations: AllocationModel[]
+    allocations: AllocationPathsType[]
     outcomeURIs: MultihashType[]
 }
 
@@ -27,7 +27,7 @@ export type ConditionResponseType = {
     parentCollectionIndexSet: number
     amountSlot: string
     partition: BigNumber[]
-    allocations: AllocationModel[]
+    allocations: AllocationPathsType[]
     outcomeURIs: MultihashType[]
 }
 

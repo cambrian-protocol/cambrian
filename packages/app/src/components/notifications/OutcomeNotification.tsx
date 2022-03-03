@@ -1,10 +1,4 @@
 import { Box, Text } from 'grommet'
-import {
-    SolverComponentOC,
-    SolverContractAllocationsType,
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
 import SolverStatusNotification, {
     SolverStatusNotificationProps,
 } from './SolverStatusNotification'
@@ -12,24 +6,19 @@ import SolverStatusNotification, {
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import { OutcomeCollectionModel } from '@cambrian/app/models/SolverModel'
 import { Warning } from 'phosphor-react'
 
 type OutcomeNotificationProps = SolverStatusNotificationProps & {
-    outcomeCollection: SolverComponentOC
+    outcomeCollection: OutcomeCollectionModel
     canRequestArbitration?: boolean
-    allocations: SolverContractAllocationsType
     status: ConditionStatus
-    solverData: SolverModel
-    currentCondition: SolverContractCondition
 }
 
 const OutcomeNotification = ({
     outcomeCollection,
     canRequestArbitration,
-    allocations,
     status,
-    solverData,
-    currentCondition,
 }: OutcomeNotificationProps) => {
     if (status === ConditionStatus.OutcomeProposed) {
         return (
@@ -37,12 +26,7 @@ const OutcomeNotification = ({
                 title="Outcome Proposed"
                 // message="Proposed desciption text"
             >
-                <OutcomeCollectionCard
-                    solverData={solverData}
-                    currentCondition={currentCondition}
-                    allocations={allocations}
-                    outcomeCollection={outcomeCollection}
-                />
+                <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
                 {canRequestArbitration && (
                     <>
                         <Box pad="small">
@@ -67,12 +51,7 @@ const OutcomeNotification = ({
                 title="Outcome confirmed"
                 // message="Confirmed descripiton text"
             >
-                <OutcomeCollectionCard
-                    solverData={solverData}
-                    currentCondition={currentCondition}
-                    allocations={allocations}
-                    outcomeCollection={outcomeCollection}
-                />
+                <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
             </SolverStatusNotification>
         )
     } else {

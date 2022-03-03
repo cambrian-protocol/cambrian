@@ -1,9 +1,4 @@
-import {
-    SlotWithMetaDataModel,
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
-
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
@@ -12,16 +7,12 @@ import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
-    allocations: { address: SlotWithMetaDataModel; amount: string }[]
-    solverData: SolverModel
-    currentCondition: SolverContractCondition
+    allocations: AllocationModel[]
 }
 
 const RecipientAllocationModal = ({
     onClose,
     allocations,
-    solverData,
-    currentCondition,
 }: RecipientAllocationModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
@@ -33,17 +24,16 @@ const RecipientAllocationModal = ({
             <Box gap="medium" fill>
                 {allocations.map((allocation, idx) => {
                     const decodedAddress = decodeData(
-                        [allocation.address.dataType],
-                        allocation.address.slot.data
+                        [allocation.addressSlot.dataType],
+                        allocation.addressSlot.slot.data
                     )
                     return (
                         <RecipientAllocationItem
                             key={idx}
-                            title={allocation.address.description}
+                            title={allocation.addressSlot.description}
                             subTitle={decodedAddress}
                             amount={allocation.amount}
-                            solverData={solverData}
-                            currentCondition={currentCondition}
+                            amountPercentage={allocation.amountPercentage}
                         />
                     )
                 })}
