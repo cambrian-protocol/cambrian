@@ -1,5 +1,4 @@
 import { ComposerAction, ComposerStateType } from './composer.types'
-import { IdPathType, SolverModel } from '../../models/SolverModel'
 import React, {
     PropsWithChildren,
     useEffect,
@@ -7,6 +6,7 @@ import React, {
     useState,
 } from 'react'
 
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
 import { OutcomeCollectionModel } from '@cambrian/app/src/models/ConditionModel'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { composerReducer } from './composer.reducer'
@@ -15,7 +15,7 @@ import initialComposer from './composer.init'
 type ComposerContextOptions = {
     composer: ComposerStateType
     dispatch: React.Dispatch<ComposerAction>
-    currentIdPath?: IdPathType
+    currentIdPath?: ComposerIdPathType
     currentSolver?: Solver
     currentOutcomeCollection?: OutcomeCollectionModel
 }
@@ -31,7 +31,7 @@ const ComposerContext = React.createContext<ComposerContextOptions>({
 const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
     const [composer, dispatch] = useReducer(composerReducer, initialComposer)
 
-    const [currentIdPath, setCurrentIdPath] = useState<IdPathType>()
+    const [currentIdPath, setCurrentIdPath] = useState<ComposerIdPathType>()
     const [currentSolver, setCurrentSolver] = useState<Solver>()
     const [currentOutcomeCollection, setCurrentOutcomeCollection] =
         useState<OutcomeCollectionModel>()

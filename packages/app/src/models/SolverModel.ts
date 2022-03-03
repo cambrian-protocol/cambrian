@@ -16,18 +16,19 @@ import { ethers } from 'ethers'
  * Solution Composer
  **/
 
-export type IdPathType = { solverId?: string; ocId?: string }
-
-export type SolverConfigAddressType = {
-    address: string
-    linkedSlots: string[]
-}
+export type ComposerIdPathType = { solverId?: string; ocId?: string }
 
 export type ComposerSolverConfigModel = {
     implementation?: string
     collateralToken?: string
-    keeperAddress: SolverConfigAddressType
-    arbitratorAddress: SolverConfigAddressType
+    keeperAddress: {
+        address: string
+        linkedSlots: string[]
+    }
+    arbitratorAddress: {
+        address: string
+        linkedSlots: string[]
+    }
     timelockSeconds?: number
     data?: string
     slots: {

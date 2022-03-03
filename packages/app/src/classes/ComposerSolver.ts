@@ -3,7 +3,7 @@ import { ulid } from 'ulid'
 
 import {
     ComposerSolverConfigModel,
-    IdPathType,
+    ComposerIdPathType,
 } from '@cambrian/app/models/SolverModel'
 import {
     ComposerSlotModel,
@@ -178,7 +178,7 @@ export default class ComposerSolver {
         delete this.config.condition.recipientAmountSlots[id]
     }
 
-    setParentCollection(parentCollection: IdPathType | null) {
+    setParentCollection(parentCollection: ComposerIdPathType | null) {
         this.config.condition.parentCollection = parentCollection
             ? parentCollection
             : undefined
