@@ -14,7 +14,7 @@ import {
 } from '@cambrian/app/models/SlotModel'
 import {
     OutcomeCollectionModel,
-    ConditionModel,
+    ComposerConditionModel,
     RecipientAmountPath,
     OCAllocations,
 } from '@cambrian/app/models/ConditionModel'
@@ -536,7 +536,7 @@ export default class ComposerSolver {
         return slots
     }
 
-    getDefaultCondition(): ConditionModel {
+    getDefaultCondition(): ComposerConditionModel {
         const defaultOC = { id: ulid(), outcomes: [] }
         const defaultCondition = {
             outcomes: [],

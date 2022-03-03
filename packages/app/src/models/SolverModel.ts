@@ -1,9 +1,9 @@
-import { ComposerSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import {
-    ConditionModel,
+    ComposerConditionModel,
     ConditionResponseType,
     ParsedConditionModel,
 } from './ConditionModel'
+import { ComposerSlotModel, SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
 import { ConditionStatus } from './ConditionStatus'
@@ -34,7 +34,7 @@ export type ComposerSolverConfigModel = {
     slots: {
         [key: string]: ComposerSlotModel
     }
-    condition: ConditionModel
+    condition: ComposerConditionModel
 }
 
 export type ComposerSolverModel = {
