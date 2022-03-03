@@ -2,15 +2,15 @@ import {
     ArrowSquareIn,
     Coin,
     Coins,
+    Handshake,
     Timer,
     TreeStructure,
     UsersThree,
-    Handshake,
 } from 'phosphor-react'
 import React, { useState } from 'react'
 import {
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
@@ -24,7 +24,7 @@ import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
-    solverData: SolverContractData
+    solverData: SolverDataModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
 }

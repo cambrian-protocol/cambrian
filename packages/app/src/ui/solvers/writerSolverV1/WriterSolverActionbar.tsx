@@ -1,6 +1,6 @@
 import {
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
 
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
@@ -14,7 +14,7 @@ import WriterActionbar from './WriterActionbar'
 import { WriterSolverRole } from './WriterSolverUI'
 
 interface WriterSolverActionbarProps {
-    solverData: SolverContractData
+    solverData: SolverDataModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
     roles: WriterSolverRole[]

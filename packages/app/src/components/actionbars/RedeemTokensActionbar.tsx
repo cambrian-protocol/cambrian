@@ -1,24 +1,22 @@
 import {
     AllocationType,
-    SolverContractAllocationsType,
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { CTFContext } from '@cambrian/app/store/CTFContext'
-import { UserContext, UserType } from '@cambrian/app/store/UserContext'
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
-import { BigNumber, ethers, EventFilter } from 'ethers'
-import { Handshake } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
-const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
+
+import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { CTFContext } from '@cambrian/app/store/CTFContext'
+import { Handshake } from 'phosphor-react'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserContext } from '@cambrian/app/store/UserContext'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
-    solverData: SolverContractData
+    solverData: SolverDataModel
 }
 
 const RedeemTokensActionbar = ({
@@ -178,7 +176,13 @@ const RedeemTokensActionbar = ({
     const getUserAllocs = () => {
         const userAllocs = solverData.allocationsHistory[
             currentCondition.conditionId
-        ].find((alloc) => alloc.address.address === user.currentUser?.address)
+        ].find(
+            (alloc) =>
+                decodeData(
+                    [alloc.address.dataType],
+                    alloc.address.slot.data
+                ) === user.currentUser?.address
+        )
 
         if (userAllocs !== undefined) {
             setUserAllocations(userAllocs.allocations)
