@@ -1,4 +1,5 @@
 import {
+    OutcomeCollectionModel,
     SolverContractCondition,
     SolverModel,
 } from '@cambrian/app/models/SolverModel'
@@ -20,6 +21,7 @@ interface WriterSolverActionbarProps {
     roles: WriterSolverRole[]
     onSubmitWork: () => Promise<void>
     hasWorkChanged: boolean
+    proposedOutcome?: OutcomeCollectionModel
 }
 
 // TODO Arbitration
@@ -30,6 +32,7 @@ const WriterSolverActionbar = ({
     roles,
     onSubmitWork,
     hasWorkChanged,
+    proposedOutcome,
 }: WriterSolverActionbarProps) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
@@ -72,11 +75,12 @@ const WriterSolverActionbar = ({
                 />
             )
         case ConditionStatus.OutcomeReported:
-            if (roles.length > 1) {
+            if (roles.length > 1 && proposedOutcome) {
                 return (
                     <RedeemTokensActionbar
                         currentCondition={currentCondition}
                         solverData={solverData}
+                        proposedOutcome={proposedOutcome}
                     />
                 )
             }

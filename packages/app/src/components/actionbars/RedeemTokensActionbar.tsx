@@ -1,27 +1,29 @@
 import {
-    AllocationType,
+    OutcomeCollectionModel,
     SolverContractCondition,
     SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import { useContext, useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
 import { Handshake } from 'phosphor-react'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserContext } from '@cambrian/app/store/UserContext'
-import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
     solverData: SolverModel
+    proposedOutcome: OutcomeCollectionModel
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
+    proposedOutcome,
 }: RedeemTokensActionbarProps) => {
     // TODO Fetch token and amount for signer
     // TODO Redeem token functionality
@@ -29,7 +31,8 @@ const RedeemTokensActionbar = ({
     const user = useContext(UserContext)
 
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [userAllocations, setUserAllocations] = useState<AllocationType[]>()
+
+    const [userAllocations, setUserAllocations] = useState<AllocationModel[]>()
     const [
         userPayoutPercentageForCondition,
         setUserPayoutPercentageForCondition,
@@ -46,14 +49,6 @@ const RedeemTokensActionbar = ({
     useEffect(() => {
         getCollateralToken()
     }, [])
-
-    useEffect(() => {
-        if (user.currentUser && solverData) {
-            getUserAllocs()
-        } else {
-            console.log(ctf, user.currentUser, solverData)
-        }
-    }, [ctf])
 
     useEffect(() => {
         if (userAllocations) {
@@ -129,7 +124,7 @@ const RedeemTokensActionbar = ({
      * Mimics calculation from ConditionalToken.sol
      * IMPORTANT: Amount in alloc is in basis points. Divide by 100 to get pct.
      */
-    const getTotalPayout = (allocations: AllocationType[]) => {
+    const getTotalPayout = (allocations: AllocationModel[]) => {
         const payoutNumerators = currentCondition.payouts
         const indexSets = solverData.config.conditionBase.partition
         const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots
@@ -152,7 +147,7 @@ const RedeemTokensActionbar = ({
             }
 
             const payoutStake = allocations.find(
-                (alloc) => alloc.outcomeCollectionIndexSet === indexSet
+                (alloc) => proposedOutcome.indexSet === indexSet
             )?.amount
 
             if (payoutStake && Number(payoutStake) > 0) {
@@ -171,22 +166,6 @@ const RedeemTokensActionbar = ({
             solverData.config.conditionBase.collateralToken
         )
         setCollateralToken(token)
-    }
-
-    const getUserAllocs = () => {
-        const userAllocs = solverData.allocationsHistory[
-            currentCondition.conditionId
-        ].find(
-            (alloc) =>
-                decodeData(
-                    [alloc.address.dataType],
-                    alloc.address.slot.data
-                ) === user.currentUser?.address
-        )
-
-        if (userAllocs !== undefined) {
-            setUserAllocations(userAllocs.allocations)
-        }
     }
 
     /**

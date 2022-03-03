@@ -8,9 +8,9 @@ import { DefaultSolverUIProps } from '../DefaultSolverUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { Layout } from '@cambrian/app/components/layout/Layout'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { OutcomeCollectionModel } from '@cambrian/app/models/SolverModel'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
-import { SolverComponentOC } from '@cambrian/app/models/SolverModel'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'
@@ -48,7 +48,8 @@ const WriterSolverUI = ({
     const ipfs = new IPFSAPI()
 
     const [solverChain, setSolverChain] = useState([solverContract.address])
-    const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
+    const [proposedOutcome, setProposedOutcome] =
+        useState<OutcomeCollectionModel>()
     const [messages, setMessages] = useState<ChatMessageType[]>([])
     const [submittedWork, setSubmittedWork] = useState<SubmissionModel[]>([])
 
@@ -95,7 +96,9 @@ const WriterSolverUI = ({
             setProposedOutcome(undefined)
         } else {
             const indexSet = getIndexSetFromBinaryArray(conditionPayouts)
-            const oc = solverData.outcomeCollections.find(
+            const oc = solverData.outcomeCollections[
+                currentCondition.conditionId
+            ].find(
                 (outcomeCollection) => outcomeCollection.indexSet === indexSet
             )
             setProposedOutcome(oc)
@@ -300,11 +303,11 @@ const WriterSolverUI = ({
                             workInput.submission ===
                             submittedWork[submittedWork.length - 1]?.submission
                         }
+                        proposedOutcome={proposedOutcome}
                     />
                 }
             >
                 <WriterSolverContentUI
-                    solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}

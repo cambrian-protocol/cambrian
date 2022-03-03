@@ -5,6 +5,7 @@ import {
 import { SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
+import { AllocationModel } from './AllocationModel'
 import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
 import { OutcomeModel } from './OutcomeModel'
@@ -19,9 +20,8 @@ import { ethers } from 'ethers'
 export type SolverModel = {
     config: SolverConfigModel
     conditions: SolverContractCondition[]
-    outcomeCollections: SolverComponentOC[]
-    allocationsHistory: SolverContractAllocationsHistoryType
     slotsHistory: SlotsHistoryHashMapType
+    outcomeCollections: OutcomeCollectionsHashMapType
     timelocksHistory: TimeLocksHashMap
     numMintedTokensByCondition?: {
         [conditionId: string]: number
@@ -31,9 +31,14 @@ export type SolverModel = {
     metaData: ComposerSolverModel[]
 }
 
-export type SolverComponentOC = {
+export type OutcomeCollectionsHashMapType = {
+    [conditionId: string]: OutcomeCollectionModel[]
+}
+
+export type OutcomeCollectionModel = {
     indexSet: number
     outcomes: OutcomeModel[]
+    allocations: AllocationModel[]
 }
 
 export type TimeLocksHashMap = {
@@ -46,26 +51,11 @@ export type SlotsHistoryHashMapType = {
 
 export type SlotsHashMapType = { [slot: string]: SlotWithMetaDataModel }
 
-export type SolverContractAllocationsHistoryType = {
-    [conditionId: string]: SolverContractAllocationsType
-}
-
-export type SolverContractAllocationsType = {
-    address: SlotWithMetaDataModel
-    allocations: AllocationType[]
-}[]
-
 export type SlotWithMetaDataModel = {
     slot: SlotModel
     description: string
     tag: Tag
     dataType: SolidityDataTypes
-}
-
-export type AllocationType = {
-    amount: string
-    outcomeCollectionIndexSet: number
-    positionId: string
 }
 
 export type SolverContractCondition = {

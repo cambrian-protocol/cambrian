@@ -57,14 +57,11 @@ const ProposeOutcomeActionbar = ({
             {showProposeOutcomeModal && (
                 <OutcomeCollectionModal
                     onBack={toggleShowProposeOutcomeModal}
-                    allocations={
-                        solverData.allocationsHistory[
+                    outcomeCollections={
+                        solverData.outcomeCollections[
                             currentCondition.conditionId
                         ]
                     }
-                    currentCondition={currentCondition}
-                    outcomeCollections={solverData.outcomeCollections}
-                    solverData={solverData}
                     proposeMethod={onProposeOutcome}
                 />
             )}
