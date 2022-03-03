@@ -4,7 +4,7 @@ import _ from 'lodash'
 // Types
 import {
     ParsedSolverModel,
-    SolverModel,
+    ComposerSolverModel,
 } from '@cambrian/app/models/SolverModel'
 import {
     ConditionModel,
@@ -19,7 +19,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 
-export function parseSolvers(composition: SolverModel[]) {
+export function parseSolvers(composition: ComposerSolverModel[]) {
     const sortedSolvers = getSolverHierarchy(composition[0], composition)
 
     if (composition.length !== sortedSolvers.length) {
@@ -37,9 +37,9 @@ export function parseSolvers(composition: SolverModel[]) {
 }
 
 export function parseSolver(
-    graphSolver: SolverModel,
+    graphSolver: ComposerSolverModel,
     currentSolverIndex: number,
-    sortedSolvers: SolverModel[]
+    sortedSolvers: ComposerSolverModel[]
 ): ParsedSolverModel {
     const ingests = Object.keys(graphSolver.config.slots).map((slotId) =>
         parseSlot(graphSolver.config.slots[slotId], sortedSolvers)
@@ -77,7 +77,7 @@ export function parseSolver(
 
 export function parseSlot(
     inSlot: ComposerSlotModel,
-    sortedSolvers: SolverModel[]
+    sortedSolvers: ComposerSolverModel[]
 ): SlotModel {
     const outSlot = <SlotModel>{
         executions: 0,
@@ -160,7 +160,7 @@ export function parseSlot(
 export function parseCondition(
     inCondition: ConditionModel,
     currentSolverIndex: number,
-    sortedSolvers: SolverModel[]
+    sortedSolvers: ComposerSolverModel[]
 ): ParsedConditionModel {
     const outCondition = <ParsedConditionModel>{}
 

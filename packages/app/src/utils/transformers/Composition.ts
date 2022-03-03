@@ -1,12 +1,12 @@
-import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { FlexInputs } from '@cambrian/app/models/TagModel'
 
 export const mergeFlexIntoComposition = (
-    oldComposition: SolverModel[],
+    oldComposition: ComposerSolverModel[],
     flexInputs: FlexInputs
-): SolverModel[] => {
+): ComposerSolverModel[] => {
     const newComposition = oldComposition.map((x) => x)
-    newComposition.forEach((solver: SolverModel, i: number) => {
+    newComposition.forEach((solver: ComposerSolverModel, i: number) => {
         for (const [tagId, taggedInput] of Object.entries(
             flexInputs[solver.id]
         )) {

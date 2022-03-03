@@ -36,8 +36,7 @@ export type SolverConfig = {
     condition: ConditionModel
 }
 
-// TODO Individual Solver description
-export type SolverModel = {
+export type ComposerSolverModel = {
     id: string
     title: string
     iface: ethers.utils.Interface
@@ -84,7 +83,7 @@ export type SolverContractData = {
     }
     collateralToken: TokenModel
     collateralBalance: number
-    metaData: SolverModel[]
+    metaData: ComposerSolverModel[]
 }
 
 export type SolverComponentOC = {

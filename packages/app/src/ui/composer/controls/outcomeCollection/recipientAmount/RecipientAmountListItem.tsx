@@ -2,9 +2,9 @@ import { ArrowArcLeft, PuzzlePiece, User, WarningCircle } from 'phosphor-react'
 import React, { useState } from 'react'
 import { SlotPath, SlotTypes } from '@cambrian/app/src/models/SlotModel'
 
+import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
 import { RecipientAmountModel } from '@cambrian/app/models/ConditionModel'
-import { SolverModel } from '@cambrian/app/src/models/SolverModel'
 import UpdateRecipientAmountModal from './modals/UpdateRecipientAmountModal'
 import UpdateRecipientModal from '../../solver/recipientList/modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -12,7 +12,7 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 type RecipientAmountListItemProps = {
     recipientSlotPath: SlotPath
-    currentSolver: SolverModel
+    currentSolver: ComposerSolverModel
     currentOcId: string
 }
 
@@ -118,7 +118,7 @@ const RecipientAmountListItem = ({
 export default RecipientAmountListItem
 
 export const findRecipientAmountModel = (
-    solver: SolverModel,
+    solver: ComposerSolverModel,
     ocId: string,
     recipientSlotPath: SlotPath
 ): RecipientAmountModel | undefined => {

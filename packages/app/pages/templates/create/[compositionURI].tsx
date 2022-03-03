@@ -1,18 +1,18 @@
-import { useEffect, useState, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { CompositionAPI } from '@cambrian/app/services/api/Composition.api'
 import CreateTemplateUI from '@cambrian/app/src/ui/solutions/common/CreateTemplateUI'
 import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import { SolutionModel } from '@cambrian/app/src/models/SolutionModel'
 import { useRouter } from 'next/dist/client/router'
-import { CompositionAPI } from '@cambrian/app/services/api/Composition.api'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 
 export default function SolutionPage() {
     const router = useRouter()
     const { compositionURI } = router.query
     const [currentComposition, setCurrentComposition] =
-        useState<SolverModel[]>() // TODO Composition model
+        useState<ComposerSolverModel[]>() // TODO Composition model
 
     useEffect(() => {
         if (!router.isReady) return

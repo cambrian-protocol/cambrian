@@ -1,5 +1,6 @@
 import {
     AllocationType,
+    ComposerSolverModel,
     SlotWithMetaDataModel,
     SlotsHashMapType,
     SlotsHistoryHashMapType,
@@ -9,7 +10,6 @@ import {
     SolverContractConfigModel,
     SolverContractConfigResponseType,
     SolverContractData,
-    SolverModel,
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
@@ -487,7 +487,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getSlotsHistory = async (
         ingests: SlotModel[],
         conditions: SolverContractCondition[],
-        metaData: SolverModel
+        metaData: ComposerSolverModel
     ): Promise<SlotsHistoryHashMapType> => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
@@ -537,7 +537,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         slotsHistory: SlotsHistoryHashMapType,
         config: SolverContractConfigModel,
         outcomeCollections: SolverComponentOC[],
-        metaData: SolverModel
+        metaData: ComposerSolverModel
     ): SolverContractAllocationsHistoryType => {
         const allocationHistory: SolverContractAllocationsHistoryType = {}
         conditions.forEach((condition) => {
@@ -593,7 +593,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getIngestWithMetaData = (
         slotId: string,
         ingests: SlotModel[],
-        metaData: SolverModel
+        metaData: ComposerSolverModel
     ): SlotWithMetaDataModel => {
         const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
         if (ingestSlot) {
