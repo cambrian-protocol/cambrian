@@ -3,11 +3,11 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type RecipientsModalProps = BaseLayerModalProps & {
-    recipientAddresses: SlotWithMetaDataModel[]
+    recipientAddresses: RichSlotModel[]
 }
 
 const RecipientsModal = ({
