@@ -1,6 +1,6 @@
 import {
     ComposerSlotModel,
-    ComposerSlotPath,
+    ComposerSlotPathType,
     SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 
@@ -11,7 +11,7 @@ import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 const updateRecipientAmountAction = (
     state: ComposerStateType,
     payload: {
-        recipient: ComposerSlotPath
+        recipient: ComposerSlotPathType
         amount: ComposerSlotModel | number
     }
 ): ComposerStateType => {

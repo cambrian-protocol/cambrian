@@ -1,6 +1,6 @@
 import {
     ComposerSlotModel,
-    ComposerSlotPath,
+    ComposerSlotPathType,
     SlotTypes,
 } from '@cambrian/app/models/SlotModel'
 import { Elements, FlowElement, Node } from 'react-flow-renderer'
@@ -102,7 +102,7 @@ type AttachNewOutcomeCollectionActionType = {
 type UpdateRecipientAmountActionType = {
     type: 'UPDATE_RECIPIENT_AMOUNT'
     payload: {
-        recipient: ComposerSlotPath
+        recipient: ComposerSlotPathType
         amount: ComposerSlotModel | number
     }
 }

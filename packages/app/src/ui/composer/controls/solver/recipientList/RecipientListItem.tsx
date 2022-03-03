@@ -1,5 +1,8 @@
 import { ArrowArcLeft, PuzzlePiece, User } from 'phosphor-react'
-import { ComposerSlotPath, SlotTypes } from '@cambrian/app/src/models/SlotModel'
+import {
+    ComposerSlotPathType,
+    SlotTypes,
+} from '@cambrian/app/src/models/SlotModel'
 import React, { useState } from 'react'
 
 import ListItem from '@cambrian/app/components/list/ListItem'
@@ -8,7 +11,7 @@ import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface RecipientListItemProps {
-    recipientSlotPath: ComposerSlotPath
+    recipientSlotPath: ComposerSlotPathType
 }
 
 const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
