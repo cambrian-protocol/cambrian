@@ -4,9 +4,9 @@ import {
 } from '@cambrian/app/src/models/SlotModel'
 import { SetStateAction, useEffect, useState } from 'react'
 
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { Select } from 'grommet'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
@@ -22,7 +22,7 @@ export type SelectRecipientType = {
 
 export type SelectedRecipientAddressType = {
     solverId: string
-    value: ComposerSlotModel | SolverModel | 'Keeper' | 'Arbitrator'
+    value: ComposerSlotModel | ComposerSolverModel | 'Keeper' | 'Arbitrator'
 }
 // TODO move select type here
 const SelectRecipient = ({
@@ -109,8 +109,8 @@ export default SelectRecipient
  *
  *  */
 const getAvailableParentAddresses = (
-    currentSolver: SolverModel,
-    solvers: SolverModel[]
+    currentSolver: ComposerSolverModel,
+    solvers: ComposerSolverModel[]
 ): SelectRecipientType[] => {
     let currentAvailableAddresses: SelectRecipientType[] = []
     if (

@@ -1,8 +1,8 @@
 import { Box, Text } from 'grommet'
 import { ComposerSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { WarningCircle } from 'phosphor-react'
 
 /**
@@ -20,7 +20,7 @@ export function isSlot(
 
 export const getSlotsByDatatype = (
     dataType: SolidityDataTypes,
-    solver: SolverModel
+    solver: ComposerSolverModel
 ): ComposerSlotModel[] => {
     const slots: ComposerSlotModel[] = []
 
@@ -49,7 +49,7 @@ export const getSlotsByDatatype = (
 // TODO create one function with optional solverindex parameter, if provided, then just return slots from this solver
 export const getAllSlotsByDataType = (
     dataType: SolidityDataTypes,
-    solvers: SolverModel[]
+    solvers: ComposerSolverModel[]
 ) => {
     const slots: ComposerSlotModel[] = []
 
@@ -83,7 +83,7 @@ export const getAllSlotsByDataType = (
  *  */
 export const getSlotTitle = (
     slotModel: ComposerSlotModel,
-    solvers: SolverModel[]
+    solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
     if (solvers) {
         if (slotModel.targetSolverId !== undefined) {
