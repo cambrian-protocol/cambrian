@@ -9,7 +9,7 @@ export enum SlotTypes {
     Manual = 3,
 }
 
-export type SlotPath = { solverId: string; slotId: string }
+export type ComposerSlotPath = { solverId: string; slotId: string }
 
 export type SlotsObj = { [key: string]: ComposerSlotModel }
 
@@ -26,7 +26,7 @@ export type ComposerSlotModel = {
     description?: string | null | undefined
     targetSolverId?: string | null | undefined
     solverFunction?: ethers.utils.FunctionFragment | null | undefined
-    incomingCallbacks?: SlotPath[]
+    incomingCallbacks?: ComposerSlotPath[]
     solverConfigAddress?: SolverConfigAddress
 }
 
