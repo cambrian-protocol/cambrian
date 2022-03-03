@@ -1,3 +1,7 @@
+import {
+    AllocationModel,
+    ComposerAllocationsHashMapType,
+} from './AllocationModel'
 import { ComposerSlotModel, ComposerSlotPathType } from './SlotModel'
 import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
 
@@ -11,7 +15,7 @@ export type ConditionModel = {
     parentCollectionIndexSet: number
     amountSlot: string
     partition: number[]
-    allocations: ParsedAllocationModel[]
+    allocations: AllocationModel[]
     outcomeURIs: Multihash[]
 }
 
@@ -22,7 +26,7 @@ export type ConditionResponseType = {
     parentCollectionIndexSet: number
     amountSlot: string
     partition: BigNumber[]
-    allocations: ParsedAllocationModel[]
+    allocations: AllocationModel[]
     outcomeURIs: Multihash[]
 }
 
@@ -40,27 +44,8 @@ export type ComposerConditionModel = {
     parentCollection?: ComposerIdPathType
 }
 
-export type ComposerAllocationsHashMapType = {
-    [outcomeCollectionId: string]: ComposerAllocationPathsType[]
-}
-
-export type ComposerAllocationPathsType = {
-    recipient: ComposerSlotPathType
-    amount: ComposerSlotPathType
-}
-
-export type ComposerAllocationType = {
-    recipientModel: ComposerSlotModel
-    amountModel: ComposerSlotModel
-}
-
 export type Multihash = {
     digest: string
     hashFunction: number
     size: number
-}
-
-export type ParsedAllocationModel = {
-    recipientAddressSlot: string
-    recipientAmountSlots: string[]
 }
