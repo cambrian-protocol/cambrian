@@ -9,7 +9,7 @@ import {
     SolverContractAllocationsHistoryType,
     SolverContractCondition,
     SolverContractConfigResponseType,
-    SolverDataModel,
+    SolverModel,
     TimeLocksHashMap,
 } from '@cambrian/app/models/SolverModel'
 import { Contract, EventFilter, ethers } from 'ethers'
@@ -85,8 +85,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const [currentSolverData, setCurrentSolverData] =
-        useState<SolverDataModel>()
+    const [currentSolverData, setCurrentSolverData] = useState<SolverModel>()
 
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
@@ -177,7 +176,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getUpdatedData = async (): Promise<SolverDataModel> => {
+    const getUpdatedData = async (): Promise<SolverModel> => {
         const config = await getConfig()
         const conditions = await getConditions()
 

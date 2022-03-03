@@ -1,6 +1,6 @@
 import {
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
@@ -10,7 +10,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 
 export interface DefaultSolverUIProps {
-    solverData: SolverDataModel
+    solverData: SolverModel
     solverContract: ethers.Contract
     solverMethods: BasicSolverMethodsType
     currentUser: UserType

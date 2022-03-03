@@ -49,17 +49,7 @@ export type ComposerSolverModel = {
  * Contract-interaction Solver Component
  **/
 
-export type SolverConfigModel = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    ingests: SlotModel[]
-    conditionBase: ParsedConditionModel
-}
-
-export type SolverDataModel = {
+export type SolverModel = {
     config: SolverConfigModel
     conditions: SolverContractCondition[]
     outcomeCollections: SolverComponentOC[]
@@ -72,6 +62,16 @@ export type SolverDataModel = {
     collateralToken: TokenModel
     collateralBalance: number
     metaData: ComposerSolverModel[]
+}
+
+export type SolverConfigModel = {
+    implementation: string
+    keeper: string
+    arbitrator: string
+    timelockSeconds: number
+    data: string
+    ingests: SlotModel[]
+    conditionBase: ParsedConditionModel
 }
 
 export type SolverComponentOC = {

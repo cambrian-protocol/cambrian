@@ -2,7 +2,7 @@ import { Box, Stack, Text, TextArea } from 'grommet'
 import {
     SolverComponentOC,
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import { SubmissionModel, WriterSolverRole } from './WriterSolverUI'
 
@@ -13,7 +13,7 @@ import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeN
 import { SetStateAction } from 'react'
 
 interface WriterSolverContentUI {
-    solverData: SolverDataModel
+    solverData: SolverModel
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
     workInput: SubmissionModel

@@ -3,7 +3,7 @@ import {
     SolverComponentOC,
     SolverContractAllocationsType,
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import SolverStatusNotification, {
     SolverStatusNotificationProps,
@@ -19,7 +19,7 @@ type OutcomeNotificationProps = SolverStatusNotificationProps & {
     canRequestArbitration?: boolean
     allocations: SolverContractAllocationsType
     status: ConditionStatus
-    solverData: SolverDataModel
+    solverData: SolverModel
     currentCondition: SolverContractCondition
 }
 
