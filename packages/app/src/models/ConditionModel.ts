@@ -2,11 +2,12 @@ import {
     AllocationModel,
     ComposerAllocationsHashMapType,
 } from './AllocationModel'
-import { ComposerSlotModel, ComposerSlotPathType } from './SlotModel'
 import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
 
 import { BigNumber } from 'ethers'
 import { ComposerIdPathType } from './SolverModel'
+import { ComposerSlotPathType } from './SlotModel'
+import { MultihashType } from './MultihashType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
 export type ConditionModel = {
@@ -16,7 +17,7 @@ export type ConditionModel = {
     amountSlot: string
     partition: number[]
     allocations: AllocationModel[]
-    outcomeURIs: Multihash[]
+    outcomeURIs: MultihashType[]
 }
 
 // Contract responses with BigNumbers
@@ -27,7 +28,7 @@ export type ConditionResponseType = {
     amountSlot: string
     partition: BigNumber[]
     allocations: AllocationModel[]
-    outcomeURIs: Multihash[]
+    outcomeURIs: MultihashType[]
 }
 
 /* 
@@ -42,10 +43,4 @@ export type ComposerConditionModel = {
     recipientAmountSlots: ComposerAllocationsHashMapType
     amountSlot: string
     parentCollection?: ComposerIdPathType
-}
-
-export type Multihash = {
-    digest: string
-    hashFunction: number
-    size: number
 }
