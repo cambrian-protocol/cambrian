@@ -9,6 +9,7 @@ import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
+import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
 
@@ -21,17 +22,13 @@ export type SolverModel = {
     conditions: SolverContractCondition[]
     slotsHistory: SlotsHistoryHashMapType
     outcomeCollections: OutcomeCollectionsHashMapType
-    timelocksHistory: TimeLocksHashMap
+    timelocksHistory: TimeLocksHashMapType
     numMintedTokensByCondition?: {
         [conditionId: string]: number
     }
     collateralToken: TokenModel
     collateralBalance: number
     metaData: ComposerSolverModel[]
-}
-
-export type TimeLocksHashMap = {
-    [conditionId: string]: number
 }
 
 export type SlotsHistoryHashMapType = {
