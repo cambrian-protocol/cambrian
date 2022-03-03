@@ -1,49 +1,16 @@
 import {
-    ComposerConditionModel,
-    ConditionModel,
-    ConditionResponseType,
-} from './ConditionModel'
-import { ComposerSlotModel, SlotModel, SlotResponseType } from './SlotModel'
+    ComposerSolverConfigModel,
+    SolverConfigModel,
+} from './SolverConfigModel'
+import { SlotModel, SlotResponseType } from './SlotModel'
 import { Tag, Tags } from './TagModel'
 
+import { ConditionResponseType } from './ConditionModel'
 import { ConditionStatus } from './ConditionStatus'
 import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
-
-/**
- * Solution Composer
- **/
-
-export type ComposerIdPathType = { solverId?: string; ocId?: string }
-
-export type ComposerSolverConfigModel = {
-    implementation?: string
-    collateralToken?: string
-    keeperAddress: {
-        address: string
-        linkedSlots: string[]
-    }
-    arbitratorAddress: {
-        address: string
-        linkedSlots: string[]
-    }
-    timelockSeconds?: number
-    data?: string
-    slots: {
-        [key: string]: ComposerSlotModel
-    }
-    condition: ComposerConditionModel
-}
-
-export type ComposerSolverModel = {
-    id: string
-    title: string
-    iface: ethers.utils.Interface
-    config: ComposerSolverConfigModel
-    tags: Tags
-}
 
 /**
  * Contract-interaction Solver Component
@@ -62,16 +29,6 @@ export type SolverModel = {
     collateralToken: TokenModel
     collateralBalance: number
     metaData: ComposerSolverModel[]
-}
-
-export type SolverConfigModel = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    ingests: SlotModel[]
-    conditionBase: ConditionModel
 }
 
 export type SolverComponentOC = {
@@ -132,4 +89,18 @@ export type SolverContractConfigResponseType = {
     data: string
     ingests: SlotResponseType[]
     conditionBase: ConditionResponseType
+}
+
+/**
+    Composer specific types
+ **/
+
+export type ComposerIdPathType = { solverId?: string; ocId?: string }
+
+export type ComposerSolverModel = {
+    id: string
+    title: string
+    iface: ethers.utils.Interface
+    config: ComposerSolverConfigModel
+    tags: Tags
 }
