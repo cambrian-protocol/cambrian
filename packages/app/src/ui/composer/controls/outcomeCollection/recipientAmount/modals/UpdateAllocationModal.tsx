@@ -9,12 +9,12 @@ import SelectOrCreateAmount, {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { ComposerAllocationType } from '@cambrian/app/models/ConditionModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import { RecipientAmountModel } from '@cambrian/app/models/ConditionModel'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
-type UpdateRecipientAmountModalProps = {
-    recipientAmountModel: RecipientAmountModel
+type UpdateAllocationModalProps = {
+    allocation: ComposerAllocationType
     recipientSlotPath: ComposerSlotPathType
     onClose: () => void
 }
@@ -23,21 +23,21 @@ type UpdateRecipientAmountModalProps = {
     - Proper Error handling if amount is not numeric
 
 */
-const UpdateRecipientAmountModal = ({
+const UpdateAllocationModal = ({
     onClose,
-    recipientAmountModel: recipientAmountModels,
+    allocation,
     recipientSlotPath,
-}: UpdateRecipientAmountModalProps) => {
+}: UpdateAllocationModalProps) => {
     const { dispatch } = useComposerContext()
     const [amountData, setAmountData] = useState<SelectAmountDataType>({
         amount: '',
     })
 
     useEffect(() => {
-        if (recipientAmountModels !== undefined) {
+        if (allocation !== undefined) {
             setAmountData({
-                amount: recipientAmountModels.amountModel.data.toString(),
-                slotModel: recipientAmountModels.amountModel,
+                amount: allocation.amountModel.data.toString(),
+                slotModel: allocation.amountModel,
             })
         }
     }, [])
@@ -86,7 +86,7 @@ const UpdateRecipientAmountModal = ({
                     primary
                     disabled={
                         amountData.amount ===
-                        recipientAmountModels.amountModel?.data.toString()
+                        allocation.amountModel?.data.toString()
                     }
                     label="Save"
                     onClick={onSave}
@@ -96,4 +96,4 @@ const UpdateRecipientAmountModal = ({
     )
 }
 
-export default UpdateRecipientAmountModal
+export default UpdateAllocationModal

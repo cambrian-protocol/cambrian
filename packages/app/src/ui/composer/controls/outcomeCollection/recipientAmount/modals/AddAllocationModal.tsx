@@ -3,17 +3,17 @@ import { Cursor, PuzzlePiece, UserPlus } from 'phosphor-react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import CreateRecipientAmountForm from '../forms/CreateRecipientAmountForm'
+import CreateAllocationForm from '../forms/CreateAllocationForm'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import SelectRecipientAmountForm from '../forms/SelectRecipientAmountForm'
+import SelectAllocationForm from '../forms/SelectAllocationForm'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-type AddRecipientAmountModalProps = {
+type AddAllocationModalProps = {
     onClose: () => void
 }
 
-const AddRecipientAmountModal = ({ onClose }: AddRecipientAmountModalProps) => {
+const AddAllocationModal = ({ onClose }: AddAllocationModalProps) => {
     const { dispatch } = useComposerContext()
     const [showSelectRecipient, setShowSelectRecipient] = useState(false)
     const [showCreateRecipient, setShowCreateRecipient] = useState(false)
@@ -59,16 +59,16 @@ const AddRecipientAmountModal = ({ onClose }: AddRecipientAmountModalProps) => {
             </BaseLayerModal>
             {showCreateRecipient && (
                 <BaseLayerModal onClose={toggleShowCreateRecipient}>
-                    <CreateRecipientAmountForm onClose={onClose} />
+                    <CreateAllocationForm onClose={onClose} />
                 </BaseLayerModal>
             )}
             {showSelectRecipient && (
                 <BaseLayerModal onClose={toggleShowSelectRecipient}>
-                    <SelectRecipientAmountForm onClose={onClose} />
+                    <SelectAllocationForm onClose={onClose} />
                 </BaseLayerModal>
             )}
         </>
     )
 }
 
-export default AddRecipientAmountModal
+export default AddAllocationModal
