@@ -1,7 +1,7 @@
 import { ComposerSlotModel, SlotPath } from './SlotModel'
 
 import { BigNumber } from 'ethers'
-import { IdPathType } from './SolverModel'
+import { ComposerIdPathType } from './SolverModel'
 import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
@@ -17,7 +17,7 @@ export type ConditionModel = {
     recipients: SlotPath[]
     recipientAmountSlots: OCAllocations
     amountSlot: string
-    parentCollection?: IdPathType
+    parentCollection?: ComposerIdPathType
 }
 
 export type OCAllocations = {
