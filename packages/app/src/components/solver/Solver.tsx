@@ -1,7 +1,6 @@
 import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
 import {
     ComposerSolverModel,
-    OutcomeCollectionsHashMapType,
     SlotWithMetaDataModel,
     SlotsHashMapType,
     SlotsHistoryHashMapType,
@@ -28,6 +27,7 @@ import { JsonFragmentType } from '@ethersproject/abi'
 import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
+import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'

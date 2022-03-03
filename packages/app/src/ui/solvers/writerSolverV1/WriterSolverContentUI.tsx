@@ -1,15 +1,13 @@
 import { Box, Stack, Text, TextArea } from 'grommet'
-import {
-    OutcomeCollectionModel,
-    SolverContractCondition,
-} from '@cambrian/app/models/SolverModel'
 import { SubmissionModel, WriterSolverRole } from './WriterSolverUI'
 
 import { CircleDashed } from 'phosphor-react'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
+import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
 
 interface WriterSolverContentUI {
     roles: WriterSolverRole[]

@@ -3,7 +3,7 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { OutcomeCollectionModel } from '@cambrian/app/models/SolverModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: OutcomeCollectionModel[]

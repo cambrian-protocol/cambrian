@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
-import { OutcomeCollectionModel } from '@cambrian/app/models/SolverModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
