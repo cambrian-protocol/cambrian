@@ -2,7 +2,7 @@ import AddDataModal, { ManualInputType } from '../modals/AddDataModal'
 import {
     SlotWithMetaDataModel,
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import { useEffect, useState } from 'react'
 
@@ -13,7 +13,7 @@ import { ethers } from 'ethers'
 
 interface ExecuteSolverActionbarProps {
     solverMethods: BasicSolverMethodsType
-    solverData: SolverDataModel
+    solverData: SolverModel
     currentCondition?: SolverContractCondition
     manualSlots: SlotWithMetaDataModel[]
 }

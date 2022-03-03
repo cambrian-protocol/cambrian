@@ -1,7 +1,7 @@
 import {
     AllocationType,
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import { useContext, useEffect, useState } from 'react'
 
@@ -16,7 +16,7 @@ import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
-    solverData: SolverDataModel
+    solverData: SolverModel
 }
 
 const RedeemTokensActionbar = ({

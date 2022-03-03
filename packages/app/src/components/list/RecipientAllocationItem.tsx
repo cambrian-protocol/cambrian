@@ -2,7 +2,7 @@ import BaseSlotInputItem, { BaseSlotInputItemProps } from './BaseSlotInputItem'
 import { Box, Text } from 'grommet'
 import {
     SolverContractCondition,
-    SolverDataModel,
+    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 
 import { BigNumber } from 'ethers'
@@ -10,7 +10,7 @@ import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 type RecipientAllocationItemProps = BaseSlotInputItemProps & {
     amount: string
-    solverData: SolverDataModel
+    solverData: SolverModel
     currentCondition?: SolverContractCondition
 }
 
