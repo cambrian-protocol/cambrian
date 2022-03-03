@@ -8,7 +8,7 @@ import {
 import {
     ComposerSlotModel,
     SlotsObj,
-    SlotPath,
+    ComposerSlotPath,
     SlotTypes,
     SolverConfigAddress,
 } from '@cambrian/app/models/SlotModel'
@@ -301,8 +301,8 @@ export default class ComposerSolver {
         this.config.condition.recipientAmountSlots[outcomeCollectionId] =
             this.config.condition.recipients.map((slotPath) => {
                 return {
-                    recipient: <SlotPath>slotPath,
-                    amount: <SlotPath>{
+                    recipient: <ComposerSlotPath>slotPath,
+                    amount: <ComposerSlotPath>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
@@ -317,11 +317,11 @@ export default class ComposerSolver {
                 this.config.condition.recipientAmountSlots[ocId].push(<
                     RecipientAmountPath
                 >{
-                    recipient: <SlotPath>{
+                    recipient: <ComposerSlotPath>{
                         solverId: this.id,
                         slotId: recipientSlotId,
                     },
-                    amount: <SlotPath>{
+                    amount: <ComposerSlotPath>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
