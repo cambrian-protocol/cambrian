@@ -1,8 +1,7 @@
 import { Box, Stack, Text, TextArea } from 'grommet'
 import {
-    SolverComponentOC,
+    OutcomeCollectionModel,
     SolverContractCondition,
-    SolverModel,
 } from '@cambrian/app/models/SolverModel'
 import { SubmissionModel, WriterSolverRole } from './WriterSolverUI'
 
@@ -13,17 +12,15 @@ import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeN
 import { SetStateAction } from 'react'
 
 interface WriterSolverContentUI {
-    solverData: SolverModel
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
     workInput: SubmissionModel
     currentCondition: SolverContractCondition
     submittedWork: SubmissionModel[]
-    proposedOutcome?: SolverComponentOC
+    proposedOutcome?: OutcomeCollectionModel
 }
 
 const WriterSolverContentUI = ({
-    solverData,
     roles,
     setWorkInput,
     workInput,
@@ -108,15 +105,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
-                                solverData={solverData}
-                                currentCondition={currentCondition}
+                                outcomeCollection={proposedOutcome}
                                 status={currentCondition.status}
-                                allocations={
-                                    solverData.allocationsHistory[
-                                        currentCondition.conditionId
-                                    ]
-                                }
-                                outcomeCollection={proposedOutcome!!}
                                 canRequestArbitration={
                                     roles.includes('Buyer') ||
                                     roles.includes('Writer')
@@ -139,15 +129,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
-                                solverData={solverData}
-                                currentCondition={currentCondition}
-                                status={currentCondition.status}
-                                allocations={
-                                    solverData.allocationsHistory[
-                                        currentCondition.conditionId
-                                    ]
-                                }
                                 outcomeCollection={proposedOutcome}
+                                status={currentCondition.status}
                             />
                             <WorkContentContainer
                                 title={dummyArticleTitle}
