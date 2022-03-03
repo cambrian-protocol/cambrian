@@ -1,6 +1,6 @@
 import {
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
@@ -11,7 +11,7 @@ import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/Solver
 import { useState } from 'react'
 
 interface ProposeOutcomeActionbarProps {
-    solverData: SolverContractData
+    solverData: SolverDataModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
 }

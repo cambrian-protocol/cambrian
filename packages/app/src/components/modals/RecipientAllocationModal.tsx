@@ -1,7 +1,7 @@
 import {
     SlotWithMetaDataModel,
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
 
 import BaseLayerModal from './BaseLayerModal'
@@ -13,7 +13,7 @@ import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 interface RecipientAllocationModalProps {
     onClose: () => void
     allocations: { address: SlotWithMetaDataModel; amount: string }[]
-    solverData: SolverContractData
+    solverData: SolverDataModel
     currentCondition: SolverContractCondition
 }
 

@@ -5,7 +5,7 @@ import {
     SolverComponentOC,
     SolverContractAllocationsType,
     SolverContractCondition,
-    SolverContractData,
+    SolverDataModel,
 } from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
@@ -18,7 +18,7 @@ interface OutcomeCollectionCardProps {
     outcomeCollection: SolverComponentOC
     proposeMethod?: (indexSet: number) => void
     allocations: SolverContractAllocationsType
-    solverData: SolverContractData
+    solverData: SolverDataModel
     currentCondition: SolverContractCondition
 }
 
