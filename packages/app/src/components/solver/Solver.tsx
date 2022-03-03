@@ -26,7 +26,7 @@ import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { JsonFragmentType } from '@ethersproject/abi'
 import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
-import { Multihash } from '@cambrian/app/models/ConditionModel'
+import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -455,7 +455,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         config: SolverConfigModel
     ): Promise<SolverComponentOC[]> => {
         const outcomeURIs = config.conditionBase.outcomeURIs.map(
-            (multiHash: Multihash) => getMultihashFromBytes32(multiHash)
+            (multiHash: MultihashType) => getMultihashFromBytes32(multiHash)
         )
 
         const outcomes = (await Promise.all(
