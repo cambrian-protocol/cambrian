@@ -1,10 +1,7 @@
 import { ethers } from 'ethers'
 import { ulid } from 'ulid'
 
-import {
-    ComposerSolverConfigModel,
-    ComposerIdPathType,
-} from '@cambrian/app/models/SolverModel'
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
 import {
     ComposerSlotModel,
     ComposerSlotsHashMapType,
@@ -28,6 +25,7 @@ import {
     ComposerAllocationPathsType,
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
+import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 
 export default class ComposerSolver {
     id: string

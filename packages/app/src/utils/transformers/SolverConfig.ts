@@ -1,11 +1,8 @@
 import { ethers } from 'ethers'
 import _ from 'lodash'
 
-// Types
-import {
-    ComposerSolverModel,
-    SolverConfigModel,
-} from '@cambrian/app/models/SolverModel'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import {
     ComposerConditionModel,
     ConditionModel,
