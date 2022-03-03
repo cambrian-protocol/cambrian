@@ -5,8 +5,8 @@ import {
 } from '@cambrian/app/models/SlotModel'
 import { Elements, FlowElement, Node } from 'react-flow-renderer'
 
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
-import { IdPathType } from '@cambrian/app/models/SolverModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
@@ -20,7 +20,7 @@ import { ethers } from 'ethers'
 export type ComposerStateType = {
     flowElements: Elements
     currentElement?: FlowElement
-    currentIdPath?: IdPathType
+    currentIdPath?: ComposerIdPathType
     solvers: ComposerSolver[]
 }
 
