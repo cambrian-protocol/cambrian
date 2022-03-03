@@ -25,6 +25,10 @@ export type SlotResponseType = {
     data: string
 }
 
+/* 
+    Composer specific Types
+*/
+
 export type ComposerSlotModel = {
     id: string
     slotType: SlotTypes

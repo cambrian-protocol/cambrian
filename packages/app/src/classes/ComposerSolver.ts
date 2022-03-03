@@ -13,12 +13,14 @@ import {
     ComposerSolverConfigAddressType,
 } from '@cambrian/app/models/SlotModel'
 import {
-    OutcomeCollectionModel,
     ComposerConditionModel,
     RecipientAmountPath,
     OCAllocations,
 } from '@cambrian/app/models/ConditionModel'
-import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import {
+    OutcomeCollectionModel,
+    OutcomeModel,
+} from '@cambrian/app/models/OutcomeModel'
 
 import * as Constants from '@cambrian/app/constants'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
