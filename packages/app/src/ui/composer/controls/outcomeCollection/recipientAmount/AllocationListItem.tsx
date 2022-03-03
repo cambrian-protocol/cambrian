@@ -5,7 +5,7 @@ import {
 } from '@cambrian/app/src/models/SlotModel'
 import React, { useState } from 'react'
 
-import { ComposerAllocationType } from '@cambrian/app/models/ConditionModel'
+import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
 import UpdateAllocationModal from './modals/UpdateAllocationModal'
