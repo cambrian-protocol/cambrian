@@ -5,7 +5,6 @@ import {
     SlotsHashMapType,
     SlotsHistoryHashMapType,
     SolverComponentOC,
-    SolverConfigModel,
     SolverContractAllocationsHistoryType,
     SolverContractCondition,
     SolverContractConfigResponseType,
@@ -29,6 +28,7 @@ import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
