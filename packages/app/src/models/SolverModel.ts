@@ -23,7 +23,7 @@ export type SolverConfigAddressType = {
     linkedSlots: string[]
 }
 
-export type SolverConfig = {
+export type ComposerSolverConfigModel = {
     implementation?: string
     collateralToken?: string
     keeperAddress: SolverConfigAddressType
@@ -40,28 +40,15 @@ export type ComposerSolverModel = {
     id: string
     title: string
     iface: ethers.utils.Interface
-    config: SolverConfig
+    config: ComposerSolverConfigModel
     tags: Tags
-}
-
-/**
- * Solver Config
- **/
-
-export type ParsedSolverModel = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    conditionBase: ParsedConditionModel
 }
 
 /**
  * Contract-interaction Solver Component
  **/
 
-export type SolverContractConfigModel = {
+export type SolverConfigModel = {
     implementation: string
     keeper: string
     arbitrator: string
@@ -72,7 +59,7 @@ export type SolverContractConfigModel = {
 }
 
 export type SolverContractData = {
-    config: SolverContractConfigModel
+    config: SolverConfigModel
     conditions: SolverContractCondition[]
     outcomeCollections: SolverComponentOC[]
     allocationsHistory: SolverContractAllocationsHistoryType
