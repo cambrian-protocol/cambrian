@@ -1,11 +1,11 @@
 import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
-import { CaretLeft, ListPlus, StackSimple, UsersThree } from 'phosphor-react'
+import { CaretLeft, ListPlus, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import AllocationList from './recipientAmount/AllocationList'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import OutcomeSelectionList from './outcomeSelection/OutcomeSelectionList'
-import RecipientAmountList from './recipientAmount/RecipientAmountList'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 export type OutcomeCollectionControllerType =
@@ -35,7 +35,7 @@ const OutcomeCollectionControl = () => {
             case 'OutcomeSelectionControl':
                 return <OutcomeSelectionList />
             case 'RecipientAmountControl':
-                return <RecipientAmountList />
+                return <AllocationList />
             default:
                 return <></>
         }

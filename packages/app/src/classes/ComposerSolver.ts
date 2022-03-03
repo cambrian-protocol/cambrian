@@ -14,8 +14,8 @@ import {
 } from '@cambrian/app/models/SlotModel'
 import {
     ComposerConditionModel,
-    RecipientAmountPath,
-    OCAllocations,
+    ComposerAllocationPathsType,
+    ComposerAllocationsHashMapType,
 } from '@cambrian/app/models/ConditionModel'
 import {
     OutcomeCollectionModel,
@@ -317,7 +317,7 @@ export default class ComposerSolver {
         Object.keys(this.config.condition.recipientAmountSlots).forEach(
             (ocId) => {
                 this.config.condition.recipientAmountSlots[ocId].push(<
-                    RecipientAmountPath
+                    ComposerAllocationPathsType
                 >{
                     recipient: <ComposerSlotPathType>{
                         solverId: this.id,
@@ -544,12 +544,12 @@ export default class ComposerSolver {
             outcomes: [],
             partition: [defaultOC] as OutcomeCollectionModel[],
             recipients: [],
-            recipientAmountSlots: <OCAllocations>{},
+            recipientAmountSlots: <ComposerAllocationsHashMapType>{},
             amountSlot: '',
         }
 
         defaultCondition.recipientAmountSlots[defaultOC.id] =
-            [] as RecipientAmountPath[]
+            [] as ComposerAllocationPathsType[]
         return defaultCondition
     }
 }

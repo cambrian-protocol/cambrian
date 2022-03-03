@@ -1,14 +1,14 @@
 import { Box, CardFooter } from 'grommet'
 
-import AddRecipientAmountModal from '@cambrian/app/ui/composer/controls/outcomeCollection/recipientAmount/modals/AddRecipientAmountModal'
+import AddAllocationModal from '@cambrian/app/ui/composer/controls/outcomeCollection/recipientAmount/modals/AddAllocationModal'
+import AllocationListItem from './AllocationListItem'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import RecipientAmountListItem from './RecipientAmountListItem'
 import { UserPlus } from 'phosphor-react'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-const RecipientAmountList = () => {
+const AllocationList = () => {
     const { currentOutcomeCollection, currentSolver, currentIdPath } =
         useComposerContext()
 
@@ -42,7 +42,7 @@ const RecipientAmountList = () => {
                         {currentSolver.config.condition.recipients.map(
                             (recipientSlotPath, idx) => {
                                 return (
-                                    <RecipientAmountListItem
+                                    <AllocationListItem
                                         currentOcId={currentIdPath.ocId!!}
                                         currentSolver={currentSolver}
                                         key={idx}
@@ -62,10 +62,10 @@ const RecipientAmountList = () => {
                 </CardFooter>
             </Box>
             {showAddRecipientModal && (
-                <AddRecipientAmountModal onClose={toggleAddRecipientModal} />
+                <AddAllocationModal onClose={toggleAddRecipientModal} />
             )}
         </>
     )
 }
 
-export default RecipientAmountList
+export default AllocationList
