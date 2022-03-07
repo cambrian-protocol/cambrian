@@ -26,12 +26,12 @@ const createRecipientWithAmountAction = (
             throw new Error('Error finding current Solver')
         }
 
-        const newRecipientSlot = currentSolver.addRecipient(
-            'Slot',
-            payload.recipient.address,
-            null,
-            payload.recipient.description
-        )
+        const newRecipientSlot = currentSolver.addRecipient({
+            type: 'Slot',
+            data: payload.recipient.address,
+            description: payload.recipient.description,
+            label: payload.recipient.label,
+        })
 
         if (isSlot(payload.amount)) {
             currentSolver.updateRecipientAmount(
@@ -44,6 +44,8 @@ const createRecipientWithAmountAction = (
                 data: [payload.amount],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
+                label: '',
+                description: '',
             })
             currentSolver.updateRecipientAmount(
                 state.currentIdPath.ocId,

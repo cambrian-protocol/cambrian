@@ -144,9 +144,10 @@ export type SlotActionPayload = {
     slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[]
-    description?: string
-    targetSolverId?: string | null
-    solverFunction?: ethers.utils.FunctionFragment | null
+    description: string
+    label: string
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
 }
 
 type DragNodeActionType = {

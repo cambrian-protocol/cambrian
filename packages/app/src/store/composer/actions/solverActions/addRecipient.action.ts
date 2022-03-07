@@ -33,13 +33,16 @@ const addRecipientAction = (
             if (!sourceEntity?.address) {
                 throw new Error('No address found in sourceEntity')
             }
-            const newSlot = currentSolver.addRecipient(
-                payload.value,
-                sourceEntity.address,
-                null,
-                undefined,
-                { type: payload.value, solverId: payload.solverId }
-            )
+            const newSlot = currentSolver.addRecipient({
+                type: payload.value,
+                data: sourceEntity.address,
+                solverConfigAdress: {
+                    type: payload.value,
+                    solverId: payload.solverId,
+                },
+                description: '',
+                label: '',
+            })
 
             // Link Entity to new slot
             if (
@@ -50,12 +53,13 @@ const addRecipientAction = (
         } else if (isSlot(payload.value)) {
             // Did i receive a Slot or a Solver as recipient?
             // Slot received - Create a callback slot
-
-            const newSlot = currentSolver.addRecipient(
-                'Callback',
-                payload.value,
-                payload.solverId
-            )
+            const newSlot = currentSolver.addRecipient({
+                type: 'Callback',
+                description: '',
+                label: '',
+                data: payload.value,
+                targetSolverId: payload.solverId,
+            })
 
             addCallbackToTargetIncomingCallbacks(
                 newSlot,
@@ -64,12 +68,13 @@ const addRecipientAction = (
             )
         } else {
             // Solver received - Create a function slot
-
-            currentSolver.addRecipient(
-                'Solver',
-                payload.value.id,
-                payload.value.id
-            )
+            currentSolver.addRecipient({
+                type: 'Solver',
+                description: '',
+                label: '',
+                data: payload.value.id,
+                targetSolverId: payload.value.id,
+            })
         }
 
         return {

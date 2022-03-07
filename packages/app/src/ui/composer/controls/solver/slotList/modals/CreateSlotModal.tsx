@@ -24,7 +24,8 @@ export type SlotDataInputType = {
 
 export const initialSlotInput: SlotConfigFormType = {
     slotType: SlotType.Constant,
-    slotDescription: '',
+    description: '',
+    label: '',
     dataInputFields: [
         { id: _uniqueId(), data: '', dataType: SolidityDataTypes.Bytes },
     ],

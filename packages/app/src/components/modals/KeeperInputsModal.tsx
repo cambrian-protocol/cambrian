@@ -26,10 +26,10 @@ const KeeperInputsModal = ({
                         return (
                             <BaseSlotInputItem
                                 key={manualSlot.slot.slot}
-                                info={manualSlot.tag.text}
-                                title={manualSlot.tag.description}
+                                info={manualSlot.tag.description}
+                                title={manualSlot.tag.label}
                                 subTitle={decodeData(
-                                    [manualSlot.tag.dataType],
+                                    manualSlot.tag.dataTypes,
                                     manualSlot.slot.data
                                 )}
                             />

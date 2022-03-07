@@ -22,17 +22,16 @@ const updateSlotAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        currentSolver.updateSlot(
-            payload.slotIdToUpdate,
-            {
-                data: payload.updatedSlot.data,
-                slotType: payload.updatedSlot.slotType,
-                dataTypes: payload.updatedSlot.dataTypes,
-            },
-            payload.updatedSlot.targetSolverId,
-            payload.updatedSlot.solverFunction,
-            payload.updatedSlot.description
-        )
+        currentSolver.updateSlot({
+            id: payload.slotIdToUpdate,
+            data: payload.updatedSlot.data,
+            slotType: payload.updatedSlot.slotType,
+            dataTypes: payload.updatedSlot.dataTypes,
+            targetSolverId: payload.updatedSlot.targetSolverId,
+            solverFunction: payload.updatedSlot.solverFunction,
+            label: payload.updatedSlot.label,
+            description: payload.updatedSlot.description,
+        })
 
         return {
             ...state,

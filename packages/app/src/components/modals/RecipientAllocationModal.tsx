@@ -24,13 +24,13 @@ const RecipientAllocationModal = ({
             <Box gap="medium" fill>
                 {allocations.map((allocation, idx) => {
                     const decodedAddress = decodeData(
-                        [allocation.addressSlot.tag.dataType],
+                        allocation.addressSlot.tag.dataTypes,
                         allocation.addressSlot.slot.data
                     )
                     return (
                         <RecipientAllocationItem
                             key={idx}
-                            title={allocation.addressSlot.tag.description}
+                            title={allocation.addressSlot.tag.label}
                             subTitle={decodedAddress}
                             amount={allocation.amount}
                             amountPercentage={allocation.amountPercentage}

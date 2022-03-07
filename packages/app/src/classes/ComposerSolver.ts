@@ -27,6 +27,37 @@ import {
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 
+type AddSlotProps = {
+    data: string[] | number[]
+    slotType: SlotType
+    dataTypes: SolidityDataTypes[]
+    solverConfigAddress?: ComposerSolverConfigAddressType
+    label: string
+    description: string
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
+}
+
+type UpdateSlotProps = AddSlotProps & {
+    id: string
+}
+
+type AddRecipientProps = {
+    type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot'
+    data: string | ComposerSlotModel | ComposerSolver
+    label: string
+    description: string
+    targetSolverId?: string
+    solverConfigAdress?: ComposerSolverConfigAddressType
+}
+
+type UpdateRecipientPropsType = {
+    id: string
+    address: string
+    label: string
+    description: string
+}
+
 export default class ComposerSolver {
     id: string
     title: string
@@ -207,13 +238,14 @@ export default class ComposerSolver {
 
     /*************************** Recipients ***************************/
 
-    addRecipient(
-        type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot',
-        data: string | ComposerSlotModel | ComposerSolver,
-        targetSolverId?: string | null | undefined,
-        description?: string,
-        solverConfigAdress?: ComposerSolverConfigAddressType
-    ) {
+    addRecipient({
+        type,
+        data,
+        label,
+        description,
+        targetSolverId,
+        solverConfigAdress,
+    }: AddRecipientProps): ComposerSlotModel {
         if (!data) {
             throw new Error('Falsey recipient data')
         }
@@ -227,6 +259,8 @@ export default class ComposerSolver {
                         slotType: SlotType.Constant,
                         dataTypes: [SolidityDataTypes.Address],
                         solverConfigAddress: solverConfigAdress,
+                        label: label,
+                        description: description,
                     })
                 } else {
                     throw new Error(
@@ -236,14 +270,14 @@ export default class ComposerSolver {
                 break
             case 'Callback':
                 if (isSlot(data)) {
-                    slot = this.addSlot(
-                        {
-                            data: [data.id],
-                            slotType: SlotType.Callback,
-                            dataTypes: [SolidityDataTypes.Uint256],
-                        },
-                        targetSolverId
-                    )
+                    slot = this.addSlot({
+                        data: [data.id],
+                        slotType: SlotType.Callback,
+                        dataTypes: [SolidityDataTypes.Uint256],
+                        label: label,
+                        description: description,
+                        targetSolverId: targetSolverId,
+                    })
                 } else {
                     throw new Error('Invalid Slot recipient data')
                 }
@@ -251,17 +285,17 @@ export default class ComposerSolver {
 
             case 'Solver':
                 if (typeof data === 'string' && targetSolverId) {
-                    slot = this.addSlot(
-                        {
-                            data: [data],
-                            slotType: SlotType.Function,
-                            dataTypes: [SolidityDataTypes.Uint256],
-                        },
-                        targetSolverId,
-                        Constants.DEFAULT_IFACE.getFunction(
+                    slot = this.addSlot({
+                        data: [data],
+                        slotType: SlotType.Function,
+                        dataTypes: [SolidityDataTypes.Uint256],
+                        label: label,
+                        description: description,
+                        targetSolverId: targetSolverId,
+                        solverFunction: Constants.DEFAULT_IFACE.getFunction(
                             'addressFromChainIndex'
-                        )
-                    )
+                        ),
+                    })
                 } else {
                     throw new Error('Invalid Solver recipient data')
                 }
@@ -270,16 +304,13 @@ export default class ComposerSolver {
             default:
                 //Slot
                 if (typeof data === 'string') {
-                    slot = this.addSlot(
-                        {
-                            data: [data],
-                            slotType: SlotType.Constant,
-                            dataTypes: [SolidityDataTypes.Address],
-                        },
-                        null,
-                        null,
-                        description
-                    )
+                    slot = this.addSlot({
+                        data: [data],
+                        slotType: SlotType.Constant,
+                        dataTypes: [SolidityDataTypes.Address],
+                        label: label,
+                        description: description,
+                    })
                 } else {
                     throw new Error('Invalid new Slot recipient data')
                 }
@@ -330,17 +361,20 @@ export default class ComposerSolver {
         )
     }
 
-    updateRecipient(
-        id: string,
-        address: string,
-        description?: string
-    ): ComposerSlotModel {
+    updateRecipient({
+        id,
+        address,
+        label,
+        description,
+    }: UpdateRecipientPropsType): ComposerSlotModel {
         if (!this.config.slots[id]) {
             throw new Error('Could not find slot for updating recipient')
         }
 
         this.config.slots[id].data[0] = address
-        this.config.slots[id].description = description
+        this.config.slots[id].tag.label = label
+        this.config.slots[id].tag.description = description
+
         return this.config.slots[id]
     }
 
@@ -376,54 +410,47 @@ export default class ComposerSolver {
 
     /*************************** Slots ***************************/
 
-    addSlot(
-        {
-            data,
-            slotType,
-            dataTypes,
-            solverConfigAddress,
-        }: {
-            data: string[] | number[]
-            slotType: SlotType
-            dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: ComposerSolverConfigAddressType
-        },
-        targetSolverId?: string | null | undefined,
-        solverFunction?: ethers.utils.FunctionFragment | null | undefined,
-        description?: string | null | undefined
-    ): ComposerSlotModel {
+    addSlot({
+        data,
+        slotType,
+        dataTypes,
+        solverConfigAddress,
+        targetSolverId,
+        solverFunction,
+        label,
+        description,
+    }: AddSlotProps): ComposerSlotModel {
         const id = ulid()
         this.config.slots[id] = {
             id: id,
             data: data,
             slotType: slotType,
             dataTypes: dataTypes,
-            targetSolverId: targetSolverId || undefined,
-            solverFunction: solverFunction || undefined,
-            description: description || undefined,
-            solverConfigAddress: solverConfigAddress || undefined,
+            targetSolverId: targetSolverId,
+            solverFunction: solverFunction,
+            solverConfigAddress: solverConfigAddress,
+            tag: {
+                id: id,
+                label: label,
+                description: description,
+                dataTypes: dataTypes,
+            },
         }
 
         return this.config.slots[id]
     }
 
-    updateSlot(
-        id: string,
-        {
-            data,
-            slotType,
-            dataTypes,
-            solverConfigAddress,
-        }: {
-            data: string[] | number[]
-            slotType: SlotType
-            dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: ComposerSolverConfigAddressType
-        },
-        targetSolverId?: string | null | undefined,
-        solverFunction?: ethers.utils.FunctionFragment | null | undefined,
-        description?: string | null | undefined
-    ): ComposerSlotModel {
+    updateSlot({
+        id,
+        data,
+        slotType,
+        dataTypes,
+        solverConfigAddress,
+        targetSolverId,
+        solverFunction,
+        label,
+        description,
+    }: UpdateSlotProps): ComposerSlotModel {
         const slot = this.config.slots[id]
         if (!slot) {
             throw new Error('Could not find slot for updating')
@@ -433,8 +460,10 @@ export default class ComposerSolver {
         slot.dataTypes = dataTypes
         slot.targetSolverId = targetSolverId
         slot.solverFunction = solverFunction
-        slot.description = description
         slot.solverConfigAddress = solverConfigAddress
+        slot.tag.dataTypes = dataTypes
+        slot.tag.label = label
+        slot.tag.description = description
         return slot
     }
 
@@ -477,6 +506,8 @@ export default class ComposerSolver {
                 data: [0],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
+                label: '',
+                description: '0% (0 basis points). Used in allocations.',
             }).id
 
         if (zeroSlotId) {
@@ -514,18 +545,33 @@ export default class ComposerSolver {
     }
 
     getDefaultSlots(): ComposerSlotsHashMapType {
+        const id = ulid()
+
         const zeroSlot = {
-            id: ulid(),
+            id: id,
             slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [0],
+            tag: {
+                id: id,
+                dataTypes: [SolidityDataTypes.Uint256],
+                label: '',
+                description: '0% (0 basis points). Used in allocations.',
+            },
         }
 
         const maxPointsSlot = {
-            id: ulid(),
+            id: id,
             slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [Constants.MAX_POINTS],
+            tag: {
+                id: id,
+                dataTypes: [SolidityDataTypes.Uint256],
+                label: '',
+                description:
+                    '100% (10000 basis points). Used to specify all of the collateral in the Solver should be allocated.',
+            },
         }
 
         const slots = <ComposerSlotsHashMapType>{}

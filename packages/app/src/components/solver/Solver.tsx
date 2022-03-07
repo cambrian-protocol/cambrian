@@ -1,9 +1,4 @@
 import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
-import {
-    ComposerSolverModel,
-    SolverModel,
-    SolverResponseModel,
-} from '@cambrian/app/models/SolverModel'
 import React, { useContext, useEffect, useState } from 'react'
 import {
     RichSlotModel,
@@ -11,6 +6,10 @@ import {
     SlotModel,
     SlotsHistoryHashMapType,
 } from '@cambrian/app/models/SlotModel'
+import {
+    SolverModel,
+    SolverResponseModel,
+} from '@cambrian/app/models/SolverModel'
 import {
     TokenAPI,
     TokenResponseType,
@@ -188,7 +187,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const conditions = await getConditions()
 
         // TODO TEMP
-        const metaData = parseMetaData(solversMetaData[0])
+        const metaData = solversMetaData
 
         const slotsHistory = await getSlotsHistory(
             config.ingests,
@@ -504,7 +503,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
                             const amountPercentage = BigNumber.from(
                                 decodeData(
-                                    [amountSlot.tag.dataType],
+                                    amountSlot.tag.dataTypes,
                                     amountSlot.slot.data
                                 )
                             ).div(100)
@@ -767,7 +766,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title={solversMetaData[0]?.title}
+                            title={solversMetaData.title}
                             subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
