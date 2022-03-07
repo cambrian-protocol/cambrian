@@ -6,7 +6,7 @@ import { ComposerStateType } from '@cambrian/app/store/composer/composer.types'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SelectSolution from '@cambrian/app/components/selects/SelectSolution'
-import { parseComposerSolvers } from '@cambrian/app/utils/transformers/SolverConfig'
+import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 

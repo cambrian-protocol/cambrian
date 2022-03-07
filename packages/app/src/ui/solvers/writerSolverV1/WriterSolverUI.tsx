@@ -14,7 +14,7 @@ import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'
-import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/SolverConfig'
+import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 export type SubmissionModel = {
     submission: string
