@@ -98,11 +98,8 @@ export const getSlotTitle = (
                         callingSolver.config.slots[slotModel.data[0]]
 
                     if (callingSlot) {
-                        if (
-                            callingSlot.description &&
-                            callingSlot.description !== ''
-                        ) {
-                            return `${callingSlot.description} (${callingSolver.title})`
+                        if (callingSlot.tag.label !== '') {
+                            return `${callingSlot.tag.label} (${callingSolver.title})`
                         } else if (callingSlot.data.length === 1) {
                             return `${callingSlot.data[0].toString()} (${
                                 callingSolver.title
@@ -133,12 +130,8 @@ export const getSlotTitle = (
             }
 
             // Get constant desc or first data entry
-            if (
-                slotModel.description &&
-                slotModel.description !== undefined &&
-                slotModel.description !== ''
-            ) {
-                return slotModel.description
+            if (slotModel.tag.label !== '') {
+                return slotModel.tag.label
             } else if (slotModel.data.length === 1) {
                 return slotModel.data[0].toString()
             }
