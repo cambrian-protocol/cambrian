@@ -20,7 +20,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
-import { Tags } from '../models/TagModel'
+import { SlotTagsHashMapType } from '../models/SlotTagModel'
 import {
     ComposerAllocationPathsType,
     ComposerAllocationsHashMapType,
@@ -33,7 +33,7 @@ export default class ComposerSolver {
     description: string
     iface: ethers.utils.Interface
     config: ComposerSolverConfigModel
-    tags: Tags
+    tags: SlotTagsHashMapType
 
     constructor(
         title = 'New Solver',

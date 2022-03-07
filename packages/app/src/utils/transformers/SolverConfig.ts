@@ -1,8 +1,14 @@
 import { ethers } from 'ethers'
 import _ from 'lodash'
 
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import {
+    ComposerSolverModel,
+    SolverModel,
+} from '@cambrian/app/models/SolverModel'
+import {
+    ComposerSolverConfigModel,
+    SolverConfigModel,
+} from '@cambrian/app/models/SolverConfigModel'
 import {
     ComposerConditionModel,
     ConditionModel,
@@ -17,54 +23,101 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { SolverMetaDataModel } from '../../models/SolverMetaDataModel'
 
-export function parseSolvers(composition: ComposerSolverModel[]) {
-    const sortedSolvers = getSolverHierarchy(composition[0], composition)
+export async function parseComposerSolvers(
+    composerSolvers: ComposerSolverModel[]
+): Promise<SolverModel[] | undefined> {
+    if (composerSolvers.length === 0) {
+        console.error('No Solver existent.')
+        return undefined
+    }
 
-    if (composition.length !== sortedSolvers.length) {
+    if (composerSolvers[0].config.collateralToken === undefined) {
+        console.error('No collateral token defined.')
+        return undefined
+    }
+
+    const collateralToken = await TokenAPI.getTokenInfo(
+        composerSolvers[0].config.collateralToken
+    )
+
+    const sortedSolvers = getSolverHierarchy(
+        composerSolvers[0],
+        composerSolvers
+    )
+
+    if (composerSolvers.length !== sortedSolvers.length) {
         console.error(
             'Error building hierarchy of Solvers. Is every Solver connected?'
         ) // Todo error context?
-        return
+        return undefined
     }
 
-    const solverConfigs = sortedSolvers.map((x, i) =>
-        parseSolver(x, i, sortedSolvers)
-    )
+    // TODO OutcomeCollections
+    const solvers: SolverModel[] = sortedSolvers.map((solver, index) => {
+        return {
+            collateralToken: collateralToken,
+            collateralBalance: 0,
+            slotsHistory: {},
+            timelocksHistory: {},
+            outcomeCollections: {},
+            metaData: parseMetaData(sortedSolvers[index]),
+            conditions: [],
+            config: parseComposerSolverConfig(
+                solver.config,
+                index,
+                sortedSolvers
+            ),
+        }
+    })
 
-    return solverConfigs
+    return solvers
 }
 
-export function parseSolver(
-    graphSolver: ComposerSolverModel,
+export function parseMetaData(
+    composerSolver: ComposerSolverModel
+): SolverMetaDataModel {
+    return {
+        title: composerSolver.title,
+        description: 'TODO',
+        customUIULID: 'TODO',
+        version: '1.0',
+        tags: composerSolver.tags,
+    }
+}
+
+export function parseComposerSolverConfig(
+    composerSolverConfig: ComposerSolverConfigModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
 ): SolverConfigModel {
-    const ingests = Object.keys(graphSolver.config.slots).map((slotId) =>
-        parseSlot(graphSolver.config.slots[slotId], sortedSolvers)
+    const ingests = Object.keys(composerSolverConfig.slots).map((slotId) =>
+        parseComposerSlot(composerSolverConfig.slots[slotId], sortedSolvers)
     )
 
-    const conditionBase = parseCondition(
-        graphSolver.config.condition,
+    const conditionBase = parseComposerCondition(
+        composerSolverConfig.condition,
         currentSolverIndex,
         sortedSolvers
     )
 
     const solver = {
-        implementation: graphSolver.config.implementation
-            ? graphSolver.config.implementation
+        implementation: composerSolverConfig.implementation
+            ? composerSolverConfig.implementation
             : '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
-        keeper: graphSolver.config.keeperAddress.address,
-        arbitrator: graphSolver.config.arbitratorAddress?.address
-            ? graphSolver.config.arbitratorAddress.address
+        keeper: composerSolverConfig.keeperAddress.address,
+        arbitrator: composerSolverConfig.arbitratorAddress?.address
+            ? composerSolverConfig.arbitratorAddress.address
             : ethers.constants.AddressZero,
-        timelockSeconds: graphSolver.config.timelockSeconds
-            ? graphSolver.config.timelockSeconds
+        timelockSeconds: composerSolverConfig.timelockSeconds
+            ? composerSolverConfig.timelockSeconds
             : 0,
-        data: graphSolver.config.data
+        data: composerSolverConfig.data
             ? ethers.utils.defaultAbiCoder.encode(
                   ['bytes'],
-                  [graphSolver.config.data]
+                  [composerSolverConfig.data]
               )
             : ethers.constants.HashZero,
         ingests: ingests,
@@ -74,7 +127,7 @@ export function parseSolver(
     return solver
 }
 
-export function parseSlot(
+export function parseComposerSlot(
     inSlot: ComposerSlotModel,
     sortedSolvers: ComposerSolverModel[]
 ): SlotModel {
@@ -156,7 +209,7 @@ export function parseSlot(
     return outSlot
 }
 
-export function parseCondition(
+export function parseComposerCondition(
     inCondition: ComposerConditionModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
