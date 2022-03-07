@@ -1,11 +1,8 @@
-import {
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
-
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { Layout } from '@cambrian/app/components/layout/Layout'
 import { SetStateAction } from 'react'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 

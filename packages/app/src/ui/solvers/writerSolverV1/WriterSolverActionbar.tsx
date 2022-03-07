@@ -1,8 +1,3 @@
-import {
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
-
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/ConfirmOutcomeActionbar'
@@ -11,6 +6,8 @@ import ExecuteSolverActionbar from '@cambrian/app/components/actionbars/ExecuteS
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/ProposeOutcomeActionbar'
 import RedeemTokensActionbar from '@cambrian/app/components/actionbars/RedeemTokensActionbar'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import WriterActionbar from './WriterActionbar'
 import { WriterSolverRole } from './WriterSolverUI'
 
