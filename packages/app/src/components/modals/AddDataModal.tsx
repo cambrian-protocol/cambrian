@@ -42,7 +42,7 @@ const AddDataModal = ({
                         <Box flex>
                             <FormField
                                 name={`manualInputs[${idx}].data`}
-                                label={input.slotWithMetaData.description}
+                                label={input.slotWithMetaData.tag.description}
                                 required
                             />
                         </Box>
