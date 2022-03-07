@@ -21,6 +21,7 @@ export type ConditionModel = {
     outcomeURIs: MultihashType[]
 }
 
+// TODO Type merge or renaming if really necessary. Will circle back to it as soon as composer => interaction flow is clear
 export type SolverContractCondition = {
     executions: number
     collateralToken: string
