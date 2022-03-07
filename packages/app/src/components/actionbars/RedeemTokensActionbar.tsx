@@ -1,7 +1,3 @@
-import {
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
 import { useContext, useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
@@ -9,6 +5,8 @@ import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
 import { Handshake } from 'phosphor-react'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserContext } from '@cambrian/app/store/UserContext'

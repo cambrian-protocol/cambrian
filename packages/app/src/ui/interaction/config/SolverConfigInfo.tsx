@@ -8,10 +8,6 @@ import {
     UsersThree,
 } from 'phosphor-react'
 import React, { useState } from 'react'
-import {
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
@@ -21,6 +17,8 @@ import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {

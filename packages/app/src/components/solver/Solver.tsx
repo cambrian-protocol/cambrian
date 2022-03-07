@@ -1,7 +1,6 @@
 import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
 import {
     ComposerSolverModel,
-    SolverContractCondition,
     SolverModel,
     SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
@@ -33,6 +32,7 @@ import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeColle
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'

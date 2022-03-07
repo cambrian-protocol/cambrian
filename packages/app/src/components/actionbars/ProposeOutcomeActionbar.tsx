@@ -1,12 +1,9 @@
-import {
-    SolverContractCondition,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
-
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { BasicSolverMethodsType } from '../solver/Solver'
 import { Info } from 'phosphor-react'
 import OutcomeCollectionModal from '../modals/OutcomeCollectionModal'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { useState } from 'react'
 

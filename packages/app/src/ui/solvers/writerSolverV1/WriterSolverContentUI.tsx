@@ -7,7 +7,7 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
-import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 
 interface WriterSolverContentUI {
     roles: WriterSolverRole[]
