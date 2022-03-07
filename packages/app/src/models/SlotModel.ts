@@ -1,8 +1,8 @@
 import { BigNumber, ethers } from 'ethers'
 
+import { SlotTagModel } from './SlotTagModel'
 import { SlotType } from './SlotType'
 import { SolidityDataTypes } from './SolidityDataTypes'
-import { TagModel } from './TagModel'
 
 export type SlotModel = {
     executions: number
@@ -24,9 +24,7 @@ export type RichSlotsHashMapType = { [slot: string]: RichSlotModel }
 
 export type RichSlotModel = {
     slot: SlotModel
-    description: string
-    tag: TagModel
-    dataType: SolidityDataTypes
+    tag: SlotTagModel
 }
 
 export type SlotsHistoryHashMapType = {

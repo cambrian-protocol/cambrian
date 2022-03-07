@@ -9,7 +9,8 @@ import {
 import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
-import { Tags } from './TagModel'
+import { SlotTagsHashMapType } from './SlotTagModel'
+import { SolverMetaDataModel } from './SolverMetaDataModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
@@ -25,7 +26,7 @@ export type SolverModel = {
     }
     collateralToken: TokenModel
     collateralBalance: number
-    metaData: ComposerSolverModel[]
+    metaData: SolverMetaDataModel
 }
 
 // Contract responses with BigNumbers
@@ -50,5 +51,5 @@ export type ComposerSolverModel = {
     title: string
     iface: ethers.utils.Interface
     config: ComposerSolverConfigModel
-    tags: Tags
+    tags: SlotTagsHashMapType
 }

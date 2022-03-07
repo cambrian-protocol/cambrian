@@ -26,9 +26,9 @@ const RecipientsModal = ({
                         <BaseSlotInputItem
                             info={recipientAddress.tag.text}
                             key={idx}
-                            title={recipientAddress.description}
+                            title={recipientAddress.tag.description}
                             subTitle={decodeData(
-                                [recipientAddress.dataType],
+                                [recipientAddress.tag.dataType],
                                 recipientAddress.slot.data
                             )}
                         />
