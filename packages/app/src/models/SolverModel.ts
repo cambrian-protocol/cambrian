@@ -2,10 +2,12 @@ import {
     ComposerSolverConfigModel,
     SolverConfigModel,
 } from './SolverConfigModel'
+import {
+    ConditionResponseType,
+    SolverContractCondition,
+} from './ConditionModel'
 import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
-import { ConditionResponseType } from './ConditionModel'
-import { ConditionStatus } from './ConditionStatus'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
 import { Tags } from './TagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
@@ -35,17 +37,6 @@ export type SolverResponseModel = {
     data: string
     ingests: SlotResponseType[]
     conditionBase: ConditionResponseType
-}
-
-// TODO Extract into ConditionModel, refactor
-export type SolverContractCondition = {
-    executions: number
-    collateralToken: string
-    questionId: string
-    parentCollectionId: string
-    conditionId: string
-    payouts: number[]
-    status: ConditionStatus
 }
 
 /**

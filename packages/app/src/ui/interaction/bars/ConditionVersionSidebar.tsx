@@ -11,7 +11,7 @@ import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatu
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SetStateAction } from 'react'
-import { SolverContractCondition } from '@cambrian/app/models/SolverModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 
 interface ConditionVersionSidebarProps {
     solverTitle: string

@@ -7,6 +7,7 @@ import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
 import { BigNumber } from 'ethers'
 import { ComposerIdPathType } from './SolverModel'
 import { ComposerSlotPathType } from './SlotModel'
+import { ConditionStatus } from './ConditionStatus'
 import { MultihashType } from './MultihashType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
@@ -18,6 +19,16 @@ export type ConditionModel = {
     partition: number[]
     allocations: AllocationPathsType[]
     outcomeURIs: MultihashType[]
+}
+
+export type SolverContractCondition = {
+    executions: number
+    collateralToken: string
+    questionId: string
+    parentCollectionId: string
+    conditionId: string
+    payouts: number[]
+    status: ConditionStatus
 }
 
 // Contract responses with BigNumbers
