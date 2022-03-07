@@ -40,11 +40,11 @@ export type ComposerSlotModel = {
     slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[] // TODO
-    description?: string | null | undefined
-    targetSolverId?: string | null | undefined
-    solverFunction?: ethers.utils.FunctionFragment | null | undefined
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
     incomingCallbacks?: ComposerSlotPathType[]
     solverConfigAddress?: ComposerSolverConfigAddressType
+    tag: SlotTagModel
 }
 
 export type ComposerSlotPathType = { solverId: string; slotId: string }

@@ -21,11 +21,12 @@ const updateRecipientAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        currentSolver.updateRecipient(
-            payload.slotId,
-            payload.recipientData.address,
-            payload.recipientData.description
-        )
+        currentSolver.updateRecipient({
+            id: payload.slotId,
+            address: payload.recipientData.address,
+            label: payload.recipientData.label,
+            description: payload.recipientData.description,
+        })
 
         return {
             ...state,

@@ -11,6 +11,7 @@ type CreateRecipientFormProps = {
 
 export type RecipientFormType = {
     address: string
+    label: string
     description: string
 }
 
@@ -19,6 +20,7 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
 
     const [input, setInput] = useState<RecipientFormType>({
         address: '',
+        label: '',
         description: '',
     })
 

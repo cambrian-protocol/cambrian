@@ -42,6 +42,8 @@ const updateRecipientAmountAction = (
                 data: [payload.amount],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
+                description: '',
+                label: '',
             })
             currentSolver.updateRecipientAmount(
                 state.currentIdPath.ocId,

@@ -24,9 +24,10 @@ type SlotConfigFormProps = {
 export type SlotConfigFormType = {
     slotType: SlotType
     dataInputFields: SlotDataInputType[]
-    slotDescription: string
-    solverFunction?: ethers.utils.FunctionFragment | null
-    targetSolverId?: string | null
+    label: string
+    description: string
+    solverFunction?: ethers.utils.FunctionFragment
+    targetSolverId?: string
     callbackTargetSlotPath?: ComposerSlotPathType
 }
 
@@ -97,10 +98,8 @@ const SlotConfigForm = ({
         case SlotType.Manual:
             FormFields = (
                 <>
-                    <FormField
-                        label="Slot description"
-                        name="slotDescription"
-                    />
+                    <FormField label="Slot label" name="label" />
+                    <FormField label="Slot description" name="description" />
                     <SlotDataInputField
                         value={slotInput.dataInputFields[0]}
                         onUpdate={handleUpdateDataInputField}
@@ -193,6 +192,8 @@ export const mapSlotConfigFormToSlotActionPayload = (
         slotType: slotConfigFormInput.slotType,
         dataTypes: dataTypes,
         data: data,
+        label: slotConfigFormInput.label,
+        description: slotConfigFormInput.description,
     }
 
     switch (slotConfigFormInput.slotType) {
@@ -210,9 +211,6 @@ export const mapSlotConfigFormToSlotActionPayload = (
             slotPayload.targetSolverId = slotConfigFormInput.targetSolverId
             slotPayload.solverFunction = slotConfigFormInput.solverFunction
             break
-        case SlotType.Manual:
-        case SlotType.Constant:
-            slotPayload.description = slotConfigFormInput.slotDescription
     }
     return slotPayload
 }

@@ -27,7 +27,8 @@ const RecipientConfigForm = ({
             }}
         >
             <FormField name="address" label="Address*" validate={required} />
-            <FormField name="description" label="Descriptive Name (Optional)" />
+            <FormField name="label" label="Label" />
+            <FormField name="description" label="Description" />
             <Box>
                 <IconContext.Provider value={{ size: '24' }}>
                     <Button primary type="submit" label={submitLabel} />

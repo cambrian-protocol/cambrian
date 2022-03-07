@@ -33,7 +33,13 @@ const attachNewSolverAction = (state: ComposerStateType): ComposerStateType => {
             ocId: state.currentIdPath.ocId,
         })
 
-        currentSolver.addRecipient('Solver', newSolver.id, newSolver.id)
+        currentSolver.addRecipient({
+            type: 'Solver',
+            data: newSolver.id,
+            targetSolverId: newSolver.id,
+            label: '',
+            description: '',
+        })
 
         // Flow updates
         const nextPosition = { x: 0, y: 0 }
