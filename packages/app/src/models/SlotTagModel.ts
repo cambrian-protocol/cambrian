@@ -6,10 +6,10 @@ export type SlotTagsHashMapType = {
 
 export type SlotTagModel = {
     id: string
-    text: string
-    dataType: SolidityDataTypes
+    dataTypes: SolidityDataTypes[]
     isFlex?: boolean
-    description?: string
+    label: string
+    description: string
 }
 
 export type TaggedInput = SlotTagModel & {

@@ -21,6 +21,7 @@ const UpdateRecipientModal = ({
 
     const [input, setInput] = useState<RecipientFormType>({
         address: '',
+        label: '',
         description: '',
     })
 
@@ -29,11 +30,8 @@ const UpdateRecipientModal = ({
         if (recipientModel.data.length === 1) {
             setInput({
                 address: recipientModel.data[0].toString(),
-                description:
-                    recipientModel.description !== undefined &&
-                    recipientModel.description !== null
-                        ? recipientModel.description
-                        : '',
+                label: recipientModel.tag.label,
+                description: recipientModel.tag.description,
             })
         }
     }, [])

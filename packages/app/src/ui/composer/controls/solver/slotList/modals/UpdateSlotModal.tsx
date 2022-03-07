@@ -57,7 +57,8 @@ const UpdateSlotFormModal = ({
             dataInputFields: dataInputFields,
             solverFunction: slotModel.solverFunction,
             targetSolverId: slotModel.targetSolverId,
-            slotDescription: slotModel.description || '',
+            description: slotModel.tag.description,
+            label: slotModel.tag.label,
             callbackTargetSlotPath: callbackTargetSlotPath,
         })
     }, [])

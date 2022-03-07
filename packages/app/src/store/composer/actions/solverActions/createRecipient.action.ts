@@ -3,7 +3,7 @@ import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/rec
 
 const createRecipientAction = (
     state: ComposerStateType,
-    recipientData: RecipientFormType
+    payload: RecipientFormType
 ): ComposerStateType => {
     if (
         state.currentIdPath !== undefined &&
@@ -18,12 +18,12 @@ const createRecipientAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        currentSolver.addRecipient(
-            'Slot',
-            recipientData.address,
-            null,
-            recipientData.description
-        )
+        currentSolver.addRecipient({
+            type: 'Slot',
+            data: payload.address,
+            description: payload.description,
+            label: payload.label,
+        })
 
         return {
             ...state,

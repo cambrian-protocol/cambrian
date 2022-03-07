@@ -47,16 +47,16 @@ const addRecipientWithAmountAction = (
                 throw new Error('No address found in sourceEntity')
             }
 
-            newRecipientSlot = currentSolver.addRecipient(
-                payload.recipient.value,
-                sourceEntity.address,
-                null,
-                undefined,
-                {
+            newRecipientSlot = currentSolver.addRecipient({
+                type: payload.recipient.value,
+                data: sourceEntity.address,
+                description: '',
+                label: '',
+                solverConfigAdress: {
                     type: payload.recipient.value,
                     solverId: payload.recipient.solverId,
-                }
-            )
+                },
+            })
 
             // Link Entity to new slot
             if (
@@ -70,11 +70,13 @@ const addRecipientWithAmountAction = (
             // Did i receive a Slot or a Solver as recipient?
             // Constant slot received - Create a callback slot
 
-            newRecipientSlot = currentSolver.addRecipient(
-                'Callback',
-                payload.recipient.value.id,
-                payload.recipient.solverId
-            )
+            newRecipientSlot = currentSolver.addRecipient({
+                type: 'Callback',
+                data: payload.recipient.value.id,
+                targetSolverId: payload.recipient.solverId,
+                label: '',
+                description: '',
+            })
 
             addCallbackToTargetIncomingCallbacks(
                 newRecipientSlot,
@@ -84,11 +86,13 @@ const addRecipientWithAmountAction = (
         } else {
             // Solver received - Create a function slot
 
-            newRecipientSlot = currentSolver.addRecipient(
-                'Solver',
-                payload.recipient.value.id,
-                payload.recipient.value.id
-            )
+            newRecipientSlot = currentSolver.addRecipient({
+                type: 'Solver',
+                data: payload.recipient.value.id,
+                targetSolverId: payload.recipient.value.id,
+                label: '',
+                description: '',
+            })
         }
 
         if (isSlot(payload.amount)) {
@@ -102,6 +106,8 @@ const addRecipientWithAmountAction = (
                 data: [payload.amount],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
+                label: '',
+                description: '',
             })
             currentSolver.updateRecipientAmount(
                 state.currentIdPath.ocId,

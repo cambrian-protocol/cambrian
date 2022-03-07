@@ -46,7 +46,7 @@ const SolverConfigInfo = ({
     return (
         <>
             <HeaderTextSection
-                title={solverData.metaData[0]?.title}
+                title={solverData.metaData.title}
                 subTitle="Solver configuration"
                 paragraph="This Solver is designed for a buyer to source articles for the purposes of content marketing. "
             />
@@ -70,13 +70,17 @@ const SolverConfigInfo = ({
                 />
                 <PlainSectionDivider />
                 <BaseMenuListItem
-                    info={solverData.metaData[0]?.tags['timelockSeconds']?.text}
+                    info={
+                        solverData.metaData.tags['timelockSeconds']?.description
+                    }
                     title="Timelock"
                     icon={<Timer />}
                     subTitle={solverData.config.timelockSeconds.toString()}
                 />
                 <BaseMenuListItem
-                    info={solverData.metaData[0]?.tags['collateralToken']?.text}
+                    info={
+                        solverData.metaData.tags['collateralToken']?.description
+                    }
                     title="Token"
                     icon={<Coin />}
                     subTitle={`${solverData.collateralToken.address} ${
