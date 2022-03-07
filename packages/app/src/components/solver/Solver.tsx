@@ -2,8 +2,8 @@ import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
 import {
     ComposerSolverModel,
     SolverContractCondition,
-    SolverContractConfigResponseType,
     SolverModel,
+    SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
 import React, { useContext, useEffect, useState } from 'react'
 import {
@@ -389,8 +389,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getConfig = async (): Promise<SolverConfigModel> => {
         try {
-            const res: SolverContractConfigResponseType =
-                await contract.getConfig()
+            const res: SolverResponseModel = await contract.getConfig()
 
             const parsedIngests = res.ingests.map((ingest) => {
                 return {

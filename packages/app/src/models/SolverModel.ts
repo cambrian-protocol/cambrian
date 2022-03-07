@@ -12,10 +12,6 @@ import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
 import { ethers } from 'ethers'
 
-/**
- * Contract-interaction Solver Component
- **/
-
 export type SolverModel = {
     config: SolverConfigModel
     conditions: SolverContractCondition[]
@@ -30,6 +26,17 @@ export type SolverModel = {
     metaData: ComposerSolverModel[]
 }
 
+// Contract responses with BigNumbers
+export type SolverResponseModel = {
+    implementation: string
+    keeper: string
+    arbitrator: string
+    timelockSeconds: number
+    data: string
+    ingests: SlotResponseType[]
+    conditionBase: ConditionResponseType
+}
+
 // TODO Extract into ConditionModel, refactor
 export type SolverContractCondition = {
     executions: number
@@ -39,19 +46,6 @@ export type SolverContractCondition = {
     conditionId: string
     payouts: number[]
     status: ConditionStatus
-}
-
-/* 
-    Contract Responses with BigNumbers
-*/
-export type SolverContractConfigResponseType = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    ingests: SlotResponseType[]
-    conditionBase: ConditionResponseType
 }
 
 /**
