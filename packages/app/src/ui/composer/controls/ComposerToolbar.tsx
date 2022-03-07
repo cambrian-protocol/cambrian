@@ -6,7 +6,7 @@ import { ComposerStateType } from '@cambrian/app/store/composer/composer.types'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SelectSolution from '@cambrian/app/components/selects/SelectSolution'
-import { parseSolvers } from '@cambrian/app/utils/transformers/SolverConfig'
+import { parseComposerSolvers } from '@cambrian/app/utils/transformers/SolverConfig'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
@@ -26,7 +26,7 @@ const ComposerToolbar = () => {
 
     const handleLogSolverConfigs = () => {
         try {
-            const solverConfigs = parseSolvers(composer.solvers)
+            const solverConfigs = parseComposerSolvers(composer.solvers)
             console.log(solverConfigs)
         } catch (err) {
             console.error(err)
@@ -35,7 +35,7 @@ const ComposerToolbar = () => {
 
     const handleExportStrategy = () => {
         try {
-            const solverConfigs = parseSolvers(composer.solvers)
+            const solverConfigs = parseComposerSolvers(composer.solvers)
             console.log(solverConfigs)
         } catch (err) {
             console.error(err)

@@ -15,6 +15,10 @@ import {
     TokenAPI,
     TokenResponseType,
 } from '@cambrian/app/services/api/Token.api'
+import {
+    binaryArrayFromIndexSet,
+    parseMetaData,
+} from '@cambrian/app/utils/transformers/SolverConfig'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { Box } from 'grommet'
@@ -33,10 +37,10 @@ import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverMetaDataModel } from '@cambrian/app/models/SolverMetaDataModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
@@ -184,11 +188,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const conditions = await getConditions()
 
         // TODO TEMP
-        const metaData = solversMetaData
+        const metaData = parseMetaData(solversMetaData[0])
+
         const slotsHistory = await getSlotsHistory(
             config.ingests,
             conditions,
-            metaData[0]
+            metaData
         )
 
         const numMintedTokensByCondition =
@@ -205,7 +210,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             conditions,
             slotsHistory,
             collateralToken,
-            metaData[0],
+            metaData,
             numMintedTokensByCondition
         )
 
@@ -456,7 +461,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         conditions: SolverContractCondition[],
         slotHistory: SlotsHistoryHashMapType,
         collateralToken: TokenResponseType,
-        metaData: ComposerSolverModel,
+        metaData: SolverMetaDataModel,
         numMintedTokensByCondition?: {
             [conditionId: string]: number
         }
@@ -499,7 +504,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
                             const amountPercentage = BigNumber.from(
                                 decodeData(
-                                    [amountSlot.dataType],
+                                    [amountSlot.tag.dataType],
                                     amountSlot.slot.data
                                 )
                             ).div(100)
@@ -558,7 +563,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getSlotsHistory = async (
         ingests: SlotModel[],
         conditions: SolverContractCondition[],
-        metaData: ComposerSolverModel
+        metaData: SolverMetaDataModel
     ): Promise<SlotsHistoryHashMapType> => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
@@ -588,13 +593,9 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     const ulid = ethers.utils.parseBytes32String(
                         currentSlot.slot
                     )
-                    const metaSlot = metaData.config.slots[ulid]
-
                     data[currentSlot.slot] = {
                         slot: currentSlot,
                         tag: metaData.tags[ulid],
-                        description: metaSlot.description || '',
-                        dataType: metaSlot.dataTypes[0],
                     }
                 }
             })
@@ -606,17 +607,14 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getIngestWithMetaData = (
         slotId: string,
         ingests: SlotModel[],
-        metaData: ComposerSolverModel
+        metaData: SolverMetaDataModel
     ): RichSlotModel => {
         const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
         if (ingestSlot) {
             // Enrich with MetaData
             const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
-            const metaSlot = metaData.config.slots[ulid]
             return {
                 slot: ingestSlot,
-                dataType: metaSlot.dataTypes[0],
-                description: metaSlot.description || '',
                 tag: metaData.tags[ulid],
             }
         } else {
@@ -636,7 +634,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     getIngestWithMetaData(
                         allocation.recipientAddressSlot,
                         currentSolverData.config.ingests,
-                        currentSolverData.metaData[0]
+                        currentSolverData.metaData
                     )
             )
         } else {
@@ -665,7 +663,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             getIngestWithMetaData(
                                 ingest.slot,
                                 currentSolverData.config.ingests,
-                                currentSolverData.metaData[0]
+                                currentSolverData.metaData
                             )
                         )
                     }

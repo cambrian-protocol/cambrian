@@ -1,9 +1,9 @@
 import { DEFAULT_ABI } from './../constants/index'
 import { ComposerSolverModel } from './../models/SolverModel'
-import { Tags } from '../models/TagModel'
 import { ethers } from 'ethers'
 import { getBytes32FromMultihash } from '../utils/helpers/multihash'
 import { SolidityDataTypes } from '../models/SolidityDataTypes'
+import { SlotTagsHashMapType } from '../models/SlotTagModel'
 
 export const configs = {
     implementation: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
@@ -149,94 +149,118 @@ export const configs = {
     },
 }
 
-export const tags = <Tags>{
+export const tags = <SlotTagsHashMapType>{
     keeper: {
         id: 'keeper',
         text: 'The Keeper is responsible for selecting the Writer, executing & reporting the outcome of this solve.',
+        dataType: SolidityDataTypes.Address,
+        description: 'Keeper',
         isFlex: false,
     },
 
     arbitrator: {
         id: 'arbitrator',
         text: 'This Solver has no arbitrator.',
+        description: 'Arbitrator',
+        dataType: SolidityDataTypes.Address,
         isFlex: false,
     },
 
     data: {
         id: 'data',
         text: 'The slot IDs containing the chosen Writer (1st) and Buyer (2nd)',
+        dataType: SolidityDataTypes.Bytes32,
         isFlex: false,
     },
 
     collateralToken: {
         id: 'collateralToken',
         text: 'ERC20 token being used as payment.',
+        description: 'Collateral Token',
+        dataType: SolidityDataTypes.Address,
         isFlex: true,
     },
 
     timelockSeconds: {
         id: 'timelockSeconds',
+        description: 'Timelock seconds',
         text: 'The number of seconds which must pass between proposing and confirming outcome results without dispute.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: true,
     },
 
     '01FSP76J4J37AQM1WRZDY85CY3': {
         id: '01FSP76J4J37AQM1WRZDY85CY3',
         text: '0% (0 basis points). Used in allocations.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: false,
     },
 
     '01FSP76J4J9N3905P6M7JQFBD2': {
         id: '01FSP76J4J9N3905P6M7JQFBD2',
         text: '100% (10000 basis points). Used to specify all of the collateral in the Solver should be allocated.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: false,
     },
 
     '01FSP77T8YCZ3TK50BMB6NCC5W': {
         id: '01FSP77T8YCZ3TK50BMB6NCC5W',
+        description: 'Keeper',
         text: 'Contains the address of the Keeper for receiving payment.',
+        dataType: SolidityDataTypes.Address,
         isFlex: false,
     },
 
     '01FSP78E4KMM5HEQB09BD8T253': {
         id: '01FSP78E4KMM5HEQB09BD8T253',
+        description: 'Writer (Bankless)',
         text: 'To contain the address of the specified Writer. Must be added by the Keeper before solve can be executed.',
+        dataType: SolidityDataTypes.Address,
         isFlex: false,
     },
 
     '01FSP79JH6NFA733XX2DB5W5YT': {
         id: '01FSP79JH6NFA733XX2DB5W5YT',
+        description: 'Treasury (Bankless)',
         text: 'Contains the address of the BanklessDAO treasury for receiving payment.',
+        dataType: SolidityDataTypes.Address,
         isFlex: false,
     },
 
     '01FSP7A5ZZEXTNAMK5D8MHY93F': {
         id: '01FSP7A5ZZEXTNAMK5D8MHY93F',
+        description: 'Cambrian Treasury',
         text: 'Contains the address of the Cambrian treasury for receiving payment.',
+        dataType: SolidityDataTypes.Address,
         isFlex: false,
     },
 
     '01FSP7AJHMVFKHKTTCVX5MVCA7': {
         id: '01FSP7AJHMVFKHKTTCVX5MVCA7',
+        description: 'Buyer',
         text: 'Contains the address of the Buyer for receiving refunds.',
+        dataType: SolidityDataTypes.Address,
         isFlex: true,
     },
 
     '01FSP93R1E6ZV9QAB66PPDFDE3': {
         id: '01FSP93R1E6ZV9QAB66PPDFDE3',
         text: '90% (9000 basis points). Used in allocations.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: false,
     },
 
     '01FSP971A4PH6PSEC6SDHYB3R0': {
         id: '01FSP971A4PH6PSEC6SDHYB3R0',
         text: '4% (400 basis points). Used in allocations.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: false,
     },
 
     '01FSP97S7T6S6E98BZ7FQJJY20': {
         id: '01FSP97S7T6S6E98BZ7FQJJY20',
         text: '2% (200 basis points). Used in allocations.',
+        dataType: SolidityDataTypes.Uint256,
         isFlex: false,
     },
 }
