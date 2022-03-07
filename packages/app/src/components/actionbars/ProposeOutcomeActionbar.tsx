@@ -4,7 +4,7 @@ import { Info } from 'phosphor-react'
 import OutcomeCollectionModal from '../modals/OutcomeCollectionModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useState } from 'react'
 
 interface ProposeOutcomeActionbarProps {

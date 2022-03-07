@@ -18,7 +18,7 @@ import {
 import {
     binaryArrayFromIndexSet,
     parseMetaData,
-} from '@cambrian/app/utils/transformers/SolverConfig'
+} from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { Box } from 'grommet'
