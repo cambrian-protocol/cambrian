@@ -101,7 +101,6 @@ type AttachNewOutcomeCollectionActionType = {
     type: 'ATTACH_NEW_OUTCOME_COLLECTION'
 }
 
-// TODO update slotTag
 type UpdateRecipientAllocationActionType = {
     type: 'UPDATE_RECIPIENT_ALLOCATION'
     payload: {
@@ -124,7 +123,6 @@ type CreateRecipientWithAllocationAction = {
     }
 }
 
-// TODO Add slotTag
 type AddRecipientWithAllocationAction = {
     type: 'ADD_RECIPIENT_WITH_ALLOCATION'
     payload: {
