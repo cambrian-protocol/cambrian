@@ -6,6 +6,7 @@ import { Select } from 'grommet'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
+import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 type SelectRecipientProps = {
@@ -130,30 +131,29 @@ const getAvailableParentAddresses = (
                 },
             })
 
-            Object.keys(parentSolver.config.slots).forEach((key) => {
+            Object.keys(parentSolver.config.slots).forEach((slot) => {
                 if (
-                    parentSolver.config.slots[key].dataTypes.length === 1 &&
-                    parentSolver.config.slots[key].solverConfigAddress ===
+                    parentSolver.config.slots[slot].dataTypes.length === 1 &&
+                    parentSolver.config.slots[slot].solverConfigAddress ===
                         undefined &&
-                    parentSolver.config.slots[key].dataTypes[0] ===
+                    parentSolver.config.slots[slot].dataTypes[0] ===
                         SolidityDataTypes.Address &&
-                    (parentSolver.config.slots[key].slotType ===
+                    (parentSolver.config.slots[slot].slotType ===
                         SlotType.Constant ||
-                        parentSolver.config.slots[key].slotType ===
+                        parentSolver.config.slots[slot].slotType ===
                             SlotType.Manual)
                 ) {
-                    const currentTitle =
-                        parentSolver.config.slots[key].description !==
-                            undefined &&
-                        parentSolver.config.slots[key].description !== ''
-                            ? parentSolver.config.slots[key].description
-                            : parentSolver.config.slots[key].data[0].toString()
+                    const currentTitle = getSlotTitle(
+                        parentSolver.config.slots[slot],
+                        parentSolver.slotTags,
+                        solvers
+                    )
 
                     currentAvailableAddresses.push({
                         title: currentTitle.toString(),
                         address: {
                             solverId: parentSolver.id,
-                            value: parentSolver.config.slots[key],
+                            value: parentSolver.config.slots[slot],
                         },
                     })
                 }

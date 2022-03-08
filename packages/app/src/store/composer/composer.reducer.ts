@@ -1,11 +1,11 @@
 import {
     ADD_RECIPIENT,
-    ADD_RECIPIENT_WITH_AMOUNT,
+    ADD_RECIPIENT_WITH_ALLOCATION,
     ATTACH_NEW_OUTCOME_COLLECTION,
     ATTACH_NEW_SOLVER,
     CREATE_OUTCOME,
     CREATE_RECIPIENT,
-    CREATE_RECIPIENT_WITH_AMOUNT,
+    CREATE_RECIPIENT_WITH_ALLOCATION,
     CREATE_SLOT,
     CREATE_SOLVER,
     DELETE_NODE,
@@ -16,7 +16,7 @@ import {
     TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION,
     UPDATE_OUTCOME,
     UPDATE_RECIPIENT,
-    UPDATE_RECIPIENT_AMOUNT,
+    UPDATE_RECIPIENT_ALLOCATION,
     UPDATE_SELECTED_ELEMENT,
     UPDATE_SLOT,
     UPDATE_SOLUTION_SETTINGS,
@@ -25,12 +25,12 @@ import {
 import { ComposerAction, ComposerStateType } from './composer.types'
 import {
     addRecipientAction,
-    addRecipientWithAmountAction,
+    addRecipientAllocationAction,
     attachNewOutcomeCollectionAction,
     attachNewSolverAction,
     createOutcomeAction,
     createRecipientAction,
-    createRecipientWithAmountAction,
+    createRecipientAllocationAction,
     createSlotAction,
     createSolverAction,
     deleteNodeAction,
@@ -41,7 +41,7 @@ import {
     toggleOutcomeOfOutcomeCollectionAction,
     updateOutcomeAction,
     updateRecipientAction,
-    updateRecipientAmountAction,
+    updateRecipientAllocationAction,
     updateSelectedElementAction,
     updateSlotAction,
     updateSolutionSettingsAction,
@@ -78,16 +78,16 @@ export const composerReducer = (
             return updateSlotAction(state, action.payload)
         case CREATE_RECIPIENT:
             return createRecipientAction(state, action.payload)
-        case CREATE_RECIPIENT_WITH_AMOUNT:
-            return createRecipientWithAmountAction(state, action.payload)
-        case UPDATE_RECIPIENT_AMOUNT:
-            return updateRecipientAmountAction(state, action.payload)
+        case CREATE_RECIPIENT_WITH_ALLOCATION:
+            return createRecipientAllocationAction(state, action.payload)
+        case UPDATE_RECIPIENT_ALLOCATION:
+            return updateRecipientAllocationAction(state, action.payload)
         case CREATE_SOLVER:
             return createSolverAction(state)
         case ATTACH_NEW_SOLVER:
             return attachNewSolverAction(state)
-        case ADD_RECIPIENT_WITH_AMOUNT:
-            return addRecipientWithAmountAction(state, action.payload)
+        case ADD_RECIPIENT_WITH_ALLOCATION:
+            return addRecipientAllocationAction(state, action.payload)
         case ADD_RECIPIENT:
             return addRecipientAction(state, action.payload)
         case UPDATE_RECIPIENT:

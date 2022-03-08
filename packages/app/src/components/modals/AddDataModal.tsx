@@ -58,7 +58,7 @@ const AddDataModal = ({
                         </Box>
                     </Box>
                     <Text size="small" color="dark-6">
-                        {input.slotWithMetaData.tag.text}
+                        {input.slotWithMetaData.tag.label}
                     </Text>
                 </Box>
             )

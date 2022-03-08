@@ -1,24 +1,29 @@
-import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
+import {
+    ComposerSlotModel,
+    ComposerSlotPathType,
+} from '@cambrian/app/models/SlotModel'
+
 import { ComposerStateType } from '../../composer.types'
-import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
-const createRecipientWithAmountAction = (
+const updateRecipientAllocationAction = (
     state: ComposerStateType,
     payload: {
-        recipient: RecipientFormType
-        amount: number | ComposerSlotModel
+        recipient: ComposerSlotPathType
+        amount: ComposerSlotModel | number
     }
 ): ComposerStateType => {
     if (
         state.currentIdPath !== undefined &&
-        state.currentIdPath.ocId !== undefined &&
         state.currentIdPath.solverId !== undefined &&
-        state.currentIdPath.solverId.length
+        state.currentIdPath.ocId !== undefined &&
+        !isNaN(state.currentIdPath.solverId.length) &&
+        !isNaN(state.currentIdPath.ocId.length)
     ) {
         const updatedSolvers = [...state.solvers]
+
         const currentSolver = updatedSolvers.find(
             (x) => x.id === state.currentIdPath?.solverId
         )
@@ -26,17 +31,10 @@ const createRecipientWithAmountAction = (
             throw new Error('Error finding current Solver')
         }
 
-        const newRecipientSlot = currentSolver.addRecipient({
-            type: 'Slot',
-            data: payload.recipient.address,
-            description: payload.recipient.description,
-            label: payload.recipient.label,
-        })
-
         if (isSlot(payload.amount)) {
-            currentSolver.updateRecipientAmount(
+            currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                newRecipientSlot.id,
+                payload.recipient.slotId,
                 payload.amount.id
             )
         } else {
@@ -44,23 +42,18 @@ const createRecipientWithAmountAction = (
                 data: [payload.amount],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
-                label: '',
-                description: '',
             })
-            currentSolver.updateRecipientAmount(
+            currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                newRecipientSlot.id,
+                payload.recipient.slotId,
                 newAmountSlot.id
             )
         }
 
-        return {
-            ...state,
-            solvers: updatedSolvers,
-        }
+        return { ...state, solvers: updatedSolvers }
     }
-    console.error('No Solver selected')
+    console.error('No Outcome Collection selected')
     return state
 }
 
-export default createRecipientWithAmountAction
+export default updateRecipientAllocationAction

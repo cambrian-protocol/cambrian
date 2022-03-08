@@ -12,7 +12,10 @@ interface SlotListItemProps {
 }
 
 const SlotListItem = ({ slotModel }: SlotListItemProps) => {
-    const { composer, dispatch } = useComposerContext()
+    const { composer, dispatch, currentSolver } = useComposerContext()
+
+    if (!currentSolver) throw Error('No current Solver defined!')
+
     const [showUpdateSlotModal, setShowUpdateSlotModal] = useState(false)
 
     const toggleUpdateSlotModal = () =>
@@ -34,7 +37,11 @@ const SlotListItem = ({ slotModel }: SlotListItemProps) => {
         })
     }
 
-    const currentTitle = getSlotTitle(slotModel, composer.solvers)
+    const currentTitle = getSlotTitle(
+        slotModel,
+        currentSolver.slotTags,
+        composer.solvers
+    )
 
     return (
         <>
