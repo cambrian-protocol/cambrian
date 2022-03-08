@@ -1,7 +1,6 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 
 import { IconContext } from 'phosphor-react'
-import { RecipientFormType } from './CreateRecipientForm'
 import { SetStateAction } from 'react'
 import { required } from '@cambrian/app/utils/helpers/validation'
 
@@ -10,6 +9,14 @@ interface RecipientConfigFormProps {
     recipientInput: RecipientFormType
     setRecipientInput: React.Dispatch<SetStateAction<RecipientFormType>>
     submitLabel: string
+}
+
+export const initialRecipientConfigFormInput = {
+    address: '',
+}
+
+export type RecipientFormType = {
+    address: string
 }
 
 const RecipientConfigForm = ({
@@ -27,12 +34,8 @@ const RecipientConfigForm = ({
             }}
         >
             <FormField name="address" label="Address*" validate={required} />
-            <FormField name="label" label="Label" />
-            <FormField name="description" label="Description" />
             <Box>
-                <IconContext.Provider value={{ size: '24' }}>
-                    <Button primary type="submit" label={submitLabel} />
-                </IconContext.Provider>
+                <Button primary type="submit" label={submitLabel} />
             </Box>
         </Form>
     )

@@ -6,22 +6,22 @@ import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
-import UpdateAllocationModal from './modals/UpdateAllocationModal'
+import UpdateRecipientAllocationModal from './modals/UpdateRecipientAllocationModal'
 import UpdateRecipientModal from '../../solver/recipientList/modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
-type RecipientAmountListItemProps = {
+type RecipientAllocationListItemProps = {
     recipientSlotPath: ComposerSlotPathType
     currentSolver: ComposerSolverModel
     currentOcId: string
 }
 
-const AllocationListItem = ({
+const RecipientAllocationListItem = ({
     recipientSlotPath,
     currentSolver,
     currentOcId,
-}: RecipientAmountListItemProps) => {
+}: RecipientAllocationListItemProps) => {
     const { composer, dispatch } = useComposerContext()
     const [showEditAmountModal, setShowEditAmountModal] = useState(false)
     const [showEditRecipientModal, setShowEditRecipientModal] = useState(false)
@@ -57,6 +57,7 @@ const AllocationListItem = ({
 
     const currentTitle = getSlotTitle(
         allocation.recipientModel,
+        currentSolver.slotTags,
         composer.solvers
     )
 
@@ -97,7 +98,7 @@ const AllocationListItem = ({
                 }
             />
             {showEditAmountModal && (
-                <UpdateAllocationModal
+                <UpdateRecipientAllocationModal
                     recipientSlotPath={recipientSlotPath}
                     onClose={toggleShowEditAmountModal}
                     allocation={allocation}
@@ -106,14 +107,14 @@ const AllocationListItem = ({
             {showEditRecipientModal && (
                 <UpdateRecipientModal
                     onClose={toggleShowEditRecipientModal}
-                    recipientModel={allocation.recipientModel}
+                    recipientSlot={allocation.recipientModel}
                 />
             )}
         </>
     )
 }
 
-export default AllocationListItem
+export default RecipientAllocationListItem
 
 export const findAllocation = (
     solver: ComposerSolverModel,

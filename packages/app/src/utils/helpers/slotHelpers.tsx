@@ -2,6 +2,7 @@ import { Box, Text } from 'grommet'
 
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { WarningCircle } from 'phosphor-react'
@@ -84,6 +85,7 @@ export const getAllSlotsByDataType = (
  *  */
 export const getSlotTitle = (
     slotModel: ComposerSlotModel,
+    currentSolverTags: SlotTagsHashMapType,
     solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
     if (solvers) {
@@ -96,10 +98,11 @@ export const getSlotTitle = (
                 if (callingSolver) {
                     const callingSlot =
                         callingSolver.config.slots[slotModel.data[0]]
-
                     if (callingSlot) {
-                        if (callingSlot.tag.label !== '') {
-                            return `${callingSlot.tag.label} (${callingSolver.title})`
+                        const callingSlotTag =
+                            callingSolver.slotTags[callingSlot.id]
+                        if (callingSlotTag && callingSlotTag.label !== '') {
+                            return `${callingSlotTag.label} (${callingSolver.title})`
                         } else if (callingSlot.data.length === 1) {
                             return `${callingSlot.data[0].toString()} (${
                                 callingSolver.title
@@ -128,10 +131,10 @@ export const getSlotTitle = (
                 )
                 return `${configSolver?.title}'s ${slotModel.solverConfigAddress.type}`
             }
-
+            const currentSlotTag = currentSolverTags[slotModel.id]
             // Get constant desc or first data entry
-            if (slotModel.tag.label !== '') {
-                return slotModel.tag.label
+            if (currentSlotTag && currentSlotTag.label !== '') {
+                return currentSlotTag.label
             } else if (slotModel.data.length === 1) {
                 return slotModel.data[0].toString()
             }
@@ -141,7 +144,7 @@ export const getSlotTitle = (
         <Box direction="row" gap="xsmall" align="center">
             <WarningCircle color="red" size={'24'} />
             <Text size="small" color="status-error" weight={'normal'}>
-                Missing data
+                No label found
             </Text>
         </Box>
     )

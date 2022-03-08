@@ -1,11 +1,13 @@
 import { ComposerStateType } from '../../composer.types'
-import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
+import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
+import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
 
 const updateRecipientAction = (
     state: ComposerStateType,
     payload: {
         slotId: string
         recipientData: RecipientFormType
+        slotTag: SlotTagFormInputType
     }
 ): ComposerStateType => {
     if (
@@ -24,8 +26,13 @@ const updateRecipientAction = (
         currentSolver.updateRecipient({
             id: payload.slotId,
             address: payload.recipientData.address,
-            label: payload.recipientData.label,
-            description: payload.recipientData.description,
+        })
+
+        currentSolver.updateSlotTag({
+            slotId: payload.slotId,
+            description: payload.slotTag.description,
+            label: payload.slotTag.label,
+            isFlex: payload.slotTag.isFlex,
         })
 
         return {

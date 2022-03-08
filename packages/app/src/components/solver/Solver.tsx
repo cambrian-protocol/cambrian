@@ -14,10 +14,7 @@ import {
     TokenAPI,
     TokenResponseType,
 } from '@cambrian/app/services/api/Token.api'
-import {
-    binaryArrayFromIndexSet,
-    parseMetaData,
-} from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { slotTags, solverTag } from '@cambrian/app/stubs/tags'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { Box } from 'grommet'
@@ -33,17 +30,18 @@ import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SolverMetaDataModel } from '@cambrian/app/models/SolverMetaDataModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { solversMetaData } from '@cambrian/app/stubs/tags'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -187,12 +185,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const conditions = await getConditions()
 
         // TODO TEMP
-        const metaData = solversMetaData
+        const metaData = solverTag
 
+        // TODO Get SlotTags
         const slotsHistory = await getSlotsHistory(
             config.ingests,
             conditions,
-            metaData
+            slotTags
         )
 
         const numMintedTokensByCondition =
@@ -209,7 +208,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             conditions,
             slotsHistory,
             collateralToken,
-            metaData,
+            slotTags,
             numMintedTokensByCondition
         )
 
@@ -226,7 +225,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             numMintedTokensByCondition: numMintedTokensByCondition,
             collateralBalance: collateralBalance,
             collateralToken: collateralToken,
-            metaData: metaData,
+            solverTag: metaData,
+            slotTags: slotTags,
         }
     }
 
@@ -460,7 +460,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         conditions: SolverContractCondition[],
         slotHistory: SlotsHistoryHashMapType,
         collateralToken: TokenResponseType,
-        metaData: SolverMetaDataModel,
+        slotTags: SlotTagsHashMapType,
         numMintedTokensByCondition?: {
             [conditionId: string]: number
         }
@@ -503,7 +503,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
                             const amountPercentage = BigNumber.from(
                                 decodeData(
-                                    amountSlot.tag.dataTypes,
+                                    [SolidityDataTypes.Uint256],
                                     amountSlot.slot.data
                                 )
                             ).div(100)
@@ -539,7 +539,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                                     getIngestWithMetaData(
                                         allocation.recipientAddressSlot,
                                         config.ingests,
-                                        metaData
+                                        slotTags
                                     ),
                                 amountPercentage: amountPercentage.toString(),
                                 positionId: positionId,
@@ -562,7 +562,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getSlotsHistory = async (
         ingests: SlotModel[],
         conditions: SolverContractCondition[],
-        metaData: SolverMetaDataModel
+        slotTags: SlotTagsHashMapType
     ): Promise<SlotsHistoryHashMapType> => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
@@ -594,7 +594,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     )
                     data[currentSlot.slot] = {
                         slot: currentSlot,
-                        tag: metaData.tags[ulid],
+                        tag: slotTags[ulid],
                     }
                 }
             })
@@ -606,7 +606,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const getIngestWithMetaData = (
         slotId: string,
         ingests: SlotModel[],
-        metaData: SolverMetaDataModel
+        slotTags: SlotTagsHashMapType
     ): RichSlotModel => {
         const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
         if (ingestSlot) {
@@ -614,7 +614,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
             return {
                 slot: ingestSlot,
-                tag: metaData.tags[ulid],
+                tag: slotTags[ulid],
             }
         } else {
             throw new Error(`Error while finding ingest with slotId: ${slotId}`)
@@ -633,7 +633,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     getIngestWithMetaData(
                         allocation.recipientAddressSlot,
                         currentSolverData.config.ingests,
-                        currentSolverData.metaData
+                        currentSolverData.slotTags
                     )
             )
         } else {
@@ -662,7 +662,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             getIngestWithMetaData(
                                 ingest.slot,
                                 currentSolverData.config.ingests,
-                                currentSolverData.metaData
+                                currentSolverData.slotTags
                             )
                         )
                     }
@@ -766,7 +766,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title={solversMetaData.title}
+                            title={solverTag.title}
                             subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />

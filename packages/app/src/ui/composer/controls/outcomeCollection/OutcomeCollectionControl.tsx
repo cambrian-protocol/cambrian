@@ -2,16 +2,16 @@ import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
 import { CaretLeft, ListPlus, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import AllocationList from './recipientAmount/AllocationList'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import OutcomeSelectionList from './outcomeSelection/OutcomeSelectionList'
+import RecipientAllocationList from './recipientAmount/RecipientAllocationList'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 export type OutcomeCollectionControllerType =
     | 'MainControl'
     | 'OutcomeSelectionControl'
-    | 'RecipientAmountControl'
+    | 'RecipientAllocationControl'
 
 /* TODO 
 - Warn if two collections with the same outcomes are attached to the Solver 
@@ -34,8 +34,8 @@ const OutcomeCollectionControl = () => {
         switch (controller) {
             case 'OutcomeSelectionControl':
                 return <OutcomeSelectionList />
-            case 'RecipientAmountControl':
-                return <AllocationList />
+            case 'RecipientAllocationControl':
+                return <RecipientAllocationList />
             default:
                 return <></>
         }
@@ -83,7 +83,7 @@ const OutcomeCollectionControl = () => {
                                 icon={<UsersThree />}
                                 title={'Allocation'}
                                 onClick={() =>
-                                    setController('RecipientAmountControl')
+                                    setController('RecipientAllocationControl')
                                 }
                             />
                         </Box>

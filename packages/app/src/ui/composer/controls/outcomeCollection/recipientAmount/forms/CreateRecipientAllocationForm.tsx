@@ -5,25 +5,36 @@ import SelectOrCreateAmount, {
 
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { RecipientFormType } from '../../../solver/recipientList/forms/CreateRecipientForm'
+import { RecipientFormType } from '../../../solver/recipientList/forms/RecipientConfigForm'
+import { SlotTagFormInputType } from '../../../solver/general/forms/SlotTagForm'
+import SlotTagModal from '../../../solver/general/modals/SlotTagModal'
+import { initialSlotTagInput } from '../../../solver/slotList/modals/CreateSlotModal'
 import { required } from '@cambrian/app/src/utils/helpers/validation'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-type CreateAllocationFormProps = {
+type CreateRecipientAllocationFormProps = {
     onClose: () => void
 }
 
-const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
+const CreateRecipientAllocationForm = ({
+    onClose,
+}: CreateRecipientAllocationFormProps) => {
     const { dispatch } = useComposerContext()
+
+    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
+
+    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
 
     const [input, setInput] = useState<RecipientFormType>({
         address: '',
-        description: '',
     })
     const [amountData, setAmountData] = useState<SelectAmountDataType>({
         amount: '',
     })
+
+    const [slotTagInput, setSlotTagInput] =
+        useState<SlotTagFormInputType>(initialSlotTagInput)
 
     const onSubmit = (event: FormExtendedEvent<RecipientFormType, Element>) => {
         event.preventDefault()
@@ -40,10 +51,11 @@ const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
 
         if (amountToSave !== undefined) {
             dispatch({
-                type: 'CREATE_RECIPIENT_WITH_AMOUNT',
+                type: 'CREATE_RECIPIENT_WITH_ALLOCATION',
                 payload: {
                     recipient: input,
                     amount: amountToSave,
+                    slotTag: slotTagInput,
                 },
             })
             onClose()
@@ -58,6 +70,11 @@ const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
             <Box fill>
+                <Button
+                    onClick={toggleShowSlotTagModal}
+                    label="Tag"
+                    secondary
+                />
                 <Form<RecipientFormType>
                     value={input}
                     onSubmit={(event) => onSubmit(event)}
@@ -69,10 +86,6 @@ const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
                         name="address"
                         label="Address*"
                         validate={required}
-                    />
-                    <FormField
-                        name="description"
-                        label="Descriptive Name (Optional)"
                     />
                     <FormField>
                         <SelectOrCreateAmount
@@ -89,8 +102,15 @@ const CreateAllocationForm = ({ onClose }: CreateAllocationFormProps) => {
                     </Box>
                 </Form>
             </Box>
+            {showSlotTagModal && (
+                <SlotTagModal
+                    onBack={toggleShowSlotTagModal}
+                    slotTagInput={slotTagInput}
+                    setSlotTagInput={setSlotTagInput}
+                />
+            )}
         </>
     )
 }
 
-export default CreateAllocationForm
+export default CreateRecipientAllocationForm

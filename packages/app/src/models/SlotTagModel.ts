@@ -1,13 +1,13 @@
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 export type SlotTagsHashMapType = {
-    [elementId: string]: SlotTagModel
+    [slotId: string]: SlotTagModel
 }
 
+// TODO Add icon
 export type SlotTagModel = {
     id: string
-    dataTypes: SolidityDataTypes[]
-    isFlex?: boolean
+    isFlex: boolean
     label: string
     description: string
 }

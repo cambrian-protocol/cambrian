@@ -13,37 +13,43 @@ interface RecipientListItemProps {
 }
 
 const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
-    const { composer, dispatch } = useComposerContext()
+    const { composer, dispatch, currentSolver } = useComposerContext()
+    if (!currentSolver) throw Error('No current Solver defined!')
+
     const [showEditRecipientModal, setShowEditRecipientModal] = useState(false)
 
     const toggleShowEditRecipientModal = () => {
         setShowEditRecipientModal(!showEditRecipientModal)
     }
 
-    const recipientModel = composer.solvers?.find(
+    const recipientSlot = composer.solvers?.find(
         (x) => x.id === recipientSlotPath.solverId
     )?.config.slots[recipientSlotPath.slotId]
 
-    if (!recipientModel) {
+    if (!recipientSlot) {
         throw new Error('Could not find recipient model')
     }
 
     const currentIcon =
-        recipientModel.slotType === SlotType.Callback ? (
+        recipientSlot.slotType === SlotType.Callback ? (
             <ArrowArcLeft size="24" />
-        ) : recipientModel.slotType === SlotType.Function ? (
+        ) : recipientSlot.slotType === SlotType.Function ? (
             <PuzzlePiece size="24" />
         ) : (
             <User size="24" />
         )
 
-    const currentTitle = getSlotTitle(recipientModel, composer.solvers)
+    const currentTitle = getSlotTitle(
+        recipientSlot,
+        currentSolver.slotTags,
+        composer.solvers
+    )
     // TODO custom confirmation modal
     const handleDeleteRecipient = () => {
         if (window.confirm('Are you sure?')) {
             dispatch({
                 type: 'DELETE_SLOT',
-                payload: { slotToDelete: recipientModel },
+                payload: { slotToDelete: recipientSlot },
             })
         }
     }
@@ -56,8 +62,8 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
                 title={currentTitle}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    recipientModel.slotType === SlotType.Constant &&
-                    recipientModel.solverConfigAddress === undefined
+                    recipientSlot.slotType === SlotType.Constant &&
+                    recipientSlot.solverConfigAddress === undefined
                         ? toggleShowEditRecipientModal
                         : undefined
                 }
@@ -65,7 +71,7 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
             {showEditRecipientModal && (
                 <UpdateRecipientModal
                     onClose={toggleShowEditRecipientModal}
-                    recipientModel={recipientModel}
+                    recipientSlot={recipientSlot}
                 />
             )}
         </>

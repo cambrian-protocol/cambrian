@@ -24,7 +24,6 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { SolverMetaDataModel } from '../../models/SolverMetaDataModel'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[]
@@ -56,14 +55,15 @@ export async function parseComposerSolvers(
     }
 
     // TODO OutcomeCollections
-    const solvers: SolverModel[] = sortedSolvers.map((solver, index) => {
+    return sortedSolvers.map((solver, index) => {
         return {
             collateralToken: collateralToken,
             collateralBalance: 0,
             slotsHistory: {},
             timelocksHistory: {},
             outcomeCollections: {},
-            metaData: parseMetaData(sortedSolvers[index]),
+            solverTag: solver.solverTag,
+            slotTags: solver.slotTags,
             conditions: [],
             config: parseComposerSolverConfig(
                 solver.config,
@@ -72,20 +72,6 @@ export async function parseComposerSolvers(
             ),
         }
     })
-
-    return solvers
-}
-
-export function parseMetaData(
-    composerSolver: ComposerSolverModel
-): SolverMetaDataModel {
-    return {
-        title: composerSolver.title,
-        description: 'TODO',
-        customUIULID: 'TODO',
-        version: '1.0',
-        tags: composerSolver.tags,
-    }
 }
 
 export function parseComposerSolverConfig(
@@ -103,7 +89,7 @@ export function parseComposerSolverConfig(
         sortedSolvers
     )
 
-    const solver = {
+    return {
         implementation: composerSolverConfig.implementation
             ? composerSolverConfig.implementation
             : '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
@@ -123,8 +109,6 @@ export function parseComposerSolverConfig(
         ingests: ingests,
         conditionBase: conditionBase,
     }
-
-    return solver
 }
 
 export function parseComposerSlot(

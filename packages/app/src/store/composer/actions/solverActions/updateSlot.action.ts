@@ -1,10 +1,13 @@
 import { ComposerStateType, SlotActionPayload } from '../../composer.types'
 
+import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
+
 const updateSlotAction = (
     state: ComposerStateType,
     payload: {
         slotIdToUpdate: string
         updatedSlot: SlotActionPayload
+        slotTag: SlotTagFormInputType
     }
 ) => {
     // TODO Edge case slot was an amount, but isn't anymore.
@@ -29,8 +32,13 @@ const updateSlotAction = (
             dataTypes: payload.updatedSlot.dataTypes,
             targetSolverId: payload.updatedSlot.targetSolverId,
             solverFunction: payload.updatedSlot.solverFunction,
-            label: payload.updatedSlot.label,
-            description: payload.updatedSlot.description,
+        })
+
+        currentSolver.updateSlotTag({
+            slotId: payload.slotIdToUpdate,
+            label: payload.slotTag.label,
+            description: payload.slotTag.description,
+            isFlex: payload.slotTag.isFlex,
         })
 
         return {

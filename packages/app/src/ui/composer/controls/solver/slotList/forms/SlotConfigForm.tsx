@@ -1,7 +1,6 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 
 import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
-import { IconContext } from 'phosphor-react'
 import SelectCallingSolver from '@cambrian/app/components/selects/SelectCallingSolver'
 import SelectSlot from '@cambrian/app/components/selects/SelectSlot'
 import SelectSlotType from '@cambrian/app/components/selects/SelectSlotType'
@@ -24,8 +23,6 @@ type SlotConfigFormProps = {
 export type SlotConfigFormType = {
     slotType: SlotType
     dataInputFields: SlotDataInputType[]
-    label: string
-    description: string
     solverFunction?: ethers.utils.FunctionFragment
     targetSolverId?: string
     callbackTargetSlotPath?: ComposerSlotPathType
@@ -98,8 +95,6 @@ const SlotConfigForm = ({
         case SlotType.Manual:
             FormFields = (
                 <>
-                    <FormField label="Slot label" name="label" />
-                    <FormField label="Slot description" name="description" />
                     <SlotDataInputField
                         value={slotInput.dataInputFields[0]}
                         onUpdate={handleUpdateDataInputField}
@@ -155,10 +150,8 @@ const SlotConfigForm = ({
                     <SelectSlotType name="slotType" />
                 </FormField>
                 {FormFields}
-                <Box>
-                    <IconContext.Provider value={{ size: '24' }}>
-                        <Button primary type="submit" label={submitLabel} />
-                    </IconContext.Provider>
+                <Box direction="row" justify="between">
+                    <Button primary type="submit" label={submitLabel} />
                 </Box>
             </Form>
         </Box>
@@ -192,8 +185,6 @@ export const mapSlotConfigFormToSlotActionPayload = (
         slotType: slotConfigFormInput.slotType,
         dataTypes: dataTypes,
         data: data,
-        label: slotConfigFormInput.label,
-        description: slotConfigFormInput.description,
     }
 
     switch (slotConfigFormInput.slotType) {

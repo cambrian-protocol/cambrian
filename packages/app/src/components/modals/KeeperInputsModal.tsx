@@ -4,6 +4,7 @@ import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
@@ -24,12 +25,13 @@ const KeeperInputsModal = ({
                 {manualInputs.map((manualSlot) => {
                     if (manualSlot !== undefined) {
                         return (
+                            // TODO dynamic datatype parsing
                             <BaseSlotInputItem
                                 key={manualSlot.slot.slot}
                                 info={manualSlot.tag.description}
                                 title={manualSlot.tag.label}
                                 subTitle={decodeData(
-                                    manualSlot.tag.dataTypes,
+                                    [SolidityDataTypes.Address],
                                     manualSlot.slot.data
                                 )}
                             />
