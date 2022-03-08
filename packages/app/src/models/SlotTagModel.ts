@@ -1,5 +1,3 @@
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-
 export type SlotTagsHashMapType = {
     [slotId: string]: SlotTagModel
 }
