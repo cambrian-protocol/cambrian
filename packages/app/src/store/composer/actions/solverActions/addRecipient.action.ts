@@ -40,8 +40,6 @@ const addRecipientAction = (
                     type: payload.value,
                     solverId: payload.solverId,
                 },
-                description: '',
-                label: '',
             })
 
             // Link Entity to new slot
@@ -55,8 +53,6 @@ const addRecipientAction = (
             // Slot received - Create a callback slot
             const newSlot = currentSolver.addRecipient({
                 type: 'Callback',
-                description: '',
-                label: '',
                 data: payload.value,
                 targetSolverId: payload.solverId,
             })
@@ -70,8 +66,6 @@ const addRecipientAction = (
             // Solver received - Create a function slot
             currentSolver.addRecipient({
                 type: 'Solver',
-                description: '',
-                label: '',
                 data: payload.value.id,
                 targetSolverId: payload.value.id,
             })

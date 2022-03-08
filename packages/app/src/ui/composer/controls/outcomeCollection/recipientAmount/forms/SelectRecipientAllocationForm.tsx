@@ -11,11 +11,13 @@ import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextS
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
-type SelectAllocationFormProps = {
+type SelectRecipientAllocationFormProps = {
     onClose: () => void
 }
 
-const SelectAllocationForm = ({ onClose }: SelectAllocationFormProps) => {
+const SelectRecipientAllocationForm = ({
+    onClose,
+}: SelectRecipientAllocationFormProps) => {
     const { dispatch } = useComposerContext()
 
     const [selectedRecipient, setSelectedRecipient] =
@@ -42,7 +44,7 @@ const SelectAllocationForm = ({ onClose }: SelectAllocationFormProps) => {
 
             if (amountToSave !== undefined) {
                 dispatch({
-                    type: 'ADD_RECIPIENT_WITH_AMOUNT',
+                    type: 'ADD_RECIPIENT_WITH_ALLOCATION',
                     payload: {
                         amount: amountToSave,
                         recipient: selectedRecipient.address,
@@ -81,4 +83,4 @@ const SelectAllocationForm = ({ onClose }: SelectAllocationFormProps) => {
     )
 }
 
-export default SelectAllocationForm
+export default SelectRecipientAllocationForm

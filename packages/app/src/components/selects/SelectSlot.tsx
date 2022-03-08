@@ -64,17 +64,18 @@ const SelectSlot = ({
             for (let i = 0; i < currentSolverIndex; i++) {
                 Object.keys(solverHierarchy[i]?.config.slots).forEach((key) => {
                     const slot = solverHierarchy[i].config.slots[key]
+                    const slotTag = currentSolver.slotTags[slot.id]
 
-                    const slotDescription = `${
-                        slot.description && slot.description !== ''
-                            ? slot.description + ' '
+                    const slotLabel = `${
+                        slotTag && slotTag.label !== ''
+                            ? slotTag.label + ' '
                             : ''
                     }(${
                         solverHierarchy[i].title
                     } - Data: ${slot.data.toString()})`
 
                     const currentSelectSlotForm = {
-                        label: slotDescription,
+                        label: slotLabel,
                         callbackTargetSlotPath: {
                             slotId: slot.id,
                             solverId: solverHierarchy[i].id,

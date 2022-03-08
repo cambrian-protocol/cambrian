@@ -8,7 +8,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { addCallbackToTargetIncomingCallbacks } from '../solverActions/createSlot.action'
 
 // TODO DRY with addRecipientAction
-const addRecipientWithAmountAction = (
+const addRecipientAllocationAction = (
     state: ComposerStateType,
     payload: {
         recipient: SelectedRecipientAddressType
@@ -50,8 +50,6 @@ const addRecipientWithAmountAction = (
             newRecipientSlot = currentSolver.addRecipient({
                 type: payload.recipient.value,
                 data: sourceEntity.address,
-                description: '',
-                label: '',
                 solverConfigAdress: {
                     type: payload.recipient.value,
                     solverId: payload.recipient.solverId,
@@ -72,10 +70,8 @@ const addRecipientWithAmountAction = (
 
             newRecipientSlot = currentSolver.addRecipient({
                 type: 'Callback',
-                data: payload.recipient.value.id,
+                data: payload.recipient.value,
                 targetSolverId: payload.recipient.solverId,
-                label: '',
-                description: '',
             })
 
             addCallbackToTargetIncomingCallbacks(
@@ -90,13 +86,11 @@ const addRecipientWithAmountAction = (
                 type: 'Solver',
                 data: payload.recipient.value.id,
                 targetSolverId: payload.recipient.value.id,
-                label: '',
-                description: '',
             })
         }
 
         if (isSlot(payload.amount)) {
-            currentSolver.updateRecipientAmount(
+            currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 newRecipientSlot.id,
                 payload.amount.id
@@ -106,10 +100,8 @@ const addRecipientWithAmountAction = (
                 data: [payload.amount],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
-                label: '',
-                description: '',
             })
-            currentSolver.updateRecipientAmount(
+            currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 newRecipientSlot.id,
                 newAmountSlot.id
@@ -124,4 +116,4 @@ const addRecipientWithAmountAction = (
     return state
 }
 
-export default addRecipientWithAmountAction
+export default addRecipientAllocationAction

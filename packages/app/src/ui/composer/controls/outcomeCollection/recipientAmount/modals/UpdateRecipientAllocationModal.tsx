@@ -13,7 +13,7 @@ import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
-type UpdateAllocationModalProps = {
+type UpdateRecipientAllocationModalProps = {
     allocation: ComposerAllocationType
     recipientSlotPath: ComposerSlotPathType
     onClose: () => void
@@ -23,11 +23,11 @@ type UpdateAllocationModalProps = {
     - Proper Error handling if amount is not numeric
 
 */
-const UpdateAllocationModal = ({
+const UpdateRecipientAllocationModal = ({
     onClose,
     allocation,
     recipientSlotPath,
-}: UpdateAllocationModalProps) => {
+}: UpdateRecipientAllocationModalProps) => {
     const { dispatch } = useComposerContext()
     const [amountData, setAmountData] = useState<SelectAmountDataType>({
         amount: '',
@@ -56,7 +56,7 @@ const UpdateAllocationModal = ({
 
         if (amountToSave !== undefined) {
             dispatch({
-                type: 'UPDATE_RECIPIENT_AMOUNT',
+                type: 'UPDATE_RECIPIENT_ALLOCATION',
                 payload: {
                     amount: amountToSave,
                     recipient: recipientSlotPath,
@@ -96,4 +96,4 @@ const UpdateAllocationModal = ({
     )
 }
 
-export default UpdateAllocationModal
+export default UpdateRecipientAllocationModal

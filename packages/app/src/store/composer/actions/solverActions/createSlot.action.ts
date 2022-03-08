@@ -2,11 +2,12 @@ import { ComposerStateType, SlotActionPayload } from '../../composer.types'
 
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
 
 const createSlotAction = (
     state: ComposerStateType,
-    payload: SlotActionPayload
+    payload: { slot: SlotActionPayload; slotTag: SlotTagFormInputType }
 ): ComposerStateType => {
     if (
         state.currentIdPath !== undefined &&
@@ -22,16 +23,21 @@ const createSlotAction = (
         }
 
         const newSlot = currentSolver.addSlot({
-            data: payload.data,
-            slotType: payload.slotType,
-            dataTypes: payload.dataTypes,
-            targetSolverId: payload.targetSolverId,
-            solverFunction: payload.solverFunction,
-            label: payload.label,
-            description: payload.description,
+            data: payload.slot.data,
+            slotType: payload.slot.slotType,
+            dataTypes: payload.slot.dataTypes,
+            targetSolverId: payload.slot.targetSolverId,
+            solverFunction: payload.slot.solverFunction,
         })
 
-        if (payload.slotType === SlotType.Callback) {
+        currentSolver.addSlotTag({
+            slotId: newSlot.id,
+            label: payload.slotTag.label,
+            description: payload.slotTag.description,
+            isFlex: payload.slotTag.isFlex,
+        })
+
+        if (payload.slot.slotType === SlotType.Callback) {
             addCallbackToTargetIncomingCallbacks(
                 newSlot,
                 currentSolver.id,

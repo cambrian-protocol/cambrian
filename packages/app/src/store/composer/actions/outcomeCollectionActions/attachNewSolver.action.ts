@@ -37,8 +37,6 @@ const attachNewSolverAction = (state: ComposerStateType): ComposerStateType => {
             type: 'Solver',
             data: newSolver.id,
             targetSolverId: newSolver.id,
-            label: '',
-            description: '',
         })
 
         // Flow updates

@@ -3,6 +3,7 @@ import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import RecipientAllocationItem from '../list/RecipientAllocationItem'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 interface RecipientAllocationModalProps {
@@ -24,7 +25,7 @@ const RecipientAllocationModal = ({
             <Box gap="medium" fill>
                 {allocations.map((allocation, idx) => {
                     const decodedAddress = decodeData(
-                        allocation.addressSlot.tag.dataTypes,
+                        [SolidityDataTypes.Address],
                         allocation.addressSlot.slot.data
                     )
                     return (

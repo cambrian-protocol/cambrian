@@ -261,8 +261,8 @@ const WriterSolverUI = ({
                     roles.includes('Buyer') ||
                     roles.includes('Arbitrator') ? (
                         <ConditionVersionSidebar
-                            solverTitle={`Solver: ${solverData.metaData.title}`}
-                            solverMetaVersion={`v${solverData.metaData.version}`}
+                            solverTitle={`Solver: ${solverData.solverTag.title}`}
+                            solverMetaVersion={`v${solverData.solverTag.version}`}
                             currentCondition={currentCondition}
                             setCurrentCondition={setCurrentCondition}
                             solverConditions={solverData.conditions}

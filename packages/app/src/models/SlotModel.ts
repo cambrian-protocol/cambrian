@@ -44,7 +44,6 @@ export type ComposerSlotModel = {
     solverFunction?: ethers.utils.FunctionFragment
     incomingCallbacks?: ComposerSlotPathType[]
     solverConfigAddress?: ComposerSolverConfigAddressType
-    tag: SlotTagModel
 }
 
 export type ComposerSlotPathType = { solverId: string; slotId: string }
