@@ -39,7 +39,7 @@ const SelectRecipient = ({
     useEffect(() => {
         if (currentSolver !== undefined) {
             const availableAddresses: SelectRecipientType[] =
-                getAvailableParentAddresses(currentSolver, composer.solvers)
+                getAvailableAddresses(currentSolver, composer.solvers)
 
             // Add Keeper and Arbitrator addresses to the list
             composer.solvers.forEach((solver) => {
@@ -107,11 +107,46 @@ export default SelectRecipient
  * Constant addresses and Solvers
  *
  *  */
-const getAvailableParentAddresses = (
+const getAvailableAddresses = (
     currentSolver: ComposerSolverModel,
     solvers: ComposerSolverModel[]
 ): SelectRecipientType[] => {
     let currentAvailableAddresses: SelectRecipientType[] = []
+
+    currentAvailableAddresses.push({
+        title: currentSolver.title,
+        address: {
+            solverId: currentSolver.id,
+            value: currentSolver,
+        },
+    })
+
+    Object.keys(currentSolver.config.slots).forEach((slot) => {
+        if (
+            currentSolver.config.slots[slot].dataTypes.length === 1 &&
+            currentSolver.config.slots[slot].solverConfigAddress ===
+                undefined &&
+            currentSolver.config.slots[slot].dataTypes[0] ===
+                SolidityDataTypes.Address &&
+            (currentSolver.config.slots[slot].slotType === SlotType.Constant ||
+                currentSolver.config.slots[slot].slotType === SlotType.Manual)
+        ) {
+            const currentTitle = getSlotTitle(
+                currentSolver.config.slots[slot],
+                currentSolver.slotTags,
+                solvers
+            )
+
+            currentAvailableAddresses.push({
+                title: currentTitle.toString(),
+                address: {
+                    solverId: currentSolver.id,
+                    value: currentSolver.config.slots[slot],
+                },
+            })
+        }
+    })
+
     if (
         currentSolver.config.condition.parentCollection !== undefined &&
         currentSolver.config.condition.parentCollection.solverId !== undefined
@@ -123,43 +158,8 @@ const getAvailableParentAddresses = (
         )
 
         if (parentSolver) {
-            currentAvailableAddresses.push({
-                title: parentSolver.title,
-                address: {
-                    solverId: parentSolver.id,
-                    value: parentSolver,
-                },
-            })
-
-            Object.keys(parentSolver.config.slots).forEach((slot) => {
-                if (
-                    parentSolver.config.slots[slot].dataTypes.length === 1 &&
-                    parentSolver.config.slots[slot].solverConfigAddress ===
-                        undefined &&
-                    parentSolver.config.slots[slot].dataTypes[0] ===
-                        SolidityDataTypes.Address &&
-                    (parentSolver.config.slots[slot].slotType ===
-                        SlotType.Constant ||
-                        parentSolver.config.slots[slot].slotType ===
-                            SlotType.Manual)
-                ) {
-                    const currentTitle = getSlotTitle(
-                        parentSolver.config.slots[slot],
-                        parentSolver.slotTags,
-                        solvers
-                    )
-
-                    currentAvailableAddresses.push({
-                        title: currentTitle.toString(),
-                        address: {
-                            solverId: parentSolver.id,
-                            value: parentSolver.config.slots[slot],
-                        },
-                    })
-                }
-            })
             currentAvailableAddresses = currentAvailableAddresses.concat(
-                getAvailableParentAddresses(parentSolver, solvers)
+                getAvailableAddresses(parentSolver, solvers)
             )
         }
     }

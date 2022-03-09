@@ -62,7 +62,8 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
                 title={currentTitle}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    recipientSlot.slotType === SlotType.Constant &&
+                    (recipientSlot.slotType === SlotType.Constant ||
+                        recipientSlot.slotType === SlotType.Manual) &&
                     recipientSlot.solverConfigAddress === undefined
                         ? toggleShowEditRecipientModal
                         : undefined

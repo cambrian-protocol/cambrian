@@ -50,18 +50,28 @@ const addRecipientAction = (
             }
         } else if (isSlot(payload.value)) {
             // Did i receive a Slot or a Solver as recipient?
-            // Slot received - Create a callback slot
-            const newSlot = currentSolver.addRecipient({
-                type: 'Callback',
-                data: payload.value,
-                targetSolverId: payload.solverId,
-            })
 
-            addCallbackToTargetIncomingCallbacks(
-                newSlot,
-                currentSolver.id,
-                updatedSolvers
-            )
+            // Slot received
+            if (payload.solverId === currentSolver.id) {
+                // A slot of the current solver has been selected as a recipient, just add it to our recipients
+                currentSolver.addRecipient({
+                    type: 'Slot_Exists',
+                    data: payload.value.id,
+                })
+            } else {
+                // The slot is from up the solver chain - We create a callback slot
+                const newSlot = currentSolver.addRecipient({
+                    type: 'Callback',
+                    data: payload.value,
+                    targetSolverId: payload.solverId,
+                })
+
+                addCallbackToTargetIncomingCallbacks(
+                    newSlot,
+                    currentSolver.id,
+                    updatedSolvers
+                )
+            }
         } else {
             // Solver received - Create a function slot
             currentSolver.addRecipient({

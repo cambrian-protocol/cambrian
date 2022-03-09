@@ -35,11 +35,7 @@ const RecipientConfigForm = ({
                     setRecipientInput(nextValue)
                 }}
             >
-                <FormField
-                    name="address"
-                    label="Address*"
-                    validate={required}
-                />
+                <FormField name="address" label="Address" />
                 <Box>
                     <Button primary type="submit" label={submitLabel} />
                 </Box>
