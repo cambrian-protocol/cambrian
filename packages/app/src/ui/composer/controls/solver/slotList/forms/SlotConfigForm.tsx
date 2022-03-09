@@ -1,5 +1,6 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import SelectCallingSolver from '@cambrian/app/components/selects/SelectCallingSolver'
 import SelectSlot from '@cambrian/app/components/selects/SelectSlot'
@@ -138,7 +139,7 @@ const SlotConfigForm = ({
     }
 
     return (
-        <Box fill>
+        <BaseFormContainer>
             <Form<SlotConfigFormType>
                 value={slotInput}
                 onSubmit={(event) => onSubmit(event)}
@@ -150,11 +151,11 @@ const SlotConfigForm = ({
                     <SelectSlotType name="slotType" />
                 </FormField>
                 {FormFields}
-                <Box direction="row" justify="between">
+                <Box margin={{ top: 'small' }}>
                     <Button primary type="submit" label={submitLabel} />
                 </Box>
             </Form>
-        </Box>
+        </BaseFormContainer>
     )
 }
 

@@ -6,11 +6,13 @@ import RecipientConfigForm, {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { Button } from 'grommet'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
 import SlotTagModal from '../../general/modals/SlotTagModal'
+import { Tag } from 'phosphor-react'
 import { initialSlotTagInput } from '../../slotList/modals/CreateSlotModal'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
@@ -77,12 +79,15 @@ const UpdateRecipientModal = ({
                     subTitle="Changed your mind?"
                     paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
                 />
-                <Button
-                    onClick={toggleShowSlotTagModal}
-                    secondary
-                    label="Tag"
-                />
                 <Box fill>
+                    <BaseMenuListItem
+                        subTitle="Define a label, a description and more..."
+                        title="Tag"
+                        icon={<Tag />}
+                        onClick={toggleShowSlotTagModal}
+                    />
+                    <PlainSectionDivider />
+                    <HeaderTextSection paragraph="Setup the type of slot and it's according configuration for the smart contract." />
                     <RecipientConfigForm
                         onSubmit={onSubmit}
                         setRecipientInput={setInput}

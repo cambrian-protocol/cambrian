@@ -8,6 +8,7 @@ import SelectOrCreateAmount, {
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
 import { useEffect, useState } from 'react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
@@ -71,26 +72,26 @@ const UpdateRecipientAllocationModal = ({
     return (
         <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
-                title="Define share"
+                title="Define the share"
                 subTitle="Choose an existant amount to save gas"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
             />
             <Box gap="small" fill="horizontal">
-                <Box flex>
+                <BaseFormContainer gap="small">
                     <SelectOrCreateAmount
                         amountData={amountData}
                         setAmountData={setAmountData}
                     />
-                </Box>
-                <Button
-                    primary
-                    disabled={
-                        amountData.amount ===
-                        allocation.amountModel?.data.toString()
-                    }
-                    label="Save"
-                    onClick={onSave}
-                />
+                    <Button
+                        primary
+                        disabled={
+                            amountData.amount ===
+                            allocation.amountModel?.data.toString()
+                        }
+                        label="Save"
+                        onClick={onSave}
+                    />
+                </BaseFormContainer>
             </Box>
         </BaseLayerModal>
     )

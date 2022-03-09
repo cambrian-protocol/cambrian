@@ -36,14 +36,12 @@ const CreateOutcomeModal = ({ onClose }: CreateOutcomeModalProps) => {
                 subTitle="What could happen?"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
-            <Box fill>
-                <OutcomeConfigForm
-                    onSubmit={onSubmit}
-                    outcomeInput={input}
-                    setOutcomeInput={setInput}
-                    submitLabel="Create"
-                />
-            </Box>
+            <OutcomeConfigForm
+                onSubmit={onSubmit}
+                outcomeInput={input}
+                setOutcomeInput={setInput}
+                submitLabel="Create"
+            />
         </BaseLayerModal>
     )
 }
