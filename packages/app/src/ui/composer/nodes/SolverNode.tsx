@@ -36,7 +36,7 @@ export const SolverNode = memo((props: FlowElement) => {
                 <Box direction="row" gap="small">
                     <PuzzlePiece color="white" size="24" />
                     <Heading color="white" level="4">
-                        {props.data?.label}
+                        {currentSolverNode?.solverTag?.title}
                     </Heading>
                 </Box>
                 <Box>

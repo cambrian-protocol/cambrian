@@ -20,8 +20,10 @@ import updateSelectedElementAction from './flow/updateSelectedElement.action'
 import updateSlotAction from './solverActions/updateSlot.action'
 import updateSolutionSettingsAction from './general/updateSolutionSettings.action'
 import updateSolverMainConfigAction from './solverActions/updateSolverMainConfig.action'
+import updateSolverTagAction from './solverActions/updateSolverTag.action'
 
 export {
+    updateSolverTagAction,
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
     dragNodeAction,

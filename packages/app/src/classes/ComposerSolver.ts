@@ -1,3 +1,4 @@
+import { SolverTagModel } from './../models/SolverTagModel'
 import { SlotTagsHashMapType } from './../models/SlotTagModel'
 import { ethers } from 'ethers'
 import { ulid } from 'ulid'
@@ -26,7 +27,6 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
-import { SolverTagModel } from '../models/SolverTagModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -68,15 +68,12 @@ type AddSlotTagProps = {
 
 export default class ComposerSolver {
     id: string
-    title: string
-    description: string
     iface: ethers.utils.Interface
     config: ComposerSolverConfigModel
     slotTags: SlotTagsHashMapType
     solverTag: SolverTagModel
 
     constructor(
-        title = 'New Solver',
         iface = new ethers.utils.Interface(Constants.DEFAULT_ABI),
         id?: string,
         config?: ComposerSolverConfigModel,
@@ -85,35 +82,21 @@ export default class ComposerSolver {
     ) {
         this.id = id ? id : ulid()
         this.iface = iface
-        this.title = title
-        this.description = ''
         this.config = config ? config : this.getDefaultConfig()
         this.slotTags = slotTags || {}
         this.solverTag = solverTag || {
-            title: 'TODO',
-            description: 'TODO',
-            version: 'TODO',
+            title: 'New Solver',
+            description: '',
+            version: '1.0',
+            banner: '',
+            avatar: '',
         }
     }
 
     /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
-        const {
-            title,
-            description,
-            keeperAddress,
-            arbitratorAddress,
-            timelockSeconds,
-        } = mainConfig
-
-        if (title !== this.title) {
-            this.updateTitle(title)
-        }
-
-        if (description !== this.description) {
-            this.updateDescription(description)
-        }
+        const { keeperAddress, arbitratorAddress, timelockSeconds } = mainConfig
 
         if (keeperAddress !== this.config.keeperAddress.address) {
             this.updateKeeper(keeperAddress)
@@ -126,14 +109,6 @@ export default class ComposerSolver {
         if (timelockSeconds !== this.config.timelockSeconds) {
             this.updateTimelock(timelockSeconds)
         }
-    }
-
-    updateTitle(title: string) {
-        this.title = title
-    }
-
-    updateDescription(description: string) {
-        this.description = description
     }
 
     updateKeeper(address: string) {
@@ -187,6 +162,22 @@ export default class ComposerSolver {
 
     deleteSlotTag(slotId: string) {
         delete this.slotTags[slotId]
+    }
+
+    updateSolverTag({
+        title,
+        description,
+        version,
+        avatar,
+        banner,
+    }: SolverTagModel) {
+        this.solverTag = {
+            title: title,
+            description: description,
+            version: version,
+            avatar: avatar,
+            banner: banner,
+        }
     }
 
     /*************************** Outcomes & Collections ***************************/
