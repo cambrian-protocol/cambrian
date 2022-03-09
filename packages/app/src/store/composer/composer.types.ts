@@ -14,6 +14,7 @@ import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { ethers } from 'ethers'
 
 // TODO Refactor, cleanup
@@ -45,6 +46,12 @@ export type ComposerAction =
     | LoadComposerAction
     | DragNodeActionType
     | UpdateSolutionSettingsActionType
+    | UpdateSolverTagActionType
+
+type UpdateSolverTagActionType = {
+    type: 'UPDATE_SOLVER_TAG'
+    payload: SolverTagModel
+}
 
 type LoadComposerAction = {
     type: 'LOAD_COMPOSER'

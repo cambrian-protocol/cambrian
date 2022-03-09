@@ -1,6 +1,8 @@
 import { Box, DropButton, Text } from 'grommet'
 import { CaretRight, IconContext, Info } from 'phosphor-react'
 
+import PlainSectionDivider from '../sections/PlainSectionDivider'
+
 export interface BaseMenuListItemProps {
     title: string
     subTitle?: string
@@ -58,6 +60,7 @@ const BaseMenuListItem = ({
                     </Box>
                 )}
             </Box>
+            <PlainSectionDivider />
         </IconContext.Provider>
     )
 }
