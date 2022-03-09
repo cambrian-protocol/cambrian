@@ -21,6 +21,7 @@ import {
     UPDATE_SLOT,
     UPDATE_SOLUTION_SETTINGS,
     UPDATE_SOLVER_MAIN_CONFIG,
+    UPDATE_SOLVER_TAG,
 } from './composer.constants'
 import { ComposerAction, ComposerStateType } from './composer.types'
 import {
@@ -46,6 +47,7 @@ import {
     updateSlotAction,
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
+    updateSolverTagAction,
 } from './actions'
 
 export const composerReducer = (
@@ -100,6 +102,8 @@ export const composerReducer = (
             return dragNodeAction(state, action.payload)
         case UPDATE_SOLUTION_SETTINGS:
             return updateSolutionSettingsAction(state, action.payload)
+        case UPDATE_SOLVER_TAG:
+            return updateSolverTagAction(state, action.payload)
         default:
             return state
     }

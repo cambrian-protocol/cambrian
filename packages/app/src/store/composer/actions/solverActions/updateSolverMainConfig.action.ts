@@ -2,8 +2,6 @@ import { ComposerStateType } from '../../composer.types'
 import _ from 'lodash'
 
 export type SolverMainConfigType = {
-    title: string
-    description: string
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds: number
@@ -61,18 +59,8 @@ const updateSolverMainConfigAction = (
 
         currentSolver.updateMainConfig(payload)
 
-        const updatedFlow = state.flowElements.map((el) => {
-            if (el.id === state.currentElement?.id) {
-                el.data = {
-                    ...el.data,
-                    label: payload.title,
-                }
-            }
-            return el
-        })
         return {
             ...state,
-            flowElements: updatedFlow,
             solvers: updatedSolvers,
         }
     }

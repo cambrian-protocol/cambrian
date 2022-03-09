@@ -7,16 +7,16 @@ import {
     Text,
     TextInput,
 } from 'grommet'
-import { ClipboardText, Scales, Shield, Timer } from 'phosphor-react'
 import React, { useEffect, useState } from 'react'
+import { Scales, Shield, Tag, Timer } from 'phosphor-react'
 
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import SolverTagModal from './modals/SolverTagModal'
 import _ from 'lodash'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 type SolverSettingsControlInputType = {
-    title: string
-    description: string
     keeperAddress: string
     arbitratorAddress: string
     timelockDays: number
@@ -25,8 +25,6 @@ type SolverSettingsControlInputType = {
 }
 
 const initialSolverSettingsInput: SolverSettingsControlInputType = {
-    title: '',
-    description: '',
     keeperAddress: '',
     arbitratorAddress: '',
     timelockDays: 0,
@@ -70,6 +68,11 @@ const parseSecondsToForm = (
 const SolverSettingsControl = () => {
     const { dispatch, currentSolver } = useComposerContext()
 
+    const [showSolverTagModal, setShowSolverTagModal] = useState(false)
+
+    const toggleShowSolverTagModal = () =>
+        setShowSolverTagModal(!showSolverTagModal)
+
     const [initialInput, setInitialInput] =
         useState<SolverSettingsControlInputType>(initialSolverSettingsInput)
     const [input, setInput] = useState<SolverSettingsControlInputType>(
@@ -83,8 +86,6 @@ const SolverSettingsControl = () => {
                 ? parseSecondsToForm(currentSolver.config.timelockSeconds)
                 : { weeks: 0, days: 0, hours: 0, minutes: 0 }
             const loadedInput = {
-                title: currentSolver.title,
-                description: currentSolver.description,
                 keeperAddress: currentSolver.config.keeperAddress.address,
                 arbitratorAddress:
                     currentSolver.config.arbitratorAddress.address,
@@ -108,8 +109,6 @@ const SolverSettingsControl = () => {
             payload: {
                 arbitratorAddress: input.arbitratorAddress,
                 keeperAddress: input.keeperAddress,
-                title: input.title,
-                description: input.description,
                 timelockSeconds: parseInputToSeconds({
                     days: input.timelockDays,
                     hours: input.timelockHours,
@@ -119,8 +118,6 @@ const SolverSettingsControl = () => {
         })
 
         setInitialInput({
-            title: input.title,
-            description: input.description,
             keeperAddress: input.keeperAddress,
             arbitratorAddress: input.arbitratorAddress,
             timelockDays: input.timelockDays,
@@ -129,81 +126,90 @@ const SolverSettingsControl = () => {
         })
     }
 
+    if (!currentSolver) throw Error('No current Solver defined!')
+
     return (
-        <Box gap="small" overflow={{ vertical: 'auto' }}>
-            <HeaderTextSection
-                title="Solver settings"
-                subTitle="Lorem Ipsum"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
-            />
-            <Form<SolverSettingsControlInputType>
-                value={input}
-                onSubmit={(event) => onSubmit(event)}
-                onChange={(nextValue: SolverSettingsControlInputType) => {
-                    setInput(nextValue)
-                }}
-            >
-                <FormField
-                    label={
-                        <Box direction="row" gap="small">
-                            <ClipboardText size="24" />
-                            <Text>Title</Text>
-                        </Box>
-                    }
+        <>
+            <Box gap="small" overflow={{ vertical: 'auto' }}>
+                <HeaderTextSection
+                    title="Solver settings"
+                    subTitle="Lorem Ipsum"
+                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                />
+                <BaseMenuListItem
+                    title="Solver Tag"
+                    icon={<Tag />}
+                    onClick={toggleShowSolverTagModal}
+                />
+                <HeaderTextSection paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra." />
+                <Form<SolverSettingsControlInputType>
+                    value={input}
+                    onSubmit={(event) => onSubmit(event)}
+                    onChange={(nextValue: SolverSettingsControlInputType) => {
+                        setInput(nextValue)
+                    }}
                 >
-                    <TextInput name="title" />
-                </FormField>
-                <FormField
-                    name="keeperAddress"
-                    label={
-                        <Box direction="row" gap="small">
-                            <Shield size="24" />
-                            <Text>Keeper address</Text>
+                    <FormField
+                        name="keeperAddress"
+                        label={
+                            <Box direction="row" gap="small">
+                                <Shield size="24" />
+                                <Text>Keeper address</Text>
+                            </Box>
+                        }
+                    >
+                        <TextInput name="keeperAddress" />
+                    </FormField>
+                    <FormField
+                        label={
+                            <Box direction="row" gap="small">
+                                <Scales size="24" />
+                                <Text>Arbitrator address</Text>
+                            </Box>
+                        }
+                    >
+                        <TextInput name="arbitratorAddress" />
+                    </FormField>
+                    <FormField
+                        label={
+                            <Box direction="row" gap="small">
+                                <Timer size="24" />
+                                <Text>Time lock</Text>
+                            </Box>
+                        }
+                    >
+                        <Box direction="row">
+                            <FormField label="Days">
+                                <TextInput type="number" name="timelockDays" />
+                            </FormField>
+                            <FormField label="Hours">
+                                <TextInput type="number" name="timelockHours" />
+                            </FormField>
+                            <FormField label="Minutes">
+                                <TextInput
+                                    type="number"
+                                    name="timelockMinutes"
+                                />
+                            </FormField>
                         </Box>
-                    }
-                >
-                    <TextInput name="keeperAddress" />
-                </FormField>
-                <FormField
-                    label={
-                        <Box direction="row" gap="small">
-                            <Scales size="24" />
-                            <Text>Arbitrator address</Text>
-                        </Box>
-                    }
-                >
-                    <TextInput name="arbitratorAddress" />
-                </FormField>
-                <FormField
-                    label={
-                        <Box direction="row" gap="small">
-                            <Timer size="24" />
-                            <Text>Time lock</Text>
-                        </Box>
-                    }
-                >
-                    <Box direction="row">
-                        <FormField label="Days">
-                            <TextInput type="number" name="timelockDays" />
-                        </FormField>
-                        <FormField label="Hours">
-                            <TextInput type="number" name="timelockHours" />
-                        </FormField>
-                        <FormField label="Minutes">
-                            <TextInput type="number" name="timelockMinutes" />
-                        </FormField>
+                    </FormField>
+                    <Box flex>
+                        <Button
+                            disabled={_.isEqual(initialInput, input)}
+                            primary
+                            type="submit"
+                            label={'Save'}
+                        />
                     </Box>
-                </FormField>
-                <Box flex>
-                    <Button
-                        disabled={_.isEqual(initialInput, input)}
-                        primary
-                        type="submit"
-                        label={'Save'}
-                    />
-                </Box>
-            </Form>
-        </Box>
+                </Form>
+            </Box>
+            {showSolverTagModal && (
+                <SolverTagModal
+                    onBack={toggleShowSolverTagModal}
+                    currentSolverTag={currentSolver.solverTag}
+                />
+            )}
+        </>
     )
 }
 

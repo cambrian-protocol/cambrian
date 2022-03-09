@@ -13,7 +13,6 @@ import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeList from './outcomeList/OutcomeList'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecipientList from './recipientList/RecipientList'
 import SlotList from './slotList/SlotList'
 import SolverSettingsControl from './general/SolverSettingsControl'
@@ -61,8 +60,6 @@ export const SolverControl = () => {
         }
     }
 
-    if (currentSolver === undefined) return null
-
     return (
         <Card background="background-front" fill>
             <CardHeader pad={'medium'} elevation="small" height={'5em'}>
@@ -78,7 +75,7 @@ export const SolverControl = () => {
                 </Box>
                 <Box flex>
                     <Text weight="bold" size="small">
-                        {currentSolver?.title}
+                        {currentSolver?.solverTag.title}
                     </Text>
                 </Box>
             </CardHeader>
@@ -99,7 +96,6 @@ export const SolverControl = () => {
                                         setController('SolverSettingsControl')
                                     }
                                 />
-                                <PlainSectionDivider />
                                 <BaseMenuListItem
                                     icon={<TreeStructure />}
                                     title="Outcome list"
@@ -107,7 +103,6 @@ export const SolverControl = () => {
                                         setController('OutcomeListControl')
                                     }
                                 />
-                                <PlainSectionDivider />
                                 <BaseMenuListItem
                                     icon={<UserList />}
                                     title={'Recipient list'}
@@ -115,7 +110,6 @@ export const SolverControl = () => {
                                         setController('RecipientListControl')
                                     }
                                 />
-                                <PlainSectionDivider />
                                 <BaseMenuListItem
                                     icon={<ArrowSquareIn />}
                                     title={'Slot list'}
