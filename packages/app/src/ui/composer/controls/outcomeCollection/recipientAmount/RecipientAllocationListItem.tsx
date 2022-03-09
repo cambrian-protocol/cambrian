@@ -91,7 +91,9 @@ const RecipientAllocationListItem = ({
                 onAllocate={toggleShowEditAmountModal}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    allocation.recipientModel.slotType === SlotType.Constant &&
+                    (allocation.recipientModel.slotType === SlotType.Constant ||
+                        allocation.recipientModel.slotType ===
+                            SlotType.Manual) &&
                     allocation.recipientModel.solverConfigAddress === undefined
                         ? toggleShowEditRecipientModal
                         : undefined
