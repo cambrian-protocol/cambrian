@@ -103,6 +103,7 @@ export const Layout = ({
                                 </Collapsible>
                                 <Box flex>
                                     <Appbar
+                                        isSidebarOpen={showSidebar}
                                         title={appbarTitle}
                                         toggleHelp={toggleHelp}
                                         toggleSidebar={toggleSidebar}
