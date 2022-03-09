@@ -79,15 +79,21 @@ export default class ComposerSolver {
         title = 'New Solver',
         iface = new ethers.utils.Interface(Constants.DEFAULT_ABI),
         id?: string,
-        config?: ComposerSolverConfigModel
+        config?: ComposerSolverConfigModel,
+        slotTags?: SlotTagsHashMapType,
+        solverTag?: SolverTagModel
     ) {
         this.id = id ? id : ulid()
         this.iface = iface
         this.title = title
         this.description = ''
         this.config = config ? config : this.getDefaultConfig()
-        this.slotTags = {}
-        this.solverTag = { title: 'TODO', description: 'TODO', version: 'TODO' }
+        this.slotTags = slotTags || {}
+        this.solverTag = solverTag || {
+            title: 'TODO',
+            description: 'TODO',
+            version: 'TODO',
+        }
     }
 
     /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
