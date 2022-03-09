@@ -1,5 +1,4 @@
-import { Box, ResponsiveContext, Text } from 'grommet'
-import { Faders, IconContext, TreeStructure } from 'phosphor-react'
+import { Box, Text } from 'grommet'
 import { MouseEvent, useState } from 'react'
 import ReactFlow, {
     FlowElement,
@@ -8,12 +7,16 @@ import ReactFlow, {
     isNode,
 } from 'react-flow-renderer'
 
-import ComposerToolbar from './controls/ComposerToolbar'
+import { Card } from 'grommet'
+import { CardBody } from 'grommet'
+import { CardHeader } from 'grommet'
+import { Cursor } from 'phosphor-react'
+import { Layout } from '@cambrian/app/components/layout/Layout'
 import OutcomeCollectionControl from './controls/outcomeCollection/OutcomeCollectionControl'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
+import SolutionConfig from './config/SolutionConfig'
 import { SolverControl } from './controls/solver/SolverControl'
 import { SolverNode } from './nodes/SolverNode'
-import styled from 'styled-components'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 const nodeTypes = {
@@ -21,12 +24,6 @@ const nodeTypes = {
     oc: OutcomeCollectionNode,
 }
 
-const ComposerControl = styled(Box)`
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 4;
-`
 const snapGrid: [number, number] = [20, 20]
 
 /* 
@@ -39,8 +36,6 @@ TODO
 */
 export const Composer = () => {
     const { composer, dispatch } = useComposerContext()
-
-    const [showDiagram, setShowDiagram] = useState(false)
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
         // TODO Ask if sure
@@ -73,123 +68,58 @@ export const Composer = () => {
                     return <SolverControl />
                 case 'oc':
                     return <OutcomeCollectionControl />
-                default:
-                    return <></>
             }
         }
+        return (
+            <Card
+                background="background-front"
+                fill
+                margin={{ right: 'small' }}
+            >
+                <CardHeader pad={'medium'} elevation="small">
+                    <Text>No Solver or Outcome selected</Text>
+                </CardHeader>
+                <CardBody
+                    pad="medium"
+                    justify="center"
+                    align="center"
+                    gap="medium"
+                >
+                    <Cursor size="36" />
+                    <Text textAlign="center">
+                        Please select a Solver or an Outcome you want to
+                        configure
+                    </Text>
+                </CardBody>
+            </Card>
+        )
     }
 
     return (
-        <ResponsiveContext.Consumer>
-            {(screenSize) =>
-                screenSize !== 'small' ? (
-                    <Box direction="row" justify="between" fill>
-                        <ReactFlow
-                            elementsSelectable
-                            elements={composer.flowElements}
-                            deleteKeyCode={46}
-                            nodeTypes={nodeTypes}
-                            /*    onConnect={onConnect}
-                             */
-                            onElementsRemove={onElementsRemove}
-                            onElementClick={onSelect}
-                            onPaneClick={onSelect}
-                            onNodeDragStop={onNodeDragStop}
-                            snapToGrid={true}
-                            snapGrid={snapGrid}
-                        >
-                            <ReactFlowControls />
-                            <ComposerControl>
-                                <ComposerToolbar />
-                            </ComposerControl>
-                        </ReactFlow>
-                        <Box
-                            width={{ min: 'medium', max: 'medium' }}
-                            gap="small"
-                        >
-                            <>
-                                {composer.currentElement !== undefined && (
-                                    <>{renderControl()}</>
-                                )}
-                            </>
-                        </Box>
-                    </Box>
-                ) : (
-                    <>
-                        {showDiagram ? (
-                            <Box fill direction="row" justify="between">
-                                <ReactFlow
-                                    elementsSelectable
-                                    elements={composer.flowElements}
-                                    deleteKeyCode={46}
-                                    nodeTypes={nodeTypes}
-                                    /*    onConnect={onConnect}
-                                     */
-                                    onElementsRemove={onElementsRemove}
-                                    onElementClick={onSelect}
-                                    onPaneClick={onSelect}
-                                >
-                                    <ReactFlowControls />
-                                    <ComposerControl>
-                                        <ComposerToolbar />
-                                    </ComposerControl>
-                                </ReactFlow>
-                            </Box>
-                        ) : (
-                            <Box fill pad="small" gap="small">
-                                <>
-                                    {composer.currentElement !== undefined && (
-                                        <>{renderControl()}</>
-                                    )}
-                                </>
-                            </Box>
-                        )}
-                        <Box
-                            width={'100%'}
-                            height={{ min: 'auto' }}
-                            direction="row"
-                            justify="around"
-                        >
-                            <IconContext.Provider value={{ size: '24' }}>
-                                <Box
-                                    round="small"
-                                    width={'50%'}
-                                    justify="center"
-                                    align="center"
-                                    onClick={() => setShowDiagram(true)}
-                                    pad="medium"
-                                    background={
-                                        showDiagram
-                                            ? 'background-contrast'
-                                            : 'none'
-                                    }
-                                    focusIndicator={false}
-                                >
-                                    <TreeStructure />
-                                    <Text size="xsmall">Diagram</Text>
-                                </Box>
-                                <Box
-                                    round="small"
-                                    width={'50%'}
-                                    justify="center"
-                                    align="center"
-                                    onClick={() => setShowDiagram(false)}
-                                    pad="medium"
-                                    background={
-                                        !showDiagram
-                                            ? 'background-contrast'
-                                            : 'none'
-                                    }
-                                    focusIndicator={false}
-                                >
-                                    <Faders />
-                                    <Text size="xsmall">Details</Text>
-                                </Box>
-                            </IconContext.Provider>
-                        </Box>
-                    </>
-                )
-            }
-        </ResponsiveContext.Consumer>
+        <Layout
+            fill
+            contextTitle="Composer"
+            config={<SolutionConfig />}
+            sidebar={<>{renderControl()}</>}
+        >
+            <Box direction="row" justify="between" fill>
+                <ReactFlow
+                    elementsSelectable
+                    elements={composer.flowElements}
+                    deleteKeyCode={46}
+                    nodeTypes={nodeTypes}
+                    /*    onConnect={onConnect}
+                     */
+                    onElementsRemove={onElementsRemove}
+                    onElementClick={onSelect}
+                    onPaneClick={onSelect}
+                    onNodeDragStop={onNodeDragStop}
+                    snapToGrid={true}
+                    snapGrid={snapGrid}
+                >
+                    <ReactFlowControls />
+                </ReactFlow>
+            </Box>
+        </Layout>
     )
 }

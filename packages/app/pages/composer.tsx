@@ -6,9 +6,7 @@ import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 export default function ComposerPage() {
     return (
         <ComposerContextProvider>
-            <Layout fill contextTitle="Composer" config={<SolutionConfig />}>
-                <Composer />
-            </Layout>
+            <Composer />
         </ComposerContextProvider>
     )
 }
