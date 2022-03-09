@@ -6,6 +6,7 @@ import SelectRecipient, {
     SelectRecipientType,
 } from '@cambrian/app/components/selects/SelectRecipient'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
@@ -62,23 +63,25 @@ const SelectRecipientAllocationForm = ({
                 subTitle="Choose an existant address from your solution"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
             />
-            <Form onSubmit={(event) => onSubmit(event)}>
-                <FormField>
-                    <SelectRecipient
-                        selectedRecipient={selectedRecipient}
-                        setSelectedRecipient={setSelectedRecipient}
-                    />
-                </FormField>
-                <FormField>
-                    <SelectOrCreateAmount
-                        amountData={amountData}
-                        setAmountData={setAmountData}
-                    />
-                </FormField>
-                <Box>
-                    <Button primary type="submit" label="Save" />
-                </Box>
-            </Form>
+            <BaseFormContainer>
+                <Form onSubmit={(event) => onSubmit(event)}>
+                    <FormField>
+                        <SelectRecipient
+                            selectedRecipient={selectedRecipient}
+                            setSelectedRecipient={setSelectedRecipient}
+                        />
+                    </FormField>
+                    <FormField>
+                        <SelectOrCreateAmount
+                            amountData={amountData}
+                            setAmountData={setAmountData}
+                        />
+                    </FormField>
+                    <Box>
+                        <Button primary type="submit" label="Save" />
+                    </Box>
+                </Form>
+            </BaseFormContainer>
         </Box>
     )
 }
