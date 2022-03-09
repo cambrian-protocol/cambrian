@@ -4,10 +4,14 @@ import RecipientConfigForm, {
     initialRecipientConfigFormInput,
 } from './RecipientConfigForm'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
 import SlotTagModal from '../../general/modals/SlotTagModal'
+import { Tag } from 'phosphor-react'
 import { initialSlotTagInput } from '../../slotList/modals/CreateSlotModal'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -46,7 +50,14 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
             <Box fill>
-                <Button secondary onClick={toggleShowTagModal} label="Tag" />
+                <BaseMenuListItem
+                    subTitle="Define a label, a description and more..."
+                    title="Tag"
+                    icon={<Tag />}
+                    onClick={toggleShowTagModal}
+                />
+                <PlainSectionDivider />
+                <HeaderTextSection paragraph="Setup the address of the recipient." />
                 <RecipientConfigForm
                     onSubmit={onSubmit}
                     setRecipientInput={setInput}
