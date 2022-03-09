@@ -42,7 +42,13 @@ type UpdateSlotProps = AddSlotProps & {
 }
 
 type AddRecipientProps = {
-    type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot'
+    type:
+        | 'Keeper'
+        | 'Arbitrator'
+        | 'Solver'
+        | 'Callback'
+        | 'Slot'
+        | 'Slot_Exists'
     data: string | ComposerSlotModel | ComposerSolver
     targetSolverId?: string
     solverConfigAdress?: ComposerSolverConfigAddressType
@@ -326,9 +332,7 @@ export default class ComposerSolver {
                     throw new Error('Invalid Solver recipient data')
                 }
                 break
-
-            default:
-                //Slot
+            case 'Slot':
                 if (typeof data === 'string') {
                     slot = this.addSlot({
                         data: [data],
@@ -338,6 +342,12 @@ export default class ComposerSolver {
                 } else {
                     throw new Error('Invalid new Slot recipient data')
                 }
+                break
+            case 'Slot_Exists':
+                if (typeof data === 'string') {
+                    slot = this.config.slots[data]
+                }
+                break
         }
 
         // Add recipient
