@@ -61,7 +61,7 @@ export const SolverControl = () => {
     }
 
     return (
-        <Card background="background-front" fill>
+        <Card background="background-front" fill margin={{ right: 'small' }}>
             <CardHeader pad={'medium'} elevation="small" height={'5em'}>
                 <Box width={'2em'}>
                     {controller !== 'MainControl' && (
@@ -81,7 +81,7 @@ export const SolverControl = () => {
             </CardHeader>
             {controller === 'MainControl' ? (
                 <>
-                    <CardBody pad="small">
+                    <CardBody pad="medium">
                         <Box gap="small" fill overflow={{ vertical: 'auto' }}>
                             <HeaderTextSection
                                 title="Solver"
@@ -127,7 +127,7 @@ export const SolverControl = () => {
                     </CardBody>
                 </>
             ) : (
-                <CardBody pad="small">{renderControl()}</CardBody>
+                <CardBody pad="medium">{renderControl()}</CardBody>
             )}
         </Card>
     )

@@ -42,7 +42,7 @@ const OutcomeCollectionControl = () => {
     }
 
     return (
-        <Card background="background-front" fill>
+        <Card background="background-front" fill margin={{ right: 'small' }}>
             <CardHeader pad={'medium'} elevation="small" height={'5em'}>
                 <Box width={'2em'}>
                     {controller !== 'MainControl' && (
@@ -56,7 +56,7 @@ const OutcomeCollectionControl = () => {
                 </Box>
                 <Box flex>
                     <Text weight="bold" size="small">
-                        {currentSolver?.title}
+                        {currentSolver?.solverTag.title}
                     </Text>
                     <Text color="light-2" size="small">
                         Outcome Collection
@@ -64,7 +64,7 @@ const OutcomeCollectionControl = () => {
                 </Box>
             </CardHeader>
             {controller === 'MainControl' ? (
-                <CardBody pad="small">
+                <CardBody pad="medium">
                     <Box gap="medium">
                         <HeaderTextSection
                             title="Outcome collection"
@@ -90,7 +90,7 @@ const OutcomeCollectionControl = () => {
                     </Box>
                 </CardBody>
             ) : (
-                <CardBody pad="small">{renderControl()}</CardBody>
+                <CardBody pad="medium">{renderControl()}</CardBody>
             )}
         </Card>
     )
