@@ -81,8 +81,8 @@ export const Layout = ({
                                                                   max: '90vw',
                                                               }
                                                             : {
-                                                                  min: '50vw',
-                                                                  max: '50vw',
+                                                                  min: '50em',
+                                                                  max: '30vw',
                                                               }
                                                     }
                                                 >
@@ -115,7 +115,8 @@ export const Layout = ({
                                         }}
                                         align="center"
                                         onClick={
-                                            showSidebar
+                                            showSidebar &&
+                                            screenSize === 'small'
                                                 ? toggleSidebar
                                                 : undefined
                                         }
