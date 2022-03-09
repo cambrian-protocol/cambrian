@@ -42,14 +42,21 @@ const ListItem = ({
             gap="small"
             height={{ min: 'auto' }}
             background={isActive ? 'primary-gradient' : 'background-contrast'}
+            elevation="small"
         >
             <Box direction="row" justify="between" align="center">
                 <Box direction="row" gap="small">
-                    <Box width={{ min: 'xxsmall' }} pad="small">
+                    <Box
+                        width={{ min: 'xxsmall' }}
+                        pad="small"
+                        background={'secondary-gradient'}
+                        round="small"
+                        elevation="small"
+                    >
                         {icon}
                     </Box>
-                    <Box>
-                        <Text color="white" size="small">
+                    <Box justify="center">
+                        <Text color="dark-4" size="small">
                             {description}
                         </Text>
                         <Text color="white" truncate="tip" weight={'bold'}>

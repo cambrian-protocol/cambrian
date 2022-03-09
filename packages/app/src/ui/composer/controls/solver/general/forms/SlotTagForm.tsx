@@ -1,3 +1,4 @@
+import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { CheckBox } from 'grommet'
 import { Form } from 'grommet'
@@ -26,10 +27,12 @@ const SlotTagForm = ({ onSubmit, input, setInput }: SlotTagFormProps) => {
                 setInput(nextValue)
             }}
         >
-            <FormField name="label" label="Label" />
-            <FormField name="description" label="Description" />
-            <CheckBox label="Is flexible?" name="isFlex" />
-            <Button primary label="Save" type="submit" />
+            <Box gap="small">
+                <FormField name="label" label="Label" />
+                <FormField name="description" label="Description" />
+                <CheckBox label="Is flexible?" name="isFlex" />
+                <Button primary label="Save" type="submit" />
+            </Box>
         </Form>
     )
 }
