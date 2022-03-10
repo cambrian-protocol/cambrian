@@ -1,10 +1,10 @@
-import { Composer } from '@cambrian/app/src/ui/composer/Composer'
 import { ComposerContextProvider } from '@cambrian/app/src/store/composer/composer.context'
+import { ComposerUI } from '@cambrian/app/ui/composer/ComposerUI'
 
 export default function ComposerPage() {
     return (
         <ComposerContextProvider>
-            <Composer />
+            <ComposerUI />
         </ComposerContextProvider>
     )
 }
