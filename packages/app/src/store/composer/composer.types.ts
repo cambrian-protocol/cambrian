@@ -54,7 +54,7 @@ type UpdateSolverTagActionType = {
 }
 
 type LoadComposerAction = {
-    type: 'LOAD_COMPOSER'
+    type: 'LOAD_COMPOSITION'
     payload: ComposerStateType
 }
 

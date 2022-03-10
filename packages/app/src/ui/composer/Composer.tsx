@@ -1,5 +1,4 @@
 import { Box, Text } from 'grommet'
-import { MouseEvent, useState } from 'react'
 import ReactFlow, {
     FlowElement,
     Node,
@@ -10,8 +9,10 @@ import ReactFlow, {
 import { Card } from 'grommet'
 import { CardBody } from 'grommet'
 import { CardHeader } from 'grommet'
+import ComposerActionbar from './bars/ComposerActionbar'
 import { Cursor } from 'phosphor-react'
 import { Layout } from '@cambrian/app/components/layout/Layout'
+import { MouseEvent } from 'react'
 import OutcomeCollectionControl from './controls/outcomeCollection/OutcomeCollectionControl'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import SolutionConfig from './config/SolutionConfig'
@@ -31,7 +32,6 @@ TODO
 - Selected Element Styling
 - Deleting Nodes - update solvers accordingly
 - Manual connection of Nodes
-- Proper responsive Layouting
 
 */
 export const Composer = () => {
@@ -96,30 +96,33 @@ export const Composer = () => {
     }
 
     return (
-        <Layout
-            fill
-            contextTitle="Composer"
-            config={<SolutionConfig />}
-            sidebar={<>{renderControl()}</>}
-        >
-            <Box direction="row" justify="between" fill>
-                <ReactFlow
-                    elementsSelectable
-                    elements={composer.flowElements}
-                    deleteKeyCode={46}
-                    nodeTypes={nodeTypes}
-                    /*    onConnect={onConnect}
-                     */
-                    onElementsRemove={onElementsRemove}
-                    onElementClick={onSelect}
-                    onPaneClick={onSelect}
-                    onNodeDragStop={onNodeDragStop}
-                    snapToGrid={true}
-                    snapGrid={snapGrid}
-                >
-                    <ReactFlowControls />
-                </ReactFlow>
-            </Box>
-        </Layout>
+        <>
+            <Layout
+                fill
+                contextTitle="Composer"
+                config={<SolutionConfig />}
+                sidebar={<>{renderControl()}</>}
+                actionBar={<ComposerActionbar />}
+            >
+                <Box direction="row" justify="between" fill>
+                    <ReactFlow
+                        elementsSelectable
+                        elements={composer.flowElements}
+                        deleteKeyCode={46}
+                        nodeTypes={nodeTypes}
+                        /*    onConnect={onConnect}
+                         */
+                        onElementsRemove={onElementsRemove}
+                        onElementClick={onSelect}
+                        onPaneClick={onSelect}
+                        onNodeDragStop={onNodeDragStop}
+                        snapToGrid={true}
+                        snapGrid={snapGrid}
+                    >
+                        <ReactFlowControls />
+                    </ReactFlow>
+                </Box>
+            </Layout>
+        </>
     )
 }

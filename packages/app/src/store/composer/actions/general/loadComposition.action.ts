@@ -1,7 +1,7 @@
 import { ComposerStateType } from '../../composer.types'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 
-const loadComposerAction = (
+const loadCompositionAction = (
     state: ComposerStateType,
     payload: ComposerStateType
 ) => {
@@ -22,4 +22,4 @@ const loadComposerAction = (
     }
 }
 
-export default loadComposerAction
+export default loadCompositionAction
