@@ -8,11 +8,13 @@ import UpdateRecipientModal from './modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
-interface RecipientListItemProps {
+interface ComposerRecipientListItemProps {
     recipientSlotPath: ComposerSlotPathType
 }
 
-const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
+const ComposerRecipientListItem = ({
+    recipientSlotPath,
+}: ComposerRecipientListItemProps) => {
     const { composer, dispatch, currentSolver } = useComposerContext()
     if (!currentSolver) throw Error('No current Solver defined!')
 
@@ -79,4 +81,4 @@ const RecipientListItem = ({ recipientSlotPath }: RecipientListItemProps) => {
     )
 }
 
-export default RecipientListItem
+export default ComposerRecipientListItem

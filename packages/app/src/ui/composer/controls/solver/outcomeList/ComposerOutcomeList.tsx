@@ -1,14 +1,15 @@
-import { Box, CardFooter } from 'grommet'
 import React, { useState } from 'react'
 
+import { Box } from 'grommet'
+import ComposerOutcomeListItem from './ComposerOutcomeListItem'
 import CreateOutcomeModal from '@cambrian/app/ui/composer/controls/solver/outcomeList/modals/CreateOutcomeModal'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import OutcomeListItem from './OutcomeListItem'
 import { Plus } from 'phosphor-react'
+import SidebarCardFooter from '@cambrian/app/components/cards/SidebarCardFooter'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
-const OutcomeList = () => {
+const ComposerOutcomeList = () => {
     const { currentSolver } = useComposerContext()
     const [showCreateOutcomeModal, setShowCreateOutcomeFormModal] =
         useState(false)
@@ -31,7 +32,7 @@ const OutcomeList = () => {
                     <Box gap="small" fill>
                         {currentSolver.config.condition.outcomes.map(
                             (outcome) => (
-                                <OutcomeListItem
+                                <ComposerOutcomeListItem
                                     key={outcome.id}
                                     outcome={outcome}
                                 />
@@ -39,13 +40,13 @@ const OutcomeList = () => {
                         )}
                     </Box>
                 </Box>
-                <CardFooter justify="end">
+                <SidebarCardFooter>
                     <FloatingActionButton
                         icon={<Plus size="24" />}
                         label="Create new Outcome"
                         onClick={toggleCreateOutcomeModal}
                     />
-                </CardFooter>
+                </SidebarCardFooter>
             </Box>
             {showCreateOutcomeModal && (
                 <CreateOutcomeModal onClose={toggleCreateOutcomeModal} />
@@ -54,4 +55,4 @@ const OutcomeList = () => {
     )
 }
 
-export default OutcomeList
+export default ComposerOutcomeList

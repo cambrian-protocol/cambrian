@@ -1,14 +1,15 @@
-import { Box, CardFooter } from 'grommet'
 import React, { useState } from 'react'
 
 import AddRecipientModal from './modals/AddRecipientModal'
+import { Box } from 'grommet'
+import ComposerRecipientListItem from './ComposerRecipientListItem'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
-import RecipientListItem from './RecipientListItem'
+import SidebarCardFooter from '@cambrian/app/components/cards/SidebarCardFooter'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
-const RecipientList = () => {
+const ComposerRecipientList = () => {
     const { currentSolver } = useComposerContext()
     const [showAddRecipientModal, setShowAddRecipientModal] = useState(false)
 
@@ -31,7 +32,7 @@ const RecipientList = () => {
                         {currentSolver.config.condition.recipients.map(
                             (recipient, idx) => {
                                 return (
-                                    <RecipientListItem
+                                    <ComposerRecipientListItem
                                         key={idx}
                                         recipientSlotPath={recipient}
                                     />
@@ -40,13 +41,13 @@ const RecipientList = () => {
                         )}
                     </Box>
                 </Box>
-                <CardFooter justify="end">
+                <SidebarCardFooter>
                     <FloatingActionButton
                         icon={<Plus size="24" />}
                         label="Create new Recipient"
                         onClick={toggleAddRecipientModal}
                     />
-                </CardFooter>
+                </SidebarCardFooter>
             </Box>
             {showAddRecipientModal && (
                 <AddRecipientModal onClose={toggleAddRecipientModal} />
@@ -55,4 +56,4 @@ const RecipientList = () => {
     )
 }
 
-export default RecipientList
+export default ComposerRecipientList

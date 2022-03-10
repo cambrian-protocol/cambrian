@@ -1,4 +1,3 @@
-import { Box, Text } from 'grommet'
 import ReactFlow, {
     FlowElement,
     Node,
@@ -6,17 +5,15 @@ import ReactFlow, {
     isNode,
 } from 'react-flow-renderer'
 
-import { Card } from 'grommet'
-import { CardBody } from 'grommet'
-import { CardHeader } from 'grommet'
+import { Box } from 'grommet'
 import ComposerActionbar from './bars/ComposerActionbar'
-import { Cursor } from 'phosphor-react'
+import ComposerDefaultControl from './controls/ComposerDefaultControl'
+import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
+import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
 import { Layout } from '@cambrian/app/components/layout/Layout'
 import { MouseEvent } from 'react'
-import OutcomeCollectionControl from './controls/outcomeCollection/OutcomeCollectionControl'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import SolutionConfig from './config/SolutionConfig'
-import { SolverControl } from './controls/solver/SolverControl'
 import { SolverNode } from './nodes/SolverNode'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
@@ -65,34 +62,12 @@ export const ComposerUI = () => {
         ) {
             switch (composer.currentElement?.type) {
                 case 'solver':
-                    return <SolverControl />
+                    return <ComposerSolverControl />
                 case 'oc':
-                    return <OutcomeCollectionControl />
+                    return <ComposerOutcomeCollectionControl />
             }
         }
-        return (
-            <Card
-                background="background-front"
-                fill
-                margin={{ right: 'small' }}
-            >
-                <CardHeader pad={'medium'} elevation="small">
-                    <Text>No Solver or Outcome selected</Text>
-                </CardHeader>
-                <CardBody
-                    pad="medium"
-                    justify="center"
-                    align="center"
-                    gap="medium"
-                >
-                    <Cursor size="36" />
-                    <Text textAlign="center">
-                        Please select a Solver or an Outcome you want to
-                        configure
-                    </Text>
-                </CardBody>
-            </Card>
-        )
+        return <ComposerDefaultControl />
     }
 
     return (
