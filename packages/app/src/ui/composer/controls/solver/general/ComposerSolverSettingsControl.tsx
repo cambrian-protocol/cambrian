@@ -65,7 +65,7 @@ const parseSecondsToForm = (
     }
 }
 
-const SolverSettingsControl = () => {
+const ComposerSolverSettingsControl = () => {
     const { dispatch, currentSolver } = useComposerContext()
 
     const [showSolverTagModal, setShowSolverTagModal] = useState(false)
@@ -213,4 +213,4 @@ const SolverSettingsControl = () => {
     )
 }
 
-export default SolverSettingsControl
+export default ComposerSolverSettingsControl

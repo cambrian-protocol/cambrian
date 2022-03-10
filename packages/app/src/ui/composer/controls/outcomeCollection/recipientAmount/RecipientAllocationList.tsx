@@ -1,9 +1,9 @@
-import { Box, CardFooter } from 'grommet'
-
 import AddRecipientAllocationModal from '@cambrian/app/ui/composer/controls/outcomeCollection/recipientAmount/modals/AddRecipientAllocationModal'
+import { Box } from 'grommet'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import RecipientAllocationListItem from './RecipientAllocationListItem'
+import SidebarCardFooter from '@cambrian/app/components/cards/SidebarCardFooter'
 import { UserPlus } from 'phosphor-react'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
@@ -53,13 +53,13 @@ const RecipientAllocationList = () => {
                         )}
                     </Box>
                 </Box>
-                <CardFooter justify="end">
+                <SidebarCardFooter>
                     <FloatingActionButton
                         icon={<UserPlus size="24" />}
                         label="Add Recipient"
                         onClick={toggleAddRecipientModal}
                     />
-                </CardFooter>
+                </SidebarCardFooter>
             </Box>
             {showAddRecipientModal && (
                 <AddRecipientAllocationModal

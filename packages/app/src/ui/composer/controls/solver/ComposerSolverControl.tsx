@@ -1,21 +1,25 @@
 import {
     ArrowSquareIn,
-    CaretLeft,
     Gear,
     StackSimple,
     TreeStructure,
     UserList,
 } from 'phosphor-react'
-import { Box, Card, CardBody, CardFooter, CardHeader, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import { Box } from 'grommet'
+import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
+import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
+import ComposerRecipientList from './recipientList/ComposerRecipientList'
+import ComposerSlotList from './slotList/ComposerSlotList'
+import ComposerSolverSettingsControl from './general/ComposerSolverSettingsControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import OutcomeList from './outcomeList/OutcomeList'
-import RecipientList from './recipientList/RecipientList'
-import SlotList from './slotList/SlotList'
-import SolverSettingsControl from './general/SolverSettingsControl'
+import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
+import SidebarCardBody from '@cambrian/app/components/cards/SidebarCardBody'
+import SidebarCardFooter from '@cambrian/app/components/cards/SidebarCardFooter'
+import SidebarCardHeader from '@cambrian/app/components/cards/SidebarCardHeader'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
 export type SolverControllerType =
@@ -29,7 +33,7 @@ export type SolverControllerType =
 /* TODO
 - Node Position
 */
-export const SolverControl = () => {
+export const ComposerSolverControl = () => {
     const { dispatch, currentSolver } = useComposerContext()
 
     const [controller, setController] =
@@ -48,40 +52,31 @@ export const SolverControl = () => {
     function renderControl() {
         switch (controller) {
             case 'SolverSettingsControl':
-                return <SolverSettingsControl />
+                return <ComposerSolverSettingsControl />
             case 'RecipientListControl':
-                return <RecipientList />
+                return <ComposerRecipientList />
             case 'OutcomeListControl':
-                return <OutcomeList />
+                return <ComposerOutcomeList />
             case 'SlotControl':
-                return <SlotList />
+                return <ComposerSlotList />
             default:
                 return <></>
         }
     }
 
     return (
-        <Card background="background-front" fill margin={{ right: 'small' }}>
-            <CardHeader pad={'medium'} elevation="small" height={'5em'}>
-                <Box width={'2em'}>
-                    {controller !== 'MainControl' && (
-                        <Box
-                            onClick={() => setController('MainControl')}
-                            focusIndicator={false}
-                        >
-                            <CaretLeft size="24" />
-                        </Box>
-                    )}
-                </Box>
-                <Box flex>
-                    <Text weight="bold" size="small">
-                        {currentSolver?.solverTag.title}
-                    </Text>
-                </Box>
-            </CardHeader>
-            {controller === 'MainControl' ? (
-                <>
-                    <CardBody pad="medium">
+        <SidebarCard>
+            <SidebarCardHeader title={currentSolver?.solverTag.title} />
+            <Breadcrump
+                onBack={
+                    controller !== 'MainControl'
+                        ? () => setController('MainControl')
+                        : undefined
+                }
+            />
+            <SidebarCardBody>
+                {controller === 'MainControl' ? (
+                    <>
                         <Box gap="small" fill overflow={{ vertical: 'auto' }}>
                             <HeaderTextSection
                                 title="Solver"
@@ -117,18 +112,18 @@ export const SolverControl = () => {
                                 />
                             </Box>
                         </Box>
-                        <CardFooter justify="end">
+                        <SidebarCardFooter>
                             <FloatingActionButton
                                 onClick={handleAttachOutcomeCollection}
                                 label="Attach Outcome collection"
                                 icon={<StackSimple size="24" />}
                             />
-                        </CardFooter>
-                    </CardBody>
-                </>
-            ) : (
-                <CardBody pad="medium">{renderControl()}</CardBody>
-            )}
-        </Card>
+                        </SidebarCardFooter>
+                    </>
+                ) : (
+                    <>{renderControl()}</>
+                )}
+            </SidebarCardBody>
+        </SidebarCard>
     )
 }
