@@ -1,14 +1,14 @@
-import { Box, CardFooter } from 'grommet'
-
+import { Box } from 'grommet'
+import ComposerSlotListItem from './ComposerSlotListItem'
 import CreateSlotFormModal from './modals/CreateSlotModal'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
-import SlotListItem from './SlotListItem'
+import SidebarCardFooter from '@cambrian/app/components/cards/SidebarCardFooter'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
-const SlotList = () => {
+const ComposerSlotList = () => {
     const { currentSolver } = useComposerContext()
     const [showCreateSlotModal, setShowCreateSlotModal] = useState(false)
 
@@ -30,7 +30,7 @@ const SlotList = () => {
                     <Box gap="small" fill>
                         {Object.keys(currentSolver.config.slots).map(
                             (slotId) => (
-                                <SlotListItem
+                                <ComposerSlotListItem
                                     slotModel={
                                         currentSolver.config.slots[slotId]
                                     }
@@ -40,13 +40,13 @@ const SlotList = () => {
                         )}
                     </Box>
                 </Box>
-                <CardFooter justify="end">
+                <SidebarCardFooter>
                     <FloatingActionButton
                         icon={<Plus size="24" />}
                         label="Create new Slot"
                         onClick={toggleCreateSlotModal}
                     />
-                </CardFooter>
+                </SidebarCardFooter>
             </Box>
             {showCreateSlotModal && (
                 <CreateSlotFormModal onClose={toggleCreateSlotModal} />
@@ -55,4 +55,4 @@ const SlotList = () => {
     )
 }
 
-export default SlotList
+export default ComposerSlotList

@@ -7,11 +7,11 @@ import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
-interface SlotListItemProps {
+interface ComposerSlotListItemProps {
     slotModel: ComposerSlotModel
 }
 
-const SlotListItem = ({ slotModel }: SlotListItemProps) => {
+const ComposerSlotListItem = ({ slotModel }: ComposerSlotListItemProps) => {
     const { composer, dispatch, currentSolver } = useComposerContext()
 
     if (!currentSolver) throw Error('No current Solver defined!')
@@ -66,4 +66,4 @@ const SlotListItem = ({ slotModel }: SlotListItemProps) => {
     )
 }
 
-export default SlotListItem
+export default ComposerSlotListItem

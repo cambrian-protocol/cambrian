@@ -1,15 +1,15 @@
 import ListItem from '@cambrian/app/components/list/ListItem'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TreeStructure } from 'phosphor-react'
-import UpdateOutcomeModal from '../../solver/outcomeList/modals/UpdateOutcomeModal'
+import UpdateOutcomeModal from './modals/UpdateOutcomeModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
-interface OutcomeListItemPrpos {
+interface ComposerOutcomeListItemPrpos {
     outcome: OutcomeModel
 }
 
-const OutcomeListItem = ({ outcome }: OutcomeListItemPrpos) => {
+const ComposerOutcomeListItem = ({ outcome }: ComposerOutcomeListItemPrpos) => {
     const { dispatch } = useComposerContext()
     const [showUpdateOutcomeModal, setShowUpdateOutcomeFormModal] =
         useState(false)
@@ -42,4 +42,4 @@ const OutcomeListItem = ({ outcome }: OutcomeListItemPrpos) => {
     )
 }
 
-export default OutcomeListItem
+export default ComposerOutcomeListItem
