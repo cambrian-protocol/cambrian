@@ -8,7 +8,6 @@ const loadComposerAction = (
     //TODO Dynamic ABI import of solver interface (Can't create Interface from JSON)
     const solversWithCorrectABI = payload.solvers.map((solver) => {
         return new Solver(
-            solver.title,
             solver.iface,
             solver.id,
             solver.config,
