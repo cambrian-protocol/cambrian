@@ -34,7 +34,7 @@ TODO
 - Manual connection of Nodes
 
 */
-export const Composer = () => {
+export const ComposerUI = () => {
     const { composer, dispatch } = useComposerContext()
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
