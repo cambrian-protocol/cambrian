@@ -11,7 +11,7 @@ import deleteNodeAction from './flow/deleteNode.action'
 import deleteOutcomeAction from './solverActions/deleteOutcome.action'
 import deleteSlotAction from './solverActions/deleteSlot.action'
 import dragNodeAction from './flow/dragNode.action'
-import loadComposerAction from './general/loadComposer.action'
+import loadCompositionAction from './general/loadComposition.action'
 import toggleOutcomeOfOutcomeCollectionAction from './outcomeCollectionActions/toggleOutcomeOfOutcomeCollection.action'
 import updateOutcomeAction from './solverActions/updateOutcome.action'
 import updateRecipientAction from './solverActions/updateRecipient.action'
@@ -27,7 +27,7 @@ export {
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
     dragNodeAction,
-    loadComposerAction,
+    loadCompositionAction,
     deleteOutcomeAction,
     updateOutcomeAction,
     updateSelectedElementAction,
