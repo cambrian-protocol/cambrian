@@ -56,19 +56,16 @@ const SolverConfigInfo = ({
                     title="Recipients"
                     onClick={toggleShowRecipientModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
                     icon={<TreeStructure />}
                     title="Outcomes"
                     onClick={toggleShowOutcomeModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
                     icon={<ArrowSquareIn />}
                     title="Keeper Inputs"
                     onClick={toggleShowKeeperInputModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
                     info={solverData.slotTags['timelockSeconds']?.description}
                     title="Timelock"
