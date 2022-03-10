@@ -102,10 +102,10 @@ export const getSlotTitle = (
                         const callingSlotTag =
                             callingSolver.slotTags[callingSlot.id]
                         if (callingSlotTag && callingSlotTag.label !== '') {
-                            return `${callingSlotTag.label} (${callingSolver.title})`
+                            return `${callingSlotTag.label} (${callingSolver.solverTag.title})`
                         } else if (callingSlot.data.length === 1) {
                             return `${callingSlot.data[0].toString()} (${
-                                callingSolver.title
+                                callingSolver.solverTag.title
                             })`
                         }
                     }
@@ -117,7 +117,7 @@ export const getSlotTitle = (
                 // Get solver title
                 return (
                     solvers.find((x) => x.id === slotModel.targetSolverId)
-                        ?.title || 'No Solver title found'
+                        ?.solverTag?.title || 'No Solver title found'
                 )
             }
         } else if (
@@ -129,7 +129,7 @@ export const getSlotTitle = (
                 const configSolver = solvers.find(
                     (x) => x.id === slotModel.solverConfigAddress?.solverId
                 )
-                return `${configSolver?.title}'s ${slotModel.solverConfigAddress.type}`
+                return `${configSolver?.solverTag.title}'s ${slotModel.solverConfigAddress.type}`
             }
             const currentSlotTag = currentSolverTags[slotModel.id]
             // Get constant desc or first data entry
