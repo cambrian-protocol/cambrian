@@ -60,7 +60,7 @@ const BaseMenuListItem = ({
                     </Box>
                 )}
             </Box>
-            <PlainSectionDivider />
+            {!onClick ? <></> : <PlainSectionDivider />}
         </IconContext.Provider>
     )
 }
