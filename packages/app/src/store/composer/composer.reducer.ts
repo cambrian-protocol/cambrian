@@ -38,7 +38,7 @@ import {
     deleteOutcomeAction,
     deleteSlotAction,
     dragNodeAction,
-    loadComposerAction,
+    loadCompositionAction,
     toggleOutcomeOfOutcomeCollectionAction,
     updateOutcomeAction,
     updateRecipientAction,
@@ -97,7 +97,7 @@ export const composerReducer = (
         case DELETE_SLOT:
             return deleteSlotAction(state, action.payload)
         case LOAD_COMPOSER:
-            return loadComposerAction(state, action.payload)
+            return loadCompositionAction(state, action.payload)
         case DRAG_NODE:
             return dragNodeAction(state, action.payload)
         case UPDATE_SOLUTION_SETTINGS:
