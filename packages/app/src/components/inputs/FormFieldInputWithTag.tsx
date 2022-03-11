@@ -36,7 +36,6 @@ const FormFieldInputWithTag = ({
             payload: { slotIdToUpdate: slotId, slotTag: slotTag },
         })
         setSlotTagInput(slotTag)
-        console.log(currentSolver)
     }
 
     return (
