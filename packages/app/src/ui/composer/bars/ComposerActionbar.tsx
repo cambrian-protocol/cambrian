@@ -1,5 +1,5 @@
 import Actionbar from '../../interaction/bars/Actionbar'
-import ExportCompositionModal from '../general/modals/ExportCompositionModal'
+import ExportSuccessModal from '../general/modals/ExportSuccessModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -56,9 +56,13 @@ const ComposerActionbar = () => {
                 />
             )}
             {showExportCompositionModal && (
-                <ExportCompositionModal
+                <ExportSuccessModal
+                    ctaLabel="Create Template"
+                    title="Composition exported"
+                    description="This is your CID for your exported composition. Use it to create a template."
+                    link={'/templates/create'}
                     onClose={toggleShowExportCompositionModal}
-                    exportedCompositionCID={exportedCompositionCID}
+                    exportedCID={exportedCompositionCID}
                 />
             )}
         </>

@@ -22,6 +22,8 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
+    onSuccess: (templateCId: string) => void
+    onFailure: () => void
 }
 
 export type CreateTemplateFormType = {
@@ -46,18 +48,11 @@ const initialInput = {
     flexInputs: {} as FlexInputs,
 }
 
-export interface SetTemplateInputValueProps {
-    solverId: string
-    tagId: string
-    value?: string
-}
-export interface SetIsFlexProps {
-    solverId: string
-    tagId: string
-    isFlex: boolean
-}
-
-const CreateTemplateForm = ({ composition }: CreateTemplateFormProps) => {
+const CreateTemplateForm = ({
+    composition,
+    onSuccess,
+    onFailure,
+}: CreateTemplateFormProps) => {
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
         string | undefined
@@ -232,61 +227,68 @@ const CreateTemplateForm = ({ composition }: CreateTemplateFormProps) => {
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        const updatedComposition = [...composition.solvers]
+        const updatedComposerSolvers = [...composition.solvers]
         // Update our composition with new flexInput values
-        updatedComposition.forEach((solver: ComposerSolverModel, i: number) => {
-            for (const [tagId, taggedInput] of Object.entries(
-                input.flexInputs[solver.id]
-            )) {
-                updatedComposition[i].slotTags[tagId] = {
-                    id: taggedInput.id,
-                    label: taggedInput.label,
-                    description: taggedInput.description,
-                    isFlex: taggedInput.isFlex,
-                }
+        if (Object.entries(input.flexInputs).length > 0) {
+            updatedComposerSolvers.forEach(
+                (solver: ComposerSolverModel, i: number) => {
+                    for (const [tagId, taggedInput] of Object.entries(
+                        input.flexInputs[solver.id]
+                    )) {
+                        console.log(tagId, taggedInput)
+                        updatedComposerSolvers[i].slotTags[tagId] = {
+                            id: taggedInput.id,
+                            label: taggedInput.label,
+                            description: taggedInput.description,
+                            isFlex: taggedInput.isFlex,
+                        }
 
-                if (typeof taggedInput.value !== 'undefined') {
-                    switch (tagId) {
-                        case 'keeper':
-                            updatedComposition[i].config[
-                                'keeperAddress'
-                            ].address = taggedInput.value
-                            break
+                        if (typeof taggedInput.value !== 'undefined') {
+                            switch (tagId) {
+                                case 'keeper':
+                                    updatedComposerSolvers[i].config[
+                                        'keeperAddress'
+                                    ].address = taggedInput.value
+                                    break
 
-                        case 'arbitrator':
-                            updatedComposition[i].config[
-                                'arbitratorAddress'
-                            ].address = taggedInput.value
-                            break
+                                case 'arbitrator':
+                                    updatedComposerSolvers[i].config[
+                                        'arbitratorAddress'
+                                    ].address = taggedInput.value
+                                    break
 
-                        case 'data':
-                            updatedComposition[i].config['data'] =
-                                taggedInput.value
-                            break
+                                case 'data':
+                                    updatedComposerSolvers[i].config['data'] =
+                                        taggedInput.value
+                                    break
 
-                        case 'collateralToken':
-                            updatedComposition[i].config['collateralToken'] =
-                                taggedInput.value
-                            break
+                                case 'collateralToken':
+                                    updatedComposerSolvers[i].config[
+                                        'collateralToken'
+                                    ] = taggedInput.value
+                                    break
 
-                        case 'timelockSeconds':
-                            updatedComposition[i].config['timelockSeconds'] =
-                                parseInt(taggedInput.value)
-                            break
+                                case 'timelockSeconds':
+                                    updatedComposerSolvers[i].config[
+                                        'timelockSeconds'
+                                    ] = parseInt(taggedInput.value)
+                                    break
 
-                        default:
-                            // SlotID
-                            updatedComposition[i].config.slots[tagId].data = [
-                                taggedInput.value,
-                            ]
+                                default:
+                                    // SlotID
+                                    updatedComposerSolvers[i].config.slots[
+                                        tagId
+                                    ].data = [taggedInput.value]
+                            }
+                        }
                     }
                 }
-            }
-        })
+            )
+        }
 
         // Construct template object
         const template: TemplateModel = {
-            composerSolvers: updatedComposition,
+            composerSolvers: updatedComposerSolvers,
             pfp: input.pfp,
             name: input.name,
             title: input.title,
@@ -301,13 +303,12 @@ const CreateTemplateForm = ({ composition }: CreateTemplateFormProps) => {
         // Pin template to ipfs
         try {
             const res = await ipfs.pin(template)
-            if (res) {
-                //onSuccess(res.IpfsHash)
-                console.log('Created Template', res.IpfsHash, template, input)
+            if (res && res.IpfsHash) {
+                onSuccess(res.IpfsHash)
             }
         } catch (e) {
             console.log(e)
-            // onFailure()
+            onFailure()
         }
     }
 
