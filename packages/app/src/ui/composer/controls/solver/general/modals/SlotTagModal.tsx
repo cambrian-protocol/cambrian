@@ -1,27 +1,27 @@
-import { SetStateAction, useState } from 'react'
 import SlotTagForm, { SlotTagFormInputType } from '../forms/SlotTagForm'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { useState } from 'react'
 
 interface SlotTagModalProps {
     slotTagInput: SlotTagFormInputType
-    setSlotTagInput: React.Dispatch<SetStateAction<SlotTagFormInputType>>
+    onSubmit: (input: SlotTagFormInputType) => void
     onBack: () => void
 }
 
 const SlotTagModal = ({
     onBack,
     slotTagInput,
-    setSlotTagInput,
+    onSubmit,
 }: SlotTagModalProps) => {
     const [input, setInput] = useState<SlotTagFormInputType>(slotTagInput)
 
-    const onSubmit = (event: FormExtendedEvent<{}, Element>) => {
+    const handleSubmit = (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
-        setSlotTagInput(input)
+        onSubmit(input)
         onBack()
     }
 
@@ -33,7 +33,7 @@ const SlotTagModal = ({
             />
             <BaseFormContainer>
                 <SlotTagForm
-                    onSubmit={onSubmit}
+                    onSubmit={handleSubmit}
                     input={input}
                     setInput={setInput}
                 />
