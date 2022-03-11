@@ -18,6 +18,7 @@ import updateRecipientAction from './solverActions/updateRecipient.action'
 import updateRecipientAllocationAction from './outcomeCollectionActions/updateRecipientAllocation.action'
 import updateSelectedElementAction from './flow/updateSelectedElement.action'
 import updateSlotAction from './solverActions/updateSlot.action'
+import updateSlotTagAction from './solverActions/updateSlotTag.action'
 import updateSolutionSettingsAction from './general/updateSolutionSettings.action'
 import updateSolverMainConfigAction from './solverActions/updateSolverMainConfig.action'
 import updateSolverTagAction from './solverActions/updateSolverTag.action'
@@ -46,4 +47,5 @@ export {
     addRecipientAction,
     updateRecipientAction,
     deleteSlotAction,
+    updateSlotTagAction,
 }

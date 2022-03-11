@@ -9,11 +9,9 @@ import SlotConfigForm, {
 } from '../forms/SlotConfigForm'
 import { initialSlotInput, initialSlotTagInput } from './CreateSlotModal'
 
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { Box } from 'grommet'
-import { Button } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -132,7 +130,9 @@ const UpdateSlotFormModal = ({
                 <SlotTagModal
                     onBack={toggleShowSlotTagModal}
                     slotTagInput={slotTagInput}
-                    setSlotTagInput={setSlotTagInput}
+                    onSubmit={(slotTag: SlotTagFormInputType) => {
+                        setSlotTagInput(slotTag)
+                    }}
                 />
             )}
         </>

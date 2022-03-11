@@ -100,7 +100,9 @@ const UpdateRecipientModal = ({
                 <SlotTagModal
                     onBack={toggleShowSlotTagModal}
                     slotTagInput={slotTagInput}
-                    setSlotTagInput={setSlotTagInput}
+                    onSubmit={(slotTag: SlotTagFormInputType) => {
+                        setSlotTagInput(slotTag)
+                    }}
                 />
             )}
         </>

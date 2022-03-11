@@ -4,9 +4,7 @@ import RecipientConfigForm, {
     initialRecipientConfigFormInput,
 } from './RecipientConfigForm'
 
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
@@ -69,7 +67,9 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
                 <SlotTagModal
                     onBack={toggleShowTagModal}
                     slotTagInput={slotTagInput}
-                    setSlotTagInput={setSlotTagInput}
+                    onSubmit={(slotTag: SlotTagFormInputType) => {
+                        setSlotTagInput(slotTag)
+                    }}
                 />
             )}
         </>
