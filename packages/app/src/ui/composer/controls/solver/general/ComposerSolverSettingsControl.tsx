@@ -4,15 +4,15 @@ import {
     Form,
     FormExtendedEvent,
     FormField,
-    Text,
     TextInput,
 } from 'grommet'
 import React, { useEffect, useState } from 'react'
-import { Scales, Shield, Tag, Timer } from 'phosphor-react'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import FormFieldInputWithTag from '@cambrian/app/components/inputs/FormFieldInputWithTag'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SolverTagModal from './modals/SolverTagModal'
+import { Tag } from 'phosphor-react'
 import _ from 'lodash'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -149,50 +149,42 @@ const ComposerSolverSettingsControl = () => {
                         setInput(nextValue)
                     }}
                 >
-                    <FormField
-                        name="keeperAddress"
-                        label={
-                            <Box direction="row" gap="small">
-                                <Shield size="24" />
-                                <Text>Keeper address</Text>
+                    <FormFieldInputWithTag
+                        slotId="keeperAddress"
+                        label="Keeper"
+                        input={<TextInput name="keeperAddress" />}
+                    />
+                    <FormFieldInputWithTag
+                        slotId="arbitratorAddress"
+                        label="Arbitrator"
+                        input={<TextInput name="arbitratorAddress" />}
+                    />
+                    <FormFieldInputWithTag
+                        slotId="timelockSeconds"
+                        label="Timelock"
+                        input={
+                            <Box direction="row">
+                                <FormField label="Days">
+                                    <TextInput
+                                        type="number"
+                                        name="timelockDays"
+                                    />
+                                </FormField>
+                                <FormField label="Hours">
+                                    <TextInput
+                                        type="number"
+                                        name="timelockHours"
+                                    />
+                                </FormField>
+                                <FormField label="Minutes">
+                                    <TextInput
+                                        type="number"
+                                        name="timelockMinutes"
+                                    />
+                                </FormField>
                             </Box>
                         }
-                    >
-                        <TextInput name="keeperAddress" />
-                    </FormField>
-                    <FormField
-                        label={
-                            <Box direction="row" gap="small">
-                                <Scales size="24" />
-                                <Text>Arbitrator address</Text>
-                            </Box>
-                        }
-                    >
-                        <TextInput name="arbitratorAddress" />
-                    </FormField>
-                    <FormField
-                        label={
-                            <Box direction="row" gap="small">
-                                <Timer size="24" />
-                                <Text>Time lock</Text>
-                            </Box>
-                        }
-                    >
-                        <Box direction="row">
-                            <FormField label="Days">
-                                <TextInput type="number" name="timelockDays" />
-                            </FormField>
-                            <FormField label="Hours">
-                                <TextInput type="number" name="timelockHours" />
-                            </FormField>
-                            <FormField label="Minutes">
-                                <TextInput
-                                    type="number"
-                                    name="timelockMinutes"
-                                />
-                            </FormField>
-                        </Box>
-                    </FormField>
+                    />
                     <Box flex>
                         <Button
                             disabled={_.isEqual(initialInput, input)}

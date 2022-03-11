@@ -37,10 +37,19 @@ export type ComposerAction =
     | DragNodeActionType
     | UpdateSolutionSettingsActionType
     | UpdateSolverTagActionType
+    | UpdateSlotTagActionType
 
 type UpdateSolverTagActionType = {
     type: 'UPDATE_SOLVER_TAG'
     payload: SolverTagModel
+}
+
+type UpdateSlotTagActionType = {
+    type: 'UPDATE_SLOT_TAG'
+    payload: {
+        slotIdToUpdate: string
+        slotTag: SlotTagFormInputType
+    }
 }
 
 type LoadComposerAction = {

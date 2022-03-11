@@ -19,6 +19,7 @@ import {
     UPDATE_RECIPIENT_ALLOCATION,
     UPDATE_SELECTED_ELEMENT,
     UPDATE_SLOT,
+    UPDATE_SLOT_TAG,
     UPDATE_SOLUTION_SETTINGS,
     UPDATE_SOLVER_MAIN_CONFIG,
     UPDATE_SOLVER_TAG,
@@ -44,6 +45,7 @@ import {
     updateRecipientAllocationAction,
     updateSelectedElementAction,
     updateSlotAction,
+    updateSlotTagAction,
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
     updateSolverTagAction,
@@ -106,6 +108,8 @@ export const composerReducer = (
             return updateSolutionSettingsAction(state, action.payload)
         case UPDATE_SOLVER_TAG:
             return updateSolverTagAction(state, action.payload)
+        case UPDATE_SLOT_TAG:
+            return updateSlotTagAction(state, action.payload)
         default:
             return state
     }
