@@ -37,10 +37,10 @@ const LoadCompositionModal = ({ onClose }: LoadCompositionModalProps) => {
             const compositionObject = (await ipfs.getFromCID(
                 input.cid
             )) as CompositionModel
-            if (compositionObject && compositionObject.composer) {
+            if (compositionObject) {
                 dispatch({
                     type: 'LOAD_COMPOSITION',
-                    payload: compositionObject.composer,
+                    payload: compositionObject,
                 })
                 onClose()
             }

@@ -1,5 +1,5 @@
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
 import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
@@ -7,13 +7,13 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const createRecipientAllocationAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: {
         recipient: RecipientFormType
         amount: number | ComposerSlotModel
         slotTag: SlotTagFormInputType
     }
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.ocId !== undefined &&

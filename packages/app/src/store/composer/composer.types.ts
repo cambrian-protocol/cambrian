@@ -2,10 +2,9 @@ import {
     ComposerSlotModel,
     ComposerSlotPathType,
 } from '@cambrian/app/models/SlotModel'
-import { Elements, FlowElement, Node } from 'react-flow-renderer'
+import { FlowElement, Node } from 'react-flow-renderer'
 
-import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
-import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
+import { CompositionModel } from '../../models/CompositionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
@@ -16,15 +15,6 @@ import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/Solutio
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { ethers } from 'ethers'
-
-// TODO Refactor, cleanup
-
-export type ComposerStateType = {
-    flowElements: Elements
-    currentElement?: FlowElement
-    currentIdPath?: ComposerIdPathType
-    solvers: ComposerSolver[]
-}
 
 export type ComposerAction =
     | UpdateSelectionActionType
@@ -55,7 +45,7 @@ type UpdateSolverTagActionType = {
 
 type LoadComposerAction = {
     type: 'LOAD_COMPOSITION'
-    payload: ComposerStateType
+    payload: CompositionModel
 }
 
 type UpdateSolverMainConfigActionType = {

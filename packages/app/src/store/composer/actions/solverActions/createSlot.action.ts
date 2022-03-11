@@ -1,14 +1,14 @@
-import { ComposerStateType, SlotActionPayload } from '../../composer.types'
-
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SlotActionPayload } from '../../composer.types'
 import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
 
 const createSlotAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: { slot: SlotActionPayload; slotTag: SlotTagFormInputType }
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
