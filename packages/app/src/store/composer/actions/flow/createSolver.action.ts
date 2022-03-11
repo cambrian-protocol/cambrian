@@ -1,7 +1,7 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 
-const createSolverAction = (state: ComposerStateType): ComposerStateType => {
+const createSolverAction = (state: CompositionModel): CompositionModel => {
     const newSolver = new Solver()
     const updatedSolvers = [...state.solvers]
     updatedSolvers.push(newSolver)

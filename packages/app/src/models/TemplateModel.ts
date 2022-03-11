@@ -1,11 +1,11 @@
-import { SolverModel } from './SolverModel'
+import ComposerSolver from '../classes/ComposerSolver'
 
 export type TemplateModel = {
     pfp: string
     name: string
     title: string
     description: string
-    composition: SolverModel[]
+    composerSolvers: ComposerSolver[]
     price?: {
         amount: number
         denominationToken: string

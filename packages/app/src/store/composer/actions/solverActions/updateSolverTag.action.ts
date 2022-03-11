@@ -1,8 +1,8 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 
 const updateSolverTagAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SolverTagModel
 ) => {
     if (

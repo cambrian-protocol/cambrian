@@ -1,10 +1,10 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlowElement } from 'react-flow-renderer'
 
 const updateSelectedElementAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     selectedElement?: FlowElement
-): ComposerStateType => {
+): CompositionModel => {
     let selectedIdPath
     if (selectedElement !== undefined) {
         const idPathArr = selectedElement.id.split('/')

@@ -1,12 +1,12 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
 import { addCallbackToTargetIncomingCallbacks } from './createSlot.action'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const addRecipientAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SelectedRecipientAddressType
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
