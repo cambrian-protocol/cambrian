@@ -6,20 +6,22 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { CheckBox, Header } from 'grommet'
-import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
-import React, { useState } from 'react'
+import { FlexInputs, TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import React, { useEffect, useState } from 'react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Coin } from 'phosphor-react'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateTemplateFormProps {
-    composition: ComposerSolverModel[]
-    onSuccess: (cid: string) => void
-    onFailure: () => void
+    composition: CompositionModel
 }
 
 export type CreateTemplateFormType = {
@@ -44,11 +46,18 @@ const initialInput = {
     flexInputs: {} as FlexInputs,
 }
 
-const CreateTemplateForm = ({
-    composition,
-    onSuccess,
-    onFailure,
-}: CreateTemplateFormProps) => {
+export interface SetTemplateInputValueProps {
+    solverId: string
+    tagId: string
+    value?: string
+}
+export interface SetIsFlexProps {
+    solverId: string
+    tagId: string
+    isFlex: boolean
+}
+
+const CreateTemplateForm = ({ composition }: CreateTemplateFormProps) => {
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
         string | undefined
@@ -62,22 +71,22 @@ const CreateTemplateForm = ({
     /**
      * Initialize input.flexInputs from composition
      */
-    React.useEffect(() => {
+    useEffect(() => {
         const flexInputs = {} as {
             [solverId: string]: {
                 [tagId: string]: TaggedInput
             }
         }
 
-        composition.forEach((solver) => {
-            Object.keys(solver.tags).forEach((tagId) => {
-                if (solver.tags[tagId].isFlex === true) {
+        composition.solvers.forEach((solver) => {
+            Object.keys(solver.slotTags).forEach((tagId) => {
+                if (solver.slotTags[tagId].isFlex === true) {
                     if (typeof flexInputs[solver.id] === 'undefined') {
                         flexInputs[solver.id] = {}
                     }
 
                     flexInputs[solver.id][tagId] = {
-                        ...solver.tags[tagId],
+                        ...solver.slotTags[tagId],
                         value: undefined,
                     }
                 }
@@ -92,7 +101,7 @@ const CreateTemplateForm = ({
     const setFlexInputValue = (
         solverId: string,
         tagId: string,
-        value: string | undefined
+        value?: string
     ) => {
         const inputs: CreateTemplateFormType = { ...input }
         inputs.flexInputs[solverId][tagId].value = value
@@ -100,9 +109,9 @@ const CreateTemplateForm = ({
         setIsFlex(solverId, tagId, !value)
     }
 
-    const setIsFlex = (solverId: string, tagId: string, bool: boolean) => {
+    const setIsFlex = (solverId: string, tagId: string, isFlex: boolean) => {
         const inputs: CreateTemplateFormType = { ...input }
-        inputs.flexInputs[solverId][tagId].isFlex = bool
+        inputs.flexInputs[solverId][tagId].isFlex = isFlex
         setInput(inputs)
     }
 
@@ -112,48 +121,28 @@ const CreateTemplateForm = ({
      * These fields may be provided by the template or left "isFlex" for the Proposal stage
      */
     const renderFlexInputs = () => {
-        return Object.keys(input.flexInputs).map((solverId) => {
-            return Object.keys(input.flexInputs[solverId]).map((tagId) => {
+        const flexInputs = Object.keys(input.flexInputs).map((solverId) =>
+            Object.keys(input.flexInputs[solverId]).map((tagId) => {
+                const currentFlexInput = input.flexInputs[solverId][tagId]
                 return (
-                    <Box direction="row" key={`${solverId}-${tagId}`}>
-                        <Box basis="3/4">
-                            <FormField
-                                name={tagId}
-                                label={tagId}
-                                help={input.flexInputs[solverId][tagId].text}
-                                type={getFlexInputType(
-                                    composition,
-                                    input.flexInputs[solverId][tagId]
-                                )}
-                                onChange={(event) =>
-                                    setFlexInputValue(
-                                        solverId,
-                                        tagId,
-                                        event.target.value
-                                    )
-                                }
-                            />
-                        </Box>
-
-                        <Box align="end">
-                            <CheckBox
-                                checked={
-                                    input.flexInputs[solverId][tagId].isFlex
-                                }
-                                label="Leave Unfilled"
-                                onChange={(event) =>
-                                    setIsFlex(
-                                        solverId,
-                                        tagId,
-                                        event.target.checked
-                                    )
-                                }
-                            />
-                        </Box>
-                    </Box>
+                    <FlexInput
+                        key={`${solverId}-${tagId}`}
+                        solverId={solverId}
+                        input={currentFlexInput}
+                        inputType={getFlexInputType(
+                            composition.solvers,
+                            currentFlexInput
+                        )}
+                        setIsFlex={setIsFlex}
+                        setFlexInputValue={setFlexInputValue}
+                    />
                 )
             })
-        })
+        )
+
+        if (flexInputs.length !== 0) {
+            return <BaseFormGroupContainer>{flexInputs}</BaseFormGroupContainer>
+        }
     }
 
     const getFlexInputType = (
@@ -174,7 +163,6 @@ const CreateTemplateForm = ({
             const slot = composition.find(
                 (solver) => solver.config.slots[tag.id]
             )?.config.slots[tag.id]
-
             if (slot?.dataTypes[0] === SolidityDataTypes.Uint256) {
                 return 'number'
             } else {
@@ -244,50 +232,51 @@ const CreateTemplateForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-
-        const newComposition = composition.map((x) => x)
-
+        const updatedComposition = [...composition.solvers]
         // Update our composition with new flexInput values
-        newComposition.forEach((solver: ComposerSolverModel, i: number) => {
+        updatedComposition.forEach((solver: ComposerSolverModel, i: number) => {
             for (const [tagId, taggedInput] of Object.entries(
                 input.flexInputs[solver.id]
             )) {
-                newComposition[i].tags[tagId] = {
+                updatedComposition[i].slotTags[tagId] = {
                     id: taggedInput.id,
-                    text: taggedInput.text,
+                    label: taggedInput.label,
+                    description: taggedInput.description,
                     isFlex: taggedInput.isFlex,
                 }
 
                 if (typeof taggedInput.value !== 'undefined') {
                     switch (tagId) {
                         case 'keeper':
-                            newComposition[i].config['keeperAddress'].address =
-                                taggedInput.value
+                            updatedComposition[i].config[
+                                'keeperAddress'
+                            ].address = taggedInput.value
                             break
 
                         case 'arbitrator':
-                            newComposition[i].config[
+                            updatedComposition[i].config[
                                 'arbitratorAddress'
                             ].address = taggedInput.value
                             break
 
                         case 'data':
-                            newComposition[i].config['data'] = taggedInput.value
+                            updatedComposition[i].config['data'] =
+                                taggedInput.value
                             break
 
                         case 'collateralToken':
-                            newComposition[i].config['collateralToken'] =
+                            updatedComposition[i].config['collateralToken'] =
                                 taggedInput.value
                             break
 
                         case 'timelockSeconds':
-                            newComposition[i].config['collateralToken'] =
-                                taggedInput.value
+                            updatedComposition[i].config['timelockSeconds'] =
+                                parseInt(taggedInput.value)
                             break
 
                         default:
                             // SlotID
-                            newComposition[i].config.slots[tagId].data = [
+                            updatedComposition[i].config.slots[tagId].data = [
                                 taggedInput.value,
                             ]
                     }
@@ -296,8 +285,8 @@ const CreateTemplateForm = ({
         })
 
         // Construct template object
-        const template = {
-            composition: newComposition,
+        const template: TemplateModel = {
+            composerSolvers: updatedComposition,
             pfp: input.pfp,
             name: input.name,
             title: input.title,
@@ -307,21 +296,23 @@ const CreateTemplateForm = ({
                 denominationToken: input.denominationToken,
                 preferredTokens: input.preferredTokens,
             },
-        } as TemplateModel
+        }
 
         // Pin template to ipfs
         try {
             const res = await ipfs.pin(template)
-            onSuccess(res.IpfsHash)
-            console.log('Created Template', res.IpfsHash, template, input)
+            if (res) {
+                //onSuccess(res.IpfsHash)
+                console.log('Created Template', res.IpfsHash, template, input)
+            }
         } catch (e) {
             console.log(e)
-            onFailure()
+            // onFailure()
         }
     }
 
     return (
-        <>
+        <BaseFormContainer>
             <Form<CreateTemplateFormType>
                 onChange={(nextValue: CreateTemplateFormType) => {
                     setInput(nextValue)
@@ -329,37 +320,59 @@ const CreateTemplateForm = ({
                 value={input}
                 onSubmit={(event) => onSubmit(event)}
             >
-                <FormField
-                    name="name"
-                    label="Your/Organization Name"
-                    required
-                />
-                <FormField name="pfp" label="Avatar URL" required />
-                <FormField name="title" label="Title" required />
-                <FormField name="description" label="Description" required>
-                    <TextArea name="description" rows={5} resize={false} />
-                </FormField>
-                <Header>Awaiting Inputs</Header>
-                <Box gap="small">{renderFlexInputs()}</Box>
-                <Box gap="small">
-                    <FormField name="price" label="Asking Price">
+                <Box gap="medium">
+                    <BaseFormGroupContainer>
                         <FormField
-                            name="denominationToken"
-                            label="Denomination token"
-                            help={denominationTokenSymbol || 'Contract address'}
-                            type="string"
-                            onChange={(event) =>
-                                updateDenominationTokenSymbol(
-                                    event.target.value
-                                )
-                            }
+                            name="name"
+                            label="Your/Organization Name"
+                            required
+                        />
+                        <FormField name="pfp" label="Avatar URL" required />
+                        <FormField
+                            name="title"
+                            label="Template title"
+                            required
                         />
                         <FormField
-                            name="askingAmount"
-                            label="Amount (in the denomination token)"
-                            help="eg. 1.0042"
-                            type="number"
-                        />
+                            name="description"
+                            label="Template description"
+                            required
+                        >
+                            <TextArea
+                                name="description"
+                                rows={5}
+                                resize={false}
+                            />
+                        </FormField>
+                    </BaseFormGroupContainer>
+                    {renderFlexInputs()}
+                    <BaseFormGroupContainer
+                        direction="row"
+                        gap="small"
+                        align="end"
+                    >
+                        <Box basis="1/4">
+                            <FormField
+                                name="askingAmount"
+                                label="Amount"
+                                type="number"
+                            />
+                        </Box>
+                        <Box flex>
+                            <FormField
+                                name="denominationToken"
+                                label="Token address"
+                                type="string"
+                                onChange={(event) =>
+                                    updateDenominationTokenSymbol(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </Box>
+                        <Box margin={{ bottom: '1.5em' }}>
+                            {denominationTokenSymbol || <Coin size="24" />}
+                        </Box>
                         {isUncertainCollateral() && (
                             <FormField
                                 name="preferredTokens"
@@ -379,13 +392,13 @@ const CreateTemplateForm = ({
                                 }
                             />
                         )}
-                    </FormField>
-                </Box>
-                <Box pad={{ top: 'medium' }}>
-                    <Button primary type="submit" label="Create Template" />
+                    </BaseFormGroupContainer>
+                    <Box>
+                        <Button primary type="submit" label="Create Template" />
+                    </Box>
                 </Box>
             </Form>
-        </>
+        </BaseFormContainer>
     )
 }
 

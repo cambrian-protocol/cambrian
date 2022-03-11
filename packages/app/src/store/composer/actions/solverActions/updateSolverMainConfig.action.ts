@@ -1,4 +1,4 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import _ from 'lodash'
 
 export type SolverMainConfigType = {
@@ -8,9 +8,9 @@ export type SolverMainConfigType = {
 }
 
 const updateSolverMainConfigAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SolverMainConfigType
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&

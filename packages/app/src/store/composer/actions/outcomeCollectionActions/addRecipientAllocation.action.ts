@@ -2,19 +2,19 @@ import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
-import { ComposerStateType } from '../../composer.types'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { addCallbackToTargetIncomingCallbacks } from '../solverActions/createSlot.action'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 
 // TODO DRY with addRecipientAction
 const addRecipientAllocationAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: {
         recipient: SelectedRecipientAddressType
         amount: number | ComposerSlotModel
     }
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.ocId !== undefined &&

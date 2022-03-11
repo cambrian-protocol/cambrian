@@ -23,7 +23,6 @@ import {
     UPDATE_SOLVER_MAIN_CONFIG,
     UPDATE_SOLVER_TAG,
 } from './composer.constants'
-import { ComposerAction, ComposerStateType } from './composer.types'
 import {
     addRecipientAction,
     addRecipientAllocationAction,
@@ -50,10 +49,13 @@ import {
     updateSolverTagAction,
 } from './actions'
 
+import { ComposerAction } from './composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+
 export const composerReducer = (
-    state: ComposerStateType,
+    state: CompositionModel,
     action: ComposerAction
-): ComposerStateType => {
+): CompositionModel => {
     switch (action.type) {
         case UPDATE_SELECTED_ELEMENT:
             return updateSelectedElementAction(

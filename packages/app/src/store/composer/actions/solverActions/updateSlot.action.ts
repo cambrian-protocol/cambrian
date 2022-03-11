@@ -1,9 +1,9 @@
-import { ComposerStateType, SlotActionPayload } from '../../composer.types'
-
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SlotActionPayload } from '../../composer.types'
 import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
 
 const updateSlotAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: {
         slotIdToUpdate: string
         updatedSlot: SlotActionPayload

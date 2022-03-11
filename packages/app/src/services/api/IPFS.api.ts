@@ -31,9 +31,14 @@ export class IPFSAPI {
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
-
         const gateway = this.gateways[gatewayIndex]
-        const base32 = new CID(cid).toV1().toString('base32')
+        let base32 = undefined
+        try {
+            base32 = new CID(cid).toV1().toString('base32')
+        } catch {
+            console.warn('Could not create CID from: ', cid)
+            return undefined
+        }
 
         const timeout = setTimeout(() => {
             console.log('Gateway timed out')

@@ -1,9 +1,9 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 
 const loadCompositionAction = (
-    state: ComposerStateType,
-    payload: ComposerStateType
+    state: CompositionModel,
+    payload: CompositionModel
 ) => {
     //TODO Dynamic ABI import of solver interface (Can't create Interface from JSON)
     const solversWithCorrectABI = payload.solvers.map((solver) => {

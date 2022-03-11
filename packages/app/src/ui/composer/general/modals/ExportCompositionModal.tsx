@@ -10,7 +10,7 @@ interface ExportCompositionModalProps {
     exportedCompositionCID: string
 }
 
-// TODO Validate composition before export trigger
+// TODO Validate composition and show errors
 const ExportCompositionModal = ({
     onClose,
     exportedCompositionCID,

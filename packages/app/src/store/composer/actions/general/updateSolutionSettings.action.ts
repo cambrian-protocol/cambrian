@@ -1,10 +1,10 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 
 const updateSolutionSettingsAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SolutionConfigFormType
-): ComposerStateType => {
+): CompositionModel => {
     const updatedSolvers = state.solvers.map((solver) => {
         solver.config.collateralToken = payload.collateralToken
         return solver

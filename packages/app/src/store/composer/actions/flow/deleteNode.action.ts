@@ -1,9 +1,9 @@
 import { getOutgoers, isNode, removeElements } from 'react-flow-renderer'
 
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import _ from 'lodash'
 
-const deleteNodeAction = (state: ComposerStateType): ComposerStateType => {
+const deleteNodeAction = (state: CompositionModel): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&

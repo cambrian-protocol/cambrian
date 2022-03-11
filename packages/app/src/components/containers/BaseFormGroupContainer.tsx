@@ -2,23 +2,21 @@ import { Box } from 'grommet'
 import { BoxExtendedProps } from 'grommet'
 import { PropsWithChildren } from 'react'
 
-const BaseFormContainer = ({
+const BaseFormGroupContainer = ({
     children,
-    ...rest
+    ...props
 }: PropsWithChildren<{}> & BoxExtendedProps) => {
     return (
         <Box
-            background={'background-front'}
             pad="medium"
             elevation="small"
+            background={'background-contrast'}
             round="small"
-            fill="horizontal"
-            height={{ min: 'auto' }}
-            {...rest}
+            {...props}
         >
             {children}
         </Box>
     )
 }
 
-export default BaseFormContainer
+export default BaseFormGroupContainer

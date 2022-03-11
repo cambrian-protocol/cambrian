@@ -3,18 +3,18 @@ import {
     ComposerSlotPathType,
 } from '@cambrian/app/models/SlotModel'
 
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const updateRecipientAllocationAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: {
         recipient: ComposerSlotPathType
         amount: ComposerSlotModel | number
     }
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&

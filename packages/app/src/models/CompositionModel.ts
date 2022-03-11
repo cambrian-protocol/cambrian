@@ -1,7 +1,12 @@
-import { ComposerStateType } from '../store/composer/composer.types'
-import { SolverModel } from './SolverModel'
+import { Elements, FlowElement } from 'react-flow-renderer'
 
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
+
+// TODO Composition Title and description
 export type CompositionModel = {
-    solvers?: SolverModel[]
-    composer: ComposerStateType
+    flowElements: Elements
+    currentElement?: FlowElement
+    currentIdPath?: ComposerIdPathType
+    solvers: ComposerSolver[]
 }

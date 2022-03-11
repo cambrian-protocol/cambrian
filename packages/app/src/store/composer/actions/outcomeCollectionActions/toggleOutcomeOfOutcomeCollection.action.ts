@@ -1,11 +1,11 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import _ from 'lodash'
 
 const toggleOutcomeOfOutcomeCollectionAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     outcome: OutcomeModel
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
