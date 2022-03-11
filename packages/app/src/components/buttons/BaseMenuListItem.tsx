@@ -1,6 +1,7 @@
-import { Box, DropButton, Text } from 'grommet'
-import { CaretRight, IconContext, Info } from 'phosphor-react'
+import { Box, Text } from 'grommet'
+import { CaretRight, IconContext } from 'phosphor-react'
 
+import InfoDropButton from './InfoDropButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 
 export interface BaseMenuListItemProps {
@@ -43,17 +44,7 @@ const BaseMenuListItem = ({
                         </Text>
                     </Box>
                 </Box>
-                {info && (
-                    <DropButton
-                        icon={<Info size={32} />}
-                        dropAlign={{ top: 'bottom', right: 'right' }}
-                        dropContent={
-                            <Box pad="medium" width={{ max: 'medium' }}>
-                                <Text size="small">{info}</Text>
-                            </Box>
-                        }
-                    />
-                )}
+                {info && <InfoDropButton info={info} />}
                 {onClick && (
                     <Box>
                         <CaretRight />
