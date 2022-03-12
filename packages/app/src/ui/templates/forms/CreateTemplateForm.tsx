@@ -8,6 +8,7 @@ import {
 } from 'grommet'
 import { FlexInputs, TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import React, { useEffect, useState } from 'react'
+import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
@@ -17,12 +18,12 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
-    onSuccess: (templateCId: string) => void
+    compositionCID: string
+    onSuccess: (templateCID: string) => void
     onFailure: () => void
 }
 
@@ -51,7 +52,7 @@ const initialInput = {
 const CreateTemplateForm = ({
     composition,
     onSuccess,
-    onFailure,
+    compositionCID,
 }: CreateTemplateFormProps) => {
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
@@ -60,8 +61,6 @@ const CreateTemplateForm = ({
     const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
         (string | undefined)[] | undefined
     >()
-
-    const ipfs = new IPFSAPI()
 
     /**
      * Initialize input.flexInputs from composition
@@ -227,88 +226,13 @@ const CreateTemplateForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        const updatedComposerSolvers = [...composition.solvers]
-        // Update our composition with new flexInput values
-        if (Object.entries(input.flexInputs).length > 0) {
-            updatedComposerSolvers.forEach(
-                (solver: ComposerSolverModel, i: number) => {
-                    for (const [tagId, taggedInput] of Object.entries(
-                        input.flexInputs[solver.id]
-                    )) {
-                        console.log(tagId, taggedInput)
-                        updatedComposerSolvers[i].slotTags[tagId] = {
-                            id: taggedInput.id,
-                            label: taggedInput.label,
-                            description: taggedInput.description,
-                            isFlex: taggedInput.isFlex,
-                        }
 
-                        if (typeof taggedInput.value !== 'undefined') {
-                            switch (tagId) {
-                                case 'keeper':
-                                    updatedComposerSolvers[i].config[
-                                        'keeperAddress'
-                                    ].address = taggedInput.value
-                                    break
-
-                                case 'arbitrator':
-                                    updatedComposerSolvers[i].config[
-                                        'arbitratorAddress'
-                                    ].address = taggedInput.value
-                                    break
-
-                                case 'data':
-                                    updatedComposerSolvers[i].config['data'] =
-                                        taggedInput.value
-                                    break
-
-                                case 'collateralToken':
-                                    updatedComposerSolvers[i].config[
-                                        'collateralToken'
-                                    ] = taggedInput.value
-                                    break
-
-                                case 'timelockSeconds':
-                                    updatedComposerSolvers[i].config[
-                                        'timelockSeconds'
-                                    ] = parseInt(taggedInput.value)
-                                    break
-
-                                default:
-                                    // SlotID
-                                    updatedComposerSolvers[i].config.slots[
-                                        tagId
-                                    ].data = [taggedInput.value]
-                            }
-                        }
-                    }
-                }
-            )
-        }
-
-        // Construct template object
-        const template: TemplateModel = {
-            composerSolvers: updatedComposerSolvers,
-            pfp: input.pfp,
-            name: input.name,
-            title: input.title,
-            description: input.description,
-            price: {
-                amount: input.askingAmount,
-                denominationToken: input.denominationToken,
-                preferredTokens: input.preferredTokens,
-            },
-        }
-
-        // Pin template to ipfs
-        try {
-            const res = await ipfs.pin(template)
-            if (res && res.IpfsHash) {
-                onSuccess(res.IpfsHash)
-            }
-        } catch (e) {
-            console.log(e)
-            onFailure()
+        const stageHand = new Stagehand()
+        stageHand.setStage(composition, compositionCID, StageNames.composition)
+        stageHand.createTemplate(input)
+        const res = await stageHand.publishStage(StageNames.template)
+        if (res && res.IpfsHash) {
+            onSuccess(res?.IpfsHash)
         }
     }
 

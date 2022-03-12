@@ -32,7 +32,7 @@ export const BaseLayout = ({
     fill,
     appbarTitle,
 }: LayoutProps) => {
-    const [showSidebar, setShowSidebar] = useState(true)
+    const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
 
     const toggleSidebar = () => setShowSidebar(!showSidebar)
