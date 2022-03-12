@@ -1,9 +1,9 @@
 import { Box, Button } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import FundProposal from '@cambrian/app/src/ui/proposals/FundProposal'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import Link from 'next/link'
 import ParticipantAvatar from '@cambrian/app/src/components/avatars/AvatarWithTitle'
 import { ProposalModel } from '@cambrian/app/src/models/ProposalModel'
@@ -41,7 +41,7 @@ export default function ProposalPage() {
     return (
         <>
             {currentProposal && (
-                <Layout contextTitle="Proposal">
+                <BaseLayout contextTitle="Proposal">
                     <Box>
                         <HeaderTextSection
                             title={currentProposal.title}
@@ -74,7 +74,7 @@ export default function ProposalPage() {
                             )}
                         </Box>
                     </Box>
-                </Layout>
+                </BaseLayout>
             )}
         </>
     )
