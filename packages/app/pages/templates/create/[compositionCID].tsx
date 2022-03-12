@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { SmileyXEyes } from 'phosphor-react'
 import { Text } from 'grommet'
@@ -54,7 +54,7 @@ export default function CreateTemplatePage() {
 
     return (
         <>
-            <Layout contextTitle="Create Template">
+            <BaseLayout contextTitle="Create Template">
                 {currentComposition && (
                     <CreateTemplateUI composition={currentComposition} />
                 )}
@@ -73,7 +73,7 @@ export default function CreateTemplatePage() {
                         </Box>
                     </Box>
                 )}
-            </Layout>
+            </BaseLayout>
             {isLoading && <LoadingScreen context="Loading composition" />}
         </>
     )

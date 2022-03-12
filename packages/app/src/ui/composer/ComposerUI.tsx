@@ -5,12 +5,12 @@ import ReactFlow, {
     isNode,
 } from 'react-flow-renderer'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
 import ComposerActionbar from './bars/ComposerActionbar'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
 import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
 import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
-import { Layout } from '@cambrian/app/components/layout/Layout'
 import { MouseEvent } from 'react'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import SolutionConfig from './config/SolutionConfig'
@@ -72,7 +72,7 @@ export const ComposerUI = () => {
 
     return (
         <>
-            <Layout
+            <BaseLayout
                 fill
                 contextTitle="Composer"
                 config={<SolutionConfig />}
@@ -97,7 +97,7 @@ export const ComposerUI = () => {
                         <ReactFlowControls />
                     </ReactFlow>
                 </Box>
-            </Layout>
+            </BaseLayout>
         </>
     )
 }

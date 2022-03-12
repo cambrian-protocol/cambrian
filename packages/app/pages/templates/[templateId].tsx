@@ -1,12 +1,12 @@
-import { useEffect, useState, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
 import CreateProposalUI from '@cambrian/app/src/ui/solutions/common/CreateProposalUI'
-import { Layout } from '@cambrian/app/src/components/layout/Layout'
-import { useRouter } from 'next/dist/client/router'
-import { UserContext } from '@cambrian/app/store/UserContext'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { UserContext } from '@cambrian/app/store/UserContext'
+import { useRouter } from 'next/dist/client/router'
 
 export default function TemplatePage() {
     const user = useContext(UserContext)
@@ -53,11 +53,11 @@ export default function TemplatePage() {
     return (
         <>
             {currentTemplate && (
-                <Layout contextTitle="Create Proposal">
+                <BaseLayout contextTitle="Create Proposal">
                     <Box justify="center" align="center" gap="small">
                         <CreateProposalUI template={currentTemplate} />
                     </Box>
-                </Layout>
+                </BaseLayout>
             )}
         </>
     )
