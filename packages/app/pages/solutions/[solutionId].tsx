@@ -1,12 +1,12 @@
-import { useEffect, useState, useContext } from 'react'
+import { useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
 import CreateProposalUI from '@cambrian/app/src/ui/solutions/common/CreateProposalUI'
-import { Layout } from '@cambrian/app/src/components/layout/Layout'
 import { SolutionModel } from '@cambrian/app/src/models/SolutionModel'
 import { SolutionsHubAPI } from '@cambrian/app/src/services/api/SolutionsHub.api'
-import { useRouter } from 'next/dist/client/router'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useRouter } from 'next/dist/client/router'
 
 export default function SolutionPage() {
     const { currentUser, currentProvider, login } = useCurrentUser()
@@ -48,11 +48,11 @@ export default function SolutionPage() {
     return (
         <>
             {currentSolution && (
-                <Layout contextTitle="Create Proposal">
+                <BaseLayout contextTitle="Create Proposal">
                     <Box justify="center" align="center" gap="small">
                         <CreateProposalUI solution={currentSolution} />
                     </Box>
-                </Layout>
+                </BaseLayout>
             )}
         </>
     )

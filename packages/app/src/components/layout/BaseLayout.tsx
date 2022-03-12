@@ -21,8 +21,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     appbarTitle?: string
 }
 
-// TODO Rename to BaseLayout
-export const Layout = ({
+export const BaseLayout = ({
     sideNav,
     sidebar,
     children,
@@ -33,7 +32,7 @@ export const Layout = ({
     fill,
     appbarTitle,
 }: LayoutProps) => {
-    const [showSidebar, setShowSidebar] = useState(false)
+    const [showSidebar, setShowSidebar] = useState(true)
     const [showHelp, setShowHelp] = useState(false)
 
     const toggleSidebar = () => setShowSidebar(!showSidebar)

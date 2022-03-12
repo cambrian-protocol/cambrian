@@ -1,5 +1,5 @@
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
-import { Layout } from '@cambrian/app/components/layout/Layout'
 import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -19,9 +19,9 @@ export interface DefaultSolverUIProps {
 
 const DefaultSolverUI = ({ solverData }: DefaultSolverUIProps) => {
     return (
-        <Layout contextTitle="Default interaction">
+        <BaseLayout contextTitle="Default interaction">
             {JSON.stringify(solverData)}
-        </Layout>
+        </BaseLayout>
     )
 }
 

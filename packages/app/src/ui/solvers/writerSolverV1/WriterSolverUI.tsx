@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import ChatFAB from '@cambrian/app/components/chat/ChatFAB'
 import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '../../interaction/bars/ConditionVersionSidebar'
 import { DefaultSolverUIProps } from '../DefaultSolverUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { Layout } from '@cambrian/app/components/layout/Layout'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
@@ -247,7 +247,7 @@ const WriterSolverUI = ({
 
     return (
         <>
-            <Layout
+            <BaseLayout
                 contextTitle="Writer Solver interaction"
                 config={
                     <SolverConfigInfo
@@ -315,7 +315,7 @@ const WriterSolverUI = ({
                     workInput={workInput}
                     proposedOutcome={proposedOutcome}
                 />
-            </Layout>
+            </BaseLayout>
             {isLoading && (
                 <LoadingScreen context="Please confirm this transaction" />
             )}

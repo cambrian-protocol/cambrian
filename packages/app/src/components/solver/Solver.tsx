@@ -17,6 +17,7 @@ import {
 import { slotTags, solverTag } from '@cambrian/app/stubs/tags'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
@@ -25,7 +26,6 @@ import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { JsonFragmentType } from '@ethersproject/abi'
-import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
@@ -741,7 +741,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const loadWriter = true
     if (isDeployed === false) {
         return (
-            <Layout contextTitle="Not found">
+            <BaseLayout contextTitle="Not found">
                 <Box fill justify="center">
                     <HeaderTextSection
                         title="Solver Not Found"
@@ -749,12 +749,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                         paragraph="Smart contract unreachable. Perhaps the Solver has not finished deploying yet. Try refreshing in a minute."
                     />
                 </Box>
-            </Layout>
+            </BaseLayout>
         )
     } else if (currentSolverData && currentUser) {
         if (currentCondition === undefined) {
             return (
-                <Layout
+                <BaseLayout
                     contextTitle="Uninitialzed Solve"
                     actionBar={
                         <ExecuteSolverActionbar
@@ -771,7 +771,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
                     </Box>
-                </Layout>
+                </BaseLayout>
             )
         }
         if (loadWriter) {
