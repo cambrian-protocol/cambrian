@@ -6,21 +6,19 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { FlexInputs, TaggedInput } from '@cambrian/app/models/TagModel'
+import { FlexInputs, TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import React, { useEffect, useState } from 'react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
 
 interface CreateProposalFormProps {
     template: TemplateModel
-    templateId: string
-    onSuccess: () => void
-    onFailure: () => void
 }
 
 type CreateProposalFormType = {
@@ -39,45 +37,37 @@ const initialInput = {
     flexInputs: {},
 }
 
-const CreateProposalForm = ({
-    template,
-    templateId,
-    onSuccess,
-    onFailure,
-}: CreateProposalFormProps) => {
+const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [preferredTokensString, setPreferredTokensString] = useState('')
     const [suggestedPriceString, setSuggestedPriceString] = useState('')
 
-    const ipfs = new IPFSAPI()
-
     /**
      * Initialize input.flexInputs from composition
      */
-    React.useEffect(() => {
+    useEffect(() => {
         const flexInputs = {} as {
             [solverId: string]: {
                 [tagId: string]: TaggedInput
             }
         }
-
-        template.composition.forEach((solver) => {
-            Object.keys(solver.tags).forEach((tagId) => {
-                if (solver.tags[tagId].isFlex === true) {
+        template.composerSolvers.forEach((solver) => {
+            Object.keys(solver.slotTags).forEach((tagId) => {
+                if (solver.slotTags[tagId].isFlex === true) {
                     if (typeof flexInputs[solver.id] === 'undefined') {
                         flexInputs[solver.id] = {}
                     }
 
                     flexInputs[solver.id][tagId] = {
-                        ...solver.tags[tagId],
+                        ...solver.slotTags[tagId],
                         value: undefined,
                     }
                 }
             })
         })
-
         const inputs = { ...input }
         inputs.flexInputs = flexInputs
+        inputs.price = template.price?.amount || 0
         setInput(inputs)
     }, [])
 
@@ -143,33 +133,28 @@ const CreateProposalForm = ({
      * These fields MUST be provided here in the Proposal stage
      */
     const renderFlexInputs = () => {
-        return Object.keys(input.flexInputs).map((solverId) => {
-            return Object.keys(input.flexInputs[solverId]).map((tagId) => {
+        const flexInputs = Object.keys(input.flexInputs).map((solverId) =>
+            Object.keys(input.flexInputs[solverId]).map((tagId) => {
+                const currentFlexInput = input.flexInputs[solverId][tagId]
                 return (
-                    <Box direction="row" key={`${solverId}-${tagId}`}>
-                        <Box basis="3/4">
-                            <FormField
-                                name={tagId}
-                                label={tagId}
-                                help={input.flexInputs[solverId][tagId].text}
-                                type={getFlexInputType(
-                                    template.composition,
-                                    input.flexInputs[solverId][tagId]
-                                )}
-                                onChange={(event) =>
-                                    setFlexInputValue(
-                                        solverId,
-                                        tagId,
-                                        event.target.value
-                                    )
-                                }
-                                required
-                            />
-                        </Box>
-                    </Box>
+                    <FlexInput
+                        required
+                        key={`${solverId}-${tagId}`}
+                        solverId={solverId}
+                        input={currentFlexInput}
+                        inputType={getFlexInputType(
+                            template.composerSolvers,
+                            currentFlexInput
+                        )}
+                        setFlexInputValue={setFlexInputValue}
+                    />
                 )
             })
-        })
+        )
+
+        if (flexInputs.length !== 0) {
+            return <BaseFormGroupContainer>{flexInputs}</BaseFormGroupContainer>
+        }
     }
 
     const getFlexInputType = (
@@ -215,22 +200,22 @@ const CreateProposalForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-
+        /* 
         const newComposition = mergeFlexIntoComposition(
             template.composition,
             input.flexInputs
-        )
+        ) */
 
-        const proposalContext = {
+        /*    const proposalContext = {
             price: input.price,
             title: input.title,
             description: input.description,
             tokenAddress: input.tokenAddress,
             sourceTemplateId: templateId,
-        }
+        } */
 
         // Construct template object
-        const proposal = {
+        /*  const proposal = {
             composition: newComposition,
             pfp: input.pfp,
             name: input.name,
@@ -241,10 +226,10 @@ const CreateProposalForm = ({
                 denominationToken: input.denominationToken,
                 preferredTokens: input.preferredTokens,
             },
-        } as TemplateModel
+        } as TemplateModel */
 
         // Pin template to ipfs
-        try {
+        /*  try {
             const res = await ipfs.pin(template)
             if (!res) throw 'No response received'
             onSuccess()
@@ -252,7 +237,7 @@ const CreateProposalForm = ({
         } catch (e) {
             console.log(e)
             onFailure()
-        }
+        } */
 
         /* 
         Create proposal and save proposal data to ipfs
@@ -281,11 +266,11 @@ const CreateProposalForm = ({
         
         Display CTA to view proposal via proposalId
         */
-        onSuccess()
+        /*  onSuccess() */
         console.log('Create Proposal', template, input)
     }
     return (
-        <>
+        <BaseFormContainer>
             <Form<CreateProposalFormType>
                 onChange={(nextValue: CreateProposalFormType) => {
                     setInput(nextValue)
@@ -293,48 +278,62 @@ const CreateProposalForm = ({
                 value={input}
                 onSubmit={(event) => onSubmit(event)}
             >
-                <FormField name="title" label="Title" required />
-                <FormField name="description" label="Description" required>
-                    <TextArea name="description" rows={5} resize={false} />
-                </FormField>
-                <Box>{renderFlexInputs()}</Box>
-                <Box direction="row" gap="small">
-                    <Box width={{ max: 'medium' }}>
+                <Box gap="medium">
+                    <BaseFormGroupContainer>
+                        <FormField name="title" label="Title" required />
                         <FormField
-                            name="price"
-                            label="Price"
-                            type="number"
-                            help={`${suggestedPriceString}`}
+                            name="description"
+                            label="Description"
                             required
-                        />
-                    </Box>
-                    <Box fill>
-                        {isUncertainCollateral() ? (
-                            <FormField
-                                name="tokenAddress"
-                                label="Payment Token address"
-                                help={`${preferredTokensString}`}
-                                required
+                        >
+                            <TextArea
+                                name="description"
+                                rows={5}
+                                resize={false}
                             />
-                        ) : (
-                            <FormField
-                                name="tokenAddress"
-                                label="Payment Token address"
-                                value={
-                                    template.composition[0].config[
-                                        'collateralToken'
-                                    ]
-                                }
-                                disabled
-                            />
-                        )}
+                        </FormField>
+                    </BaseFormGroupContainer>
+                    {renderFlexInputs()}
+                    <BaseFormGroupContainer>
+                        <Box direction="row" gap="small">
+                            <Box width={{ max: 'medium' }}>
+                                <FormField
+                                    name="price"
+                                    label="Price"
+                                    type="number"
+                                    help={`${suggestedPriceString}`}
+                                    required
+                                />
+                            </Box>
+                            <Box fill>
+                                {isUncertainCollateral() ? (
+                                    <FormField
+                                        name="tokenAddress"
+                                        label="Payment Token address"
+                                        help={`${preferredTokensString}`}
+                                        required
+                                    />
+                                ) : (
+                                    <FormField
+                                        name="tokenAddress"
+                                        label="Payment Token address"
+                                        value={
+                                            template.composerSolvers[0].config[
+                                                'collateralToken'
+                                            ]
+                                        }
+                                        disabled
+                                    />
+                                )}
+                            </Box>
+                        </Box>
+                    </BaseFormGroupContainer>
+                    <Box>
+                        <Button primary type="submit" label="Create Proposal" />
                     </Box>
-                </Box>
-                <Box pad={{ top: 'medium' }}>
-                    <Button primary type="submit" label="Create Proposal" />
                 </Box>
             </Form>
-        </>
+        </BaseFormContainer>
     )
 }
 

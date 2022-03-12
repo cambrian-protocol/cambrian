@@ -1,56 +1,73 @@
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
-import { FlexInputs } from '@cambrian/app/models/TagModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { FlexInputs } from '@cambrian/app/models/SlotTagModel'
 
 export const mergeFlexIntoComposition = (
-    oldComposition: ComposerSolverModel[],
+    oldComposition: CompositionModel,
     flexInputs: FlexInputs
-): ComposerSolverModel[] => {
-    const newComposition = oldComposition.map((x) => x)
-    newComposition.forEach((solver: ComposerSolverModel, i: number) => {
-        for (const [tagId, taggedInput] of Object.entries(
-            flexInputs[solver.id]
-        )) {
-            newComposition[i].tags[tagId] = {
-                id: taggedInput.id,
-                text: taggedInput.text,
-                isFlex: taggedInput.isFlex,
-            }
+): CompositionModel => {
+    const updatedComposerSolvers = [...oldComposition.solvers]
 
-            if (typeof taggedInput.value !== 'undefined') {
-                switch (tagId) {
-                    case 'keeper':
-                        newComposition[i].config['keeperAddress'].address =
-                            taggedInput.value
-                        break
+    // Update our composition with new flexInput values
+    if (Object.entries(flexInputs).length > 0) {
+        updatedComposerSolvers.forEach(
+            (solver: ComposerSolverModel, i: number) => {
+                for (const [tagId, taggedInput] of Object.entries(
+                    flexInputs[solver.id]
+                )) {
+                    console.log(tagId, taggedInput)
+                    updatedComposerSolvers[i].slotTags[tagId] = {
+                        id: taggedInput.id,
+                        label: taggedInput.label,
+                        description: taggedInput.description,
+                        isFlex: taggedInput.isFlex,
+                    }
 
-                    case 'arbitrator':
-                        newComposition[i].config['arbitratorAddress'].address =
-                            taggedInput.value
-                        break
+                    if (typeof taggedInput.value !== 'undefined') {
+                        switch (tagId) {
+                            case 'keeper':
+                                updatedComposerSolvers[i].config[
+                                    'keeperAddress'
+                                ].address = taggedInput.value
+                                break
 
-                    case 'data':
-                        newComposition[i].config['data'] = taggedInput.value
-                        break
+                            case 'arbitrator':
+                                updatedComposerSolvers[i].config[
+                                    'arbitratorAddress'
+                                ].address = taggedInput.value
+                                break
 
-                    case 'collateralToken':
-                        newComposition[i].config['collateralToken'] =
-                            taggedInput.value
-                        break
+                            case 'data':
+                                updatedComposerSolvers[i].config['data'] =
+                                    taggedInput.value
+                                break
 
-                    case 'timelockSeconds':
-                        newComposition[i].config['collateralToken'] =
-                            taggedInput.value
-                        break
+                            case 'collateralToken':
+                                updatedComposerSolvers[i].config[
+                                    'collateralToken'
+                                ] = taggedInput.value
+                                break
 
-                    default:
-                        // SlotID
-                        newComposition[i].config.slots[tagId].data = [
-                            taggedInput.value,
-                        ]
+                            case 'timelockSeconds':
+                                updatedComposerSolvers[i].config[
+                                    'timelockSeconds'
+                                ] = parseInt(taggedInput.value)
+                                break
+
+                            default:
+                                // SlotID
+                                updatedComposerSolvers[i].config.slots[
+                                    tagId
+                                ].data = [taggedInput.value]
+                        }
+                    }
                 }
             }
-        }
-    })
+        )
+    }
 
-    return newComposition
+    return {
+        ...oldComposition,
+        solvers: updatedComposerSolvers,
+    }
 }

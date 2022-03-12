@@ -18,6 +18,7 @@ export default function CreateTemplatePage() {
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
         useState<CompositionModel>()
+    const [currentCompositionCID, setCurrentCompositionCID] = useState<string>()
     const [isLoading, setIsLoading] = useState(true)
     const [showError, setShowError] = useState(false)
 
@@ -27,6 +28,7 @@ export default function CreateTemplatePage() {
             compositionCID !== undefined &&
             typeof compositionCID === 'string'
         ) {
+            setCurrentCompositionCID(compositionCID)
             fetchComposition(compositionCID)
         } else {
             setShowError(true)
@@ -55,8 +57,11 @@ export default function CreateTemplatePage() {
     return (
         <>
             <BaseLayout contextTitle="Create Template">
-                {currentComposition && (
-                    <CreateTemplateUI composition={currentComposition} />
+                {currentComposition && currentCompositionCID && (
+                    <CreateTemplateUI
+                        compositionCID={currentCompositionCID}
+                        composition={currentComposition}
+                    />
                 )}
                 {showError && (
                     <Box fill justify="center" align="center" gap="large">
