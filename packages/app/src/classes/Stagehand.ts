@@ -1,20 +1,18 @@
-import { create } from 'lodash'
+import { CompositionModel } from '../models/CompositionModel'
 import { ProposalModel } from '../models/ProposalModel'
 import { SolutionModel } from '../models/SolutionModel'
-import { SolverModel } from '../models/SolverModel'
 import { TemplateModel } from '../models/TemplateModel'
 import { IPFSAPI } from '../services/api/IPFS.api'
-import { CreateTemplateFormType } from '../ui/solutions/common/forms/CreateTemplateForm'
+import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 
-enum StageNames {
+export enum StageNames {
     composition = 'composition',
     template = 'template',
     solution = 'solution',
     proposal = 'proposal',
 }
 
-type CompositionModel = SolverModel[]
 type StageModel =
     | CompositionModel
     | TemplateModel
@@ -87,8 +85,8 @@ export default class Stagehand {
         )
 
         if (newComposition) {
-            const template = <TemplateModel>{
-                composition: newComposition,
+            const template: TemplateModel = {
+                composerSolvers: newComposition.solvers,
                 pfp: createTemplateForm.pfp,
                 name: createTemplateForm.name,
                 title: createTemplateForm.title,
@@ -99,6 +97,7 @@ export default class Stagehand {
                     preferredTokens: createTemplateForm.preferredTokens,
                 },
             }
+
             if (!this.isStageSchema(template, StageNames.template)) {
                 console.error(
                     'Error: Generated template does not satisfy template schema'

@@ -7,18 +7,22 @@ import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 
 interface CreateTemplateUIProps {
+    compositionCID: string
     composition: CompositionModel
 }
 
-const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {
+const CreateTemplateUI = ({
+    composition,
+    compositionCID,
+}: CreateTemplateUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
 
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
 
-    const [createdTemplateCId, setCreatedTemplateCId] = useState<string>()
+    const [createdTemplateCID, setCreatedTemplateCID] = useState<string>()
 
-    const handleSuccess = (createdTemplateId: string) => {
-        setCreatedTemplateCId(createdTemplateId)
+    const handleSuccess = (templateCID: string) => {
+        setCreatedTemplateCID(templateCID)
         toggleShowSuccessModal()
     }
 
@@ -35,17 +39,18 @@ const CreateTemplateUI = ({ composition }: CreateTemplateUIProps) => {
             />
             <Box fill>
                 <CreateTemplateForm
+                    compositionCID={compositionCID}
                     composition={composition}
                     onSuccess={handleSuccess}
                     onFailure={handleFailure}
                 />
                 <Box pad="medium" />
             </Box>
-            {showSuccessModal && createdTemplateCId && (
+            {showSuccessModal && createdTemplateCID && (
                 <ExportSuccessModal
                     ctaLabel="Create Proposal"
                     link="/templates/"
-                    exportedCID={createdTemplateCId}
+                    exportedCID={createdTemplateCID}
                     description="This is your CID for your exported template. Share it with your clients and receive proposals."
                     title="Template created"
                     onClose={toggleShowSuccessModal}
