@@ -1,13 +1,12 @@
 import Actionbar from '../../interaction/bars/Actionbar'
 import ExportSuccessModal from '../general/modals/ExportSuccessModal'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
+import Stagehand from '@cambrian/app/classes/Stagehand'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
 const ComposerActionbar = () => {
-    const ipfs = new IPFSAPI()
-
+    const stageHand = new Stagehand()
     const { composer } = useComposerContext()
     const [exportedCompositionCID, setExportedCompositionCID] =
         useState<string>('')
@@ -26,9 +25,9 @@ const ComposerActionbar = () => {
 
     const onExportComposition = async () => {
         try {
-            const response = await ipfs.pin(composer)
-            if (response && response.IpfsHash) {
-                setExportedCompositionCID(response.IpfsHash)
+            const ipfsHash = await stageHand.publishComposition(composer)
+            if (ipfsHash) {
+                setExportedCompositionCID(ipfsHash)
                 toggleShowExportCompositionModal()
             }
         } catch (err) {
