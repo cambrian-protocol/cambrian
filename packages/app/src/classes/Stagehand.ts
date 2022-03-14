@@ -105,14 +105,14 @@ export default class Stagehand {
             return undefined
         }
 
-        const newComposition = mergeFlexIntoComposition(
+        const updatedComposition = mergeFlexIntoComposition(
             <CompositionModel>this.stages.composition,
             createTemplateForm.flexInputs
         )
 
-        if (newComposition) {
+        if (updatedComposition) {
             const template: TemplateModel = {
-                composerSolvers: newComposition.solvers,
+                updatedComposition: updatedComposition,
                 pfp: createTemplateForm.pfp,
                 name: createTemplateForm.name,
                 title: createTemplateForm.title,

@@ -11,14 +11,12 @@ import Stagehand from '@cambrian/app/classes/Stagehand'
 
 interface CreateTemplateUIProps {
     stagehand: Stagehand
-    compositionCID: string
     composition: CompositionModel
 }
 
 const CreateTemplateUI = ({
     stagehand,
     composition,
-    compositionCID,
 }: CreateTemplateUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
 
