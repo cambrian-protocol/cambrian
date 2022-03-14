@@ -19,6 +19,7 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateProposalFormProps {
     template: TemplateModel
+    onSubmit: (proposalInput: CreateProposalFormType) => void
 }
 
 export type CreateProposalFormType = {
@@ -37,7 +38,10 @@ const initialInput = {
     flexInputs: {},
 }
 
-const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
+const CreateProposalForm = ({
+    template,
+    onSubmit,
+}: CreateProposalFormProps) => {
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [preferredTokensString, setPreferredTokensString] = useState('')
     const [suggestedPriceString, setSuggestedPriceString] = useState('')
@@ -198,77 +202,9 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
         return bool
     }
 
-    const onSubmit = async (event: FormExtendedEvent) => {
+    const handleSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-
-        /* 
-        const newComposition = mergeFlexIntoComposition(
-            template.composition,
-            input.flexInputs
-        ) */
-
-        /*    const proposalContext = {
-            price: input.price,
-            title: input.title,
-            description: input.description,
-            tokenAddress: input.tokenAddress,
-            sourceTemplateId: templateId,
-        } */
-
-        // Construct template object
-        /*  const proposal = {
-            composition: newComposition,
-            pfp: input.pfp,
-            name: input.name,
-            title: input.title,
-            description: input.description,
-            price: {
-                amount: input.askingAmount,
-                denominationToken: input.denominationToken,
-                preferredTokens: input.preferredTokens,
-            },
-        } as TemplateModel */
-
-        // Pin template to ipfs
-        /*  try {
-            const res = await ipfs.pin(template)
-            if (!res) throw 'No response received'
-            onSuccess()
-            console.log('Created Template', res.IpfsHash, template, input)
-        } catch (e) {
-            console.log(e)
-            onFailure()
-        } */
-
-        /* 
-        Create proposal and save proposal data to ipfs
-
-        Transformer parsesSolvers and spits out solverConfigs
-         
-        const cid = await Hash.of(solverConfigs);
-
-        await this.IPFSSolutionsHub.connect(this.keeper).createSolution(
-        solutionId,
-        this.ToyToken.address,
-        solverConfigs,
-        getBytes32FromMultihash(cid)
-        );
-
-        let tx = await this.ProposalsHub.connect(this.keeper).createProposal(
-        this.ToyToken.address,
-        this.IPFSSolutionsHub.address,
-        this.amount,
-        solutionId
-        );
-        let rc = await tx.wait();
-        const proposalId = new ethers.utils.Interface([
-        "event CreateProposal(bytes32 id)",
-        ]).parseLog(rc.logs[0]).args.id;
-        
-        Display CTA to view proposal via proposalId
-        */
-        /*  onSuccess() */
-        console.log('Create Proposal', template, input)
+        onSubmit(input)
     }
     return (
         <BaseFormContainer>
@@ -277,7 +213,7 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
                     setInput(nextValue)
                 }}
                 value={input}
-                onSubmit={(event) => onSubmit(event)}
+                onSubmit={(event) => handleSubmit(event)}
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>

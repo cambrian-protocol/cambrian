@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react'
 
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
+import { CreateProposalFormType } from '@cambrian/app/ui/proposals/forms/CreateProposalForm'
 import CreateProposalUI from '@cambrian/app/ui/proposals/CreateProposalUI'
+import ExportSuccessModal from '@cambrian/app/ui/composer/general/modals/ExportSuccessModal'
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -13,13 +15,18 @@ import { useRouter } from 'next/dist/client/router'
 const createProposalPageTitle = 'Create Proposal'
 
 export default function CreateProposalPage() {
-    const { currentUser, login } = useCurrentUser()
+    const { currentUser, currentProvider, login } = useCurrentUser()
     const router = useRouter()
     const { templateCID } = router.query
     const [currentTemplate, setCurrentTemplate] = useState<TemplateModel>()
     const [isLoading, setIsLoading] = useState(true)
+    const [isInTransaction, setIsInTransaction] = useState(false)
     const [showError, setShowError] = useState(false)
     const [stagehand] = useState(new Stagehand())
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
+
+    const [createdProposalCID, setCreatedProposalCID] = useState<string>()
 
     useEffect(() => {
         if (!currentUser) {
@@ -41,7 +48,6 @@ export default function CreateProposalPage() {
     }, [router])
 
     const fetchTemplate = async (templateCID: string) => {
-        setIsLoading(true)
         try {
             const template = (await stagehand.loadStage(
                 templateCID,
@@ -59,12 +65,37 @@ export default function CreateProposalPage() {
         setIsLoading(false)
     }
 
+    // TODO Error handling - case contract gets deployed but IPFS wasn't successful. Gas is paid but no info about the deployed solvers / solutions / proposals
+    const onCreateProposal = async (proposalInput: CreateProposalFormType) => {
+        setIsInTransaction(true)
+        try {
+            if (currentUser && currentProvider) {
+                const ipfsHash = await stagehand.publishProposal(
+                    proposalInput,
+                    currentUser,
+                    currentProvider
+                )
+                if (ipfsHash) {
+                    setCreatedProposalCID(ipfsHash)
+                    toggleShowSuccessModal()
+                }
+            }
+        } catch (err) {
+            console.error(err)
+        }
+
+        setIsInTransaction(false)
+    }
+
     return (
         <>
             {currentTemplate && (
                 <BaseLayout contextTitle={createProposalPageTitle}>
                     <Box justify="center" align="center" gap="small">
-                        <CreateProposalUI template={currentTemplate} />
+                        <CreateProposalUI
+                            onCreateProposal={onCreateProposal}
+                            template={currentTemplate}
+                        />
                     </Box>
                 </BaseLayout>
             )}
@@ -74,7 +105,20 @@ export default function CreateProposalPage() {
                     stageName={StageNames.template}
                 />
             )}
-            {isLoading && <LoadingScreen context="Loading template" />}
+            {isLoading && <LoadingScreen context="Loading" />}
+            {isInTransaction && (
+                <LoadingScreen context="Please confirm this transaction" />
+            )}
+            {showSuccessModal && createdProposalCID && (
+                <ExportSuccessModal
+                    ctaLabel="Fund Proposal"
+                    link="/proposal/"
+                    exportedCID={createdProposalCID}
+                    description="This is your CID for your created Proposal. Share it with your investors and fund the proposals."
+                    title="Proposal created"
+                    onClose={toggleShowSuccessModal}
+                />
+            )}
         </>
     )
 }
