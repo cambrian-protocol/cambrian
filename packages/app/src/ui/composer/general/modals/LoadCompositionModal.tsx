@@ -1,3 +1,5 @@
+import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
+
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
@@ -7,7 +9,6 @@ import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
 import { FormField } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { Text } from 'grommet'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
@@ -22,7 +23,7 @@ type LoadCompositionFormType = {
 
 const LoadCompositionModal = ({ onClose }: LoadCompositionModalProps) => {
     const { dispatch } = useComposerContext()
-    const ipfs = new IPFSAPI()
+    const stagehand = new Stagehand()
 
     const [input, setInput] = useState<LoadCompositionFormType>({
         cid: '',
@@ -34,8 +35,9 @@ const LoadCompositionModal = ({ onClose }: LoadCompositionModalProps) => {
     ) => {
         event.preventDefault()
         try {
-            const compositionObject = (await ipfs.getFromCID(
-                input.cid
+            const compositionObject = (await stagehand.loadStage(
+                input.cid,
+                StageNames.composition
             )) as CompositionModel
             if (compositionObject) {
                 dispatch({
@@ -43,6 +45,8 @@ const LoadCompositionModal = ({ onClose }: LoadCompositionModalProps) => {
                     payload: compositionObject,
                 })
                 onClose()
+            } else {
+                setShowErrorMessage(true)
             }
         } catch {
             setShowErrorMessage(true)
