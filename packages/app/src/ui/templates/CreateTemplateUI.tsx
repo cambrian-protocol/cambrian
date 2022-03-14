@@ -1,17 +1,22 @@
+import CreateTemplateForm, {
+    CreateTemplateFormType,
+} from './forms/CreateTemplateForm'
 import React, { useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import CreateTemplateForm from './forms/CreateTemplateForm'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import Stagehand from '@cambrian/app/classes/Stagehand'
 
 interface CreateTemplateUIProps {
+    stagehand: Stagehand
     compositionCID: string
     composition: CompositionModel
 }
 
 const CreateTemplateUI = ({
+    stagehand,
     composition,
     compositionCID,
 }: CreateTemplateUIProps) => {
@@ -21,8 +26,9 @@ const CreateTemplateUI = ({
 
     const [createdTemplateCID, setCreatedTemplateCID] = useState<string>()
 
-    const handleSuccess = (templateCID: string) => {
-        setCreatedTemplateCID(templateCID)
+    const onSubmit = async (templateInput: CreateTemplateFormType) => {
+        const ipfsHash = await stagehand.publishTemplate(templateInput)
+        setCreatedTemplateCID(ipfsHash)
         toggleShowSuccessModal()
     }
 
@@ -39,9 +45,8 @@ const CreateTemplateUI = ({
             />
             <Box fill>
                 <CreateTemplateForm
-                    compositionCID={compositionCID}
                     composition={composition}
-                    onSuccess={handleSuccess}
+                    onSubmit={onSubmit}
                     onFailure={handleFailure}
                 />
                 <Box pad="medium" />

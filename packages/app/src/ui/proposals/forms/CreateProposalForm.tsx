@@ -21,7 +21,7 @@ interface CreateProposalFormProps {
     template: TemplateModel
 }
 
-type CreateProposalFormType = {
+export type CreateProposalFormType = {
     title: string
     description: string
     price: number
@@ -200,6 +200,7 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
+
         /* 
         const newComposition = mergeFlexIntoComposition(
             template.composition,
