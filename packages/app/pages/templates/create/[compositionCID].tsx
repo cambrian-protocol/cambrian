@@ -65,7 +65,6 @@ export default function CreateTemplatePage() {
                 <BaseLayout contextTitle={createTemplatePageTitle}>
                     <CreateTemplateUI
                         stagehand={stagehand}
-                        compositionCID={currentCompositionCID}
                         composition={currentComposition}
                     />
                 </BaseLayout>
