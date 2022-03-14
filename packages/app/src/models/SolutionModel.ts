@@ -1,3 +1,4 @@
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ParticipantModel } from './ParticipantModel'
 import { TokenModel } from './TokenModel'
 
@@ -7,10 +8,8 @@ export type SolutionModel = {
     isExecuted: boolean
     seller: ParticipantModel
     collateralToken: TokenModel
-    keeper: string
-    proposalsHub: string
-    proposalId: string
-    solverConfigsHash: string
     solverConfigsCID: string
+    proposalId: string
+    finalComposition: CompositionModel
     solverAddresses: string[]
 }
