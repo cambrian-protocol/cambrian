@@ -1,19 +1,17 @@
+import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 import { useEffect, useState } from 'react'
 
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
-import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import { SmileyXEyes } from 'phosphor-react'
-import { Text } from 'grommet'
 import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useRouter } from 'next/dist/client/router'
 
-export default function CreateTemplatePage() {
-    const ipfs = new IPFSAPI()
+const createTemplatePageTitle = 'Create Template'
 
+export default function CreateTemplatePage() {
     const router = useRouter()
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
@@ -21,6 +19,7 @@ export default function CreateTemplatePage() {
     const [currentCompositionCID, setCurrentCompositionCID] = useState<string>()
     const [isLoading, setIsLoading] = useState(true)
     const [showError, setShowError] = useState(false)
+    const [stagehand] = useState(new Stagehand())
 
     useEffect(() => {
         if (!router.isReady) return
@@ -38,14 +37,20 @@ export default function CreateTemplatePage() {
     const fetchComposition = async (compositionCID: string) => {
         setIsLoading(true)
         try {
-            const compositionObject = (await ipfs.getFromCID(
-                compositionCID
+            const composition = (await stagehand.loadStage(
+                compositionCID,
+                StageNames.composition
             )) as CompositionModel
+
+            // Check if composition is valid
             const parsedSolvers = await parseComposerSolvers(
-                compositionObject.solvers
+                composition.solvers
             )
-            if (parsedSolvers && compositionObject) {
-                setCurrentComposition(compositionObject)
+
+            if (composition && parsedSolvers) {
+                setCurrentComposition(composition)
+            } else {
+                setShowError(true)
             }
         } catch {
             setShowError(true)
@@ -56,29 +61,21 @@ export default function CreateTemplatePage() {
 
     return (
         <>
-            <BaseLayout contextTitle="Create Template">
-                {currentComposition && currentCompositionCID && (
+            {currentComposition && currentCompositionCID && (
+                <BaseLayout contextTitle={createTemplatePageTitle}>
                     <CreateTemplateUI
+                        stagehand={stagehand}
                         compositionCID={currentCompositionCID}
                         composition={currentComposition}
                     />
-                )}
-                {showError && (
-                    <Box fill justify="center" align="center" gap="large">
-                        <SmileyXEyes size="42" />
-                        <Box width="medium">
-                            <Text>
-                                No valid composition found at provided CID
-                            </Text>
-                            <Text size="small" color="dark-4">
-                                Please double check the Composition CID, try
-                                again, or check with your composition creator if
-                                the composition was valid when exported
-                            </Text>
-                        </Box>
-                    </Box>
-                )}
-            </BaseLayout>
+                </BaseLayout>
+            )}
+            {showError && (
+                <InvalidCIDUI
+                    contextTitle={createTemplatePageTitle}
+                    stageName={StageNames.composition}
+                />
+            )}
             {isLoading && <LoadingScreen context="Loading composition" />}
         </>
     )

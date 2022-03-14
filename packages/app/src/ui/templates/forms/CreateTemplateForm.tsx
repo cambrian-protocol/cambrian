@@ -8,7 +8,6 @@ import {
 } from 'grommet'
 import { FlexInputs, TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import React, { useEffect, useState } from 'react'
-import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
@@ -16,14 +15,12 @@ import { Coin } from 'phosphor-react'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
-    compositionCID: string
-    onSuccess: (templateCID: string) => void
+    onSubmit: (templateInput: CreateTemplateFormType) => void
     onFailure: () => void
 }
 
@@ -51,8 +48,7 @@ const initialInput = {
 
 const CreateTemplateForm = ({
     composition,
-    onSuccess,
-    compositionCID,
+    onSubmit,
 }: CreateTemplateFormProps) => {
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
@@ -224,16 +220,9 @@ const CreateTemplateForm = ({
         return bool
     }
 
-    const onSubmit = async (event: FormExtendedEvent) => {
+    const handleSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-
-        const stageHand = new Stagehand()
-        stageHand.setStage(composition, compositionCID, StageNames.composition)
-        stageHand.createTemplate(input)
-        const res = await stageHand.publishStage(StageNames.template)
-        if (res && res.IpfsHash) {
-            onSuccess(res?.IpfsHash)
-        }
+        onSubmit(input)
     }
 
     return (
@@ -243,7 +232,7 @@ const CreateTemplateForm = ({
                     setInput(nextValue)
                 }}
                 value={input}
-                onSubmit={(event) => onSubmit(event)}
+                onSubmit={(event) => handleSubmit(event)}
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>
