@@ -51,7 +51,7 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
                 [tagId: string]: TaggedInput
             }
         }
-        template.composerSolvers.forEach((solver) => {
+        template.updatedComposition.solvers.forEach((solver) => {
             Object.keys(solver.slotTags).forEach((tagId) => {
                 if (solver.slotTags[tagId].isFlex === true) {
                     if (typeof flexInputs[solver.id] === 'undefined') {
@@ -143,7 +143,7 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
                         solverId={solverId}
                         input={currentFlexInput}
                         inputType={getFlexInputType(
-                            template.composerSolvers,
+                            template.updatedComposition.solvers,
                             currentFlexInput
                         )}
                         setFlexInputValue={setFlexInputValue}
@@ -319,7 +319,8 @@ const CreateProposalForm = ({ template }: CreateProposalFormProps) => {
                                         name="tokenAddress"
                                         label="Payment Token address"
                                         value={
-                                            template.composerSolvers[0].config[
+                                            template.updatedComposition
+                                                .solvers[0].config[
                                                 'collateralToken'
                                             ]
                                         }
