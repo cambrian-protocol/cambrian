@@ -15,6 +15,7 @@ import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { Text } from 'grommet'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateProposalFormProps {
@@ -238,18 +239,24 @@ const CreateProposalForm = ({
                                     name="price"
                                     label="Price"
                                     type="number"
-                                    help={`${suggestedPriceString}`}
                                     required
                                 />
+                                <Text size="xsmall" color="dark-4">
+                                    {suggestedPriceString}
+                                </Text>
                             </Box>
                             <Box fill>
                                 {isUncertainCollateral() ? (
-                                    <FormField
-                                        name="tokenAddress"
-                                        label="Payment Token address"
-                                        help={`${preferredTokensString}`}
-                                        required
-                                    />
+                                    <Box>
+                                        <FormField
+                                            name="tokenAddress"
+                                            label="Payment Token address"
+                                            required
+                                        />
+                                        <Text size="xsmall" color="dark-4">
+                                            {preferredTokensString}
+                                        </Text>
+                                    </Box>
                                 ) : (
                                     <FormField
                                         name="tokenAddress"
