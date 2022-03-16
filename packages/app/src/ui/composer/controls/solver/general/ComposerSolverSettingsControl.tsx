@@ -17,6 +17,7 @@ import _ from 'lodash'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 type SolverSettingsControlInputType = {
+    implementation: string
     keeperAddress: string
     arbitratorAddress: string
     timelockDays: number
@@ -25,6 +26,7 @@ type SolverSettingsControlInputType = {
 }
 
 const initialSolverSettingsInput: SolverSettingsControlInputType = {
+    implementation: '',
     keeperAddress: '',
     arbitratorAddress: '',
     timelockDays: 0,
@@ -86,6 +88,7 @@ const ComposerSolverSettingsControl = () => {
                 ? parseSecondsToForm(currentSolver.config.timelockSeconds)
                 : { weeks: 0, days: 0, hours: 0, minutes: 0 }
             const loadedInput = {
+                implementation: currentSolver.config.implementation || '',
                 keeperAddress: currentSolver.config.keeperAddress.address,
                 arbitratorAddress:
                     currentSolver.config.arbitratorAddress.address,
@@ -107,6 +110,7 @@ const ComposerSolverSettingsControl = () => {
         dispatch({
             type: 'UPDATE_SOLVER_MAIN_CONFIG',
             payload: {
+                implementation: input.implementation,
                 arbitratorAddress: input.arbitratorAddress,
                 keeperAddress: input.keeperAddress,
                 timelockSeconds: parseInputToSeconds({
@@ -118,6 +122,7 @@ const ComposerSolverSettingsControl = () => {
         })
 
         setInitialInput({
+            implementation: input.implementation,
             keeperAddress: input.keeperAddress,
             arbitratorAddress: input.arbitratorAddress,
             timelockDays: input.timelockDays,
@@ -128,6 +133,7 @@ const ComposerSolverSettingsControl = () => {
 
     if (!currentSolver) throw Error('No current Solver defined!')
 
+    // TODO Implementation Contract Select
     return (
         <>
             <Box gap="small" overflow={{ vertical: 'auto' }}>
@@ -184,6 +190,10 @@ const ComposerSolverSettingsControl = () => {
                                 </FormField>
                             </Box>
                         }
+                    />
+                    <FormField
+                        name="implementation"
+                        label="Implementation Contract Address"
                     />
                     <Box flex>
                         <Button

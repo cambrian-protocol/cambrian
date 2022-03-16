@@ -24,6 +24,8 @@ interface CreateProposalFormProps {
 }
 
 export type CreateProposalFormType = {
+    name: string
+    pfp: string
     title: string
     description: string
     price: number
@@ -32,6 +34,8 @@ export type CreateProposalFormType = {
 }
 
 const initialInput = {
+    name: '',
+    pfp: '',
     title: '',
     description: '',
     price: 0,
@@ -217,6 +221,14 @@ const CreateProposalForm = ({
                 onSubmit={(event) => handleSubmit(event)}
             >
                 <Box gap="medium">
+                    <BaseFormGroupContainer>
+                        <FormField
+                            name="name"
+                            label="Your/Organization Name"
+                            required
+                        />
+                        <FormField name="pfp" label="Avatar URL" required />
+                    </BaseFormGroupContainer>
                     <BaseFormGroupContainer>
                         <FormField name="title" label="Title" required />
                         <FormField
