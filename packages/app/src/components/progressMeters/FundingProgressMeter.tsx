@@ -1,15 +1,15 @@
 import { Box, Meter, Stack, Text } from 'grommet'
 
 interface FundingProgressMeterProps {
-    total: number
-    current: number
+    fundingGoal: number
+    funding: number
 }
 
 const FundingProgressMeter = ({
-    total,
-    current,
+    fundingGoal,
+    funding,
 }: FundingProgressMeterProps) => {
-    const percentageValue = (current * 100) / total
+    const percentageValue = (funding * 100) / fundingGoal
     return (
         <Box fill>
             <Box align="center" pad="large">
@@ -26,12 +26,12 @@ const FundingProgressMeter = ({
                         align="center"
                         pad={{ bottom: 'small' }}
                     >
-                        <Text size="xlarge">{percentageValue}</Text>
+                        <Text size="xlarge">{percentageValue.toFixed()}</Text>
                         <Text size="small">%</Text>
                     </Box>
                 </Stack>
                 <Text textAlign="center" size="small" color="dark-5">
-                    {current}/{total}
+                    {funding}/{fundingGoal}
                 </Text>
             </Box>
         </Box>

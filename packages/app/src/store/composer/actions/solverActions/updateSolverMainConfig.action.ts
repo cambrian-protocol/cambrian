@@ -2,6 +2,7 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import _ from 'lodash'
 
 export type SolverMainConfigType = {
+    implementation: string
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds: number
