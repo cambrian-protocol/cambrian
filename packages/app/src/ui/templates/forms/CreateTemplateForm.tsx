@@ -85,6 +85,11 @@ const CreateTemplateForm = ({
 
         const inputs = { ...input }
         inputs.flexInputs = flexInputs
+
+        if (composition.solvers[0].config.collateralToken)
+            inputs.denominationToken =
+                composition.solvers[0].config.collateralToken
+
         setInput(inputs)
     }, [])
 

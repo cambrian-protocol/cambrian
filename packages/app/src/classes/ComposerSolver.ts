@@ -96,7 +96,12 @@ export default class ComposerSolver {
     /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
-        const { keeperAddress, arbitratorAddress, timelockSeconds } = mainConfig
+        const {
+            keeperAddress,
+            arbitratorAddress,
+            timelockSeconds,
+            implementation,
+        } = mainConfig
 
         if (keeperAddress !== this.config.keeperAddress.address) {
             this.updateKeeper(keeperAddress)
@@ -108,6 +113,10 @@ export default class ComposerSolver {
 
         if (timelockSeconds !== this.config.timelockSeconds) {
             this.updateTimelock(timelockSeconds)
+        }
+
+        if (implementation !== this.config.implementation) {
+            this.updateImplementation(implementation)
         }
     }
 
@@ -131,6 +140,10 @@ export default class ComposerSolver {
 
     updateCollateralToken(tokenAddress: string) {
         this.config.collateralToken = tokenAddress
+    }
+
+    updateImplementation(implementation: string) {
+        this.config.implementation = implementation
     }
 
     /*********************************** Tags *************************************/
@@ -533,7 +546,9 @@ export default class ComposerSolver {
     /*************************** Initialization ***************************/
 
     getDefaultConfig(): ComposerSolverConfigModel {
+        // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
         const config = {
+            implementation: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
             keeperAddress: { address: '', linkedSlots: [] },
             arbitratorAddress: { address: '', linkedSlots: [] },
             timelockSeconds: 0,
