@@ -15,11 +15,12 @@ export class IPFSAPI {
 
     constructor() {
         this.gateways = [
-            'ipfs.dweb.link',
-            'ipfs.infura-ipfs.io',
+            'cambrianprotocol.mypinata.cloud',
+            'localhost:8080',
+            // 'ipfs.dweb.link',
+            // 'ipfs.infura-ipfs.io',
             // 'ipfs.fleek.co',
             // 'infura-ipfs.io',
-            // 'gateway.pinata.cloud',
         ]
     }
 
@@ -40,7 +41,10 @@ export class IPFSAPI {
         }, 5000)
 
         try {
-            const response = await fetch(`https://${base32}.${gateway}`)
+            const response =
+                gatewayIndex < 2
+                    ? await fetch(`http://${gateway}/ipfs/${cid}`)
+                    : await fetch(`https://${base32}.${gateway}`)
             const data = await response.text()
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
