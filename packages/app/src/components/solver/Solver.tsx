@@ -14,7 +14,6 @@ import {
     TokenAPI,
     TokenResponseType,
 } from '@cambrian/app/services/api/Token.api'
-import { slotTags, solverTag } from '@cambrian/app/stubs/tags'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BaseLayout } from '../layout/BaseLayout'
@@ -35,6 +34,7 @@ import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
@@ -71,9 +71,17 @@ interface SolverProps {
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
     currentUser: UserType
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
 }
 
-const Solver = ({ address, abi, currentUser }: SolverProps) => {
+const Solver = ({
+    address,
+    abi,
+    currentUser,
+    slotTags,
+    solverTag,
+}: SolverProps) => {
     const ctf = useContext(CTFContext)
     const ipfs = new IPFSAPI()
 
@@ -184,10 +192,6 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const config = await getConfig()
         const conditions = await getConditions()
 
-        // TODO TEMP
-        const metaData = solverTag
-
-        // TODO Get SlotTags
         const slotsHistory = await getSlotsHistory(
             config.ingests,
             conditions,
@@ -225,7 +229,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             numMintedTokensByCondition: numMintedTokensByCondition,
             collateralBalance: collateralBalance,
             collateralToken: collateralToken,
-            solverTag: metaData,
+            solverTag: solverTag,
             slotTags: slotTags,
         }
     }
