@@ -77,13 +77,13 @@ const CreateProposalForm = ({
         const inputs = { ...input }
         inputs.flexInputs = flexInputs
         inputs.price = template.price?.amount || 0
+        inputs.tokenAddress = template.price?.denominationToken || ''
         setInput(inputs)
     }, [])
 
     useEffect(() => {
         getPreferredTokensString()
         getSuggestedPriceString()
-        console.log(input.tokenAddress)
     }, [])
 
     const getPreferredTokensString = async () => {
@@ -217,6 +217,7 @@ const CreateProposalForm = ({
         <BaseFormContainer>
             <Form<CreateProposalFormType>
                 onChange={(nextValue: CreateProposalFormType) => {
+                    console.log(nextValue)
                     setInput(nextValue)
                 }}
                 value={input}
