@@ -4,6 +4,7 @@ import React, { PropsWithChildren, useEffect, useState } from 'react'
 import { ERC20_ABI } from '../constants'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { UserType } from './UserContext'
+import { addTokenDecimals } from '../utils/helpers/tokens'
 
 const PROPOSALS_HUB_ABI =
     require('@artifacts/contracts/ProposalsHub.sol/ProposalsHub.json').abi
@@ -23,7 +24,7 @@ export type ProposalsHubContextType = {
     getProposalFunding: (
         proposalId: string,
         user: UserType
-    ) => Promise<number | null>
+    ) => Promise<BigNumber | null>
     fundProposal: (
         proposalId: string,
         tokenAddress: string,
@@ -122,7 +123,7 @@ export const ProposalsHubContextProvider = ({
 
         await proposalsHub
             .connect(user.signer)
-            .fundProposal(proposalId, tokenAddress, BigNumber.from(amount))
+            .fundProposal(proposalId, tokenAddress, addTokenDecimals(amount))
     }
 
     const handleDefundProposal = async (
@@ -135,7 +136,7 @@ export const ProposalsHubContextProvider = ({
 
         await proposalsHub
             .connect(user.signer)
-            .defundProposal(proposalId, tokenAddress, BigNumber.from(amount))
+            .defundProposal(proposalId, tokenAddress, addTokenDecimals(amount))
     }
 
     const handleExecuteProposal = async (
@@ -156,7 +157,7 @@ export const ProposalsHubContextProvider = ({
         user: UserType
     ) => {
         const proposalContract = await handleGetProposal(proposalId, user)
-        if (proposalContract) return proposalContract.funding.toNumber()
+        if (proposalContract) return proposalContract.funding
     }
 
     return (

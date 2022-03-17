@@ -8,6 +8,8 @@ import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '../models/ProposalModel'
 import { SolutionModel } from '../models/SolutionModel'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
+import { TokenAPI } from '../services/api/Token.api'
+import { addTokenDecimals } from '../utils/helpers/tokens'
 
 export enum StageNames {
     composition = 'composition',
@@ -153,40 +155,43 @@ export default class Stagehand {
     ) => {
         const template = this.stages[StageNames.template] as TemplateModel
 
-        // TODO Get total supply of collateral Token
-        const solution: SolutionModel = {
-            id: solutionId,
-            isExecuted: false,
-            seller: {
-                name: template.name,
-                address: 'TODO',
-                pfp: template.pfp,
-            },
-            collateralToken: {
-                address: finalComposition.solvers[0].config.collateralToken!!,
-                totalSupply: 0,
-            },
-            finalComposition: finalComposition,
-            proposalId: proposalId,
-            solverAddresses: solverAddresses,
-            solverConfigsCID: solverConfigsCID,
-            solverConfigs: solverConfigs,
-        }
-        this.stages[StageNames.solution] = solution
+        const token = await TokenAPI.getTokenInfo(
+            createProposalInput.tokenAddress
+        )
+        if (token) {
+            const solution: SolutionModel = {
+                id: solutionId,
+                isExecuted: false,
+                seller: {
+                    name: template.name,
+                    address: 'TODO',
+                    pfp: template.pfp,
+                },
+                collateralToken: token,
+                finalComposition: finalComposition,
+                proposalId: proposalId,
+                solverAddresses: solverAddresses,
+                solverConfigsCID: solverConfigsCID,
+                solverConfigs: solverConfigs,
+            }
 
-        const proposal: ProposalModel = {
-            id: proposalId,
-            title: createProposalInput.title,
-            buyer: {
-                address: user.address,
-                name: createProposalInput.name,
-                pfp: createProposalInput.pfp,
-            },
-            description: createProposalInput.description,
-            amount: createProposalInput.price,
+            this.stages[StageNames.solution] = solution
+
+            const proposal: ProposalModel = {
+                id: proposalId,
+                title: createProposalInput.title,
+                buyer: {
+                    address: user.address,
+                    name: createProposalInput.name,
+                    pfp: createProposalInput.pfp,
+                },
+                description: createProposalInput.description,
+                amount: addTokenDecimals(createProposalInput.price, token),
+            }
+
+            this.stages[StageNames.proposal] = proposal
+            return this.publishStages()
         }
-        this.stages[StageNames.proposal] = proposal
-        return this.publishStages()
     }
 
     executeProposal = async () => {

@@ -3,6 +3,7 @@ import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 import { useEffect, useState } from 'react'
 
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
+import { BigNumber } from 'ethers'
 import FundProposalUI from '@cambrian/app/ui/proposals/FundProposalUI'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
@@ -21,7 +22,9 @@ export default function ProposalPage() {
     const { currentUser, login } = useCurrentUser()
     const [currentProposal, setCurrentProposal] = useState<ProposalModel>()
     const [currentSolution, setCurrentSolution] = useState<SolutionModel>()
-    const [currentFunding, setCurrentFunding] = useState(0)
+    const [currentFunding, setCurrentFunding] = useState<BigNumber>(
+        BigNumber.from(0)
+    )
     const [showError, setShowError] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [isInTransaction, setIsInTransaction] = useState(false)
@@ -67,10 +70,8 @@ export default function ProposalPage() {
                 )
                 if (proposalFunding) setCurrentFunding(proposalFunding)
             } else {
-                setShowError(true)
             }
         } catch {
-            setShowError(true)
             console.warn('Cannot fetch proposal')
         }
         setIsLoading(false)
@@ -93,7 +94,7 @@ export default function ProposalPage() {
 
     return (
         <>
-            {currentProposal && currentSolution && (
+            {currentProposal && currentSolution ? (
                 <BaseLayout contextTitle={fundProposalPageTitle}>
                     <Box>
                         <HeaderTextSection
@@ -128,7 +129,7 @@ export default function ProposalPage() {
                                         href={`/solvers/${currentSolution.solverAddresses[0]}`}
                                     />
                                 </>
-                            ) : currentFunding < currentProposal.amount ? (
+                            ) : currentFunding.lt(currentProposal.amount) ? (
                                 <FundProposalUI
                                     currentFunding={currentFunding}
                                     solution={currentSolution}
@@ -155,8 +156,7 @@ export default function ProposalPage() {
                         </Box>
                     </Box>
                 </BaseLayout>
-            )}
-            {showError && (
+            ) : (
                 <InvalidCIDUI
                     contextTitle={fundProposalPageTitle}
                     stageName={StageNames.template}
