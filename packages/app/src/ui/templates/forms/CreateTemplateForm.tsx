@@ -17,6 +17,7 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { initial } from 'lodash'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
@@ -25,8 +26,8 @@ interface CreateTemplateFormProps {
 }
 
 export type CreateTemplateFormType = {
-    pfp: string
-    name: string
+    pfp?: string
+    name?: string
     title: string
     description: string
     askingAmount: number
@@ -50,18 +51,10 @@ const CreateTemplateForm = ({
     composition,
     onSubmit,
 }: CreateTemplateFormProps) => {
-    const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
-    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
-        string | undefined
-    >('')
-    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
-        (string | undefined)[] | undefined
-    >()
-
     /**
      * Initialize input.flexInputs from composition
      */
-    useEffect(() => {
+    const getInitialInput = () => {
         const flexInputs = {} as {
             [solverId: string]: {
                 [tagId: string]: TaggedInput
@@ -83,15 +76,25 @@ const CreateTemplateForm = ({
             })
         })
 
-        const inputs = { ...input }
+        const inputs = { ...initialInput }
         inputs.flexInputs = flexInputs
 
         if (composition.solvers[0].config.collateralToken)
             inputs.denominationToken =
                 composition.solvers[0].config.collateralToken
 
-        setInput(inputs)
-    }, [])
+        return inputs
+    }
+
+    const [input, setInput] = useState<CreateTemplateFormType>(
+        getInitialInput()
+    )
+    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
+        string | undefined
+    >('')
+    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
+        (string | undefined)[] | undefined
+    >()
 
     const setFlexInputValue = (
         solverId: string,
@@ -241,12 +244,8 @@ const CreateTemplateForm = ({
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>
-                        <FormField
-                            name="name"
-                            label="Your/Organization Name"
-                            required
-                        />
-                        <FormField name="pfp" label="Avatar URL" required />
+                        <FormField name="name" label="Your/Organization Name" />
+                        <FormField name="pfp" label="Avatar URL" />
                         <FormField
                             name="title"
                             label="Template title"
