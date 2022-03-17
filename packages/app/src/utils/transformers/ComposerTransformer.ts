@@ -24,6 +24,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[]
@@ -100,14 +101,30 @@ export function parseComposerSolverConfig(
         timelockSeconds: composerSolverConfig.timelockSeconds
             ? composerSolverConfig.timelockSeconds
             : 0,
-        data: composerSolverConfig.data
-            ? ethers.utils.defaultAbiCoder.encode(
-                  ['bytes'],
-                  [composerSolverConfig.data]
-              )
-            : ethers.constants.HashZero,
+        data:
+            composerSolverConfig.data && composerSolverConfig.data.length
+                ? parseCoreDataInput(composerSolverConfig.data)
+                : ethers.constants.HashZero,
         ingests: ingests,
         conditionBase: conditionBase,
+    }
+}
+
+export function parseCoreDataInput(datas: SolverCoreDataInputType[]) {
+    const types = datas.map((x) => x.type)
+    const values = datas.map((x, i) => {
+        if (types[i] === SolidityDataTypes.Bytes32) {
+            return ethers.utils.formatBytes32String(x.data)
+        } else {
+            return x.data
+        }
+    })
+
+    try {
+        return ethers.utils.defaultAbiCoder.encode([...types], [...values])
+    } catch (e) {
+        console.error(e)
+        return ethers.constants.HashZero
     }
 }
 

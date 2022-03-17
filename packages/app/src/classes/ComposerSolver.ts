@@ -27,6 +27,7 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
+import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -93,7 +94,7 @@ export default class ComposerSolver {
         }
     }
 
-    /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
+    /*************************** Title & Keeper & Arbitrator & Timelock & "Core" Data ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
         const {
@@ -144,6 +145,10 @@ export default class ComposerSolver {
 
     updateImplementation(implementation: string) {
         this.config.implementation = implementation
+    }
+
+    updateData(data: SolverCoreDataInputType[]) {
+        this.config.data = data
     }
 
     /*********************************** Tags *************************************/
@@ -552,7 +557,7 @@ export default class ComposerSolver {
             keeperAddress: { address: '', linkedSlots: [] },
             arbitratorAddress: { address: '', linkedSlots: [] },
             timelockSeconds: 0,
-            data: '',
+            data: [],
             slots: this.getDefaultSlots(),
             condition: this.getDefaultCondition(),
         }

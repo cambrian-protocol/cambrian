@@ -15,9 +15,11 @@ import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/Solutio
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { ethers } from 'ethers'
+import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 export type ComposerAction =
     | UpdateSelectionActionType
+    | UpdateSolverDataActionType
     | UpdateSolverMainConfigActionType
     | AttachNewOutcomeCollectionActionType
     | OutcomeCollectionActionType
@@ -55,6 +57,11 @@ type UpdateSlotTagActionType = {
 type LoadComposerAction = {
     type: 'LOAD_COMPOSITION'
     payload: CompositionModel
+}
+
+type UpdateSolverDataActionType = {
+    type: 'UPDATE_SOLVER_DATA'
+    payload: SolverCoreDataInputType[]
 }
 
 type UpdateSolverMainConfigActionType = {
