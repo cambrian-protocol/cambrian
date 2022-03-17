@@ -7,7 +7,7 @@ interface ParticipantAvatarProps {
     icon?: JSX.Element
     pfpPath?: string
     role?: string
-    title: string
+    title?: string
 }
 
 const ParticipantAvatar = ({
@@ -47,7 +47,7 @@ const ParticipantAvatar = ({
                     </Text>
                 )}
                 <Text size="small" weight="bold">
-                    {title}
+                    {title || 'Anonym'}
                 </Text>
             </Box>
         </Box>

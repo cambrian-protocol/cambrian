@@ -1,8 +1,8 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 
 export type TemplateModel = {
-    pfp: string
-    name: string
+    pfp?: string
+    name?: string
     title: string
     description: string
     updatedComposition: CompositionModel
