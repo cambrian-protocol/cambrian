@@ -25,8 +25,7 @@ const FlexInput = ({
         <Box direction="row" justify="between" gap="small">
             <Box flex>
                 <FormField
-                    required={required}
-                    name={input.id}
+                    // required={required} // TODO: FIX Required Validation for flexInputs
                     label={input.label}
                     type={inputType}
                     onChange={(event) =>

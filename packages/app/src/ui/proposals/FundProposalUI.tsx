@@ -30,12 +30,17 @@ const FundProposalUI = ({
     const onFundProposal = async (amount: number) => {
         if (currentUser) {
             setIsInTransaction(true)
-            await fundProposal(
-                proposal.id,
-                solution.collateralToken.address,
-                amount,
-                currentUser
-            )
+            try {
+                await fundProposal(
+                    proposal.id,
+                    solution.collateralToken.address,
+                    amount,
+                    currentUser
+                )
+            } catch (e) {
+                console.log(e)
+            }
+
             setIsInTransaction(false)
         }
     }

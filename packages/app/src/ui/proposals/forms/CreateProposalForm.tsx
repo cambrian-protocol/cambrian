@@ -222,12 +222,8 @@ const CreateProposalForm = ({
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>
-                        <FormField
-                            name="name"
-                            label="Your/Organization Name"
-                            required
-                        />
-                        <FormField name="pfp" label="Avatar URL" required />
+                        <FormField name="name" label="Your/Organization Name" />
+                        <FormField name="pfp" label="Avatar URL" />
                     </BaseFormGroupContainer>
                     <BaseFormGroupContainer>
                         <FormField name="title" label="Title" required />
