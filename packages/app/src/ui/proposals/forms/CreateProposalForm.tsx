@@ -211,6 +211,8 @@ const CreateProposalForm = ({
         event.preventDefault()
         onSubmit(input)
     }
+
+    // TODO Refactor Form / Dynamic Flex Inputs / Validation / Validate Type Error handling
     return (
         <BaseFormContainer>
             <Form<CreateProposalFormType>
@@ -219,6 +221,19 @@ const CreateProposalForm = ({
                 }}
                 value={input}
                 onSubmit={(event) => handleSubmit(event)}
+                onValidate={(validation) => {
+                    Object.keys(input.flexInputs).forEach((solverId) => {
+                        Object.keys(input.flexInputs[solverId]).map((tagId) => {
+                            const inputValue =
+                                input.flexInputs[solverId][tagId].value
+                            if (inputValue === undefined || inputValue === '') {
+                                validation.errors[
+                                    input.flexInputs[solverId][tagId].id
+                                ] = 'required'
+                            }
+                        })
+                    })
+                }}
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>
