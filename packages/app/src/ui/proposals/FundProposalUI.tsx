@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import { BigNumber } from 'ethers'
 import { Box } from 'grommet'
 import FundProposalForm from './forms/FundProposalForm'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -8,11 +9,12 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
 
 interface FundProposalUIProps {
-    currentFunding: number
+    currentFunding: BigNumber
     proposal: ProposalModel
     solution: SolutionModel
 }
@@ -25,6 +27,24 @@ const FundProposalUI = ({
     const { currentUser } = useCurrentUser()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const { fundProposal, defundProposal } = useProposalsHub()
+
+    const [currentFundingNumber, setCurrentFundingNumber] = useState<number>(0)
+    const [fundingGoal, setFundingGoal] = useState<number>(0)
+
+    useEffect(() => {
+        setCurrentFundingNumber(
+            formatDecimals(
+                solution.collateralToken,
+                BigNumber.from(currentFunding)
+            )
+        )
+        setFundingGoal(
+            formatDecimals(
+                solution.collateralToken,
+                BigNumber.from(proposal.amount)
+            )
+        )
+    }, [])
 
     // TODO remove Loading if transaction rejected
     const onFundProposal = async (amount: number) => {
@@ -69,8 +89,8 @@ const FundProposalUI = ({
             />
             <BaseFormContainer gap="medium">
                 <FundingProgressMeter
-                    funding={currentFunding}
-                    fundingGoal={proposal.amount}
+                    funding={currentFundingNumber}
+                    fundingGoal={fundingGoal}
                 />
                 <Box fill>
                     <FundProposalForm

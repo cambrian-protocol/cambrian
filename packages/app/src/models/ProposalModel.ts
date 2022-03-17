@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers'
 import { ParticipantModel } from './ParticipantModel'
 
 export type ProposalModel = {
@@ -5,5 +6,5 @@ export type ProposalModel = {
     title: string
     buyer: ParticipantModel
     description: string
-    amount: number
+    amount: BigNumber
 }
