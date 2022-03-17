@@ -110,15 +110,15 @@ export const ProposalsHubContextProvider = ({
     ) => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
 
-        // const tokenContract = new ethers.Contract(
-        //     tokenAddress,
-        //     ERC20_ABI,
-        //     ethers.getDefaultProvider()
-        // )
+        const tokenContract = new ethers.Contract(
+            tokenAddress,
+            ERC20_ABI,
+            ethers.getDefaultProvider()
+        )
 
-        // await tokenContract
-        //     .connect(user.signer)
-        //     .approve(proposalsHub.address, amount)
+        await tokenContract
+            .connect(user.signer)
+            .approve(proposalsHub.address, amount)
 
         await proposalsHub
             .connect(user.signer)
