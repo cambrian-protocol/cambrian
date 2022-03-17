@@ -27,18 +27,7 @@ export class IPFSAPI {
     getLocalStorage = async (cid: string) => {
         try {
             const data = localStorage.getItem(cid)
-
-            let base32 = undefined
-            try {
-                base32 = new CID(cid).toV1().toString('base32')
-            } catch {
-                console.warn('Could not create base32 CID from: ', cid)
-                return undefined
-            }
-
-            const isMatch = await this.isMatchingCID(base32, data)
-
-            if (data && isMatch) {
+            if (data) {
                 console.log(`Got local storage for ${cid}`)
                 return this.tryParseJson(data)
             }
@@ -51,9 +40,9 @@ export class IPFSAPI {
         cid: string,
         gatewayIndex = 0
     ): Promise<Object | undefined> => {
-        if ((gatewayIndex = 0)) {
+        if (gatewayIndex == 0) {
             try {
-                const obj = this.getLocalStorage(cid)
+                const obj = await this.getLocalStorage(cid)
                 if (obj) {
                     return obj
                 }
@@ -86,7 +75,7 @@ export class IPFSAPI {
             if (isMatch) {
                 const obj = this.tryParseJson(data)
                 try {
-                    localStorage.setItem('cid', JSON.stringify(obj))
+                    localStorage.setItem(cid, JSON.stringify(obj))
                 } catch (e) {
                     console.log(e)
                 }
