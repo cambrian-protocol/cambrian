@@ -14,7 +14,6 @@ interface FlexInputProps {
 }
 
 const FlexInput = ({
-    required,
     input,
     inputType,
     solverId,
@@ -25,7 +24,7 @@ const FlexInput = ({
         <Box direction="row" justify="between" gap="small">
             <Box flex>
                 <FormField
-                    // required={required} // TODO: FIX Required Validation for flexInputs
+                    name={input.id}
                     label={input.label}
                     type={inputType}
                     onChange={(event) =>
