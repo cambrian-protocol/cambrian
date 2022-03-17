@@ -4,6 +4,7 @@ import {
     StackSimple,
     TreeStructure,
     UserList,
+    Cube,
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
@@ -14,6 +15,7 @@ import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
 import ComposerRecipientList from './recipientList/ComposerRecipientList'
 import ComposerSlotList from './slotList/ComposerSlotList'
 import ComposerSolverSettingsControl from './general/ComposerSolverSettingsControl'
+import ComposerSolverCoreDataInputControl from './general/ComposerSolverCoreDataInputControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
@@ -29,6 +31,7 @@ export type SolverControllerType =
     | 'RecipientListControl'
     | 'OutcomeListControl'
     | 'TimingControl'
+    | 'CoreInput'
 
 /* TODO
 - Node Position
@@ -59,6 +62,8 @@ export const ComposerSolverControl = () => {
                 return <ComposerOutcomeList />
             case 'SlotControl':
                 return <ComposerSlotList />
+            case 'CoreInput':
+                return <ComposerSolverCoreDataInputControl />
             default:
                 return <></>
         }
@@ -109,6 +114,11 @@ export const ComposerSolverControl = () => {
                                     icon={<ArrowSquareIn />}
                                     title={'Slot list'}
                                     onClick={() => setController('SlotControl')}
+                                />
+                                <BaseMenuListItem
+                                    icon={<Cube />}
+                                    title={'Core Input'}
+                                    onClick={() => setController('CoreInput')}
                                 />
                             </Box>
                         </Box>

@@ -106,8 +106,8 @@ const UpdateSlotFormModal = ({
             <BaseLayerModal onClose={onClose}>
                 <HeaderTextSection
                     title="Edit Slot"
-                    subTitle="Manual slot configuration"
-                    paragraph="You should know what you do. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+                    subTitle={`Slot ID: ${slotModel.id}`}
+                    // paragraph="You should know what you do. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
                 />
                 <Box fill>
                     <BaseMenuListItem

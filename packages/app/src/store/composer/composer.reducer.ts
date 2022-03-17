@@ -21,6 +21,7 @@ import {
     UPDATE_SLOT,
     UPDATE_SLOT_TAG,
     UPDATE_SOLUTION_SETTINGS,
+    UPDATE_SOLVER_DATA,
     UPDATE_SOLVER_MAIN_CONFIG,
     UPDATE_SOLVER_TAG,
 } from './composer.constants'
@@ -47,6 +48,7 @@ import {
     updateSlotAction,
     updateSlotTagAction,
     updateSolutionSettingsAction,
+    updateSolverDataAction,
     updateSolverMainConfigAction,
     updateSolverTagAction,
 } from './actions'
@@ -64,6 +66,8 @@ export const composerReducer = (
                 state,
                 action.payload.selectedElement
             )
+        case UPDATE_SOLVER_DATA:
+            return updateSolverDataAction(state, action.payload)
         case UPDATE_SOLVER_MAIN_CONFIG:
             return updateSolverMainConfigAction(state, action.payload)
         case TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION:

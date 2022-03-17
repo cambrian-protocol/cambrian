@@ -1,3 +1,4 @@
+import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { ComposerConditionModel, ConditionModel } from './ConditionModel'
 import { ComposerSlotModel, SlotModel } from './SlotModel'
 
@@ -27,7 +28,7 @@ export type ComposerSolverConfigModel = {
         linkedSlots: string[]
     }
     timelockSeconds?: number
-    data?: string
+    data?: SolverCoreDataInputType[]
     slots: {
         [key: string]: ComposerSlotModel
     }

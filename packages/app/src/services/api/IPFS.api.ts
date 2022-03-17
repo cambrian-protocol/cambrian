@@ -24,10 +24,44 @@ export class IPFSAPI {
         ]
     }
 
+    getLocalStorage = async (cid: string) => {
+        try {
+            const data = localStorage.getItem(cid)
+
+            let base32 = undefined
+            try {
+                base32 = new CID(cid).toV1().toString('base32')
+            } catch {
+                console.warn('Could not create base32 CID from: ', cid)
+                return undefined
+            }
+
+            const isMatch = await this.isMatchingCID(base32, data)
+
+            if (data && isMatch) {
+                console.log(`Got local storage for ${cid}`)
+                return this.tryParseJson(data)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     getFromCID = async (
         cid: string,
         gatewayIndex = 0
     ): Promise<Object | undefined> => {
+        if ((gatewayIndex = 0)) {
+            try {
+                const obj = this.getLocalStorage(cid)
+                if (obj) {
+                    return obj
+                }
+            } catch (e) {
+                console.log('Not available in localstorage')
+            }
+        }
+
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
@@ -36,7 +70,7 @@ export class IPFSAPI {
         try {
             base32 = new CID(cid).toV1().toString('base32')
         } catch {
-            console.warn('Could not create CID from: ', cid)
+            console.warn('Could not create base32 CID from: ', cid)
             return undefined
         }
 
@@ -50,7 +84,13 @@ export class IPFSAPI {
             const data = await response.text()
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
-                return this.tryParseJson(data)
+                const obj = this.tryParseJson(data)
+                try {
+                    localStorage.setItem('cid', JSON.stringify(obj))
+                } catch (e) {
+                    console.log(e)
+                }
+                return obj
             } else {
                 return this.getFromCID(cid, gatewayIndex + 1)
             }
