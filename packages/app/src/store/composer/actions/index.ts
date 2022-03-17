@@ -22,11 +22,13 @@ import updateSlotTagAction from './solverActions/updateSlotTag.action'
 import updateSolutionSettingsAction from './general/updateSolutionSettings.action'
 import updateSolverMainConfigAction from './solverActions/updateSolverMainConfig.action'
 import updateSolverTagAction from './solverActions/updateSolverTag.action'
+import updateSolverDataAction from './solverActions/updateSolverData.action'
 
 export {
     updateSolverTagAction,
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
+    updateSolverDataAction,
     dragNodeAction,
     loadCompositionAction,
     deleteOutcomeAction,
