@@ -1,15 +1,19 @@
+import { BigNumber } from '@ethersproject/bignumber'
 import { Box, Meter, Stack, Text } from 'grommet'
 
 interface FundingProgressMeterProps {
-    fundingGoal: number
-    funding: number
+    fundingGoal: BigNumber
+    funding: BigNumber
 }
 
 const FundingProgressMeter = ({
     fundingGoal,
     funding,
 }: FundingProgressMeterProps) => {
-    const percentageValue = (funding * 100) / fundingGoal
+    const percentageValue =
+        funding.toString() !== '0' && fundingGoal.toString() !== '0'
+            ? funding.mul(BigNumber.from(100)).div(fundingGoal)
+            : BigNumber.from(0)
     return (
         <Box fill>
             <Box align="center" pad="large">
@@ -17,7 +21,7 @@ const FundingProgressMeter = ({
                     <Meter
                         type="circle"
                         background="light-2"
-                        values={[{ value: percentageValue }]}
+                        values={[{ value: Number(percentageValue) }]}
                         size="xsmall"
                         thickness="small"
                     />
@@ -26,12 +30,17 @@ const FundingProgressMeter = ({
                         align="center"
                         pad={{ bottom: 'small' }}
                     >
-                        <Text size="xlarge">{percentageValue.toFixed()}</Text>
+                        <Text size="xlarge">
+                            {Number(percentageValue).toFixed()}
+                        </Text>
                         <Text size="small">%</Text>
                     </Box>
                 </Stack>
                 <Text textAlign="center" size="small" color="dark-5">
-                    {funding}/{fundingGoal}
+                    {Number(funding)}/{Number(fundingGoal)}
+                </Text>
+                <Text textAlign="center" size="small" color="dark-5">
+                    Remaining: {fundingGoal.sub(funding).toString()}
                 </Text>
             </Box>
         </Box>

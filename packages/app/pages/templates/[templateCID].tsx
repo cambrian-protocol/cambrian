@@ -93,50 +93,56 @@ export default function CreateProposalPage() {
             proposalInput.flexInputs
         )
 
-        if (finalComposition) {
-            const parsedSolvers = await parseComposerSolvers(
-                finalComposition.solvers
-            )
-            if (parsedSolvers) {
-                const solverConfigs = parsedSolvers.map(
-                    (solver) => solver.config
+        try {
+            if (finalComposition) {
+                const parsedSolvers = await parseComposerSolvers(
+                    finalComposition.solvers
                 )
+                if (parsedSolvers) {
+                    const solverConfigs = parsedSolvers.map(
+                        (solver) => solver.config
+                    )
 
-                const solverConfigsCIDString = await Hash.of(solverConfigs)
-                const solverConfigsCID = getBytes32FromMultihash(
-                    solverConfigsCIDString
-                )
+                    const solverConfigsCIDString = await Hash.of(
+                        JSON.stringify(solverConfigs)
+                    )
+                    const solverConfigsCID = getBytes32FromMultihash(
+                        solverConfigsCIDString
+                    )
 
-                const solutionId = ethers.utils.formatBytes32String(ulid())
+                    const solutionId = ethers.utils.formatBytes32String(ulid())
 
-                const proposalId = await createSolutionAndProposal(
-                    finalComposition.solvers[0].config.collateralToken!!,
-                    getIPFSSolutionsHubAddress(),
-                    BigNumber.from(proposalInput.price),
-                    solutionId,
-                    solverConfigs,
-                    solverConfigsCID,
-                    currentUser
-                )
-
-                if (proposalId) {
-                    const ipfsHash = await stagehand.publishProposal(
+                    const proposalId = await createSolutionAndProposal(
+                        finalComposition.solvers[0].config.collateralToken!!,
+                        getIPFSSolutionsHubAddress(),
+                        BigNumber.from(proposalInput.price),
                         solutionId,
-                        proposalId,
-                        finalComposition,
-                        proposalInput,
-                        // solverAddresses,
                         solverConfigs,
                         solverConfigsCID,
                         currentUser
                     )
 
-                    if (ipfsHash) {
-                        setCreatedProposalCID(ipfsHash)
-                        toggleShowSuccessModal()
+                    if (proposalId) {
+                        const ipfsHash = await stagehand.publishProposal(
+                            solutionId,
+                            proposalId,
+                            finalComposition,
+                            proposalInput,
+                            // solverAddresses,
+                            solverConfigs,
+                            solverConfigsCID,
+                            currentUser
+                        )
+
+                        if (ipfsHash) {
+                            setCreatedProposalCID(ipfsHash)
+                            toggleShowSuccessModal()
+                        }
                     }
                 }
             }
+        } catch (e) {
+            console.log(e)
         }
         setIsInTransaction(false)
     }

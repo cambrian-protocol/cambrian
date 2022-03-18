@@ -197,6 +197,25 @@
       "inputs": [
         {
           "internalType": "bytes32",
+          "name": "_solutionId",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getSolvers",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "solvers",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
           "name": "_proposalId",
           "type": "bytes32"
         },

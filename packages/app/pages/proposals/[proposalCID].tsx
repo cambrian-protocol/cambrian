@@ -1,9 +1,9 @@
 import { Box, Button } from 'grommet'
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers, EventFilter } from 'ethers'
 import FundProposalUI from '@cambrian/app/ui/proposals/FundProposalUI'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
@@ -14,12 +14,14 @@ import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
 import { useRouter } from 'next/dist/client/router'
+import { IPFSSolutionsHubContext } from '@cambrian/app/store/IPFSSolutionsHubContext'
 
 const fundProposalPageTitle = 'Fund Proposal'
 
 export default function ProposalPage() {
     const [stagehand] = useState(new Stagehand())
     const { currentUser, login } = useCurrentUser()
+    const ipfsSolutionsHub = useContext(IPFSSolutionsHubContext).contract
     const [currentProposal, setCurrentProposal] = useState<ProposalModel>()
     const [currentSolution, setCurrentSolution] = useState<SolutionModel>()
     const [currentFunding, setCurrentFunding] = useState<BigNumber>(
@@ -30,7 +32,75 @@ export default function ProposalPage() {
     const [isInTransaction, setIsInTransaction] = useState(false)
     const router = useRouter()
     const { proposalCID } = router.query
-    const { executeProposal, getProposalFunding } = useProposalsHub()
+    const { contract, executeProposal, getProposalFunding, getProposal } =
+        useProposalsHub()
+
+    useEffect(() => {
+        if (currentProposal && ipfsSolutionsHub) {
+            getSolution()
+        }
+    }, [currentProposal, ipfsSolutionsHub])
+
+    const getSolution = async () => {
+        if (ipfsSolutionsHub && currentProposal) {
+            console.log('Getting solution')
+            const proposal = await getProposal(currentProposal.id)
+            if (proposal) {
+                const solvers = await ipfsSolutionsHub.getSolvers(
+                    proposal.solutionId
+                )
+                console.log(solvers)
+
+                if (solvers && solvers.length) {
+                    router.push(`/solvers/${solvers[0]}`)
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (contract) {
+            contract.on(
+                contract.filters.FundProposal(null, null, null),
+                async (proposalId, amount, from) => {
+                    console.log('Funded: ', proposalId, amount, from)
+                    const proposalFunding = await getProposalFunding(proposalId)
+                    if (proposalFunding) setCurrentFunding(proposalFunding)
+                    setIsInTransaction(false)
+                }
+            )
+
+            contract.on(
+                contract.filters.DefundProposal(null, null, null),
+                async (proposalId, amount, from) => {
+                    console.log('Defunded: ', proposalId, amount, from)
+                    const proposalFunding = await getProposalFunding(proposalId)
+                    if (proposalFunding) setCurrentFunding(proposalFunding)
+                    setIsInTransaction(false)
+                }
+            )
+
+            contract.on(
+                contract.filters.ExecuteProposal(null),
+                async (proposalId) => {
+                    console.log('Executed Proposal: ', proposalId)
+                    if (ipfsSolutionsHub) {
+                        const proposal = await getProposal(proposalId)
+                        if (proposal) {
+                            const solvers = await ipfsSolutionsHub.getSolvers(
+                                proposal.solutionId
+                            )
+                            console.log(solvers)
+                            if (solvers && solvers.length) {
+                                router.push(`/solvers/${solvers[0]}`)
+                            }
+                        }
+                    }
+                    setIsInTransaction(false)
+                }
+            )
+        }
+    }, [contract])
 
     useEffect(() => {
         if (!currentUser) {
@@ -50,7 +120,7 @@ export default function ProposalPage() {
         } else {
             setShowError(true)
         }
-    }, [router, currentUser])
+    }, [router, currentUser, contract])
 
     const fetchProposal = async (proposalCID: string) => {
         try {
@@ -64,12 +134,8 @@ export default function ProposalPage() {
             if (proposal && solution && currentUser) {
                 setCurrentProposal(proposal)
                 setCurrentSolution(solution)
-                const proposalFunding = await getProposalFunding(
-                    proposal.id,
-                    currentUser
-                )
+                const proposalFunding = await getProposalFunding(proposal.id)
                 if (proposalFunding) setCurrentFunding(proposalFunding)
-            } else {
             }
         } catch {
             console.warn('Cannot fetch proposal')
@@ -78,7 +144,12 @@ export default function ProposalPage() {
     }
 
     const onExecuteProposal = async () => {
-        if (currentProposal && currentSolution && currentUser) {
+        if (
+            currentProposal &&
+            currentSolution &&
+            currentUser &&
+            ipfsSolutionsHub
+        ) {
             setIsInTransaction(true)
             await executeProposal(
                 currentProposal.id,
@@ -86,9 +157,8 @@ export default function ProposalPage() {
                 currentUser
             )
             const finalStagesCID = stagehand.executeProposal()
-            setIsInTransaction(false)
+
             console.log('Final stages CID: ', finalStagesCID)
-            router.push(`/solvers/${currentSolution.solverAddresses[0]}`)
         }
     }
 

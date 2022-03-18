@@ -26,10 +26,14 @@ const FundProposalUI = ({
 }: FundProposalUIProps) => {
     const { currentUser } = useCurrentUser()
     const [isInTransaction, setIsInTransaction] = useState(false)
-    const { fundProposal, defundProposal } = useProposalsHub()
+    const [hasApproved, setHasApproved] = useState(false)
 
-    const [currentFundingNumber, setCurrentFundingNumber] = useState<number>(0)
-    const [fundingGoal, setFundingGoal] = useState<number>(0)
+    const { approveFunding, fundProposal, defundProposal } = useProposalsHub()
+
+    const [currentFundingNumber, setCurrentFundingNumber] = useState<BigNumber>(
+        BigNumber.from(0)
+    )
+    const [fundingGoal, setFundingGoal] = useState<BigNumber>(BigNumber.from(0))
 
     useEffect(() => {
         setCurrentFundingNumber(
@@ -44,9 +48,8 @@ const FundProposalUI = ({
                 BigNumber.from(proposal.amount)
             )
         )
-    }, [])
+    }, [currentFunding])
 
-    // TODO remove Loading if transaction rejected
     const onFundProposal = async (amount: number) => {
         if (currentUser) {
             setIsInTransaction(true)
@@ -57,6 +60,27 @@ const FundProposalUI = ({
                     amount,
                     currentUser
                 )
+                setHasApproved(false)
+            } catch (e) {
+                console.log(e)
+            }
+
+            setIsInTransaction(false)
+        }
+    }
+
+    const onApproveFunding = async (amount: number) => {
+        if (currentUser) {
+            setIsInTransaction(true)
+            try {
+                const bool = await approveFunding(
+                    solution.collateralToken.address,
+                    amount,
+                    currentUser
+                )
+                if (!!bool) {
+                    setHasApproved(true)
+                }
             } catch (e) {
                 console.log(e)
             }
@@ -94,7 +118,9 @@ const FundProposalUI = ({
                 />
                 <Box fill>
                     <FundProposalForm
+                        hasApproved={hasApproved}
                         onFundProposal={onFundProposal}
+                        onApproveFunding={onApproveFunding}
                         onDefundProposal={onDefundProposal}
                         token={solution.collateralToken}
                     />
