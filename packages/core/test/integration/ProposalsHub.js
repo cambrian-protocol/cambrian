@@ -4,6 +4,8 @@ const SOLVER_ABI =
   require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
 const SOLUTIONSHUB_ABI =
   require("../../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
+const IPFSSOLUTIONSHUB_ABI =
+  require("../../artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,
@@ -12,6 +14,9 @@ const { getSimpleSolutionConfig } = require("../../helpers/testHelpers.js");
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
+
+const { getBytes32FromMultihash } = require("../../helpers/multihash");
+const Hash = require("ipfs-only-hash");
 
 describe("ProposalsHub", function () {
   this.beforeEach(async function () {
@@ -39,12 +44,16 @@ describe("ProposalsHub", function () {
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
+    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHub");
 
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
 
     this.ISolutionsHub = new ethers.utils.Interface(SOLUTIONSHUB_ABI);
     this.ISolutionsHub.format(FormatTypes.full);
+
+    this.IIPFSSolutionsHub = new ethers.utils.Interface(IPFSSOLUTIONSHUB_ABI);
+    this.IIPFSSolutionsHub.format(FormatTypes.full);
 
     await this.ToyToken.mint(this.user0.address, this.amount);
     await this.ToyToken.mint(this.user1.address, this.amount);
@@ -760,4 +769,114 @@ describe("ProposalsHub", function () {
       "ProposalsHub::Claim is 0"
     );
   });
+
+  // it("Can create Solution and Proposal in same tx with createIPFSSOlutionAndProposal", async function () {
+  //   const ingests = [
+  //     {
+  //       executions: 0,
+  //       ingestType: 1,
+  //       slot: ethers.utils.formatBytes32String("0"),
+  //       solverIndex: 0,
+  //       data: ethers.utils.defaultAbiCoder.encode(
+  //         ["bytes32"],
+  //         [ethers.utils.formatBytes32String("")]
+  //       ),
+  //     },
+  //     {
+  //       executions: 0,
+  //       ingestType: 1,
+  //       slot: ethers.utils.formatBytes32String("1"),
+  //       solverIndex: 0,
+  //       data: ethers.utils.defaultAbiCoder.encode(
+  //         ["address"],
+  //         [this.user0.address]
+  //       ),
+  //     },
+  //     {
+  //       executions: 0,
+  //       ingestType: 1,
+  //       slot: ethers.utils.formatBytes32String("2"),
+  //       solverIndex: 0,
+  //       data: ethers.utils.defaultAbiCoder.encode(
+  //         ["address"],
+  //         [this.user1.address]
+  //       ),
+  //     },
+  //     {
+  //       executions: 0,
+  //       ingestType: 1,
+  //       slot: ethers.utils.formatBytes32String("3"),
+  //       solverIndex: 0,
+  //       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+  //     },
+  //     {
+  //       executions: 0,
+  //       ingestType: 1,
+  //       slot: ethers.utils.formatBytes32String("4"),
+  //       solverIndex: 0,
+  //       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
+  //     },
+  //   ];
+
+  //   const conditionBase = {
+  //     collateralToken: this.ToyToken.address,
+  //     outcomeSlots: 2,
+  //     parentCollectionIndexSet: 0,
+  //     amountSlot: ethers.utils.formatBytes32String("4"),
+  //     partition: [1, 2],
+  //     allocations: [
+  //       {
+  //         recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+  //         recipientAmountSlots: [
+  //           ethers.utils.formatBytes32String("3"),
+  //           ethers.utils.formatBytes32String("4"),
+  //         ],
+  //       },
+  //       {
+  //         recipientAddressSlot: ethers.utils.formatBytes32String("2"),
+  //         recipientAmountSlots: [
+  //           ethers.utils.formatBytes32String("4"),
+  //           ethers.utils.formatBytes32String("3"),
+  //         ],
+  //       },
+  //     ],
+  //     outcomeURIs: [
+  //       getBytes32FromMultihash(
+  //         "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+  //       ),
+  //       getBytes32FromMultihash(
+  //         "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+  //       ),
+  //     ],
+  //   };
+
+  //   const solverConfigs = [
+  //     [
+  //       this.Solver.address,
+  //       this.keeper.address,
+  //       this.arbitrator.address,
+  //       0,
+  //       ethers.utils.formatBytes32String(""),
+  //       ingests,
+  //       conditionBase,
+  //     ],
+  //   ];
+
+  //   const cid = await Hash.of(solverConfigs);
+
+  //   //Create proposal
+  //   let res = await this.ProposalsHub.connect(
+  //     this.keeper
+  //   ).createIPFSSolutionAndProposal(
+  //     this.solutionId,
+  //     this.ToyToken.address,
+  //     this.IPFSSolutionsHub.address,
+  //     this.amount,
+  //     solverConfigs,
+  //     getBytes32FromMultihash(cid)
+  //   );
+
+  //   console.log(res);
+  //   expect(res[0]).to.equal(this.solutionId);
+  // });
 });
