@@ -37,10 +37,10 @@ export const mergeFlexIntoComposition = (
                                 ].address = taggedInput.value
                                 break
 
-                            case 'data':
-                                updatedComposerSolvers[i].config['data'] =
-                                    taggedInput.value
-                                break
+                            // case 'data':
+                            //     updatedComposerSolvers[i].config['data'] =
+                            //         taggedInput.value
+                            //     break
 
                             case 'collateralToken':
                                 updatedComposerSolvers[i].config[

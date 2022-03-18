@@ -154,4 +154,12 @@ contract IPFSSolutionsHub {
     {
         _address = solutions[_solutionId].solverAddresses[_index];
     }
+
+    function getSolvers(bytes32 _solutionId)
+        public
+        view
+        returns (address[] memory solvers)
+    {
+        solvers = solutions[_solutionId].solverAddresses;
+    }
 }

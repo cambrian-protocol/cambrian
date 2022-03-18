@@ -5,6 +5,8 @@ import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface FundProposalFormProps {
+    hasApproved: boolean
+    onApproveFunding: (amountToFund: number) => void
     onFundProposal: (amountToFund: number) => void
     onDefundProposal: (amountToDefund: number) => void
     token: TokenModel
@@ -19,7 +21,9 @@ const initialInput = {
 }
 
 const FundProposalForm = ({
+    hasApproved,
     token,
+    onApproveFunding,
     onFundProposal,
     onDefundProposal,
 }: FundProposalFormProps) => {
@@ -29,6 +33,11 @@ const FundProposalForm = ({
         onFundProposal(input.amount)
         setInput(initialInput)
     }
+
+    const onApprove = () => {
+        onApproveFunding(input.amount)
+    }
+
     return (
         <>
             <Form<FundProposalFormType>
@@ -36,7 +45,7 @@ const FundProposalForm = ({
                     setInput(nextValue)
                 }}
                 value={input}
-                onSubmit={onSubmit}
+                onSubmit={hasApproved ? onSubmit : onApprove}
             >
                 <Box gap="medium">
                     <Box direction="row" gap="small" justify="center">
@@ -56,7 +65,19 @@ const FundProposalForm = ({
                             label="Defund"
                             onClick={() => onDefundProposal(input.amount)}
                         />
-                        <Button primary type="submit" label="Fund Proposal" />
+                        {hasApproved ? (
+                            <Button
+                                primary
+                                type="submit"
+                                label="Fund Proposal"
+                            />
+                        ) : (
+                            <Button
+                                primary
+                                type="submit"
+                                label="Approve Spend"
+                            />
+                        )}
                     </Box>
                 </Box>
             </Form>

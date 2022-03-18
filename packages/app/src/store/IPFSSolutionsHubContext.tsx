@@ -1,9 +1,10 @@
-import { ContractTransaction, ethers } from 'ethers'
+import { Contract, ContractTransaction, ethers } from 'ethers'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { getBytes32FromMultihash } from '../utils/helpers/multihash'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import { SolutionsHubAPI } from '../services/api/SolutionsHub.api'
 
 const IPFS_SOLUTIONS_HUB_ABI =
     require('@artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json').abi
@@ -16,11 +17,13 @@ export type IPFSSolutionsHubContextType = {
         solverConfigs: SolverConfigModel[],
         solverConfigsCID: string
     ) => Promise<ContractTransaction | null>
+    contract: Contract | undefined
 }
 export const IPFSSolutionsHubContext =
     React.createContext<IPFSSolutionsHubContextType>({
         getIPFSSolutionsHubAddress: () => '',
         createSolution: async () => null,
+        contract: undefined,
     })
 
 export const IPFSSolutionsHubContextProvider = ({
@@ -30,15 +33,15 @@ export const IPFSSolutionsHubContextProvider = ({
     const [IPFSSolutionsHub, setIPFSSolutionsHub] = useState<ethers.Contract>()
 
     useEffect(() => {
-        if (process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS) {
+        if (currentUser && process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS) {
             const contract = new ethers.Contract(
                 process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS,
                 new ethers.utils.Interface(IPFS_SOLUTIONS_HUB_ABI),
-                ethers.getDefaultProvider()
+                currentUser.signer
             )
             setIPFSSolutionsHub(contract)
         }
-    }, [])
+    }, [currentUser])
 
     const onCreateSolution = async (
         solutionId: string,
@@ -67,6 +70,7 @@ export const IPFSSolutionsHubContextProvider = ({
     return (
         <IPFSSolutionsHubContext.Provider
             value={{
+                contract: IPFSSolutionsHub,
                 createSolution: onCreateSolution,
                 getIPFSSolutionsHubAddress: getIPFSSolutionsHubAddress,
             }}

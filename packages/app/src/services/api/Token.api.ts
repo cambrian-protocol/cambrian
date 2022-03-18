@@ -1,15 +1,15 @@
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 
 const ERC20_ABI =
     require('@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json').abi
 
 export type TokenResponseType = {
     address: string
-    decimals?: number
+    decimals: BigNumber
     name?: string
     symbol?: string
-    totalSupply: number
+    totalSupply: BigNumber
 }
 
 export const TokenAPI = {
@@ -42,7 +42,7 @@ export const TokenAPI = {
                     decimals:
                         decimals.status === 'fulfilled'
                             ? decimals.value
-                            : undefined,
+                            : BigNumber.from(18),
                     name: name.status === 'fulfilled' ? name.value : undefined,
                     symbol:
                         symbol.status === 'fulfilled'
@@ -62,6 +62,7 @@ export const TokenAPI = {
 
         return <TokenModel>{
             address: address,
+            decimals: BigNumber.from(18),
         }
     },
 }

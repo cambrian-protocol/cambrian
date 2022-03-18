@@ -25,4 +25,9 @@ interface IIPFSSolutionsHub {
         external
         view
         returns (address solver);
+
+    function getSolvers(bytes32 _solutionId)
+        external
+        view
+        returns (address[] memory solvers);
 }

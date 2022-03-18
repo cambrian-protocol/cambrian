@@ -1,4 +1,4 @@
-import { BigNumber, ContractTransaction, ethers } from 'ethers'
+import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { ERC20_ABI } from '../constants'
@@ -6,6 +6,8 @@ import { SolverConfigModel } from '../models/SolverConfigModel'
 import { UserType } from './UserContext'
 import { addTokenDecimals } from '../utils/helpers/tokens'
 import { MultihashType } from '../utils/helpers/multihash'
+import { TokenAPI } from '../services/api/Token.api'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 const Hash = require('ipfs-only-hash')
 
 const PROPOSALS_HUB_ABI =
@@ -19,6 +21,7 @@ export type ProposalsHubContextType = {
     //     solutionId: string,
     //     user: UserType
     // ) => Promise<string | null>
+    contract: Contract | undefined
     createSolutionAndProposal: (
         collateralToken: string,
         ipfsSolutionsHubAddress: string,
@@ -28,18 +31,17 @@ export type ProposalsHubContextType = {
         solverConfigsCID: MultihashType,
         user: UserType
     ) => Promise<string | null>
-    getProposal: (
-        proposalId: string,
+    getProposal: (proposalId: string) => Promise<ethers.Contract | null>
+    getProposalFunding: (proposalId: string) => Promise<BigNumber | null>
+    approveFunding: (
+        tokenAddress: string,
+        amount: BigNumber | number,
         user: UserType
-    ) => Promise<ethers.Contract | null>
-    getProposalFunding: (
-        proposalId: string,
-        user: UserType
-    ) => Promise<BigNumber | null>
+    ) => Promise<boolean | null>
     fundProposal: (
         proposalId: string,
         tokenAddress: string,
-        amount: number,
+        amount: BigNumber | number,
         user: UserType
     ) => Promise<void>
     defundProposal: (
@@ -56,8 +58,10 @@ export type ProposalsHubContextType = {
 }
 export const ProposalsHubContext = React.createContext<ProposalsHubContextType>(
     {
+        contract: undefined,
         createSolutionAndProposal: async () => null,
         getProposal: async () => null,
+        approveFunding: async () => null,
         fundProposal: async () => {},
         defundProposal: async () => {},
         executeProposal: async () => {},
@@ -68,18 +72,19 @@ export const ProposalsHubContext = React.createContext<ProposalsHubContextType>(
 export const ProposalsHubContextProvider = ({
     children,
 }: PropsWithChildren<{}>) => {
+    const user = useCurrentUser()
     const [proposalsHub, setProposalsHub] = useState<ethers.Contract>()
 
     useEffect(() => {
-        if (process.env.NEXT_PUBLIC_PROPOSALS_HUB_ADDRESS) {
+        if (user.currentUser && process.env.NEXT_PUBLIC_PROPOSALS_HUB_ADDRESS) {
             const contract = new ethers.Contract(
                 process.env.NEXT_PUBLIC_PROPOSALS_HUB_ADDRESS,
                 new ethers.utils.Interface(PROPOSALS_HUB_ABI),
-                ethers.getDefaultProvider()
+                user.currentUser?.signer || ethers.getDefaultProvider()
             )
             setProposalsHub(contract)
         }
-    }, [])
+    }, [user])
 
     const handleCreateSolutionAndProposal = async (
         collateralToken: string,
@@ -92,39 +97,51 @@ export const ProposalsHubContextProvider = ({
     ): Promise<string | null> => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
 
+        const token = await TokenAPI.getTokenInfo(collateralToken)
+        const weiPrice = addTokenDecimals(price, token).toString()
+
         const tx: ContractTransaction = await proposalsHub
             .connect(user.signer)
             .createIPFSSolutionAndProposal(
                 solutionId,
                 collateralToken,
                 ipfsSolutionsHubAddress,
-                price,
+                weiPrice,
                 solverConfigs,
                 solverConfigsCID
             )
         let rc = await tx.wait()
+
         return new ethers.utils.Interface([
             'event CreateProposal(bytes32 id)',
-        ]).parseLog(rc.logs[0]).args.id
+        ]).parseLog(
+            rc.logs.find((log) =>
+                log.topics.includes(
+                    ethers.utils.keccak256(
+                        ethers.utils.toUtf8Bytes('CreateProposal(bytes32)')
+                    )
+                )
+            ) as any
+        ).args.id
     }
 
-    const handleGetProposal = async (proposalId: string, user: UserType) => {
+    const handleGetProposal = async (proposalId: string) => {
         if (proposalsHub) {
-            const contract = await proposalsHub
-                .connect(user.signer)
-                .getProposal(proposalId)
+            const proposal = await proposalsHub.getProposal(proposalId)
 
-            return contract
+            return proposal
         }
     }
 
-    const handleFundProposal = async (
-        proposalId: string,
+    const handleApproveFunding = async (
         tokenAddress: string,
-        amount: number,
+        amount: number | BigNumber,
         user: UserType
     ) => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
+
+        const token = await TokenAPI.getTokenInfo(tokenAddress)
+        const weiAmount = addTokenDecimals(amount, token)
 
         const tokenContract = new ethers.Contract(
             tokenAddress,
@@ -132,26 +149,50 @@ export const ProposalsHubContextProvider = ({
             ethers.getDefaultProvider()
         )
 
-        await tokenContract
-            .connect(user.signer)
-            .approve(proposalsHub.address, amount)
+        try {
+            await tokenContract
+                .connect(user.signer)
+                .approve(proposalsHub.address, weiAmount)
+        } catch (e) {
+            return false
+        }
+        return true
+    }
+
+    const handleFundProposal = async (
+        proposalId: string,
+        tokenAddress: string,
+        amount: number | BigNumber,
+        user: UserType
+    ) => {
+        if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
+
+        const token = await TokenAPI.getTokenInfo(tokenAddress)
+        const weiAmount = addTokenDecimals(amount, token)
 
         await proposalsHub
             .connect(user.signer)
-            .fundProposal(proposalId, tokenAddress, addTokenDecimals(amount))
+            .fundProposal(proposalId, tokenAddress, weiAmount)
     }
 
     const handleDefundProposal = async (
         proposalId: string,
         tokenAddress: string,
-        amount: number,
+        amount: BigNumber | number,
         user: UserType
     ) => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
 
-        await proposalsHub
-            .connect(user.signer)
-            .defundProposal(proposalId, tokenAddress, addTokenDecimals(amount))
+        try {
+            const token = await TokenAPI.getTokenInfo(tokenAddress)
+            const weiAmount = addTokenDecimals(amount, token)
+
+            await proposalsHub
+                .connect(user.signer)
+                .defundProposal(proposalId, tokenAddress, weiAmount)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     const handleExecuteProposal = async (
@@ -167,20 +208,23 @@ export const ProposalsHubContextProvider = ({
             .executeIPFSProposal(proposalId, solverConfigs)
     }
 
-    const handleGetProposalFunding = async (
-        proposalId: string,
-        user: UserType
-    ) => {
-        const proposalContract = await handleGetProposal(proposalId, user)
-        if (proposalContract) return proposalContract.funding
+    const handleGetProposalFunding = async (proposalId: string) => {
+        try {
+            const proposalContract = await handleGetProposal(proposalId)
+            if (proposalContract) return proposalContract.funding
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     return (
         <ProposalsHubContext.Provider
             value={{
                 // createProposal: handleCreateProposal,
+                contract: proposalsHub,
                 createSolutionAndProposal: handleCreateSolutionAndProposal,
                 getProposal: handleGetProposal,
+                approveFunding: handleApproveFunding,
                 fundProposal: handleFundProposal,
                 defundProposal: handleDefundProposal,
                 executeProposal: handleExecuteProposal,

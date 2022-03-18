@@ -38,6 +38,8 @@ contract ProposalsHub is ERC1155Receiver {
 
     event CreateProposal(bytes32 id);
     event ExecuteProposal(bytes32 id);
+    event FundProposal(bytes32 id, uint256 amount, address from);
+    event DefundProposal(bytes32 id, uint256 amount, address from);
 
     constructor(address _ctfAddress) {
         conditionalTokens = IConditionalTokens(_ctfAddress);
@@ -214,6 +216,8 @@ contract ProposalsHub is ERC1155Receiver {
             token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
         );
+
+        emit FundProposal(proposalId, amount, msg.sender);
     }
 
     /**
@@ -241,11 +245,19 @@ contract ProposalsHub is ERC1155Receiver {
             amount <= funderAmountMap[proposalId][msg.sender],
             "Committed funds is lower than amount."
         );
+        uint256 beforeBalance = token.balanceOf(address(this));
 
         proposals[proposalId].funding -= amount;
         funderAmountMap[proposalId][msg.sender] -= amount;
 
         token.transfer(msg.sender, amount);
+
+        require(
+            beforeBalance - token.balanceOf(address(this)) == amount,
+            "Before and after balance wrong"
+        );
+
+        emit DefundProposal(proposalId, amount, msg.sender);
     }
 
     function getProposal(bytes32 id)
