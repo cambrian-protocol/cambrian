@@ -11,6 +11,7 @@ export interface BaseMenuListItemProps {
     isActive?: boolean
     onClick?: () => void
     info?: string
+    hideDivider?: boolean
 }
 
 const BaseMenuListItem = ({
@@ -20,6 +21,7 @@ const BaseMenuListItem = ({
     onClick,
     isActive,
     info,
+    hideDivider,
 }: BaseMenuListItemProps) => {
     return (
         <IconContext.Provider value={{ size: '24', color: 'white' }}>
@@ -51,7 +53,11 @@ const BaseMenuListItem = ({
                     </Box>
                 )}
             </Box>
-            {!onClick || isActive ? <></> : <PlainSectionDivider />}
+            {!onClick || isActive || hideDivider ? (
+                <></>
+            ) : (
+                <PlainSectionDivider />
+            )}
         </IconContext.Provider>
     )
 }

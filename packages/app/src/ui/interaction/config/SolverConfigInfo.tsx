@@ -15,7 +15,6 @@ import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
-import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -46,9 +45,12 @@ const SolverConfigInfo = ({
     return (
         <>
             <HeaderTextSection
-                title={solverData.solverTag.title}
+                title={solverData.solverTag?.title || 'No Solver title set'}
                 subTitle="Solver configuration"
-                paragraph="This Solver is designed for a buyer to source articles for the purposes of content marketing. "
+                paragraph={
+                    solverData.solverTag?.description ||
+                    'No Solver description set'
+                }
             />
             <Box gap="small" fill="horizontal">
                 <BaseMenuListItem

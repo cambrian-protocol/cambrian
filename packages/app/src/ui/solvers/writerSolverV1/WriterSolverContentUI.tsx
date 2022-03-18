@@ -8,8 +8,10 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 
 interface WriterSolverContentUI {
+    solverData: SolverModel
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
     workInput: SubmissionModel
@@ -25,11 +27,8 @@ const WriterSolverContentUI = ({
     currentCondition,
     submittedWork,
     proposedOutcome,
+    solverData,
 }: WriterSolverContentUI) => {
-    const dummyArticleTitle = 'Uniswap Treasury Diversification'
-    const dummyArticleDescription =
-        'Write an article about why Uniswap and other protocols with large treasuries should be diversifying their holdings.'
-
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
             if (roles.includes('Keeper')) {
@@ -57,9 +56,9 @@ const WriterSolverContentUI = ({
                 return (
                     <Box fill gap="small">
                         <HeaderTextSection
-                            title={dummyArticleTitle}
+                            title={solverData.solverTag?.title}
                             subTitle="Most recent state of"
-                            paragraph={dummyArticleDescription}
+                            paragraph={solverData.solverTag?.description}
                         />
                         <Stack anchor="center" fill>
                             <TextArea
@@ -91,8 +90,8 @@ const WriterSolverContentUI = ({
             } else {
                 return (
                     <WorkContentContainer
-                        title={dummyArticleTitle}
-                        description={dummyArticleDescription}
+                        title={solverData.solverTag?.title}
+                        description={solverData.solverTag?.description}
                         submittedWork={submittedWork[submittedWork.length - 1]}
                     />
                 )
@@ -111,8 +110,8 @@ const WriterSolverContentUI = ({
                                 }
                             />
                             <WorkContentContainer
-                                title={dummyArticleTitle}
-                                description={dummyArticleDescription}
+                                title={solverData.solverTag?.title}
+                                description={solverData.solverTag?.description}
                                 submittedWork={
                                     submittedWork[submittedWork.length - 1]
                                 }
@@ -131,8 +130,8 @@ const WriterSolverContentUI = ({
                                 status={currentCondition.status}
                             />
                             <WorkContentContainer
-                                title={dummyArticleTitle}
-                                description={dummyArticleDescription}
+                                title={solverData.solverTag?.title}
+                                description={solverData.solverTag?.description}
                                 submittedWork={
                                     submittedWork[submittedWork.length - 1]
                                 }
