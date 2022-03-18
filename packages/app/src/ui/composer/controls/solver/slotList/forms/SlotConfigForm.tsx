@@ -1,7 +1,7 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
-import { SlotPath, SlotTypes } from '@cambrian/app/models/SlotModel'
 
-import { IconContext } from 'phosphor-react'
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import SelectCallingSolver from '@cambrian/app/components/selects/SelectCallingSolver'
 import SelectSlot from '@cambrian/app/components/selects/SelectSlot'
 import SelectSlotType from '@cambrian/app/components/selects/SelectSlotType'
@@ -10,6 +10,7 @@ import { SetStateAction } from 'react'
 import { SlotActionPayload } from '@cambrian/app/store/composer/composer.types'
 import SlotDataInputField from '@cambrian/app/components/inputs/SlotDataInput'
 import { SlotDataInputType } from '../modals/CreateSlotModal'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import _uniqueId from 'lodash/uniqueId'
 import { ethers } from 'ethers'
@@ -21,12 +22,11 @@ type SlotConfigFormProps = {
     submitLabel: string
 }
 export type SlotConfigFormType = {
-    slotType: SlotTypes
+    slotType: SlotType
     dataInputFields: SlotDataInputType[]
-    slotDescription: string
-    solverFunction?: ethers.utils.FunctionFragment | null
-    targetSolverId?: string | null
-    callbackTargetSlotPath?: SlotPath
+    solverFunction?: ethers.utils.FunctionFragment
+    targetSolverId?: string
+    callbackTargetSlotPath?: ComposerSlotPathType
 }
 
 const SlotConfigForm = ({
@@ -64,7 +64,9 @@ const SlotConfigForm = ({
         }))
     }
 
-    const handleUpdateCallbackSlotPath = (updatedTargetSlotPath?: SlotPath) => {
+    const handleUpdateCallbackSlotPath = (
+        updatedTargetSlotPath?: ComposerSlotPathType
+    ) => {
         setSlotInput((prev) => ({
             ...prev,
             callbackTargetSlotPath: updatedTargetSlotPath,
@@ -73,7 +75,7 @@ const SlotConfigForm = ({
     let FormFields = null
 
     switch (slotInput.slotType) {
-        case SlotTypes.Callback:
+        case SlotType.Callback:
             FormFields = (
                 <FormField
                     label="Target slot"
@@ -90,14 +92,10 @@ const SlotConfigForm = ({
                 </FormField>
             )
             break
-        case SlotTypes.Constant:
-        case SlotTypes.Manual:
+        case SlotType.Constant:
+        case SlotType.Manual:
             FormFields = (
                 <>
-                    <FormField
-                        label="Slot description"
-                        name="slotDescription"
-                    />
                     <SlotDataInputField
                         value={slotInput.dataInputFields[0]}
                         onUpdate={handleUpdateDataInputField}
@@ -105,7 +103,7 @@ const SlotConfigForm = ({
                 </>
             )
             break
-        case SlotTypes.Function:
+        case SlotType.Function:
             FormFields = (
                 <>
                     <FormField label="Calling Solver" name="callingSolverIndex">
@@ -141,7 +139,7 @@ const SlotConfigForm = ({
     }
 
     return (
-        <Box fill>
+        <BaseFormContainer>
             <Form<SlotConfigFormType>
                 value={slotInput}
                 onSubmit={(event) => onSubmit(event)}
@@ -153,13 +151,11 @@ const SlotConfigForm = ({
                     <SelectSlotType name="slotType" />
                 </FormField>
                 {FormFields}
-                <Box>
-                    <IconContext.Provider value={{ size: '24' }}>
-                        <Button primary type="submit" label={submitLabel} />
-                    </IconContext.Provider>
+                <Box margin={{ top: 'small' }}>
+                    <Button primary type="submit" label={submitLabel} />
                 </Box>
             </Form>
-        </Box>
+        </BaseFormContainer>
     )
 }
 
@@ -193,7 +189,7 @@ export const mapSlotConfigFormToSlotActionPayload = (
     }
 
     switch (slotConfigFormInput.slotType) {
-        case SlotTypes.Callback:
+        case SlotType.Callback:
             // Doesn't hurt to check
             if (slotConfigFormInput.callbackTargetSlotPath !== undefined) {
                 slotPayload.targetSolverId =
@@ -203,13 +199,10 @@ export const mapSlotConfigFormToSlotActionPayload = (
                 ]
             }
             break
-        case SlotTypes.Function:
+        case SlotType.Function:
             slotPayload.targetSolverId = slotConfigFormInput.targetSolverId
             slotPayload.solverFunction = slotConfigFormInput.solverFunction
             break
-        case SlotTypes.Manual:
-        case SlotTypes.Constant:
-            slotPayload.description = slotConfigFormInput.slotDescription
     }
     return slotPayload
 }

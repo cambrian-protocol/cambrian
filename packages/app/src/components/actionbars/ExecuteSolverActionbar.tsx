@@ -1,21 +1,19 @@
 import AddDataModal, { ManualInputType } from '../modals/AddDataModal'
-import {
-    SlotWithMetaDataModel,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { BasicSolverMethodsType } from '../solver/Solver'
 import { Info } from 'phosphor-react'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'
 
 interface ExecuteSolverActionbarProps {
     solverMethods: BasicSolverMethodsType
-    solverData: SolverContractData
+    solverData: SolverModel
     currentCondition?: SolverContractCondition
-    manualSlots: SlotWithMetaDataModel[]
+    manualSlots: RichSlotModel[]
 }
 
 const ExecuteSolverActionbar = ({
@@ -35,7 +33,7 @@ const ExecuteSolverActionbar = ({
                 const data =
                     solverData.slotsHistory[currentCondition.conditionId][
                         manualSlot.slot.slot
-                    ]?.data
+                    ]?.slot.data
                 if (!data) {
                     allManualFieldsFilled = false
                 }

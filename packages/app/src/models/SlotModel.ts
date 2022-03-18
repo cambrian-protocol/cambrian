@@ -1,39 +1,12 @@
 import { BigNumber, ethers } from 'ethers'
 
+import { SlotTagModel } from './SlotTagModel'
+import { SlotType } from './SlotType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
-export enum SlotTypes {
-    Callback = 0,
-    Constant = 1,
-    Function = 2,
-    Manual = 3,
-}
-
-export type SlotPath = { solverId: string; slotId: string }
-
-export type SlotsObj = { [key: string]: SlotModel }
-
-export type SolverConfigAddress = {
-    type: 'Keeper' | 'Arbitrator'
-    solverId: string
-}
-
 export type SlotModel = {
-    id: string
-    slotType: SlotTypes
-    dataTypes: SolidityDataTypes[]
-    data: any[] // TODO
-    description?: string | null | undefined
-    targetSolverId?: string | null | undefined
-    solverFunction?: ethers.utils.FunctionFragment | null | undefined
-    incomingCallbacks?: SlotPath[]
-    solverConfigAddress?: SolverConfigAddress
-}
-
-// TODO Renaming and organizing Types, separate Composer and Interaction Types
-export type ParsedSlotModel = {
     executions: number
-    ingestType: SlotTypes
+    ingestType: SlotType
     slot: string
     solverIndex: number
     data: string
@@ -42,7 +15,43 @@ export type ParsedSlotModel = {
 export type SlotResponseType = {
     slot: string
     executions: BigNumber
-    ingestType: SlotTypes
+    ingestType: SlotType
     solverIndex: BigNumber
     data: string
+}
+
+export type RichSlotsHashMapType = { [slot: string]: RichSlotModel }
+
+export type RichSlotModel = {
+    slot: SlotModel
+    tag: SlotTagModel
+}
+
+export type SlotsHistoryHashMapType = {
+    [conditionId: string]: RichSlotsHashMapType
+}
+
+/* 
+    Composer specific Types
+*/
+
+export type ComposerSlotModel = {
+    id: string
+    slotType: SlotType
+    dataTypes: SolidityDataTypes[]
+    data: any[] // TODO
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
+    incomingCallbacks?: ComposerSlotPathType[]
+    solverConfigAddress?: ComposerSolverConfigAddressType
+}
+
+export type ComposerSlotPathType = { solverId: string; slotId: string }
+
+export type ComposerSlotsHashMapType = { [key: string]: ComposerSlotModel }
+
+// To check if a certain slot is a Keeper or Arbitrator address of another solver
+export type ComposerSolverConfigAddressType = {
+    type: 'Keeper' | 'Arbitrator'
+    solverId: string
 }

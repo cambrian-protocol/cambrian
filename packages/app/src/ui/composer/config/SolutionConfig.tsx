@@ -8,6 +8,7 @@ import {
 } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -55,7 +56,7 @@ const SolutionConfig = () => {
                 subTitle="Global settings"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
             />
-            <Box fill>
+            <BaseFormContainer>
                 <Form<SolutionConfigFormType>
                     value={input}
                     onSubmit={(event) => onSubmit(event)}
@@ -78,7 +79,7 @@ const SolutionConfig = () => {
                         />
                     </Box>
                 </Form>
-            </Box>
+            </BaseFormContainer>
         </>
     )
 }

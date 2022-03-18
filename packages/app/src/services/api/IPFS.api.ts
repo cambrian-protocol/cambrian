@@ -1,6 +1,7 @@
 import { LOCAL_PIN_ENDPOINT, PIN_ENDPOINT } from '@cambrian/app/constants'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+
 import fetch from 'node-fetch'
+
 const Hash = require('ipfs-only-hash')
 const CID = require('cids')
 
@@ -24,16 +25,44 @@ export class IPFSAPI {
         ]
     }
 
+    getLocalStorage = async (cid: string) => {
+        try {
+            const data = localStorage.getItem(cid)
+            if (data) {
+                console.log(`Got local storage for ${cid}`)
+                return this.tryParseJson(data)
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     getFromCID = async (
         cid: string,
         gatewayIndex = 0
     ): Promise<Object | undefined> => {
+        if (gatewayIndex == 0) {
+            try {
+                const obj = await this.getLocalStorage(cid)
+                if (obj) {
+                    return obj
+                }
+            } catch (e) {
+                console.log('Not available in localstorage')
+            }
+        }
+
         if (gatewayIndex && gatewayIndex >= this.gateways.length) {
             return undefined
         }
-
         const gateway = this.gateways[gatewayIndex]
-        const base32 = new CID(cid).toV1().toString('base32')
+        let base32 = undefined
+        try {
+            base32 = new CID(cid).toV1().toString('base32')
+        } catch {
+            console.warn('Could not create base32 CID from: ', cid)
+            return undefined
+        }
 
         const timeout = setTimeout(() => {
             console.log('Gateway timed out')
@@ -48,7 +77,13 @@ export class IPFSAPI {
             const data = await response.text()
             const isMatch = await this.isMatchingCID(base32, data)
             if (isMatch) {
-                return this.tryParseJson(data)
+                const obj = this.tryParseJson(data)
+                try {
+                    localStorage.setItem(cid, JSON.stringify(obj))
+                } catch (e) {
+                    console.log(e)
+                }
+                return obj
             } else {
                 return this.getFromCID(cid, gatewayIndex + 1)
             }

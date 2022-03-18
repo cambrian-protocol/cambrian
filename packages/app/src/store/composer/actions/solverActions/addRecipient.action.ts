@@ -1,12 +1,12 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
 import { addCallbackToTargetIncomingCallbacks } from './createSlot.action'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const addRecipientAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SelectedRecipientAddressType
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -33,41 +33,52 @@ const addRecipientAction = (
             if (!sourceEntity?.address) {
                 throw new Error('No address found in sourceEntity')
             }
-            const newSlot = currentSolver.addRecipient(
-                payload.value,
-                sourceEntity.address,
-                null,
-                undefined,
-                { type: payload.value, solverId: payload.solverId }
-            )
+            const newSlot = currentSolver.addRecipient({
+                type: payload.value,
+                data: sourceEntity.address,
+                solverConfigAdress: {
+                    type: payload.value,
+                    solverId: payload.solverId,
+                },
+            })
 
             // Link Entity to new slot
-            if (!sourceEntity?.linkedSlots.find((x) => x === newSlot.id)) {
+            if (
+                !sourceEntity?.linkedSlots.find((x: string) => x === newSlot.id)
+            ) {
                 sourceEntity?.linkedSlots.push(newSlot.id)
             }
         } else if (isSlot(payload.value)) {
             // Did i receive a Slot or a Solver as recipient?
-            // Slot received - Create a callback slot
 
-            const newSlot = currentSolver.addRecipient(
-                'Callback',
-                payload.value,
-                payload.solverId
-            )
+            // Slot received
+            if (payload.solverId === currentSolver.id) {
+                // A slot of the current solver has been selected as a recipient, just add it to our recipients
+                currentSolver.addRecipient({
+                    type: 'Slot_Exists',
+                    data: payload.value.id,
+                })
+            } else {
+                // The slot is from up the solver chain - We create a callback slot
+                const newSlot = currentSolver.addRecipient({
+                    type: 'Callback',
+                    data: payload.value,
+                    targetSolverId: payload.solverId,
+                })
 
-            addCallbackToTargetIncomingCallbacks(
-                newSlot,
-                currentSolver.id,
-                updatedSolvers
-            )
+                addCallbackToTargetIncomingCallbacks(
+                    newSlot,
+                    currentSolver.id,
+                    updatedSolvers
+                )
+            }
         } else {
             // Solver received - Create a function slot
-
-            currentSolver.addRecipient(
-                'Solver',
-                payload.value.id,
-                payload.value.id
-            )
+            currentSolver.addRecipient({
+                type: 'Solver',
+                data: payload.value.id,
+                targetSolverId: payload.value.id,
+            })
         }
 
         return {

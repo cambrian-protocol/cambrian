@@ -2,16 +2,12 @@ import {
     ArrowSquareIn,
     Coin,
     Coins,
+    Handshake,
     Timer,
     TreeStructure,
     UsersThree,
-    Handshake,
 } from 'phosphor-react'
 import React, { useState } from 'react'
-import {
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
@@ -21,10 +17,12 @@ import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
 import PlainSectionDivider from '../../../components/sections/PlainSectionDivider'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
-    solverData: SolverContractData
+    solverData: SolverModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
 }
@@ -48,7 +46,7 @@ const SolverConfigInfo = ({
     return (
         <>
             <HeaderTextSection
-                title={solverData.metaData[0]?.title}
+                title={solverData.solverTag.title}
                 subTitle="Solver configuration"
                 paragraph="This Solver is designed for a buyer to source articles for the purposes of content marketing. "
             />
@@ -58,27 +56,24 @@ const SolverConfigInfo = ({
                     title="Recipients"
                     onClick={toggleShowRecipientModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
                     icon={<TreeStructure />}
                     title="Outcomes"
                     onClick={toggleShowOutcomeModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
                     icon={<ArrowSquareIn />}
                     title="Keeper Inputs"
                     onClick={toggleShowKeeperInputModal}
                 />
-                <PlainSectionDivider />
                 <BaseMenuListItem
-                    info={solverData.metaData[0]?.tags['timelockSeconds']?.text}
+                    info={solverData.slotTags['timelockSeconds']?.description}
                     title="Timelock"
                     icon={<Timer />}
                     subTitle={solverData.config.timelockSeconds.toString()}
                 />
                 <BaseMenuListItem
-                    info={solverData.metaData[0]?.tags['collateralToken']?.text}
+                    info={solverData.slotTags['collateralToken']?.description}
                     title="Token"
                     icon={<Coin />}
                     subTitle={`${solverData.collateralToken.address} ${
@@ -129,14 +124,11 @@ const SolverConfigInfo = ({
             {showOutcomeModal && (
                 <OutcomeCollectionModal
                     onBack={toggleShowOutcomeModal}
-                    solverData={solverData}
-                    allocations={
-                        solverData.allocationsHistory[
+                    outcomeCollections={
+                        solverData.outcomeCollections[
                             currentCondition.conditionId
                         ]
                     }
-                    currentCondition={currentCondition}
-                    outcomeCollections={solverData.outcomeCollections}
                 />
             )}
         </>

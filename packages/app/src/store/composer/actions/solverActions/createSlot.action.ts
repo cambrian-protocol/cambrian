@@ -1,12 +1,14 @@
-import { ComposerStateType, SlotActionPayload } from '../../composer.types'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
-
-import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SlotActionPayload } from '../../composer.types'
+import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
+import { SlotType } from '@cambrian/app/models/SlotType'
 
 const createSlotAction = (
-    state: ComposerStateType,
-    payload: SlotActionPayload
-): ComposerStateType => {
+    state: CompositionModel,
+    payload: { slot: SlotActionPayload; slotTag: SlotTagFormInputType }
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -20,18 +22,22 @@ const createSlotAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        const newSlot = currentSolver.addSlot(
-            {
-                data: payload.data,
-                slotType: payload.slotType,
-                dataTypes: payload.dataTypes,
-            },
-            payload.targetSolverId,
-            payload.solverFunction,
-            payload.description
-        )
+        const newSlot = currentSolver.addSlot({
+            data: payload.slot.data,
+            slotType: payload.slot.slotType,
+            dataTypes: payload.slot.dataTypes,
+            targetSolverId: payload.slot.targetSolverId,
+            solverFunction: payload.slot.solverFunction,
+        })
 
-        if (payload.slotType === SlotTypes.Callback) {
+        currentSolver.addSlotTag({
+            slotId: newSlot.id,
+            label: payload.slotTag.label,
+            description: payload.slotTag.description,
+            isFlex: payload.slotTag.isFlex,
+        })
+
+        if (payload.slot.slotType === SlotType.Callback) {
             addCallbackToTargetIncomingCallbacks(
                 newSlot,
                 currentSolver.id,
@@ -55,9 +61,9 @@ export default createSlotAction
  *
  */
 export const addCallbackToTargetIncomingCallbacks = (
-    slot: SlotModel,
+    slot: ComposerSlotModel,
     currentSolverId: string,
-    solvers: SolverModel[]
+    solvers: ComposerSolverModel[]
 ) => {
     if (
         slot.targetSolverId !== undefined &&

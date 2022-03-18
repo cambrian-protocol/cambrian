@@ -1,19 +1,20 @@
-import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import {
     CircleDashed,
     Clipboard,
     ClockCounterClockwise,
     RepeatOnce,
 } from 'phosphor-react'
-import {
-    ConditionStatus,
-    SolverContractCondition,
-} from '@cambrian/app/models/SolverModel'
 
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SetStateAction } from 'react'
+import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
+import SidebarCardBody from '@cambrian/app/components/cards/SidebarCardBody'
+import SidebarCardHeader from '@cambrian/app/components/cards/SidebarCardHeader'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 
 interface ConditionVersionSidebarProps {
     solverTitle: string
@@ -41,14 +42,9 @@ const ConditionVersionSidebar = ({
     const newestCondition = conditions.pop()
     conditions.reverse()
     return (
-        <Card fill margin={{ right: 'small' }} background="background-front">
-            <CardHeader pad="medium" elevation="small">
-                <Text>{solverTitle}</Text>
-                <Text size="small" color="dark-3">
-                    {solverMetaVersion}
-                </Text>
-            </CardHeader>
-            <CardBody pad="medium" gap="small" overflow={{ vertical: 'auto' }}>
+        <SidebarCard>
+            <SidebarCardHeader title={solverTitle} info={solverMetaVersion} />
+            <SidebarCardBody>
                 <Box height={{ min: 'auto' }} fill>
                     {newestCondition !== undefined ? (
                         <Box gap="medium">
@@ -147,8 +143,8 @@ const ConditionVersionSidebar = ({
                         </Box>
                     )}
                 </Box>
-            </CardBody>
-        </Card>
+            </SidebarCardBody>
+        </SidebarCard>
     )
 }
 

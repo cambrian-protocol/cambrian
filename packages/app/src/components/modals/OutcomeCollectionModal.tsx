@@ -1,29 +1,18 @@
 import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
-import {
-    SolverComponentOC,
-    SolverContractAllocationsType,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
-    outcomeCollections: SolverComponentOC[]
-    allocations: SolverContractAllocationsType
-    solverData: SolverContractData
-    currentCondition: SolverContractCondition
+    outcomeCollections: OutcomeCollectionModel[]
     proposeMethod?: (indexSet: number) => void
 }
 
 const OutcomeCollectionModal = ({
-    outcomeCollections,
-    allocations,
     proposeMethod,
-    solverData,
-    currentCondition,
+    outcomeCollections,
     ...rest
 }: OutcomeCollectionModalProps) => {
     return (
@@ -38,10 +27,7 @@ const OutcomeCollectionModal = ({
                         <OutcomeCollectionCard
                             key={outcomeCollection.indexSet}
                             outcomeCollection={outcomeCollection}
-                            allocations={allocations}
-                            solverData={solverData}
                             proposeMethod={proposeMethod}
-                            currentCondition={currentCondition}
                         />
                     )
                 })}

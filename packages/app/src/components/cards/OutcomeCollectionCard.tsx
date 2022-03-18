@@ -1,50 +1,23 @@
-import {
-    AddressWithMetaDataType,
-    SolverComponentOC,
-    SolverContractAllocationsType,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
 import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 
 interface OutcomeCollectionCardProps {
-    outcomeCollection: SolverComponentOC
+    outcomeCollection: OutcomeCollectionModel
     proposeMethod?: (indexSet: number) => void
-    allocations: SolverContractAllocationsType
-    solverData: SolverContractData
-    currentCondition: SolverContractCondition
 }
 
 const OutcomeCollectionCard = ({
     outcomeCollection,
     proposeMethod,
-    allocations,
-    solverData,
-    currentCondition,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
-
-    const currentAllocations: {
-        address: AddressWithMetaDataType
-        amount: string
-    }[] = allocations.map((allocation) => {
-        const amount = allocation.allocations.find(
-            (alloc) =>
-                alloc.outcomeCollectionIndexSet === outcomeCollection.indexSet
-        )
-
-        return {
-            address: allocation.address,
-            amount: amount?.amount || 'No amount found',
-        }
-    })
 
     const toggleShowAllocationModal = () =>
         setShowAllocationModal(!showAllocationModal)
@@ -86,9 +59,7 @@ const OutcomeCollectionCard = ({
             {showAllocationModal && (
                 <RecipientAllocationModal
                     onClose={toggleShowAllocationModal}
-                    allocations={currentAllocations}
-                    solverData={solverData}
-                    currentCondition={currentCondition}
+                    allocations={outcomeCollection.allocations}
                 />
             )}
         </>

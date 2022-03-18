@@ -6,7 +6,7 @@ import "hardhat-deploy";
 import "@nomiclabs/hardhat-web3";
 import "tsconfig-paths/register";
 // import 'hardhat-log-remover'
-import "hardhat-gas-reporter";
+// import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/types";
 
 const TESTNET_PRIVATE_KEY =

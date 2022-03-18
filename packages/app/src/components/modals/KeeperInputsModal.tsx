@@ -3,13 +3,12 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { ParsedSlotModel } from '@cambrian/app/models/SlotModel'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { Tag } from '@cambrian/app/models/TagModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
-    manualInputs: { slot: ParsedSlotModel; tag: Tag; description: string }[]
+    manualInputs: RichSlotModel[]
 }
 
 const KeeperInputsModal = ({
@@ -25,12 +24,12 @@ const KeeperInputsModal = ({
             <Box gap="medium" fill>
                 {manualInputs.map((manualSlot) => {
                     if (manualSlot !== undefined) {
-                        // TODO determite type of manual Input to decode it
                         return (
+                            // TODO dynamic datatype parsing
                             <BaseSlotInputItem
                                 key={manualSlot.slot.slot}
-                                info={manualSlot.tag.text}
-                                title={manualSlot.description}
+                                info={manualSlot.tag.description}
+                                title={manualSlot.tag.label}
                                 subTitle={decodeData(
                                     [SolidityDataTypes.Address],
                                     manualSlot.slot.data

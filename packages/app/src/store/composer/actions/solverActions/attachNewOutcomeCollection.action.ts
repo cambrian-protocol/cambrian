@@ -1,9 +1,9 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { isNode } from 'react-flow-renderer'
 
 const attachNewOutcomeCollectionAction = (
-    state: ComposerStateType
-): ComposerStateType => {
+    state: CompositionModel
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&

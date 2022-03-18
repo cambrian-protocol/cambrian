@@ -1,22 +1,20 @@
-import {
-    ConditionStatus,
-    SolverComponentOC,
-} from '@cambrian/app/models/SolverModel'
 import { useEffect, useState } from 'react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import ChatFAB from '@cambrian/app/components/chat/ChatFAB'
 import { ChatMessageType } from '@cambrian/app/components/chat/ChatMessage'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '../../interaction/bars/ConditionVersionSidebar'
 import { DefaultSolverUIProps } from '../DefaultSolverUI'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { Layout } from '@cambrian/app/components/layout/Layout'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import SolutionSideNav from '@cambrian/app/components/nav/SolutionSideNav'
 import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'
-import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/SolverConfig'
+import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 export type SubmissionModel = {
     submission: string
@@ -50,7 +48,8 @@ const WriterSolverUI = ({
     const ipfs = new IPFSAPI()
 
     const [solverChain, setSolverChain] = useState([solverContract.address])
-    const [proposedOutcome, setProposedOutcome] = useState<SolverComponentOC>()
+    const [proposedOutcome, setProposedOutcome] =
+        useState<OutcomeCollectionModel>()
     const [messages, setMessages] = useState<ChatMessageType[]>([])
     const [submittedWork, setSubmittedWork] = useState<SubmissionModel[]>([])
 
@@ -97,7 +96,9 @@ const WriterSolverUI = ({
             setProposedOutcome(undefined)
         } else {
             const indexSet = getIndexSetFromBinaryArray(conditionPayouts)
-            const oc = solverData.outcomeCollections.find(
+            const oc = solverData.outcomeCollections[
+                currentCondition.conditionId
+            ].find(
                 (outcomeCollection) => outcomeCollection.indexSet === indexSet
             )
             setProposedOutcome(oc)
@@ -246,7 +247,7 @@ const WriterSolverUI = ({
 
     return (
         <>
-            <Layout
+            <BaseLayout
                 contextTitle="Writer Solver interaction"
                 config={
                     <SolverConfigInfo
@@ -260,8 +261,8 @@ const WriterSolverUI = ({
                     roles.includes('Buyer') ||
                     roles.includes('Arbitrator') ? (
                         <ConditionVersionSidebar
-                            solverTitle={`Solver: ${solverData.metaData[0]?.title}`}
-                            solverMetaVersion={'v1.0'}
+                            solverTitle={`Solver: ${solverData.solverTag.title}`}
+                            solverMetaVersion={`v${solverData.solverTag.version}`}
                             currentCondition={currentCondition}
                             setCurrentCondition={setCurrentCondition}
                             solverConditions={solverData.conditions}
@@ -302,11 +303,11 @@ const WriterSolverUI = ({
                             workInput.submission ===
                             submittedWork[submittedWork.length - 1]?.submission
                         }
+                        proposedOutcome={proposedOutcome}
                     />
                 }
             >
                 <WriterSolverContentUI
-                    solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}
@@ -314,7 +315,7 @@ const WriterSolverUI = ({
                     workInput={workInput}
                     proposedOutcome={proposedOutcome}
                 />
-            </Layout>
+            </BaseLayout>
             {isLoading && (
                 <LoadingScreen context="Please confirm this transaction" />
             )}

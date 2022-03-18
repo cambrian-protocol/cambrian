@@ -1,63 +1,73 @@
 import {
     ADD_RECIPIENT,
-    ADD_RECIPIENT_WITH_AMOUNT,
+    ADD_RECIPIENT_WITH_ALLOCATION,
     ATTACH_NEW_OUTCOME_COLLECTION,
     ATTACH_NEW_SOLVER,
     CREATE_OUTCOME,
     CREATE_RECIPIENT,
-    CREATE_RECIPIENT_WITH_AMOUNT,
+    CREATE_RECIPIENT_WITH_ALLOCATION,
     CREATE_SLOT,
     CREATE_SOLVER,
     DELETE_NODE,
     DELETE_OUTCOME,
     DELETE_SLOT,
     DRAG_NODE,
-    LOAD_COMPOSER,
+    LOAD_COMPOSITION,
     TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION,
     UPDATE_OUTCOME,
     UPDATE_RECIPIENT,
-    UPDATE_RECIPIENT_AMOUNT,
+    UPDATE_RECIPIENT_ALLOCATION,
     UPDATE_SELECTED_ELEMENT,
     UPDATE_SLOT,
+    UPDATE_SLOT_TAG,
     UPDATE_SOLUTION_SETTINGS,
+    UPDATE_SOLVER_DATA,
     UPDATE_SOLVER_MAIN_CONFIG,
+    UPDATE_SOLVER_TAG,
 } from './composer.constants'
-import { ComposerAction, ComposerStateType } from './composer.types'
 import {
     addRecipientAction,
-    addRecipientWithAmountAction,
+    addRecipientAllocationAction,
     attachNewOutcomeCollectionAction,
     attachNewSolverAction,
     createOutcomeAction,
     createRecipientAction,
-    createRecipientWithAmountAction,
+    createRecipientAllocationAction,
     createSlotAction,
     createSolverAction,
     deleteNodeAction,
     deleteOutcomeAction,
     deleteSlotAction,
     dragNodeAction,
-    loadComposerAction,
+    loadCompositionAction,
     toggleOutcomeOfOutcomeCollectionAction,
     updateOutcomeAction,
     updateRecipientAction,
-    updateRecipientAmountAction,
+    updateRecipientAllocationAction,
     updateSelectedElementAction,
     updateSlotAction,
+    updateSlotTagAction,
     updateSolutionSettingsAction,
+    updateSolverDataAction,
     updateSolverMainConfigAction,
+    updateSolverTagAction,
 } from './actions'
 
+import { ComposerAction } from './composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+
 export const composerReducer = (
-    state: ComposerStateType,
+    state: CompositionModel,
     action: ComposerAction
-): ComposerStateType => {
+): CompositionModel => {
     switch (action.type) {
         case UPDATE_SELECTED_ELEMENT:
             return updateSelectedElementAction(
                 state,
                 action.payload.selectedElement
             )
+        case UPDATE_SOLVER_DATA:
+            return updateSolverDataAction(state, action.payload)
         case UPDATE_SOLVER_MAIN_CONFIG:
             return updateSolverMainConfigAction(state, action.payload)
         case TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION:
@@ -78,28 +88,32 @@ export const composerReducer = (
             return updateSlotAction(state, action.payload)
         case CREATE_RECIPIENT:
             return createRecipientAction(state, action.payload)
-        case CREATE_RECIPIENT_WITH_AMOUNT:
-            return createRecipientWithAmountAction(state, action.payload)
-        case UPDATE_RECIPIENT_AMOUNT:
-            return updateRecipientAmountAction(state, action.payload)
+        case CREATE_RECIPIENT_WITH_ALLOCATION:
+            return createRecipientAllocationAction(state, action.payload)
+        case UPDATE_RECIPIENT_ALLOCATION:
+            return updateRecipientAllocationAction(state, action.payload)
         case CREATE_SOLVER:
             return createSolverAction(state)
         case ATTACH_NEW_SOLVER:
             return attachNewSolverAction(state)
-        case ADD_RECIPIENT_WITH_AMOUNT:
-            return addRecipientWithAmountAction(state, action.payload)
+        case ADD_RECIPIENT_WITH_ALLOCATION:
+            return addRecipientAllocationAction(state, action.payload)
         case ADD_RECIPIENT:
             return addRecipientAction(state, action.payload)
         case UPDATE_RECIPIENT:
             return updateRecipientAction(state, action.payload)
         case DELETE_SLOT:
             return deleteSlotAction(state, action.payload)
-        case LOAD_COMPOSER:
-            return loadComposerAction(state, action.payload)
+        case LOAD_COMPOSITION:
+            return loadCompositionAction(state, action.payload)
         case DRAG_NODE:
             return dragNodeAction(state, action.payload)
         case UPDATE_SOLUTION_SETTINGS:
             return updateSolutionSettingsAction(state, action.payload)
+        case UPDATE_SOLVER_TAG:
+            return updateSolverTagAction(state, action.payload)
+        case UPDATE_SLOT_TAG:
+            return updateSlotTagAction(state, action.payload)
         default:
             return state
     }
