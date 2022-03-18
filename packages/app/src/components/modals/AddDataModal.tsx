@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 
 interface ExecuteSolverModalProps {
     onBack: () => void
-    manualSlots: SlotWithMetaDataModel[]
+    manualSlots: RichSlotModel[]
     onAddData: (data: ManualInputType) => void
 }
 
@@ -15,7 +15,7 @@ export type ManualInputsFormType = { manualInputs: ManualInputType[] }
 
 export type ManualInputType = {
     data: any
-    slotWithMetaData: SlotWithMetaDataModel
+    slotWithMetaData: RichSlotModel
 }
 
 const AddDataModal = ({
@@ -42,7 +42,7 @@ const AddDataModal = ({
                         <Box flex>
                             <FormField
                                 name={`manualInputs[${idx}].data`}
-                                label={input.slotWithMetaData.description}
+                                label={input.slotWithMetaData.tag.description}
                                 required
                             />
                         </Box>
@@ -58,7 +58,7 @@ const AddDataModal = ({
                         </Box>
                     </Box>
                     <Text size="small" color="dark-6">
-                        {input.slotWithMetaData.tag.text}
+                        {input.slotWithMetaData.tag.label}
                     </Text>
                 </Box>
             )

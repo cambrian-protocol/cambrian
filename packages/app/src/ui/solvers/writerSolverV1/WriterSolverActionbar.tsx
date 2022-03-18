@@ -1,25 +1,24 @@
-import {
-    ConditionStatus,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
-
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/ConfirmOutcomeActionbar'
 import DefaultActionbar from '@cambrian/app/components/actionbars/DefaultActionbar'
 import ExecuteSolverActionbar from '@cambrian/app/components/actionbars/ExecuteSolverActionbar'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/ProposeOutcomeActionbar'
 import RedeemTokensActionbar from '@cambrian/app/components/actionbars/RedeemTokensActionbar'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import WriterActionbar from './WriterActionbar'
 import { WriterSolverRole } from './WriterSolverUI'
 
 interface WriterSolverActionbarProps {
-    solverData: SolverContractData
+    solverData: SolverModel
     solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
     roles: WriterSolverRole[]
     onSubmitWork: () => Promise<void>
     hasWorkChanged: boolean
+    proposedOutcome?: OutcomeCollectionModel
 }
 
 // TODO Arbitration
@@ -30,6 +29,7 @@ const WriterSolverActionbar = ({
     roles,
     onSubmitWork,
     hasWorkChanged,
+    proposedOutcome,
 }: WriterSolverActionbarProps) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
@@ -72,11 +72,12 @@ const WriterSolverActionbar = ({
                 />
             )
         case ConditionStatus.OutcomeReported:
-            if (roles.length > 1) {
+            if (roles.length > 1 && proposedOutcome) {
                 return (
                     <RedeemTokensActionbar
                         currentCondition={currentCondition}
                         solverData={solverData}
+                        proposedOutcome={proposedOutcome}
                     />
                 )
             }

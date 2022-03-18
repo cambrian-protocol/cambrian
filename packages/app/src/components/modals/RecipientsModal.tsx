@@ -3,12 +3,12 @@ import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 import BaseSlotInputItem from '../list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { SlotWithMetaDataModel } from '@cambrian/app/models/SolverModel'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 type RecipientsModalProps = BaseLayerModalProps & {
-    recipientAddresses: SlotWithMetaDataModel[]
+    recipientAddresses: RichSlotModel[]
 }
 
 const RecipientsModal = ({
@@ -25,9 +25,9 @@ const RecipientsModal = ({
                 {recipientAddresses.map((recipientAddress, idx) => {
                     return (
                         <BaseSlotInputItem
-                            info={recipientAddress.tag.text}
+                            info={recipientAddress.tag.description}
                             key={idx}
-                            title={recipientAddress.description}
+                            title={recipientAddress.tag.label}
                             subTitle={decodeData(
                                 [SolidityDataTypes.Address],
                                 recipientAddress.slot.data

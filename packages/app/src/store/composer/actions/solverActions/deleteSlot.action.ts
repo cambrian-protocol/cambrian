@@ -1,11 +1,11 @@
-import { ComposerStateType } from '../../composer.types'
-import { SlotModel } from '@cambrian/app/models/SlotModel'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import _ from 'lodash'
 
 const deleteSlotAction = (
-    state: ComposerStateType,
-    payload: { slotToDelete: SlotModel }
-): ComposerStateType => {
+    state: CompositionModel,
+    payload: { slotToDelete: ComposerSlotModel }
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -34,7 +34,8 @@ const deleteSlotAction = (
 
             if (sourceEntity) {
                 sourceEntity.linkedSlots = sourceEntity.linkedSlots.filter(
-                    (linkedSlot) => linkedSlot !== payload.slotToDelete.id
+                    (linkedSlot: string) =>
+                        linkedSlot !== payload.slotToDelete.id
                 )
             } else {
                 throw new Error(

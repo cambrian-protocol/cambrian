@@ -1,11 +1,11 @@
 import { Node, isNode } from 'react-flow-renderer'
 
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 
 const dragNodeAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: Node
-): ComposerStateType => {
+): CompositionModel => {
     const updatedFlow = state.flowElements.map((el) => {
         if (isNode(el) && el.id === payload?.id) {
             el.position = {

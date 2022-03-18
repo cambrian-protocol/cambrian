@@ -1,22 +1,22 @@
-import {
-    AllocationType,
-    IPFSOutcomeModel,
-    SlotWithMetaDataModel,
-    SlotsHashMapType,
-    SlotsHistoryHashMapType,
-    SolverComponentOC,
-    SolverContractAllocationsHistoryType,
-    SolverContractCondition,
-    SolverContractConfigModel,
-    SolverContractConfigResponseType,
-    SolverContractData,
-    SolverModel,
-    TimeLocksHashMap,
-} from '@cambrian/app/models/SolverModel'
-import { Contract, EventFilter, ethers } from 'ethers'
-import { ParsedSlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
+import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
+import {
+    RichSlotModel,
+    RichSlotsHashMapType,
+    SlotModel,
+    SlotsHistoryHashMapType,
+} from '@cambrian/app/models/SlotModel'
+import {
+    SolverModel,
+    SolverResponseModel,
+} from '@cambrian/app/models/SolverModel'
+import {
+    TokenAPI,
+    TokenResponseType,
+} from '@cambrian/app/services/api/Token.api'
 
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
@@ -25,17 +25,23 @@ import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { JsonFragmentType } from '@ethersproject/abi'
-import { Layout } from '../layout/Layout'
 import LoadingScreen from '../info/LoadingScreen'
-import { Multihash } from '@cambrian/app/models/ConditionModel'
+import { MultihashType } from '@cambrian/app/models/MultihashType'
+import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
+import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { solversMetaData } from '@cambrian/app/stubs/tags'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -52,26 +58,30 @@ export type BasicSolverMethodsType = {
     getTrackingID: () => {}
     getUIUri: () => {}
     getData: (slotId: string) => any
-    getCurrentSlots: (ingests: ParsedSlotModel[]) => Promise<any[]> | undefined
+    getCurrentSlots: (ingests: SlotModel[]) => Promise<any[]> | undefined
     getCondition: (index: number) => any
     getConditions: () => {}
     getConfig: () => {}
-    getManualInputs: (
-        condition: SolverContractCondition
-    ) => SlotWithMetaDataModel[]
-    getManualSlots: () => SlotWithMetaDataModel[]
-    getRecipientSlots: (
-        condition: SolverContractCondition
-    ) => SlotWithMetaDataModel[]
+    getManualInputs: (condition: SolverContractCondition) => RichSlotModel[]
+    getManualSlots: () => RichSlotModel[]
+    getRecipientSlots: (condition: SolverContractCondition) => RichSlotModel[]
 }
 
 interface SolverProps {
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
     currentUser: UserType
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
 }
 
-const Solver = ({ address, abi, currentUser }: SolverProps) => {
+const Solver = ({
+    address,
+    abi,
+    currentUser,
+    slotTags,
+    solverTag,
+}: SolverProps) => {
     const ctf = useContext(CTFContext)
     const ipfs = new IPFSAPI()
 
@@ -87,8 +97,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const [isLoading, setIsLoading] = useState(false)
 
-    const [currentSolverData, setCurrentSolverData] =
-        useState<SolverContractData>()
+    const [currentSolverData, setCurrentSolverData] = useState<SolverModel>()
 
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
@@ -179,30 +188,14 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getUpdatedData = async (): Promise<SolverContractData> => {
+    const getUpdatedData = async (): Promise<SolverModel> => {
         const config = await getConfig()
         const conditions = await getConditions()
 
-        const outcomeCollections = await getOutcomeCollections(config)
-
-        const timelocksHistory = await getTimelocksHistory(conditions)
-        const slotsHistory = await getSlotsHistory(config.ingests, conditions)
-
-        // TODO TEMP
-        const metaData = solversMetaData
-
-        const allocationHistory = getAllocationHistory(
+        const slotsHistory = await getSlotsHistory(
+            config.ingests,
             conditions,
-            slotsHistory,
-            config,
-            outcomeCollections,
-            metaData
-        )
-
-        const collateralBalance = await getCollateralBalance()
-
-        const collateralToken = await TokenAPI.getTokenInfo(
-            config.conditionBase.collateralToken
+            slotTags
         )
 
         const numMintedTokensByCondition =
@@ -211,17 +204,33 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 config.conditionBase.collateralToken
             )
 
+        const collateralToken = await TokenAPI.getTokenInfo(
+            config.conditionBase.collateralToken
+        )
+        const outcomeCollections = await getOutcomeCollections(
+            config,
+            conditions,
+            slotsHistory,
+            collateralToken,
+            slotTags,
+            numMintedTokensByCondition
+        )
+
+        const timelocksHistory = await getTimelocksHistory(conditions)
+
+        const collateralBalance = await getCollateralBalance()
+
         return {
             config: config,
-            outcomeCollections: outcomeCollections,
-            allocationsHistory: allocationHistory,
             conditions: conditions,
             timelocksHistory: timelocksHistory,
+            outcomeCollections: outcomeCollections,
             slotsHistory: slotsHistory,
             numMintedTokensByCondition: numMintedTokensByCondition,
             collateralBalance: collateralBalance,
             collateralToken: collateralToken,
-            metaData: metaData,
+            solverTag: solverTag,
+            slotTags: slotTags,
         }
     }
 
@@ -352,7 +361,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getCurrentSlots = (ingests: ParsedSlotModel[]) => {
+    const getCurrentSlots = (ingests: SlotModel[]) => {
         try {
             return Promise.all(ingests.map((x) => getData(x.slot)))
         } catch (e) {
@@ -386,10 +395,9 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    const getConfig = async (): Promise<SolverContractConfigModel> => {
+    const getConfig = async (): Promise<SolverConfigModel> => {
         try {
-            const res: SolverContractConfigResponseType =
-                await contract.getConfig()
+            const res: SolverResponseModel = await contract.getConfig()
 
             const parsedIngests = res.ingests.map((ingest) => {
                 return {
@@ -441,8 +449,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getTimelocksHistory = async (
         conditions: SolverContractCondition[]
-    ): Promise<TimeLocksHashMap> => {
-        const timeLocksHashMap: TimeLocksHashMap = {}
+    ): Promise<TimeLocksHashMapType> => {
+        const timeLocksHashMap: TimeLocksHashMapType = {}
         conditions.forEach(async (condition, idx) => {
             const timelock = await getTimelock(idx)
             timeLocksHashMap[condition.conditionId] = timelock.toNumber()
@@ -452,44 +460,117 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     }
 
     const getOutcomeCollections = async (
-        config: SolverContractConfigModel
-    ): Promise<SolverComponentOC[]> => {
+        config: SolverConfigModel,
+        conditions: SolverContractCondition[],
+        slotHistory: SlotsHistoryHashMapType,
+        collateralToken: TokenResponseType,
+        slotTags: SlotTagsHashMapType,
+        numMintedTokensByCondition?: {
+            [conditionId: string]: number
+        }
+    ): Promise<OutcomeCollectionsHashMapType> => {
+        const outcomeCollectionsHashMap: OutcomeCollectionsHashMapType = {}
+
         const outcomeURIs = config.conditionBase.outcomeURIs.map(
-            (multiHash: Multihash) => getMultihashFromBytes32(multiHash)
+            (multiHash: MultihashType) => getMultihashFromBytes32(multiHash)
         )
 
         const outcomes = (await Promise.all(
             outcomeURIs.map((outcomeURI: string | null) => {
                 if (outcomeURI) return ipfs.getFromCID(outcomeURI)
             })
-        )) as IPFSOutcomeModel[]
+        )) as OutcomeModel[]
 
-        return config.conditionBase.partition.map((indexSet) => {
-            const outcomeCollection: IPFSOutcomeModel[] = []
-            const binaryArray = binaryArrayFromIndexSet(
-                indexSet,
-                config.conditionBase.outcomeSlots
-            )
-            binaryArray.forEach((binary, idx) => {
-                if (binary === 1) {
-                    outcomeCollection.push(outcomes[idx])
-                }
-            })
-            return {
-                indexSet: indexSet,
-                outcomes: outcomeCollection,
-            }
+        conditions.forEach((condition) => {
+            outcomeCollectionsHashMap[condition.conditionId] =
+                config.conditionBase.partition.map((indexSet, idx) => {
+                    const outcomeCollection: OutcomeModel[] = []
+                    const binaryArray = binaryArrayFromIndexSet(
+                        indexSet,
+                        config.conditionBase.outcomeSlots
+                    )
+                    binaryArray.forEach((binary, idx) => {
+                        if (binary === 1) {
+                            outcomeCollection.push(outcomes[idx])
+                        }
+                    })
+                    const allocations: AllocationModel[] =
+                        config.conditionBase.allocations.map((allocation) => {
+                            const addressSlot =
+                                slotHistory[condition.conditionId][
+                                    allocation.recipientAddressSlot
+                                ]
+                            const amountSlot =
+                                slotHistory[condition.conditionId][
+                                    allocation.recipientAmountSlots[idx]
+                                ]
+
+                            const amountPercentage = BigNumber.from(
+                                decodeData(
+                                    [SolidityDataTypes.Uint256],
+                                    amountSlot.slot.data
+                                )
+                            ).div(100)
+
+                            const amount =
+                                numMintedTokensByCondition &&
+                                numMintedTokensByCondition[
+                                    condition.conditionId
+                                ] != 0
+                                    ? formatDecimals(
+                                          collateralToken,
+                                          amountPercentage
+                                              .mul(
+                                                  numMintedTokensByCondition[
+                                                      condition.conditionId
+                                                  ]
+                                              )
+                                              .div(100)
+                                      )
+                                    : ''
+
+                            const positionId = calculatePositionId(
+                                config.conditionBase.collateralToken,
+                                calculateCollectionId(
+                                    condition.conditionId,
+                                    indexSet
+                                )
+                            )
+
+                            return {
+                                addressSlot:
+                                    addressSlot ||
+                                    getIngestWithMetaData(
+                                        allocation.recipientAddressSlot,
+                                        config.ingests,
+                                        slotTags
+                                    ),
+                                amountPercentage: amountPercentage.toString(),
+                                positionId: positionId,
+                                amount: amount,
+                            }
+                        })
+
+                    return {
+                        indexSet: indexSet,
+                        outcomes: outcomeCollection,
+                        allocations: allocations,
+                    }
+                })
         })
+
+        return outcomeCollectionsHashMap
     }
 
     // Improvement - reference by conditionId instead of executions
     const getSlotsHistory = async (
-        ingests: ParsedSlotModel[],
-        conditions: SolverContractCondition[]
+        ingests: SlotModel[],
+        conditions: SolverContractCondition[],
+        slotTags: SlotTagsHashMapType
     ): Promise<SlotsHistoryHashMapType> => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
-            ingests.map(async (ingest: ParsedSlotModel) => {
+            ingests.map(async (ingest: SlotModel) => {
                 const dataArr: any[] = await contract.getAllData(ingest.slot)
                 const slotHistory = dataArr.map((data, idx) => {
                     return {
@@ -504,126 +585,61 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             })
         )
         conditions.forEach((condition) => {
-            const data: SlotsHashMapType = {}
+            const data: RichSlotsHashMapType = {}
             currentSlotData.forEach((slot) => {
-                const rightVersionSlot = slot.find(
+                const currentSlot = slot.find(
                     (el) => el.executions === condition.executions
                 )
-                if (rightVersionSlot)
-                    data[rightVersionSlot?.slot] = rightVersionSlot
+
+                if (currentSlot) {
+                    // Enrich slot with Metadata
+                    const ulid = ethers.utils.parseBytes32String(
+                        currentSlot.slot
+                    )
+                    data[currentSlot.slot] = {
+                        slot: currentSlot,
+                        tag: slotTags[ulid],
+                    }
+                }
             })
             slotsHistory[condition.conditionId] = data
         })
         return slotsHistory
     }
 
-    const getAllocationHistory = (
-        conditions: SolverContractCondition[],
-        slotsHistory: SlotsHistoryHashMapType,
-        config: SolverContractConfigModel,
-        outcomeCollections: SolverComponentOC[],
-        metaData: SolverModel[]
-    ): SolverContractAllocationsHistoryType => {
-        const allocationHistory: SolverContractAllocationsHistoryType = {}
-        conditions.forEach((condition) => {
-            config.conditionBase.allocations.forEach((allocation) => {
-                try {
-                    const allocations: AllocationType[] =
-                        allocation.recipientAmountSlots?.map(
-                            (recipientAmountSlot, idx) => {
-                                const amountData =
-                                    slotsHistory[condition.conditionId][
-                                        recipientAmountSlot
-                                    ]?.data
-
-                                return {
-                                    outcomeCollectionIndexSet:
-                                        outcomeCollections[idx].indexSet,
-                                    amount: amountData,
-                                    positionId: calculatePositionId(
-                                        config.conditionBase.collateralToken,
-                                        calculateCollectionId(
-                                            condition.conditionId,
-                                            outcomeCollections[idx].indexSet
-                                        )
-                                    ),
-                                }
-                            }
-                        )
-
-                    if (!allocationHistory[condition.conditionId])
-                        allocationHistory[condition.conditionId] = []
-
-                    const decodedAddress = decodeData(
-                        [SolidityDataTypes.Address],
-                        slotsHistory[condition.conditionId][
-                            allocation.recipientAddressSlot
-                        ]?.data
-                    )
-
-                    const ulid = ethers.utils.parseBytes32String(
-                        allocation.recipientAddressSlot
-                    )
-                    const description = metaData[0].config.slots[ulid]
-
-                    allocationHistory[condition.conditionId].push({
-                        address: {
-                            address: decodedAddress,
-                            tag: metaData[0].tags[ulid],
-                            description: description.description || '',
-                        },
-                        allocations: allocations,
-                    })
-                } catch (e) {
-                    console.error(e)
-                    throw new Error('Error while retreiving allocation History')
-                }
-            })
-        })
-        return allocationHistory
+    const getIngestWithMetaData = (
+        slotId: string,
+        ingests: SlotModel[],
+        slotTags: SlotTagsHashMapType
+    ): RichSlotModel => {
+        const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
+        if (ingestSlot) {
+            // Enrich with MetaData
+            const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
+            return {
+                slot: ingestSlot,
+                tag: slotTags[ulid],
+            }
+        } else {
+            throw new Error(`Error while finding ingest with slotId: ${slotId}`)
+        }
     }
 
     const getRecipientSlots = (
         condition: SolverContractCondition
-    ): SlotWithMetaDataModel[] => {
+    ): RichSlotModel[] => {
         if (currentSolverData) {
-            const recipientAddressSlots =
-                currentSolverData.config.conditionBase.allocations.map(
-                    (allocation) => allocation.recipientAddressSlot
-                )
-
-            return recipientAddressSlots.map((recipientAddressSlot) => {
-                const slotFromCondition =
+            return currentSolverData.config.conditionBase.allocations.map(
+                (allocation) =>
                     currentSolverData.slotsHistory[condition.conditionId][
-                        recipientAddressSlot
-                    ]
-                if (slotFromCondition) {
-                    return getMetaData(slotFromCondition)
-                } else {
-                    const ingestSlot = currentSolverData.config.ingests.find(
-                        (ingest) => ingest.slot === recipientAddressSlot
+                        allocation.recipientAddressSlot
+                    ] ||
+                    getIngestWithMetaData(
+                        allocation.recipientAddressSlot,
+                        currentSolverData.config.ingests,
+                        currentSolverData.slotTags
                     )
-                    if (ingestSlot) {
-                        return getMetaData(ingestSlot)
-                    } else {
-                        throw new Error('Error while finding recipient slot')
-                    }
-                }
-            })
-        } else {
-            throw new Error('No solver data exists')
-        }
-    }
-
-    const getMetaData = (slot: ParsedSlotModel): SlotWithMetaDataModel => {
-        if (currentSolverData) {
-            const ulid = ethers.utils.parseBytes32String(slot.slot)
-            const metaSlot = currentSolverData.metaData[0].config.slots[ulid]
-            return {
-                slot: slot,
-                tag: currentSolverData.metaData[0].tags[ulid],
-                description: metaSlot.description || '',
-            }
+            )
         } else {
             throw new Error('No solver data exists')
         }
@@ -631,31 +647,33 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getManualInputs = (
         condition: SolverContractCondition
-    ): SlotWithMetaDataModel[] => {
+    ): RichSlotModel[] => {
         if (currentSolverData) {
-            const manualSlots = Object.values(
+            return Object.values(
                 currentSolverData.slotsHistory[condition.conditionId]
-            ).filter((slot) => slot.ingestType === SlotTypes.Manual)
-
-            return manualSlots.map((manualSlot) =>
-                getMetaData(
-                    currentSolverData.slotsHistory[condition.conditionId][
-                        manualSlot.slot
-                    ]
-                )
-            )
+            ).filter((slot) => slot.slot.ingestType === SlotType.Manual)
         } else {
             throw new Error('No solver data exists')
         }
     }
 
-    const getManualSlots = (): SlotWithMetaDataModel[] => {
+    const getManualSlots = (): RichSlotModel[] => {
         if (currentSolverData) {
-            const manualIngests = currentSolverData.config.ingests.filter(
-                (ingest) => ingest.ingestType === SlotTypes.Manual
+            return currentSolverData.config.ingests.reduce(
+                (filtered: RichSlotModel[], ingest) => {
+                    if (ingest.ingestType === SlotType.Manual) {
+                        filtered.push(
+                            getIngestWithMetaData(
+                                ingest.slot,
+                                currentSolverData.config.ingests,
+                                currentSolverData.slotTags
+                            )
+                        )
+                    }
+                    return filtered
+                },
+                []
             )
-
-            return manualIngests.map((ingest) => getMetaData(ingest))
         } else {
             throw new Error('No solver data exists')
         }
@@ -727,7 +745,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const loadWriter = true
     if (isDeployed === false) {
         return (
-            <Layout contextTitle="Not found">
+            <BaseLayout contextTitle="Not found">
                 <Box fill justify="center">
                     <HeaderTextSection
                         title="Solver Not Found"
@@ -735,12 +753,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                         paragraph="Smart contract unreachable. Perhaps the Solver has not finished deploying yet. Try refreshing in a minute."
                     />
                 </Box>
-            </Layout>
+            </BaseLayout>
         )
     } else if (currentSolverData && currentUser) {
         if (currentCondition === undefined) {
             return (
-                <Layout
+                <BaseLayout
                     contextTitle="Uninitialzed Solve"
                     actionBar={
                         <ExecuteSolverActionbar
@@ -752,12 +770,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title={solversMetaData[0]?.title}
+                            title={solverTag.title}
                             subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
                     </Box>
-                </Layout>
+                </BaseLayout>
             )
         }
         if (loadWriter) {

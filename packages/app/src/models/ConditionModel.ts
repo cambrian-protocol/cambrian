@@ -1,73 +1,58 @@
-import { SlotModel, SlotPath } from './SlotModel'
+import {
+    AllocationPathsType,
+    ComposerAllocationsHashMapType,
+} from './AllocationModel'
+import { OutcomeCollectionModel, OutcomeModel } from './OutcomeModel'
 
 import { BigNumber } from 'ethers'
-import { IdPathType } from './SolverModel'
+import { ComposerIdPathType } from './SolverModel'
+import { ComposerSlotPathType } from './SlotModel'
+import { ConditionStatus } from './ConditionStatus'
+import { MultihashType } from './MultihashType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
-export type OutcomeCollectionModel = {
-    id: string
-    outcomes: OutcomeModel[]
-}
-
-export type OutcomeModel = {
-    id: string
-    title: string
-    uri: string
-    description: string
-    context?: string
-}
-
 export type ConditionModel = {
-    collateralToken?: SolidityDataTypes.Address
-    outcomes: OutcomeModel[]
-    partition: OutcomeCollectionModel[]
-    recipients: SlotPath[]
-    recipientAmountSlots: OCAllocations
-    amountSlot: string
-    parentCollection?: IdPathType
-}
-
-export type OCAllocations = {
-    [outcomeCollectionId: string]: RecipientAmountPath[]
-}
-
-export type RecipientAmountPath = { recipient: SlotPath; amount: SlotPath }
-
-export type RecipientAmountModel = {
-    recipientModel: SlotModel
-    amountModel: SlotModel
-}
-
-export type Multihash = {
-    digest: string
-    hashFunction: number
-    size: number
-}
-
-export type ParsedConditionModel = {
     collateralToken: string
     outcomeSlots: number
     parentCollectionIndexSet: number
     amountSlot: string
     partition: number[]
-    allocations: ParsedAllocationModel[]
-    outcomeURIs: Multihash[]
+    allocations: AllocationPathsType[]
+    outcomeURIs: MultihashType[]
 }
 
-export type ParsedAllocationModel = {
-    recipientAddressSlot: string
-    recipientAmountSlots: string[]
+// TODO Type merge or renaming if really necessary. Will circle back to it as soon as composer => interaction flow is clear
+export type SolverContractCondition = {
+    executions: number
+    collateralToken: string
+    questionId: string
+    parentCollectionId: string
+    conditionId: string
+    payouts: number[]
+    status: ConditionStatus
 }
 
-/* 
-    Contract responses with BigNumbers
-*/
+// Contract responses with BigNumbers
 export type ConditionResponseType = {
     collateralToken: string
     outcomeSlots: number
     parentCollectionIndexSet: number
     amountSlot: string
     partition: BigNumber[]
-    allocations: ParsedAllocationModel[]
-    outcomeURIs: Multihash[]
+    allocations: AllocationPathsType[]
+    outcomeURIs: MultihashType[]
+}
+
+/* 
+    Composer specific types
+*/
+
+export type ComposerConditionModel = {
+    collateralToken?: SolidityDataTypes.Address
+    outcomes: OutcomeModel[]
+    partition: OutcomeCollectionModel[]
+    recipients: ComposerSlotPathType[]
+    recipientAmountSlots: ComposerAllocationsHashMapType
+    amountSlot: string
+    parentCollection?: ComposerIdPathType
 }

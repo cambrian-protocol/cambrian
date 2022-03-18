@@ -1,8 +1,8 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { isNode } from 'react-flow-renderer'
 
-const attachNewSolverAction = (state: ComposerStateType): ComposerStateType => {
+const attachNewSolverAction = (state: CompositionModel): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -33,7 +33,11 @@ const attachNewSolverAction = (state: ComposerStateType): ComposerStateType => {
             ocId: state.currentIdPath.ocId,
         })
 
-        currentSolver.addRecipient('Solver', newSolver.id, newSolver.id)
+        currentSolver.addRecipient({
+            type: 'Solver',
+            data: newSolver.id,
+            targetSolverId: newSolver.id,
+        })
 
         // Flow updates
         const nextPosition = { x: 0, y: 0 }

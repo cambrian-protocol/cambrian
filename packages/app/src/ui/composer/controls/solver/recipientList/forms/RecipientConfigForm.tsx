@@ -1,7 +1,7 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { IconContext } from 'phosphor-react'
-import { RecipientFormType } from './CreateRecipientForm'
 import { SetStateAction } from 'react'
 import { required } from '@cambrian/app/utils/helpers/validation'
 
@@ -12,6 +12,14 @@ interface RecipientConfigFormProps {
     submitLabel: string
 }
 
+export const initialRecipientConfigFormInput = {
+    address: '',
+}
+
+export type RecipientFormType = {
+    address: string
+}
+
 const RecipientConfigForm = ({
     onSubmit,
     recipientInput,
@@ -19,21 +27,20 @@ const RecipientConfigForm = ({
     submitLabel,
 }: RecipientConfigFormProps) => {
     return (
-        <Form<RecipientFormType>
-            value={recipientInput}
-            onSubmit={(event) => onSubmit(event)}
-            onChange={(nextValue: RecipientFormType) => {
-                setRecipientInput(nextValue)
-            }}
-        >
-            <FormField name="address" label="Address*" validate={required} />
-            <FormField name="description" label="Descriptive Name (Optional)" />
-            <Box>
-                <IconContext.Provider value={{ size: '24' }}>
+        <BaseFormContainer>
+            <Form<RecipientFormType>
+                value={recipientInput}
+                onSubmit={(event) => onSubmit(event)}
+                onChange={(nextValue: RecipientFormType) => {
+                    setRecipientInput(nextValue)
+                }}
+            >
+                <FormField name="address" label="Address" />
+                <Box>
                     <Button primary type="submit" label={submitLabel} />
-                </IconContext.Provider>
-            </Box>
-        </Form>
+                </Box>
+            </Form>
+        </BaseFormContainer>
     )
 }
 

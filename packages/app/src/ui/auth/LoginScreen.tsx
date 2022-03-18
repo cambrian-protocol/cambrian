@@ -1,8 +1,8 @@
 import { Box, Text } from 'grommet'
-import { Scan, Wallet } from 'phosphor-react'
 
+import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { Layout } from '@cambrian/app/components/layout/Layout'
+import { Wallet } from 'phosphor-react'
 
 interface LoginScreenProps {
     onConnectWallet: () => {}
@@ -11,7 +11,7 @@ interface LoginScreenProps {
 // TODO WIP
 const LoginScreen = ({ onConnectWallet }: LoginScreenProps) => {
     return (
-        <Layout contextTitle="Login">
+        <BaseLayout contextTitle="Login">
             <Box pad="small" width="medium" gap="small" fill justify="center">
                 <HeaderTextSection
                     title="Please connect your Ethereum wallet"
@@ -34,7 +34,7 @@ const LoginScreen = ({ onConnectWallet }: LoginScreenProps) => {
                     <Text>Connect Wallet</Text>
                 </Box>
             </Box>
-        </Layout>
+        </BaseLayout>
     )
 }
 

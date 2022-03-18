@@ -1,9 +1,9 @@
 import BaseLayerModal from './BaseLayerModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { IPFSOutcomeModel } from '@cambrian/app/models/SolverModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 interface OutcomeDetailModalProps {
-    outcome: IPFSOutcomeModel
+    outcome: OutcomeModel
     onClose: () => void
 }
 

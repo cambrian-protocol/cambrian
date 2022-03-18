@@ -1,5 +1,5 @@
 import ListItem from '@cambrian/app/components/list/ListItem'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TreeStructure } from 'phosphor-react'
 import UpdateOutcomeModal from '../../solver/outcomeList/modals/UpdateOutcomeModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'

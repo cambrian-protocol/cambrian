@@ -1,29 +1,24 @@
 import { Box, Stack, Text, TextArea } from 'grommet'
-import {
-    ConditionStatus,
-    SolverComponentOC,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
 import { SubmissionModel, WriterSolverRole } from './WriterSolverUI'
 
 import { CircleDashed } from 'phosphor-react'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 
 interface WriterSolverContentUI {
-    solverData: SolverContractData
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
     workInput: SubmissionModel
     currentCondition: SolverContractCondition
     submittedWork: SubmissionModel[]
-    proposedOutcome?: SolverComponentOC
+    proposedOutcome?: OutcomeCollectionModel
 }
 
 const WriterSolverContentUI = ({
-    solverData,
     roles,
     setWorkInput,
     workInput,
@@ -108,15 +103,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
-                                solverData={solverData}
-                                currentCondition={currentCondition}
+                                outcomeCollection={proposedOutcome}
                                 status={currentCondition.status}
-                                allocations={
-                                    solverData.allocationsHistory[
-                                        currentCondition.conditionId
-                                    ]
-                                }
-                                outcomeCollection={proposedOutcome!!}
                                 canRequestArbitration={
                                     roles.includes('Buyer') ||
                                     roles.includes('Writer')
@@ -139,15 +127,8 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
-                                solverData={solverData}
-                                currentCondition={currentCondition}
-                                status={currentCondition.status}
-                                allocations={
-                                    solverData.allocationsHistory[
-                                        currentCondition.conditionId
-                                    ]
-                                }
                                 outcomeCollection={proposedOutcome}
+                                status={currentCondition.status}
                             />
                             <WorkContentContainer
                                 title={dummyArticleTitle}

@@ -1,161 +1,37 @@
 import {
-    ConditionModel,
+    ComposerSolverConfigModel,
+    SolverConfigModel,
+} from './SolverConfigModel'
+import {
     ConditionResponseType,
-    ParsedConditionModel,
+    SolverContractCondition,
 } from './ConditionModel'
-import { ParsedSlotModel, SlotModel, SlotResponseType } from './SlotModel'
-import { Tag, Tags } from './TagModel'
+import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
-import { ethers } from 'ethers'
+import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
+import { SlotTagsHashMapType } from './SlotTagModel'
+import { SolverTagModel } from './SolverTagModel'
+import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
+import { ethers } from 'ethers'
 
-/**
- * Solution Composer
- **/
-
-export type IdPathType = { solverId?: string; ocId?: string }
-
-export type SolverConfigAddressType = {
-    address: string
-    linkedSlots: string[]
-}
-
-export type SolverConfig = {
-    implementation?: string
-    collateralToken?: string
-    keeperAddress: SolverConfigAddressType
-    arbitratorAddress: SolverConfigAddressType
-    timelockSeconds?: number
-    data?: string
-    slots: {
-        [key: string]: SlotModel
-    }
-    condition: ConditionModel
-}
-
-// TODO Individual Solver description
 export type SolverModel = {
-    id: string
-    title: string
-    iface: ethers.utils.Interface
-    config: SolverConfig
-    tags: Tags
-}
-
-/**
- * Solver Config
- **/
-
-export type ParsedSolverModel = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    conditionBase: ParsedConditionModel
-}
-
-/**
- * Contract-interaction Solver Component
- **/
-
-export type SolverContractConfigModel = {
-    implementation: string
-    keeper: string
-    arbitrator: string
-    timelockSeconds: number
-    data: string
-    ingests: ParsedSlotModel[]
-    conditionBase: ParsedConditionModel
-}
-
-export type IPFSOutcomeModel = {
-    title: string
-    description: string
-    context: string
-}
-
-export enum ConditionStatus {
-    Initiated,
-    Executed,
-    OutcomeProposed,
-    ArbitrationRequested,
-    ArbitrationPending,
-    ArbitrationDelivered,
-    OutcomeReported,
-}
-
-export type SolverContractData = {
-    config: SolverContractConfigModel
+    config: SolverConfigModel
     conditions: SolverContractCondition[]
-    outcomeCollections: SolverComponentOC[]
-    allocationsHistory: SolverContractAllocationsHistoryType
     slotsHistory: SlotsHistoryHashMapType
-    timelocksHistory: TimeLocksHashMap
+    outcomeCollections: OutcomeCollectionsHashMapType
+    timelocksHistory: TimeLocksHashMapType
     numMintedTokensByCondition?: {
         [conditionId: string]: number
     }
     collateralToken: TokenModel
     collateralBalance: number
-    metaData: SolverModel[]
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
 }
 
-export type SolverComponentOC = {
-    indexSet: number
-    outcomes: IPFSOutcomeModel[]
-}
-
-export type TimeLocksHashMap = {
-    [conditionId: string]: number
-}
-
-export type SlotsHistoryHashMapType = {
-    [conditionId: string]: SlotsHashMapType
-}
-
-export type SlotsHashMapType = { [slot: string]: ParsedSlotModel }
-
-export type SolverContractAllocationsHistoryType = {
-    [conditionId: string]: SolverContractAllocationsType
-}
-
-export type SolverContractAllocationsType = {
-    address: AddressWithMetaDataType
-    allocations: AllocationType[]
-}[]
-
-export type AddressWithMetaDataType = {
-    address: string
-    description: string
-    tag: Tag
-}
-
-export type SlotWithMetaDataModel = {
-    slot: ParsedSlotModel
-    description: string
-    tag: Tag
-}
-
-export type AllocationType = {
-    amount: string
-    outcomeCollectionIndexSet: number
-    positionId: string
-}
-
-export type SolverContractCondition = {
-    executions: number
-    collateralToken: string
-    questionId: string
-    parentCollectionId: string
-    conditionId: string
-    payouts: number[]
-    status: ConditionStatus
-}
-
-/* 
-    Contract Responses with BigNumbers
-*/
-export type SolverContractConfigResponseType = {
+// Contract responses with BigNumbers
+export type SolverResponseModel = {
     implementation: string
     keeper: string
     arbitrator: string
@@ -163,4 +39,18 @@ export type SolverContractConfigResponseType = {
     data: string
     ingests: SlotResponseType[]
     conditionBase: ConditionResponseType
+}
+
+/**
+    Composer specific types
+ **/
+
+export type ComposerIdPathType = { solverId?: string; ocId?: string }
+
+export type ComposerSolverModel = {
+    id: string
+    iface: ethers.utils.Interface
+    config: ComposerSolverConfigModel
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
 }
