@@ -2,13 +2,12 @@ import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { ERC20_ABI } from '../constants'
+import { MultihashType } from '../utils/helpers/multihash'
 import { SolverConfigModel } from '../models/SolverConfigModel'
+import { TokenAPI } from '../services/api/Token.api'
 import { UserType } from './UserContext'
 import { addTokenDecimals } from '../utils/helpers/tokens'
-import { MultihashType } from '../utils/helpers/multihash'
-import { TokenAPI } from '../services/api/Token.api'
 import { useCurrentUser } from '../hooks/useCurrentUser'
-const Hash = require('ipfs-only-hash')
 
 const PROPOSALS_HUB_ABI =
     require('@artifacts/contracts/ProposalsHub.sol/ProposalsHub.json').abi
@@ -146,7 +145,7 @@ export const ProposalsHubContextProvider = ({
         const tokenContract = new ethers.Contract(
             tokenAddress,
             ERC20_ABI,
-            ethers.getDefaultProvider()
+            user.signer
         )
 
         try {
