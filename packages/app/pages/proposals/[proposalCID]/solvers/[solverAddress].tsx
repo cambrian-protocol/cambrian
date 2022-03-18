@@ -73,14 +73,7 @@ export default function SolverPage() {
                 currentUser &&
                 currentProposal && (
                     <Solver
-                        solverTag={
-                            currentProposal.solution.finalComposition.solvers[0]
-                                .solverTag!!
-                        }
-                        slotTags={
-                            currentProposal.solution.finalComposition.solvers[0]
-                                .slotTags!!
-                        }
+                        proposal={currentProposal}
                         address={solverAddress}
                         abi={USE_WRITER ? WRITER_ABI : SOLVER_ABI}
                         currentUser={currentUser}

@@ -38,6 +38,7 @@ const initialSubmission = {
 }
 
 const WriterSolverUI = ({
+    proposal,
     currentUser,
     solverContract,
     solverData,
@@ -308,7 +309,8 @@ const WriterSolverUI = ({
                 }
             >
                 <WriterSolverContentUI
-                    solverData={solverData}
+                    proposalTitle={proposal.title}
+                    proposalDescription={proposal.description}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}

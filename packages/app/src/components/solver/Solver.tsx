@@ -29,12 +29,12 @@ import LoadingScreen from '../info/LoadingScreen'
 import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
@@ -68,20 +68,13 @@ export type BasicSolverMethodsType = {
 }
 
 interface SolverProps {
+    proposal: ProposalModel
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
     currentUser: UserType
-    slotTags: SlotTagsHashMapType
-    solverTag: SolverTagModel
 }
 
-const Solver = ({
-    address,
-    abi,
-    currentUser,
-    slotTags,
-    solverTag,
-}: SolverProps) => {
+const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
     const ctf = useContext(CTFContext)
     const ipfs = new IPFSAPI()
 
@@ -195,7 +188,7 @@ const Solver = ({
         const slotsHistory = await getSlotsHistory(
             config.ingests,
             conditions,
-            slotTags
+            proposal.solution.finalComposition.solvers[0].slotTags
         )
 
         const numMintedTokensByCondition =
@@ -212,14 +205,14 @@ const Solver = ({
             conditions,
             slotsHistory,
             collateralToken,
-            slotTags,
+            proposal.solution.finalComposition.solvers[0].slotTags,
             numMintedTokensByCondition
         )
 
         const timelocksHistory = await getTimelocksHistory(conditions)
 
         const collateralBalance = await getCollateralBalance()
-
+        // TODO right solver index
         return {
             config: config,
             conditions: conditions,
@@ -229,8 +222,8 @@ const Solver = ({
             numMintedTokensByCondition: numMintedTokensByCondition,
             collateralBalance: collateralBalance,
             collateralToken: collateralToken,
-            solverTag: solverTag,
-            slotTags: slotTags,
+            solverTag: proposal.solution.finalComposition.solvers[0].solverTag,
+            slotTags: proposal.solution.finalComposition.solvers[0].slotTags,
         }
     }
 
@@ -770,7 +763,7 @@ const Solver = ({
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title={solverTag.title}
+                            title={proposal.title}
                             subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
@@ -782,6 +775,7 @@ const Solver = ({
             return (
                 <>
                     <WriterSolverUI
+                        proposal={proposal}
                         solverData={currentSolverData}
                         solverContract={contract}
                         currentUser={currentUser}
@@ -797,6 +791,7 @@ const Solver = ({
         } else {
             return (
                 <DefaultSolverUI
+                    proposal={proposal}
                     solverData={currentSolverData}
                     solverContract={contract}
                     currentUser={currentUser}
