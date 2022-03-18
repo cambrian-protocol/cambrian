@@ -1,3 +1,4 @@
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -5,7 +6,6 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
 import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
 import { IPFSAPI } from '../services/api/IPFS.api'
-import { ProposalModel } from '../models/ProposalModel'
 import { SolutionModel } from '../models/SolutionModel'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { TokenAPI } from '../services/api/Token.api'
@@ -15,15 +15,10 @@ import { MultihashType } from '../utils/helpers/multihash'
 export enum StageNames {
     composition = 'composition',
     template = 'template',
-    solution = 'solution',
     proposal = 'proposal',
 }
 
-type StageModel =
-    | CompositionModel
-    | TemplateModel
-    | SolutionModel
-    | ProposalModel
+type StageModel = CompositionModel | TemplateModel | ProposalModel
 
 type Stages = {
     [key in StageNames]: StageModel
@@ -44,10 +39,6 @@ export default class Stagehand {
 
     get template() {
         return this.stages.template
-    }
-
-    get solution() {
-        return this.stages.solution
     }
 
     get proposal() {
@@ -161,21 +152,17 @@ export default class Stagehand {
         if (token) {
             const solution: SolutionModel = {
                 id: solutionId,
-                isExecuted: false,
                 seller: {
                     name: template.name,
                     address: 'TODO',
                     pfp: template.pfp,
                 },
-                solverAddresses: [], // TODO, all this solution data can come from onchain
                 collateralToken: token,
                 finalComposition: finalComposition,
                 proposalId: proposalId,
                 solverConfigsCID: solverConfigsCID,
                 solverConfigs: solverConfigs,
             }
-
-            this.stages[StageNames.solution] = solution
 
             const proposal: ProposalModel = {
                 id: proposalId,
@@ -187,17 +174,11 @@ export default class Stagehand {
                 },
                 description: createProposalInput.description,
                 amount: addTokenDecimals(createProposalInput.price, token),
+                solution: solution,
             }
 
             this.stages[StageNames.proposal] = proposal
             return this.publishStages()
         }
-    }
-
-    executeProposal = async () => {
-        const solution = this.stages[StageNames.solution] as SolutionModel
-        console.log(this.stages)
-        solution.isExecuted = true
-        return this.publishStages()
     }
 }

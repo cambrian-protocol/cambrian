@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers'
 import { ParticipantModel } from './ParticipantModel'
+import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 
 export type ProposalModel = {
     id: string
@@ -7,4 +8,5 @@ export type ProposalModel = {
     buyer: ParticipantModel
     description: string
     amount: BigNumber
+    solution: SolutionModel
 }

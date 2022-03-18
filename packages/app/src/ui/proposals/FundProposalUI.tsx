@@ -1,130 +1,189 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { BigNumber } from 'ethers'
 import { Box } from 'grommet'
 import FundProposalForm from './forms/FundProposalForm'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { IPFSSolutionsHubContext } from '@cambrian/app/store/IPFSSolutionsHubContext'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import { SolutionModel } from '@cambrian/app/models/SolutionModel'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
+import { useRouter } from 'next/router'
 
 interface FundProposalUIProps {
-    currentFunding: BigNumber
+    proposalCID: string
     proposal: ProposalModel
-    solution: SolutionModel
 }
 
-const FundProposalUI = ({
-    proposal,
-    solution,
-    currentFunding,
-}: FundProposalUIProps) => {
+const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
     const { currentUser } = useCurrentUser()
     const [isInTransaction, setIsInTransaction] = useState(false)
-    const [hasApproved, setHasApproved] = useState(false)
+    const router = useRouter()
 
-    const { approveFunding, fundProposal, defundProposal } = useProposalsHub()
+    const {
+        contract,
+        approveFunding,
+        fundProposal,
+        defundProposal,
+        executeProposal,
+        getProposalFunding,
+        getProposal,
+    } = useProposalsHub()
+    const ipfsSolutionsHub = useContext(IPFSSolutionsHubContext).contract
 
-    const [currentFundingNumber, setCurrentFundingNumber] = useState<BigNumber>(
-        BigNumber.from(0)
-    )
-    const [fundingGoal, setFundingGoal] = useState<BigNumber>(BigNumber.from(0))
+    const [currentFunding, setCurrentFunding] = useState(BigNumber.from(0))
+    const [fundingGoal, setFundingGoal] = useState(BigNumber.from(0))
 
     useEffect(() => {
-        setCurrentFundingNumber(
-            formatDecimals(
-                solution.collateralToken,
-                BigNumber.from(currentFunding)
-            )
-        )
-        setFundingGoal(
-            formatDecimals(
-                solution.collateralToken,
-                BigNumber.from(proposal.amount)
-            )
-        )
-    }, [currentFunding])
+        fetchFunding()
+    }, [])
 
-    const onFundProposal = async (amount: number) => {
-        if (currentUser) {
-            setIsInTransaction(true)
-            try {
-                await fundProposal(
-                    proposal.id,
-                    solution.collateralToken.address,
-                    amount,
-                    currentUser
-                )
-                setHasApproved(false)
-            } catch (e) {
-                console.log(e)
-            }
+    useEffect(() => {
+        initListeners()
+    }, [contract])
 
-            setIsInTransaction(false)
+    const fetchFunding = async () => {
+        // Fetch funding
+        const proposalFunding = await getProposalFunding(proposal.id)
+        if (proposalFunding) {
+            setCurrentFunding(BigNumber.from(proposalFunding))
+            setFundingGoal(BigNumber.from(proposal.amount))
         }
     }
 
-    const onApproveFunding = async (amount: number) => {
+    const initListeners = () => {
+        if (contract) {
+            contract.on(
+                contract.filters.FundProposal(null, null, null),
+                async (proposalId) => {
+                    const proposalFunding = await getProposalFunding(proposalId)
+                    if (proposalFunding) {
+                        setCurrentFunding(proposalFunding)
+                        setIsInTransaction(false)
+                    }
+                }
+            )
+
+            contract.on(
+                contract.filters.DefundProposal(null, null, null),
+                async (proposalId) => {
+                    const proposalFunding = await getProposalFunding(proposalId)
+                    if (proposalFunding) {
+                        setCurrentFunding(proposalFunding)
+                        setIsInTransaction(false)
+                    }
+                }
+            )
+
+            contract.on(
+                contract.filters.ExecuteProposal(null),
+                async (proposalId) => {
+                    if (ipfsSolutionsHub) {
+                        const proposal = await getProposal(proposalId)
+                        if (proposal) {
+                            const solvers = await ipfsSolutionsHub.getSolvers(
+                                proposal.solutionId
+                            )
+                            if (solvers && solvers.length) {
+                                router.push(
+                                    `/proposals/${proposalCID}/solvers/${solvers[0]}`
+                                )
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    const onFundProposal = async (amount: number): Promise<boolean> => {
+        if (currentUser) {
+            setIsInTransaction(true)
+            await fundProposal(
+                proposal.id,
+                proposal.solution.collateralToken.address,
+                amount,
+                currentUser
+            )
+            return true
+        }
+        setIsInTransaction(false)
+        return false
+    }
+
+    const onApproveFunding = async (amount: number): Promise<boolean> => {
         if (currentUser) {
             setIsInTransaction(true)
             try {
-                const bool = await approveFunding(
-                    solution.collateralToken.address,
+                const approved = await approveFunding(
+                    proposal.solution.collateralToken.address,
                     amount,
                     currentUser
                 )
-                if (!!bool) {
-                    setHasApproved(true)
-                }
+                setIsInTransaction(false)
+                return !!approved
             } catch (e) {
                 console.log(e)
             }
-
-            setIsInTransaction(false)
         }
+        setIsInTransaction(false)
+        return false
     }
 
     const onDefundProposal = async (amount: number) => {
         if (currentUser) {
             setIsInTransaction(true)
-            await defundProposal(
+            return await defundProposal(
                 proposal.id,
-                solution.collateralToken.address,
+                proposal.solution.collateralToken.address,
                 amount,
                 currentUser
             )
-            setIsInTransaction(false)
+        }
+        setIsInTransaction(false)
+        return false
+    }
+
+    const onExecuteProposal = async () => {
+        if (currentUser) {
+            await executeProposal(
+                proposal.id,
+                proposal.solution.solverConfigs,
+                currentUser
+            )
         }
     }
 
     return (
         <>
             <HeaderTextSection
-                title="Fund this proposal"
-                subTitle="Proposal funding description"
-                paragraph={
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis.'
+                title={
+                    currentFunding.eq(fundingGoal)
+                        ? 'Proposal ready to execute'
+                        : 'Fund this proposal'
                 }
+                subTitle="Proposal funding"
             />
             <BaseFormContainer gap="medium">
-                <FundingProgressMeter
-                    funding={currentFundingNumber}
-                    fundingGoal={fundingGoal}
-                />
-                <Box fill>
-                    <FundProposalForm
-                        hasApproved={hasApproved}
-                        onFundProposal={onFundProposal}
-                        onApproveFunding={onApproveFunding}
-                        onDefundProposal={onDefundProposal}
-                        token={solution.collateralToken}
+                <BaseFormGroupContainer>
+                    <FundingProgressMeter
+                        token={proposal.solution.collateralToken}
+                        funding={currentFunding}
+                        fundingGoal={fundingGoal}
                     />
-                </Box>
+                </BaseFormGroupContainer>
+                <FundProposalForm
+                    onExecuteProposal={onExecuteProposal}
+                    isFunded={currentFunding.eq(fundingGoal)}
+                    onFundProposal={onFundProposal}
+                    onApproveFunding={onApproveFunding}
+                    onDefundProposal={onDefundProposal}
+                    token={proposal.solution.collateralToken}
+                />
             </BaseFormContainer>
             <Box pad="medium" />
             {isInTransaction && (
