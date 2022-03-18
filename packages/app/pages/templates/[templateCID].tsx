@@ -9,7 +9,7 @@ import ExportSuccessModal from '@cambrian/app/ui/composer/general/modals/ExportS
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
 import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { ulid } from 'ulid'
@@ -18,6 +18,11 @@ import { useIPFSSolutionsHub } from '@cambrian/app/hooks/useIPFSSolutionsHub'
 import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
 import { useRouter } from 'next/dist/client/router'
 import { useSolverFactory } from '@cambrian/app/hooks/useSolverFactory'
+import { MultihashType } from '@cambrian/app/models/MultihashType'
+import {
+    getBytes32FromMultihash,
+    getMultihashFromBytes32,
+} from '@cambrian/app/utils/helpers/multihash'
 
 const Hash = require('ipfs-only-hash')
 
@@ -35,7 +40,7 @@ export default function CreateProposalPage() {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
     const { createSolution, getIPFSSolutionsHubAddress } = useIPFSSolutionsHub()
-    const { createProposal } = useProposalsHub()
+    const { createSolutionAndProposal } = useProposalsHub()
     const { deploySolvers } = useSolverFactory()
 
     const [createdProposalCID, setCreatedProposalCID] = useState<string>()
@@ -93,28 +98,24 @@ export default function CreateProposalPage() {
                 finalComposition.solvers
             )
             if (parsedSolvers) {
-                const solverAddresses = await deploySolvers(parsedSolvers)
-
                 const solverConfigs = parsedSolvers.map(
                     (solver) => solver.config
                 )
-                const solverConfigCID = await Hash.of(
-                    JSON.stringify(solverConfigs)
+
+                const solverConfigsCIDString = await Hash.of(solverConfigs)
+                const solverConfigsCID = getBytes32FromMultihash(
+                    solverConfigsCIDString
                 )
+
                 const solutionId = ethers.utils.formatBytes32String(ulid())
 
-                await createSolution(
-                    solutionId,
-                    finalComposition.solvers[0].config.collateralToken!!,
-                    solverConfigs,
-                    solverConfigCID
-                )
-
-                const proposalId = await createProposal(
+                const proposalId = await createSolutionAndProposal(
                     finalComposition.solvers[0].config.collateralToken!!,
                     getIPFSSolutionsHubAddress(),
-                    proposalInput.price,
+                    BigNumber.from(proposalInput.price),
                     solutionId,
+                    solverConfigs,
+                    solverConfigsCID,
                     currentUser
                 )
 
@@ -124,9 +125,9 @@ export default function CreateProposalPage() {
                         proposalId,
                         finalComposition,
                         proposalInput,
-                        solverAddresses,
-                        solverConfigCID,
+                        // solverAddresses,
                         solverConfigs,
+                        solverConfigsCID,
                         currentUser
                     )
 
