@@ -5,7 +5,6 @@ import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
-import PlainSectionDivider from '../sections/PlainSectionDivider'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 
 interface OutcomeCollectionCardProps {
@@ -36,15 +35,14 @@ const OutcomeCollectionCard = ({
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
-                    <PlainSectionDivider margin="small" />
                     <BaseMenuListItem
+                        hideDivider
                         title="Allocation"
                         icon={<Coins />}
                         onClick={toggleShowAllocationModal}
                     />
                     {proposeMethod && (
                         <Box pad="small" gap="small">
-                            <PlainSectionDivider />
                             <Button
                                 onClick={() =>
                                     proposeMethod(outcomeCollection.indexSet)

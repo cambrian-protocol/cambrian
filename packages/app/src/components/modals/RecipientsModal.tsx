@@ -25,9 +25,9 @@ const RecipientsModal = ({
                 {recipientAddresses.map((recipientAddress, idx) => {
                     return (
                         <BaseSlotInputItem
-                            info={recipientAddress.tag.description}
+                            info={recipientAddress.tag?.description}
                             key={idx}
-                            title={recipientAddress.tag.label}
+                            title={recipientAddress.tag?.label}
                             subTitle={decodeData(
                                 [SolidityDataTypes.Address],
                                 recipientAddress.slot.data

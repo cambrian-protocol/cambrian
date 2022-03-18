@@ -308,6 +308,7 @@ const WriterSolverUI = ({
                 }
             >
                 <WriterSolverContentUI
+                    solverData={solverData}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}
