@@ -1,7 +1,9 @@
+import { BigNumber } from 'ethers'
+
 export type TokenModel = {
     address: string
-    decimals?: number
+    decimals: BigNumber
     name?: string
     symbol?: string
-    totalSupply: number
+    totalSupply: BigNumber
 }
