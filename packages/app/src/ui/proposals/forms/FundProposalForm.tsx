@@ -1,15 +1,17 @@
 import { Box, Button, Form, FormField } from 'grommet'
 import React, { useState } from 'react'
 
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface FundProposalFormProps {
-    hasApproved: boolean
-    onApproveFunding: (amountToFund: number) => void
-    onFundProposal: (amountToFund: number) => void
+    onExecuteProposal: () => void
+    onApproveFunding: (amountToFund: number) => Promise<boolean>
+    onFundProposal: (amountToFund: number) => Promise<boolean>
     onDefundProposal: (amountToDefund: number) => void
     token: TokenModel
+    isFunded: boolean
 }
 
 type FundProposalFormType = {
@@ -21,21 +23,25 @@ const initialInput = {
 }
 
 const FundProposalForm = ({
-    hasApproved,
     token,
+    onExecuteProposal,
     onApproveFunding,
     onFundProposal,
     onDefundProposal,
+    isFunded,
 }: FundProposalFormProps) => {
     const [input, setInput] = useState<FundProposalFormType>(initialInput)
+    const [isApproved, setIsApproved] = useState(false)
 
-    const onSubmit = () => {
-        onFundProposal(input.amount)
-        setInput(initialInput)
+    const onSubmit = async () => {
+        if (await onFundProposal(input.amount)) {
+            setIsApproved(false)
+            setInput(initialInput)
+        }
     }
 
-    const onApprove = () => {
-        onApproveFunding(input.amount)
+    const onApprove = async () => {
+        setIsApproved(await onApproveFunding(input.amount))
     }
 
     return (
@@ -45,11 +51,15 @@ const FundProposalForm = ({
                     setInput(nextValue)
                 }}
                 value={input}
-                onSubmit={hasApproved ? onSubmit : onApprove}
+                onSubmit={isApproved ? onSubmit : onApprove}
             >
                 <Box gap="medium">
-                    <Box direction="row" gap="small" justify="center">
-                        <Box basis="1/4">
+                    <BaseFormGroupContainer
+                        direction="row"
+                        gap="small"
+                        justify="center"
+                    >
+                        <Box>
                             <FormField
                                 name="amount"
                                 label="Amount"
@@ -58,15 +68,22 @@ const FundProposalForm = ({
                             />
                         </Box>
                         <TokenAvatar token={token} />
-                    </Box>
+                    </BaseFormGroupContainer>
                     <Box direction="row" justify="between">
                         <Button
                             secondary
                             label="Defund"
                             onClick={() => onDefundProposal(input.amount)}
                         />
-                        {hasApproved ? (
+                        {isFunded ? (
                             <Button
+                                primary
+                                onClick={onExecuteProposal}
+                                label="Execute Proposal"
+                            />
+                        ) : isApproved ? (
+                            <Button
+                                disabled={isFunded}
                                 primary
                                 type="submit"
                                 label="Fund Proposal"
@@ -75,7 +92,7 @@ const FundProposalForm = ({
                             <Button
                                 primary
                                 type="submit"
-                                label="Approve Spend"
+                                label="Approve access"
                             />
                         )}
                     </Box>
