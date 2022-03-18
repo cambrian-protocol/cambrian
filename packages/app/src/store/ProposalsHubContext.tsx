@@ -5,16 +5,27 @@ import { ERC20_ABI } from '../constants'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { UserType } from './UserContext'
 import { addTokenDecimals } from '../utils/helpers/tokens'
+import { MultihashType } from '../utils/helpers/multihash'
+const Hash = require('ipfs-only-hash')
 
 const PROPOSALS_HUB_ABI =
     require('@artifacts/contracts/ProposalsHub.sol/ProposalsHub.json').abi
 
 export type ProposalsHubContextType = {
-    createProposal: (
+    // createProposal: (
+    //     collateralToken: string,
+    //     ipfsSolutionsHubAddress: string,
+    //     price: number,
+    //     solutionId: string,
+    //     user: UserType
+    // ) => Promise<string | null>
+    createSolutionAndProposal: (
         collateralToken: string,
         ipfsSolutionsHubAddress: string,
-        price: number,
+        price: BigNumber,
         solutionId: string,
+        solverConfigs: SolverConfigModel[],
+        solverConfigsCID: MultihashType,
         user: UserType
     ) => Promise<string | null>
     getProposal: (
@@ -45,7 +56,7 @@ export type ProposalsHubContextType = {
 }
 export const ProposalsHubContext = React.createContext<ProposalsHubContextType>(
     {
-        createProposal: async () => null,
+        createSolutionAndProposal: async () => null,
         getProposal: async () => null,
         fundProposal: async () => {},
         defundProposal: async () => {},
@@ -70,22 +81,26 @@ export const ProposalsHubContextProvider = ({
         }
     }, [])
 
-    const handleCreateProposal = async (
+    const handleCreateSolutionAndProposal = async (
         collateralToken: string,
         ipfsSolutionsHubAddress: string,
-        price: number,
+        price: BigNumber,
         solutionId: string,
+        solverConfigs: SolverConfigModel[],
+        solverConfigsCID: MultihashType,
         user: UserType
     ): Promise<string | null> => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
 
         const tx: ContractTransaction = await proposalsHub
             .connect(user.signer)
-            .createProposal(
+            .createIPFSSolutionAndProposal(
+                solutionId,
                 collateralToken,
                 ipfsSolutionsHubAddress,
                 price,
-                solutionId
+                solverConfigs,
+                solverConfigsCID
             )
         let rc = await tx.wait()
         return new ethers.utils.Interface([
@@ -163,7 +178,8 @@ export const ProposalsHubContextProvider = ({
     return (
         <ProposalsHubContext.Provider
             value={{
-                createProposal: handleCreateProposal,
+                // createProposal: handleCreateProposal,
+                createSolutionAndProposal: handleCreateSolutionAndProposal,
                 getProposal: handleGetProposal,
                 fundProposal: handleFundProposal,
                 defundProposal: handleDefundProposal,

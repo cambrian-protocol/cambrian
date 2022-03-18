@@ -10,6 +10,7 @@ import { SolutionModel } from '../models/SolutionModel'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { TokenAPI } from '../services/api/Token.api'
 import { addTokenDecimals } from '../utils/helpers/tokens'
+import { MultihashType } from '../utils/helpers/multihash'
 
 export enum StageNames {
     composition = 'composition',
@@ -148,9 +149,8 @@ export default class Stagehand {
         proposalId: string,
         finalComposition: CompositionModel,
         createProposalInput: CreateProposalFormType,
-        solverAddresses: string[],
-        solverConfigsCID: string,
         solverConfigs: SolverConfigModel[],
+        solverConfigsCID: MultihashType,
         user: UserType
     ) => {
         const template = this.stages[StageNames.template] as TemplateModel
@@ -167,10 +167,10 @@ export default class Stagehand {
                     address: 'TODO',
                     pfp: template.pfp,
                 },
+                solverAddresses: [], // TODO, all this solution data can come from onchain
                 collateralToken: token,
                 finalComposition: finalComposition,
                 proposalId: proposalId,
-                solverAddresses: solverAddresses,
                 solverConfigsCID: solverConfigsCID,
                 solverConfigs: solverConfigs,
             }
