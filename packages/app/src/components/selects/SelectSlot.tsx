@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react'
 
+import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import { Select } from 'grommet'
-import { SlotPath } from '@cambrian/app/models/SlotModel'
 import { getRegExp } from '@cambrian/app/utils/regexp/searchSupport'
 import { getSolverHierarchy } from '@cambrian/app/utils/helpers/solverHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface SelectSlotProps {
     name: string
-    selectedCallbackTargetSlotPath?: SlotPath
-    updateCallbackSlotPath: (targetSlotPath?: SlotPath) => void
+    selectedCallbackTargetSlotPath?: ComposerSlotPathType
+    updateCallbackSlotPath: (targetSlotPath?: ComposerSlotPathType) => void
 }
 
 export type SelectSlotFormType = {
     label: string
-    callbackTargetSlotPath?: SlotPath
+    callbackTargetSlotPath?: ComposerSlotPathType
 }
 
 const defaultSlotObjects: SelectSlotFormType[] = []
 
-const findSelectSlotFormType = (slotPathToFind: SlotPath) => {
+const findSelectSlotFormType = (slotPathToFind: ComposerSlotPathType) => {
     const option = defaultSlotObjects.find(
         (el) =>
             el.callbackTargetSlotPath?.solverId === slotPathToFind.solverId &&
@@ -64,17 +64,18 @@ const SelectSlot = ({
             for (let i = 0; i < currentSolverIndex; i++) {
                 Object.keys(solverHierarchy[i]?.config.slots).forEach((key) => {
                     const slot = solverHierarchy[i].config.slots[key]
+                    const slotTag = currentSolver.slotTags[slot.id]
 
-                    const slotDescription = `${
-                        slot.description && slot.description !== ''
-                            ? slot.description + ' '
+                    const slotLabel = `${
+                        slotTag && slotTag.label !== ''
+                            ? slotTag.label + ' '
                             : ''
                     }(${
                         solverHierarchy[i].title
                     } - Data: ${slot.data.toString()})`
 
                     const currentSelectSlotForm = {
-                        label: slotDescription,
+                        label: slotLabel,
                         callbackTargetSlotPath: {
                             slotId: slot.id,
                             solverId: solverHierarchy[i].id,

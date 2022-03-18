@@ -3,7 +3,7 @@ import { FlowElement, Handle, Position } from 'react-flow-renderer'
 import React, { memo, useEffect, useState } from 'react'
 import { StackSimple, TreeStructure } from 'phosphor-react'
 
-import { OutcomeCollectionModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeModel'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export const OutcomeCollectionNode = memo((props: FlowElement) => {

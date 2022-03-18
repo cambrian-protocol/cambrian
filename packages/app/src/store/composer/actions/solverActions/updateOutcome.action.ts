@@ -1,10 +1,10 @@
-import { ComposerStateType } from '../../composer.types'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 const updateOutcomeAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     outcome: OutcomeModel
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&

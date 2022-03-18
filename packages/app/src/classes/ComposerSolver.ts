@@ -1,76 +1,108 @@
+import { SolverTagModel } from './../models/SolverTagModel'
+import { SlotTagsHashMapType } from './../models/SlotTagModel'
 import { ethers } from 'ethers'
 import { ulid } from 'ulid'
 
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
 import {
-    SolverModel,
-    SolverConfig,
-    SolverConfigAddressType,
-    IdPathType,
-} from '@cambrian/app/models/SolverModel'
-import {
-    SlotModel,
-    SlotsObj,
-    SlotPath,
-    SlotTypes,
-    SolverConfigAddress,
+    ComposerSlotModel,
+    ComposerSlotsHashMapType,
+    ComposerSlotPathType,
+    ComposerSolverConfigAddressType,
 } from '@cambrian/app/models/SlotModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
+import { ComposerConditionModel } from '@cambrian/app/models/ConditionModel'
 import {
-    OutcomeModel,
     OutcomeCollectionModel,
-    ConditionModel,
-    RecipientAmountPath,
-    OCAllocations,
-} from '@cambrian/app/models/ConditionModel'
+    OutcomeModel,
+} from '@cambrian/app/models/OutcomeModel'
 
 import * as Constants from '@cambrian/app/constants'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
-import { Tags } from '../models/TagModel'
+import {
+    ComposerAllocationPathsType,
+    ComposerAllocationsHashMapType,
+} from '../models/AllocationModel'
+import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
+import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+
+type AddSlotProps = {
+    data: string[] | number[]
+    slotType: SlotType
+    dataTypes: SolidityDataTypes[]
+    solverConfigAddress?: ComposerSolverConfigAddressType
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
+}
+
+type UpdateSlotProps = AddSlotProps & {
+    id: string
+}
+
+type AddRecipientProps = {
+    type:
+        | 'Keeper'
+        | 'Arbitrator'
+        | 'Solver'
+        | 'Callback'
+        | 'Slot'
+        | 'Slot_Exists'
+    data: string | ComposerSlotModel | ComposerSolver
+    targetSolverId?: string
+    solverConfigAdress?: ComposerSolverConfigAddressType
+}
+
+type UpdateRecipientPropsType = {
+    id: string
+    address: string
+}
+
+type AddSlotTagProps = {
+    slotId: string
+    label: string
+    description: string
+    isFlex: boolean
+}
 
 export default class ComposerSolver {
     id: string
-    title: string
-    description: string
     iface: ethers.utils.Interface
-    config: SolverConfig
-    tags: Tags
+    config: ComposerSolverConfigModel
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
 
     constructor(
-        title = 'New Solver',
         iface = new ethers.utils.Interface(Constants.DEFAULT_ABI),
         id?: string,
-        config?: SolverConfig
+        config?: ComposerSolverConfigModel,
+        slotTags?: SlotTagsHashMapType,
+        solverTag?: SolverTagModel
     ) {
         this.id = id ? id : ulid()
         this.iface = iface
-        this.title = title
-        this.description = ''
         this.config = config ? config : this.getDefaultConfig()
-        this.tags = {}
+        this.slotTags = slotTags || {}
+        this.solverTag = solverTag || {
+            title: 'New Solver',
+            description: '',
+            version: '1.0',
+            banner: '',
+            avatar: '',
+        }
     }
 
-    // TODO, ADD TAG FUNCTIONS
-
-    /*************************** Title & Keeper & Arbitrator & Timelock ***************************/
+    /*************************** Title & Keeper & Arbitrator & Timelock & "Core" Data ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
         const {
-            title,
-            description,
             keeperAddress,
             arbitratorAddress,
             timelockSeconds,
+            implementation,
         } = mainConfig
-
-        if (title !== this.title) {
-            this.updateTitle(title)
-        }
-
-        if (description !== this.description) {
-            this.updateDescription(description)
-        }
 
         if (keeperAddress !== this.config.keeperAddress.address) {
             this.updateKeeper(keeperAddress)
@@ -83,14 +115,10 @@ export default class ComposerSolver {
         if (timelockSeconds !== this.config.timelockSeconds) {
             this.updateTimelock(timelockSeconds)
         }
-    }
 
-    updateTitle(title: string) {
-        this.title = title
-    }
-
-    updateDescription(description: string) {
-        this.description = description
+        if (implementation !== this.config.implementation) {
+            this.updateImplementation(implementation)
+        }
     }
 
     updateKeeper(address: string) {
@@ -113,6 +141,61 @@ export default class ComposerSolver {
 
     updateCollateralToken(tokenAddress: string) {
         this.config.collateralToken = tokenAddress
+    }
+
+    updateImplementation(implementation: string) {
+        this.config.implementation = implementation
+    }
+
+    updateData(data: SolverCoreDataInputType[]) {
+        this.config.data = data
+    }
+
+    /*********************************** Tags *************************************/
+
+    addSlotTag({ slotId, description, label, isFlex }: AddSlotTagProps) {
+        this.slotTags[slotId] = {
+            id: slotId,
+            label: label,
+            description: description,
+            isFlex: isFlex,
+        }
+    }
+
+    updateSlotTag({ slotId, description, label, isFlex }: AddSlotTagProps) {
+        const slotTagToUpdate = this.slotTags[slotId]
+        if (slotTagToUpdate) {
+            slotTagToUpdate.label = label
+            slotTagToUpdate.description = description
+            slotTagToUpdate.isFlex = isFlex
+        } else {
+            this.slotTags[slotId] = {
+                id: slotId,
+                label: label,
+                description: description,
+                isFlex: isFlex,
+            }
+        }
+    }
+
+    deleteSlotTag(slotId: string) {
+        delete this.slotTags[slotId]
+    }
+
+    updateSolverTag({
+        title,
+        description,
+        version,
+        avatar,
+        banner,
+    }: SolverTagModel) {
+        this.solverTag = {
+            title: title,
+            description: description,
+            version: version,
+            avatar: avatar,
+            banner: banner,
+        }
     }
 
     /*************************** Outcomes & Collections ***************************/
@@ -180,7 +263,7 @@ export default class ComposerSolver {
         delete this.config.condition.recipientAmountSlots[id]
     }
 
-    setParentCollection(parentCollection: IdPathType | null) {
+    setParentCollection(parentCollection: ComposerIdPathType | null) {
         this.config.condition.parentCollection = parentCollection
             ? parentCollection
             : undefined
@@ -209,24 +292,24 @@ export default class ComposerSolver {
 
     /*************************** Recipients ***************************/
 
-    addRecipient(
-        type: 'Keeper' | 'Arbitrator' | 'Solver' | 'Callback' | 'Slot',
-        data: string | SlotModel | ComposerSolver,
-        targetSolverId?: string | null | undefined,
-        description?: string,
-        solverConfigAdress?: SolverConfigAddress
-    ) {
+    addRecipient({
+        type,
+        data,
+        targetSolverId,
+        solverConfigAdress,
+    }: AddRecipientProps): ComposerSlotModel {
         if (!data) {
             throw new Error('Falsey recipient data')
         }
-        let slot = {} as SlotModel
+
+        let slot = {} as ComposerSlotModel
         switch (type) {
             case 'Arbitrator':
             case 'Keeper':
                 if (typeof data === 'string') {
                     slot = this.addSlot({
                         data: [data],
-                        slotType: SlotTypes.Constant,
+                        slotType: SlotType.Constant,
                         dataTypes: [SolidityDataTypes.Address],
                         solverConfigAddress: solverConfigAdress,
                     })
@@ -238,14 +321,12 @@ export default class ComposerSolver {
                 break
             case 'Callback':
                 if (isSlot(data)) {
-                    slot = this.addSlot(
-                        {
-                            data: [data.id],
-                            slotType: SlotTypes.Callback,
-                            dataTypes: [SolidityDataTypes.Uint256],
-                        },
-                        targetSolverId
-                    )
+                    slot = this.addSlot({
+                        data: [data.id],
+                        slotType: SlotType.Callback,
+                        dataTypes: [SolidityDataTypes.Uint256],
+                        targetSolverId: targetSolverId,
+                    })
                 } else {
                     throw new Error('Invalid Slot recipient data')
                 }
@@ -253,38 +334,35 @@ export default class ComposerSolver {
 
             case 'Solver':
                 if (typeof data === 'string' && targetSolverId) {
-                    slot = this.addSlot(
-                        {
-                            data: [data],
-                            slotType: SlotTypes.Function,
-                            dataTypes: [SolidityDataTypes.Uint256],
-                        },
-                        targetSolverId,
-                        Constants.DEFAULT_IFACE.getFunction(
+                    slot = this.addSlot({
+                        data: [data],
+                        slotType: SlotType.Function,
+                        dataTypes: [SolidityDataTypes.Uint256],
+                        targetSolverId: targetSolverId,
+                        solverFunction: Constants.DEFAULT_IFACE.getFunction(
                             'addressFromChainIndex'
-                        )
-                    )
+                        ),
+                    })
                 } else {
                     throw new Error('Invalid Solver recipient data')
                 }
                 break
-
-            default:
-                //Slot
+            case 'Slot':
                 if (typeof data === 'string') {
-                    slot = this.addSlot(
-                        {
-                            data: [data],
-                            slotType: SlotTypes.Constant,
-                            dataTypes: [SolidityDataTypes.Address],
-                        },
-                        null,
-                        null,
-                        description
-                    )
+                    slot = this.addSlot({
+                        data: [data],
+                        slotType: SlotType.Constant,
+                        dataTypes: [SolidityDataTypes.Address],
+                    })
                 } else {
                     throw new Error('Invalid new Slot recipient data')
                 }
+                break
+            case 'Slot_Exists':
+                if (typeof data === 'string') {
+                    slot = this.config.slots[data]
+                }
+                break
         }
 
         // Add recipient
@@ -293,18 +371,18 @@ export default class ComposerSolver {
             slotId: slot.id,
         })
 
-        this.addNewRecipientAmountSlots(slot.id)
+        this.addNewRecipientAllocationSlots(slot.id)
 
         return slot
     }
 
-    // new recipientAmountsSlots when outcomeCollection added
+    // new recipientAllocationSlots Slots when outcomeCollection added
     addNewOutcomeCollectionAmountSlots(outcomeCollectionId: string) {
         this.config.condition.recipientAmountSlots[outcomeCollectionId] =
             this.config.condition.recipients.map((slotPath) => {
                 return {
-                    recipient: <SlotPath>slotPath,
-                    amount: <SlotPath>{
+                    recipient: <ComposerSlotPathType>slotPath,
+                    amount: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
@@ -312,18 +390,18 @@ export default class ComposerSolver {
             })
     }
 
-    // new recipientAmountsSlots when recipient added
-    addNewRecipientAmountSlots(recipientSlotId: string) {
+    // new recipientAllocationSlots when recipient added
+    addNewRecipientAllocationSlots(recipientSlotId: string) {
         Object.keys(this.config.condition.recipientAmountSlots).forEach(
             (ocId) => {
                 this.config.condition.recipientAmountSlots[ocId].push(<
-                    RecipientAmountPath
+                    ComposerAllocationPathsType
                 >{
-                    recipient: <SlotPath>{
+                    recipient: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: recipientSlotId,
                     },
-                    amount: <SlotPath>{
+                    amount: <ComposerSlotPathType>{
                         solverId: this.id,
                         slotId: this.getZeroSlotId(),
                     },
@@ -332,34 +410,34 @@ export default class ComposerSolver {
         )
     }
 
-    updateRecipient(
-        id: string,
-        address: string,
-        description?: string
-    ): SlotModel {
+    updateRecipient({
+        id,
+        address,
+    }: UpdateRecipientPropsType): ComposerSlotModel {
         if (!this.config.slots[id]) {
             throw new Error('Could not find slot for updating recipient')
         }
 
         this.config.slots[id].data[0] = address
-        this.config.slots[id].description = description
+
         return this.config.slots[id]
     }
 
-    updateRecipientAmount(
+    updateRecipientAllocation(
         outcomeCollectionId: string,
         recipientSlotId: string,
         amountSlotId: string
     ) {
-        const recipientAmountPath = this.config.condition.recipientAmountSlots[
-            outcomeCollectionId
-        ].find(
-            (recipientAmount) =>
-                recipientAmount.recipient.slotId === recipientSlotId
-        )
+        const recipientAllocationPath =
+            this.config.condition.recipientAmountSlots[
+                outcomeCollectionId
+            ].find(
+                (recipientAmount) =>
+                    recipientAmount.recipient.slotId === recipientSlotId
+            )
 
-        if (recipientAmountPath) {
-            recipientAmountPath.amount.slotId = amountSlotId
+        if (recipientAllocationPath) {
+            recipientAllocationPath.amount.slotId = amountSlotId
         } else {
             throw new Error(
                 "Could not update recipient's amount slot for outcomeCollection"
@@ -378,54 +456,37 @@ export default class ComposerSolver {
 
     /*************************** Slots ***************************/
 
-    addSlot(
-        {
-            data,
-            slotType,
-            dataTypes,
-            solverConfigAddress,
-        }: {
-            data: string[] | number[]
-            slotType: SlotTypes
-            dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: SolverConfigAddress
-        },
-        targetSolverId?: string | null | undefined,
-        solverFunction?: ethers.utils.FunctionFragment | null | undefined,
-        description?: string | null | undefined
-    ): SlotModel {
+    addSlot({
+        data,
+        slotType,
+        dataTypes,
+        solverConfigAddress,
+        targetSolverId,
+        solverFunction,
+    }: AddSlotProps): ComposerSlotModel {
         const id = ulid()
         this.config.slots[id] = {
             id: id,
             data: data,
             slotType: slotType,
             dataTypes: dataTypes,
-            targetSolverId: targetSolverId || undefined,
-            solverFunction: solverFunction || undefined,
-            description: description || undefined,
-            solverConfigAddress: solverConfigAddress || undefined,
+            targetSolverId: targetSolverId,
+            solverFunction: solverFunction,
+            solverConfigAddress: solverConfigAddress,
         }
 
         return this.config.slots[id]
     }
 
-    updateSlot(
-        id: string,
-        {
-            data,
-            slotType,
-            dataTypes,
-            solverConfigAddress,
-        }: {
-            data: string[] | number[]
-            slotType: SlotTypes
-            dataTypes: SolidityDataTypes[]
-            solverConfigAddress?: SolverConfigAddress
-        },
-        targetSolverId?: string | null | undefined,
-        solverFunction?: ethers.utils.FunctionFragment | null | undefined,
-        description?: string | null | undefined
-    ): SlotModel {
+    updateSlot({
+        id,
+        data,
+        slotType,
+        dataTypes,
+        solverConfigAddress,
+        targetSolverId,
+        solverFunction,
+    }: UpdateSlotProps): ComposerSlotModel {
         const slot = this.config.slots[id]
         if (!slot) {
             throw new Error('Could not find slot for updating')
@@ -435,7 +496,6 @@ export default class ComposerSolver {
         slot.dataTypes = dataTypes
         slot.targetSolverId = targetSolverId
         slot.solverFunction = solverFunction
-        slot.description = description
         slot.solverConfigAddress = solverConfigAddress
         return slot
     }
@@ -477,7 +537,7 @@ export default class ComposerSolver {
             ) ||
             this.addSlot({
                 data: [0],
-                slotType: SlotTypes.Constant,
+                slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
             }).id
 
@@ -490,12 +550,14 @@ export default class ComposerSolver {
 
     /*************************** Initialization ***************************/
 
-    getDefaultConfig(): SolverConfig {
+    getDefaultConfig(): ComposerSolverConfigModel {
+        // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
         const config = {
+            implementation: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
             keeperAddress: { address: '', linkedSlots: [] },
             arbitratorAddress: { address: '', linkedSlots: [] },
             timelockSeconds: 0,
-            data: '',
+            data: [],
             slots: this.getDefaultSlots(),
             condition: this.getDefaultCondition(),
         }
@@ -515,22 +577,24 @@ export default class ComposerSolver {
         return config
     }
 
-    getDefaultSlots(): SlotsObj {
+    getDefaultSlots(): ComposerSlotsHashMapType {
+        const id = ulid()
+
         const zeroSlot = {
-            id: ulid(),
-            slotType: SlotTypes.Constant,
+            id: id,
+            slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [0],
         }
 
         const maxPointsSlot = {
-            id: ulid(),
-            slotType: SlotTypes.Constant,
+            id: id,
+            slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [Constants.MAX_POINTS],
         }
 
-        const slots = <SlotsObj>{}
+        const slots = <ComposerSlotsHashMapType>{}
 
         slots[zeroSlot.id] = zeroSlot
         slots[maxPointsSlot.id] = maxPointsSlot
@@ -538,18 +602,18 @@ export default class ComposerSolver {
         return slots
     }
 
-    getDefaultCondition(): ConditionModel {
+    getDefaultCondition(): ComposerConditionModel {
         const defaultOC = { id: ulid(), outcomes: [] }
         const defaultCondition = {
             outcomes: [],
             partition: [defaultOC] as OutcomeCollectionModel[],
             recipients: [],
-            recipientAmountSlots: <OCAllocations>{},
+            recipientAmountSlots: <ComposerAllocationsHashMapType>{},
             amountSlot: '',
         }
 
         defaultCondition.recipientAmountSlots[defaultOC.id] =
-            [] as RecipientAmountPath[]
+            [] as ComposerAllocationPathsType[]
         return defaultCondition
     }
 }

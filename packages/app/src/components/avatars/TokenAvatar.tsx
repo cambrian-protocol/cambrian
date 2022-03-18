@@ -11,7 +11,7 @@ interface TokenAvatar {
 const TokenAvatar = ({ token }: TokenAvatar) => {
     return (
         <Tip
-            content={`Token name: ${token.tokenName}`}
+            content={`${token.symbol || token.name || ''} @ ${token.address}`}
             dropProps={{ align: { bottom: 'bottom', left: 'right' } }}
         >
             <Box
@@ -35,7 +35,7 @@ const TokenAvatar = ({ token }: TokenAvatar) => {
                 </Box>
                 <Box justify="center" align="center">
                     <Text size="small" weight="bold">
-                        {token.tokenSymbol}
+                        {token.symbol || ''}
                     </Text>
                 </Box>
             </Box>

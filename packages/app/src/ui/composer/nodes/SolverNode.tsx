@@ -8,12 +8,13 @@ import { Box, Heading, Text } from 'grommet'
 import { FlowElement, Handle, Position } from 'react-flow-renderer'
 import React, { memo, useEffect, useState } from 'react'
 
-import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export const SolverNode = memo((props: FlowElement) => {
     const { composer } = useComposerContext()
-    const [currentSolverNode, setCurrentSolverNode] = useState<SolverModel>()
+    const [currentSolverNode, setCurrentSolverNode] =
+        useState<ComposerSolverModel>()
 
     useEffect(() => {
         const idPathArr = props.id.split('/')
@@ -35,7 +36,7 @@ export const SolverNode = memo((props: FlowElement) => {
                 <Box direction="row" gap="small">
                     <PuzzlePiece color="white" size="24" />
                     <Heading color="white" level="4">
-                        {props.data?.label}
+                        {currentSolverNode?.solverTag?.title}
                     </Heading>
                 </Box>
                 <Box>

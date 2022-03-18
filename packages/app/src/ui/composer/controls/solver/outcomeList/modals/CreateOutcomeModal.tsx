@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import OutcomeConfigForm from '../forms/OutcomeConfigForm'
-import { OutcomeModel } from '@cambrian/app/models/ConditionModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { ulid } from 'ulid'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -36,14 +36,12 @@ const CreateOutcomeModal = ({ onClose }: CreateOutcomeModalProps) => {
                 subTitle="What could happen?"
                 paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
             />
-            <Box fill>
-                <OutcomeConfigForm
-                    onSubmit={onSubmit}
-                    outcomeInput={input}
-                    setOutcomeInput={setInput}
-                    submitLabel="Create"
-                />
-            </Box>
+            <OutcomeConfigForm
+                onSubmit={onSubmit}
+                outcomeInput={input}
+                setOutcomeInput={setInput}
+                submitLabel="Create"
+            />
         </BaseLayerModal>
     )
 }

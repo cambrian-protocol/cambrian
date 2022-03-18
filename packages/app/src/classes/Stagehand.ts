@@ -1,29 +1,29 @@
-import { create } from 'lodash'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { UserType } from '@cambrian/app/store/UserContext'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
+import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
+import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '../models/ProposalModel'
 import { SolutionModel } from '../models/SolutionModel'
-import { SolverModel } from '../models/SolverModel'
-import { TemplateModel } from '../models/TemplateModel'
-import { IPFSAPI } from '../services/api/IPFS.api'
-import { CreateTemplateFormType } from '../ui/solutions/common/forms/CreateTemplateForm'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
+import { TokenAPI } from '../services/api/Token.api'
+import { addTokenDecimals } from '../utils/helpers/tokens'
+import { MultihashType } from '../utils/helpers/multihash'
 
-enum StageNames {
+export enum StageNames {
     composition = 'composition',
     template = 'template',
     solution = 'solution',
     proposal = 'proposal',
 }
 
-type CompositionModel = SolverModel[]
 type StageModel =
     | CompositionModel
     | TemplateModel
     | SolutionModel
     | ProposalModel
-
-type StageIds = {
-    [key in StageNames]: string
-}
 
 type Stages = {
     [key in StageNames]: StageModel
@@ -31,12 +31,10 @@ type Stages = {
 
 export default class Stagehand {
     ipfs: IPFSAPI
-    stageIds: StageIds
     stages: Stages
 
     constructor() {
         this.ipfs = new IPFSAPI()
-        this.stageIds = {} as StageIds
         this.stages = {} as Stages
     }
 
@@ -56,49 +54,82 @@ export default class Stagehand {
         return this.stages.proposal
     }
 
-    get compositionId() {
-        return this.stageIds.composition
-    }
-
-    get templateId() {
-        return this.stageIds.template
-    }
-
-    get solutionId() {
-        return this.stageIds.solution
-    }
-
-    get proposalId() {
-        return this.stageIds.proposal
+    publishStages = async () => {
+        try {
+            const res = await this.ipfs.pin(this.stages)
+            if (res && res.IpfsHash) {
+                console.log('Published stages: ', this.stages)
+                return res.IpfsHash
+            }
+        } catch (e) {
+            console.error(e, this.stages)
+            return undefined
+        }
     }
 
     /**
-     * Create a template by applying CreateTemplateForm to a loaded composition
+     * Load stage from IPFS
      */
-    createTemplate = async (createTemplateForm: CreateTemplateFormType) => {
+    loadStage = async (stagesCID: string, stageType: StageNames) => {
+        try {
+            const stages = (await this.ipfs.getFromCID(stagesCID)) as Stages
+            console.log('Fetched stages: ', stages)
+            this.stages = stages
+            return stages[stageType]
+        } catch (e) {
+            console.log(e)
+            return undefined
+        }
+    }
+
+    // TODO
+    isStageSchema = (data: StageModel, stage: StageNames) => {
+        return true
+    }
+
+    /**
+     * Creates a Composition and publishes it to IPFS
+     */
+    publishComposition = async (composition: CompositionModel) => {
+        if (!this.isStageSchema(composition, StageNames.composition)) {
+            console.error(
+                `Error: ${composition} does not satisfy ${StageNames.composition} schema`
+            )
+            return undefined
+        }
+        this.stages['composition'] = composition
+
+        return this.publishStages()
+    }
+
+    /**
+     * Creates a template by applying CreateTemplateForm to a loaded composition and publishes it to IPFS
+     */
+    publishTemplate = async (createTemplateInput: CreateTemplateFormType) => {
         if (!this.stages.composition) {
             console.error('Error: Load a composition into Stagehand first')
             return undefined
         }
 
-        const newComposition = mergeFlexIntoComposition(
+        const updatedComposition = mergeFlexIntoComposition(
             <CompositionModel>this.stages.composition,
-            createTemplateForm.flexInputs
+            createTemplateInput.flexInputs
         )
 
-        if (newComposition) {
-            const template = <TemplateModel>{
-                composition: newComposition,
-                pfp: createTemplateForm.pfp,
-                name: createTemplateForm.name,
-                title: createTemplateForm.title,
-                description: createTemplateForm.description,
+        if (updatedComposition) {
+            const template: TemplateModel = {
+                updatedComposition: updatedComposition,
+                pfp: createTemplateInput.pfp,
+                name: createTemplateInput.name,
+                title: createTemplateInput.title,
+                description: createTemplateInput.description,
                 price: {
-                    amount: createTemplateForm.askingAmount,
-                    denominationToken: createTemplateForm.denominationToken,
-                    preferredTokens: createTemplateForm.preferredTokens,
+                    amount: createTemplateInput.askingAmount,
+                    denominationToken: createTemplateInput.denominationToken,
+                    preferredTokens: createTemplateInput.preferredTokens,
                 },
             }
+
             if (!this.isStageSchema(template, StageNames.template)) {
                 console.error(
                     'Error: Generated template does not satisfy template schema'
@@ -106,62 +137,67 @@ export default class Stagehand {
                 return undefined
             }
             this.stages['template'] = template
-            return template
+            return this.publishStages()
         } else {
             console.error('Error merging provided flex inputs into composition')
             return undefined
         }
     }
 
-    /**
-     * Publish Stage by pinning to IPFS
-     */
-    publishStage = async (stageType: StageNames) => {
-        if (
-            !this.stages[stageType] ||
-            !this.isStageSchema(this.stages[stageType], StageNames.template)
-        ) {
-            console.error(
-                `Error: ${stageType} does not satisfy ${stageType} schema`
-            )
-            return undefined
-        }
+    publishProposal = async (
+        solutionId: string,
+        proposalId: string,
+        finalComposition: CompositionModel,
+        createProposalInput: CreateProposalFormType,
+        solverConfigs: SolverConfigModel[],
+        solverConfigsCID: MultihashType,
+        user: UserType
+    ) => {
+        const template = this.stages[StageNames.template] as TemplateModel
 
-        try {
-            const res = await this.ipfs.pin(this.stages[stageType])
-            return res
-        } catch (e) {
-            console.error(e)
+        const token = await TokenAPI.getTokenInfo(
+            createProposalInput.tokenAddress
+        )
+        if (token) {
+            const solution: SolutionModel = {
+                id: solutionId,
+                isExecuted: false,
+                seller: {
+                    name: template.name,
+                    address: 'TODO',
+                    pfp: template.pfp,
+                },
+                solverAddresses: [], // TODO, all this solution data can come from onchain
+                collateralToken: token,
+                finalComposition: finalComposition,
+                proposalId: proposalId,
+                solverConfigsCID: solverConfigsCID,
+                solverConfigs: solverConfigs,
+            }
+
+            this.stages[StageNames.solution] = solution
+
+            const proposal: ProposalModel = {
+                id: proposalId,
+                title: createProposalInput.title,
+                buyer: {
+                    address: user.address,
+                    name: createProposalInput.name,
+                    pfp: createProposalInput.pfp,
+                },
+                description: createProposalInput.description,
+                amount: addTokenDecimals(createProposalInput.price, token),
+            }
+
+            this.stages[StageNames.proposal] = proposal
+            return this.publishStages()
         }
     }
 
-    /**
-     * Load stage from IPFS
-     */
-    loadStage = async (stageId: string, stageType: StageNames) => {
-        try {
-            const stage = (await this.ipfs.getFromCID(stageId)) as StageModel
-            return this.setStage(stage, stageId, stageType)
-        } catch (e) {
-            console.log(e)
-            return undefined
-        }
-    }
-
-    /**
-     * Set internal stage variable
-     */
-    setStage = (stage: StageModel, stageId: string, stageType: StageNames) => {
-        if (!stage || !this.isStageSchema(stage, stageType)) {
-            return undefined
-        }
-        this.stageIds[stageType] = stageId
-        this.stages[stageType] = stage
-        return this.stages[stageType]
-    }
-
-    // TODO
-    isStageSchema = (data: StageModel, stage: StageNames) => {
-        return true
+    executeProposal = async () => {
+        const solution = this.stages[StageNames.solution] as SolutionModel
+        console.log(this.stages)
+        solution.isExecuted = true
+        return this.publishStages()
     }
 }

@@ -1,29 +1,27 @@
-import {
-    AllocationType,
-    SolverContractAllocationsType,
-    SolverContractCondition,
-    SolverContractData,
-} from '@cambrian/app/models/SolverModel'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { CTFContext } from '@cambrian/app/store/CTFContext'
-import { UserContext, UserType } from '@cambrian/app/store/UserContext'
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/SolverConfig'
-import { BigNumber, ethers, EventFilter } from 'ethers'
-import { Handshake } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
-const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
+
+import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import { CTFContext } from '@cambrian/app/store/CTFContext'
+import { Handshake } from 'phosphor-react'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserContext } from '@cambrian/app/store/UserContext'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
-    solverData: SolverContractData
+    solverData: SolverModel
+    proposedOutcome: OutcomeCollectionModel
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
+    proposedOutcome,
 }: RedeemTokensActionbarProps) => {
     // TODO Fetch token and amount for signer
     // TODO Redeem token functionality
@@ -31,7 +29,8 @@ const RedeemTokensActionbar = ({
     const user = useContext(UserContext)
 
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [userAllocations, setUserAllocations] = useState<AllocationType[]>()
+
+    const [userAllocations, setUserAllocations] = useState<AllocationModel[]>()
     const [
         userPayoutPercentageForCondition,
         setUserPayoutPercentageForCondition,
@@ -48,14 +47,6 @@ const RedeemTokensActionbar = ({
     useEffect(() => {
         getCollateralToken()
     }, [])
-
-    useEffect(() => {
-        if (user.currentUser && solverData) {
-            getUserAllocs()
-        } else {
-            console.log(ctf, user.currentUser, solverData)
-        }
-    }, [ctf])
 
     useEffect(() => {
         if (userAllocations) {
@@ -131,7 +122,7 @@ const RedeemTokensActionbar = ({
      * Mimics calculation from ConditionalToken.sol
      * IMPORTANT: Amount in alloc is in basis points. Divide by 100 to get pct.
      */
-    const getTotalPayout = (allocations: AllocationType[]) => {
+    const getTotalPayout = (allocations: AllocationModel[]) => {
         const payoutNumerators = currentCondition.payouts
         const indexSets = solverData.config.conditionBase.partition
         const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots
@@ -154,7 +145,7 @@ const RedeemTokensActionbar = ({
             }
 
             const payoutStake = allocations.find(
-                (alloc) => alloc.outcomeCollectionIndexSet === indexSet
+                (alloc) => proposedOutcome.indexSet === indexSet
             )?.amount
 
             if (payoutStake && Number(payoutStake) > 0) {
@@ -173,16 +164,6 @@ const RedeemTokensActionbar = ({
             solverData.config.conditionBase.collateralToken
         )
         setCollateralToken(token)
-    }
-
-    const getUserAllocs = () => {
-        const userAllocs = solverData.allocationsHistory[
-            currentCondition.conditionId
-        ].find((alloc) => alloc.address.address === user.currentUser?.address)
-
-        if (userAllocs !== undefined) {
-            setUserAllocations(userAllocs.allocations)
-        }
     }
 
     /**

@@ -56,12 +56,7 @@ const SlotDataInputField = ({
 
     return (
         <IconContext.Provider value={{ size: '24' }}>
-            <Box
-                direction="row"
-                align="center"
-                height={{ min: 'auto' }}
-                pad="xsmall"
-            >
+            <Box direction="row" align="center" height={{ min: 'auto' }}>
                 <Box direction="row" gap="small" fill>
                     <Box flex>
                         <TextInput

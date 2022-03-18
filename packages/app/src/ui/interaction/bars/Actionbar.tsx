@@ -1,11 +1,4 @@
-import {
-    Box,
-    Button,
-    ButtonExtendedProps,
-    ResponsiveContext,
-    Spinner,
-    Stack,
-} from 'grommet'
+import { Box, Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
 
 import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
 
@@ -44,6 +37,7 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         direction="row"
                         align="center"
                         pad={{ horizontal: 'small' }}
+                        justify="between"
                     >
                         {actions.info ? (
                             <Box flex>

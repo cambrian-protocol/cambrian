@@ -4,11 +4,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
 import "./interfaces/ISolutionsHub.sol";
+import "./interfaces/IPFSSolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
 
 import "./SolverLib.sol";
-
-import "./IPFSSolutionsHub.sol";
 
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
@@ -39,6 +38,8 @@ contract ProposalsHub is ERC1155Receiver {
 
     event CreateProposal(bytes32 id);
     event ExecuteProposal(bytes32 id);
+    event FundProposal(bytes32 id, uint256 amount, address from);
+    event DefundProposal(bytes32 id, uint256 amount, address from);
 
     constructor(address _ctfAddress) {
         conditionalTokens = IConditionalTokens(_ctfAddress);
@@ -85,7 +86,7 @@ contract ProposalsHub is ERC1155Receiver {
             "ProposalsHub::Proposal already executed"
         );
 
-        IPFSSolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
+        IIPFSSolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
             proposalId,
             proposals[proposalId].solutionId,
             solverConfigs
@@ -131,10 +132,10 @@ contract ProposalsHub is ERC1155Receiver {
         address solutionsHub,
         uint256 fundingGoal,
         bytes32 solutionId
-    ) external {
+    ) public returns (bytes32 proposalId) {
         nonce++;
 
-        bytes32 _proposalId = keccak256(
+        proposalId = keccak256(
             abi.encodePacked(
                 msg.sender,
                 solutionId,
@@ -144,16 +145,41 @@ contract ProposalsHub is ERC1155Receiver {
             )
         );
 
-        Proposal storage proposal = proposals[_proposalId];
+        Proposal storage proposal = proposals[proposalId];
         proposal.collateralToken = collateralToken;
         proposal.proposer = msg.sender;
         proposal.solutionsHub = solutionsHub;
-        proposal.id = _proposalId;
+        proposal.id = proposalId;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
 
-        ISolutionsHub(solutionsHub).linkToProposal(_proposalId, solutionId);
-        emit CreateProposal(_proposalId);
+        ISolutionsHub(solutionsHub).linkToProposal(proposalId, solutionId);
+        emit CreateProposal(proposalId);
+    }
+
+    function createIPFSSolutionAndProposal(
+        bytes32 solutionId,
+        IERC20 collateralToken,
+        IIPFSSolutionsHub ipfsSolutionsHub,
+        uint256 fundingGoal,
+        SolverLib.Config[] calldata solverConfigs,
+        SolverLib.Multihash calldata solverConfigsCID
+    ) external returns (bytes32 solutionID, bytes32 proposalID) {
+        solutionID = ipfsSolutionsHub.createSolution(
+            solutionId,
+            collateralToken,
+            solverConfigs,
+            solverConfigsCID
+        );
+
+        proposalID = createProposal(
+            collateralToken,
+            address(ipfsSolutionsHub),
+            fundingGoal,
+            solutionId
+        );
+
+        return (solutionID, proposalID);
     }
 
     /**
@@ -190,6 +216,8 @@ contract ProposalsHub is ERC1155Receiver {
             token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
         );
+
+        emit FundProposal(proposalId, amount, msg.sender);
     }
 
     /**
@@ -217,11 +245,19 @@ contract ProposalsHub is ERC1155Receiver {
             amount <= funderAmountMap[proposalId][msg.sender],
             "Committed funds is lower than amount."
         );
+        uint256 beforeBalance = token.balanceOf(address(this));
 
         proposals[proposalId].funding -= amount;
         funderAmountMap[proposalId][msg.sender] -= amount;
 
         token.transfer(msg.sender, amount);
+
+        require(
+            beforeBalance - token.balanceOf(address(this)) == amount,
+            "Before and after balance wrong"
+        );
+
+        emit DefundProposal(proposalId, amount, msg.sender);
     }
 
     function getProposal(bytes32 id)

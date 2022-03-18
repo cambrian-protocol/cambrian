@@ -1,19 +1,20 @@
 import { Box, Text } from 'grommet'
-import { SlotModel, SlotTypes } from '@cambrian/app/models/SlotModel'
 
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
+import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { WarningCircle } from 'phosphor-react'
-import { BytesLike, ethers } from 'ethers'
 
 /**
  * Determites if the passed parameter is a Slot
  * @returns true if it is a slot
  * */
 export function isSlot(
-    toBeDetermined: any | SlotModel
-): toBeDetermined is SlotModel {
-    if ((toBeDetermined as SlotModel).slotType) {
+    toBeDetermined: any | ComposerSlotModel
+): toBeDetermined is ComposerSlotModel {
+    if ((toBeDetermined as ComposerSlotModel).slotType) {
         return true
     }
     return false
@@ -21,20 +22,20 @@ export function isSlot(
 
 export const getSlotsByDatatype = (
     dataType: SolidityDataTypes,
-    solver: SolverModel
-): SlotModel[] => {
-    const slots: SlotModel[] = []
+    solver: ComposerSolverModel
+): ComposerSlotModel[] => {
+    const slots: ComposerSlotModel[] = []
 
     for (const [_, value] of Object.entries(solver.config.slots)) {
         switch (value.slotType) {
-            case SlotTypes.Constant:
+            case SlotType.Constant:
                 if (
                     value.dataTypes.length === 1 &&
                     value.dataTypes[0] == dataType
                 ) {
                     slots.push(value)
                 }
-            case SlotTypes.Function:
+            case SlotType.Function:
                 if (
                     value.solverFunction?.outputs?.length === 1 &&
                     value.solverFunction.outputs[0].type === dataType
@@ -50,21 +51,21 @@ export const getSlotsByDatatype = (
 // TODO create one function with optional solverindex parameter, if provided, then just return slots from this solver
 export const getAllSlotsByDataType = (
     dataType: SolidityDataTypes,
-    solvers: SolverModel[]
+    solvers: ComposerSolverModel[]
 ) => {
-    const slots: SlotModel[] = []
+    const slots: ComposerSlotModel[] = []
 
     solvers.forEach((solver) => {
         for (const [_, value] of Object.entries(solver.config.slots)) {
             switch (value.slotType) {
-                case SlotTypes.Constant:
+                case SlotType.Constant:
                     if (
                         value.dataTypes.length === 1 &&
                         value.dataTypes[0] == dataType
                     ) {
                         slots.push(value)
                     }
-                case SlotTypes.Function:
+                case SlotType.Function:
                     if (
                         value.solverFunction?.outputs?.length === 1 &&
                         value.solverFunction.outputs[0].type === dataType
@@ -83,62 +84,57 @@ export const getAllSlotsByDataType = (
  *
  *  */
 export const getSlotTitle = (
-    slotModel: SlotModel,
-    solvers: SolverModel[]
+    slotModel: ComposerSlotModel,
+    currentSolverTags: SlotTagsHashMapType,
+    solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
     if (solvers) {
         if (slotModel.targetSolverId !== undefined) {
             // Its either a callback or a function
-            if (slotModel.slotType === SlotTypes.Callback) {
+            if (slotModel.slotType === SlotType.Callback) {
                 const callingSolver = solvers.find(
                     (x) => x.id === slotModel.targetSolverId
                 )
                 if (callingSolver) {
                     const callingSlot =
                         callingSolver.config.slots[slotModel.data[0]]
-
                     if (callingSlot) {
-                        if (
-                            callingSlot.description &&
-                            callingSlot.description !== ''
-                        ) {
-                            return `${callingSlot.description} (${callingSolver.title})`
+                        const callingSlotTag =
+                            callingSolver.slotTags[callingSlot.id]
+                        if (callingSlotTag && callingSlotTag.label !== '') {
+                            return `${callingSlotTag.label} (${callingSolver.solverTag.title})`
                         } else if (callingSlot.data.length === 1) {
                             return `${callingSlot.data[0].toString()} (${
-                                callingSolver.title
+                                callingSolver.solverTag.title
                             })`
                         }
                     }
                 }
             } else if (
-                slotModel.slotType === SlotTypes.Function &&
+                slotModel.slotType === SlotType.Function &&
                 slotModel.solverFunction?.name === 'addressFromChainIndex'
             ) {
                 // Get solver title
                 return (
                     solvers.find((x) => x.id === slotModel.targetSolverId)
-                        ?.title || 'No Solver title found'
+                        ?.solverTag?.title || 'No Solver title found'
                 )
             }
         } else if (
-            slotModel.slotType === SlotTypes.Constant ||
-            slotModel.slotType === SlotTypes.Manual
+            slotModel.slotType === SlotType.Constant ||
+            slotModel.slotType === SlotType.Manual
         ) {
             // Display if its an Arbitrator or Keeper
             if (slotModel.solverConfigAddress !== undefined) {
                 const configSolver = solvers.find(
                     (x) => x.id === slotModel.solverConfigAddress?.solverId
                 )
-                return `${configSolver?.title}'s ${slotModel.solverConfigAddress.type}`
+                return `${configSolver?.solverTag.title}'s ${slotModel.solverConfigAddress.type}`
             }
-
+            const currentSlotTag = currentSolverTags[slotModel.id]
             // Get constant desc or first data entry
-            if (
-                slotModel.description &&
-                slotModel.description !== undefined &&
-                slotModel.description !== ''
-            ) {
-                return slotModel.description
+            if (currentSlotTag && currentSlotTag.label !== '') {
+                return currentSlotTag.label
             } else if (slotModel.data.length === 1) {
                 return slotModel.data[0].toString()
             }
@@ -148,7 +144,7 @@ export const getSlotTitle = (
         <Box direction="row" gap="xsmall" align="center">
             <WarningCircle color="red" size={'24'} />
             <Text size="small" color="status-error" weight={'normal'}>
-                Missing data
+                No label found
             </Text>
         </Box>
     )

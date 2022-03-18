@@ -1,18 +1,17 @@
-import { ComposerStateType } from '../../composer.types'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import _ from 'lodash'
 
 export type SolverMainConfigType = {
-    title: string
-    description: string
+    implementation: string
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds: number
 }
 
 const updateSolverMainConfigAction = (
-    state: ComposerStateType,
+    state: CompositionModel,
     payload: SolverMainConfigType
-): ComposerStateType => {
+): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -38,7 +37,7 @@ const updateSolverMainConfigAction = (
             updatedSolvers.forEach((solver) => {
                 if (keeperHasChanged) {
                     currentSolver.config.keeperAddress.linkedSlots.forEach(
-                        (linkedSlot) => {
+                        (linkedSlot: string) => {
                             const slot = solver.config.slots[linkedSlot]
                             if (slot !== undefined) {
                                 slot.data = [payload.keeperAddress]
@@ -48,7 +47,7 @@ const updateSolverMainConfigAction = (
                 }
                 if (arbitratorHasChanged) {
                     currentSolver.config.arbitratorAddress.linkedSlots.forEach(
-                        (linkedSlot) => {
+                        (linkedSlot: string) => {
                             const slot = solver.config.slots[linkedSlot]
                             if (slot !== undefined) {
                                 slot.data = [payload.arbitratorAddress]
@@ -61,18 +60,8 @@ const updateSolverMainConfigAction = (
 
         currentSolver.updateMainConfig(payload)
 
-        const updatedFlow = state.flowElements.map((el) => {
-            if (el.id === state.currentElement?.id) {
-                el.data = {
-                    ...el.data,
-                    label: payload.title,
-                }
-            }
-            return el
-        })
         return {
             ...state,
-            flowElements: updatedFlow,
             solvers: updatedSolvers,
         }
     }

@@ -1,12 +1,11 @@
-import { SolverModel } from './SolverModel'
-import { FlexInputs } from './TagModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 
 export type TemplateModel = {
-    pfp: string
-    name: string
+    pfp?: string
+    name?: string
     title: string
     description: string
-    composition: SolverModel[]
+    updatedComposition: CompositionModel
     price?: {
         amount: number
         denominationToken: string

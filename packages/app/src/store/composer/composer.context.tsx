@@ -1,5 +1,7 @@
-import { ComposerAction, ComposerStateType } from './composer.types'
-import { IdPathType, SolverModel } from '../../models/SolverModel'
+import {
+    ComposerIdPathType,
+    ComposerSolverModel,
+} from '@cambrian/app/models/SolverModel'
 import React, {
     PropsWithChildren,
     useEffect,
@@ -7,16 +9,18 @@ import React, {
     useState,
 } from 'react'
 
-import { OutcomeCollectionModel } from '@cambrian/app/src/models/ConditionModel'
-import Solver from '@cambrian/app/classes/ComposerSolver'
+import { ComposerAction } from './composer.types'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeModel'
 import { composerReducer } from './composer.reducer'
 import initialComposer from './composer.init'
 
 type ComposerContextOptions = {
-    composer: ComposerStateType
+    composer: CompositionModel
     dispatch: React.Dispatch<ComposerAction>
-    currentIdPath?: IdPathType
-    currentSolver?: Solver
+    currentIdPath?: ComposerIdPathType
+    currentSolver?: ComposerSolver
     currentOutcomeCollection?: OutcomeCollectionModel
 }
 
@@ -31,8 +35,8 @@ const ComposerContext = React.createContext<ComposerContextOptions>({
 const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
     const [composer, dispatch] = useReducer(composerReducer, initialComposer)
 
-    const [currentIdPath, setCurrentIdPath] = useState<IdPathType>()
-    const [currentSolver, setCurrentSolver] = useState<Solver>()
+    const [currentIdPath, setCurrentIdPath] = useState<ComposerIdPathType>()
+    const [currentSolver, setCurrentSolver] = useState<ComposerSolver>()
     const [currentOutcomeCollection, setCurrentOutcomeCollection] =
         useState<OutcomeCollectionModel>()
 
@@ -44,7 +48,7 @@ const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
             composer.currentIdPath.solverId.length
         ) {
             const currentSolver = composer.solvers.find(
-                (x) => x.id === composer.currentIdPath?.solverId
+                (x: ComposerSolver) => x.id === composer.currentIdPath?.solverId
             )
             setCurrentSolver(currentSolver)
 
