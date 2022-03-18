@@ -182,16 +182,12 @@ export const ProposalsHubContextProvider = ({
     ) => {
         if (!proposalsHub) throw new Error('No Proposals Hub Contract defined')
 
-        try {
-            const token = await TokenAPI.getTokenInfo(tokenAddress)
-            const weiAmount = addTokenDecimals(amount, token)
+        const token = await TokenAPI.getTokenInfo(tokenAddress)
+        const weiAmount = addTokenDecimals(amount, token)
 
-            await proposalsHub
-                .connect(user.signer)
-                .defundProposal(proposalId, tokenAddress, weiAmount)
-        } catch (e) {
-            console.log(e)
-        }
+        await proposalsHub
+            .connect(user.signer)
+            .defundProposal(proposalId, tokenAddress, weiAmount)
     }
 
     const handleExecuteProposal = async (

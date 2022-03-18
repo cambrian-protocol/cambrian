@@ -88,6 +88,7 @@ const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
                             const solvers = await ipfsSolutionsHub.getSolvers(
                                 proposal.solutionId
                             )
+                            setIsInTransaction(false)
                             if (solvers && solvers.length) {
                                 router.push(
                                     `/proposals/${proposalCID}/solvers/${solvers[0]}`
@@ -102,23 +103,28 @@ const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
 
     const onFundProposal = async (amount: number): Promise<boolean> => {
         if (currentUser) {
-            setIsInTransaction(true)
-            await fundProposal(
-                proposal.id,
-                proposal.solution.collateralToken.address,
-                amount,
-                currentUser
-            )
-            return true
+            try {
+                setIsInTransaction(true)
+                await fundProposal(
+                    proposal.id,
+                    proposal.solution.collateralToken.address,
+                    amount,
+                    currentUser
+                )
+                return true
+            } catch (err) {
+                console.error(err)
+                setIsInTransaction(false)
+            }
         }
-        setIsInTransaction(false)
         return false
     }
 
+    // TODO Tokencontract approve listener
     const onApproveFunding = async (amount: number): Promise<boolean> => {
         if (currentUser) {
-            setIsInTransaction(true)
             try {
+                setIsInTransaction(true)
                 const approved = await approveFunding(
                     proposal.solution.collateralToken.address,
                     amount,
@@ -136,13 +142,18 @@ const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
 
     const onDefundProposal = async (amount: number) => {
         if (currentUser) {
-            setIsInTransaction(true)
-            return await defundProposal(
-                proposal.id,
-                proposal.solution.collateralToken.address,
-                amount,
-                currentUser
-            )
+            try {
+                setIsInTransaction(true)
+                await defundProposal(
+                    proposal.id,
+                    proposal.solution.collateralToken.address,
+                    amount,
+                    currentUser
+                )
+                return true
+            } catch (err) {
+                console.error(err)
+            }
         }
         setIsInTransaction(false)
         return false
@@ -150,12 +161,18 @@ const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
 
     const onExecuteProposal = async () => {
         if (currentUser) {
-            await executeProposal(
-                proposal.id,
-                proposal.solution.solverConfigs,
-                currentUser
-            )
+            try {
+                setIsInTransaction(true)
+                return await executeProposal(
+                    proposal.id,
+                    proposal.solution.solverConfigs,
+                    currentUser
+                )
+            } catch (err) {
+                console.error(err)
+            }
         }
+        setIsInTransaction(false)
     }
 
     return (
