@@ -4,7 +4,6 @@ import React, { PropsWithChildren, useEffect, useState } from 'react'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { getBytes32FromMultihash } from '../utils/helpers/multihash'
 import { useCurrentUser } from '../hooks/useCurrentUser'
-import { SolutionsHubAPI } from '../services/api/SolutionsHub.api'
 
 const IPFS_SOLUTIONS_HUB_ABI =
     require('@artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json').abi

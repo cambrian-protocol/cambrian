@@ -22,10 +22,7 @@ const OutcomeNotification = ({
 }: OutcomeNotificationProps) => {
     if (status === ConditionStatus.OutcomeProposed) {
         return (
-            <SolverStatusNotification
-                title="Outcome Proposed"
-                // message="Proposed desciption text"
-            >
+            <SolverStatusNotification title="Outcome Proposed">
                 <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
                 {canRequestArbitration && (
                     <>
@@ -47,10 +44,7 @@ const OutcomeNotification = ({
         )
     } else if (status === ConditionStatus.OutcomeReported) {
         return (
-            <SolverStatusNotification
-                title="Outcome confirmed"
-                // message="Confirmed descripiton text"
-            >
+            <SolverStatusNotification title="Outcome confirmed">
                 <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
             </SolverStatusNotification>
         )

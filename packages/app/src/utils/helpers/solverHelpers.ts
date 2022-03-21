@@ -1,5 +1,4 @@
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
-import Solver from '@cambrian/app/classes/ComposerSolver'
 
 // Returns a sorted hierarchy containing the selected solver
 export function getSolverHierarchy(

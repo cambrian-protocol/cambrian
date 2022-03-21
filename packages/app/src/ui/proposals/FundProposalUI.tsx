@@ -88,7 +88,6 @@ const FundProposalUI = ({ proposal, proposalCID }: FundProposalUIProps) => {
                             const solvers = await ipfsSolutionsHub.getSolvers(
                                 proposal.solutionId
                             )
-                            setIsInTransaction(false)
                             if (solvers && solvers.length) {
                                 router.push(
                                     `/proposals/${proposalCID}/solvers/${solvers[0]}`

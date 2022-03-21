@@ -12,7 +12,7 @@ type ConditionStatusDetailsType = {
 
 export const CONDITION_STATUS_DETAILS: ConditionStatusDetailsType = {
     0: {
-        name: 'Initiaded',
+        name: 'Initiated',
         label: 'Initiated',
         icon: <AsteriskSimple />,
     },

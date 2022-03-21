@@ -212,7 +212,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         const timelocksHistory = await getTimelocksHistory(conditions)
 
         const collateralBalance = await getCollateralBalance()
-        // TODO right solver index
+        // TODO right solver index for tags / solver
         return {
             config: config,
             conditions: conditions,
@@ -510,16 +510,13 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                                 numMintedTokensByCondition[
                                     condition.conditionId
                                 ] != 0
-                                    ? formatDecimals(
-                                          collateralToken,
-                                          amountPercentage
-                                              .mul(
-                                                  numMintedTokensByCondition[
-                                                      condition.conditionId
-                                                  ]
-                                              )
-                                              .div(100)
-                                      )
+                                    ? amountPercentage
+                                          .mul(
+                                              numMintedTokensByCondition[
+                                                  condition.conditionId
+                                              ]
+                                          )
+                                          .div(100)
                                     : ''
 
                             const positionId = calculatePositionId(
