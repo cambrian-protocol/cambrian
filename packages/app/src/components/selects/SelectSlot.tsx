@@ -71,7 +71,7 @@ const SelectSlot = ({
                             ? slotTag.label + ' '
                             : ''
                     }(${
-                        solverHierarchy[i].title
+                        solverHierarchy[i].solverTag.title
                     } - Data: ${slot.data.toString()})`
 
                     const currentSelectSlotForm = {
