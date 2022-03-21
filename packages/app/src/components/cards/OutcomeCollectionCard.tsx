@@ -6,15 +6,18 @@ import { Coins } from 'phosphor-react'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface OutcomeCollectionCardProps {
     outcomeCollection: OutcomeCollectionModel
     proposeMethod?: (indexSet: number) => void
+    token: TokenModel
 }
 
 const OutcomeCollectionCard = ({
     outcomeCollection,
     proposeMethod,
+    token,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -56,6 +59,7 @@ const OutcomeCollectionCard = ({
             </Card>
             {showAllocationModal && (
                 <RecipientAllocationModal
+                    token={token}
                     onClose={toggleShowAllocationModal}
                     allocations={outcomeCollection.allocations}
                 />

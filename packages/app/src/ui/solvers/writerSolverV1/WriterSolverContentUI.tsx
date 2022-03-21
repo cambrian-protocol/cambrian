@@ -8,6 +8,7 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import OutcomeNotification from '@cambrian/app/components/notifications/OutcomeNotification'
 import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface WriterSolverContentUI {
     proposalTitle: string
@@ -18,9 +19,11 @@ interface WriterSolverContentUI {
     currentCondition: SolverContractCondition
     submittedWork: SubmissionModel[]
     proposedOutcome?: OutcomeCollectionModel
+    token: TokenModel
 }
 
 const WriterSolverContentUI = ({
+    token,
     roles,
     setWorkInput,
     workInput,
@@ -103,6 +106,7 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                token={token}
                                 outcomeCollection={proposedOutcome}
                                 status={currentCondition.status}
                                 canRequestArbitration={
@@ -127,6 +131,7 @@ const WriterSolverContentUI = ({
                     {proposedOutcome && (
                         <>
                             <OutcomeNotification
+                                token={token}
                                 outcomeCollection={proposedOutcome}
                                 status={currentCondition.status}
                             />
