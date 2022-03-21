@@ -72,7 +72,7 @@ const CreateSlotFormModal = ({ onClose }: CreateSlotModalProps) => {
                 <HeaderTextSection
                     title="Create new Slot"
                     subTitle="Manual slot configuration"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                    paragraph="Create a new slot which provides data to this Solver during runtime. If you don't know, you can ignore this."
                 />
                 <Box fill>
                     <BaseMenuListItem

@@ -39,7 +39,7 @@ const UpdateOutcomeModal = ({ outcome, onClose }: UpdateOutcomeModalProps) => {
             <HeaderTextSection
                 title="Update outcome"
                 subTitle="Configurate your outcome"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                paragraph="Define the important conditions of the outcome under Description and include other relevant information under Context."
             />
             <Box fill>
                 <OutcomeConfigForm

@@ -25,8 +25,8 @@ const ComposerRecipientList = () => {
                 <Box gap="small" fill overflow={{ vertical: 'auto' }}>
                     <HeaderTextSection
                         title="Recipient list"
-                        subTitle="Who will deserve a share?"
-                        paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                        subTitle="Who might receive a share?"
+                        paragraph="These recipients are allocated conditional tokens for outcome collections. If their outcome collection occurs, their tokens are redeemable for Solver funds."
                     />
                     <Box gap="small" fill>
                         {currentSolver.config.condition.recipients.map(

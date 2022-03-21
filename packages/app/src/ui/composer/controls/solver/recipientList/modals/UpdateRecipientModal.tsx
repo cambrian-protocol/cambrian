@@ -77,7 +77,7 @@ const UpdateRecipientModal = ({
                 <HeaderTextSection
                     title="Edit recipient"
                     subTitle="Changed your mind?"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                    paragraph="Edit the new address for this recipient."
                 />
                 <Box fill>
                     <BaseMenuListItem

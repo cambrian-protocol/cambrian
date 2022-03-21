@@ -29,8 +29,8 @@ const CreateProposalUI = ({
             pfpPath={template.pfp}
         />
         <HeaderTextSection
-            subTitle="Define the topic and price"
-            paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+            subTitle="Define your proposal"
+            paragraph='Enter the details of your proposal below. Enter the total funding required as "price".'
         />
         <Box fill>
             <CreateProposalForm

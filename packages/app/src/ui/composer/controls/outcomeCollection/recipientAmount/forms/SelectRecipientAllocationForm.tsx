@@ -60,8 +60,8 @@ const SelectRecipientAllocationForm = ({
         <Box gap="small">
             <HeaderTextSection
                 title="Select recipient with amount"
-                subTitle="Choose an existant address from your solution"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
+                subTitle="Choose an existing address"
+                paragraph="This recipient can redeem tokens for Solver funds when an outcome collection allocated to them occurs."
             />
             <BaseFormContainer>
                 <Form onSubmit={(event) => onSubmit(event)}>

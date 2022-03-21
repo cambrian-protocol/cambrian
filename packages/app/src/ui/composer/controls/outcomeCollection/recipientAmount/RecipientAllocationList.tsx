@@ -36,7 +36,7 @@ const RecipientAllocationList = () => {
                         subTitle={`Pick who gets what in the case of ${currentOutcomeCollection.outcomes.map(
                             (outcome) => ` #${outcome.title}`
                         )}`}
-                        paragraph="Define the shares each recipient will receive, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                        paragraph="Define the shares each recipient will receive for this outcome collection. Value are given in Basis Points. 100 BPs = 1%"
                     />
                     <Box gap="small" fill>
                         {currentSolver.config.condition.recipients.map(
