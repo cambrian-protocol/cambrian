@@ -125,6 +125,7 @@ const SolverConfigInfo = ({
             )}
             {showOutcomeModal && (
                 <OutcomeCollectionModal
+                    token={solverData.collateralToken}
                     onBack={toggleShowOutcomeModal}
                     outcomeCollections={
                         solverData.outcomeCollections[
