@@ -45,7 +45,10 @@ const SelectTargetSolver = ({
     useEffect(() => {
         const availableTargetSolvers: SelectTargetSolverFormType[] =
             composer.solvers.map((solver) => {
-                return { label: solver.title, targetSolverId: solver.id }
+                return {
+                    label: solver.solverTag.title,
+                    targetSolverId: solver.id,
+                }
             })
         defaultTargetSolverOptions = defaultTargetSolverOptions.concat(
             availableTargetSolvers
