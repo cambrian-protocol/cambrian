@@ -10,10 +10,6 @@ import {
     SolverModel,
     SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
-import {
-    TokenAPI,
-    TokenResponseType,
-} from '@cambrian/app/services/api/Token.api'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BaseLayout } from '../layout/BaseLayout'
@@ -36,6 +32,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
@@ -204,7 +201,6 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
             config,
             conditions,
             slotsHistory,
-            collateralToken,
             proposal.solution.finalComposition.solvers[0].slotTags,
             numMintedTokensByCondition
         )
@@ -213,6 +209,12 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
 
         const collateralBalance = await getCollateralBalance()
         // TODO right solver index for tags / solver
+
+        console.log('SlotsHistory:', slotsHistory)
+        console.log(
+            'Available SlotTags:',
+            proposal.solution.finalComposition.solvers[0].slotTags
+        )
         return {
             config: config,
             conditions: conditions,
@@ -456,7 +458,6 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         config: SolverConfigModel,
         conditions: SolverContractCondition[],
         slotHistory: SlotsHistoryHashMapType,
-        collateralToken: TokenResponseType,
         slotTags: SlotTagsHashMapType,
         numMintedTokensByCondition?: {
             [conditionId: string]: number
@@ -517,7 +518,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                                               ]
                                           )
                                           .div(100)
-                                    : ''
+                                    : undefined
 
                             const positionId = calculatePositionId(
                                 config.conditionBase.collateralToken,
@@ -586,9 +587,16 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                     const ulid = ethers.utils.parseBytes32String(
                         currentSlot.slot
                     )
+
+                    // Fallback empty Slot
                     data[currentSlot.slot] = {
                         slot: currentSlot,
-                        tag: slotTags[ulid],
+                        tag: slotTags[ulid] || {
+                            id: ulid,
+                            label: '',
+                            isFlex: false,
+                            description: '',
+                        },
                     }
                 }
             })
@@ -606,9 +614,15 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         if (ingestSlot) {
             // Enrich with MetaData
             const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
+            // Fallback empty Slot
             return {
                 slot: ingestSlot,
-                tag: slotTags[ulid],
+                tag: slotTags[ulid] || {
+                    id: ulid,
+                    label: '',
+                    isFlex: false,
+                    description: '',
+                },
             }
         } else {
             throw new Error(`Error while finding ingest with slotId: ${slotId}`)
