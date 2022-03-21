@@ -19,7 +19,7 @@ const SelectCallingSolver = ({ name }: SelectCallingSolverProps) => {
     useEffect(() => {
         setOptions(
             composer.solvers.map((solver) => ({
-                label: solver.title,
+                label: solver.solverTag.title,
                 targetSolverId: solver.id,
             }))
         )
