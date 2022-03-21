@@ -4,11 +4,13 @@ import {
     RichSlotModel,
 } from './SlotModel'
 
+import { BigNumber } from 'ethers'
+
 export type AllocationModel = {
     addressSlot: RichSlotModel
     positionId: string
     amountPercentage: string
-    amount?: string
+    amount?: BigNumber
 }
 
 export type AllocationPathsType = {

@@ -4,16 +4,19 @@ import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import RecipientAllocationItem from '../list/RecipientAllocationItem'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
     allocations: AllocationModel[]
+    token: TokenModel
 }
 
 const RecipientAllocationModal = ({
     onClose,
     allocations,
+    token,
 }: RecipientAllocationModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
@@ -35,6 +38,7 @@ const RecipientAllocationModal = ({
                             subTitle={decodedAddress}
                             amount={allocation.amount}
                             amountPercentage={allocation.amountPercentage}
+                            token={token}
                         />
                     )
                 })}

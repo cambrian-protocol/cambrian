@@ -217,7 +217,6 @@ const CreateProposalForm = ({
         <BaseFormContainer>
             <Form<CreateProposalFormType>
                 onChange={(nextValue: CreateProposalFormType) => {
-                    console.log(nextValue)
                     setInput(nextValue)
                 }}
                 value={input}
