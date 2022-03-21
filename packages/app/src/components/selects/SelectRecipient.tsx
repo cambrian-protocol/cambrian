@@ -48,7 +48,7 @@ const SelectRecipient = ({
                     solver.config.keeperAddress.address !== ''
                 ) {
                     availableAddresses.push({
-                        title: `${solver.title}'s Keeper`,
+                        title: `${solver.solverTag.title}'s Keeper`,
                         address: {
                             solverId: solver.id,
                             value: 'Keeper',
@@ -61,7 +61,7 @@ const SelectRecipient = ({
                     solver.config.arbitratorAddress.address !== ''
                 ) {
                     availableAddresses.push({
-                        title: `${solver.title}'s Arbitrator`,
+                        title: `${solver.solverTag.title}'s Arbitrator`,
                         address: {
                             solverId: solver.id,
                             value: 'Arbitrator',
@@ -114,7 +114,7 @@ const getAvailableAddresses = (
     let currentAvailableAddresses: SelectRecipientType[] = []
 
     currentAvailableAddresses.push({
-        title: currentSolver.title,
+        title: currentSolver.solverTag.title,
         address: {
             solverId: currentSolver.id,
             value: currentSolver,
