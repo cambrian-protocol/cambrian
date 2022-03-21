@@ -7,23 +7,29 @@ import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { Warning } from 'phosphor-react'
 
 type OutcomeNotificationProps = SolverStatusNotificationProps & {
     outcomeCollection: OutcomeCollectionModel
     canRequestArbitration?: boolean
     status: ConditionStatus
+    token: TokenModel
 }
 
 const OutcomeNotification = ({
     outcomeCollection,
     canRequestArbitration,
     status,
+    token,
 }: OutcomeNotificationProps) => {
     if (status === ConditionStatus.OutcomeProposed) {
         return (
             <SolverStatusNotification title="Outcome Proposed">
-                <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
+                <OutcomeCollectionCard
+                    token={token}
+                    outcomeCollection={outcomeCollection}
+                />
                 {canRequestArbitration && (
                     <>
                         <Box pad="small">
@@ -45,7 +51,10 @@ const OutcomeNotification = ({
     } else if (status === ConditionStatus.OutcomeReported) {
         return (
             <SolverStatusNotification title="Outcome confirmed">
-                <OutcomeCollectionCard outcomeCollection={outcomeCollection} />
+                <OutcomeCollectionCard
+                    token={token}
+                    outcomeCollection={outcomeCollection}
+                />
             </SolverStatusNotification>
         )
     } else {
