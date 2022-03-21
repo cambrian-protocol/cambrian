@@ -61,7 +61,7 @@ const ComposerOutcomeCollectionControl = () => {
                         <HeaderTextSection
                             title="Outcome collection"
                             subTitle="Fine tune your Outcome Collection"
-                            paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+                            paragraph="Define the outcomes and token allocations for this collection."
                         />
                         <Box gap="small">
                             <BaseMenuListItem

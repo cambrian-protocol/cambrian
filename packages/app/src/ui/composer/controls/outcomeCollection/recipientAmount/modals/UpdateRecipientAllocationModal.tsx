@@ -73,8 +73,8 @@ const UpdateRecipientAllocationModal = ({
         <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
                 title="Define the share"
-                subTitle="Choose an existant amount to save gas"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis."
+                subTitle="Choose an existing amount to save gas"
+                paragraph="Amounts are denoted in Basis Points. 100 BPs = 1%"
             />
             <Box gap="small" fill="horizontal">
                 <BaseFormContainer gap="small">

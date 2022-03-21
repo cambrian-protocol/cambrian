@@ -14,7 +14,7 @@ const SolverTagModal = ({ onBack, currentSolverTag }: SolverTagModalProps) => {
         <BaseLayerModal onBack={onBack}>
             <HeaderTextSection
                 title="Solver Tag"
-                paragraph="Define some Metadata that everybody knows what this Solver is capable of."
+                paragraph="Descriptive metadata for this Solver."
             />
             <BaseFormContainer>
                 <SolverTagForm

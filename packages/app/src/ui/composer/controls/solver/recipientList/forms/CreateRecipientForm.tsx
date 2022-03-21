@@ -45,7 +45,7 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
             <HeaderTextSection
                 title="Create new recipient"
                 subTitle="Who else deserves a share?"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                paragraph="They will receive conditional tokens when included in an outcome collection."
             />
             <Box fill>
                 <BaseMenuListItem

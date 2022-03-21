@@ -86,7 +86,7 @@ export const ComposerSolverControl = () => {
                             <HeaderTextSection
                                 title="Solver"
                                 subTitle="Fine tune your Solver"
-                                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+                                paragraph="Directly edit settings and data. Or, add flags for later editing in templates and proposals."
                             />
                             <Box gap="small">
                                 <BaseMenuListItem
