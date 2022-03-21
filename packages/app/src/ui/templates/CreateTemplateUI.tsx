@@ -8,7 +8,6 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Stagehand from '@cambrian/app/classes/Stagehand'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 
 interface CreateTemplateUIProps {
     stagehand: Stagehand
