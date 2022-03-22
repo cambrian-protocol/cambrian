@@ -11,6 +11,11 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserContext } from '@cambrian/app/store/UserContext'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
+import { SlotsHistoryHashMapType } from '@cambrian/app/models/SlotModel'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { BigNumber } from 'ethers'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
@@ -34,7 +39,7 @@ const RedeemTokensActionbar = ({
     const [
         userPayoutPercentageForCondition,
         setUserPayoutPercentageForCondition,
-    ] = useState<number>()
+    ] = useState<BigNumber>()
     const [isRedeemed, setIsRedeemed] = useState<boolean>(false)
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
 
@@ -49,17 +54,39 @@ const RedeemTokensActionbar = ({
     }, [])
 
     useEffect(() => {
+        if (user.currentUser && solverData) {
+            getUserAllocations()
+        }
+    }, [user, solverData])
+
+    useEffect(() => {
+        console.log('userAllocs: ', userAllocations)
+
         if (userAllocations) {
-            setUserPayoutPercentageForCondition(getTotalPayout(userAllocations))
+            console.log('total payout: ', getTotalPayoutPct(userAllocations))
+            setUserPayoutPercentageForCondition(
+                getTotalPayoutPct(userAllocations)
+            )
         }
     }, [userAllocations])
 
-    // address indexed redeemer,
-    // IERC20 indexed collateralToken,
-    // bytes32 indexed parentCollectionId,
-    // bytes32 conditionId,
-    // uint256[] indexSets,
-    // uint256 payout
+    const getUserAllocations = () => {
+        const allocs: AllocationModel[] = []
+        solverData.outcomeCollections[currentCondition.conditionId].forEach(
+            (oc) => {
+                oc.allocations.forEach((allocation) => {
+                    const decodedAddress = decodeData(
+                        [SolidityDataTypes.Address],
+                        allocation.addressSlot.slot.data
+                    )
+                    if (decodedAddress === user.currentUser?.address) {
+                        allocs.push(allocation)
+                    }
+                })
+            }
+        )
+        setUserAllocations(allocs)
+    }
 
     const listenIsRedeemed = async () => {
         if (ctf && user.currentUser) {
@@ -120,9 +147,9 @@ const RedeemTokensActionbar = ({
 
     /**
      * Mimics calculation from ConditionalToken.sol
-     * IMPORTANT: Amount in alloc is in basis points. Divide by 100 to get pct.
+     * TODO, may not be calculating properly for multiple allocations to the same user from one OC
      */
-    const getTotalPayout = (allocations: AllocationModel[]) => {
+    const getTotalPayoutPct = (allocations: AllocationModel[]) => {
         const payoutNumerators = currentCondition.payouts
         const indexSets = solverData.config.conditionBase.partition
         const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots
@@ -131,7 +158,7 @@ const RedeemTokensActionbar = ({
             return total + next
         })
 
-        let payout = 0
+        let payout = BigNumber.from(0)
 
         for (let i = 0; i < indexSets.length; i++) {
             const indexSet = indexSets[i]
@@ -146,14 +173,16 @@ const RedeemTokensActionbar = ({
 
             const payoutStake = allocations.find(
                 (alloc) => proposedOutcome.indexSet === indexSet
-            )?.amount
+            )?.amountPercentage
 
-            if (payoutStake && Number(payoutStake) > 0) {
-                payout = payout + (Number(payoutStake) * payoutNumerator) / den
+            if (payoutStake && BigNumber.from(payoutStake).gt(0)) {
+                // payout = payout + (Number(payoutStake) * payoutNumerator) / den
+                payout = payout
+                    .add(BigNumber.from(payoutStake).mul(payoutNumerator))
+                    .div(den)
             }
         }
-
-        return payout / 100 // Get percent from basis points
+        return payout
     }
 
     /**
@@ -219,18 +248,17 @@ const RedeemTokensActionbar = ({
                                   ]
                                       ? formatDecimals(
                                             collateralToken,
-                                            userPayoutPercentageForCondition *
-                                                solverData
-                                                    .numMintedTokensByCondition[
-                                                    currentCondition.conditionId
-                                                ]
-                                        ) / 100
-                                      : `${
-                                            solverData
-                                                .numMintedTokensByCondition?.[
-                                                currentCondition.conditionId
-                                            ]
-                                        }`
+                                            userPayoutPercentageForCondition
+                                                .mul(
+                                                    solverData
+                                                        .numMintedTokensByCondition[
+                                                        currentCondition
+                                                            .conditionId
+                                                    ]
+                                                )
+                                                .div(BigNumber.from(100))
+                                        )
+                                      : 'Unknown'
                               } ${
                                   collateralToken
                                       ? collateralToken.symbol ||
