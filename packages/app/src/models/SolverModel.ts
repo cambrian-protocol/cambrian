@@ -13,7 +13,7 @@ import { SlotTagsHashMapType } from './SlotTagModel'
 import { SolverTagModel } from './SolverTagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 
 export type SolverModel = {
     config: SolverConfigModel
@@ -22,7 +22,7 @@ export type SolverModel = {
     outcomeCollections: OutcomeCollectionsHashMapType
     timelocksHistory: TimeLocksHashMapType
     numMintedTokensByCondition?: {
-        [conditionId: string]: number
+        [conditionId: string]: BigNumber
     }
     collateralToken: TokenModel
     collateralBalance: number

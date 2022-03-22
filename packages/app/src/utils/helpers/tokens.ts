@@ -5,14 +5,12 @@ export const formatDecimals = (
     token: TokenModel | undefined,
     amount: BigNumber | number | string
 ) => {
-    let amnt: any = amount
-
-    amnt = BigNumber.from(amount)
+    let amnt = BigNumber.from(amount)
 
     if (token?.decimals) {
-        return amnt.div(BigNumber.from(10).pow(BigNumber.from(token.decimals)))
+        return amnt.div(BigNumber.from(10).pow(token.decimals))
     } else {
-        return amnt.div(BigNumber.from(10).pow(BigNumber.from(18)))
+        return amnt.div(BigNumber.from(10).pow(18).toString())
     }
 }
 
