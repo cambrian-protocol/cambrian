@@ -25,9 +25,9 @@ const ComposerOutcomeList = () => {
             <Box gap="small" fill justify="between">
                 <Box gap="small" fill overflow={{ vertical: 'auto' }}>
                     <HeaderTextSection
-                        title="Outcome list"
-                        subTitle="Create outcomes which can occure"
-                        paragraph="Define the conditions and attach more functionality down the chain, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                        title="All Outcomes"
+                        subTitle="Define possible outcomes"
+                        paragraph="All of the outcomes which may be included in an outcome collection. Represents any eventually to be considered at the resolution of the Solver."
                     />
                     <Box gap="small" fill>
                         {currentSolver.config.condition.outcomes.map(

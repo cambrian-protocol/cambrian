@@ -138,16 +138,16 @@ const ComposerSolverSettingsControl = () => {
         <>
             <Box gap="small" overflow={{ vertical: 'auto' }}>
                 <HeaderTextSection
-                    title="Solver settings"
-                    subTitle="Lorem Ipsum"
-                    paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                    title="Main Settings"
+                    subTitle="Solver"
+                    paragraph="Define the Solver implementation, Keeper, Arbitrator, Timelock, and metadata."
                 />
                 <BaseMenuListItem
                     title="Solver Tag"
                     icon={<Tag />}
                     onClick={toggleShowSolverTagModal}
                 />
-                <HeaderTextSection paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra." />
+                {/* <HeaderTextSection paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra." /> */}
                 <Form<SolverSettingsControlInputType>
                     value={input}
                     onSubmit={(event) => onSubmit(event)}

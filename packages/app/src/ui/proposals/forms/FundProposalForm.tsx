@@ -92,7 +92,7 @@ const FundProposalForm = ({
                             <Button
                                 primary
                                 type="submit"
-                                label="Approve access"
+                                label="Approve Transfer"
                             />
                         )}
                     </Box>

@@ -71,7 +71,7 @@ const CreateRecipientAllocationForm = ({
             <HeaderTextSection
                 title="Create new recipient"
                 subTitle="and allocate amount"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                paragraph="They will receive conditional tokens when included in an outcome collection."
             />
             <Box fill>
                 <BaseMenuListItem

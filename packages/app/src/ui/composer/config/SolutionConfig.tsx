@@ -54,7 +54,7 @@ const SolutionConfig = () => {
             <HeaderTextSection
                 title="Solution Settings"
                 subTitle="Global settings"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+                paragraph="These settings are universal between Solvers."
             />
             <BaseFormContainer>
                 <Form<SolutionConfigFormType>

@@ -34,7 +34,7 @@ const CreateOutcomeModal = ({ onClose }: CreateOutcomeModalProps) => {
             <HeaderTextSection
                 title="Create new outcome"
                 subTitle="What could happen?"
-                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                paragraph="Define the important conditions of the outcome under Description and include other relevant information under Context."
             />
             <OutcomeConfigForm
                 onSubmit={onSubmit}

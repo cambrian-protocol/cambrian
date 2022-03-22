@@ -117,7 +117,7 @@ const ListItem = ({
                 {onAllocate && (
                     <ListItemButton
                         onClick={onAllocate}
-                        label={'Edit BPS'}
+                        label={'Edit BPs'}
                         icon={
                             <StackedIcon
                                 stackBackground="background-contrast"

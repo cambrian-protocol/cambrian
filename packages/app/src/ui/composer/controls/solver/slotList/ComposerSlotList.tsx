@@ -25,7 +25,7 @@ const ComposerSlotList = () => {
                     <HeaderTextSection
                         title="Slot managment"
                         subTitle="Manual slot configuration"
-                        paragraph="You should know what you do here. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra."
+                        paragraph="Manually edit slots containing data to be used during Solver operation. If you don't know what you're doing, you can leave this alone."
                     />
                     <Box gap="small" fill>
                         {Object.keys(currentSolver.config.slots).map(
