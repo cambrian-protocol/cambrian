@@ -26,8 +26,8 @@ const OutcomeSelectionList = () => {
                 <Box gap="small" fill overflow={{ vertical: 'auto' }}>
                     <HeaderTextSection
                         title="Outcome selection"
-                        subTitle="Pick which outcome is included"
-                        paragraph="Define the conditions and attach more functionality down the chain, Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. Nam nec justo ultricies, tristique justo eget, dignissim turpis. "
+                        subTitle="Select, edit and create outcomes for this collection."
+                        paragraph="Allocated tokens from an outcome collection are redeemable when ANY of the included outcomes are true."
                     />
                     <Box gap="small" fill>
                         {currentSolver.config.condition.outcomes.map(

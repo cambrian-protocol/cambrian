@@ -106,10 +106,8 @@ const ConditionVersionSidebar = ({
                                         <Text>Last Solves</Text>
                                     </Box>
                                     <Text size="small" color="dark-6">
-                                        History solver version description text,
-                                        Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit. Suspendisse vel erat et
-                                        enim blandit pharetra.
+                                        History of solves attempted on this
+                                        Solver.
                                     </Text>
                                     {conditions.map((condition, idx) => (
                                         <BaseMenuListItem

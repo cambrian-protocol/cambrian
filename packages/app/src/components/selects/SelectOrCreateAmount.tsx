@@ -105,7 +105,7 @@ const SelectOrCreateAmount = ({
                             onSearch={(text: string) => onSearch(text)}
                         />
                     </Box>
-                    <Text>BPS</Text>
+                    <Text>BPs</Text>
                 </Box>
             )}
         </>

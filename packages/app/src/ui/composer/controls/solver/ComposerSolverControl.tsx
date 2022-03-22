@@ -1,10 +1,10 @@
 import {
     ArrowSquareIn,
+    Cube,
     Gear,
     StackSimple,
     TreeStructure,
     UserList,
-    Cube,
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
@@ -14,8 +14,8 @@ import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
 import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
 import ComposerRecipientList from './recipientList/ComposerRecipientList'
 import ComposerSlotList from './slotList/ComposerSlotList'
-import ComposerSolverSettingsControl from './general/ComposerSolverSettingsControl'
 import ComposerSolverCoreDataInputControl from './general/ComposerSolverCoreDataInputControl'
+import ComposerSolverSettingsControl from './general/ComposerSolverSettingsControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
@@ -86,7 +86,7 @@ export const ComposerSolverControl = () => {
                             <HeaderTextSection
                                 title="Solver"
                                 subTitle="Fine tune your Solver"
-                                paragraph="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
+                                paragraph="Directly edit settings and data. Or, add flags for later editing in templates and proposals."
                             />
                             <Box gap="small">
                                 <BaseMenuListItem

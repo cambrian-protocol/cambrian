@@ -460,7 +460,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         slotHistory: SlotsHistoryHashMapType,
         slotTags: SlotTagsHashMapType,
         numMintedTokensByCondition?: {
-            [conditionId: string]: number
+            [conditionId: string]: BigNumber
         }
     ): Promise<OutcomeCollectionsHashMapType> => {
         const outcomeCollectionsHashMap: OutcomeCollectionsHashMapType = {}
@@ -510,7 +510,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                                 numMintedTokensByCondition &&
                                 numMintedTokensByCondition[
                                     condition.conditionId
-                                ] != 0
+                                ].toString() !== '0'
                                     ? amountPercentage
                                           .mul(
                                               numMintedTokensByCondition[
@@ -688,7 +688,9 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         collateralToken: string
     ) => {
         if (ctf) {
-            const numMintedByCondition = {} as { [conditionId: string]: number }
+            const numMintedByCondition = {} as {
+                [conditionId: string]: BigNumber
+            }
             await Promise.all(
                 conditions.map(async (condition) => {
                     const logs = await ctf.queryFilter(
@@ -709,11 +711,10 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                         .map((l) => l.args?.amount)
                         .filter(Boolean)
                         .reduce((x, y) => {
-                            return x + y
-                        }, 0)
+                            return BigNumber.from(x).add(BigNumber.from(y))
+                        }, BigNumber.from(0))
 
-                    numMintedByCondition[condition.conditionId] =
-                        amount.toString()
+                    numMintedByCondition[condition.conditionId] = amount
                 })
             )
 
