@@ -37,7 +37,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 export type BasicSolverMethodsType = {
