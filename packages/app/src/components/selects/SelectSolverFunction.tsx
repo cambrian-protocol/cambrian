@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import { DEFAULT_IFACE } from '@cambrian/app/constants'
 import { Select } from 'grommet'
 import _ from 'lodash'
 import { ethers } from 'ethers'
@@ -12,6 +11,7 @@ type SelectSolverFunctionProps = {
     updateSolverFunction: (
         updatedSolverFunction?: ethers.utils.FunctionFragment
     ) => void
+    disabled?: boolean
 }
 
 export type SelectSolverFunctionFormType = {
@@ -20,34 +20,11 @@ export type SelectSolverFunctionFormType = {
 }
 
 const defaultSolverFunctionOptions: SelectSolverFunctionFormType[] = []
-const solverFunctionOptions = [
-    {
-        label: 'Select...',
-    },
-    {
-        label: DEFAULT_IFACE.getFunction('addressFromChainIndex').name,
-        solverFunction: DEFAULT_IFACE.getFunction('addressFromChainIndex'),
-    },
-]
-
-const findSolverFunctionFormType = (
-    solverFunctionToFind?: ethers.utils.FunctionFragment | null
-) => {
-    const option = solverFunctionOptions.find(
-        (el) => el.solverFunction === solverFunctionToFind
-    )
-
-    if (option !== undefined) {
-        return option
-    }
-    return {
-        label: 'Select...',
-    }
-}
 
 const SelectSolverFunction = ({
     selectedSolverFunction,
     updateSolverFunction,
+    disabled,
 }: SelectSolverFunctionProps) => {
     const { currentSolver } = useComposerContext()
     const [currentSolverFunction, setCurrentSolverFunction] =
@@ -102,6 +79,7 @@ const SelectSolverFunction = ({
 
     return (
         <Select
+            disabled={disabled}
             placeholder="Select..."
             value={currentSolverFunction?.label}
             options={functionOptions}

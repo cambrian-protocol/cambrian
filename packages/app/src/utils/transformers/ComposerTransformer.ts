@@ -94,9 +94,9 @@ export function parseComposerSolverConfig(
         implementation: composerSolverConfig.implementation
             ? composerSolverConfig.implementation
             : '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
-        keeper: composerSolverConfig.keeperAddress.address,
-        arbitrator: composerSolverConfig.arbitratorAddress?.address
-            ? composerSolverConfig.arbitratorAddress.address
+        keeper: composerSolverConfig.keeperAddress,
+        arbitrator: composerSolverConfig.arbitratorAddress
+            ? composerSolverConfig.arbitratorAddress
             : ethers.constants.AddressZero,
         timelockSeconds: composerSolverConfig.timelockSeconds
             ? composerSolverConfig.timelockSeconds

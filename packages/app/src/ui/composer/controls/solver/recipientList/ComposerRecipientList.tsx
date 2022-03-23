@@ -39,6 +39,7 @@ const ComposerRecipientList = () => {
                                 )
                             }
                         )}
+                        <Box pad="small" />
                     </Box>
                 </Box>
                 <SidebarCardFooter>

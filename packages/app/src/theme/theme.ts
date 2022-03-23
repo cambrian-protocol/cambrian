@@ -126,4 +126,9 @@ export const cpTheme = deepMerge(grommet, {
             thickness: '2px',
         },
     },
+    select: {
+        icons: {
+            color: 'white',
+        },
+    },
 })

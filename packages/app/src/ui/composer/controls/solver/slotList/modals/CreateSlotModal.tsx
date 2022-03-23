@@ -1,20 +1,14 @@
+import CreateSlotForm, { SlotFormType } from '../forms/CreateSlotForm'
 import React, { useState } from 'react'
-import SlotConfigForm, {
-    SlotConfigFormType,
-    mapSlotConfigFormToSlotActionPayload,
-} from '../forms/SlotConfigForm'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { Box } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import { SlotActionPayload } from '@cambrian/app/store/composer/composer.types'
 import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
-import SlotTagModal from '../../general/modals/SlotTagModal'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { Tag } from 'phosphor-react'
 import _uniqueId from 'lodash/uniqueId'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -28,7 +22,7 @@ export type SlotDataInputType = {
     dataType: SolidityDataTypes
 }
 
-export const initialSlotInput: SlotConfigFormType = {
+export const initialSlotInput: SlotFormType = {
     slotType: SlotType.Constant,
     dataInputFields: [
         { id: _uniqueId(), data: '', dataType: SolidityDataTypes.Bytes },
@@ -44,21 +38,16 @@ export const initialSlotTagInput: SlotTagFormInputType = {
 const CreateSlotFormModal = ({ onClose }: CreateSlotModalProps) => {
     const { dispatch } = useComposerContext()
 
-    const [slotInput, setSlotInput] =
-        useState<SlotConfigFormType>(initialSlotInput)
+    const [slotInput, setSlotInput] = useState<SlotFormType>(initialSlotInput)
 
     const [slotTagInput, setSlotTagInput] = useState(initialSlotTagInput)
-
-    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
-
-    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
 
     const onSubmit = (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
         dispatch({
             type: 'CREATE_SLOT',
             payload: {
-                slot: mapSlotConfigFormToSlotActionPayload(slotInput),
+                slot: mapSlotFormTypeToSlotActionPayload(slotInput),
                 slotTag: slotTagInput,
             },
         })
@@ -75,33 +64,61 @@ const CreateSlotFormModal = ({ onClose }: CreateSlotModalProps) => {
                     paragraph="Create a new slot which provides data to this Solver during runtime. If you don't know, you can ignore this."
                 />
                 <Box fill>
-                    <BaseMenuListItem
-                        subTitle="Define a label, a description and more..."
-                        title="Tag"
-                        icon={<Tag />}
-                        onClick={toggleShowSlotTagModal}
-                    />
-                    <PlainSectionDivider />
-                    <HeaderTextSection paragraph="Setup the type of slot and it's according configuration for the smart contract." />
-                    <SlotConfigForm
+                    <CreateSlotForm
+                        slotTagInput={slotTagInput}
+                        setSlotTagInput={setSlotTagInput}
                         onSubmit={onSubmit}
                         slotInput={slotInput}
                         setSlotInput={setSlotInput}
-                        submitLabel="Create slot"
                     />
                 </Box>
             </BaseLayerModal>
-            {showSlotTagModal && (
-                <SlotTagModal
-                    onBack={toggleShowSlotTagModal}
-                    slotTagInput={slotTagInput}
-                    onSubmit={(slotTag: SlotTagFormInputType) => {
-                        setSlotTagInput(slotTag)
-                    }}
-                />
-            )}
         </>
     )
 }
 
 export default CreateSlotFormModal
+
+export const mapSlotFormTypeToSlotActionPayload = (
+    slotConfigFormInput: SlotFormType
+): SlotActionPayload => {
+    const dataTypes: SolidityDataTypes[] = []
+    slotConfigFormInput.dataInputFields?.forEach((field) => {
+        dataTypes.push(field.dataType)
+    })
+    const data: any[] = []
+
+    slotConfigFormInput.dataInputFields?.forEach((field) => {
+        let dataToAdd: any = field.data
+        // Parse to number if possible
+        if (field.dataType === SolidityDataTypes.Uint256) {
+            const parsedInt = parseInt(field.data)
+            if (!isNaN(parsedInt)) {
+                dataToAdd = parsedInt
+            }
+        }
+        data.push(dataToAdd)
+    })
+
+    const slotPayload: SlotActionPayload = {
+        slotType: slotConfigFormInput.slotType,
+        dataTypes: dataTypes,
+        data: data,
+        reference: slotConfigFormInput.reference,
+    }
+
+    switch (slotConfigFormInput.slotType) {
+        case SlotType.Callback:
+            // Doesn't hurt to check
+            if (slotConfigFormInput.reference !== undefined) {
+                slotPayload.targetSolverId =
+                    slotConfigFormInput.reference.solverId
+            }
+            break
+        case SlotType.Function:
+            slotPayload.targetSolverId = slotConfigFormInput.targetSolverId
+            slotPayload.solverFunction = slotConfigFormInput.solverFunction
+            break
+    }
+    return slotPayload
+}

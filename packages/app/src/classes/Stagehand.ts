@@ -49,7 +49,6 @@ export default class Stagehand {
         try {
             const res = await this.ipfs.pin(this.stages)
             if (res && res.IpfsHash) {
-                console.log('Published stages: ', this.stages)
                 return res.IpfsHash
             }
         } catch (e) {
@@ -64,7 +63,6 @@ export default class Stagehand {
     loadStage = async (stagesCID: string, stageType: StageNames) => {
         try {
             const stages = (await this.ipfs.getFromCID(stagesCID)) as Stages
-            console.log('Fetched stages: ', stages)
             this.stages = stages
             return stages[stageType]
         } catch (e) {
@@ -154,7 +152,7 @@ export default class Stagehand {
                 id: solutionId,
                 seller: {
                     name: template.name,
-                    address: 'TODO',
+                    address: 'TODO', // TODO No address needed on template creation
                     pfp: template.pfp,
                 },
                 collateralToken: token,

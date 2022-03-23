@@ -1,6 +1,7 @@
-import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { ComposerConditionModel, ConditionModel } from './ConditionModel'
 import { ComposerSlotModel, SlotModel } from './SlotModel'
+
+import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 export type SolverConfigModel = {
     implementation: string
@@ -19,14 +20,8 @@ export type SolverConfigModel = {
 export type ComposerSolverConfigModel = {
     implementation?: string
     collateralToken?: string
-    keeperAddress: {
-        address: string
-        linkedSlots: string[]
-    }
-    arbitratorAddress: {
-        address: string
-        linkedSlots: string[]
-    }
+    keeperAddress: string
+    arbitratorAddress: string
     timelockSeconds?: number
     data?: SolverCoreDataInputType[]
     slots: {

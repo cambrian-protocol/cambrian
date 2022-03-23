@@ -36,9 +36,6 @@ const UpdateRecipientModal = ({
     const [slotTagInput, setSlotTagInput] =
         useState<SlotTagFormInputType>(initialSlotTagInput)
 
-    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
-    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
-
     useEffect(() => {
         //Init
         if (recipientSlot.data.length === 1) {
@@ -80,15 +77,9 @@ const UpdateRecipientModal = ({
                     paragraph="Edit the new address for this recipient."
                 />
                 <Box fill>
-                    <BaseMenuListItem
-                        subTitle="Define a label, a description and more..."
-                        title="Tag"
-                        icon={<Tag />}
-                        onClick={toggleShowSlotTagModal}
-                    />
-                    <PlainSectionDivider />
-                    <HeaderTextSection paragraph="Setup the type of slot and it's according configuration for the smart contract." />
                     <RecipientConfigForm
+                        recipientTagInput={slotTagInput}
+                        setRecipientTagInput={setSlotTagInput}
                         onSubmit={onSubmit}
                         setRecipientInput={setInput}
                         recipientInput={input}
@@ -96,15 +87,6 @@ const UpdateRecipientModal = ({
                     />
                 </Box>
             </BaseLayerModal>
-            {showSlotTagModal && (
-                <SlotTagModal
-                    onBack={toggleShowSlotTagModal}
-                    slotTagInput={slotTagInput}
-                    onSubmit={(slotTag: SlotTagFormInputType) => {
-                        setSlotTagInput(slotTag)
-                    }}
-                />
-            )}
         </>
     )
 }

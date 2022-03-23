@@ -16,12 +16,14 @@ interface SlotDataInputFieldProps {
     value: SlotDataInputType
     onUpdate: (updatedDataInput: SlotDataInputType) => void
     required?: boolean
+    disabledType?: boolean
 }
 
 const SlotDataInputField = ({
     value,
     onUpdate,
     required,
+    disabledType,
 }: SlotDataInputFieldProps) => {
     const [validationIcon, setValidationIcon] = useState(<></>)
 
@@ -71,7 +73,7 @@ const SlotDataInputField = ({
                     </Box>
                     <Box>
                         <SelectDataType
-                            disabled={required}
+                            disabled={required || disabledType}
                             selectedSolidityDataType={value.dataType}
                             updateSolidtyDataType={onUpdateDataType}
                         />

@@ -1,7 +1,8 @@
 import { Select } from 'grommet'
+import { SelectExtendedProps } from 'grommet'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
 
-interface SelectSlotTypeProps {
+type SelectSlotTypeProps = Omit<SelectExtendedProps, 'options'> & {
     name: string
 }
 
@@ -17,9 +18,10 @@ const slotTypeOptions = [
     { label: 'Manual', slotType: SlotType.Manual },
 ]
 
-const SelectSlotType = ({ name }: SelectSlotTypeProps) => {
+const SelectSlotType = ({ name, ...rest }: SelectSlotTypeProps) => {
     return (
         <Select
+            {...rest}
             name={name}
             placeholder="Select..."
             options={slotTypeOptions}

@@ -15,7 +15,6 @@ export const mergeFlexIntoComposition = (
                 for (const [tagId, taggedInput] of Object.entries(
                     flexInputs[solver.id]
                 )) {
-                    console.log(tagId, taggedInput)
                     updatedComposerSolvers[i].slotTags[tagId] = {
                         id: taggedInput.id,
                         label: taggedInput.label,
@@ -28,13 +27,13 @@ export const mergeFlexIntoComposition = (
                             case 'keeper':
                                 updatedComposerSolvers[i].config[
                                     'keeperAddress'
-                                ].address = taggedInput.value
+                                ] = taggedInput.value
                                 break
 
                             case 'arbitrator':
                                 updatedComposerSolvers[i].config[
                                     'arbitratorAddress'
-                                ].address = taggedInput.value
+                                ] = taggedInput.value
                                 break
 
                             // case 'data':

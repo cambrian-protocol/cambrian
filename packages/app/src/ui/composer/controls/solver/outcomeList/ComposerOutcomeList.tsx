@@ -38,6 +38,7 @@ const ComposerOutcomeList = () => {
                                 />
                             )
                         )}
+                        <Box pad="small" />
                     </Box>
                 </Box>
                 <SidebarCardFooter>

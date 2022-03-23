@@ -12,10 +12,10 @@ import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
+import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { ethers } from 'ethers'
-import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 export type ComposerAction =
     | UpdateSelectionActionType
@@ -163,6 +163,7 @@ export type SlotActionPayload = {
     data: any[]
     targetSolverId?: string
     solverFunction?: ethers.utils.FunctionFragment
+    reference?: ComposerSlotPathType
 }
 
 type DragNodeActionType = {

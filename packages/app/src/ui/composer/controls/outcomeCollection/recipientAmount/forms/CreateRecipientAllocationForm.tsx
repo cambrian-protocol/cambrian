@@ -74,15 +74,13 @@ const CreateRecipientAllocationForm = ({
                 paragraph="They will receive conditional tokens when included in an outcome collection."
             />
             <Box fill>
-                <BaseMenuListItem
-                    subTitle="Define a label, a description and more..."
-                    title="Tag"
-                    icon={<Tag />}
-                    onClick={toggleShowSlotTagModal}
-                />
-                <PlainSectionDivider />
-                <HeaderTextSection paragraph="Setup the address of the recipient." />
-                <BaseFormContainer>
+                <BaseFormContainer gap="medium">
+                    <BaseMenuListItem
+                        subTitle="Define a label, a description and more..."
+                        title="Tag"
+                        icon={<Tag />}
+                        onClick={toggleShowSlotTagModal}
+                    />
                     <Form<RecipientFormType>
                         value={input}
                         onSubmit={(event) => onSubmit(event)}
@@ -90,11 +88,7 @@ const CreateRecipientAllocationForm = ({
                             setInput(nextValue)
                         }}
                     >
-                        <FormField
-                            name="address"
-                            label="Address*"
-                            validate={required}
-                        />
+                        <FormField name="address" label="Address" />
                         <FormField>
                             <SelectOrCreateAmount
                                 amountData={amountData}

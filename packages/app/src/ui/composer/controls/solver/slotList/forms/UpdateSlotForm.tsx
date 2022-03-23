@@ -1,40 +1,43 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import { SetStateAction, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import SelectCallingSolver from '@cambrian/app/components/selects/SelectCallingSolver'
 import SelectSlot from '@cambrian/app/components/selects/SelectSlot'
 import SelectSlotType from '@cambrian/app/components/selects/SelectSlotType'
 import SelectSolverFunction from '@cambrian/app/components/selects/SelectSolverFunction'
-import { SetStateAction } from 'react'
-import { SlotActionPayload } from '@cambrian/app/store/composer/composer.types'
 import SlotDataInputField from '@cambrian/app/components/inputs/SlotDataInput'
 import { SlotDataInputType } from '../modals/CreateSlotModal'
+import { SlotFormType } from './CreateSlotForm'
+import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
+import SlotTagModal from '../../general/modals/SlotTagModal'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { Tag } from 'phosphor-react'
 import _uniqueId from 'lodash/uniqueId'
 import { ethers } from 'ethers'
 
 type SlotConfigFormProps = {
     onSubmit: (event: FormExtendedEvent<{}, Element>) => void
-    slotInput: SlotConfigFormType
-    setSlotInput: React.Dispatch<SetStateAction<SlotConfigFormType>>
-    submitLabel: string
-}
-export type SlotConfigFormType = {
-    slotType: SlotType
-    dataInputFields: SlotDataInputType[]
-    solverFunction?: ethers.utils.FunctionFragment
-    targetSolverId?: string
-    callbackTargetSlotPath?: ComposerSlotPathType
+    slotInput: SlotFormType
+    setSlotInput: React.Dispatch<SetStateAction<SlotFormType>>
+    slotTagInput: SlotTagFormInputType
+    setSlotTagInput: React.Dispatch<SetStateAction<SlotTagFormInputType>>
 }
 
-const SlotConfigForm = ({
+const UpdateSlotForm = ({
     onSubmit,
     slotInput,
     setSlotInput,
-    submitLabel,
+    slotTagInput,
+    setSlotTagInput,
 }: SlotConfigFormProps) => {
+    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
+
+    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
+
     const handleUpdateDataInputField = (
         updatedDataInput: SlotDataInputType
     ) => {
@@ -64,12 +67,10 @@ const SlotConfigForm = ({
         }))
     }
 
-    const handleUpdateCallbackSlotPath = (
-        updatedTargetSlotPath?: ComposerSlotPathType
-    ) => {
+    const handleUpdateReference = (updatedReference?: ComposerSlotPathType) => {
         setSlotInput((prev) => ({
             ...prev,
-            callbackTargetSlotPath: updatedTargetSlotPath,
+            reference: updatedReference,
         }))
     }
     let FormFields = null
@@ -77,17 +78,11 @@ const SlotConfigForm = ({
     switch (slotInput.slotType) {
         case SlotType.Callback:
             FormFields = (
-                <FormField
-                    label="Target slot"
-                    required
-                    name="callbackTargetSlotPath"
-                >
+                <FormField label="Target slot" required name="reference">
                     <SelectSlot
-                        name="callbackTargetSlotPath"
-                        updateCallbackSlotPath={handleUpdateCallbackSlotPath}
-                        selectedCallbackTargetSlotPath={
-                            slotInput.callbackTargetSlotPath
-                        }
+                        name="reference"
+                        updateReference={handleUpdateReference}
+                        selectedReference={slotInput.reference}
                     />
                 </FormField>
             )
@@ -95,19 +90,18 @@ const SlotConfigForm = ({
         case SlotType.Constant:
         case SlotType.Manual:
             FormFields = (
-                <>
-                    <SlotDataInputField
-                        value={slotInput.dataInputFields[0]}
-                        onUpdate={handleUpdateDataInputField}
-                    />
-                </>
+                <SlotDataInputField
+                    disabledType
+                    value={slotInput.dataInputFields[0]}
+                    onUpdate={handleUpdateDataInputField}
+                />
             )
             break
         case SlotType.Function:
             FormFields = (
                 <>
-                    <FormField label="Calling Solver" name="callingSolverIndex">
-                        <SelectCallingSolver name="callingSolverIndex" />
+                    <FormField label="Calling Solver" name="targetSolverId">
+                        <SelectCallingSolver name="targetSolverId" />
                     </FormField>
                     <FormField
                         label="Solver Function"
@@ -115,6 +109,7 @@ const SlotConfigForm = ({
                         name="solverFunction"
                     >
                         <SelectSolverFunction
+                            disabled
                             selectedSolverFunction={slotInput.solverFunction}
                             updateSolverFunction={handleUpdateSolverFunction}
                         />
@@ -139,70 +134,41 @@ const SlotConfigForm = ({
     }
 
     return (
-        <BaseFormContainer>
-            <Form<SlotConfigFormType>
-                value={slotInput}
-                onSubmit={(event) => onSubmit(event)}
-                onChange={(nextValue: SlotConfigFormType) => {
-                    setSlotInput(nextValue)
-                }}
-            >
-                <FormField label="Slot type" name="slotType">
-                    <SelectSlotType name="slotType" />
-                </FormField>
-                {FormFields}
-                <Box margin={{ top: 'small' }}>
-                    <Button primary type="submit" label={submitLabel} />
-                </Box>
-            </Form>
-        </BaseFormContainer>
+        <>
+            <BaseFormContainer gap="medium">
+                <BaseMenuListItem
+                    subTitle="Define a label, a description and more..."
+                    title="Tag"
+                    icon={<Tag />}
+                    onClick={toggleShowSlotTagModal}
+                />
+                <Form<SlotFormType>
+                    value={slotInput}
+                    onSubmit={(event) => onSubmit(event)}
+                    onChange={(nextValue: SlotFormType) => {
+                        setSlotInput(nextValue)
+                    }}
+                >
+                    <FormField label="Slot type" name="slotType">
+                        <SelectSlotType disabled name="slotType" />
+                    </FormField>
+                    {FormFields}
+                    <Box margin={{ top: 'medium' }}>
+                        <Button primary type="submit" label={'Save slot'} />
+                    </Box>
+                </Form>
+            </BaseFormContainer>
+            {showSlotTagModal && (
+                <SlotTagModal
+                    onBack={toggleShowSlotTagModal}
+                    slotTagInput={slotTagInput}
+                    onSubmit={(slotTag: SlotTagFormInputType) => {
+                        setSlotTagInput(slotTag)
+                    }}
+                />
+            )}
+        </>
     )
 }
 
-export default SlotConfigForm
-
-export const mapSlotConfigFormToSlotActionPayload = (
-    slotConfigFormInput: SlotConfigFormType
-): SlotActionPayload => {
-    const dataTypes: SolidityDataTypes[] = []
-    slotConfigFormInput.dataInputFields?.forEach((field) => {
-        dataTypes.push(field.dataType)
-    })
-    const data: any[] = []
-
-    slotConfigFormInput.dataInputFields?.forEach((field) => {
-        let dataToAdd: any = field.data
-        // Parse to number if possible
-        if (field.dataType === SolidityDataTypes.Uint256) {
-            const parsedInt = parseInt(field.data)
-            if (!isNaN(parsedInt)) {
-                dataToAdd = parsedInt
-            }
-        }
-        data.push(dataToAdd)
-    })
-
-    const slotPayload: SlotActionPayload = {
-        slotType: slotConfigFormInput.slotType,
-        dataTypes: dataTypes,
-        data: data,
-    }
-
-    switch (slotConfigFormInput.slotType) {
-        case SlotType.Callback:
-            // Doesn't hurt to check
-            if (slotConfigFormInput.callbackTargetSlotPath !== undefined) {
-                slotPayload.targetSolverId =
-                    slotConfigFormInput.callbackTargetSlotPath.solverId
-                slotPayload.data = [
-                    slotConfigFormInput.callbackTargetSlotPath.slotId,
-                ]
-            }
-            break
-        case SlotType.Function:
-            slotPayload.targetSolverId = slotConfigFormInput.targetSolverId
-            slotPayload.solverFunction = slotConfigFormInput.solverFunction
-            break
-    }
-    return slotPayload
-}
+export default UpdateSlotForm

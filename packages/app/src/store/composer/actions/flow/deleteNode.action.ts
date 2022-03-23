@@ -56,11 +56,11 @@ const deleteNodeAction = (state: CompositionModel): CompositionModel => {
                 })
 
                 // Delete the solver
-                const solverIdx = state.solvers.findIndex((x) => {
-                    x.id === state.currentIdPath?.solverId
-                })
+                const solverIdx = state.solvers.findIndex(
+                    (x) => x.id === state.currentIdPath?.solverId
+                )
                 if (solverIdx) {
-                    state.solvers.splice(solverIdx, 1)
+                    updatedSolvers.splice(solverIdx, 1)
                 }
                 const elementsToRemove = getOutgoers(
                     state.currentElement,

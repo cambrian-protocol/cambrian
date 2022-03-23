@@ -8,22 +8,22 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 interface SelectSlotProps {
     name: string
-    selectedCallbackTargetSlotPath?: ComposerSlotPathType
-    updateCallbackSlotPath: (targetSlotPath?: ComposerSlotPathType) => void
+    selectedReference?: ComposerSlotPathType
+    updateReference: (reference?: ComposerSlotPathType) => void
 }
 
 export type SelectSlotFormType = {
     label: string
-    callbackTargetSlotPath?: ComposerSlotPathType
+    reference?: ComposerSlotPathType
 }
 
 const defaultSlotObjects: SelectSlotFormType[] = []
 
-const findSelectSlotFormType = (slotPathToFind: ComposerSlotPathType) => {
+const findSelectSlotFormType = (referenceToFind: ComposerSlotPathType) => {
     const option = defaultSlotObjects.find(
         (el) =>
-            el.callbackTargetSlotPath?.solverId === slotPathToFind.solverId &&
-            el.callbackTargetSlotPath?.slotId === slotPathToFind.slotId
+            el.reference?.solverId === referenceToFind.solverId &&
+            el.reference?.slotId === referenceToFind.slotId
     )
     if (option !== undefined) {
         return option
@@ -34,8 +34,8 @@ const findSelectSlotFormType = (slotPathToFind: ComposerSlotPathType) => {
 
 // TODO Refactor slot-rework merge to slot ULID, manual value and update value controll can be thrown out then
 const SelectSlot = ({
-    selectedCallbackTargetSlotPath,
-    updateCallbackSlotPath,
+    selectedReference,
+    updateReference,
     name,
 }: SelectSlotProps) => {
     const { composer, currentSolver } = useComposerContext()
@@ -50,9 +50,6 @@ const SelectSlot = ({
         if (currentSolver !== undefined) {
             defaultSlotObjects.splice(0, defaultSlotObjects.length)
             // Init defaultOptions
-            // TODO Label UI
-
-            // TODO: Something better than this, probably.
             const solverHierarchy = getSolverHierarchy(
                 currentSolver,
                 composer.solvers
@@ -64,19 +61,15 @@ const SelectSlot = ({
             for (let i = 0; i < currentSolverIndex; i++) {
                 Object.keys(solverHierarchy[i]?.config.slots).forEach((key) => {
                     const slot = solverHierarchy[i].config.slots[key]
-                    const slotTag = currentSolver.slotTags[slot.id]
-
-                    const slotLabel = `${
+                    const slotTag = solverHierarchy[i].slotTags[slot.id]
+                    const slotLabel =
                         slotTag && slotTag.label !== ''
-                            ? slotTag.label + ' '
-                            : ''
-                    }(${
-                        solverHierarchy[i].solverTag.title
-                    } - Data: ${slot.data.toString()})`
+                            ? slotTag.label
+                            : slot.id
 
                     const currentSelectSlotForm = {
                         label: slotLabel,
-                        callbackTargetSlotPath: {
+                        reference: {
                             slotId: slot.id,
                             solverId: solverHierarchy[i].id,
                         },
@@ -87,9 +80,9 @@ const SelectSlot = ({
 
             setSlotOptions(defaultSlotObjects)
 
-            if (selectedCallbackTargetSlotPath !== undefined) {
+            if (selectedReference !== undefined) {
                 setCurrentSelectedSlot(
-                    findSelectSlotFormType(selectedCallbackTargetSlotPath)
+                    findSelectSlotFormType(selectedReference)
                 )
             }
             setIsInitialized(true)
@@ -103,13 +96,13 @@ const SelectSlot = ({
 
     const onChange = (option: SelectSlotFormType) => {
         setCurrentSelectedSlot(option)
-        if (option.callbackTargetSlotPath !== undefined) {
-            updateCallbackSlotPath({
-                solverId: option.callbackTargetSlotPath.solverId,
-                slotId: option.callbackTargetSlotPath.slotId,
+        if (option.reference !== undefined) {
+            updateReference({
+                solverId: option.reference.solverId,
+                slotId: option.reference.slotId,
             })
         } else {
-            updateCallbackSlotPath(undefined)
+            updateReference(undefined)
         }
     }
 

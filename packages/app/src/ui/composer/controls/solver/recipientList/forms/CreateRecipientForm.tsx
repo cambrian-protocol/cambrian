@@ -28,9 +28,6 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
         initialRecipientConfigFormInput
     )
 
-    const [showTagModal, setShowTagModal] = useState(false)
-    const toggleShowTagModal = () => setShowTagModal(!showTagModal)
-
     const onSubmit = (event: FormExtendedEvent<RecipientFormType, Element>) => {
         event.preventDefault()
         dispatch({
@@ -48,30 +45,15 @@ const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
                 paragraph="They will receive conditional tokens when included in an outcome collection."
             />
             <Box fill>
-                <BaseMenuListItem
-                    subTitle="Define a label, a description and more..."
-                    title="Tag"
-                    icon={<Tag />}
-                    onClick={toggleShowTagModal}
-                />
-                <PlainSectionDivider />
-                <HeaderTextSection paragraph="Setup the address of the recipient." />
                 <RecipientConfigForm
+                    recipientTagInput={slotTagInput}
+                    setRecipientTagInput={setSlotTagInput}
                     onSubmit={onSubmit}
                     setRecipientInput={setInput}
                     recipientInput={input}
                     submitLabel="Create"
                 />
             </Box>
-            {showTagModal && (
-                <SlotTagModal
-                    onBack={toggleShowTagModal}
-                    slotTagInput={slotTagInput}
-                    onSubmit={(slotTag: SlotTagFormInputType) => {
-                        setSlotTagInput(slotTag)
-                    }}
-                />
-            )}
         </>
     )
 }
