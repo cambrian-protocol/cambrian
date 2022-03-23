@@ -85,61 +85,35 @@ export const getAllSlotsByDataType = (
  *  */
 export const getSlotTitle = (
     slotModel: ComposerSlotModel,
-    currentSolverTags: SlotTagsHashMapType,
+    currentSlotTags: SlotTagsHashMapType,
     solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
-    if (solvers) {
-        if (slotModel.targetSolverId !== undefined) {
-            // Its either a callback or a function
-            if (slotModel.slotType === SlotType.Callback) {
-                const callingSolver = solvers.find(
-                    (x) => x.id === slotModel.targetSolverId
-                )
-                if (callingSolver) {
-                    const callingSlot =
-                        callingSolver.config.slots[slotModel.data[0]]
-                    if (callingSlot) {
-                        const callingSlotTag =
-                            callingSolver.slotTags[callingSlot.id]
-                        if (callingSlotTag && callingSlotTag.label !== '') {
-                            return `${callingSlotTag.label} (${callingSolver.solverTag.title})`
-                        } else if (callingSlot.data.length === 1) {
-                            return `${callingSlot.data[0].toString()} (${
-                                callingSolver.solverTag.title
-                            })`
-                        }
-                    }
+    if (slotModel.reference !== undefined && solvers) {
+        const referencedSolver = solvers.find(
+            (x) => x.id === slotModel.reference?.solverId
+        )
+        if (referencedSolver) {
+            if (slotModel.reference.slotId === 'solver') {
+                return referencedSolver.solverTag.title
+            } else {
+                const slotTag =
+                    referencedSolver.slotTags[slotModel.reference.slotId]
+                if (slotTag) {
+                    return slotTag.label
+                } else {
+                    return 'No label defined'
                 }
-            } else if (
-                slotModel.slotType === SlotType.Function &&
-                slotModel.solverFunction?.name === 'addressFromChainIndex'
-            ) {
-                // Get solver title
-                return (
-                    solvers.find((x) => x.id === slotModel.targetSolverId)
-                        ?.solverTag?.title || 'No Solver title found'
-                )
-            }
-        } else if (
-            slotModel.slotType === SlotType.Constant ||
-            slotModel.slotType === SlotType.Manual
-        ) {
-            // Display if its an Arbitrator or Keeper
-            if (slotModel.solverConfigAddress !== undefined) {
-                const configSolver = solvers.find(
-                    (x) => x.id === slotModel.solverConfigAddress?.solverId
-                )
-                return `${configSolver?.solverTag.title}'s ${slotModel.solverConfigAddress.type}`
-            }
-            const currentSlotTag = currentSolverTags[slotModel.id]
-            // Get constant desc or first data entry
-            if (currentSlotTag && currentSlotTag.label !== '') {
-                return currentSlotTag.label
-            } else if (slotModel.data.length === 1) {
-                return slotModel.data[0].toString()
             }
         }
     }
+    const currentSlotTag = currentSlotTags[slotModel.id]
+
+    if (currentSlotTag && currentSlotTag.label !== '') {
+        return currentSlotTag.label
+    } else if (slotModel.data.length === 1 && slotModel.data[0] !== '') {
+        return slotModel.data[0]
+    }
+
     return (
         <Box direction="row" gap="xsmall" align="center">
             <WarningCircle color="red" size={'24'} />

@@ -10,8 +10,6 @@ const updateSlotAction = (
         slotTag: SlotTagFormInputType
     }
 ) => {
-    // TODO Edge case slot was an amount, but isn't anymore.
-
     if (
         state.currentIdPath !== undefined &&
         state.currentIdPath.solverId !== undefined &&
@@ -32,6 +30,7 @@ const updateSlotAction = (
             dataTypes: payload.updatedSlot.dataTypes,
             targetSolverId: payload.updatedSlot.targetSolverId,
             solverFunction: payload.updatedSlot.solverFunction,
+            reference: payload.updatedSlot.reference,
         })
 
         currentSolver.updateSlotTag({

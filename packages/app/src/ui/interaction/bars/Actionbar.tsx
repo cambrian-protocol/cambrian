@@ -52,7 +52,7 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         ) : (
                             <Box flex />
                         )}
-                        <Box>
+                        <Box width={{ min: 'auto' }}>
                             {actions.primaryAction && (
                                 <Button
                                     {...actions.primaryAction}

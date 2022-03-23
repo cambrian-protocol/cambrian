@@ -33,10 +33,9 @@ const attachNewSolverAction = (state: CompositionModel): CompositionModel => {
             ocId: state.currentIdPath.ocId,
         })
 
-        currentSolver.addRecipient({
-            type: 'Solver',
-            data: newSolver.id,
-            targetSolverId: newSolver.id,
+        currentSolver.addRecipientReference({
+            solverId: newSolver.id,
+            slotId: 'solver',
         })
 
         // Flow updates
@@ -52,7 +51,7 @@ const attachNewSolverAction = (state: CompositionModel): CompositionModel => {
             id: `${newSolver.id}`,
             type: 'solver',
             position: nextPosition,
-            data: { label: `New Solver` },
+            data: { label: newSolver.id },
         }
 
         const newEdge = {

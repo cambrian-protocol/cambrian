@@ -19,10 +19,9 @@ const createRecipientAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        const newRecipientSlot = currentSolver.addRecipient({
-            type: 'Slot',
-            data: payload.recipientData.address,
-        })
+        const newRecipientSlot = currentSolver.createRecipient(
+            payload.recipientData.address
+        )
 
         currentSolver.addSlotTag({
             slotId: newRecipientSlot.id,

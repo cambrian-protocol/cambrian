@@ -51,6 +51,7 @@ const RecipientAllocationList = () => {
                                 )
                             }
                         )}
+                        <Box pad="small" />
                     </Box>
                 </Box>
                 <SidebarCardFooter>

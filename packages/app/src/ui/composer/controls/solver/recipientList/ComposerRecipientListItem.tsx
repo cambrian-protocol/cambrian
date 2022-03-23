@@ -64,9 +64,7 @@ const ComposerRecipientListItem = ({
                 title={currentTitle}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    (recipientSlot.slotType === SlotType.Constant ||
-                        recipientSlot.slotType === SlotType.Manual) &&
-                    recipientSlot.solverConfigAddress === undefined
+                    recipientSlot.reference === undefined
                         ? toggleShowEditRecipientModal
                         : undefined
                 }

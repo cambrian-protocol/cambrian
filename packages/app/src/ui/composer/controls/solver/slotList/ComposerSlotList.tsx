@@ -38,6 +38,7 @@ const ComposerSlotList = () => {
                                 />
                             )
                         )}
+                        <Box pad="small" />
                     </Box>
                 </Box>
                 <SidebarCardFooter>

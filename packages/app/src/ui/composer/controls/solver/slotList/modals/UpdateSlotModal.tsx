@@ -1,24 +1,20 @@
-import {
-    ComposerSlotModel,
-    ComposerSlotPathType,
-} from '@cambrian/app/models/SlotModel'
 import React, { useEffect, useState } from 'react'
-import SlotConfigForm, {
-    SlotConfigFormType,
-    mapSlotConfigFormToSlotActionPayload,
-} from '../forms/SlotConfigForm'
-import { initialSlotInput, initialSlotTagInput } from './CreateSlotModal'
+import {
+    initialSlotInput,
+    initialSlotTagInput,
+    mapSlotFormTypeToSlotActionPayload,
+} from './CreateSlotModal'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { Box } from 'grommet'
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { FormExtendedEvent } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import { SlotFormType } from '../forms/CreateSlotForm'
 import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
-import SlotTagModal from '../../general/modals/SlotTagModal'
-import { SlotType } from '@cambrian/app/models/SlotType'
-import { Tag } from 'phosphor-react'
+import { Text } from 'grommet'
+import UpdateSlotForm from '../forms/UpdateSlotForm'
 import _uniqueId from 'lodash/uniqueId'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -35,15 +31,10 @@ const UpdateSlotFormModal = ({
 
     if (!currentSolver) throw Error('No current Solver defined!')
 
-    const [slotInput, setSlotInput] =
-        useState<SlotConfigFormType>(initialSlotInput)
+    const [slotInput, setSlotInput] = useState<SlotFormType>(initialSlotInput)
 
     const [slotTagInput, setSlotTagInput] =
         useState<SlotTagFormInputType>(initialSlotTagInput)
-
-    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
-
-    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
 
     // Init
     useEffect(() => {
@@ -54,25 +45,12 @@ const UpdateSlotFormModal = ({
                 dataType: slotModel.dataTypes[idx],
             }
         })
-
-        let callbackTargetSlotPath: ComposerSlotPathType | undefined
-        if (
-            slotModel.slotType === SlotType.Callback &&
-            slotModel.targetSolverId != undefined &&
-            slotModel.data.length === 1
-        ) {
-            callbackTargetSlotPath = {
-                solverId: slotModel.targetSolverId,
-                slotId: slotModel.data[0],
-            }
-        }
-
         setSlotInput({
             slotType: slotModel.slotType,
             dataInputFields: dataInputFields,
             solverFunction: slotModel.solverFunction,
             targetSolverId: slotModel.targetSolverId,
-            callbackTargetSlotPath: callbackTargetSlotPath,
+            reference: slotModel.reference,
         })
 
         const slotTag = currentSolver.slotTags[slotModel.id]
@@ -88,12 +66,11 @@ const UpdateSlotFormModal = ({
 
     const onSubmit = (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
-
         dispatch({
             type: 'UPDATE_SLOT',
             payload: {
                 slotIdToUpdate: slotModel.id,
-                updatedSlot: mapSlotConfigFormToSlotActionPayload(slotInput),
+                updatedSlot: mapSlotFormTypeToSlotActionPayload(slotInput),
                 slotTag: slotTagInput,
             },
         })
@@ -101,41 +78,34 @@ const UpdateSlotFormModal = ({
         onClose()
     }
 
+    // TODO UX Improvement: CTA Go to reference slot
     return (
-        <>
-            <BaseLayerModal onClose={onClose}>
-                <HeaderTextSection
-                    title="Edit Slot"
-                    subTitle={`Slot ID: ${slotModel.id}`}
-                    // paragraph="You should know what you do. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel erat et enim blandit pharetra. "
-                />
-                <Box fill>
-                    <BaseMenuListItem
-                        subTitle="Define a label, a description and more..."
-                        title="Tag"
-                        icon={<Tag />}
-                        onClick={toggleShowSlotTagModal}
-                    />
-                    <PlainSectionDivider />
-                    <HeaderTextSection paragraph="Setup the type of slot and it's according configuration for the smart contract." />
-                    <SlotConfigForm
+        <BaseLayerModal onClose={onClose}>
+            <HeaderTextSection
+                title="Edit Slot"
+                subTitle={`Slot ID: ${slotModel.id}`}
+            />
+            <Box fill>
+                {slotInput.reference === undefined ? (
+                    <UpdateSlotForm
+                        slotTagInput={slotTagInput}
+                        setSlotTagInput={setSlotTagInput}
                         onSubmit={onSubmit}
                         slotInput={slotInput}
                         setSlotInput={setSlotInput}
-                        submitLabel="Save slot"
                     />
-                </Box>
-            </BaseLayerModal>
-            {showSlotTagModal && (
-                <SlotTagModal
-                    onBack={toggleShowSlotTagModal}
-                    slotTagInput={slotTagInput}
-                    onSubmit={(slotTag: SlotTagFormInputType) => {
-                        setSlotTagInput(slotTag)
-                    }}
-                />
-            )}
-        </>
+                ) : (
+                    <BaseFormContainer>
+                        <Text size="small" color="status-warning">
+                            This is a reference to a slot of the solver:{' '}
+                            {slotInput.reference.solverId} and its slot:{' '}
+                            {slotInput.reference.slotId}. If you want to edit
+                            it, you must edit the referenced slot directly
+                        </Text>
+                    </BaseFormContainer>
+                )}
+            </Box>
+        </BaseLayerModal>
     )
 }
 

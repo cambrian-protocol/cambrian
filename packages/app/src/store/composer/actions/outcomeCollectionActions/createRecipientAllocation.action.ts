@@ -28,10 +28,9 @@ const createRecipientAllocationAction = (
             throw new Error('Error finding current Solver')
         }
 
-        const newRecipientSlot = currentSolver.addRecipient({
-            type: 'Slot',
-            data: payload.recipient.address,
-        })
+        const newRecipientSlot = currentSolver.createRecipient(
+            payload.recipient.address
+        )
 
         if (isSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(

@@ -76,7 +76,6 @@ const RecipientAllocationListItem = ({
                 type: 'DELETE_SLOT',
                 payload: { slotToDelete: allocation.recipientModel },
             })
-            // TODO Check if amount is still being used - if not - delete amount slot
         }
     }
 
@@ -91,10 +90,7 @@ const RecipientAllocationListItem = ({
                 onAllocate={toggleShowEditAmountModal}
                 onRemove={handleDeleteRecipient}
                 onEdit={
-                    (allocation.recipientModel.slotType === SlotType.Constant ||
-                        allocation.recipientModel.slotType ===
-                            SlotType.Manual) &&
-                    allocation.recipientModel.solverConfigAddress === undefined
+                    allocation.recipientModel.reference === undefined
                         ? toggleShowEditRecipientModal
                         : undefined
                 }

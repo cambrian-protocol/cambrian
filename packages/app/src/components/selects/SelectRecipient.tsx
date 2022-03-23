@@ -1,6 +1,5 @@
 import { SetStateAction, useEffect, useState } from 'react'
 
-import { ComposerSlotModel } from '@cambrian/app/src/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { Select } from 'grommet'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
@@ -21,7 +20,7 @@ export type SelectRecipientType = {
 
 export type SelectedRecipientAddressType = {
     solverId: string
-    value: ComposerSlotModel | ComposerSolverModel | 'Keeper' | 'Arbitrator'
+    value: string // Either the slotID, solver, keeper or arbitrator
 }
 // TODO move select type here
 const SelectRecipient = ({
@@ -45,26 +44,26 @@ const SelectRecipient = ({
             composer.solvers.forEach((solver) => {
                 if (
                     solver.config.keeperAddress !== undefined &&
-                    solver.config.keeperAddress.address !== ''
+                    solver.config.keeperAddress !== ''
                 ) {
                     availableAddresses.push({
                         title: `${solver.solverTag.title}'s Keeper`,
                         address: {
                             solverId: solver.id,
-                            value: 'Keeper',
+                            value: 'keeper',
                         },
                     })
                 }
 
                 if (
                     solver.config.arbitratorAddress !== undefined &&
-                    solver.config.arbitratorAddress.address !== ''
+                    solver.config.arbitratorAddress !== ''
                 ) {
                     availableAddresses.push({
                         title: `${solver.solverTag.title}'s Arbitrator`,
                         address: {
                             solverId: solver.id,
-                            value: 'Arbitrator',
+                            value: 'arbitrator',
                         },
                     })
                 }
@@ -114,34 +113,32 @@ const getAvailableAddresses = (
     let currentAvailableAddresses: SelectRecipientType[] = []
 
     currentAvailableAddresses.push({
-        title: currentSolver.solverTag.title,
+        title: `Solver: ${currentSolver.solverTag.title}`,
         address: {
             solverId: currentSolver.id,
-            value: currentSolver,
+            value: 'solver',
         },
     })
 
-    Object.keys(currentSolver.config.slots).forEach((slot) => {
+    Object.keys(currentSolver.config.slots).forEach((slotId) => {
         if (
-            currentSolver.config.slots[slot].dataTypes.length === 1 &&
-            currentSolver.config.slots[slot].solverConfigAddress ===
-                undefined &&
-            currentSolver.config.slots[slot].dataTypes[0] ===
-                SolidityDataTypes.Address &&
-            (currentSolver.config.slots[slot].slotType === SlotType.Constant ||
-                currentSolver.config.slots[slot].slotType === SlotType.Manual)
+            currentSolver.config.slots[slotId].dataTypes.length === 1 &&
+            currentSolver.config.slots[slotId].dataTypes[0] ===
+                SolidityDataTypes.Address
         ) {
             const currentTitle = getSlotTitle(
-                currentSolver.config.slots[slot],
+                currentSolver.config.slots[slotId],
                 currentSolver.slotTags,
                 solvers
             )
 
             currentAvailableAddresses.push({
-                title: currentTitle.toString(),
+                title: `${currentTitle.toString()} (Solver: ${
+                    currentSolver.solverTag.title
+                })`,
                 address: {
                     solverId: currentSolver.id,
-                    value: currentSolver.config.slots[slot],
+                    value: slotId,
                 },
             })
         }

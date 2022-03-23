@@ -20,30 +20,6 @@ const deleteSlotAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        // Clean linkedSlots of SolverConfigAddresses
-        if (payload.slotToDelete.solverConfigAddress !== undefined) {
-            const solverConfigAddress = payload.slotToDelete.solverConfigAddress
-            const propKey =
-                solverConfigAddress.type === 'Keeper'
-                    ? 'keeperAddress'
-                    : 'arbitratorAddress'
-
-            const sourceEntity = state.solvers.find(
-                (x) => x.id === solverConfigAddress.solverId
-            )?.config[propKey]
-
-            if (sourceEntity) {
-                sourceEntity.linkedSlots = sourceEntity.linkedSlots.filter(
-                    (linkedSlot: string) =>
-                        linkedSlot !== payload.slotToDelete.id
-                )
-            } else {
-                throw new Error(
-                    'Could not find solver with defined Keeper or Arbitrator'
-                )
-            }
-        }
-
         currentSolver.deleteSlot(payload.slotToDelete.id)
 
         return {

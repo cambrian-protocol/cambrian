@@ -26,38 +26,6 @@ const updateSolverMainConfigAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        const keeperHasChanged =
-            payload.keeperAddress !== currentSolver.config.keeperAddress.address
-
-        const arbitratorHasChanged =
-            payload.arbitratorAddress !==
-            currentSolver.config.arbitratorAddress.address
-        // Update all linkedSlots
-        if (keeperHasChanged || arbitratorHasChanged) {
-            updatedSolvers.forEach((solver) => {
-                if (keeperHasChanged) {
-                    currentSolver.config.keeperAddress.linkedSlots.forEach(
-                        (linkedSlot: string) => {
-                            const slot = solver.config.slots[linkedSlot]
-                            if (slot !== undefined) {
-                                slot.data = [payload.keeperAddress]
-                            }
-                        }
-                    )
-                }
-                if (arbitratorHasChanged) {
-                    currentSolver.config.arbitratorAddress.linkedSlots.forEach(
-                        (linkedSlot: string) => {
-                            const slot = solver.config.slots[linkedSlot]
-                            if (slot !== undefined) {
-                                slot.data = [payload.arbitratorAddress]
-                            }
-                        }
-                    )
-                }
-            })
-        }
-
         currentSolver.updateMainConfig(payload)
 
         return {

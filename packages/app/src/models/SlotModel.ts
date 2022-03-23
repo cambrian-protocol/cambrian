@@ -42,16 +42,12 @@ export type ComposerSlotModel = {
     data: any[] // TODO
     targetSolverId?: string
     solverFunction?: ethers.utils.FunctionFragment
-    incomingCallbacks?: ComposerSlotPathType[]
-    solverConfigAddress?: ComposerSolverConfigAddressType
+    reference?: ComposerSlotPathType
 }
 
-export type ComposerSlotPathType = { solverId: string; slotId: string }
+export type ComposerSlotPathType = {
+    solverId: string
+    slotId: string | 'keeper' | 'arbitrator' | 'solver'
+}
 
 export type ComposerSlotsHashMapType = { [key: string]: ComposerSlotModel }
-
-// To check if a certain slot is a Keeper or Arbitrator address of another solver
-export type ComposerSolverConfigAddressType = {
-    type: 'Keeper' | 'Arbitrator'
-    solverId: string
-}

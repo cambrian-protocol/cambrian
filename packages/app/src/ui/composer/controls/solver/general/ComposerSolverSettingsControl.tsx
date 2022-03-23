@@ -89,9 +89,8 @@ const ComposerSolverSettingsControl = () => {
                 : { weeks: 0, days: 0, hours: 0, minutes: 0 }
             const loadedInput = {
                 implementation: currentSolver.config.implementation || '',
-                keeperAddress: currentSolver.config.keeperAddress.address,
-                arbitratorAddress:
-                    currentSolver.config.arbitratorAddress.address,
+                keeperAddress: currentSolver.config.keeperAddress,
+                arbitratorAddress: currentSolver.config.arbitratorAddress,
                 timelockDays: parsedSeconds.days,
                 timelockHours: parsedSeconds.hours,
                 timelockMinutes: parsedSeconds.minutes,
@@ -156,12 +155,12 @@ const ComposerSolverSettingsControl = () => {
                     }}
                 >
                     <FormFieldInputWithTag
-                        slotId="keeperAddress"
+                        slotId="keeper"
                         label="Keeper"
                         input={<TextInput name="keeperAddress" />}
                     />
                     <FormFieldInputWithTag
-                        slotId="arbitratorAddress"
+                        slotId="arbitrator"
                         label="Arbitrator"
                         input={<TextInput name="arbitratorAddress" />}
                     />
