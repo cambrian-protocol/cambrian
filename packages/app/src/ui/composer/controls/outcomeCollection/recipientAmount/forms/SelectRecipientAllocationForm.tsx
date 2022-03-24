@@ -1,88 +1,103 @@
-import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import { Button, Form, FormExtendedEvent } from 'grommet'
 import SelectOrCreateAmount, {
     SelectAmountDataType,
+    initialSelectAmountInput,
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
 import SelectRecipient, {
     SelectRecipientType,
+    initialSelectRecipientInput,
 } from '@cambrian/app/components/selects/SelectRecipient'
+import SlotTagFormFields, {
+    SlotTagFormFieldsType,
+    initialSlotTagInput,
+} from '../../../solver/general/forms/SlotTagFormFields'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
-import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
 type SelectRecipientAllocationFormProps = {
     onClose: () => void
 }
+export type SelectRecipientAllocationFormType = SlotTagFormFieldsType &
+    SelectRecipientType & {
+        selectedAmount: SelectAmountDataType
+    }
+
+export const initialSelectRecipientAllocationFormInput: SelectRecipientAllocationFormType =
+    {
+        ...initialSelectRecipientInput,
+        ...initialSlotTagInput,
+        selectedAmount: initialSelectAmountInput,
+    }
 
 const SelectRecipientAllocationForm = ({
     onClose,
 }: SelectRecipientAllocationFormProps) => {
     const { dispatch } = useComposerContext()
 
-    const [selectedRecipient, setSelectedRecipient] =
-        useState<SelectRecipientType>({
-            title: '',
-        })
+    const [input, setInput] = useState<SelectRecipientAllocationFormType>(
+        initialSelectRecipientAllocationFormInput
+    )
 
-    const [amountData, setAmountData] = useState<SelectAmountDataType>({
-        amount: '',
-    })
+    const handleUpdateSelectedAmount = (amount: SelectAmountDataType) => {
+        setInput((prev) => {
+            return { ...prev, selectedAmount: amount }
+        })
+    }
 
     const onSubmit = (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
-        if (selectedRecipient.address !== undefined) {
-            let amountToSave: ComposerSlotModel | number | undefined
-            if (amountData.slotModel !== undefined) {
-                amountToSave = amountData.slotModel
-            } else {
-                const parsedAmount = parseInt(amountData.amount)
-                if (!isNaN(parsedAmount)) {
-                    amountToSave = parsedAmount
-                }
-            }
+        // Parsing input to Number
+        let amountToDispatch: ComposerSlotModel | number | undefined
 
-            if (amountToSave !== undefined) {
-                dispatch({
-                    type: 'ADD_RECIPIENT_WITH_ALLOCATION',
-                    payload: {
-                        amount: amountToSave,
-                        recipient: selectedRecipient.address,
-                    },
-                })
+        if (input.selectedAmount.slotModel) {
+            amountToDispatch = input.selectedAmount.slotModel
+        } else {
+            const parsedAmount = parseInt(input.selectedAmount.amount)
+            if (!isNaN(parsedAmount)) {
+                amountToDispatch = parsedAmount
             }
         }
-        onClose()
+        if (amountToDispatch !== undefined) {
+            dispatch({
+                type: 'ADD_RECIPIENT_WITH_ALLOCATION',
+                payload: { ...input, amount: amountToDispatch },
+            })
+            onClose()
+        } else {
+            console.error('Amount must be numeric!')
+        }
     }
 
     return (
-        <Box gap="small">
-            <HeaderTextSection
-                title="Select recipient with amount"
-                subTitle="Choose an existing address"
-                paragraph="This recipient can redeem tokens for Solver funds when an outcome collection allocated to them occurs."
-            />
+        <Form<SelectRecipientAllocationFormType>
+            onSubmit={(event) => onSubmit(event)}
+            onChange={(nextValue: SelectRecipientAllocationFormType) => {
+                setInput((prev) => {
+                    return {
+                        ...prev,
+                        ...nextValue,
+                    }
+                })
+            }}
+        >
             <BaseFormContainer>
-                <Form onSubmit={(event) => onSubmit(event)}>
-                    <FormField>
-                        <SelectRecipient
-                            selectedRecipient={selectedRecipient}
-                            setSelectedRecipient={setSelectedRecipient}
-                        />
-                    </FormField>
-                    <FormField>
-                        <SelectOrCreateAmount
-                            amountData={amountData}
-                            setAmountData={setAmountData}
-                        />
-                    </FormField>
-                    <Box>
-                        <Button primary type="submit" label="Save" />
-                    </Box>
-                </Form>
+                <SlotTagFormFields />
+                <BaseFormGroupContainer>
+                    <SelectRecipient />
+                </BaseFormGroupContainer>
+                <BaseFormGroupContainer>
+                    <SelectOrCreateAmount
+                        amountData={input.selectedAmount}
+                        updateSelectedAmount={handleUpdateSelectedAmount}
+                    />
+                </BaseFormGroupContainer>
+                <Button primary type="submit" label="Add recipient" />
             </BaseFormContainer>
-        </Box>
+        </Form>
     )
 }
 

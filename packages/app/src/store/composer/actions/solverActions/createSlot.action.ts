@@ -1,11 +1,22 @@
+import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SlotActionPayload } from '../../composer.types'
-import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
+import { SlotTagFormFieldsType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SlotType } from '@cambrian/app/models/SlotType'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { ethers } from 'ethers'
+
+export type CreateSlotActionPayload = SlotTagFormFieldsType & {
+    slotType: SlotType
+    dataTypes: SolidityDataTypes[]
+    data: any[]
+    targetSolverId?: string
+    solverFunction?: ethers.utils.FunctionFragment
+    reference?: ComposerSlotPathType
+}
 
 const createSlotAction = (
     state: CompositionModel,
-    payload: { slot: SlotActionPayload; slotTag: SlotTagFormInputType }
+    payload: CreateSlotActionPayload
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -22,29 +33,29 @@ const createSlotAction = (
 
         let newSlot
 
-        if (payload.slot.slotType === SlotType.Callback) {
+        if (payload.slotType === SlotType.Callback) {
             newSlot = currentSolver.addSlot({
                 data: [''],
-                slotType: payload.slot.slotType,
-                dataTypes: payload.slot.dataTypes,
-                reference: payload.slot.reference,
+                slotType: payload.slotType,
+                dataTypes: payload.dataTypes,
+                reference: payload.reference,
             })
         } else {
             newSlot = currentSolver.addSlot({
-                data: payload.slot.data,
-                slotType: payload.slot.slotType,
-                dataTypes: payload.slot.dataTypes,
-                targetSolverId: payload.slot.targetSolverId,
-                solverFunction: payload.slot.solverFunction,
-            })
-
-            currentSolver.addSlotTag({
-                slotId: newSlot.id,
-                label: payload.slotTag.label,
-                description: payload.slotTag.description,
-                isFlex: payload.slotTag.isFlex,
+                data: payload.data,
+                slotType: payload.slotType,
+                dataTypes: payload.dataTypes,
+                targetSolverId: payload.targetSolverId,
+                solverFunction: payload.solverFunction,
             })
         }
+
+        currentSolver.addSlotTag({
+            slotId: newSlot.id,
+            label: payload.label,
+            description: payload.description,
+            isFlex: payload.isFlex,
+        })
 
         return {
             ...state,

@@ -1,22 +1,11 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextInput,
-} from 'grommet'
+import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 import React, { useEffect, useState } from 'react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import FormFieldInputWithTag from '@cambrian/app/components/inputs/FormFieldInputWithTag'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import SolverTagModal from './modals/SolverTagModal'
-import { Tag } from 'phosphor-react'
-import _ from 'lodash'
-import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverRegisteryAPI from '@cambrian/app/services/api/SolverRegistry.api'
+import _ from 'lodash'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export type SolverCoreDataInputType = {
     type: SolidityDataTypes

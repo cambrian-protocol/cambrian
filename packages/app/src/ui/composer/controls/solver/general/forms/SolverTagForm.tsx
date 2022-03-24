@@ -1,3 +1,5 @@
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { Form } from 'grommet'
@@ -35,19 +37,21 @@ const SolverTagForm = ({ onBack, currentSolverTag }: SolverTagFormProps) => {
                 setInput(nextValue)
             }}
         >
-            <Box gap="small">
-                <FormField name="title" label="Label" />
-                <FormField name="description" label="Description" />
-                <FormField name="version" label="Version" />
-                <FormField name="banner" label="Banner" />
-                <FormField name="avatar" label="Avatar" />
+            <BaseFormContainer>
+                <BaseFormGroupContainer>
+                    <FormField name="title" label="Label" />
+                    <FormField name="description" label="Description" />
+                    <FormField name="version" label="Version" />
+                    <FormField name="banner" label="Banner" />
+                    <FormField name="avatar" label="Avatar" />
+                </BaseFormGroupContainer>
                 <Button
                     primary
                     label="Save"
                     type="submit"
                     disabled={_.isEqual(currentSolverTag, input)}
                 />
-            </Box>
+            </BaseFormContainer>
         </Form>
     )
 }

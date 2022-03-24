@@ -1,21 +1,18 @@
-import {
-    ComposerSlotModel,
-    ComposerSlotPathType,
-} from '@cambrian/app/models/SlotModel'
 import { FlowElement, Node } from 'react-flow-renderer'
 
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '../../models/CompositionModel'
+import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
+import { CreateSlotActionPayload } from './actions/solverActions/createSlot.action'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
-import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
-import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
-import { SlotType } from '@cambrian/app/models/SlotType'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
+import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
+import { SlotTagFormFieldsType } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
-import { ethers } from 'ethers'
+import { UpdateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/UpdateRecipientForm'
 
 export type ComposerAction =
     | UpdateSelectionActionType
@@ -50,7 +47,7 @@ type UpdateSlotTagActionType = {
     type: 'UPDATE_SLOT_TAG'
     payload: {
         slotIdToUpdate: string
-        slotTag: SlotTagFormInputType
+        slotTag: SlotTagFormFieldsType
     }
 }
 
@@ -87,7 +84,7 @@ type OutcomeActionType = {
 
 type CreateSlotActionType = {
     type: 'CREATE_SLOT'
-    payload: { slot: SlotActionPayload; slotTag: SlotTagFormInputType }
+    payload: CreateSlotActionPayload
 }
 
 type DeleteSlotActionType = {
@@ -101,8 +98,7 @@ type UpdateSlotActionType = {
     type: 'UPDATE_SLOT'
     payload: {
         slotIdToUpdate: string
-        updatedSlot: SlotActionPayload
-        slotTag: SlotTagFormInputType
+        updatedSlot: CreateSlotActionPayload
     }
 }
 
@@ -117,53 +113,37 @@ type AttachNewOutcomeCollectionActionType = {
 type UpdateRecipientAllocationActionType = {
     type: 'UPDATE_RECIPIENT_ALLOCATION'
     payload: {
-        recipient: ComposerSlotPathType
+        recipientId: string
         amount: ComposerSlotModel | number
     }
 }
 
 type CreateRecipientAction = {
     type: 'CREATE_RECIPIENT'
-    payload: { recipientData: RecipientFormType; slotTag: SlotTagFormInputType }
+    payload: CreateRecipientFormType
 }
 
 type CreateRecipientWithAllocationAction = {
     type: 'CREATE_RECIPIENT_WITH_ALLOCATION'
-    payload: {
-        recipient: RecipientFormType
-        amount: ComposerSlotModel | number
-        slotTag: SlotTagFormInputType
-    }
+    payload: CreateRecipientFormType & { amount: ComposerSlotModel | number }
 }
 
 type AddRecipientWithAllocationAction = {
     type: 'ADD_RECIPIENT_WITH_ALLOCATION'
-    payload: {
-        recipient: SelectedRecipientAddressType
-        amount: ComposerSlotModel | number
-    }
+    payload: SlotTagFormFieldsType &
+        SelectRecipientType & { amount: ComposerSlotModel | number }
 }
 type AddRecipientAction = {
     type: 'ADD_RECIPIENT'
-    payload: SelectedRecipientAddressType
+    payload: SelectedRecipientFormType
 }
 
 type UpdateRecipientActionType = {
     type: 'UPDATE_RECIPIENT'
     payload: {
         slotId: string
-        recipientData: RecipientFormType
-        slotTag: SlotTagFormInputType
+        recipientData: UpdateRecipientFormType
     }
-}
-
-export type SlotActionPayload = {
-    slotType: SlotType
-    dataTypes: SolidityDataTypes[]
-    data: any[]
-    targetSolverId?: string
-    solverFunction?: ethers.utils.FunctionFragment
-    reference?: ComposerSlotPathType
 }
 
 type DragNodeActionType = {

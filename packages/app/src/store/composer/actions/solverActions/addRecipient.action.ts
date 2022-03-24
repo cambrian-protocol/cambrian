@@ -1,9 +1,9 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
+import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
 
 const addRecipientAction = (
     state: CompositionModel,
-    payload: SelectedRecipientAddressType
+    payload: SelectedRecipientFormType
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -17,11 +17,17 @@ const addRecipientAction = (
         if (!currentSolver) {
             throw new Error('Error finding current Solver')
         }
-
-        currentSolver.addRecipientReference({
-            solverId: payload.solverId,
-            slotId: payload.value,
-        })
+        if (payload.reference) {
+            const newSlot = currentSolver.addRecipientReference(
+                payload.reference
+            )
+            currentSolver.addSlotTag({
+                slotId: newSlot.id,
+                label: payload.label,
+                description: payload.description,
+                isFlex: payload.isFlex,
+            })
+        }
 
         return {
             ...state,

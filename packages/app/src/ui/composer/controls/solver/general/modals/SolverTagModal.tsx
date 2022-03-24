@@ -1,5 +1,5 @@
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SolverTagForm from '../forms/SolverTagForm'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
@@ -14,14 +14,14 @@ const SolverTagModal = ({ onBack, currentSolverTag }: SolverTagModalProps) => {
         <BaseLayerModal onBack={onBack}>
             <HeaderTextSection
                 title="Solver Tag"
-                paragraph="Descriptive metadata for this Solver."
+                subTitle="Descriptive metadata for this Solver."
             />
-            <BaseFormContainer>
+            <Box fill>
                 <SolverTagForm
                     onBack={onBack}
                     currentSolverTag={currentSolverTag}
                 />
-            </BaseFormContainer>
+            </Box>
         </BaseLayerModal>
     )
 }

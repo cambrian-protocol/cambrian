@@ -2,7 +2,7 @@ import { ArrowSquareIn } from 'phosphor-react'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
 import { SlotType } from '@cambrian/app/models/SlotType'
-import UpdateSlotFormModal from './modals/UpdateSlotModal'
+import UpdateSlotModal from './modals/UpdateSlotModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
@@ -49,15 +49,11 @@ const ComposerSlotListItem = ({ slotModel }: ComposerSlotListItemProps) => {
                 icon={<ArrowSquareIn size={'24'} />}
                 description={currentSlotTypeLabel}
                 title={currentTitle}
-                onEdit={
-                    slotModel.solverConfigAddress === undefined && slotModel.id
-                        ? toggleUpdateSlotModal
-                        : undefined
-                }
+                onEdit={toggleUpdateSlotModal}
                 onRemove={slotModel.id ? handleRemoveSlot : undefined}
             />
             {showUpdateSlotModal && (
-                <UpdateSlotFormModal
+                <UpdateSlotModal
                     slotModel={slotModel}
                     onClose={toggleUpdateSlotModal}
                 />

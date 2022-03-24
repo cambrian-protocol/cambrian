@@ -1,17 +1,15 @@
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SelectedRecipientAddressType } from '@cambrian/app/components/selects/SelectRecipient'
+import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
+import { SlotTagFormFieldsType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
-// TODO DRY with addRecipientAction
 const addRecipientAllocationAction = (
     state: CompositionModel,
-    payload: {
-        recipient: SelectedRecipientAddressType
-        amount: number | ComposerSlotModel
-    }
+    payload: SlotTagFormFieldsType &
+        SelectRecipientType & { amount: ComposerSlotModel | number }
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -23,13 +21,20 @@ const addRecipientAllocationAction = (
         const currentSolver = updatedSolvers.find(
             (x) => x.id === state.currentIdPath?.solverId
         )
-        if (!currentSolver) {
-            throw new Error('Error finding current Solver')
+        if (!currentSolver || !payload.reference) {
+            throw new Error(
+                'Error finding current Solver or retreiving slot reference data'
+            )
         }
+        const newRecipientSlot = currentSolver.addRecipientReference(
+            payload.reference
+        )
 
-        const newRecipientSlot = currentSolver.addRecipientReference({
-            solverId: payload.recipient.solverId,
-            slotId: payload.recipient.value,
+        currentSolver.addSlotTag({
+            slotId: newRecipientSlot.id,
+            label: payload.label,
+            description: payload.description,
+            isFlex: payload.isFlex,
         })
 
         if (isSlot(payload.amount)) {
