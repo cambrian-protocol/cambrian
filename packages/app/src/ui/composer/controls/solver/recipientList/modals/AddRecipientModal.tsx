@@ -1,11 +1,11 @@
 import { Cursor, UserPlus } from 'phosphor-react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import { Box } from 'grommet'
-import CreateRecipientForm from '../forms/CreateRecipientForm'
+import CreateRecipientModal from './CreateRecipientModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import SelectRecipientForm from '../forms/SelectRecipientForm'
+import SelectRecipientModal from './SelectRecipientModal'
 import { useState } from 'react'
 
 type AddRecipientModalProps = {
@@ -30,7 +30,7 @@ const AddRecipientModal = ({ onClose }: AddRecipientModalProps) => {
                     subTitle="Who else deserves a share?"
                     paragraph="You can choose between existent recipients and solvers, or create a new ones"
                 />
-                <Box gap="small" fill>
+                <BaseFormContainer>
                     <BaseMenuListItem
                         title="Select recipient"
                         icon={<Cursor size="24" />}
@@ -41,17 +41,19 @@ const AddRecipientModal = ({ onClose }: AddRecipientModalProps) => {
                         icon={<UserPlus size="24" />}
                         onClick={toggleShowCreateRecipient}
                     />
-                </Box>
+                </BaseFormContainer>
             </BaseLayerModal>
             {showCreateRecipient && (
-                <BaseLayerModal onClose={toggleShowCreateRecipient}>
-                    <CreateRecipientForm onClose={onClose} />
-                </BaseLayerModal>
+                <CreateRecipientModal
+                    onBack={toggleShowCreateRecipient}
+                    onClose={onClose}
+                />
             )}
             {showSelectRecipient && (
-                <BaseLayerModal onClose={toggleShowSelectRecipient}>
-                    <SelectRecipientForm onClose={onClose} />
-                </BaseLayerModal>
+                <SelectRecipientModal
+                    onBack={toggleShowSelectRecipient}
+                    onClose={onClose}
+                />
             )}
         </>
     )

@@ -1,5 +1,5 @@
 import { Box, Select, Text } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -9,7 +9,7 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 type SelectOrCreateAmountProps = {
     amountData: SelectAmountDataType
-    setAmountData: React.Dispatch<SetStateAction<SelectAmountDataType>>
+    updateSelectedAmount: (selectedAmount: SelectAmountDataType) => void
 }
 
 // the prefix name of the Create option entry
@@ -29,6 +29,8 @@ export type SelectAmountDataType = {
     slotModel?: ComposerSlotModel
 }
 
+export const initialSelectAmountInput = { amount: '' }
+
 const defaultAmountObjects: SelectAmountDataType[] = []
 /* 
  TODOs 
@@ -40,7 +42,7 @@ const defaultAmountObjects: SelectAmountDataType[] = []
 */
 const SelectOrCreateAmount = ({
     amountData,
-    setAmountData,
+    updateSelectedAmount,
 }: SelectOrCreateAmountProps) => {
     const { currentSolver } = useComposerContext()
     const [amountOptions, setAmountOptions] = useState(defaultAmountObjects)
@@ -80,9 +82,9 @@ const SelectOrCreateAmount = ({
         if (option.amount.includes(prefix)) {
             defaultAmountObjects.pop() // remove Create option
             defaultAmountObjects.push({ amount: searchValue })
-            setAmountData({ amount: searchValue })
+            updateSelectedAmount({ amount: searchValue })
         } else {
-            setAmountData(option)
+            updateSelectedAmount(option)
         }
     }
 

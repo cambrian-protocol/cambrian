@@ -1,10 +1,9 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
-import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
+import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 
 const createRecipientAction = (
     state: CompositionModel,
-    payload: { recipientData: RecipientFormType; slotTag: SlotTagFormInputType }
+    payload: CreateRecipientFormType
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -19,15 +18,12 @@ const createRecipientAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        const newRecipientSlot = currentSolver.createRecipient(
-            payload.recipientData.address
-        )
-
+        const newRecipientSlot = currentSolver.createRecipient(payload.address)
         currentSolver.addSlotTag({
             slotId: newRecipientSlot.id,
-            label: payload.slotTag.label,
-            description: payload.slotTag.description,
-            isFlex: payload.slotTag.isFlex,
+            label: payload.label,
+            description: payload.description,
+            isFlex: payload.isFlex,
         })
 
         return {

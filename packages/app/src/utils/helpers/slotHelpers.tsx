@@ -12,8 +12,9 @@ import { WarningCircle } from 'phosphor-react'
  * @returns true if it is a slot
  * */
 export function isSlot(
-    toBeDetermined: any | ComposerSlotModel
+    toBeDetermined?: any | ComposerSlotModel
 ): toBeDetermined is ComposerSlotModel {
+    if (!toBeDetermined) return false
     if ((toBeDetermined as ComposerSlotModel).slotType) {
         return true
     }
@@ -88,24 +89,6 @@ export const getSlotTitle = (
     currentSlotTags: SlotTagsHashMapType,
     solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
-    if (slotModel.reference !== undefined && solvers) {
-        const referencedSolver = solvers.find(
-            (x) => x.id === slotModel.reference?.solverId
-        )
-        if (referencedSolver) {
-            if (slotModel.reference.slotId === 'solver') {
-                return referencedSolver.solverTag.title
-            } else {
-                const slotTag =
-                    referencedSolver.slotTags[slotModel.reference.slotId]
-                if (slotTag) {
-                    return slotTag.label
-                } else {
-                    return 'No label defined'
-                }
-            }
-        }
-    }
     const currentSlotTag = currentSlotTags[slotModel.id]
 
     if (currentSlotTag && currentSlotTag.label !== '') {

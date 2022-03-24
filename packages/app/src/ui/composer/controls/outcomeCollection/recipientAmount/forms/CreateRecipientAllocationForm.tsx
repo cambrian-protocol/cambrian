@@ -1,120 +1,102 @@
-import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import {
+    CreateRecipientFormType,
+    initialCreateRecipientFormInput,
+} from '../../../solver/recipientList/forms/CreateRecipientForm'
 import SelectOrCreateAmount, {
     SelectAmountDataType,
+    initialSelectAmountInput,
 } from '@cambrian/app/components/selects/SelectOrCreateAmount'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Button } from 'grommet'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { RecipientFormType } from '../../../solver/recipientList/forms/RecipientConfigForm'
-import { SlotTagFormInputType } from '../../../solver/general/forms/SlotTagForm'
-import SlotTagModal from '../../../solver/general/modals/SlotTagModal'
-import { Tag } from 'phosphor-react'
-import { initialSlotTagInput } from '../../../solver/slotList/modals/CreateSlotModal'
-import { required } from '@cambrian/app/src/utils/helpers/validation'
-import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
+import { Form } from 'grommet'
+import { FormExtendedEvent } from 'grommet'
+import { FormField } from 'grommet'
+import SlotTagFormFields from '../../../solver/general/forms/SlotTagFormFields'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
-type CreateRecipientAllocationFormProps = {
+interface CreateRecipientAllocationFormProps {
     onClose: () => void
 }
+
+export type CreateRecipientAllocationFormType = CreateRecipientFormType & {
+    selectedAmount: SelectAmountDataType
+}
+
+const initialCreateRecipientAllocationFormInput: CreateRecipientAllocationFormType =
+    {
+        ...initialCreateRecipientFormInput,
+        selectedAmount: initialSelectAmountInput,
+    }
 
 const CreateRecipientAllocationForm = ({
     onClose,
 }: CreateRecipientAllocationFormProps) => {
     const { dispatch } = useComposerContext()
 
-    const [showSlotTagModal, setShowSlotTagModal] = useState(false)
+    const [input, setInput] = useState<CreateRecipientAllocationFormType>(
+        initialCreateRecipientAllocationFormInput
+    )
 
-    const toggleShowSlotTagModal = () => setShowSlotTagModal(!showSlotTagModal)
-
-    const [input, setInput] = useState<RecipientFormType>({
-        address: '',
-    })
-    const [amountData, setAmountData] = useState<SelectAmountDataType>({
-        amount: '',
-    })
-
-    const [slotTagInput, setSlotTagInput] =
-        useState<SlotTagFormInputType>(initialSlotTagInput)
-
-    const onSubmit = (event: FormExtendedEvent<RecipientFormType, Element>) => {
+    const onSubmit = (
+        event: FormExtendedEvent<CreateRecipientAllocationFormType, Element>
+    ) => {
         event.preventDefault()
+        // Parsing input to Number
+        let amountToDispatch: ComposerSlotModel | number | undefined
 
-        let amountToSave: ComposerSlotModel | number | undefined
-        if (amountData.slotModel !== undefined) {
-            amountToSave = amountData.slotModel
+        if (input.selectedAmount.slotModel) {
+            amountToDispatch = input.selectedAmount.slotModel
         } else {
-            const parsedAmount = parseInt(amountData.amount)
+            const parsedAmount = parseInt(input.selectedAmount.amount)
             if (!isNaN(parsedAmount)) {
-                amountToSave = parsedAmount
+                amountToDispatch = parsedAmount
             }
         }
 
-        if (amountToSave !== undefined) {
+        if (amountToDispatch !== undefined) {
+            onClose()
             dispatch({
                 type: 'CREATE_RECIPIENT_WITH_ALLOCATION',
-                payload: {
-                    recipient: input,
-                    amount: amountToSave,
-                    slotTag: slotTagInput,
-                },
+                payload: { ...input, amount: amountToDispatch },
             })
             onClose()
+        } else {
+            console.error('Amount must be numeric!')
         }
     }
 
+    const handleUpdateSelectedAmount = (amount: SelectAmountDataType) => {
+        setInput((prev) => {
+            return { ...prev, selectedAmount: amount }
+        })
+    }
+
     return (
-        <>
-            <HeaderTextSection
-                title="Create new recipient"
-                subTitle="and allocate amount"
-                paragraph="They will receive conditional tokens when included in an outcome collection."
-            />
-            <Box fill>
-                <BaseFormContainer gap="medium">
-                    <BaseMenuListItem
-                        subTitle="Define a label, a description and more..."
-                        title="Tag"
-                        icon={<Tag />}
-                        onClick={toggleShowSlotTagModal}
+        <Form<CreateRecipientAllocationFormType>
+            value={input}
+            onSubmit={(event) => onSubmit(event)}
+            onChange={(nextValue: CreateRecipientAllocationFormType) => {
+                setInput(nextValue)
+            }}
+        >
+            <BaseFormContainer>
+                <SlotTagFormFields />
+                <BaseFormGroupContainer>
+                    <FormField name="address" label="Address" />
+                </BaseFormGroupContainer>
+                <BaseFormGroupContainer>
+                    <SelectOrCreateAmount
+                        amountData={input.selectedAmount}
+                        updateSelectedAmount={handleUpdateSelectedAmount}
                     />
-                    <Form<RecipientFormType>
-                        value={input}
-                        onSubmit={(event) => onSubmit(event)}
-                        onChange={(nextValue: RecipientFormType) => {
-                            setInput(nextValue)
-                        }}
-                    >
-                        <FormField name="address" label="Address" />
-                        <FormField>
-                            <SelectOrCreateAmount
-                                amountData={amountData}
-                                setAmountData={setAmountData}
-                            />
-                        </FormField>
-                        <Box>
-                            <Button
-                                primary
-                                type="submit"
-                                label="Create Recipient"
-                            />
-                        </Box>
-                    </Form>
-                </BaseFormContainer>
-            </Box>
-            {showSlotTagModal && (
-                <SlotTagModal
-                    onBack={toggleShowSlotTagModal}
-                    slotTagInput={slotTagInput}
-                    onSubmit={(slotTag: SlotTagFormInputType) => {
-                        setSlotTagInput(slotTag)
-                    }}
-                />
-            )}
-        </>
+                </BaseFormGroupContainer>
+                <Button primary type="submit" label="Create Recipient" />
+            </BaseFormContainer>
+        </Form>
     )
 }
 

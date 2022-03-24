@@ -1,60 +1,61 @@
-import { Box, FormExtendedEvent } from 'grommet'
-import RecipientConfigForm, {
-    RecipientFormType,
-    initialRecipientConfigFormInput,
-} from './RecipientConfigForm'
+import { Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import SlotTagFormFields, {
+    SlotTagFormFieldsType,
+    initialSlotTagInput,
+} from '../../general/forms/SlotTagFormFields'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { SlotTagFormInputType } from '../../general/forms/SlotTagForm'
-import SlotTagModal from '../../general/modals/SlotTagModal'
-import { Tag } from 'phosphor-react'
-import { initialSlotTagInput } from '../../slotList/modals/CreateSlotModal'
-import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
-type CreateRecipientFormProps = {
+interface RecipientConfigFormProps {
     onClose: () => void
 }
 
-const CreateRecipientForm = ({ onClose }: CreateRecipientFormProps) => {
+export const initialCreateRecipientFormInput = {
+    ...initialSlotTagInput,
+    address: '',
+}
+
+export type CreateRecipientFormType = SlotTagFormFieldsType & {
+    address: string
+}
+
+const CreateRecipientForm = ({ onClose }: RecipientConfigFormProps) => {
     const { dispatch } = useComposerContext()
 
-    const [slotTagInput, setSlotTagInput] =
-        useState<SlotTagFormInputType>(initialSlotTagInput)
-
-    const [input, setInput] = useState<RecipientFormType>(
-        initialRecipientConfigFormInput
+    const [input, setInput] = useState<CreateRecipientFormType>(
+        initialCreateRecipientFormInput
     )
 
-    const onSubmit = (event: FormExtendedEvent<RecipientFormType, Element>) => {
+    const onSubmit = (
+        event: FormExtendedEvent<CreateRecipientFormType, Element>
+    ) => {
         event.preventDefault()
         dispatch({
             type: 'CREATE_RECIPIENT',
-            payload: { recipientData: input, slotTag: slotTagInput },
+            payload: input,
         })
         onClose()
     }
 
     return (
-        <>
-            <HeaderTextSection
-                title="Create new recipient"
-                subTitle="Who else deserves a share?"
-                paragraph="They will receive conditional tokens when included in an outcome collection."
-            />
-            <Box fill>
-                <RecipientConfigForm
-                    recipientTagInput={slotTagInput}
-                    setRecipientTagInput={setSlotTagInput}
-                    onSubmit={onSubmit}
-                    setRecipientInput={setInput}
-                    recipientInput={input}
-                    submitLabel="Create"
-                />
-            </Box>
-        </>
+        <Form<CreateRecipientFormType>
+            value={input}
+            onSubmit={(event) => onSubmit(event)}
+            onChange={(nextValue: CreateRecipientFormType) => {
+                setInput(nextValue)
+            }}
+        >
+            <BaseFormContainer>
+                <SlotTagFormFields />
+                <BaseFormGroupContainer>
+                    <FormField name="address" label="Address" />
+                </BaseFormGroupContainer>
+                <Button primary type="submit" label="Create recipient" />
+            </BaseFormContainer>
+        </Form>
     )
 }
 

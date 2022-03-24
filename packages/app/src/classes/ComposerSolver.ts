@@ -149,12 +149,12 @@ export default class ComposerSolver {
             slotTagToUpdate.description = description
             slotTagToUpdate.isFlex = isFlex
         } else {
-            this.slotTags[slotId] = {
-                id: slotId,
+            this.addSlotTag({
+                slotId: slotId,
                 label: label,
                 description: description,
                 isFlex: isFlex,
-            }
+            })
         }
     }
 

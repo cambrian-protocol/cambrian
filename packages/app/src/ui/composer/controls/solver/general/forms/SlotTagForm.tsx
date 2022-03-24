@@ -1,44 +1,56 @@
-import { Box } from 'grommet'
+import SlotTagFormFields, {
+    SlotTagFormFieldsType,
+    initialSlotTagInput,
+} from './SlotTagFormFields'
+import { useEffect, useState } from 'react'
+
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
-import { CheckBox } from 'grommet'
 import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
-import { FormField } from 'grommet'
-import { SetStateAction } from 'react'
-import { TextArea } from 'grommet'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface SlotTagFormProps {
-    onSubmit: (event: FormExtendedEvent<{}, Element>) => void
-    input: SlotTagFormInputType
-    setInput: React.Dispatch<SetStateAction<SlotTagFormInputType>>
+    onClose: () => void
+    slotId: string
 }
 
-export type SlotTagFormInputType = {
-    label: string
-    description: string
-    isFlex: boolean
-}
+const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
+    const { currentSolver, dispatch } = useComposerContext()
 
-const SlotTagForm = ({ onSubmit, input, setInput }: SlotTagFormProps) => {
+    const [input, setInput] =
+        useState<SlotTagFormFieldsType>(initialSlotTagInput)
+
+    //Init
+    useEffect(() => {
+        if (currentSolver && currentSolver.slotTags[slotId]) {
+            setInput(currentSolver.slotTags[slotId])
+        }
+    }, [])
+
+    const onSubmit = (
+        event: FormExtendedEvent<SlotTagFormFieldsType, Element>
+    ) => {
+        event.preventDefault()
+        dispatch({
+            type: 'UPDATE_SLOT_TAG',
+            payload: { slotIdToUpdate: slotId, slotTag: input },
+        })
+        onClose()
+    }
+
     return (
-        <Form<SlotTagFormInputType>
+        <Form<SlotTagFormFieldsType>
             value={input}
             onSubmit={(event) => onSubmit(event)}
-            onChange={(nextValue: SlotTagFormInputType) => {
+            onChange={(nextValue: SlotTagFormFieldsType) => {
                 setInput(nextValue)
             }}
         >
-            <Box gap="medium">
-                <FormField name="label" label="Label" />
-                <FormField label="Description">
-                    <TextArea name="description" rows={5} resize={false} />
-                </FormField>
-                <CheckBox
-                    label="Will be finally defined during template and proposal creation process"
-                    name="isFlex"
-                />
-                <Button primary label="Save" type="submit" />
-            </Box>
+            <BaseFormContainer>
+                <SlotTagFormFields />
+                <Button primary type="submit" label="Save Tag" />
+            </BaseFormContainer>
         </Form>
     )
 }

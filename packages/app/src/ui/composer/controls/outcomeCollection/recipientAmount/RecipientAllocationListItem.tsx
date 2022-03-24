@@ -89,15 +89,10 @@ const RecipientAllocationListItem = ({
                 valueUnit="BPs"
                 onAllocate={toggleShowEditAmountModal}
                 onRemove={handleDeleteRecipient}
-                onEdit={
-                    allocation.recipientModel.reference === undefined
-                        ? toggleShowEditRecipientModal
-                        : undefined
-                }
+                onEdit={toggleShowEditRecipientModal}
             />
             {showEditAmountModal && (
                 <UpdateRecipientAllocationModal
-                    recipientSlotPath={recipientSlotPath}
                     onClose={toggleShowEditAmountModal}
                     allocation={allocation}
                 />

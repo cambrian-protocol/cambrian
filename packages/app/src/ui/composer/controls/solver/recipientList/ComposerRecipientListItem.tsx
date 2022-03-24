@@ -63,11 +63,7 @@ const ComposerRecipientListItem = ({
                 icon={currentIcon}
                 title={currentTitle}
                 onRemove={handleDeleteRecipient}
-                onEdit={
-                    recipientSlot.reference === undefined
-                        ? toggleShowEditRecipientModal
-                        : undefined
-                }
+                onEdit={toggleShowEditRecipientModal}
             />
             {showEditRecipientModal && (
                 <UpdateRecipientModal

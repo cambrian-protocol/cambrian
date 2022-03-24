@@ -14,6 +14,7 @@ const BaseFormContainer = ({
             round="small"
             fill="horizontal"
             height={{ min: 'auto' }}
+            gap="medium"
             {...rest}
         >
             {children}

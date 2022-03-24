@@ -8,7 +8,6 @@ import {
 } from '@cambrian/app/utils/helpers/validation'
 
 import SelectDataType from '../selects/SelectDataType'
-import { SlotDataInputType } from '@cambrian/app/ui/composer/controls/solver/slotList/modals/CreateSlotModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { ethers } from 'ethers'
 
@@ -17,6 +16,12 @@ interface SlotDataInputFieldProps {
     onUpdate: (updatedDataInput: SlotDataInputType) => void
     required?: boolean
     disabledType?: boolean
+}
+
+export type SlotDataInputType = {
+    id: string
+    data: any
+    dataType: SolidityDataTypes
 }
 
 const SlotDataInputField = ({

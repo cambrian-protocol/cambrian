@@ -1,8 +1,4 @@
-import {
-    ComposerSlotModel,
-    ComposerSlotPathType,
-} from '@cambrian/app/models/SlotModel'
-
+import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -11,7 +7,7 @@ import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 const updateRecipientAllocationAction = (
     state: CompositionModel,
     payload: {
-        recipient: ComposerSlotPathType
+        recipientId: string
         amount: ComposerSlotModel | number
     }
 ): CompositionModel => {
@@ -34,7 +30,7 @@ const updateRecipientAllocationAction = (
         if (isSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                payload.recipient.slotId,
+                payload.recipientId,
                 payload.amount.id
             )
         } else {
@@ -45,7 +41,7 @@ const updateRecipientAllocationAction = (
             })
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                payload.recipient.slotId,
+                payload.recipientId,
                 newAmountSlot.id
             )
         }

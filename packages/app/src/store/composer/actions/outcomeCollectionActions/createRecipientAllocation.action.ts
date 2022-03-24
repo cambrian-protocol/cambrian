@@ -1,18 +1,13 @@
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { RecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/RecipientConfigForm'
-import { SlotTagFormInputType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagForm'
+import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const createRecipientAllocationAction = (
     state: CompositionModel,
-    payload: {
-        recipient: RecipientFormType
-        amount: number | ComposerSlotModel
-        slotTag: SlotTagFormInputType
-    }
+    payload: CreateRecipientFormType & { amount: ComposerSlotModel | number }
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -28,9 +23,14 @@ const createRecipientAllocationAction = (
             throw new Error('Error finding current Solver')
         }
 
-        const newRecipientSlot = currentSolver.createRecipient(
-            payload.recipient.address
-        )
+        const newRecipientSlot = currentSolver.createRecipient(payload.address)
+
+        currentSolver.addSlotTag({
+            slotId: newRecipientSlot.id,
+            label: payload.label,
+            description: payload.description,
+            isFlex: payload.isFlex,
+        })
 
         if (isSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(
@@ -50,13 +50,6 @@ const createRecipientAllocationAction = (
                 newAmountSlot.id
             )
         }
-
-        currentSolver.addSlotTag({
-            slotId: newRecipientSlot.id,
-            label: payload.slotTag.label,
-            description: payload.slotTag.description,
-            isFlex: payload.slotTag.isFlex,
-        })
 
         return {
             ...state,

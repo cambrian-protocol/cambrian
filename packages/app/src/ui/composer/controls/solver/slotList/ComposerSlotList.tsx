@@ -1,6 +1,6 @@
 import { Box } from 'grommet'
 import ComposerSlotListItem from './ComposerSlotListItem'
-import CreateSlotFormModal from './modals/CreateSlotModal'
+import CreateSlotModal from './modals/CreateSlotModal'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Plus } from 'phosphor-react'
@@ -50,7 +50,7 @@ const ComposerSlotList = () => {
                 </SidebarCardFooter>
             </Box>
             {showCreateSlotModal && (
-                <CreateSlotFormModal onClose={toggleCreateSlotModal} />
+                <CreateSlotModal onClose={toggleCreateSlotModal} />
             )}
         </>
     )
