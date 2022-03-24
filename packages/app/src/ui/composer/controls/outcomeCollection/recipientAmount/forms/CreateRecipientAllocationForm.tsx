@@ -32,6 +32,7 @@ const initialCreateRecipientAllocationFormInput: CreateRecipientAllocationFormTy
         selectedAmount: initialSelectAmountInput,
     }
 
+// TODO UX Improvement: Add checkbox if slot should be filled from keeper when solve gets prepared. => create manual slot instead of constant
 const CreateRecipientAllocationForm = ({
     onClose,
 }: CreateRecipientAllocationFormProps) => {
