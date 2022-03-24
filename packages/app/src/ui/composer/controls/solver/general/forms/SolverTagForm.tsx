@@ -1,6 +1,5 @@
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
