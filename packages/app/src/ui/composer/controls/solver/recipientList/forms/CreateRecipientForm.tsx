@@ -22,6 +22,7 @@ export type CreateRecipientFormType = SlotTagFormFieldsType & {
     address: string
 }
 
+// TODO UX Improvement: Add checkbox if slot should be filled from keeper when solve gets prepared. => create manual slot instead of constant
 const CreateRecipientForm = ({ onClose }: RecipientConfigFormProps) => {
     const { dispatch } = useComposerContext()
 

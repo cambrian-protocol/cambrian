@@ -21,6 +21,7 @@ const deleteSlotAction = (
         }
 
         currentSolver.deleteSlot(payload.slotToDelete.id)
+        currentSolver.deleteSlotTag(payload.slotToDelete.id)
 
         return {
             ...state,
