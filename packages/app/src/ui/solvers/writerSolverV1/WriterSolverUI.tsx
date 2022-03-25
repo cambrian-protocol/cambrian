@@ -310,8 +310,8 @@ const WriterSolverUI = ({
             >
                 <WriterSolverContentUI
                     token={solverData.collateralToken}
-                    proposalTitle={proposal.title}
-                    proposalDescription={proposal.description}
+                    proposalTitle={proposal?.title || ''}
+                    proposalDescription={proposal?.description || ''}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}

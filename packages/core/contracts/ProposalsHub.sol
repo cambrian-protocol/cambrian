@@ -26,7 +26,7 @@ contract ProposalsHub is ERC1155Receiver {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
-        SolverLib.Multihash context;
+        SolverLib.Multihash metadataCID;
     }
 
     mapping(bytes32 => Proposal) public proposals;
@@ -131,7 +131,8 @@ contract ProposalsHub is ERC1155Receiver {
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 solutionId
+        bytes32 solutionId,
+        SolverLib.Multihash calldata metadataCID
     ) public returns (bytes32 proposalId) {
         nonce++;
 
@@ -152,6 +153,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposal.id = proposalId;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
+        proposal.metadataCID = metadataCID;
 
         ISolutionsHub(solutionsHub).linkToProposal(proposalId, solutionId);
         emit CreateProposal(proposalId);
@@ -163,7 +165,8 @@ contract ProposalsHub is ERC1155Receiver {
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
+        SolverLib.Multihash calldata solverConfigsCID,
+        SolverLib.Multihash calldata metadataCID
     ) external returns (bytes32 solutionID, bytes32 proposalID) {
         solutionID = ipfsSolutionsHub.createSolution(
             solutionId,
@@ -176,7 +179,8 @@ contract ProposalsHub is ERC1155Receiver {
             collateralToken,
             address(ipfsSolutionsHub),
             fundingGoal,
-            solutionId
+            solutionId,
+            metadataCID
         );
 
         return (solutionID, proposalID);
@@ -268,12 +272,12 @@ contract ProposalsHub is ERC1155Receiver {
         return proposals[id];
     }
 
-    function getContext(bytes32 id)
+    function getMetadataCID(bytes32 id)
         external
         view
         returns (SolverLib.Multihash memory)
     {
-        return proposals[id].context;
+        return proposals[id].metadataCID;
     }
 
     function isProposal(bytes32 id) external view returns (bool) {

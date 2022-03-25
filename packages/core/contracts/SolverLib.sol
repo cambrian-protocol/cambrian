@@ -176,8 +176,7 @@ library SolverLib {
         address factoryAddress,
         Config calldata config,
         uint256 solverIndex,
-        bytes32 trackingId,
-        Multihash calldata context
+        bytes32 trackingId
     ) public returns (address child) {
         child = ISolverFactory(factoryAddress).createSolver(
             address(this),
@@ -187,10 +186,6 @@ library SolverLib {
 
         if (trackingId != bytes32("")) {
             ISolver(child).setTrackingId(trackingId);
-        }
-
-        if (context.size > 0) {
-            ISolver(child).setContext(context);
         }
 
         emit DeployedChild(child);

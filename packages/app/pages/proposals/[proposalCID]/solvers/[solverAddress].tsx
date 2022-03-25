@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
@@ -8,6 +8,8 @@ import Solver from '@cambrian/app/components/solver/Solver'
 import { ethers } from 'ethers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
+import { IPFSSolutionsHubContext } from '@cambrian/app/store/IPFSSolutionsHubContext'
+import { ProposalsHubContext } from '@cambrian/app/store/ProposalsHubContext'
 
 const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
 const WRITER_ABI =
@@ -18,7 +20,10 @@ export default function SolverPage() {
     const { currentUser, login } = useCurrentUser()
     const [currentProposal, setCurrentProposal] = useState<ProposalModel>()
     const [showError, setShowError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
     const [isLoading, setIsLoading] = useState(true)
+    const solutionsHub = useContext(IPFSSolutionsHubContext)
+    const proposalsHub = useContext(ProposalsHubContext)
     const router = useRouter()
     const { proposalCID, solverAddress } = router.query
 
@@ -33,7 +38,8 @@ export default function SolverPage() {
     }
 
     useEffect(() => {
-        if (!router.isReady) return
+        if (!router.isReady || !proposalsHub || !solutionsHub) return
+
         if (
             typeof solverAddress !== 'string' ||
             !ethers.utils.isAddress(solverAddress)
@@ -42,13 +48,14 @@ export default function SolverPage() {
         }
 
         if (
+            solverAddress !== undefined &&
             proposalCID !== undefined &&
             typeof proposalCID === 'string' &&
             currentUser
         ) {
             init(proposalCID)
         }
-    }, [router, currentUser])
+    }, [router, currentUser, solutionsHub, proposalsHub])
 
     const init = async (proposalCID: string) => {
         // Fetch IPFS Stage
@@ -57,11 +64,18 @@ export default function SolverPage() {
             StageNames.proposal
         )) as ProposalModel
 
-        if (proposal) {
-            setCurrentProposal(proposal)
+        if (solverAddress) {
+            if (proposal) {
+                setCurrentProposal(proposal)
+            } else {
+                setErrorMessage('Proposal not found.')
+                setShowError(true)
+            }
         } else {
+            setErrorMessage('Solver not found.')
             setShowError(true)
         }
+
         setIsLoading(false)
     }
 
@@ -70,10 +84,8 @@ export default function SolverPage() {
         <>
             {typeof solverAddress == 'string' &&
                 ethers.utils.isAddress(solverAddress) &&
-                currentUser &&
-                currentProposal && (
+                currentUser && (
                     <Solver
-                        proposal={currentProposal}
                         address={solverAddress}
                         abi={USE_WRITER ? WRITER_ABI : SOLVER_ABI}
                         currentUser={currentUser}

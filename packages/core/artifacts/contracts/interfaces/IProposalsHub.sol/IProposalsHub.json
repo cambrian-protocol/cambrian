@@ -264,7 +264,7 @@
           "type": "bytes32"
         }
       ],
-      "name": "getContext",
+      "name": "getMetadataCID",
       "outputs": [
         {
           "components": [

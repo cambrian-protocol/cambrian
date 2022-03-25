@@ -2,12 +2,17 @@ import { BigNumber, Contract, ContractTransaction, ethers } from 'ethers'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { ERC20_ABI } from '../constants'
-import { MultihashType } from '../utils/helpers/multihash'
+import {
+    getMultihashFromBytes32,
+    MultihashType,
+} from '../utils/helpers/multihash'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenAPI } from '../services/api/Token.api'
 import { UserType } from './UserContext'
 import { addTokenDecimals } from '../utils/helpers/tokens'
 import { useCurrentUser } from '../hooks/useCurrentUser'
+import { IPFSAPI } from '../services/api/IPFS.api'
+import { ProposalModel } from '../models/ProposalModel'
 
 const PROPOSALS_HUB_ABI =
     require('@artifacts/contracts/ProposalsHub.sol/ProposalsHub.json').abi
@@ -54,6 +59,9 @@ export type ProposalsHubContextType = {
         solverConfigs: SolverConfigModel[],
         user: UserType
     ) => Promise<void>
+    getMetadata: (
+        proposalId: string
+    ) => Promise<ProposalModel | undefined | null>
 }
 export const ProposalsHubContext = React.createContext<ProposalsHubContextType>(
     {
@@ -65,6 +73,7 @@ export const ProposalsHubContext = React.createContext<ProposalsHubContextType>(
         defundProposal: async () => {},
         executeProposal: async () => {},
         getProposalFunding: async () => null,
+        getMetadata: async () => null,
     }
 )
 
@@ -212,6 +221,28 @@ export const ProposalsHubContextProvider = ({
         }
     }
 
+    const handleGetMetadata = async (proposalId: string) => {
+        try {
+            if (proposalsHub) {
+                const metadataCID = await proposalsHub.getMetadataCID()
+                if (metadataCID) {
+                    const cidString = getMultihashFromBytes32(metadataCID)
+                    if (cidString) {
+                        const ipfs = new IPFSAPI()
+                        const metadata = (await ipfs.getFromCID(
+                            cidString
+                        )) as ProposalModel
+                        if (metadata) {
+                            return metadata
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return (
         <ProposalsHubContext.Provider
             value={{
@@ -224,6 +255,7 @@ export const ProposalsHubContextProvider = ({
                 defundProposal: handleDefundProposal,
                 executeProposal: handleExecuteProposal,
                 getProposalFunding: handleGetProposalFunding,
+                getMetadata: handleGetMetadata,
             }}
         >
             {children}

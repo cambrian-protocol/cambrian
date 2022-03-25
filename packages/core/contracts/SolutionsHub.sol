@@ -90,9 +90,6 @@ contract SolutionsHub {
             solutions[_solutionId].solverAddresses[0]
         );
 
-        SolverLib.Multihash memory context = IProposalsHub(msg.sender)
-            .getContext(_proposalId);
-
         for (
             uint256 i;
             i < solutions[_solutionId].solverAddresses.length;
@@ -102,7 +99,6 @@ contract SolutionsHub {
                 solutions[_solutionId].solverAddresses[i]
             );
             _solver.setTrackingId(solutions[_solutionId].proposalId);
-            _solver.setContext(context);
         }
         // Prepare first Solver
         ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
