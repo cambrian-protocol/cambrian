@@ -22,7 +22,6 @@ const BaseLayerModal = ({
         {...props}
         responsive
         onEsc={onBack || onClose}
-        onClickOutside={onBack || onClose}
         full="vertical"
         position="bottom"
         margin={{ top: 'small' }}
