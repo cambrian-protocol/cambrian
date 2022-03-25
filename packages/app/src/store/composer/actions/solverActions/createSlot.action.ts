@@ -33,11 +33,12 @@ const createSlotAction = (
 
         let newSlot
 
-        if (payload.slotType === SlotType.Callback) {
+        if (payload.slotType === SlotType.Callback && payload.reference) {
             newSlot = currentSolver.addSlot({
-                data: [''],
+                data: [payload.reference.slotId],
                 slotType: payload.slotType,
                 dataTypes: payload.dataTypes,
+                targetSolverId: payload.reference.solverId,
                 reference: payload.reference,
             })
         } else {

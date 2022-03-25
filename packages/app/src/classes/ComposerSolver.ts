@@ -296,21 +296,17 @@ export default class ComposerSolver {
         switch (reference.slotId) {
             case 'keeper':
             case 'arbitrator':
-                // Selected Slot wasn't on this Solver, a callback needs to be added
-                if (reference.solverId !== this.id) {
-                    slot = this.addSlot({
-                        data: [''],
-                        slotType: SlotType.Callback,
-                        dataTypes: [SolidityDataTypes.Address],
-                        reference: reference,
-                    })
-                } else {
+                if (reference.solverId === this.id) {
                     slot = this.addSlot({
                         data: [''],
                         slotType: SlotType.Constant,
                         dataTypes: [SolidityDataTypes.Address],
                         reference: reference,
                     })
+                } else {
+                    throw new Error(
+                        'Invalid reference. Callbacks must reference a slot.'
+                    )
                 }
                 break
             case 'solver':
@@ -331,9 +327,10 @@ export default class ComposerSolver {
                     slot = this.config.slots[reference.slotId]
                 } else {
                     slot = this.addSlot({
-                        data: [''],
+                        data: [reference.slotId],
                         slotType: SlotType.Callback,
                         dataTypes: [SolidityDataTypes.Address],
+                        targetSolverId: reference.solverId,
                         reference: reference,
                     })
                 }
