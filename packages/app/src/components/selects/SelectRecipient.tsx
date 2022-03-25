@@ -40,33 +40,19 @@ const SelectRecipient = () => {
                     composer.solvers
                 )
 
-            // Add Keeper and Arbitrator addresses to the list
-            composer.solvers.forEach((solver) => {
-                if (
-                    solver.config.keeperAddress !== undefined &&
-                    solver.config.keeperAddress !== ''
-                ) {
-                    availableAddresses.push({
-                        title: `${solver.solverTag.title}'s Keeper`,
-                        reference: {
-                            solverId: solver.id,
-                            slotId: 'keeper',
-                        },
-                    })
-                }
-
-                if (
-                    solver.config.arbitratorAddress !== undefined &&
-                    solver.config.arbitratorAddress !== ''
-                ) {
-                    availableAddresses.push({
-                        title: `${solver.solverTag.title}'s Arbitrator`,
-                        reference: {
-                            solverId: solver.id,
-                            slotId: 'arbitrator',
-                        },
-                    })
-                }
+            availableAddresses.push({
+                title: `${currentSolver.solverTag.title}'s Keeper`,
+                reference: {
+                    solverId: currentSolver.id,
+                    slotId: 'keeper',
+                },
+            })
+            availableAddresses.push({
+                title: `${currentSolver.solverTag.title}'s Arbitrator`,
+                reference: {
+                    solverId: currentSolver.id,
+                    slotId: 'arbitrator',
+                },
             })
 
             setOptions(availableAddresses)
@@ -102,8 +88,6 @@ export default SelectRecipient
 
 /**
  * Recursive function to retrieve all available addresses up the chain
- * Constant addresses and Solvers
- *
  *  */
 const getAvailableAddresses = (
     rootSolver: ComposerSolverModel,

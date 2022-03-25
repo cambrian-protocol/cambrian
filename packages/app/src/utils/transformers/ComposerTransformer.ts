@@ -55,7 +55,6 @@ export async function parseComposerSolvers(
         return undefined
     }
 
-    // TODO OutcomeCollections
     return sortedSolvers.map((solver, index) => {
         return {
             collateralToken: collateralToken,
@@ -137,7 +136,6 @@ export function parseComposerSlot(
         ingestType: inSlot.slotType,
         slot: ethers.utils.formatBytes32String(inSlot.id),
     }
-
     switch (inSlot.slotType) {
         case 0: // Callback slot
             if (
@@ -164,13 +162,30 @@ export function parseComposerSlot(
                 throw 'Constant slots should have exactly 1 data element'
             }
 
+            let dataToAdd = inSlot.data[0]
+            if (inSlot.reference) {
+                const currentSolver = sortedSolvers.find(
+                    (x) => x.id === inSlot.reference?.solverId
+                )
+                if (currentSolver) {
+                    if (inSlot.reference.slotId === 'keeper') {
+                        dataToAdd = currentSolver.config.keeperAddress
+                    } else if (inSlot.reference.slotId === 'arbitrator') {
+                        dataToAdd = currentSolver.config.arbitratorAddress
+                    } else {
+                        throw 'Invalid reference. Constant slot reference can just be keeper or arbitrator'
+                    }
+                } else {
+                    throw 'Invalid reference. Referenced Solver was not found.'
+                }
+            }
+
             outSlot.solverIndex = 0
             outSlot.data = ethers.utils.defaultAbiCoder.encode(
                 [inSlot.dataTypes[0]],
-                [inSlot.data[0]]
+                [dataToAdd]
             )
             break
-
         case 2: // Function slot
             if (inSlot.data.length != inSlot.dataTypes.length) {
                 throw 'Function slots must have matching length for data and dataTypes'

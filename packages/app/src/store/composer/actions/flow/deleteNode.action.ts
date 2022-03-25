@@ -55,6 +55,25 @@ const deleteNodeAction = (state: CompositionModel): CompositionModel => {
                     }
                 })
 
+                // Delete RecipientSlot of deleted Solver from parent
+                const parentSolver = updatedSolvers.find(
+                    (x) =>
+                        x.id ===
+                        currentSolver.config.condition.parentCollection
+                            ?.solverId
+                )
+                if (parentSolver) {
+                    const solverRecipientId = Object.keys(
+                        parentSolver.config.slots
+                    ).find((slotId) => {
+                        const currentSlot = parentSolver.config.slots[slotId]
+                        return currentSlot.data[0] === currentSolver.id
+                    })
+                    if (solverRecipientId) {
+                        parentSolver.deleteRecipient(solverRecipientId)
+                    }
+                }
+
                 // Delete the solver
                 const solverIdx = state.solvers.findIndex(
                     (x) => x.id === state.currentIdPath?.solverId

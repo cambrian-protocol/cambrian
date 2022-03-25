@@ -1,18 +1,11 @@
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
 import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
 import { IPFSAPI } from '../services/api/IPFS.api'
-import { SolutionModel } from '../models/SolutionModel'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
-import { TokenAPI } from '../services/api/Token.api'
-import { addTokenDecimals } from '../utils/helpers/tokens'
-import { MultihashType } from '../utils/helpers/multihash'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
-import { create } from 'lodash'
 
 export enum StageNames {
     composition = 'composition',
@@ -120,15 +113,11 @@ export default class Stagehand {
             )
             return undefined
         }
-        try {
-            parseComposerSolvers(composition.solvers)
-        } catch (e) {
-            console.log('Error parsing this composition')
-            return undefined
-        }
 
-        this.stages['composition'] = composition
-        return this.publishStage(StageNames.composition)
+        if (await parseComposerSolvers(composition.solvers)) {
+            this.stages['composition'] = composition
+            return this.publishStage(StageNames.composition)
+        }
     }
 
     /**
@@ -152,6 +141,7 @@ export default class Stagehand {
                 this.composition!,
                 createTemplateInput.flexInputs
             )
+            // TODO async
             parseComposerSolvers(newComposition.solvers)
         } catch (e) {
             console.log('Error parsing new composition')
@@ -215,6 +205,7 @@ export default class Stagehand {
                 ),
                 createProposalInput.flexInputs
             )
+            // TODO async
             parseComposerSolvers(newComposition.solvers)
         } catch (e) {
             console.log('Error parsing new composition')
