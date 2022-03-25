@@ -1,12 +1,11 @@
-import { BigNumber } from 'ethers'
-import { ParticipantModel } from './ParticipantModel'
-import { SolutionModel } from '@cambrian/app/models/SolutionModel'
+import { CompositionModel } from './CompositionModel'
+import { FlexInputs } from './SlotTagModel'
 
 export type ProposalModel = {
-    id: string
     title: string
-    buyer: ParticipantModel
+    name: string
+    pfp: string
     description: string
-    amount: BigNumber
-    solution: SolutionModel
+    flexInputs: FlexInputs
+    templateCID: string
 }

@@ -38,6 +38,10 @@ import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolver
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
+import { ProposalsHubContext } from '@cambrian/app/store/ProposalsHubContext'
+import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -54,7 +58,7 @@ export type BasicSolverMethodsType = {
     getTrackingID: () => {}
     getUIUri: () => {}
     getData: (slotId: string) => any
-    getCurrentSlots: (ingests: SlotModel[]) => Promise<any[]> | undefined
+    getCurrentSlots: (ingests: SlotModel[]) => Promise<any[] | undefined>
     getCondition: (index: number) => any
     getConditions: () => {}
     getConfig: () => {}
@@ -64,22 +68,25 @@ export type BasicSolverMethodsType = {
 }
 
 interface SolverProps {
-    proposal: ProposalModel
     address: string
     abi: (string | Fragment | JsonFragmentType)[]
     currentUser: UserType
 }
 
-const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
-    const ctf = useContext(CTFContext)
-    const ipfs = new IPFSAPI()
+type MetadataModel = {
+    slotTags: SlotTagsHashMapType
+    solverTag: SolverTagModel
+    proposal?: ProposalModel
+}
 
-    const [contract, setContract] = useState<Contract>(
-        new ethers.Contract(
-            address,
-            new ethers.utils.Interface(abi),
-            currentUser.signer
-        )
+const Solver = ({ address, abi, currentUser }: SolverProps) => {
+    const ctf = useContext(CTFContext)
+    const proposalsHub = useContext(ProposalsHubContext)
+    const ipfs = new IPFSAPI()
+    const contract = new ethers.Contract(
+        address,
+        new ethers.utils.Interface(abi),
+        currentUser.signer
     )
     const [initialized, setInitialized] = useState(false)
     const [isDeployed, setIsDeployed] = useState<boolean | undefined>(undefined)
@@ -91,8 +98,19 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
 
+    const [metadata, setMetadata] = useState<MetadataModel>({
+        slotTags: {},
+        solverTag: {
+            title: 'Solver',
+            description: '',
+            version: '',
+            banner: '',
+            avatar: '',
+        },
+    })
+
     useEffect(() => {
-        if (ctf && contract && ipfs && !initialized) {
+        if (ctf && proposalsHub && contract && ipfs && !initialized) {
             setInitialized(true)
             init()
         }
@@ -104,10 +122,55 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         const deployed = await hasDeployedCode()
         if (deployed) {
             setIsDeployed(true)
+            await getMetadataFromProposal()
             triggerUpdate()
         } else {
             setIsDeployed(false)
         }
+    }
+
+    /**
+     * TrackingID is set to ProposalID when deployed from ProposalsHub
+     * TODO, extract this logic elsewhere so that Solvers are not dependent on Proposals
+     */
+    const getMetadataFromProposal = async () => {
+        const metadata = {} as any
+
+        try {
+            const proposalId = await contract.trackingId()
+            const metadataRes = await proposalsHub.getMetadata(proposalId)
+            if (metadataRes) {
+                const stagehand = new Stagehand()
+                const stages = await stagehand.loadStages(
+                    metadataRes.templateCID,
+                    StageNames.proposal
+                )
+                const composition = stages?.composition as
+                    | CompositionModel
+                    | undefined
+
+                if (stages?.proposal) {
+                    metadata.proposal = stages.proposal
+                }
+
+                if (stages?.composition) {
+                    const solverIndex =
+                        (await basicSolverMethods.getChainIndex()) as
+                            | number
+                            | undefined
+                    if (solverIndex !== undefined) {
+                        metadata.slotTags =
+                            composition?.solvers[solverIndex].slotTags || false
+                        metadata.solverTag =
+                            composition?.solvers[solverIndex].solverTag || false
+                    }
+                }
+            }
+        } catch (e) {
+            console.log(e)
+        }
+
+        setMetadata(metadata)
     }
 
     const hasDeployedCode = async () => {
@@ -184,7 +247,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         const slotsHistory = await getSlotsHistory(
             config.ingests,
             conditions,
-            proposal.solution.finalComposition.solvers[0].slotTags
+            metadata.slotTags || {}
         )
 
         const numMintedTokensByCondition =
@@ -200,7 +263,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
             config,
             conditions,
             slotsHistory,
-            proposal.solution.finalComposition.solvers[0].slotTags,
+            metadata.slotTags || {},
             numMintedTokensByCondition
         )
 
@@ -210,10 +273,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         // TODO right solver index for tags / solver
 
         console.log('SlotsHistory:', slotsHistory)
-        console.log(
-            'Available SlotTags:',
-            proposal.solution.finalComposition.solvers[0].slotTags
-        )
+        console.log('Available SlotTags:', metadata.slotTags || {})
         return {
             config: config,
             conditions: conditions,
@@ -223,8 +283,14 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
             numMintedTokensByCondition: numMintedTokensByCondition,
             collateralBalance: collateralBalance,
             collateralToken: collateralToken,
-            solverTag: proposal.solution.finalComposition.solvers[0].solverTag,
-            slotTags: proposal.solution.finalComposition.solvers[0].slotTags,
+            solverTag: metadata.solverTag || {
+                title: 'Solver',
+                description: '',
+                version: '',
+                banner: '',
+                avatar: '',
+            }, // TODO, why is this necessary?
+            slotTags: metadata.slotTags || {},
         }
     }
 
@@ -315,7 +381,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         return addresses
     }
 
-    const getChainIndex = () => {
+    const getChainIndex = async () => {
         try {
             return contract.chainIndex()
         } catch (e) {
@@ -331,7 +397,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         }
     }
 
-    const getTrackingID = () => {
+    const getTrackingID = async () => {
         try {
             return contract.trackingId()
         } catch (e) {
@@ -339,7 +405,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         }
     }
 
-    const getUIUri = () => {
+    const getUIUri = async () => {
         try {
             return contract.uiURI()
         } catch (e) {
@@ -347,7 +413,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         }
     }
 
-    const getData = (slotId: string) => {
+    const getData = async (slotId: string) => {
         try {
             return contract.getData(slotId)
         } catch (e) {
@@ -355,7 +421,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         }
     }
 
-    const getCurrentSlots = (ingests: SlotModel[]) => {
+    const getCurrentSlots = async (ingests: SlotModel[]) => {
         try {
             return Promise.all(ingests.map((x) => getData(x.slot)))
         } catch (e) {
@@ -363,7 +429,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         }
     }
 
-    const getCondition = (index: number) => {
+    const getCondition = async (index: number) => {
         try {
             return contract.conditions(index)
         } catch (e) {
@@ -774,7 +840,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
                 >
                     <Box fill justify="center">
                         <HeaderTextSection
-                            title={proposal.title}
+                            title={metadata.proposal?.title || ''} // NO proposal dependency in Solver.tsx
                             subTitle="Uninitialized Solver"
                             paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                         />
@@ -786,7 +852,7 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
             return (
                 <>
                     <WriterSolverUI
-                        proposal={proposal}
+                        proposal={metadata.proposal} // NO proposal dependency in Solver.tsx
                         solverData={currentSolverData}
                         solverContract={contract}
                         currentUser={currentUser}
@@ -802,7 +868,6 @@ const Solver = ({ address, abi, currentUser, proposal }: SolverProps) => {
         } else {
             return (
                 <DefaultSolverUI
-                    proposal={proposal}
                     solverData={currentSolverData}
                     solverContract={contract}
                     currentUser={currentUser}

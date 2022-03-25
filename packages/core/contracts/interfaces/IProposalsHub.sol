@@ -44,7 +44,7 @@ interface IProposalsHub {
         uint256 amount
     ) external;
 
-    function getContext(bytes32 id)
+    function getMetadataCID(bytes32 id)
         external
         view
         returns (SolverLib.Multihash memory);

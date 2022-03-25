@@ -17,12 +17,14 @@ export type IPFSSolutionsHubContextType = {
         solverConfigsCID: string
     ) => Promise<ContractTransaction | null>
     contract: Contract | undefined
+    getSolvers: (solutionId: string) => Promise<string[] | undefined | null>
 }
 export const IPFSSolutionsHubContext =
     React.createContext<IPFSSolutionsHubContextType>({
         getIPFSSolutionsHubAddress: () => '',
         createSolution: async () => null,
         contract: undefined,
+        getSolvers: async () => null,
     })
 
 export const IPFSSolutionsHubContextProvider = ({
@@ -66,12 +68,28 @@ export const IPFSSolutionsHubContextProvider = ({
         return IPFSSolutionsHub.address
     }
 
+    const getSolvers = async (
+        solutionId: string
+    ): Promise<string[] | undefined> => {
+        if (IPFSSolutionsHub) {
+            try {
+                const solverAddresses = await IPFSSolutionsHub.getSolvers(
+                    solutionId
+                )
+                return solverAddresses
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+
     return (
         <IPFSSolutionsHubContext.Provider
             value={{
                 contract: IPFSSolutionsHub,
                 createSolution: onCreateSolution,
                 getIPFSSolutionsHubAddress: getIPFSSolutionsHubAddress,
+                getSolvers: getSolvers,
             }}
         >
             {children}

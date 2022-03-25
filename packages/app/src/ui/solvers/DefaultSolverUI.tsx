@@ -8,7 +8,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 
 export interface DefaultSolverUIProps {
-    proposal: ProposalModel
     solverData: SolverModel
     solverContract: ethers.Contract
     solverMethods: BasicSolverMethodsType
@@ -17,6 +16,7 @@ export interface DefaultSolverUIProps {
     setCurrentCondition: React.Dispatch<
         SetStateAction<SolverContractCondition | undefined>
     >
+    proposal?: ProposalModel // TODO GET RID OF THIS
 }
 
 const DefaultSolverUI = ({ solverData }: DefaultSolverUIProps) => {

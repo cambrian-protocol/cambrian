@@ -11,6 +11,8 @@ import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { TokenAPI } from '../services/api/Token.api'
 import { addTokenDecimals } from '../utils/helpers/tokens'
 import { MultihashType } from '../utils/helpers/multihash'
+import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
+import { create } from 'lodash'
 
 export enum StageNames {
     composition = 'composition',
@@ -34,20 +36,20 @@ export default class Stagehand {
     }
 
     get composition() {
-        return this.stages.composition
+        return this.stages.composition as CompositionModel | undefined
     }
 
     get template() {
-        return this.stages.template
+        return this.stages.template as TemplateModel | undefined
     }
 
     get proposal() {
-        return this.stages.proposal
+        return this.stages.proposal as ProposalModel | undefined
     }
 
-    publishStages = async () => {
+    publishStage = async (stageType: StageNames) => {
         try {
-            const res = await this.ipfs.pin(this.stages)
+            const res = await this.ipfs.pin(this.stages[stageType])
             if (res && res.IpfsHash) {
                 return res.IpfsHash
             }
@@ -60,11 +62,43 @@ export default class Stagehand {
     /**
      * Load stage from IPFS
      */
-    loadStage = async (stagesCID: string, stageType: StageNames) => {
+    loadStage = async (stageCID: string, stageType: StageNames) => {
         try {
-            const stages = (await this.ipfs.getFromCID(stagesCID)) as Stages
-            this.stages = stages
-            return stages[stageType]
+            const stage = (await this.ipfs.getFromCID(stageCID)) as StageModel
+            this.stages[stageType] = stage
+            return this.stages[stageType]
+        } catch (e) {
+            console.log(e)
+            return undefined
+        }
+    }
+
+    /**
+     * Load stage and previous stages
+     */
+    loadStages = async (
+        stageCID: string,
+        stageType: StageNames
+    ): Promise<Stages | undefined> => {
+        try {
+            const stage = await this.loadStage(stageCID, stageType)
+
+            if (stage) {
+                switch (stageType) {
+                    case StageNames.proposal:
+                        return this.loadStages(
+                            this.proposal!.templateCID,
+                            StageNames.template
+                        )
+                    case StageNames.template:
+                        return this.loadStages(
+                            this.template!.compositionCID,
+                            StageNames.composition
+                        )
+                    default:
+                        return this.stages
+                }
+            }
         } catch (e) {
             console.log(e)
             return undefined
@@ -86,97 +120,117 @@ export default class Stagehand {
             )
             return undefined
         }
-        this.stages['composition'] = composition
+        try {
+            parseComposerSolvers(composition.solvers)
+        } catch (e) {
+            console.log('Error parsing this composition')
+            return undefined
+        }
 
-        return this.publishStages()
+        this.stages['composition'] = composition
+        return this.publishStage(StageNames.composition)
     }
 
     /**
      * Creates a template by applying CreateTemplateForm to a loaded composition and publishes it to IPFS
      */
-    publishTemplate = async (createTemplateInput: CreateTemplateFormType) => {
-        if (!this.stages.composition) {
-            console.error('Error: Load a composition into Stagehand first')
-            return undefined
-        }
-
-        const updatedComposition = mergeFlexIntoComposition(
-            <CompositionModel>this.stages.composition,
-            createTemplateInput.flexInputs
-        )
-
-        if (updatedComposition) {
-            const template: TemplateModel = {
-                updatedComposition: updatedComposition,
-                pfp: createTemplateInput.pfp,
-                name: createTemplateInput.name,
-                title: createTemplateInput.title,
-                description: createTemplateInput.description,
-                price: {
-                    amount: createTemplateInput.askingAmount,
-                    denominationToken: createTemplateInput.denominationToken,
-                    preferredTokens: createTemplateInput.preferredTokens,
-                },
-            }
-
-            if (!this.isStageSchema(template, StageNames.template)) {
-                console.error(
-                    'Error: Generated template does not satisfy template schema'
-                )
+    publishTemplate = async (
+        createTemplateInput: CreateTemplateFormType,
+        compositionCID: string
+    ) => {
+        if (!this.composition) {
+            try {
+                await this.loadStage(compositionCID, StageNames.composition)
+            } catch (e) {
+                console.log('Error finding composition')
                 return undefined
             }
-            this.stages['template'] = template
-            return this.publishStages()
-        } else {
-            console.error('Error merging provided flex inputs into composition')
+        }
+
+        try {
+            const newComposition = mergeFlexIntoComposition(
+                this.composition!,
+                createTemplateInput.flexInputs
+            )
+            parseComposerSolvers(newComposition.solvers)
+        } catch (e) {
+            console.log('Error parsing new composition')
             return undefined
         }
+
+        const template: TemplateModel = {
+            pfp: createTemplateInput.pfp,
+            name: createTemplateInput.name,
+            title: createTemplateInput.title,
+            description: createTemplateInput.description,
+            price: {
+                amount: createTemplateInput.askingAmount,
+                denominationToken: createTemplateInput.denominationToken,
+                preferredTokens: createTemplateInput.preferredTokens,
+            },
+            flexInputs: createTemplateInput.flexInputs,
+            compositionCID: compositionCID,
+        }
+
+        if (!this.isStageSchema(template, StageNames.template)) {
+            console.error(
+                'Error: Generated template does not satisfy template schema'
+            )
+            return undefined
+        }
+        this.stages['template'] = template
+        return this.publishStage(StageNames.template)
     }
 
     publishProposal = async (
-        solutionId: string,
-        proposalId: string,
-        finalComposition: CompositionModel,
         createProposalInput: CreateProposalFormType,
-        solverConfigs: SolverConfigModel[],
-        solverConfigsCID: MultihashType,
-        user: UserType
+        templateCID: string
     ) => {
-        const template = this.stages[StageNames.template] as TemplateModel
-
-        const token = await TokenAPI.getTokenInfo(
-            createProposalInput.tokenAddress
-        )
-        if (token) {
-            const solution: SolutionModel = {
-                id: solutionId,
-                seller: {
-                    name: template.name,
-                    address: 'TODO', // TODO No address needed on template creation
-                    pfp: template.pfp,
-                },
-                collateralToken: token,
-                finalComposition: finalComposition,
-                proposalId: proposalId,
-                solverConfigsCID: solverConfigsCID,
-                solverConfigs: solverConfigs,
+        if (!this.template) {
+            try {
+                await this.loadStage(templateCID, StageNames.template)
+            } catch (e) {
+                console.log('Error finding template')
+                return undefined
             }
-
-            const proposal: ProposalModel = {
-                id: proposalId,
-                title: createProposalInput.title,
-                buyer: {
-                    address: user.address,
-                    name: createProposalInput.name,
-                    pfp: createProposalInput.pfp,
-                },
-                description: createProposalInput.description,
-                amount: addTokenDecimals(createProposalInput.price, token),
-                solution: solution,
-            }
-
-            this.stages[StageNames.proposal] = proposal
-            return this.publishStages()
         }
+
+        if (this.template && !this.composition) {
+            try {
+                await this.loadStage(
+                    this.template.compositionCID,
+                    StageNames.composition
+                )
+            } catch (e) {
+                console.log('Error finding composition')
+                return undefined
+            }
+        }
+
+        try {
+            const newComposition = mergeFlexIntoComposition(
+                mergeFlexIntoComposition(
+                    this.composition!,
+                    this.template!.flexInputs
+                ),
+                createProposalInput.flexInputs
+            )
+            parseComposerSolvers(newComposition.solvers)
+        } catch (e) {
+            console.log('Error parsing new composition')
+            return undefined
+        }
+
+        const proposal: ProposalModel = {
+            title: createProposalInput.title,
+            name: createProposalInput.name,
+            pfp: createProposalInput.pfp,
+            description: createProposalInput.description,
+            flexInputs: createProposalInput.flexInputs,
+            templateCID: templateCID, // TODO
+        }
+
+        this.stages[StageNames.proposal] = proposal
+        return this.publishStage(StageNames.proposal)
     }
 }

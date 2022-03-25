@@ -76,8 +76,6 @@ interface ISolver {
 
     function setTrackingId(bytes32 _trackingId) external;
 
-    function setContext(SolverLib.Multihash calldata context) external;
-
     function getConditions()
         external
         view

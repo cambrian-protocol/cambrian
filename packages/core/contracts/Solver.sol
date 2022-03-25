@@ -17,7 +17,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     address ctfAddress; // Conditional token framework
     address deployerAddress; // Address which called SolverFactory to deploy this Solver
 
-    SolverLib.Multihash public uiURI; // Resource for Solver Front End
+    SolverLib.Multihash public uiCID; // Resource for Solver Front End
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
 
@@ -27,8 +27,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     uint256[] public timelocks; // Current timelock, indexed by condition
     bytes32 public trackingId; // Settable for adding some higher-level trackingId (eg. id of a proposal this solver belongs to)
-
-    SolverLib.Multihash context;
 
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
@@ -123,8 +121,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             factoryAddress,
             _config,
             chainIndex,
-            trackingId,
-            context
+            trackingId
         );
 
         return chainChild;
@@ -530,11 +527,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         require(trackingId == bytes32(0), "TrackingId set");
         require(msg.sender == deployerAddress);
         trackingId = _trackingId;
-    }
-
-    function setContext(SolverLib.Multihash calldata _context) external {
-        require(msg.sender == deployerAddress);
-        context = _context;
     }
 
     function updateTimelock(uint256 _index) internal {
