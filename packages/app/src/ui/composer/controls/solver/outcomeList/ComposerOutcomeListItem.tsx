@@ -1,4 +1,4 @@
-import ListItem from '@cambrian/app/components/list/ListItem'
+import ListItem from '@cambrian/app/components/listItems/ListItem'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TreeStructure } from 'phosphor-react'
 import UpdateOutcomeModal from './modals/UpdateOutcomeModal'

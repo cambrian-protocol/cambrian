@@ -1,7 +1,12 @@
 import { Box, Text } from 'grommet'
+import {
+    ComposerSlotModel,
+    ComposerSlotPathType,
+    SlotModel,
+} from '@cambrian/app/models/SlotModel'
 
-import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -11,11 +16,14 @@ import { WarningCircle } from 'phosphor-react'
  * Determites if the passed parameter is a Slot
  * @returns true if it is a slot
  * */
-export function isSlot(
+export function isComposerSlot(
     toBeDetermined?: any | ComposerSlotModel
 ): toBeDetermined is ComposerSlotModel {
     if (!toBeDetermined) return false
-    if ((toBeDetermined as ComposerSlotModel).slotType) {
+    if (
+        (toBeDetermined as ComposerSlotModel).slotType &&
+        (toBeDetermined as ComposerSlotModel).id
+    ) {
         return true
     }
     return false
@@ -105,4 +113,72 @@ export const getSlotTitle = (
             </Text>
         </Box>
     )
+}
+
+export const getReferenceData = (
+    reference: ComposerSlotPathType,
+    solvers: ComposerSolverModel[]
+): string | undefined => {
+    const referencedSolver = solvers.find((x) => x.id === reference.solverId)
+    if (referencedSolver) {
+        if (reference.slotId === 'keeper') {
+            return referencedSolver.config.keeperAddress
+        } else if (reference.slotId === 'arbitrator') {
+            return referencedSolver.config.arbitratorAddress
+        } else {
+            const referencedSlot =
+                referencedSolver.config.slots[reference.slotId]
+            if (referencedSlot) {
+                if (referencedSlot.reference) {
+                    getReferenceData(referencedSlot.reference, solvers)
+                } else if (referencedSlot.data.length === 1) {
+                    return referencedSlot.data[0].toString()
+                } else {
+                    console.error('Error while displaying referenced data.')
+                }
+            } else {
+                console.error('Could not find referenced slot.')
+            }
+        }
+    } else {
+        console.error('Could not find referenced solver.')
+    }
+}
+
+export const getRecipientData = (
+    recipientSlot: ComposerSlotModel | SlotModel,
+    currentSolver: ComposerSolverModel,
+    solvers: ComposerSolverModel[]
+): ParticipantModel => {
+    const slotTag = currentSolver.slotTags[recipientSlot.id]
+    if (isComposerSlot(recipientSlot)) {
+        let address = 'No address defined yet'
+
+        if (recipientSlot.reference) {
+            const referenceAddress = getReferenceData(
+                recipientSlot.reference,
+                solvers
+            )
+            if (referenceAddress) {
+                address = referenceAddress
+            }
+        } else if (
+            recipientSlot.data.length === 1 &&
+            recipientSlot.data[0] !== ''
+        ) {
+            address = recipientSlot.data[0]
+        }
+
+        return {
+            address: address,
+            name: slotTag.label || 'No name defined',
+            description: slotTag?.description,
+        }
+    } else {
+        return {
+            address: recipientSlot.data,
+            name: slotTag.label || 'No name defined',
+            description: slotTag?.description,
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
 
-import BaseSlotInputItem from '../list/BaseSlotInputItem'
+import BaseSlotInputItem from '../listItems/BaseSlotInputItem'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
@@ -27,7 +27,7 @@ const KeeperInputsModal = ({
                         return (
                             // TODO dynamic datatype parsing
                             <BaseSlotInputItem
-                                key={manualSlot.slot.slot}
+                                key={manualSlot.slot.id}
                                 info={manualSlot.tag.description}
                                 title={manualSlot.tag.label}
                                 subTitle={decodeData(

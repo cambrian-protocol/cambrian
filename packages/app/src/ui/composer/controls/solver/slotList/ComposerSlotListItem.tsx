@@ -1,6 +1,6 @@
 import { ArrowSquareIn } from 'phosphor-react'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
-import ListItem from '@cambrian/app/components/list/ListItem'
+import ListItem from '@cambrian/app/components/listItems/ListItem'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import UpdateSlotModal from './modals/UpdateSlotModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'

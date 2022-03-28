@@ -5,9 +5,9 @@ import { SlotType } from './SlotType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
 export type SlotModel = {
+    id: string
     executions: number
     ingestType: SlotType
-    slot: string
     solverIndex: number
     data: string
 }

@@ -15,9 +15,12 @@ import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
+import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
@@ -26,7 +29,6 @@ interface SolverConfigInfoProps {
     currentCondition: SolverContractCondition
 }
 
-// TODO Dynamic solver description
 const SolverConfigInfo = ({
     solverData,
     solverMethods,
@@ -41,6 +43,20 @@ const SolverConfigInfo = ({
         setShowKeeperInputModal(!showKeeperInputModal)
     const toggleShowRecipientModal = () =>
         setShowRecipientModal(!showRecipientModal)
+
+    const recipientSlots = solverMethods.getRecipientSlots(currentCondition)
+    const recipientsData: ParticipantModel[] = recipientSlots.map(
+        (recipientSlot) => {
+            return {
+                address: decodeData(
+                    [SolidityDataTypes.Address],
+                    recipientSlot.slot.data
+                ),
+                name: recipientSlot.tag.label,
+                description: recipientSlot.tag.description,
+            }
+        }
+    )
 
     return (
         <>
@@ -110,9 +126,7 @@ const SolverConfigInfo = ({
             {showRecipientModal && (
                 <RecipientsModal
                     onBack={toggleShowRecipientModal}
-                    recipientAddresses={solverMethods.getRecipientSlots(
-                        currentCondition
-                    )}
+                    recipientsData={recipientsData}
                 />
             )}
             {showKeeperInputModal && (

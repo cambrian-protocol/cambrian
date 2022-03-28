@@ -3,7 +3,7 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
+import { isComposerSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const createRecipientAllocationAction = (
     state: CompositionModel,
@@ -32,7 +32,7 @@ const createRecipientAllocationAction = (
             isFlex: payload.isFlex,
         })
 
-        if (isSlot(payload.amount)) {
+        if (isComposerSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 newRecipientSlot.id,

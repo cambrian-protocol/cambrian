@@ -32,7 +32,7 @@ const ExecuteSolverActionbar = ({
             manualSlots.forEach((manualSlot) => {
                 const data =
                     solverData.slotsHistory[currentCondition.conditionId][
-                        manualSlot.slot.slot
+                        manualSlot.slot.id
                     ]?.slot.data
                 if (!data) {
                     allManualFieldsFilled = false
@@ -60,10 +60,7 @@ const ExecuteSolverActionbar = ({
             ['address'],
             [input.data]
         )
-        await solverMethods.addData(
-            input.slotWithMetaData.slot.slot,
-            encodedData
-        )
+        await solverMethods.addData(input.slotWithMetaData.slot.id, encodedData)
     }
 
     if (currentCondition === undefined) {

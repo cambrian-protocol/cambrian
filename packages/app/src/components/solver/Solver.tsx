@@ -1,4 +1,4 @@
-import { BigNumber, Contract, EventFilter, ethers } from 'ethers'
+import { BigNumber, EventFilter, ethers } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
 import {
     RichSlotModel,
@@ -10,11 +10,13 @@ import {
     SolverModel,
     SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
+import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DefaultSolverUI from '@cambrian/app/ui/solvers/DefaultSolverUI'
 import ExecuteSolverActionbar from '../actionbars/ExecuteSolverActionbar'
 import { Fragment } from 'ethers/lib/utils'
@@ -26,11 +28,13 @@ import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { ProposalsHubContext } from '@cambrian/app/store/ProposalsHubContext'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -38,10 +42,6 @@ import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolver
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { ProposalsHubContext } from '@cambrian/app/store/ProposalsHubContext'
-import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 
 export type BasicSolverMethodsType = {
     prepareSolve: (newConditionIndex: number) => Promise<any>
@@ -423,7 +423,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const getCurrentSlots = async (ingests: SlotModel[]) => {
         try {
-            return Promise.all(ingests.map((x) => getData(x.slot)))
+            return Promise.all(ingests.map((x) => getData(x.id)))
         } catch (e) {
             console.error(e)
         }
@@ -462,6 +462,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             const parsedIngests = res.ingests.map((ingest) => {
                 return {
                     ...ingest,
+                    id: ingest.slot,
                     executions: ingest.executions.toNumber(),
                     solverIndex: ingest.solverIndex.toNumber(),
                 }
@@ -627,10 +628,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const slotsHistory: SlotsHistoryHashMapType = {}
         const currentSlotData = await Promise.all(
             ingests.map(async (ingest: SlotModel) => {
-                const dataArr: any[] = await contract.getAllData(ingest.slot)
+                const dataArr: any[] = await contract.getAllData(ingest.id)
                 const slotHistory = dataArr.map((data, idx) => {
                     return {
-                        slot: ingest.slot,
+                        id: ingest.id,
                         executions: idx + 1,
                         solverIndex: ingest.solverIndex,
                         ingestType: ingest.ingestType,
@@ -649,12 +650,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
                 if (currentSlot) {
                     // Enrich slot with Metadata
-                    const ulid = ethers.utils.parseBytes32String(
-                        currentSlot.slot
-                    )
+                    const ulid = ethers.utils.parseBytes32String(currentSlot.id)
 
                     // Fallback empty Slot
-                    data[currentSlot.slot] = {
+                    data[currentSlot.id] = {
                         slot: currentSlot,
                         tag: slotTags[ulid] || {
                             id: ulid,
@@ -675,10 +674,10 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         ingests: SlotModel[],
         slotTags: SlotTagsHashMapType
     ): RichSlotModel => {
-        const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
+        const ingestSlot = ingests.find((ingest) => ingest.id === slotId)
         if (ingestSlot) {
             // Enrich with MetaData
-            const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
+            const ulid = ethers.utils.parseBytes32String(ingestSlot.id)
             // Fallback empty Slot
             return {
                 slot: ingestSlot,
@@ -733,7 +732,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     if (ingest.ingestType === SlotType.Manual) {
                         filtered.push(
                             getIngestWithMetaData(
-                                ingest.slot,
+                                ingest.id,
                                 currentSolverData.config.ingests,
                                 currentSolverData.slotTags
                             )

@@ -37,7 +37,7 @@ const AddDataModal = ({
     if (manualInputs !== undefined) {
         ManualInputGroup = manualInputs.manualInputs?.map((input, idx) => {
             return (
-                <Box key={input.slotWithMetaData.slot.slot}>
+                <Box key={input.slotWithMetaData.slot.id}>
                     <Box direction="row" gap="medium" align="center">
                         <Box flex>
                             <FormField

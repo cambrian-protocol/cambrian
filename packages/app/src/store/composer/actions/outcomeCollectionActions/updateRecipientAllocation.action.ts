@@ -2,7 +2,7 @@ import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
+import { isComposerSlot } from '@cambrian/app/utils/helpers/slotHelpers'
 
 const updateRecipientAllocationAction = (
     state: CompositionModel,
@@ -27,7 +27,7 @@ const updateRecipientAllocationAction = (
             throw new Error('Error finding current Solver')
         }
 
-        if (isSlot(payload.amount)) {
+        if (isComposerSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 payload.recipientId,
