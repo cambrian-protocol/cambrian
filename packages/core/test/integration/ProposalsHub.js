@@ -40,7 +40,6 @@ describe("ProposalsHub", function () {
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
-    this.SolutionsHub = await ethers.getContract("SolutionsHub");
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
@@ -60,34 +59,119 @@ describe("ProposalsHub", function () {
 
     //Create solution
     this.solutionId = ethers.utils.formatBytes32String("TestID");
+    this.ingests = [
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("0"),
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(
+          ["bytes32"],
+          [ethers.utils.formatBytes32String("")]
+        ),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("1"),
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(
+          ["address"],
+          [this.ProposalsHub.address]
+        ),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("2"),
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(
+          ["address"],
+          [this.ProposalsHub.address]
+        ),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("3"),
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("4"),
+        solverIndex: 0,
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
+      },
+    ];
 
-    await this.SolutionsHub.connect(this.keeper).createSolution(
-      ...getSimpleSolutionConfig(
-        this.solutionId,
-        10000, // amount is basis points now 2021-12-27
+    this.conditionBase = {
+      collateralToken: this.ToyToken.address,
+      outcomeSlots: 2,
+      parentCollectionIndexSet: 0,
+      amountSlot: ethers.utils.formatBytes32String("4"),
+      partition: [1, 2],
+      allocations: [
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("3"),
+            ethers.utils.formatBytes32String("4"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("2"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("4"),
+            ethers.utils.formatBytes32String("3"),
+          ],
+        },
+      ],
+      outcomeURIs: [
+        getBytes32FromMultihash(
+          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
+        ),
+        getBytes32FromMultihash(
+          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
+        ),
+      ],
+    };
+
+    this.solverConfigs = [
+      [
         this.Solver.address,
         this.keeper.address,
         this.arbitrator.address,
-        this.ProposalsHub.address,
-        this.ProposalsHub.address,
-        this.ToyToken.address
-      )
-    );
+        0,
+        ethers.utils.formatBytes32String(""),
+        this.ingests,
+        this.conditionBase,
+      ],
+    ];
+
+    this.cid = await Hash.of(JSON.stringify(this.solverConfigs));
+    this.emptyCid = await Hash.of(JSON.stringify({}));
   });
 
   it("Should fund a proposal", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -132,17 +216,22 @@ describe("ProposalsHub", function () {
 
   it("Should fund and defund a proposal", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -194,17 +283,22 @@ describe("ProposalsHub", function () {
 
   it("reverts when executing if funding is not met", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -225,17 +319,22 @@ describe("ProposalsHub", function () {
 
   it("can receive conditional tokens from a Solver", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -248,9 +347,9 @@ describe("ProposalsHub", function () {
       this.amount
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
-    const solverAddress = await this.SolutionsHub.solverFromIndex(
+    const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
       0
     );
@@ -285,17 +384,22 @@ describe("ProposalsHub", function () {
 
   it("conditional tokens can be reclaimed from the Proposal", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -308,9 +412,9 @@ describe("ProposalsHub", function () {
       this.amount
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
-    const solverAddress = await this.SolutionsHub.solverFromIndex(
+    const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
       0
     );
@@ -368,17 +472,22 @@ describe("ProposalsHub", function () {
 
   it("Multiple users can reclaim CTs from Proposal", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -400,9 +509,9 @@ describe("ProposalsHub", function () {
       this.amount / 2
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
-    const solverAddress = await this.SolutionsHub.solverFromIndex(
+    const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
       0
     );
@@ -477,17 +586,22 @@ describe("ProposalsHub", function () {
 
   it("Does not allow funding while active", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -500,7 +614,7 @@ describe("ProposalsHub", function () {
       this.amount
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     await this.ToyToken.mint(this.user0.address, 1000);
     await expectRevert(
@@ -515,17 +629,22 @@ describe("ProposalsHub", function () {
 
   it("Does not allow defunding while active", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -538,7 +657,7 @@ describe("ProposalsHub", function () {
       this.amount
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     // Give Hub extra tokens otherwise defund will revert for not enough funds
     await this.ToyToken.mint(this.ProposalsHub.address, 1000);
@@ -554,17 +673,22 @@ describe("ProposalsHub", function () {
 
   it("Allows reclaiming multiple tokens", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -577,9 +701,9 @@ describe("ProposalsHub", function () {
       this.amount
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
-    const solverAddress = await this.SolutionsHub.solverFromIndex(
+    const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
       0
     );
@@ -651,17 +775,22 @@ describe("ProposalsHub", function () {
 
   it("Does not allow reclaiming too many tokens", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(this.keeper).createProposal(
+    let tx2 = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
       this.ToyToken.address,
-      this.SolutionsHub.address,
+      this.IPFSSolutionsHub.address,
       this.amount,
-      this.solutionId
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[0]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -683,9 +812,9 @@ describe("ProposalsHub", function () {
       this.amount / 2
     );
 
-    await this.ProposalsHub.executeProposal(proposalId);
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
-    const solverAddress = await this.SolutionsHub.solverFromIndex(
+    const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
       0
     );
@@ -770,113 +899,23 @@ describe("ProposalsHub", function () {
     );
   });
 
-  // it("Can create Solution and Proposal in same tx with createIPFSSOlutionAndProposal", async function () {
-  //   const ingests = [
-  //     {
-  //       executions: 0,
-  //       ingestType: 1,
-  //       slot: ethers.utils.formatBytes32String("0"),
-  //       solverIndex: 0,
-  //       data: ethers.utils.defaultAbiCoder.encode(
-  //         ["bytes32"],
-  //         [ethers.utils.formatBytes32String("")]
-  //       ),
-  //     },
-  //     {
-  //       executions: 0,
-  //       ingestType: 1,
-  //       slot: ethers.utils.formatBytes32String("1"),
-  //       solverIndex: 0,
-  //       data: ethers.utils.defaultAbiCoder.encode(
-  //         ["address"],
-  //         [this.user0.address]
-  //       ),
-  //     },
-  //     {
-  //       executions: 0,
-  //       ingestType: 1,
-  //       slot: ethers.utils.formatBytes32String("2"),
-  //       solverIndex: 0,
-  //       data: ethers.utils.defaultAbiCoder.encode(
-  //         ["address"],
-  //         [this.user1.address]
-  //       ),
-  //     },
-  //     {
-  //       executions: 0,
-  //       ingestType: 1,
-  //       slot: ethers.utils.formatBytes32String("3"),
-  //       solverIndex: 0,
-  //       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [0]),
-  //     },
-  //     {
-  //       executions: 0,
-  //       ingestType: 1,
-  //       slot: ethers.utils.formatBytes32String("4"),
-  //       solverIndex: 0,
-  //       data: ethers.utils.defaultAbiCoder.encode(["uint256"], [10000]),
-  //     },
-  //   ];
+  it("Can create Solution and Proposal in same tx with createIPFSSolutionAndProposal", async function () {
+    //Create proposal
+    let tx = await this.ProposalsHub.connect(
+      this.keeper
+    ).createIPFSSolutionAndProposal(
+      this.solutionId,
+      this.ToyToken.address,
+      this.IPFSSolutionsHub.address,
+      this.amount,
+      this.solverConfigs,
+      getBytes32FromMultihash(this.cid),
+      getBytes32FromMultihash(this.emptyCid)
+    );
 
-  //   const conditionBase = {
-  //     collateralToken: this.ToyToken.address,
-  //     outcomeSlots: 2,
-  //     parentCollectionIndexSet: 0,
-  //     amountSlot: ethers.utils.formatBytes32String("4"),
-  //     partition: [1, 2],
-  //     allocations: [
-  //       {
-  //         recipientAddressSlot: ethers.utils.formatBytes32String("1"),
-  //         recipientAmountSlots: [
-  //           ethers.utils.formatBytes32String("3"),
-  //           ethers.utils.formatBytes32String("4"),
-  //         ],
-  //       },
-  //       {
-  //         recipientAddressSlot: ethers.utils.formatBytes32String("2"),
-  //         recipientAmountSlots: [
-  //           ethers.utils.formatBytes32String("4"),
-  //           ethers.utils.formatBytes32String("3"),
-  //         ],
-  //       },
-  //     ],
-  //     outcomeURIs: [
-  //       getBytes32FromMultihash(
-  //         "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-  //       ),
-  //       getBytes32FromMultihash(
-  //         "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-  //       ),
-  //     ],
-  //   };
+    const res = await tx.wait();
 
-  //   const solverConfigs = [
-  //     [
-  //       this.Solver.address,
-  //       this.keeper.address,
-  //       this.arbitrator.address,
-  //       0,
-  //       ethers.utils.formatBytes32String(""),
-  //       ingests,
-  //       conditionBase,
-  //     ],
-  //   ];
-
-  //   const cid = await Hash.of(solverConfigs);
-
-  //   //Create proposal
-  //   let res = await this.ProposalsHub.connect(
-  //     this.keeper
-  //   ).createIPFSSolutionAndProposal(
-  //     this.solutionId,
-  //     this.ToyToken.address,
-  //     this.IPFSSolutionsHub.address,
-  //     this.amount,
-  //     solverConfigs,
-  //     getBytes32FromMultihash(cid)
-  //   );
-
-  //   console.log(res);
-  //   expect(res[0]).to.equal(this.solutionId);
-  // });
+    // console.log(res);
+    expect(res.events[0].data).to.equal(this.solutionId);
+  });
 });
