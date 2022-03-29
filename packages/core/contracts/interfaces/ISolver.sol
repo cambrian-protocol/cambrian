@@ -84,7 +84,13 @@ interface ISolver {
     function conditions(uint256 index)
         external
         view
-        returns (SolverLib.Condition memory);
+        returns (
+            IERC20,
+            bytes32,
+            bytes32,
+            bytes32,
+            uint8
+        );
 
     function arbitrator() external view returns (address);
 

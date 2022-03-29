@@ -34,13 +34,17 @@ contract ArbitrationDispatch {
         address _arbitrator = solver.arbitrator();
         require(_arbitrator != address(0), "Arbitrator can't be zero address");
 
-        SolverLib.Condition memory _condition = solver.conditions(
-            conditionIndex
-        );
+        (
+            IERC20 _c,
+            bytes32 _qid,
+            bytes32 _pcid,
+            bytes32 _cid,
+            uint8 status
+        ) = solver.conditions(conditionIndex);
 
         require(
-            _condition.status == SolverLib.Status.OutcomeProposed ||
-                _condition.status == SolverLib.Status.ArbitrationRequested,
+            status == uint8(SolverLib.Status.OutcomeProposed) ||
+                status == uint8(SolverLib.Status.ArbitrationRequested),
             "Condition status invalid for arbitration"
         );
 
@@ -48,7 +52,7 @@ contract ArbitrationDispatch {
             value: msg.value
         }(abi.encode(address(solver), conditionIndex, msg.sender));
 
-        require(success, "Transfer failed");
+        require(success, "Arbitrator reverted");
 
         emit RequestedArbitration(
             address(solver),
