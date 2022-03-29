@@ -523,6 +523,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return config;
     }
 
+    function arbitrator() public view returns (address) {
+        return config.arbitrator;
+    }
+
     function setTrackingId(bytes32 _trackingId) public {
         require(trackingId == bytes32(0), "TrackingId set");
         require(msg.sender == deployerAddress);

@@ -67,6 +67,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     },
     log: true,
   });
+
+  await deploy("ArbitrationDispatch", {
+    from: deployer,
+    args: [],
+    log: true,
+  });
 };
 module.exports.tags = [
   "ConditionalTokens",
@@ -78,4 +84,5 @@ module.exports.tags = [
   "ToyToken",
   "SolutionsHub",
   "WriterSolverV1",
+  "ArbitrationDispatch",
 ];

@@ -38,7 +38,10 @@ describe("SolverRetries", async function () {
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
 
-    await this.ToyToken.mint(this.buyer.address, "100");
+    await this.ToyToken.mint(
+      this.buyer.address,
+      ethers.utils.parseEther("100")
+    );
   });
 
   it("Should allow a retry from Solver0 in a 2-solver proposal", async function () {
