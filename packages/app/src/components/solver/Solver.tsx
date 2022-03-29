@@ -12,7 +12,6 @@ import {
 } from '@cambrian/app/models/SolverModel'
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 
-import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
@@ -29,6 +28,7 @@ import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeColle
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalsHubContext } from '@cambrian/app/store/ProposalsHubContext'
+import { RecipientAllocationModel } from '@cambrian/app/models/AllocationModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -554,7 +554,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             outcomeCollection.push(outcomes[idx])
                         }
                     })
-                    const allocations: AllocationModel[] =
+                    const allocations: RecipientAllocationModel[] =
                         config.conditionBase.allocations.map((allocation) => {
                             const addressSlot =
                                 slotHistory[condition.conditionId][

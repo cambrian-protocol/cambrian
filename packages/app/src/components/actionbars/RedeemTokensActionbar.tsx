@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
-import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BigNumber } from 'ethers'
 import { CTFContext } from '@cambrian/app/store/CTFContext'
 import { Handshake } from 'phosphor-react'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import { RecipientAllocationModel } from '@cambrian/app/models/AllocationModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -33,7 +33,8 @@ const RedeemTokensActionbar = ({
 
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
-    const [userAllocations, setUserAllocations] = useState<AllocationModel[]>()
+    const [userAllocations, setUserAllocations] =
+        useState<RecipientAllocationModel[]>()
     const [
         userPayoutPercentageForCondition,
         setUserPayoutPercentageForCondition,
@@ -69,7 +70,7 @@ const RedeemTokensActionbar = ({
     }, [userAllocations])
 
     const getUserAllocations = () => {
-        const allocs: AllocationModel[] = []
+        const allocs: RecipientAllocationModel[] = []
         solverData.outcomeCollections[currentCondition.conditionId].forEach(
             (oc) => {
                 oc.allocations.forEach((allocation) => {
@@ -147,7 +148,7 @@ const RedeemTokensActionbar = ({
      * Mimics calculation from ConditionalToken.sol
      * TODO, may not be calculating properly for multiple allocations to the same user from one OC
      */
-    const getTotalPayoutPct = (allocations: AllocationModel[]) => {
+    const getTotalPayoutPct = (allocations: RecipientAllocationModel[]) => {
         const payoutNumerators = currentCondition.payouts
         const indexSets = solverData.config.conditionBase.partition
         const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots

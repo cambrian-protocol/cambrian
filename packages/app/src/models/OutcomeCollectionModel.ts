@@ -1,10 +1,10 @@
-import { AllocationModel } from './AllocationModel'
 import { OutcomeModel } from './OutcomeModel'
+import { RecipientAllocationModel } from './AllocationModel'
 
 export type OutcomeCollectionModel = {
     indexSet: number
     outcomes: OutcomeModel[]
-    allocations: AllocationModel[]
+    allocations: RecipientAllocationModel[]
 }
 
 export type OutcomeCollectionsHashMapType = {

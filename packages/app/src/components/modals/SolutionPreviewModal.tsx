@@ -2,7 +2,7 @@ import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import SolutionPreview from '../solutionPreview/SolutionPreview'
+import SolutionPreviewUI from '../../ui/general/solutionPreview/SolutionPreviewUI'
 
 interface SolutionPreviewModalProps {
     onBack: () => void
@@ -16,7 +16,7 @@ const SolutionPreviewModal = ({
     <BaseLayerModal onBack={onBack}>
         <HeaderTextSection title="Solution preview" />
         <Box fill>
-            <SolutionPreview composition={composition} />
+            <SolutionPreviewUI composition={composition} />
         </Box>
     </BaseLayerModal>
 )

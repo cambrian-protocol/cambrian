@@ -1,7 +1,19 @@
 import { Box, Nav, ResponsiveContext, Text } from 'grommet'
-import { CaretLeft, Gear, IconContext, List, Question } from 'phosphor-react'
+import {
+    Bug,
+    CaretLeft,
+    CoinVertical,
+    Gear,
+    IconContext,
+    List,
+    Question,
+} from 'phosphor-react'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
+import { ERC20_ABI } from '@cambrian/app/constants'
+import { ethers } from 'ethers'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
 interface AppbarProps {
@@ -22,6 +34,24 @@ const Appbar = ({
     const [showConfig, setShowConfig] = useState(false)
 
     const toggleShowConfig = () => setShowConfig(!showConfig)
+
+    const { currentUser } = useCurrentUser()
+    const { composer } = useComposerContext()
+
+    const onMintTOY = async () => {
+        if (currentUser) {
+            const ToyToken = new ethers.Contract(
+                '0x0165878A594ca255338adfa4d48449f69242Eb8F',
+                ERC20_ABI,
+                ethers.getDefaultProvider()
+            )
+
+            await ToyToken.connect(currentUser.signer).mint(
+                currentUser.address,
+                '1000000000000000000000'
+            )
+        }
+    }
 
     return (
         <>
@@ -52,6 +82,14 @@ const Appbar = ({
                                 <Text color="white">{title && title}</Text>
                             </Box>
                             <Box direction="row" gap="medium">
+                                <AppbarItem
+                                    icon={<Bug />}
+                                    onClick={() => console.log(composer)}
+                                />
+                                <AppbarItem
+                                    icon={<CoinVertical />}
+                                    onClick={onMintTOY}
+                                />
                                 <AppbarItem
                                     icon={<Question />}
                                     onClick={toggleHelp}

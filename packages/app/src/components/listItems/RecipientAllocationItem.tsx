@@ -8,7 +8,7 @@ import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 type RecipientAllocationItemProps = BaseSlotInputItemProps & {
     amountPercentage: string
     amount?: BigNumber
-    token: TokenModel
+    token?: TokenModel
 }
 
 const RecipientAllocationItem = ({
@@ -17,17 +17,15 @@ const RecipientAllocationItem = ({
     subTitle,
     amount,
     token,
-}: RecipientAllocationItemProps) => {
-    return (
-        <BaseSlotInputItem title={title} subTitle={subTitle}>
-            <Box align="end">
-                <Text>{amountPercentage}%</Text>
-                <Text size="small" color="dark-6">
-                    {amount && Number(formatDecimals(token, amount))}
-                </Text>
-            </Box>
-        </BaseSlotInputItem>
-    )
-}
+}: RecipientAllocationItemProps) => (
+    <BaseSlotInputItem title={title} subTitle={subTitle}>
+        <Box align="end">
+            <Text>{amountPercentage}%</Text>
+            <Text size="small" color="dark-6">
+                {amount && Number(formatDecimals(token, amount))}
+            </Text>
+        </Box>
+    </BaseSlotInputItem>
+)
 
 export default RecipientAllocationItem

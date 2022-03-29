@@ -1,5 +1,9 @@
 import { Box, Text } from 'grommet'
 import {
+    ComposerAllocationPathsType,
+    RecipientAllocationModel,
+} from '@cambrian/app/models/AllocationModel'
+import {
     ComposerSlotModel,
     ComposerSlotPathType,
     SlotModel,
@@ -11,6 +15,7 @@ import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { WarningCircle } from 'phosphor-react'
+import { parseComposerSlot } from '../transformers/ComposerTransformer'
 
 /**
  * Determites if the passed parameter is a Slot
@@ -115,6 +120,7 @@ export const getSlotTitle = (
     )
 }
 
+// TODO refactor
 export const getReferenceData = (
     reference: ComposerSlotPathType,
     solvers: ComposerSolverModel[]
@@ -145,6 +151,7 @@ export const getReferenceData = (
     }
 }
 
+// TODO refactor
 export const getRecipientData = (
     recipientSlot: ComposerSlotModel | SlotModel,
     currentSolver: ComposerSolverModel,
@@ -181,4 +188,26 @@ export const getRecipientData = (
             description: slotTag?.description,
         }
     }
+}
+
+export const getRecipientAllocations = (
+    recipientAmountSlots: ComposerAllocationPathsType[],
+    currentSolver: ComposerSolverModel,
+    solvers: ComposerSolverModel[]
+): RecipientAllocationModel[] => {
+    return recipientAmountSlots.map((allocation) => {
+        return {
+            addressSlot: {
+                slot: parseComposerSlot(
+                    currentSolver.config.slots[allocation.recipient.slotId],
+                    solvers
+                ),
+                tag: currentSolver.slotTags[allocation.recipient.slotId],
+            },
+            amountPercentage: (
+                currentSolver.config.slots[allocation.amount.slotId].data[0] /
+                100
+            ).toString(),
+        }
+    })
 }

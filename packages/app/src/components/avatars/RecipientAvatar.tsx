@@ -26,6 +26,7 @@ const RecipientAvatar = ({ icon, pfpPath, onClick }: RecipientAvatarProps) => {
                 align="center"
                 round="small"
                 overflow="hidden"
+                elevation="small"
             >
                 {pfpPath === undefined ? (
                     <IconContext.Provider value={{ size: '24' }}>

@@ -1,16 +1,16 @@
-import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import RecipientAllocationItem from '../listItems/RecipientAllocationItem'
+import { RecipientAllocationModel } from '@cambrian/app/models/AllocationModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
-    allocations: AllocationModel[]
-    token: TokenModel
+    allocations: RecipientAllocationModel[]
+    token?: TokenModel
 }
 
 const RecipientAllocationModal = ({

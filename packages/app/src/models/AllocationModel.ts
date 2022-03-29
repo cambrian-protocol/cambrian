@@ -6,14 +6,14 @@ import {
 
 import { BigNumber } from 'ethers'
 
-export type AllocationModel = {
+export type RecipientAllocationModel = {
     addressSlot: RichSlotModel
-    positionId: string
+    positionId?: string
     amountPercentage: string
     amount?: BigNumber
 }
 
-export type AllocationPathsType = {
+export type RecipientAllocationPathsType = {
     recipientAddressSlot: string
     recipientAmountSlots: string[]
 }

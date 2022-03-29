@@ -1,13 +1,16 @@
 import { Box, Text } from 'grommet'
-import { Gear, UsersThree } from 'phosphor-react'
 import { Handle, Position } from 'react-flow-renderer'
 import React, { memo, useState } from 'react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import { Button } from 'grommet'
+import { Card } from 'grommet'
+import { CardBody } from 'grommet'
+import { CardHeader } from 'grommet'
 import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import RecipientsModal from '@cambrian/app/components/modals/RecipientsModal'
+import SolverConfigurationModal from '@cambrian/app/components/modals/SolverConfigurationModal'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { getRecipientData } from '@cambrian/app/utils/helpers/slotHelpers'
 
@@ -40,40 +43,35 @@ export const PreviewSolverNode = memo(({ data }: PreviewSolverNodeProps) => {
                 )
             }
         )
-    console.log(recipientsData)
-    /* 
-    
-        Configuration should include:
-        - Keeper Address
-        - Arbitrator Address
-        - Timelock
-        - Dynamic Implementation / Core Input?? Privileges? Writer Buyer (maybe some kind of batches 'can chat', 'can submit work')
 
-    
-    */
     return (
         <>
             <Handle position={Position.Top} type="target" id="a" />
-            <Box
-                background="primary-gradient"
-                pad="medium"
-                round="small"
-                width={{ min: 'small', max: 'medium' }}
-                gap="small"
-            >
-                <Text>{solverTag.title}</Text>
-                <Text size="small">{solverTag.description}</Text>
-                <BaseMenuListItem
-                    icon={<Gear />}
-                    onClick={toggleShowSolverConfigurationModal}
-                    title="Configuration"
-                />
-                <BaseMenuListItem
-                    icon={<UsersThree />}
-                    onClick={toggleShowRecipientsModal}
-                    title="Recipients"
-                />
-            </Box>
+            <Card background={'background-popup'}>
+                <CardHeader
+                    background={'background-front'}
+                    pad={{ horizontal: 'medium', vertical: 'small' }}
+                >
+                    <Box>
+                        <Text size="small" color="dark-4">
+                            Solver
+                        </Text>
+                        <Text>{solverTag.title}</Text>
+                    </Box>
+                </CardHeader>
+                <CardBody gap="medium" pad="medium">
+                    <Button
+                        primary
+                        onClick={toggleShowSolverConfigurationModal}
+                        label="Configuration"
+                    />
+                    <Button
+                        primary
+                        onClick={toggleShowRecipientsModal}
+                        label="Recipients"
+                    />
+                </CardBody>
+            </Card>
             <Handle type="source" position={Position.Bottom} id="b" />
             {showRecipientsModal && (
                 <RecipientsModal
@@ -81,7 +79,12 @@ export const PreviewSolverNode = memo(({ data }: PreviewSolverNodeProps) => {
                     onClose={toggleShowRecipientsModal}
                 />
             )}
-            {showSolverConfigurationModal && <></>}
+            {showSolverConfigurationModal && (
+                <SolverConfigurationModal
+                    solverData={data.currentSolver}
+                    onClose={toggleShowSolverConfigurationModal}
+                />
+            )}
         </>
     )
 })

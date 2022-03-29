@@ -9,6 +9,7 @@ export type BaseSlotInputItemProps = PropsWithChildren<{}> & {
     title?: string
     subTitle?: string
     onClick?: () => void
+    icon?: JSX.Element
 }
 
 const BaseSlotInputItem = ({
@@ -17,6 +18,7 @@ const BaseSlotInputItem = ({
     onClick,
     subTitle,
     children,
+    icon,
 }: BaseSlotInputItemProps) => {
     return (
         <Box gap="xsmall" height={{ min: 'auto' }}>
@@ -34,7 +36,7 @@ const BaseSlotInputItem = ({
             >
                 <Box gap="medium" direction="row">
                     <Box width={{ min: 'xxsmall' }}>
-                        <RecipientAvatar />
+                        <RecipientAvatar icon={icon} />
                     </Box>
                     <Box justify="center">
                         <Text truncate>{title}</Text>
