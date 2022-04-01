@@ -8,17 +8,18 @@ import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalContextHeader from './ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import ProposalsHub from '@cambrian/app/contracts/ProposalsHubContract'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import VisitProposalCTA from './VisitProposalCTA'
 import { ethers } from 'ethers'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 interface ProposalUIProps {
-    proposalId: string
     proposal: ethers.Contract
+    proposalsHub: ProposalsHub
 }
 
-const ProposalUI = ({ proposalId, proposal }: ProposalUIProps) => {
+const ProposalUI = ({ proposalsHub, proposal }: ProposalUIProps) => {
     const [metaStages, setMetaStages] = useState<Stages>()
     const [errorMsg, setErrorMsg] = useState<string>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(
@@ -69,7 +70,7 @@ const ProposalUI = ({ proposalId, proposal }: ProposalUIProps) => {
                     ) : (
                         <FundProposalForm
                             metaStages={metaStages}
-                            proposalId={proposalId}
+                            proposalsHub={proposalsHub}
                             proposal={proposal}
                             setIsProposalExecuted={setIsProposalExecuted}
                         />

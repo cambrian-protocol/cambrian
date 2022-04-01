@@ -17,13 +17,14 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import ProposalsHub from '@cambrian/app/contracts/ProposalsHubContract'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateProposalFormProps {
     composition: CompositionModel
@@ -56,14 +57,13 @@ const CreateProposalForm = ({
     template,
     templateCID,
 }: CreateProposalFormProps) => {
+    const { currentUser } = useCurrentUser()
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [preferredTokensString, setPreferredTokensString] = useState('')
     const [suggestedPriceString, setSuggestedPriceString] = useState('')
     const [proposalId, setProposalId] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<string>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
-
-    const { createSolutionAndProposal } = useProposalsHub()
 
     /**
      * Initialize input.flexInputs from template
@@ -206,19 +206,23 @@ const CreateProposalForm = ({
         event.preventDefault()
         setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
         try {
+            if (!currentUser)
+                throw new Error(
+                    'You must connect a wallet in order to create a proposal!'
+                )
             const stagehand = new Stagehand()
             const response = await stagehand.publishProposal(input, templateCID)
             if (!response)
                 throw new Error('Error while publishing proposal to IPFS')
 
-            const proposalId = await createSolutionAndProposal({
-                collateralToken: response.parsedSolvers[0].collateralToken,
-                price: input.price,
-                solverConfigs: response.parsedSolvers.map(
-                    (solver) => solver.config
-                ),
-                proposalCID: response.cid,
-            })
+            const proposalsHub = new ProposalsHub(currentUser.signer)
+
+            const proposalId = await proposalsHub.createSolutionAndProposal(
+                response.parsedSolvers[0].collateralToken,
+                input.price,
+                response.parsedSolvers.map((solver) => solver.config),
+                response.cid
+            )
             if (!proposalId)
                 throw new Error('Error while deploying solution and proposal')
 

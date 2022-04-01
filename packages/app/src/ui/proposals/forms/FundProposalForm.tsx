@@ -13,16 +13,16 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import ProposalsHub from '@cambrian/app/contracts/ProposalsHubContract'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposalsHub } from '@cambrian/app/hooks/useProposalsHub'
 
 interface FundProposalFormProps {
-    proposalId: string
     proposal: ethers.Contract
+    proposalsHub: ProposalsHub
     metaStages: Stages
     setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
 }
@@ -36,8 +36,8 @@ const initialInput = {
 }
 
 const FundProposalForm = ({
-    proposalId,
     proposal,
+    proposalsHub,
     metaStages,
     setIsProposalExecuted,
 }: FundProposalFormProps) => {
@@ -49,23 +49,13 @@ const FundProposalForm = ({
     const [transactionMessage, setTransactionMessage] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<string>()
 
-    const {
-        proposalsHubContract,
-        approveFunding,
-        fundProposal,
-        defundProposal,
-        getProposalFunding,
-        executeProposal,
-        getProposal,
-    } = useProposalsHub()
-
     useEffect(() => {
         initTokenAndFunding()
         initProposalsHubListeners()
         return () => {
-            proposalsHubContract?.removeAllListeners()
+            proposalsHub.contract.removeAllListeners()
         }
-    }, [proposalsHubContract])
+    }, [])
 
     useEffect(() => {
         initERC20Listener()
@@ -76,7 +66,7 @@ const FundProposalForm = ({
         const token = await TokenAPI.getTokenInfo(proposal.collateralToken)
         setCollateralToken(token)
 
-        const funding = await getProposalFunding(proposalId)
+        const funding = await proposalsHub.getProposalFunding(proposal.id)
         if (funding) setFunding(funding)
     }
 
@@ -100,37 +90,39 @@ const FundProposalForm = ({
     }
 
     const initProposalsHubListeners = async () => {
-        if (proposalsHubContract) {
-            proposalsHubContract.on(
-                proposalsHubContract.filters.FundProposal(null, null, null),
-                async (proposalId) => {
-                    await updateFunding(proposalId)
-                    setHasApprovedTokenAccess(false)
-                }
-            )
+        proposalsHub.contract.on(
+            proposalsHub.contract.filters.FundProposal(null, null, null),
+            async (proposalId) => {
+                await updateFunding(proposalId)
+                setHasApprovedTokenAccess(false)
+            }
+        )
 
-            proposalsHubContract.on(
-                proposalsHubContract.filters.DefundProposal(null, null, null),
-                async (proposalId) => {
-                    await updateFunding(proposalId)
-                }
-            )
+        proposalsHub.contract.on(
+            proposalsHub.contract.filters.DefundProposal(null, null, null),
+            async (proposalId) => {
+                await updateFunding(proposalId)
+            }
+        )
 
-            proposalsHubContract.on(
-                proposalsHubContract.filters.ExecuteProposal(null),
-                async (proposalId) => {
-                    const proposal = await getProposal(proposalId)
-                    if (proposal && proposal.isExecuted) {
-                        setIsProposalExecuted(true)
-                        setTransactionMessage(undefined)
-                    }
+        proposalsHub.contract.on(
+            proposalsHub.contract.filters.ExecuteProposal(null),
+            async (proposalId) => {
+                const updatedProposal = await proposalsHub.getProposal(
+                    proposalId
+                )
+                if (updatedProposal && updatedProposal.isExecuted) {
+                    setIsProposalExecuted(true)
+                    setTransactionMessage(undefined)
                 }
-            )
-        }
+            }
+        )
     }
 
     const updateFunding = async (proposalId: string) => {
-        const proposalFunding = await getProposalFunding(proposalId)
+        const proposalFunding = await proposalsHub.getProposalFunding(
+            proposalId
+        )
         if (proposalFunding) {
             setInput(initialInput)
             setFunding(proposalFunding)
@@ -152,19 +144,27 @@ const FundProposalForm = ({
 
     const onApproveFunding = async () => {
         safeTransactionCall(() =>
-            approveFunding(collateralToken!, input.amount)
+            proposalsHub.approveFunding(collateralToken!, input.amount)
         )
     }
 
     const onFundProposal = async () => {
         safeTransactionCall(() =>
-            fundProposal(proposalId, collateralToken!, input.amount)
+            proposalsHub.fundProposal(
+                proposal.id,
+                collateralToken!,
+                input.amount
+            )
         )
     }
 
     const onDefundProposal = async () => {
         safeTransactionCall(() =>
-            defundProposal(proposalId, collateralToken!, input.amount)
+            proposalsHub.defundProposal(
+                proposal.id,
+                collateralToken!,
+                input.amount
+            )
         )
     }
 
@@ -173,7 +173,7 @@ const FundProposalForm = ({
             const solverConfigs = await getSolverConfigsFromMetaStages(
                 metaStages
             )
-            await executeProposal(proposalId, solverConfigs)
+            await proposalsHub.executeProposal(proposal.id, solverConfigs)
         })
     }
 
