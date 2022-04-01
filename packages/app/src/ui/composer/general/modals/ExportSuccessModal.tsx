@@ -31,7 +31,7 @@ const ExportSuccessModal = ({
                 paragraph={description}
             />
             <BaseFormContainer direction="row" justify="between" align="center">
-                <Text>{exportedCID}</Text>
+                <Text truncate>{exportedCID}</Text>
                 <Button
                     icon={<Copy size="24" />}
                     onClick={() => {

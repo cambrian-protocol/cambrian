@@ -11,8 +11,6 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface WriterSolverContentUI {
-    proposalTitle: string
-    proposalDescription: string
     roles: WriterSolverRole[]
     setWorkInput: React.Dispatch<SetStateAction<SubmissionModel>>
     workInput: SubmissionModel
@@ -30,8 +28,6 @@ const WriterSolverContentUI = ({
     currentCondition,
     submittedWork,
     proposedOutcome,
-    proposalTitle,
-    proposalDescription,
 }: WriterSolverContentUI) => {
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
@@ -60,9 +56,9 @@ const WriterSolverContentUI = ({
                 return (
                     <Box fill gap="small">
                         <HeaderTextSection
-                            title={proposalTitle}
+                            title={'TODO Solver title'}
                             subTitle="Most recent state of"
-                            paragraph={proposalDescription}
+                            paragraph={'TODO Solver description'}
                         />
                         <Stack anchor="center" fill>
                             <TextArea
@@ -94,8 +90,8 @@ const WriterSolverContentUI = ({
             } else {
                 return (
                     <WorkContentContainer
-                        title={proposalTitle}
-                        description={proposalDescription}
+                        title={'TODO Solver title'}
+                        description={'TODO Solver description'}
                         submittedWork={submittedWork[submittedWork.length - 1]}
                     />
                 )
@@ -115,8 +111,8 @@ const WriterSolverContentUI = ({
                                 }
                             />
                             <WorkContentContainer
-                                title={proposalTitle}
-                                description={proposalDescription}
+                                title={'TODO Solver title'}
+                                description={'TODO Solver description'}
                                 submittedWork={
                                     submittedWork[submittedWork.length - 1]
                                 }
@@ -136,8 +132,8 @@ const WriterSolverContentUI = ({
                                 status={currentCondition.status}
                             />
                             <WorkContentContainer
-                                title={proposalTitle}
-                                description={proposalDescription}
+                                title={'TODO Solver title'}
+                                description={'TODO Solver description'}
                                 submittedWork={
                                     submittedWork[submittedWork.length - 1]
                                 }

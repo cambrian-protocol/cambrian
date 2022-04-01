@@ -1,39 +1,33 @@
-import CreateTemplateForm, {
-    CreateTemplateFormType,
-} from './forms/CreateTemplateForm'
 import React, { useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CreateTemplateForm from './forms/CreateTemplateForm'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import Stagehand from '@cambrian/app/classes/Stagehand'
 
 interface CreateTemplateUIProps {
-    stagehand: Stagehand
     composition: CompositionModel
+    compositionCID: string
 }
 
 const CreateTemplateUI = ({
-    stagehand,
     composition,
+    compositionCID,
 }: CreateTemplateUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
-
+    const [showFailureModal, setShowFailureModal] = useState(false)
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
+    const toggleShowFailureModal = () => setShowFailureModal(!showFailureModal)
 
-    const [createdTemplateCID, setCreatedTemplateCID] = useState<string>()
+    const [templateCID, setTemplateCID] = useState<string>()
 
-    const onSubmit = async (templateInput: CreateTemplateFormType) => {
-        const ipfsHash = await stagehand.publishTemplate(templateInput)
-        setCreatedTemplateCID(ipfsHash)
+    const handleSuccess = (templateCID: string) => {
+        setTemplateCID(templateCID)
         toggleShowSuccessModal()
     }
 
-    // TODO
-    const handleFailure = () => {}
-
-    // TODO Show composition infos (title / description)
     return (
         <>
             <HeaderTextSection
@@ -44,20 +38,24 @@ const CreateTemplateUI = ({
             <Box fill>
                 <CreateTemplateForm
                     composition={composition}
-                    onSubmit={onSubmit}
-                    onFailure={handleFailure}
+                    compositionCID={compositionCID}
+                    onFailure={toggleShowFailureModal}
+                    onSuccess={handleSuccess}
                 />
                 <Box pad="medium" />
             </Box>
-            {showSuccessModal && createdTemplateCID && (
+            {showSuccessModal && templateCID && (
                 <ExportSuccessModal
                     ctaLabel="Create Proposal"
                     link="/templates/"
-                    exportedCID={createdTemplateCID}
+                    exportedCID={templateCID}
                     description="This is your CID for your exported template. Share it with your clients and receive proposals."
                     title="Template created"
                     onClose={toggleShowSuccessModal}
                 />
+            )}
+            {showFailureModal && (
+                <ErrorPopupModal onClose={toggleShowFailureModal} />
             )}
         </>
     )

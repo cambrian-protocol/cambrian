@@ -1,8 +1,7 @@
-import { Contract, ContractTransaction, ethers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { SolverConfigModel } from '../models/SolverConfigModel'
-import { getBytes32FromMultihash } from '../utils/helpers/multihash'
 import { useCurrentUser } from '../hooks/useCurrentUser'
 
 const IPFS_SOLUTIONS_HUB_ABI =
@@ -10,20 +9,13 @@ const IPFS_SOLUTIONS_HUB_ABI =
 
 export type IPFSSolutionsHubContextType = {
     getIPFSSolutionsHubAddress: () => string
-    createSolution: (
-        solutionId: string,
-        collateralToken: string,
-        solverConfigs: SolverConfigModel[],
-        solverConfigsCID: string
-    ) => Promise<ContractTransaction | null>
-    contract: Contract | undefined
+    IPFSSolutionsHubContract: Contract | undefined
     getSolvers: (solutionId: string) => Promise<string[] | undefined | null>
 }
 export const IPFSSolutionsHubContext =
     React.createContext<IPFSSolutionsHubContextType>({
         getIPFSSolutionsHubAddress: () => '',
-        createSolution: async () => null,
-        contract: undefined,
+        IPFSSolutionsHubContract: undefined,
         getSolvers: async () => null,
     })
 
@@ -44,25 +36,8 @@ export const IPFSSolutionsHubContextProvider = ({
         }
     }, [currentUser])
 
-    const onCreateSolution = async (
-        solutionId: string,
-        collateralToken: string,
-        solverConfigs: SolverConfigModel[],
-        solverConfigsCID: string
-    ) => {
-        if (!IPFSSolutionsHub || !currentUser)
-            throw new Error('No User or IPFS Solutions Hub Contract defined')
-
-        return IPFSSolutionsHub.connect(currentUser.signer).createSolution(
-            solutionId,
-            collateralToken,
-            solverConfigs,
-            getBytes32FromMultihash(solverConfigsCID)
-        )
-    }
-
     const getIPFSSolutionsHubAddress = () => {
-        if (!IPFSSolutionsHub || !currentUser)
+        if (!IPFSSolutionsHub)
             throw new Error('No User or IPFS Solutions Hub Contract defined')
 
         return IPFSSolutionsHub.address
@@ -86,8 +61,7 @@ export const IPFSSolutionsHubContextProvider = ({
     return (
         <IPFSSolutionsHubContext.Provider
             value={{
-                contract: IPFSSolutionsHub,
-                createSolution: onCreateSolution,
+                IPFSSolutionsHubContract: IPFSSolutionsHub,
                 getIPFSSolutionsHubAddress: getIPFSSolutionsHubAddress,
                 getSolvers: getSolvers,
             }}
