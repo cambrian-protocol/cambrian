@@ -169,7 +169,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -229,7 +229,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -296,7 +296,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -332,7 +332,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -397,7 +397,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -485,7 +485,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -599,7 +599,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -642,7 +642,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -686,7 +686,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
@@ -788,7 +788,7 @@ describe("ProposalsHub", function () {
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]);
     const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
 
