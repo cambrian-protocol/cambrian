@@ -3,25 +3,27 @@ import { useEffect, useState } from 'react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import { useIPFSSolutionsHub } from '@cambrian/app/hooks/useIPFSSolutionsHub'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface VisitProposalCTAProps {
     solutionId: string
 }
 
 const VisitProposalCTA = ({ solutionId }: VisitProposalCTAProps) => {
-    const { IPFSSolutionsHubContract, getSolvers } = useIPFSSolutionsHub()
+    const { currentUser } = useCurrentUser()
     const [solverAddress, setSolverAddress] = useState<string>()
 
     useEffect(() => {
         initSolverAddress()
-    }, [IPFSSolutionsHubContract])
+    }, [currentUser])
 
     const initSolverAddress = async () => {
-        if (IPFSSolutionsHubContract) {
-            const solvers = await getSolvers(solutionId)
+        if (currentUser) {
+            const ipfsSolutionsHub = new IPFSSolutionsHub(currentUser.signer)
+            const solvers = await ipfsSolutionsHub.getSolvers(solutionId)
             if (solvers) {
                 setSolverAddress(solvers[0])
             }
