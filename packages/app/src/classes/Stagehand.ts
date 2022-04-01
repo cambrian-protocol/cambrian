@@ -15,7 +15,7 @@ export enum StageNames {
 
 type StageModel = CompositionModel | TemplateModel | ProposalModel
 
-type Stages = {
+export type Stages = {
     [key in StageNames]: StageModel
 }
 
@@ -73,28 +73,22 @@ export default class Stagehand {
         stageCID: string,
         stageType: StageNames
     ): Promise<Stages | undefined> => {
-        try {
-            const stage = await this.loadStage(stageCID, stageType)
-
-            if (stage) {
-                switch (stageType) {
-                    case StageNames.proposal:
-                        return this.loadStages(
-                            this.proposal!.templateCID,
-                            StageNames.template
-                        )
-                    case StageNames.template:
-                        return this.loadStages(
-                            this.template!.compositionCID,
-                            StageNames.composition
-                        )
-                    default:
-                        return this.stages
-                }
+        const stage = await this.loadStage(stageCID, stageType)
+        if (stage) {
+            switch (stageType) {
+                case StageNames.proposal:
+                    return this.loadStages(
+                        this.proposal!.templateCID,
+                        StageNames.template
+                    )
+                case StageNames.template:
+                    return this.loadStages(
+                        this.template!.compositionCID,
+                        StageNames.composition
+                    )
+                default:
+                    return this.stages
             }
-        } catch (e) {
-            console.log(e)
-            return undefined
         }
     }
 
@@ -136,17 +130,11 @@ export default class Stagehand {
             }
         }
 
-        try {
-            const newComposition = mergeFlexIntoComposition(
-                this.composition!,
-                createTemplateInput.flexInputs
-            )
-            // TODO async
-            parseComposerSolvers(newComposition.solvers)
-        } catch (e) {
-            console.log('Error parsing new composition')
-            return undefined
-        }
+        const newComposition = mergeFlexIntoComposition(
+            this.composition!,
+            createTemplateInput.flexInputs
+        )
+        await parseComposerSolvers(newComposition.solvers)
 
         const template: TemplateModel = {
             pfp: createTemplateInput.pfp,
@@ -177,51 +165,57 @@ export default class Stagehand {
         templateCID: string
     ) => {
         if (!this.template) {
-            try {
-                await this.loadStage(templateCID, StageNames.template)
-            } catch (e) {
-                console.log('Error finding template')
-                return undefined
-            }
+            await this.loadStage(templateCID, StageNames.template)
         }
 
         if (this.template && !this.composition) {
-            try {
-                await this.loadStage(
-                    this.template.compositionCID,
-                    StageNames.composition
-                )
-            } catch (e) {
-                console.log('Error finding composition')
-                return undefined
+            await this.loadStage(
+                this.template.compositionCID,
+                StageNames.composition
+            )
+        }
+
+        const newComposition = mergeFlexIntoComposition(
+            mergeFlexIntoComposition(
+                this.composition!,
+                this.template!.flexInputs
+            ),
+            createProposalInput.flexInputs
+        )
+        const parsedSolvers = await parseComposerSolvers(newComposition.solvers)
+        if (parsedSolvers) {
+            const proposal: ProposalModel = {
+                title: createProposalInput.title,
+                name: createProposalInput.name,
+                pfp: createProposalInput.pfp,
+                description: createProposalInput.description,
+                flexInputs: createProposalInput.flexInputs,
+                templateCID: templateCID,
+            }
+
+            this.stages[StageNames.proposal] = proposal
+            const proposalCID = await this.publishStage(StageNames.proposal)
+            if (proposalCID) {
+                return {
+                    parsedSolvers: parsedSolvers,
+                    cid: proposalCID,
+                }
             }
         }
-
-        try {
-            const newComposition = mergeFlexIntoComposition(
-                mergeFlexIntoComposition(
-                    this.composition!,
-                    this.template!.flexInputs
-                ),
-                createProposalInput.flexInputs
-            )
-            // TODO async
-            parseComposerSolvers(newComposition.solvers)
-        } catch (e) {
-            console.log('Error parsing new composition')
-            return undefined
-        }
-
-        const proposal: ProposalModel = {
-            title: createProposalInput.title,
-            name: createProposalInput.name,
-            pfp: createProposalInput.pfp,
-            description: createProposalInput.description,
-            flexInputs: createProposalInput.flexInputs,
-            templateCID: templateCID, // TODO
-        }
-
-        this.stages[StageNames.proposal] = proposal
-        return this.publishStage(StageNames.proposal)
     }
+}
+
+export const getSolverConfigsFromMetaStages = async (metaStages: Stages) => {
+    const metaTemplate = metaStages.template as TemplateModel
+    const metaProposal = metaStages.proposal as ProposalModel
+    const finalComposition = mergeFlexIntoComposition(
+        mergeFlexIntoComposition(
+            metaStages.composition as CompositionModel,
+            metaTemplate.flexInputs
+        ),
+        metaProposal.flexInputs
+    )
+    const parsedSolvers = await parseComposerSolvers(finalComposition.solvers)
+    if (!parsedSolvers) throw 'Error while parsing Solvers'
+    return parsedSolvers.map((solver) => solver.config)
 }

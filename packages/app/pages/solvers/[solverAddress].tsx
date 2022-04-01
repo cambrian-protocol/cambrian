@@ -12,7 +12,7 @@ const WRITER_ABI =
 export default function SolverPage() {
     const { currentUser, login } = useCurrentUser()
     const router = useRouter()
-    const { solverAddress } = router.query // 0x8aCd85898458400f7Db866d53FCFF6f0D49741FF
+    const { solverAddress } = router.query
 
     React.useEffect(() => {
         if (!currentUser) {

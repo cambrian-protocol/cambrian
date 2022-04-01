@@ -16,13 +16,14 @@ import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { initial } from 'lodash'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
-    onSubmit: (templateInput: CreateTemplateFormType) => void
+    compositionCID: string
     onFailure: () => void
+    onSuccess: (templateCID: string) => void
 }
 
 export type CreateTemplateFormType = {
@@ -49,8 +50,23 @@ const initialInput = {
 
 const CreateTemplateForm = ({
     composition,
-    onSubmit,
+    compositionCID,
+    onSuccess,
+    onFailure,
 }: CreateTemplateFormProps) => {
+    const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
+    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
+        string | undefined
+    >('')
+    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
+        (string | undefined)[] | undefined
+    >()
+
+    useEffect(() => {
+        const initalInput = getInitialInput()
+        setInput(initalInput)
+    }, [])
+
     /**
      * Initialize input.flexInputs from composition
      */
@@ -76,25 +92,15 @@ const CreateTemplateForm = ({
             })
         })
 
-        const inputs = { ...initialInput }
-        inputs.flexInputs = flexInputs
+        const updatedInputs = { ...initialInput }
+        updatedInputs.flexInputs = flexInputs
 
         if (composition.solvers[0].config.collateralToken)
-            inputs.denominationToken =
+            updatedInputs.denominationToken =
                 composition.solvers[0].config.collateralToken
 
-        return inputs
+        return updatedInputs
     }
-
-    const [input, setInput] = useState<CreateTemplateFormType>(
-        getInitialInput()
-    )
-    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
-        string | undefined
-    >('')
-    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
-        (string | undefined)[] | undefined
-    >()
 
     const setFlexInputValue = (
         solverId: string,
@@ -228,9 +234,18 @@ const CreateTemplateForm = ({
         return bool
     }
 
-    const handleSubmit = async (event: FormExtendedEvent) => {
+    const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        onSubmit(input)
+        const stagehand = new Stagehand()
+        const templateCID = await stagehand.publishTemplate(
+            input,
+            compositionCID
+        )
+        if (templateCID) {
+            onSuccess(templateCID)
+        } else {
+            onFailure()
+        }
     }
 
     return (
@@ -240,7 +255,7 @@ const CreateTemplateForm = ({
                     setInput(nextValue)
                 }}
                 value={input}
-                onSubmit={(event) => handleSubmit(event)}
+                onSubmit={(event) => onSubmit(event)}
             >
                 <Box gap="medium">
                     <BaseFormGroupContainer>
