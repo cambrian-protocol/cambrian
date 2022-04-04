@@ -165,7 +165,7 @@ describe("IPFSSolutionsHub", function () {
     );
     let rc = await tx.wait();
     const proposalId = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]).parseLog(rc.logs[0]).args.id;
 
     //Fund Proposal

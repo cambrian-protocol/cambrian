@@ -36,10 +36,10 @@ contract ProposalsHub is ERC1155Receiver {
     mapping(bytes32 => mapping(uint256 => uint256)) public reclaimableTokens;
     mapping(uint256 => mapping(address => uint256)) public reclaimedTokens;
 
-    event CreateProposal(bytes32 id);
-    event ExecuteProposal(bytes32 id);
-    event FundProposal(bytes32 id, uint256 amount, address from);
-    event DefundProposal(bytes32 id, uint256 amount, address from);
+    event CreateProposal(bytes32 indexed id);
+    event ExecuteProposal(bytes32 indexed id);
+    event FundProposal(bytes32 indexed id, uint256 amount, address from);
+    event DefundProposal(bytes32 indexed id, uint256 amount, address to);
 
     constructor(address _ctfAddress) {
         conditionalTokens = IConditionalTokens(_ctfAddress);
