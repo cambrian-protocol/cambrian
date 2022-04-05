@@ -1,29 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { getManualSlots, getSolverMethods } from './SolverHelpers'
 import {
     getMetadataFromProposal,
     getSolverConfig,
     getSolverData,
     getSolverOutcomes,
 } from './SolverGetters'
+import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
+import AddSolverDataContent from '@cambrian/app/ui/solvers/AddSolverDataContent'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import ExecuteSolverActionbar from '../actionbars/ExecuteSolverActionbar'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
+import ConditionVersionSidebar from '@cambrian/app/ui/interaction/bars/ConditionVersionSidebar'
+import ContentMarketingSolverUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketingSolver/ContentMarketingSolverUI'
+import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { JsonFragmentType } from '@ethersproject/abi'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import OutcomeNotification from '../notifications/OutcomeNotification'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import SolutionSideNav from '../nav/SolutionSideNav'
+import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import WriterSolverUI from '@cambrian/app/ui/solvers/writerSolverV1/WriterSolverUI'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { ethers } from 'ethers'
+import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -44,6 +55,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const [metadata, setMetadata] = useState<MetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
 
+    const [proposedOutcome, setProposedOutcome] =
+        useState<OutcomeCollectionModel>()
+
+    const { addPermission } = useCurrentUser()
+
     const proposalsHub = new ProposalsHub(currentUser.signer)
     const ctf = new CTFContract(currentUser.signer)
     const solverContract = new ethers.Contract(
@@ -63,6 +79,41 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        if (solverData && currentUser) {
+            if (currentUser.address === solverData.config.keeper)
+                addPermission('Keeper')
+
+            if (currentUser.address === solverData.config.arbitrator)
+                addPermission('Arbitrator')
+
+            if (currentCondition) {
+                const recipients = getSolverRecipientSlots(
+                    solverData,
+                    currentCondition
+                )
+
+                recipients.forEach((recipient) => {
+                    const decodedAddress = decodeData(
+                        [SolidityDataTypes.Address],
+                        recipient.slot.data
+                    )
+                    if (currentUser.address === decodedAddress)
+                        addPermission('Recipient')
+                })
+            }
+        }
+    }, [currentUser, solverData, currentCondition])
+
+    useEffect(() => {
+        if (
+            currentCondition?.status === ConditionStatus.OutcomeProposed ||
+            currentCondition?.status === ConditionStatus.OutcomeReported
+        ) {
+            initProposedOutcome()
+        }
+    }, [currentCondition, solverData])
 
     /* 
         Initializes solver data and stores ipfs data into state. 
@@ -102,43 +153,122 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         setOutcomes(fetchedOutcomes)
     }
 
+    const initProposedOutcome = () => {
+        if (!currentCondition || currentCondition.payouts.length === 0) {
+            setProposedOutcome(undefined)
+        } else {
+            const indexSet = getIndexSetFromBinaryArray(
+                currentCondition.payouts
+            )
+            const outcomeCollection = solverData?.outcomeCollections[
+                currentCondition.conditionId
+            ].find(
+                (outcomeCollection) => outcomeCollection.indexSet === indexSet
+            )
+            setProposedOutcome(outcomeCollection)
+        }
+    }
+
     // Trigger Update for the listeners
     const updateSolverData = async () => {
-        setSolverData(
-            await getSolverData(
-                solverContract,
-                solverMethods,
-                ctf,
-                outcomes,
-                metadata
-            )
+        const updatedSolverData = await getSolverData(
+            solverContract,
+            solverMethods,
+            ctf,
+            outcomes,
+            metadata
         )
+        setSolverData(updatedSolverData)
+
+        if (currentCondition?.conditionId) {
+            const currentConditionIdx = updatedSolverData.conditions.findIndex(
+                (condition) =>
+                    condition.conditionId === currentCondition.conditionId
+            )
+            setCurrentCondition(
+                updatedSolverData.conditions[currentConditionIdx]
+            )
+        }
     }
 
     // TODO Determine SolverUI
     const loadWriter = true
+
+    const customUI = {
+        sidebar: undefined,
+        sideNav: undefined,
+    }
     return (
         <>
             {solverData && currentCondition && solverMethods ? (
-                <WriterSolverUI
-                    solverData={solverData}
-                    solverContract={solverContract}
-                    currentUser={currentUser}
-                    solverMethods={solverMethods}
-                    currentCondition={currentCondition}
-                    setCurrentCondition={setCurrentCondition}
-                />
-            ) : solverData && solverMethods ? (
                 <BaseLayout
-                    contextTitle="Uninitialzed Solve"
-                    actionBar={
-                        <ExecuteSolverActionbar
+                    contextTitle="Solver"
+                    config={
+                        <SolverConfigInfo
+                            currentCondition={currentCondition}
                             solverData={solverData}
-                            solverMethods={solverMethods}
-                            manualSlots={getManualSlots(solverData)}
                         />
                     }
+                    sidebar={
+                        customUI.sidebar ? (
+                            customUI.sidebar
+                        ) : (
+                            <ConditionVersionSidebar
+                                solverTag={metadata?.solverTag}
+                                solverMethods={solverMethods}
+                                currentCondition={currentCondition}
+                                setCurrentCondition={setCurrentCondition}
+                                solverConditions={solverData.conditions}
+                            />
+                        )
+                    }
+                    sideNav={
+                        customUI.sideNav ? (
+                            customUI.sideNav
+                        ) : (
+                            <SolutionSideNav
+                                solverContract={solverContract}
+                                currentUser={currentUser}
+                                activeSolverAddress={solverContract.address}
+                            />
+                        )
+                    }
+                    actionBar={
+                        <DefaultSolverActionbar
+                            solverContract={solverContract}
+                            currentUser={currentUser}
+                            solverData={solverData}
+                            currentCondition={currentCondition}
+                            updateSolverData={updateSolverData}
+                            solverMethods={solverMethods}
+                        />
+                    }
+                    notification={
+                        proposedOutcome && (
+                            <OutcomeNotification
+                                token={solverData.collateralToken}
+                                outcomeCollection={proposedOutcome}
+                                status={currentCondition.status}
+                            />
+                        )
+                    }
                 >
+                    {currentCondition.status === ConditionStatus.Initiated ? (
+                        <AddSolverDataContent />
+                    ) : loadWriter ? (
+                        <ContentMarketingSolverUI
+                            solverMethods={solverMethods}
+                            solverContract={solverContract}
+                            currentUser={currentUser}
+                            solverData={solverData}
+                            currentCondition={currentCondition}
+                        />
+                    ) : (
+                        <>No Custom Solver UI found</>
+                    )}
+                </BaseLayout>
+            ) : solverData && solverMethods ? (
+                <BaseLayout contextTitle="Uninitialzed Solve">
                     <Box fill justify="center">
                         <HeaderTextSection
                             subTitle="Uninitialized Solver"
@@ -154,29 +284,3 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 }
 
 export default Solver
-
-/*     const initListeners = async () => {
-        const ingestedDataFilter = {
-            address: address,
-            topics: [ethers.utils.id('IngestedData()')],
-            fromBlock: 'latest',
-        } as EventFilter
-
-        solverContract.on(ingestedDataFilter, async () => {
-            console.log('Heard IngestedData event')
-            triggerUpdate()
-            setIsLoading(false)
-        })
-
-        const changedStatusFilter = {
-            address: address,
-            topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
-            fromBlock: 'latest',
-        } as EventFilter
-
-        solverContract.on(changedStatusFilter, async () => {
-            console.log('Heard ChangedStatus event')
-            triggerUpdate()
-            setIsLoading(false)
-        })
-    } */
