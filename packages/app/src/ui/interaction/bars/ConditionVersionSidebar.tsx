@@ -9,41 +9,51 @@ import {
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
+import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SetStateAction } from 'react'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
 import SidebarCardBody from '@cambrian/app/components/cards/SidebarCardBody'
 import SidebarCardHeader from '@cambrian/app/components/cards/SidebarCardHeader'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
+import usePermission from '@cambrian/app/hooks/usePermission'
 
 interface ConditionVersionSidebarProps {
-    solverTitle: string
-    solverMetaVersion?: string
     solverConditions: SolverContractCondition[]
     currentCondition: SolverContractCondition
     setCurrentCondition: React.Dispatch<
         SetStateAction<SolverContractCondition | undefined>
     >
-    onRetryCondition: () => void
-    isKeeper: boolean
+    solverMethods: GenericMethods
+    solverTag?: SolverTagModel
 }
 
 const ConditionVersionSidebar = ({
-    solverTitle,
-    solverMetaVersion,
     solverConditions,
     currentCondition,
     setCurrentCondition,
-    onRetryCondition,
-    isKeeper,
+    solverMethods,
+    solverTag,
 }: ConditionVersionSidebarProps) => {
+    const allowed = usePermission('Keeper')
+
     const conditions = [...solverConditions]
 
     const newestCondition = conditions.pop()
     conditions.reverse()
+
+    // TODO Transaction loader
+    const onRetryCondition = async () => {
+        solverMethods.prepareSolve(currentCondition.executions)
+    }
+
     return (
         <SidebarCard>
-            <SidebarCardHeader title={solverTitle} info={solverMetaVersion} />
+            <SidebarCardHeader
+                title={`Solver ${solverTag?.title}`}
+                info={solverTag?.version}
+            />
             <SidebarCardBody>
                 <Box height={{ min: 'auto' }} fill>
                     {newestCondition !== undefined ? (
@@ -55,11 +65,8 @@ const ConditionVersionSidebar = ({
                                 <Text>Current Solve</Text>
                             </Box>
                             <Text size="small" color="dark-6">
-                                Current solver version description text, Lorem
-                                ipsum dolor sit amet, consectetur adipiscing
-                                elit. Suspendisse vel erat et enim blandit
-                                pharetra. Nam nec justo ultricies, tristique
-                                justo ege.
+                                This is the most recent run of this solver. It's
+                                current status is:
                             </Text>
                             <BaseMenuListItem
                                 title={
@@ -82,7 +89,7 @@ const ConditionVersionSidebar = ({
                             />
                             {newestCondition.status ===
                                 ConditionStatus.OutcomeReported &&
-                                isKeeper && (
+                                allowed && (
                                     <Box gap="medium" height={{ min: 'auto' }}>
                                         <Text size="small" color="dark-6">
                                             You can start a retry of this solver

@@ -18,6 +18,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     actionBar?: JSX.Element
     floatingActionButton?: JSX.Element
     fill?: boolean // Needed for React Flow
+    notification?: JSX.Element
     appbarTitle?: string
 }
 
@@ -31,6 +32,7 @@ export const BaseLayout = ({
     floatingActionButton,
     fill,
     appbarTitle,
+    notification,
 }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
@@ -140,6 +142,7 @@ export const BaseLayout = ({
                                             pad={'small'}
                                             gap="small"
                                         >
+                                            {notification}
                                             {children}
                                             {floatingActionButton && (
                                                 <>
