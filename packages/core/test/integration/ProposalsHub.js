@@ -812,7 +812,14 @@ describe("ProposalsHub", function () {
       this.amount / 2
     );
 
-    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
+    const tx = await this.ProposalsHub.executeIPFSProposal(
+      proposalId,
+      this.solverConfigs
+    );
+    const res = await tx.wait();
+    res.logs.forEach((log) => {
+      console.log(JSON.stringify(log));
+    });
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,

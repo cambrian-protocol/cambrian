@@ -59,17 +59,11 @@ export default class ProposalsHub {
                 getBytes32FromMultihash(proposalCID)
             )
         let rc = await tx.wait()
-        return new ethers.utils.Interface([
-            'event CreateProposal(bytes32 id)',
-        ]).parseLog(
-            rc.logs.find((log) =>
-                log.topics.includes(
-                    ethers.utils.keccak256(
-                        ethers.utils.toUtf8Bytes('CreateProposal(bytes32)')
-                    )
-                )
-            ) as any
-        ).args.id
+        const event = rc.events?.find(
+            (event) => event.event === 'CreateProposal'
+        ) // Less fragile to event param changes.
+        const proposalId = event?.args && event.args.id
+        return proposalId
     }
 
     getProposal = async (proposalId: string) => {
