@@ -10,6 +10,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import WriterActionbar from './WriterActionbar'
 import { WriterSolverRole } from './WriterSolverUI'
+import { getManualSlots } from '@cambrian/app/components/solver/SolverHelpers'
 
 interface WriterSolverActionbarProps {
     solverData: SolverModel
@@ -39,7 +40,7 @@ const WriterSolverActionbar = ({
                         solverData={solverData}
                         currentCondition={currentCondition}
                         solverMethods={solverMethods}
-                        manualSlots={solverMethods.getManualSlots()}
+                        manualSlots={getManualSlots(solverData)}
                     />
                 )
             }

@@ -15,6 +15,7 @@ import SolverConfigInfo from '../../interaction/config/SolverConfigInfo'
 import WriterSolverActionbar from './WriterSolverActionbar'
 import WriterSolverContentUI from './WriterSolverContentUI'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { getSolverChain } from '@cambrian/app/components/solver/SolverGetters'
 
 export type SubmissionModel = {
     submission: string
@@ -38,7 +39,6 @@ const initialSubmission = {
 }
 
 const WriterSolverUI = ({
-    proposal,
     currentUser,
     solverContract,
     solverData,
@@ -190,7 +190,7 @@ const WriterSolverUI = ({
     }
 
     const initSolverChain = async () => {
-        const solverChain = await solverMethods.getSolverChain()
+        const solverChain = await getSolverChain(currentUser, solverContract)
         setSolverChain(solverChain)
     }
 
@@ -262,8 +262,8 @@ const WriterSolverUI = ({
                     roles.includes('Buyer') ||
                     roles.includes('Arbitrator') ? (
                         <ConditionVersionSidebar
-                            solverTitle={`Solver: ${solverData.solverTag.title}`}
-                            solverMetaVersion={`v${solverData.solverTag.version}`}
+                            solverTitle={`Solver: ${solverData.solverTag?.title}`}
+                            solverMetaVersion={`v${solverData.solverTag?.version}`}
                             currentCondition={currentCondition}
                             setCurrentCondition={setCurrentCondition}
                             solverConditions={solverData.conditions}
@@ -310,8 +310,6 @@ const WriterSolverUI = ({
             >
                 <WriterSolverContentUI
                     token={solverData.collateralToken}
-                    proposalTitle={proposal?.title || ''}
-                    proposalDescription={proposal?.description || ''}
                     currentCondition={currentCondition}
                     roles={roles}
                     setWorkInput={setWorkInput}
