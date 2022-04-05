@@ -341,7 +341,7 @@ const CreateProposalForm = ({
                     ctaLabel="Fund Proposal"
                     link="/proposals/"
                     exportedCID={proposalId}
-                    description="This is your Proposal Id. Share it with your investors and fund the proposal."
+                    description="This is your Proposal Id. Share it with your community and fund the proposal."
                     title="Proposal created"
                     onClose={() => setProposalId(undefined)}
                 />
