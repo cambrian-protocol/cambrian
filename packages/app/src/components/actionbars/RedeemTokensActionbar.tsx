@@ -2,8 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
-import { BigNumber } from 'ethers'
-import { CTFContext } from '@cambrian/app/store/CTFContext'
+import { BigNumber, Contract, utils } from 'ethers'
 import { Handshake } from 'phosphor-react'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -14,6 +13,7 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserContext } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
+import { CTF_IFACE } from '@cambrian/app/constants'
 
 interface RedeemTokensActionbarProps {
     currentCondition: SolverContractCondition
@@ -27,8 +27,6 @@ const RedeemTokensActionbar = ({
     proposedOutcome,
 }: RedeemTokensActionbarProps) => {
     // TODO Fetch token and amount for signer
-    // TODO Redeem token functionality
-    const ctf = useContext(CTFContext)
     const user = useContext(UserContext)
 
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
@@ -40,8 +38,20 @@ const RedeemTokensActionbar = ({
     ] = useState<BigNumber>()
     const [isRedeemed, setIsRedeemed] = useState<boolean>(false)
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
+    const [ctf, setCtf] = useState<Contract>()
 
     useEffect(() => {
+        if (user.currentUser && !ctf) {
+            const ctfContract = new Contract(
+                process.env.NEXT_PUBLIC_CTF_ADDRESS!, // TODO Replace with deployment data for prod
+                CTF_IFACE,
+                user.currentUser.signer
+            )
+            if (ctfContract) {
+                setCtf(ctfContract)
+            }
+        }
+
         if (ctf && user.currentUser) {
             listenIsRedeemed()
         }
