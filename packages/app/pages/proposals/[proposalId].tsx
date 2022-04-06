@@ -50,8 +50,12 @@ export default function ProposalPage() {
 
     return (
         <BaseLayout contextTitle="Proposal">
-            {proposal && proposalsHub ? (
-                <ProposalUI proposal={proposal} proposalsHub={proposalsHub} />
+            {proposal && proposalsHub && currentUser ? (
+                <ProposalUI
+                    currentUser={currentUser}
+                    proposal={proposal}
+                    proposalsHub={proposalsHub}
+                />
             ) : isInvalidCID ? (
                 <InvalidCIDUI stageName={StageNames.proposal} />
             ) : (

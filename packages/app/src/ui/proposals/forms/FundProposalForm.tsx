@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, FormField } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import {
     Stages,
     getSolverConfigsFromMetaStages,
@@ -18,12 +18,14 @@ import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { UserType } from '@cambrian/app/store/UserContext'
+import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
     proposalsHub: ProposalsHub
     metaStages: Stages
+    currentUser: UserType
     setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
 }
 
@@ -39,15 +41,39 @@ const FundProposalForm = ({
     proposal,
     proposalsHub,
     metaStages,
+    currentUser,
     setIsProposalExecuted,
 }: FundProposalFormProps) => {
-    const user = useCurrentUser()
-    const [input, setInput] = useState<FundProposalFormType>(initialInput)
+    const [input, _setInput] = useState<FundProposalFormType>(initialInput)
+
+    // Necessary to access state in listener
+    const inputRef = useRef(input)
+    const setInput = (newInput: FundProposalFormType) => {
+        inputRef.current = newInput
+        _setInput(newInput)
+    }
+
     const [funding, setFunding] = useState(BigNumber.from(0))
     const [hasApprovedTokenAccess, setHasApprovedTokenAccess] = useState(false)
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [transactionMessage, setTransactionMessage] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<string>()
+
+    const erc20TokenContract = new ethers.Contract(
+        proposal.collateralToken,
+        ERC20_ABI,
+        currentUser.signer
+    )
+
+    const approvalFilter = erc20TokenContract.filters.Approval(
+        currentUser.address,
+        proposal.address,
+        null
+    )
+
+    useEffect(() => {
+        setHasApprovedTokenAccess(false)
+    }, [currentUser])
 
     useEffect(() => {
         initTokenAndFunding()
@@ -58,9 +84,26 @@ const FundProposalForm = ({
     }, [])
 
     useEffect(() => {
-        initERC20Listener()
-        // TODO Clean up listener
-    }, [collateralToken, user])
+        erc20TokenContract.on(approvalFilter, approvalListener)
+        return () => {
+            erc20TokenContract.removeListener(approvalFilter, approvalListener)
+        }
+    }, [input])
+
+    const approvalListener = (
+        owner: string,
+        spender: string,
+        amount: BigNumber
+    ) => {
+        if (
+            owner === currentUser.address &&
+            Number(inputRef.current.amount) ===
+                Number(formatDecimals(proposal.collateralToken, amount))
+        ) {
+            setHasApprovedTokenAccess(true)
+        }
+        setTransactionMessage(undefined)
+    }
 
     const initTokenAndFunding = async () => {
         const token = await TokenAPI.getTokenInfo(proposal.collateralToken)
@@ -68,25 +111,6 @@ const FundProposalForm = ({
 
         const funding = await proposalsHub.getProposalFunding(proposal.id)
         if (funding) setFunding(funding)
-    }
-
-    const initERC20Listener = () => {
-        if (collateralToken && user.currentUser) {
-            // TODO Extract erc20 token contract
-            const tokenContract = new ethers.Contract(
-                collateralToken.address,
-                ERC20_ABI,
-                user.currentUser.signer
-            )
-
-            tokenContract.on(
-                tokenContract.filters.Approval(null, null, null),
-                () => {
-                    setHasApprovedTokenAccess(true)
-                    setTransactionMessage(undefined)
-                }
-            )
-        }
     }
 
     const initProposalsHubListeners = async () => {
