@@ -10,6 +10,7 @@ import ProposalContextHeader from './ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 import VisitProposalCTA from './VisitProposalCTA'
 import { ethers } from 'ethers'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
@@ -17,9 +18,14 @@ import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 interface ProposalUIProps {
     proposal: ethers.Contract
     proposalsHub: ProposalsHub
+    currentUser: UserType
 }
 
-const ProposalUI = ({ proposalsHub, proposal }: ProposalUIProps) => {
+const ProposalUI = ({
+    proposalsHub,
+    proposal,
+    currentUser,
+}: ProposalUIProps) => {
     const [metaStages, setMetaStages] = useState<Stages>()
     const [errorMsg, setErrorMsg] = useState<string>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(
@@ -69,6 +75,7 @@ const ProposalUI = ({ proposalsHub, proposal }: ProposalUIProps) => {
                         <VisitProposalCTA solutionId={proposal.solutionId} />
                     ) : (
                         <FundProposalForm
+                            currentUser={currentUser}
                             metaStages={metaStages}
                             proposalsHub={proposalsHub}
                             proposal={proposal}
