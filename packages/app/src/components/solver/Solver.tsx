@@ -13,7 +13,7 @@ import { Box } from 'grommet'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '@cambrian/app/ui/interaction/bars/ConditionVersionSidebar'
-import ContentMarketingSolverUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketingSolver/ContentMarketingSolverUI'
+import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
@@ -205,13 +205,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         }
     }
 
-    // TODO Determine SolverUI
+    // TODO Intergrate Custom UI Loading. Pass props via Provider?
     const loadWriter = true
-
     const customUI = {
         sidebar: undefined,
         sideNav: undefined,
     }
+
     return (
         <>
             {solverData && currentCondition && solverMethods ? (
@@ -270,7 +270,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                     {currentCondition.status === ConditionStatus.Initiated ? (
                         <AddSolverDataContent />
                     ) : loadWriter ? (
-                        <ContentMarketingSolverUI
+                        <ContentMarketingCustomUI
                             solverMethods={solverMethods}
                             solverContract={solverContract}
                             currentUser={currentUser}
@@ -278,7 +278,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                             currentCondition={currentCondition}
                         />
                     ) : (
-                        <>No Custom Solver UI found</>
+                        <>No Solver UI found</>
                     )}
                 </BaseLayout>
             ) : solverData && solverMethods ? (

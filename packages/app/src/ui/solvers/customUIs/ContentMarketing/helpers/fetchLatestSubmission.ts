@@ -1,6 +1,6 @@
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SubmissionModel } from './ContentMarketingSolverContent'
+import { SubmissionModel } from '../models/SubmissionModel'
 import { ethers } from 'ethers'
 
 export const fetchLatestSubmission = async (
