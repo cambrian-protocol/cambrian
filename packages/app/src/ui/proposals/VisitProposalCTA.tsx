@@ -41,7 +41,7 @@ const VisitProposalCTA = ({ solutionId }: VisitProposalCTAProps) => {
                     />
                     <Button
                         primary
-                        label="Visit first Solver"
+                        label="Visit Solver"
                         href={`/solvers/${solverAddress}`}
                     />
                 </BaseFormContainer>

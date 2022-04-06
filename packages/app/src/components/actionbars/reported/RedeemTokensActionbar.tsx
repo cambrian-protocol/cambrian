@@ -165,7 +165,7 @@ const RedeemTokensActionbar = ({
 
     /**
      * Each condition must be redeemed independently
-     * "Redeem Tokens" action may want to open a modal showing seperate redeemable value for each condition
+     * TODO "Redeem Tokens" action may want to open a modal showing seperate redeemable value for each condition
      */
     const redeemCondition = async () => {
         setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
@@ -233,7 +233,7 @@ const RedeemTokensActionbar = ({
                                                     )
                                                     .div(BigNumber.from(100))
                                             )
-                                          : 'Unknown'
+                                          : ''
                                   } ${
                                       solverData.collateralToken
                                           ? solverData.collateralToken.symbol ||
