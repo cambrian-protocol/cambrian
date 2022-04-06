@@ -49,6 +49,10 @@ interface SolverProps {
 
 const Solver = ({ address, abi, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
+
+    // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
+    const [isInitialized, setIsInitialized] = useState(false)
+
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
     // IPFS data
@@ -79,6 +83,12 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     useEffect(() => {
         init()
     }, [])
+
+    useEffect(() => {
+        if (outcomes) {
+            setIsInitialized(true)
+        }
+    }, [outcomes])
 
     useEffect(() => {
         if (solverData && currentUser) {
@@ -171,23 +181,27 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     // Trigger Update for the listeners
     const updateSolverData = async () => {
-        const updatedSolverData = await getSolverData(
-            solverContract,
-            solverMethods,
-            ctf,
-            outcomes,
-            metadata
-        )
-        setSolverData(updatedSolverData)
+        if (isInitialized) {
+            const updatedSolverData = await getSolverData(
+                solverContract,
+                solverMethods,
+                ctf,
+                outcomes,
+                metadata
+            )
+            setSolverData(updatedSolverData)
 
-        if (currentCondition?.conditionId) {
-            const currentConditionIdx = updatedSolverData.conditions.findIndex(
-                (condition) =>
-                    condition.conditionId === currentCondition.conditionId
-            )
-            setCurrentCondition(
-                updatedSolverData.conditions[currentConditionIdx]
-            )
+            if (currentCondition?.conditionId) {
+                const currentConditionIdx =
+                    updatedSolverData.conditions.findIndex(
+                        (condition) =>
+                            condition.conditionId ===
+                            currentCondition.conditionId
+                    )
+                setCurrentCondition(
+                    updatedSolverData.conditions[currentConditionIdx]
+                )
+            }
         }
     }
 

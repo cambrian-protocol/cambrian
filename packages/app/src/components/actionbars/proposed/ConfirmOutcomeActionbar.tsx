@@ -5,6 +5,7 @@ import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoadingScreen from '../../info/LoadingScreen'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { Timer } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -13,7 +14,7 @@ interface ConfirmOutcomeActionbarProps {
     currentUser: UserType
     solverContract: ethers.Contract
     solverMethods: GenericMethods
-    currentConditionIndex: number
+    currentCondition: SolverContractCondition
     updateSolverData: () => Promise<void>
 }
 
@@ -21,7 +22,7 @@ const ConfirmOutcomeActionbar = ({
     currentUser,
     solverContract,
     solverMethods,
-    currentConditionIndex,
+    currentCondition,
     updateSolverData,
 }: ConfirmOutcomeActionbarProps) => {
     const [currentTimelock, setCurrentTimelock] = useState(0)
@@ -29,25 +30,15 @@ const ConfirmOutcomeActionbar = ({
     const [transactionMsg, setTransactionMsg] = useState<string>()
     const [errMsg, setErrMsg] = useState<string>()
 
-    useEffect(() => {
-        initTimelock()
-    }, [])
-
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout
-        if (isTimelockActive) {
-            intervalId = setInterval(() => {
-                setIsTimelockActive(new Date().getTime() < currentTimelock)
-            }, 1000)
-        }
-        return () => clearInterval(intervalId)
-    }, [currentTimelock, isTimelockActive])
-
     const changedStatusFilter = {
         address: currentUser.address,
         topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
         fromBlock: 'latest',
     } as EventFilter
+
+    useEffect(() => {
+        initTimelock()
+    }, [])
 
     useEffect(() => {
         solverContract.on(changedStatusFilter, confirmOutcomeListener)
@@ -60,6 +51,16 @@ const ConfirmOutcomeActionbar = ({
         }
     }, [])
 
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout
+        if (isTimelockActive) {
+            intervalId = setInterval(() => {
+                setIsTimelockActive(new Date().getTime() < currentTimelock)
+            }, 1000)
+        }
+        return () => clearInterval(intervalId)
+    }, [currentTimelock, isTimelockActive])
+
     const confirmOutcomeListener = async () => {
         await updateSolverData()
         setTransactionMsg(undefined)
@@ -67,7 +68,7 @@ const ConfirmOutcomeActionbar = ({
 
     const initTimelock = async () => {
         const timeLockResponse: BigNumber = await solverMethods.timelocks(
-            currentConditionIndex
+            currentCondition.executions - 1
         )
         const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
         setCurrentTimelock(timeLockMilliseconds)
@@ -77,7 +78,7 @@ const ConfirmOutcomeActionbar = ({
     const onConfirmOutcome = async () => {
         setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
         try {
-            await solverMethods.confirmPayouts(currentConditionIndex)
+            await solverMethods.confirmPayouts(currentCondition.executions - 1)
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
         } catch (e: any) {
             setErrMsg(e.message)
