@@ -1,17 +1,12 @@
-import { EventFilter, ethers } from 'ethers'
-import { useEffect, useState } from 'react'
-
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
-import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import { Info } from 'phosphor-react'
-import LoadingScreen from '../../info/LoadingScreen'
-import OutcomeCollectionModal from '../../modals/OutcomeCollectionModal'
+import ProposeOutcomeModal from '../../modals/ProposeOutcomeModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { ethers } from 'ethers'
+import { useState } from 'react'
 
 interface ProposeOutcomeActionbarProps {
     currentUser: UserType
@@ -33,51 +28,8 @@ const ProposeOutcomeActionbar = ({
     const [showProposeOutcomeModal, setShowProposeOutcomeModal] =
         useState(false)
 
-    const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
-
     const toggleShowProposeOutcomeModal = () =>
         setShowProposeOutcomeModal(!showProposeOutcomeModal)
-
-    const changedStatusFilter = {
-        address: currentUser.address,
-        topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
-        fromBlock: 'latest',
-    } as EventFilter
-
-    useEffect(() => {
-        solverContract.on(changedStatusFilter, proposedOutcomeListener)
-        return () => {
-            solverContract.removeListener(
-                changedStatusFilter,
-                proposedOutcomeListener
-            )
-        }
-    }, [])
-
-    const proposedOutcomeListener = async () => {
-        await updateSolverData()
-        setTransactionMsg(undefined)
-    }
-
-    const onProposeOutcome = async (indexSet: number) => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
-        try {
-            const binaryArray = binaryArrayFromIndexSet(
-                indexSet,
-                solverData.config.conditionBase.outcomeSlots
-            )
-            await solverMethods.proposePayouts(
-                currentCondition.executions - 1,
-                binaryArray
-            )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
-            setTransactionMsg(undefined)
-            console.error(e)
-        }
-    }
 
     return (
         <>
@@ -95,24 +47,16 @@ const ProposeOutcomeActionbar = ({
                 }}
             />
             {showProposeOutcomeModal && (
-                <OutcomeCollectionModal
-                    token={solverData.collateralToken}
+                <ProposeOutcomeModal
+                    currentCondition={currentCondition}
+                    solverContract={solverContract}
+                    solverData={solverData}
+                    solverMethods={solverMethods}
+                    currentUser={currentUser}
+                    updateSolverData={updateSolverData}
                     onBack={toggleShowProposeOutcomeModal}
-                    outcomeCollections={
-                        solverData.outcomeCollections[
-                            currentCondition.conditionId
-                        ]
-                    }
-                    proposeMethod={onProposeOutcome}
                 />
             )}
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

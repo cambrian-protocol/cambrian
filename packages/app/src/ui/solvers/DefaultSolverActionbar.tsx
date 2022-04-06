@@ -68,7 +68,7 @@ const DefaultSolverActionbar = ({
                     solverContract={solverContract}
                     updateSolverData={updateSolverData}
                     solverMethods={solverMethods}
-                    currentConditionIndex={currentCondition.executions - 1}
+                    currentCondition={currentCondition}
                 />
             )
         case ConditionStatus.OutcomeReported:

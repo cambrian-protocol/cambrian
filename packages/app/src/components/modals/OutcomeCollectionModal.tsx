@@ -8,22 +8,17 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: OutcomeCollectionModel[]
-    proposeMethod?: (indexSet: number) => void
     token: TokenModel
 }
 
 const OutcomeCollectionModal = ({
-    proposeMethod,
     outcomeCollections,
     token,
     ...rest
 }: OutcomeCollectionModalProps) => {
     return (
         <BaseLayerModal {...rest}>
-            <HeaderTextSection
-                title={proposeMethod ? 'Propose an outcome' : 'Outcomes'}
-                subTitle="What can happen?"
-            />
+            <HeaderTextSection title={'Outcomes'} subTitle="What can happen?" />
             <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                 {outcomeCollections.map((outcomeCollection) => {
                     return (
@@ -31,7 +26,6 @@ const OutcomeCollectionModal = ({
                             token={token}
                             key={outcomeCollection.indexSet}
                             outcomeCollection={outcomeCollection}
-                            proposeMethod={proposeMethod}
                         />
                     )
                 })}
