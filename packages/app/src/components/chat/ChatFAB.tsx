@@ -1,34 +1,47 @@
 import { ChatMessageType } from './ChatMessage'
 import ChatModal from '../modals/ChatModal'
 import { Chats } from 'phosphor-react'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import FloatingActionButton from '../buttons/FloatingActionButton'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
 import { useState } from 'react'
 
 interface ChatFABProps {
+    currentCondition: SolverContractCondition
     currentUser: UserType
-    messages: ChatMessageType[]
-    onSubmitChat: (message: string) => Promise<void>
+    solverContract: ethers.Contract
 }
 
-const ChatFAB = ({ messages, onSubmitChat, currentUser }: ChatFABProps) => {
+const ChatFAB = ({
+    solverContract,
+    currentUser,
+    currentCondition,
+}: ChatFABProps) => {
     const [showChatModal, setShowChatModal] = useState(false)
 
     const toggleShowChatModal = () => setShowChatModal(!showChatModal)
 
     return (
         <>
-            <FloatingActionButton
-                icon={<Chats />}
-                onClick={toggleShowChatModal}
-            />
-            {showChatModal && (
-                <ChatModal
-                    currentUser={currentUser}
-                    messages={messages}
-                    onSubmitChat={onSubmitChat}
-                    onBack={toggleShowChatModal}
-                />
+            {currentCondition.status !== ConditionStatus.Initiated ? (
+                <>
+                    <FloatingActionButton
+                        icon={<Chats />}
+                        onClick={toggleShowChatModal}
+                    />
+                    {showChatModal && (
+                        <ChatModal
+                            onBack={toggleShowChatModal}
+                            currentCondition={currentCondition}
+                            solverContract={solverContract}
+                            currentUser={currentUser}
+                        />
+                    )}
+                </>
+            ) : (
+                <></>
             )}
         </>
     )

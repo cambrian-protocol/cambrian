@@ -7,13 +7,13 @@ import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Stack } from 'grommet'
-import { SubmissionModel } from './ContentMarketingSolverContent'
+import { SubmissionModel } from '../models/SubmissionModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { Text } from 'grommet'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import { fetchLatestSubmission } from './fetchLatestSubmission'
+import { fetchLatestSubmission } from '../helpers/fetchLatestSubmission'
 
 interface WriterUIProps {
     currentCondition: SolverContractCondition
@@ -28,7 +28,7 @@ export const initialSubmission = {
     submission: '',
 }
 
-const WriterUI = ({
+const SubmissionForm = ({
     currentCondition,
     currentUser,
     solverContract,
@@ -137,4 +137,4 @@ const WriterUI = ({
     )
 }
 
-export default WriterUI
+export default SubmissionForm
