@@ -25,7 +25,10 @@ const OutcomeNotification = ({
 }: OutcomeNotificationProps) => {
     if (status === ConditionStatus.OutcomeProposed) {
         return (
-            <SolverStatusNotification title="Outcome Proposed">
+            <SolverStatusNotification
+                title="Outcome proposed!"
+                message="The following outcome has been proposed:"
+            >
                 <OutcomeCollectionCard
                     token={token}
                     outcomeCollection={outcomeCollection}
@@ -50,7 +53,10 @@ const OutcomeNotification = ({
         )
     } else if (status === ConditionStatus.OutcomeReported) {
         return (
-            <SolverStatusNotification title="Outcome confirmed">
+            <SolverStatusNotification
+                title="Outcome has been confirmed!"
+                message="You can now redeem your tokens."
+            >
                 <OutcomeCollectionCard
                     token={token}
                     outcomeCollection={outcomeCollection}

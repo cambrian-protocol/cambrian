@@ -114,7 +114,7 @@ export const cpTheme = deepMerge(grommet, {
         color: 'brand',
     },
     layer: {
-        overlay: { background: 'none' },
+        border: { radius: 'small' },
         container: { elevation: 'large' },
     },
     checkBox: {

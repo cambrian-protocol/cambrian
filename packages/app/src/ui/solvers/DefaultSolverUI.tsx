@@ -1,6 +1,5 @@
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -16,7 +15,6 @@ export interface DefaultSolverUIProps {
     setCurrentCondition: React.Dispatch<
         SetStateAction<SolverContractCondition | undefined>
     >
-    proposal?: ProposalModel // TODO GET RID OF THIS
 }
 
 const DefaultSolverUI = ({ solverData }: DefaultSolverUIProps) => {

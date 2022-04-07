@@ -81,6 +81,19 @@ interface ISolver {
         view
         returns (SolverLib.Condition[] memory);
 
+    function conditions(uint256 index)
+        external
+        view
+        returns (
+            IERC20,
+            bytes32,
+            bytes32,
+            bytes32,
+            uint8
+        );
+
+    function arbitrator() external view returns (address);
+
     function collateralBalance() external view returns (uint256 balance);
 
     function redeemPosition(

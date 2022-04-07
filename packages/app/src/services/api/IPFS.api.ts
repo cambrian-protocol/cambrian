@@ -29,7 +29,6 @@ export class IPFSAPI {
         try {
             const data = localStorage.getItem(cid)
             if (data) {
-                console.log(`Got local storage for ${cid}: `, data)
                 return this.tryParseJson(data)
             }
         } catch (e) {

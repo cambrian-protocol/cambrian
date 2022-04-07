@@ -8,9 +8,12 @@ import {
     UsersThree,
 } from 'phosphor-react'
 import React, { useState } from 'react'
+import {
+    getManualInputs,
+    getSolverRecipientSlots,
+} from '@cambrian/app/components/solver/SolverHelpers'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
-import { BasicSolverMethodsType } from '@cambrian/app/components/solver/Solver'
 import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
@@ -25,13 +28,11 @@ import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
-    solverMethods: BasicSolverMethodsType
     currentCondition: SolverContractCondition
 }
 
 const SolverConfigInfo = ({
     solverData,
-    solverMethods,
     currentCondition,
 }: SolverConfigInfoProps) => {
     const [showRecipientModal, setShowRecipientModal] = useState(false)
@@ -43,20 +44,6 @@ const SolverConfigInfo = ({
         setShowKeeperInputModal(!showKeeperInputModal)
     const toggleShowRecipientModal = () =>
         setShowRecipientModal(!showRecipientModal)
-
-    const recipientSlots = solverMethods.getRecipientSlots(currentCondition)
-    const recipientsData: ParticipantModel[] = recipientSlots.map(
-        (recipientSlot) => {
-            return {
-                address: decodeData(
-                    [SolidityDataTypes.Address],
-                    recipientSlot.slot.data
-                ),
-                name: recipientSlot.tag.label,
-                description: recipientSlot.tag.description,
-            }
-        }
-    )
 
     return (
         <>
@@ -85,13 +72,23 @@ const SolverConfigInfo = ({
                     onClick={toggleShowKeeperInputModal}
                 />
                 <BaseMenuListItem
-                    info={solverData.slotTags['timelockSeconds']?.description}
+                    info={
+                        solverData.slotTags
+                            ? solverData.slotTags['timelockSeconds']
+                                  ?.description
+                            : undefined
+                    }
                     title="Timelock"
                     icon={<Timer />}
                     subTitle={solverData.config.timelockSeconds.toString()}
                 />
                 <BaseMenuListItem
-                    info={solverData.slotTags['collateralToken']?.description}
+                    info={
+                        solverData.slotTags
+                            ? solverData.slotTags['collateralToken']
+                                  ?.description
+                            : undefined
+                    }
                     title="Token"
                     icon={<Coin />}
                     subTitle={`${solverData.collateralToken.address} ${
@@ -126,15 +123,16 @@ const SolverConfigInfo = ({
             {showRecipientModal && (
                 <RecipientsModal
                     onBack={toggleShowRecipientModal}
-                    recipientsData={recipientsData}
+                    recipientAddresses={getSolverRecipientSlots(
+                        solverData,
+                        currentCondition
+                    )}
                 />
             )}
             {showKeeperInputModal && (
                 <KeeperInputsModal
                     onBack={toggleShowKeeperInputModal}
-                    manualInputs={solverMethods.getManualInputs(
-                        currentCondition
-                    )}
+                    manualInputs={getManualInputs(solverData, currentCondition)}
                 />
             )}
             {showOutcomeModal && (

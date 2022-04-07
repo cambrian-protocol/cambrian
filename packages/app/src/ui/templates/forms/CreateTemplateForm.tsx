@@ -15,14 +15,18 @@ import { Coin } from 'phosphor-react'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import Stagehand from '@cambrian/app/classes/Stagehand'
+import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { initial } from 'lodash'
+import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
-    onSubmit: (templateInput: CreateTemplateFormType) => void
+    compositionCID: string
     onFailure: () => void
+    onSuccess: () => void
 }
 
 export type CreateTemplateFormType = {
@@ -49,8 +53,24 @@ const initialInput = {
 
 const CreateTemplateForm = ({
     composition,
-    onSubmit,
+    compositionCID,
+    onSuccess,
+    onFailure,
 }: CreateTemplateFormProps) => {
+    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
+    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
+        string | undefined
+    >('')
+    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
+        (string | undefined)[] | undefined
+    >()
+
+    useEffect(() => {
+        const initalInput = getInitialInput()
+        setInput(initalInput)
+    }, [])
+
     /**
      * Initialize input.flexInputs from composition
      */
@@ -76,25 +96,15 @@ const CreateTemplateForm = ({
             })
         })
 
-        const inputs = { ...initialInput }
-        inputs.flexInputs = flexInputs
+        const updatedInputs = { ...initialInput }
+        updatedInputs.flexInputs = flexInputs
 
         if (composition.solvers[0].config.collateralToken)
-            inputs.denominationToken =
+            updatedInputs.denominationToken =
                 composition.solvers[0].config.collateralToken
 
-        return inputs
+        return updatedInputs
     }
-
-    const [input, setInput] = useState<CreateTemplateFormType>(
-        getInitialInput()
-    )
-    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
-        string | undefined
-    >('')
-    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
-        (string | undefined)[] | undefined
-    >()
 
     const setFlexInputValue = (
         solverId: string,
@@ -228,95 +238,122 @@ const CreateTemplateForm = ({
         return bool
     }
 
-    const handleSubmit = async (event: FormExtendedEvent) => {
+    const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        onSubmit(input)
+        setTransactionMsg(TRANSACITON_MESSAGE['IPFS'])
+        const stagehand = new Stagehand()
+        const templateCID = await stagehand.publishTemplate(
+            input,
+            compositionCID
+        )
+        if (templateCID) {
+            storeIdInLocalStorage(
+                'templates',
+                compositionCID,
+                input.title,
+                templateCID
+            )
+            onSuccess()
+        } else {
+            onFailure()
+        }
+        setTransactionMsg(undefined)
     }
 
     return (
-        <BaseFormContainer>
-            <Form<CreateTemplateFormType>
-                onChange={(nextValue: CreateTemplateFormType) => {
-                    setInput(nextValue)
-                }}
-                value={input}
-                onSubmit={(event) => handleSubmit(event)}
-            >
-                <Box gap="medium">
-                    <BaseFormGroupContainer>
-                        <FormField name="name" label="Your/Organization Name" />
-                        <FormField name="pfp" label="Avatar URL" />
-                        <FormField
-                            name="title"
-                            label="Template title"
-                            required
-                        />
-                        <FormField
-                            name="description"
-                            label="Template description"
-                            required
-                        >
-                            <TextArea
+        <>
+            <BaseFormContainer>
+                <Form<CreateTemplateFormType>
+                    onChange={(nextValue: CreateTemplateFormType) => {
+                        setInput(nextValue)
+                    }}
+                    value={input}
+                    onSubmit={(event) => onSubmit(event)}
+                >
+                    <Box gap="medium">
+                        <BaseFormGroupContainer>
+                            <FormField
+                                name="name"
+                                label="Your/Organization Name"
+                            />
+                            <FormField name="pfp" label="Avatar URL" />
+                            <FormField
+                                name="title"
+                                label="Template title"
+                                required
+                            />
+                            <FormField
                                 name="description"
-                                rows={5}
-                                resize={false}
-                            />
-                        </FormField>
-                    </BaseFormGroupContainer>
-                    {renderFlexInputs()}
-                    <BaseFormGroupContainer
-                        direction="row"
-                        gap="small"
-                        align="end"
-                    >
-                        <Box basis="1/4">
-                            <FormField
-                                name="askingAmount"
-                                label="Amount"
-                                type="number"
+                                label="Template description"
+                                required
+                            >
+                                <TextArea
+                                    name="description"
+                                    rows={5}
+                                    resize={false}
+                                />
+                            </FormField>
+                        </BaseFormGroupContainer>
+                        {renderFlexInputs()}
+                        <BaseFormGroupContainer
+                            direction="row"
+                            gap="small"
+                            align="end"
+                        >
+                            <Box basis="1/4">
+                                <FormField
+                                    name="askingAmount"
+                                    label="Amount"
+                                    type="number"
+                                />
+                            </Box>
+                            <Box flex>
+                                <FormField
+                                    name="denominationToken"
+                                    label="Token address"
+                                    type="string"
+                                    onChange={(event) =>
+                                        updateDenominationTokenSymbol(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </Box>
+                            <Box margin={{ bottom: '1.5em' }}>
+                                {denominationTokenSymbol || <Coin size="24" />}
+                            </Box>
+                            {isUncertainCollateral() && (
+                                <FormField
+                                    name="preferredTokens"
+                                    label="Preferred tokens for payment"
+                                    help={
+                                        Array.isArray(preferredTokenSymbols)
+                                            ? preferredTokenSymbols
+                                                  .map((x) => x || 'error')
+                                                  .join(',')
+                                            : 'Comma-seperated list of token contract addresses, or "any"'
+                                    }
+                                    type="string"
+                                    onChange={(event) =>
+                                        updatePreferredTokenSymbols(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            )}
+                        </BaseFormGroupContainer>
+                        <Box>
+                            <Button
+                                primary
+                                type="submit"
+                                label="Create Template"
                             />
                         </Box>
-                        <Box flex>
-                            <FormField
-                                name="denominationToken"
-                                label="Token address"
-                                type="string"
-                                onChange={(event) =>
-                                    updateDenominationTokenSymbol(
-                                        event.target.value
-                                    )
-                                }
-                            />
-                        </Box>
-                        <Box margin={{ bottom: '1.5em' }}>
-                            {denominationTokenSymbol || <Coin size="24" />}
-                        </Box>
-                        {isUncertainCollateral() && (
-                            <FormField
-                                name="preferredTokens"
-                                label="Preferred tokens for payment"
-                                help={
-                                    Array.isArray(preferredTokenSymbols)
-                                        ? preferredTokenSymbols
-                                              .map((x) => x || 'error')
-                                              .join(',')
-                                        : 'Comma-seperated list of token contract addresses, or "any"'
-                                }
-                                type="string"
-                                onChange={(event) =>
-                                    updatePreferredTokenSymbols(
-                                        event.target.value
-                                    )
-                                }
-                            />
-                        )}
-                    </BaseFormGroupContainer>
-                    <Box>
-                        <Button primary type="submit" label="Create Template" />
                     </Box>
-                </Box>
-            </Form>
-        </BaseFormContainer>
+                </Form>
+            </BaseFormContainer>
+            {transactionMsg && <LoadingScreen context={transactionMsg} />}
+        </>
     )
 }
 

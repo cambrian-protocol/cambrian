@@ -26,8 +26,8 @@ export type SolverModel = {
     }
     collateralToken: TokenModel
     collateralBalance: number
-    slotTags: SlotTagsHashMapType
-    solverTag: SolverTagModel
+    slotTags?: SlotTagsHashMapType
+    solverTag?: SolverTagModel
 }
 
 // Contract responses with BigNumbers

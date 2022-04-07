@@ -12,15 +12,25 @@ import React, { useEffect, useState } from 'react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import Stagehand from '@cambrian/app/classes/Stagehand'
+import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateProposalFormProps {
+    composition: CompositionModel
     template: TemplateModel
-    onSubmit: (proposalInput: CreateProposalFormType) => void
+    templateCID: string
 }
 
 export type CreateProposalFormType = {
@@ -44,38 +54,24 @@ const initialInput = {
 }
 
 const CreateProposalForm = ({
+    composition,
     template,
-    onSubmit,
+    templateCID,
 }: CreateProposalFormProps) => {
+    const { currentUser } = useCurrentUser()
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [preferredTokensString, setPreferredTokensString] = useState('')
     const [suggestedPriceString, setSuggestedPriceString] = useState('')
+    const [proposalId, setProposalId] = useState<string>()
+    const [errorMsg, setErrorMsg] = useState<string>()
+    const [transactionMsg, setTransactionMsg] = useState<string>()
 
     /**
-     * Initialize input.flexInputs from composition
+     * Initialize input.flexInputs from template
      */
     useEffect(() => {
-        const flexInputs = {} as {
-            [solverId: string]: {
-                [tagId: string]: TaggedInput
-            }
-        }
-        template.updatedComposition.solvers.forEach((solver) => {
-            Object.keys(solver.slotTags).forEach((tagId) => {
-                if (solver.slotTags[tagId].isFlex === true) {
-                    if (typeof flexInputs[solver.id] === 'undefined') {
-                        flexInputs[solver.id] = {}
-                    }
-
-                    flexInputs[solver.id][tagId] = {
-                        ...solver.slotTags[tagId],
-                        value: undefined,
-                    }
-                }
-            })
-        })
         const inputs = { ...input }
-        inputs.flexInputs = flexInputs
+        inputs.flexInputs = template.flexInputs
         inputs.price = template.price?.amount || 0
         inputs.tokenAddress = template.price?.denominationToken || ''
         setInput(inputs)
@@ -152,7 +148,7 @@ const CreateProposalForm = ({
                         solverId={solverId}
                         input={currentFlexInput}
                         inputType={getFlexInputType(
-                            template.updatedComposition.solvers,
+                            composition.solvers,
                             currentFlexInput
                         )}
                         setFlexInputValue={setFlexInputValue}
@@ -207,101 +203,164 @@ const CreateProposalForm = ({
         return bool
     }
 
-    const handleSubmit = async (event: FormExtendedEvent) => {
+    const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        onSubmit(input)
+        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        try {
+            if (!currentUser)
+                throw new Error(
+                    'You must connect a wallet in order to create a proposal!'
+                )
+            const stagehand = new Stagehand()
+            const response = await stagehand.publishProposal(input, templateCID)
+            if (!response)
+                throw new Error('Error while publishing proposal to IPFS')
+
+            const proposalsHub = new ProposalsHub(currentUser.signer)
+
+            const proposalId = await proposalsHub.createSolutionAndProposal(
+                response.parsedSolvers[0].collateralToken,
+                input.price,
+                response.parsedSolvers.map((solver) => solver.config),
+                response.cid
+            )
+            if (!proposalId)
+                throw new Error('Error while deploying solution and proposal')
+
+            storeIdInLocalStorage(
+                'proposals',
+                templateCID,
+                input.title,
+                proposalId
+            )
+            setProposalId(proposalId)
+        } catch (e: any) {
+            console.error(e)
+            setErrorMsg(e.message)
+        }
+        setTransactionMsg(undefined)
     }
 
     // TODO Refactor Form / Dynamic Flex Inputs / Validation / Validate Type Error handling
     return (
-        <BaseFormContainer>
-            <Form<CreateProposalFormType>
-                onChange={(nextValue: CreateProposalFormType) => {
-                    setInput(nextValue)
-                }}
-                value={input}
-                onSubmit={(event) => handleSubmit(event)}
-                onValidate={(validation) => {
-                    Object.keys(input.flexInputs).forEach((solverId) => {
-                        Object.keys(input.flexInputs[solverId]).map((tagId) => {
-                            const inputValue =
-                                input.flexInputs[solverId][tagId].value
-                            if (inputValue === undefined || inputValue === '') {
-                                validation.errors[
-                                    input.flexInputs[solverId][tagId].id
-                                ] = 'required'
-                            }
+        <>
+            <BaseFormContainer>
+                <Form<CreateProposalFormType>
+                    onChange={(nextValue: CreateProposalFormType) => {
+                        setInput(nextValue)
+                    }}
+                    value={input}
+                    onSubmit={(event) => onSubmit(event)}
+                    onValidate={(validation) => {
+                        Object.keys(input.flexInputs).forEach((solverId) => {
+                            Object.keys(input.flexInputs[solverId]).map(
+                                (tagId) => {
+                                    const inputValue =
+                                        input.flexInputs[solverId][tagId].value
+                                    if (
+                                        inputValue === undefined ||
+                                        inputValue === ''
+                                    ) {
+                                        validation.errors[
+                                            input.flexInputs[solverId][tagId].id
+                                        ] = 'required'
+                                    }
+                                }
+                            )
                         })
-                    })
-                }}
-            >
-                <Box gap="medium">
-                    <BaseFormGroupContainer>
-                        <FormField name="name" label="Your/Organization Name" />
-                        <FormField name="pfp" label="Avatar URL" />
-                    </BaseFormGroupContainer>
-                    <BaseFormGroupContainer>
-                        <FormField name="title" label="Title" required />
-                        <FormField
-                            name="description"
-                            label="Description"
-                            required
-                        >
-                            <TextArea
-                                name="description"
-                                rows={5}
-                                resize={false}
+                    }}
+                >
+                    <Box gap="medium">
+                        <BaseFormGroupContainer>
+                            <FormField
+                                name="name"
+                                label="Your/Organization Name"
                             />
-                        </FormField>
-                    </BaseFormGroupContainer>
-                    {renderFlexInputs()}
-                    <BaseFormGroupContainer>
-                        <Box direction="row" gap="small">
-                            <Box width={{ max: 'medium' }}>
-                                <FormField
-                                    name="price"
-                                    label="Price"
-                                    type="number"
-                                    required
+                            <FormField name="pfp" label="Avatar URL" />
+                        </BaseFormGroupContainer>
+                        <BaseFormGroupContainer>
+                            <FormField name="title" label="Title" required />
+                            <FormField
+                                name="description"
+                                label="Description"
+                                required
+                            >
+                                <TextArea
+                                    name="description"
+                                    rows={5}
+                                    resize={false}
                                 />
-                                <Text size="xsmall" color="dark-4">
-                                    {suggestedPriceString}
-                                </Text>
-                            </Box>
-                            <Box fill>
-                                {isUncertainCollateral() ? (
-                                    <Box>
+                            </FormField>
+                        </BaseFormGroupContainer>
+                        {renderFlexInputs()}
+                        <BaseFormGroupContainer>
+                            <Box direction="row" gap="small">
+                                <Box width={{ max: 'medium' }}>
+                                    <FormField
+                                        name="price"
+                                        label="Price"
+                                        type="number"
+                                        required
+                                    />
+                                    <Text size="xsmall" color="dark-4">
+                                        {suggestedPriceString}
+                                    </Text>
+                                </Box>
+                                <Box fill>
+                                    {isUncertainCollateral() ? (
+                                        <Box>
+                                            <FormField
+                                                name="tokenAddress"
+                                                label="Payment Token address"
+                                                required
+                                            />
+                                            <Text size="xsmall" color="dark-4">
+                                                {preferredTokensString}
+                                            </Text>
+                                        </Box>
+                                    ) : (
                                         <FormField
                                             name="tokenAddress"
                                             label="Payment Token address"
-                                            required
+                                            value={
+                                                composition.solvers[0].config[
+                                                    'collateralToken'
+                                                ]
+                                            }
+                                            disabled
                                         />
-                                        <Text size="xsmall" color="dark-4">
-                                            {preferredTokensString}
-                                        </Text>
-                                    </Box>
-                                ) : (
-                                    <FormField
-                                        name="tokenAddress"
-                                        label="Payment Token address"
-                                        value={
-                                            template.updatedComposition
-                                                .solvers[0].config[
-                                                'collateralToken'
-                                            ]
-                                        }
-                                        disabled
-                                    />
-                                )}
+                                    )}
+                                </Box>
                             </Box>
+                        </BaseFormGroupContainer>
+                        <Box>
+                            <Button
+                                primary
+                                type="submit"
+                                label="Create Proposal"
+                            />
                         </Box>
-                    </BaseFormGroupContainer>
-                    <Box>
-                        <Button primary type="submit" label="Create Proposal" />
                     </Box>
-                </Box>
-            </Form>
-        </BaseFormContainer>
+                </Form>
+            </BaseFormContainer>
+            {proposalId && (
+                <ExportSuccessModal
+                    keyId={templateCID}
+                    prefix="proposals"
+                    link="/proposals/"
+                    description="This is your Proposal Id. Share it with your community and fund the proposal."
+                    title="Proposal created"
+                    onClose={() => setProposalId(undefined)}
+                />
+            )}
+            {errorMsg && (
+                <ErrorPopupModal
+                    errorMessage={errorMsg}
+                    onClose={() => setErrorMsg(undefined)}
+                />
+            )}
+            {transactionMsg && <LoadingScreen context={transactionMsg} />}
+        </>
     )
 }
 

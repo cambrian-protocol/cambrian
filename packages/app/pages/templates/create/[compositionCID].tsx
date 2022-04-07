@@ -1,81 +1,81 @@
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 import { useEffect, useState } from 'react'
 
+import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
+import { FolderOpen } from 'phosphor-react'
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
 import { useRouter } from 'next/dist/client/router'
-
-const createTemplatePageTitle = 'Create Template'
 
 export default function CreateTemplatePage() {
     const router = useRouter()
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
         useState<CompositionModel>()
-    const [currentCompositionCID, setCurrentCompositionCID] = useState<string>()
-    const [isLoading, setIsLoading] = useState(true)
     const [showError, setShowError] = useState(false)
-    const [stagehand] = useState(new Stagehand())
+    const [showRecentTemplatesModal, setShowRecentTemplatesModal] =
+        useState(false)
+
+    const toggleShowRecentTemplatesModal = () =>
+        setShowRecentTemplatesModal(!showRecentTemplatesModal)
 
     useEffect(() => {
-        if (!router.isReady) return
+        if (router.isReady) fetchComposition()
+    }, [router])
+
+    const fetchComposition = async () => {
         if (
             compositionCID !== undefined &&
             typeof compositionCID === 'string'
         ) {
-            setCurrentCompositionCID(compositionCID)
-            fetchComposition(compositionCID)
-        } else {
-            setShowError(true)
-        }
-    }, [router])
-
-    const fetchComposition = async (compositionCID: string) => {
-        setIsLoading(true)
-        try {
+            const stagehand = new Stagehand()
             const composition = (await stagehand.loadStage(
                 compositionCID,
                 StageNames.composition
             )) as CompositionModel
 
-            // Check if composition is valid
-            const parsedSolvers = await parseComposerSolvers(
-                composition.solvers
-            )
-
-            if (composition && parsedSolvers) {
-                setCurrentComposition(composition)
-            } else {
-                setShowError(true)
-            }
-        } catch {
-            setShowError(true)
-            console.warn('Cannot parse and load composition')
+            if (composition) return setCurrentComposition(composition)
         }
-        setIsLoading(false)
+        setShowError(true)
     }
 
     return (
         <>
-            {currentComposition && currentCompositionCID && (
-                <BaseLayout contextTitle={createTemplatePageTitle}>
+            <BaseLayout
+                contextTitle="Create Template"
+                appbarItems={[
+                    <AppbarItem
+                        icon={<FolderOpen />}
+                        onClick={toggleShowRecentTemplatesModal}
+                    />,
+                ]}
+            >
+                {currentComposition ? (
                     <CreateTemplateUI
-                        stagehand={stagehand}
                         composition={currentComposition}
+                        compositionCID={compositionCID as string}
                     />
-                </BaseLayout>
-            )}
-            {showError && (
-                <InvalidCIDUI
-                    contextTitle={createTemplatePageTitle}
-                    stageName={StageNames.composition}
+                ) : showError ? (
+                    <InvalidCIDUI stageName={StageNames.composition} />
+                ) : (
+                    <LoadingScreen context="Loading composition" />
+                )}
+            </BaseLayout>
+            {showRecentTemplatesModal && (
+                <RecentExportsModal
+                    prefix="templates"
+                    route="/templates/"
+                    keyCID={compositionCID as string}
+                    title="Recent templates"
+                    subTitle="Distribute on of your"
+                    paragraph="Warning: These template CIDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
+                    onClose={toggleShowRecentTemplatesModal}
                 />
             )}
-            {isLoading && <LoadingScreen context="Loading composition" />}
         </>
     )
 }

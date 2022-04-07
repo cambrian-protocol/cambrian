@@ -1,10 +1,12 @@
 import Actionbar from '../../interaction/bars/Actionbar'
-import ExportSuccessModal from '../general/modals/ExportSuccessModal'
+import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
+import { Button } from 'grommet'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
+// TODO Integrate localstorage success modal
 const ComposerActionbar = () => {
     const stageHand = new Stagehand()
     const { composer } = useComposerContext()
@@ -55,14 +57,17 @@ const ComposerActionbar = () => {
                 />
             )}
             {showExportCompositionModal && (
-                <ExportSuccessModal
-                    ctaLabel="Create Template"
+                <BasePopupModal
                     title="Composition exported"
-                    description="This is your CID for your exported composition. Use it to create a template."
-                    link={'/templates/create'}
+                    description={exportedCompositionCID}
                     onClose={toggleShowExportCompositionModal}
-                    exportedCID={exportedCompositionCID}
-                />
+                >
+                    <Button
+                        primary
+                        href={`/templates/create/${exportedCompositionCID}`}
+                        label="Create template"
+                    />
+                </BasePopupModal>
             )}
         </>
     )

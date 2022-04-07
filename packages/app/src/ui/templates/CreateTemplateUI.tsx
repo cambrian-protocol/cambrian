@@ -6,23 +6,25 @@ import React, { useState } from 'react'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SolutionPreviewModal from '../../components/modals/SolutionPreviewModal'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 
 interface CreateTemplateUIProps {
-    stagehand: Stagehand
     composition: CompositionModel
+    compositionCID: string
 }
 
 const CreateTemplateUI = ({
-    stagehand,
     composition,
+    compositionCID,
 }: CreateTemplateUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
-
+    const [showFailureModal, setShowFailureModal] = useState(false)
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
+    const toggleShowFailureModal = () => setShowFailureModal(!showFailureModal)
 
     const [showSolutionPreviewModal, setShowSolutionPreviewModal] =
         useState(false)
@@ -56,18 +58,19 @@ const CreateTemplateUI = ({
                 />
                 <CreateTemplateForm
                     composition={composition}
-                    onSubmit={onSubmit}
-                    onFailure={handleFailure}
+                    compositionCID={compositionCID}
+                    onFailure={toggleShowFailureModal}
+                    onSuccess={toggleShowSuccessModal}
                 />
                 <Box pad="medium" />
             </Box>
-            {showSuccessModal && createdTemplateCID && (
+            {showSuccessModal && (
                 <ExportSuccessModal
-                    ctaLabel="Create Proposal"
+                    keyId={compositionCID}
+                    prefix="templates"
                     link="/templates/"
-                    exportedCID={createdTemplateCID}
-                    description="This is your CID for your exported template. Share it with your clients and receive proposals."
-                    title="Template created"
+                    description="This is your link to your freshly created template. Share it with your clients and receive proposals."
+                    title="New template created!"
                     onClose={toggleShowSuccessModal}
                 />
             )}
@@ -76,6 +79,9 @@ const CreateTemplateUI = ({
                     onBack={toggleShowSolutionPreviewModal}
                     composition={composition}
                 />
+            )}
+            {showFailureModal && (
+                <ErrorPopupModal onClose={toggleShowFailureModal} />
             )}
         </>
     )

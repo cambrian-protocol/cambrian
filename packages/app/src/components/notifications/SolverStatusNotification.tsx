@@ -22,9 +22,11 @@ const SolverStatusNotification = ({
             height={{ min: 'auto' }}
             margin={{ bottom: 'medium' }}
         >
-            <Box pad="small">
+            <Box pad="small" gap="small">
                 <Text weight={'bold'}>{title}</Text>
-                <Text size="small">{message}</Text>
+                <Text size="small" color="light-4">
+                    {message}
+                </Text>
             </Box>
             {children}
         </Box>

@@ -1,16 +1,22 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
+import PermissionProvider from './PermissionContext'
+import _ from 'lodash'
 import { ethers } from 'ethers'
 import { requestMetaMaskProvider } from '@cambrian/app/wallets/metamask/metamask'
+
+export type Permission = string
 
 export type UserType = {
     address: string
     signer: ethers.providers.JsonRpcSigner
+    permissions: Permission[]
 }
 
 export type UserContextType = {
     currentUser: UserType | null
     currentProvider: ethers.providers.Web3Provider | null
+    addPermission: (permission: Permission) => void
     logout: () => void
     login: () => Promise<boolean>
 }
@@ -18,6 +24,7 @@ export type UserContextType = {
 export const UserContext = React.createContext<UserContextType>({
     currentUser: null,
     currentProvider: null,
+    addPermission: () => {},
     logout: () => {},
     login: async () => false,
 })
@@ -50,10 +57,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
         return () => {
             if (window.ethereum) {
-                window.ethereum.on('accountsChanged', () => {})
-                window.ethereum.on('chainChanged', () => {})
-                window.ethereum.on('connect', () => {})
-                window.ethereum.on('disconnect', () => {})
+                window.ethereum.on('accountsChanged', handleAccountChanged)
+                window.ethereum.on('chainChanged', handleChainChanged)
+                window.ethereum.on('connect', handleEthereumConnect)
+                window.ethereum.on('disconnect', onLogout)
             }
         }
     }, [])
@@ -66,8 +73,8 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         handleAccountChanged(accounts)
     }
 
-    const handleAccountChanged = async (accounts: string[]) => {
-        if (accounts.length === 0) {
+    const handleAccountChanged = async (accounts?: string[]) => {
+        if (accounts && accounts.length === 0) {
             // Disconnected
             onLogout()
         } else {
@@ -76,7 +83,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             if (provider) {
                 const signer = provider.getSigner()
                 const address = await signer.getAddress()
-                setCurrentUser({ address: address, signer: signer })
+                setCurrentUser({
+                    address: address,
+                    signer: signer,
+                    permissions: [],
+                })
                 setCurrentProvider(provider)
             }
         }
@@ -94,7 +105,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             if (provider) {
                 const signer = provider.getSigner()
                 const address = await signer.getAddress()
-                setCurrentUser({ address: address, signer: signer })
+                setCurrentUser({
+                    address: address,
+                    signer: signer,
+                    permissions: [],
+                })
                 setCurrentProvider(provider)
                 return true
             }
@@ -109,16 +124,32 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         setCurrentUser(null)
     }
 
+    const addPermission = (newPermission: Permission) => {
+        if (currentUser && !currentUser.permissions.includes(newPermission)) {
+            const updatedPermissions = [...currentUser.permissions]
+            updatedPermissions.push(newPermission)
+            if (!_.isEqual(currentUser.permissions, updatedPermissions)) {
+                setCurrentUser({
+                    ...currentUser,
+                    permissions: updatedPermissions,
+                })
+            }
+        }
+    }
+
     return (
         <UserContext.Provider
             value={{
                 currentUser: currentUser,
                 currentProvider: currentProvider,
+                addPermission: addPermission,
                 logout: onLogout,
                 login: onLogin,
             }}
         >
-            {children}
+            <PermissionProvider permissions={currentUser?.permissions}>
+                {children}
+            </PermissionProvider>
         </UserContext.Provider>
     )
 }

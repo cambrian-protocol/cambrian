@@ -1,6 +1,7 @@
 import { Box, Nav, ResponsiveContext, Text } from 'grommet'
 import { CaretLeft, Gear, IconContext, List, Question } from 'phosphor-react'
 
+import { AppbarItem } from './AppbarItem'
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { useState } from 'react'
 
@@ -10,6 +11,7 @@ interface AppbarProps {
     toggleSidebar: () => void
     toggleHelp: () => void
     config?: JSX.Element
+    items?: JSX.Element[]
 }
 
 const Appbar = ({
@@ -18,6 +20,7 @@ const Appbar = ({
     toggleHelp,
     config,
     isSidebarOpen,
+    items,
 }: AppbarProps) => {
     const [showConfig, setShowConfig] = useState(false)
 
@@ -52,6 +55,10 @@ const Appbar = ({
                                 <Text color="white">{title && title}</Text>
                             </Box>
                             <Box direction="row" gap="medium">
+                                {items &&
+                                    items.map((item, idx) => (
+                                        <Box key={idx}>{item}</Box>
+                                    ))}
                                 <AppbarItem
                                     icon={<Question />}
                                     onClick={toggleHelp}
@@ -77,14 +84,3 @@ const Appbar = ({
 }
 
 export default Appbar
-
-interface AppbarItemProps {
-    icon: JSX.Element
-    onClick: () => void
-}
-
-const AppbarItem = ({ icon, onClick }: AppbarItemProps) => (
-    <Box pad="medium" onClick={onClick} focusIndicator={false}>
-        {icon}
-    </Box>
-)

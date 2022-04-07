@@ -147,6 +147,7 @@ describe("IPFSSolutionsHub", function () {
     ];
 
     const cid = await Hash.of(solverConfigs);
+    const nullCid = await Hash.of(JSON.stringify({}));
 
     await this.IPFSSolutionsHub.connect(this.keeper).createSolution(
       solutionId,
@@ -159,11 +160,12 @@ describe("IPFSSolutionsHub", function () {
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
-      solutionId
+      solutionId,
+      getBytes32FromMultihash(nullCid)
     );
     let rc = await tx.wait();
     const proposalId = new ethers.utils.Interface([
-      "event CreateProposal(bytes32 id)",
+      "event CreateProposal(bytes32 indexed id)",
     ]).parseLog(rc.logs[0]).args.id;
 
     //Fund Proposal
