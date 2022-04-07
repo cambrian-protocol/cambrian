@@ -36,16 +36,21 @@ export default function ProposalPage() {
 
     const fetchProposal = async () => {
         // Fetch proposal from proposalsHub via proposalId
-        if (
-            proposalId !== undefined &&
-            typeof proposalId === 'string' &&
-            currentUser
-        ) {
-            const proposalsHub = new ProposalsHub(currentUser.signer)
-            setProposalsHub(proposalsHub)
-            setCurrentProposal(await proposalsHub.getProposal(proposalId))
+        try {
+            if (proposalId === undefined && typeof proposalId !== 'string')
+                throw new Error('Invalid proposal id')
+
+            if (currentUser) {
+                const proposalsHub = new ProposalsHub(currentUser.signer)
+                setProposalsHub(proposalsHub)
+                setCurrentProposal(
+                    await proposalsHub.getProposal(proposalId as string)
+                )
+            }
+        } catch (e) {
+            console.error(e)
+            setIsInvalidCID(true)
         }
-        setIsInvalidCID(true)
     }
 
     return (
