@@ -20,6 +20,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     fill?: boolean // Needed for React Flow
     notification?: JSX.Element
     appbarTitle?: string
+    appbarItems?: JSX.Element[]
 }
 
 export const BaseLayout = ({
@@ -33,6 +34,7 @@ export const BaseLayout = ({
     fill,
     appbarTitle,
     notification,
+    appbarItems,
 }: LayoutProps) => {
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
@@ -109,6 +111,7 @@ export const BaseLayout = ({
                                         toggleHelp={toggleHelp}
                                         toggleSidebar={toggleSidebar}
                                         config={config}
+                                        items={appbarItems}
                                     />
                                     <Box
                                         fill
