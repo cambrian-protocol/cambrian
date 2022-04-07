@@ -345,9 +345,9 @@ const CreateProposalForm = ({
             </BaseFormContainer>
             {proposalId && (
                 <ExportSuccessModal
-                    ctaLabel="Fund Proposal"
+                    keyId={templateCID}
+                    prefix="proposals"
                     link="/proposals/"
-                    exportedCID={proposalId}
                     description="This is your Proposal Id. Share it with your community and fund the proposal."
                     title="Proposal created"
                     onClose={() => setProposalId(undefined)}

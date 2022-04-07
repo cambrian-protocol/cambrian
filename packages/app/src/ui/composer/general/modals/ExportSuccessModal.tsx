@@ -1,28 +1,37 @@
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import { useEffect, useState } from 'react'
+
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { Button } from 'grommet'
-import { Copy } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import StoredIdItem from '@cambrian/app/components/list/StoredIdItem'
 import { Text } from 'grommet'
+import { loadIdsFromLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 
 interface ExportCompositionModalProps {
-    title: string
     description: string
-    ctaLabel: string
     link: string
     onClose: () => void
-    exportedCID: string
+    title: string
+    prefix: string
+    keyId: string
 }
 
 const ExportSuccessModal = ({
     onClose,
-    exportedCID,
     title,
     description,
     link,
-    ctaLabel,
+    prefix,
+    keyId,
 }: ExportCompositionModalProps) => {
+    const [storedExports, setStoredExports] = useState<
+        { title: string; cid: string }[]
+    >([])
+
+    useEffect(() => {
+        setStoredExports(loadIdsFromLocalStorage(prefix, keyId))
+    }, [])
+
     return (
         <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
@@ -30,22 +39,39 @@ const ExportSuccessModal = ({
                 subTitle="Success"
                 paragraph={description}
             />
-            <BaseFormContainer direction="row" justify="between" align="center">
-                <Text truncate>{exportedCID}</Text>
-                <Button
-                    icon={<Copy size="24" />}
-                    onClick={() => {
-                        navigator.clipboard.writeText(exportedCID)
-                    }}
-                />
-            </BaseFormContainer>
-            <Box fill="horizontal" margin={{ top: 'medium' }}>
-                <Button
-                    primary
-                    label={ctaLabel}
-                    href={`${link}/${exportedCID}`}
-                />
-            </Box>
+            {storedExports.length > 0 ? (
+                <>
+                    <StoredIdItem
+                        border
+                        key={storedExports[0].cid}
+                        route={link}
+                        title={storedExports[0].title}
+                        cid={storedExports[0].cid}
+                    />
+                    {storedExports.length > 1 && (
+                        <Box margin={{ top: 'large' }} fill gap="small">
+                            <Text size="small" color="dark-4">
+                                Recent {prefix}
+                            </Text>
+                            {storedExports.map((template, idx) => {
+                                if (idx !== 0) {
+                                    return (
+                                        <StoredIdItem
+                                            border={idx === 0}
+                                            key={template.cid}
+                                            route={link}
+                                            title={template.title}
+                                            cid={template.cid}
+                                        />
+                                    )
+                                }
+                            })}
+                        </Box>
+                    )}
+                </>
+            ) : (
+                <></>
+            )}
         </BaseLayerModal>
     )
 }

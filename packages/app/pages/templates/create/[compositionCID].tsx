@@ -70,8 +70,8 @@ export default function CreateTemplatePage() {
                     prefix="templates"
                     route="/templates/"
                     keyCID={compositionCID as string}
-                    subTitle="Misplaced a template?"
-                    title="Your recently exported templates"
+                    title="Recent templates"
+                    subTitle="Distribute on of your"
                     paragraph="Warning: These template CIDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
                     onClose={toggleShowRecentTemplatesModal}
                 />

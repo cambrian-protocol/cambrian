@@ -21,13 +21,6 @@ const CreateTemplateUI = ({
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
     const toggleShowFailureModal = () => setShowFailureModal(!showFailureModal)
 
-    const [templateCID, setTemplateCID] = useState<string>()
-
-    const handleSuccess = (templateCID: string) => {
-        setTemplateCID(templateCID)
-        toggleShowSuccessModal()
-    }
-
     return (
         <>
             <HeaderTextSection
@@ -40,17 +33,17 @@ const CreateTemplateUI = ({
                     composition={composition}
                     compositionCID={compositionCID}
                     onFailure={toggleShowFailureModal}
-                    onSuccess={handleSuccess}
+                    onSuccess={toggleShowSuccessModal}
                 />
                 <Box pad="medium" />
             </Box>
-            {showSuccessModal && templateCID && (
+            {showSuccessModal && (
                 <ExportSuccessModal
-                    ctaLabel="Create Proposal"
+                    keyId={compositionCID}
+                    prefix="templates"
                     link="/templates/"
-                    exportedCID={templateCID}
-                    description="This is your CID for your exported template. Share it with your clients and receive proposals."
-                    title="Template created"
+                    description="This is your link to your freshly created template. Share it with your clients and receive proposals."
+                    title="New template created!"
                     onClose={toggleShowSuccessModal}
                 />
             )}

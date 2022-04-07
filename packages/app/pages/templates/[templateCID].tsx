@@ -80,8 +80,8 @@ export default function CreateProposalPage() {
                     prefix="proposals"
                     route="/proposals/"
                     keyCID={templateCID as string}
-                    subTitle="Misplaced a proposal?"
-                    title="Your recently created proposals"
+                    title="Recent proposals"
+                    subTitle="Distribute on of your"
                     paragraph="Warning: These proposal IDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
                     onClose={toggleShowRecentProposalsModal}
                 />

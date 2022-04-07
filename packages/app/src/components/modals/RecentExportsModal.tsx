@@ -38,8 +38,8 @@ const RecentExportsModal = ({
     return (
         <BaseLayerModal onClose={onClose}>
             <HeaderTextSection
-                subTitle={title}
-                title={subTitle}
+                subTitle={subTitle}
+                title={title}
                 paragraph={paragraph}
             />
             <Box gap="small" fill>
