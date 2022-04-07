@@ -18,6 +18,7 @@ import FlexInput from '@cambrian/app/components/inputs/FlexInput'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
@@ -242,6 +243,12 @@ const CreateTemplateForm = ({
             compositionCID
         )
         if (templateCID) {
+            storeIdInLocalStorage(
+                'templates',
+                compositionCID,
+                input.title,
+                templateCID
+            )
             onSuccess(templateCID)
         } else {
             onFailure()

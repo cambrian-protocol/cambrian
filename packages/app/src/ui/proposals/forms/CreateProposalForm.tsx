@@ -24,6 +24,7 @@ import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateProposalFormProps {
@@ -226,6 +227,12 @@ const CreateProposalForm = ({
             if (!proposalId)
                 throw new Error('Error while deploying solution and proposal')
 
+            storeIdInLocalStorage(
+                'proposals',
+                templateCID,
+                input.title,
+                proposalId
+            )
             setProposalId(proposalId)
         } catch (e: any) {
             console.error(e)
