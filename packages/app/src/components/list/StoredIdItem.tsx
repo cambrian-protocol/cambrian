@@ -9,13 +9,19 @@ interface StoredIdItemProps {
     route: string
     title: string
     cid: string
+    border?: boolean
 }
 
-const StoredIdItem = ({ route, title, cid }: StoredIdItemProps) => {
+const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
     const link = `${route}${cid}`
 
     return (
-        <BaseFormContainer gap="xsmall" direction="row" justify="between">
+        <BaseFormContainer
+            gap="xsmall"
+            direction="row"
+            justify="between"
+            border={border}
+        >
             <Box>
                 <Text>{title}</Text>
                 <Text truncate size="small" color="dark-4">
