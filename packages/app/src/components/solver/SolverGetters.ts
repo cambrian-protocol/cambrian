@@ -15,7 +15,6 @@ import {
     getSolverIngestWithMetaData,
 } from './SolverHelpers'
 
-import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { DEFAULT_ABI } from '@cambrian/app/constants'
@@ -27,6 +26,7 @@ import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeColle
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { RecipientAllocationModel } from '@cambrian/app/models/AllocationModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
@@ -47,6 +47,7 @@ export const getSolverConfig = async (
         const parsedIngests = res.ingests.map((ingest) => {
             return {
                 ...ingest,
+                id: ingest.slot,
                 executions: ingest.executions.toNumber(),
                 solverIndex: ingest.solverIndex.toNumber(),
             }
@@ -148,7 +149,7 @@ export const getSolverOutcomeCollections = async (
                         outcomeCollection.push(outcomes[idx])
                     }
                 })
-                const allocations: AllocationModel[] =
+                const allocations: RecipientAllocationModel[] =
                     config.conditionBase.allocations.map((allocation) => {
                         const addressSlot =
                             slotHistory[condition.conditionId][
@@ -274,10 +275,10 @@ export const getSolverSlots = async (
     const slotsHistory: SlotsHistoryHashMapType = {}
     const currentSlotData = await Promise.all(
         ingests.map(async (ingest: SlotModel) => {
-            const dataArr: any[] = await solverContract.getAllData(ingest.slot)
+            const dataArr: any[] = await solverContract.getAllData(ingest.id)
             const slotHistory = dataArr.map((data, idx) => {
                 return {
-                    slot: ingest.slot,
+                    id: ingest.id,
                     executions: idx + 1,
                     solverIndex: ingest.solverIndex,
                     ingestType: ingest.ingestType,
@@ -296,10 +297,10 @@ export const getSolverSlots = async (
 
             if (currentSlot) {
                 // Enrich slot with Metadata
-                const ulid = ethers.utils.parseBytes32String(currentSlot.slot)
+                const ulid = ethers.utils.parseBytes32String(currentSlot.id)
 
                 // Fallback empty Slot
-                data[currentSlot.slot] = {
+                data[currentSlot.id] = {
                     slot: currentSlot,
                     tag: slotTags
                         ? slotTags[ulid]

@@ -1,8 +1,9 @@
-import WriterSolverUI from '@cambrian/app/src/ui/solvers/writerSolverV1/WriterSolverUI'
+import ContentMarketingCustomUI from '../ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 import { SolidityDataTypes } from '../models/SolidityDataTypes'
 
-export default {
-    ui: WriterSolverUI,
+// TODO
+/* export default {
+    ui: ContentMarketingCustomUI,
     name: 'Writer Solver',
     networks: {
         localhost: {
@@ -23,4 +24,4 @@ export default {
         },
     ],
     solverTags: {}, // TODO
-}
+} */

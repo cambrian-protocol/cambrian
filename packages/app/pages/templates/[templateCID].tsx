@@ -1,3 +1,4 @@
+import { FolderOpen, TreeStructure } from 'phosphor-react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 import { useEffect, useState } from 'react'
 
@@ -5,10 +6,10 @@ import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalUI from '@cambrian/app/ui/proposals/CreateProposalUI'
-import { FolderOpen } from 'phosphor-react'
 import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
+import SolutionPreviewModal from '@cambrian/app/components/modals/SolutionPreviewModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/dist/client/router'
@@ -21,6 +22,11 @@ export default function CreateProposalPage() {
     const [showError, setShowError] = useState(false)
     const [showRecentProposalsModal, setShowRecentProposalsModal] =
         useState(false)
+    const [showSolutionPreviewModal, setShowSolutionPreviewModal] =
+        useState(false)
+
+    const toggleShowSolutionPreviewModal = () =>
+        setShowSolutionPreviewModal(!showSolutionPreviewModal)
 
     const toggleShowRecentProposalsModal = () =>
         setShowRecentProposalsModal(!showRecentProposalsModal)
@@ -61,6 +67,10 @@ export default function CreateProposalPage() {
                         icon={<FolderOpen />}
                         onClick={toggleShowRecentProposalsModal}
                     />,
+                    <AppbarItem
+                        icon={<TreeStructure />}
+                        onClick={toggleShowSolutionPreviewModal}
+                    />,
                 ]}
             >
                 {metaStages ? (
@@ -84,6 +94,12 @@ export default function CreateProposalPage() {
                     subTitle="Distribute on of your"
                     paragraph="Warning: These proposal IDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
                     onClose={toggleShowRecentProposalsModal}
+                />
+            )}
+            {showSolutionPreviewModal && metaStages?.composition && (
+                <SolutionPreviewModal
+                    onBack={toggleShowSolutionPreviewModal}
+                    composition={metaStages.composition as CompositionModel}
                 />
             )}
         </>

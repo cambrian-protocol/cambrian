@@ -38,7 +38,7 @@ const InitiatedActionbar = ({
             (manualSlot) => {
                 const data =
                     solverData.slotsHistory[currentCondition.conditionId][
-                        manualSlot.slot.slot
+                        manualSlot.slot.id
                     ]?.slot.data
 
                 return !data

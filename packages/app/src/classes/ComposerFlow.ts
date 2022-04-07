@@ -2,7 +2,7 @@ import { Elements, getOutgoers, isNode } from 'react-flow-renderer'
 
 import { ComposerSolverModel } from '../models/SolverModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { RecipientAllocationModel } from './../models/AllocationModel'
+import { RecipientAllocationModel } from '../models/AllocationModel'
 import { getRecipientAllocations } from '@cambrian/app/utils/helpers/slotHelpers'
 
 interface ComposerFlowProps {

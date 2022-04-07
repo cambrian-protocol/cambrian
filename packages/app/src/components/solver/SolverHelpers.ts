@@ -1,6 +1,7 @@
 import { RichSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 
 import { GenericMethods } from './Solver'
+import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -37,10 +38,10 @@ export const getSolverIngestWithMetaData = (
     ingests: SlotModel[],
     slotTags?: SlotTagsHashMapType
 ): RichSlotModel => {
-    const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
+    const ingestSlot = ingests.find((ingest) => ingest.id === slotId)
     if (ingestSlot) {
         // Enrich with MetaData
-        const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
+        const ulid = ethers.utils.parseBytes32String(ingestSlot.id)
 
         // Fallback empty Slot
         const tag =
@@ -79,6 +80,29 @@ export const getSolverRecipientSlots = (
     )
 }
 
+export const getSolverRecipients = (
+    solverData: SolverModel,
+    condition: SolverContractCondition
+): ParticipantModel[] => {
+    return solverData.config.conditionBase.allocations.map((allocation) => {
+        const recipientSlot =
+            solverData.slotsHistory[condition.conditionId][
+                allocation.recipientAddressSlot
+            ] ||
+            getSolverIngestWithMetaData(
+                allocation.recipientAddressSlot,
+                solverData.config.ingests,
+                solverData.slotTags
+            )
+
+        return {
+            address: recipientSlot.slot.data,
+            name: recipientSlot.tag.label,
+            description: recipientSlot.tag.description,
+        }
+    })
+}
+
 export const getManualInputs = (
     solverData: SolverModel,
     condition: SolverContractCondition
@@ -93,7 +117,7 @@ export const getManualSlots = (solverData: SolverModel): RichSlotModel[] => {
             if (ingest.ingestType === SlotType.Manual) {
                 filtered.push(
                     getSolverIngestWithMetaData(
-                        ingest.slot,
+                        ingest.id,
                         solverData.config.ingests,
                         solverData.slotTags
                     )

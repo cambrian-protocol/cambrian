@@ -33,7 +33,7 @@ export const PreviewSolverNode = memo(({ data }: PreviewSolverNodeProps) => {
         setShowRecipientsModal(!showRecipientsModal)
     const solverTag: SolverTagModel = data.currentSolver.solverTag
 
-    const recipientsData: ParticipantModel[] =
+    const recipients: ParticipantModel[] =
         data.currentSolver.config.condition.recipients.map(
             (recipientSlotPath: ComposerSlotPathType) => {
                 return getRecipientData(
@@ -75,7 +75,7 @@ export const PreviewSolverNode = memo(({ data }: PreviewSolverNodeProps) => {
             <Handle type="source" position={Position.Bottom} id="b" />
             {showRecipientsModal && (
                 <RecipientsModal
-                    recipientsData={recipientsData}
+                    recipients={recipients}
                     onClose={toggleShowRecipientsModal}
                 />
             )}

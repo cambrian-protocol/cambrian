@@ -10,7 +10,7 @@ import {
 import React, { useState } from 'react'
 import {
     getManualInputs,
-    getSolverRecipientSlots,
+    getSolverRecipients,
 } from '@cambrian/app/components/solver/SolverHelpers'
 
 import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
@@ -18,12 +18,9 @@ import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
-import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import RecipientsModal from '../../../components/modals/RecipientsModal'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface SolverConfigInfoProps {
@@ -123,7 +120,7 @@ const SolverConfigInfo = ({
             {showRecipientModal && (
                 <RecipientsModal
                     onBack={toggleShowRecipientModal}
-                    recipientAddresses={getSolverRecipientSlots(
+                    recipients={getSolverRecipients(
                         solverData,
                         currentCondition
                     )}

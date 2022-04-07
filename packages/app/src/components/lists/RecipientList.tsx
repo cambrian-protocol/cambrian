@@ -3,12 +3,12 @@ import BaseSlotInputItem from '../listItems/BaseSlotInputItem'
 import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 
 interface RecipientListProps {
-    recipientsData: ParticipantModel[]
+    recipients: ParticipantModel[]
 }
 
-const RecipientList = ({ recipientsData }: RecipientListProps) => (
+const RecipientList = ({ recipients }: RecipientListProps) => (
     <BaseListContainer>
-        {recipientsData.map((recipient, idx) => {
+        {recipients.map((recipient, idx) => {
             return (
                 <BaseSlotInputItem
                     info={recipient.description}

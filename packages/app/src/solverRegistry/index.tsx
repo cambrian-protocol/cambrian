@@ -1,5 +1,7 @@
-import WriterSolverV1 from './WriterSolverV1'
+import ContentMarketingCustomUI from '../ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 
+/* 
 export default {
-    WriterSolverV1: WriterSolverV1,
+    ContentMarketingSolver: ContentMarketingCustomUI,
 }
+ */

@@ -4,7 +4,7 @@ import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import { CircleDashed } from 'phosphor-react'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import StoredIdItem from '../list/StoredIdItem'
+import StoredIdItem from '../listItems/StoredIdItem'
 import { Text } from 'grommet'
 import { loadIdsFromLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 

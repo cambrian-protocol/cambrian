@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import StoredIdItem from '@cambrian/app/components/list/StoredIdItem'
+import StoredIdItem from '@cambrian/app/components/listItems/StoredIdItem'
 import { Text } from 'grommet'
 import { loadIdsFromLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 

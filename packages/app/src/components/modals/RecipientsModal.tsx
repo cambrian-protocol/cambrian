@@ -5,16 +5,16 @@ import { ParticipantModel } from '@cambrian/app/models/ParticipantModel'
 import RecipientList from '../lists/RecipientList'
 
 type RecipientsModalProps = BaseLayerModalProps & {
-    recipientsData: ParticipantModel[]
+    recipients: ParticipantModel[]
 }
 
-const RecipientsModal = ({ recipientsData, ...rest }: RecipientsModalProps) => (
+const RecipientsModal = ({ recipients, ...rest }: RecipientsModalProps) => (
     <BaseLayerModal {...rest}>
         <HeaderTextSection
             title="Recipients"
             paragraph="The following addresses are eligible to collect tokens based on outcomes."
         />
-        <RecipientList recipientsData={recipientsData} />
+        <RecipientList recipients={recipients} />
     </BaseLayerModal>
 )
 

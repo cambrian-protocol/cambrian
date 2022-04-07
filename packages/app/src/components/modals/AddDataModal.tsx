@@ -74,7 +74,7 @@ const AddDataModal = ({
                 [input.data]
             )
             await solverMethods.addData(
-                input.slotWithMetaData.slot.slot,
+                input.slotWithMetaData.slot.id,
                 encodedData
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
