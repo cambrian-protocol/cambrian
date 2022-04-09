@@ -70,11 +70,29 @@ const CreateProposalForm = ({
      * Initialize input.flexInputs from template
      */
     useEffect(() => {
-        const inputs = { ...input }
-        inputs.flexInputs = template.flexInputs
-        inputs.price = template.price?.amount || 0
-        inputs.tokenAddress = template.price?.denominationToken || ''
-        setInput(inputs)
+        const updatedInputs = { ...input }
+        const templateFlexInputs: FlexInputs = {}
+        Object.keys(template.flexInputs).forEach((solverId) => {
+            const solverFlexInputs = template.flexInputs[solverId]
+            Object.keys(solverFlexInputs).forEach((slotId) => {
+                const flexInput = solverFlexInputs[slotId]
+                if (flexInput.isFlex === true) {
+                    if (templateFlexInputs[solverId] === undefined) {
+                        templateFlexInputs[solverId] = {}
+                    }
+
+                    templateFlexInputs[solverId][slotId] = {
+                        ...flexInput,
+                        value: '',
+                    }
+                }
+            })
+        })
+
+        updatedInputs.flexInputs = templateFlexInputs
+        updatedInputs.price = template.price?.amount || 0
+        updatedInputs.tokenAddress = template.price?.denominationToken || ''
+        setInput(updatedInputs)
     }, [])
 
     useEffect(() => {
