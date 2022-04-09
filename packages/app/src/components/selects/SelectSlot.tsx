@@ -61,16 +61,16 @@ const SelectSlot = ({
             for (let i = 0; i < currentSolverIndex; i++) {
                 Object.keys(solverHierarchy[i]?.config.slots).forEach((key) => {
                     const slot = solverHierarchy[i].config.slots[key]
-                    const slotTag = solverHierarchy[i].slotTags[slot.id]
+                    const slotTag = solverHierarchy[i].slotTags[slot.slot]
                     const slotLabel =
                         slotTag && slotTag.label !== ''
                             ? slotTag.label
-                            : slot.id
+                            : slot.slot
 
                     const currentSelectSlotForm = {
                         label: slotLabel,
                         reference: {
-                            slotId: slot.id,
+                            slotId: slot.slot,
                             solverId: solverHierarchy[i].id,
                         },
                     }

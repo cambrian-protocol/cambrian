@@ -5,7 +5,7 @@ import { SlotType } from './SlotType'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
 export type SlotModel = {
-    id: string
+    slot: string
     executions: number
     ingestType: SlotType
     solverIndex: number
@@ -36,7 +36,7 @@ export type SlotsHistoryHashMapType = {
 */
 
 export type ComposerSlotModel = {
-    id: string
+    slot: string
     slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[] // TODO

@@ -282,10 +282,10 @@ export default class ComposerSolver {
         // Add to recipients array
         this.config.condition.recipients.push({
             solverId: this.id,
-            slotId: slot.id,
+            slotId: slot.slot,
         })
 
-        this.addNewRecipientAllocationSlots(slot.id)
+        this.addNewRecipientAllocationSlots(slot.slot)
 
         return slot
     }
@@ -339,10 +339,10 @@ export default class ComposerSolver {
         // Add to recipients array
         this.config.condition.recipients.push({
             solverId: this.id,
-            slotId: slot.id,
+            slotId: slot.slot,
         })
 
-        this.addNewRecipientAllocationSlots(slot.id)
+        this.addNewRecipientAllocationSlots(slot.slot)
 
         return slot
     }
@@ -437,7 +437,7 @@ export default class ComposerSolver {
     }: AddSlotProps): ComposerSlotModel {
         const id = ulid()
         this.config.slots[id] = {
-            id: id,
+            slot: id,
             data: data,
             slotType: slotType,
             dataTypes: dataTypes,
@@ -509,7 +509,7 @@ export default class ComposerSolver {
                 data: [0],
                 slotType: SlotType.Constant,
                 dataTypes: [SolidityDataTypes.Uint256],
-            }).id
+            }).slot
 
         if (zeroSlotId) {
             return zeroSlotId
@@ -551,14 +551,14 @@ export default class ComposerSolver {
         const id = ulid()
 
         const zeroSlot = {
-            id: id,
+            slot: id,
             slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [0],
         }
 
         const maxPointsSlot = {
-            id: id,
+            slot: id,
             slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
             data: [Constants.MAX_POINTS],
@@ -566,8 +566,8 @@ export default class ComposerSolver {
 
         const slots = <ComposerSlotsHashMapType>{}
 
-        slots[zeroSlot.id] = zeroSlot
-        slots[maxPointsSlot.id] = maxPointsSlot
+        slots[zeroSlot.slot] = zeroSlot
+        slots[maxPointsSlot.slot] = maxPointsSlot
 
         return slots
     }

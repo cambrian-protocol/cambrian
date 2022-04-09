@@ -134,7 +134,7 @@ export function parseComposerSlot(
     const outSlot = <SlotModel>{
         executions: 0,
         ingestType: inSlot.slotType,
-        id: ethers.utils.formatBytes32String(inSlot.id),
+        slot: ethers.utils.formatBytes32String(inSlot.slot),
     }
     switch (inSlot.slotType) {
         case 0: // Callback slot

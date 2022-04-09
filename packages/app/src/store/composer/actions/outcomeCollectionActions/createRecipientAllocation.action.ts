@@ -26,7 +26,7 @@ const createRecipientAllocationAction = (
         const newRecipientSlot = currentSolver.createRecipient(payload.address)
 
         currentSolver.addSlotTag({
-            slotId: newRecipientSlot.id,
+            slotId: newRecipientSlot.slot,
             label: payload.label,
             description: payload.description,
             isFlex: payload.isFlex,
@@ -35,8 +35,8 @@ const createRecipientAllocationAction = (
         if (isComposerSlot(payload.amount)) {
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                newRecipientSlot.id,
-                payload.amount.id
+                newRecipientSlot.slot,
+                payload.amount.slot
             )
         } else {
             const newAmountSlot = currentSolver.addSlot({
@@ -46,8 +46,8 @@ const createRecipientAllocationAction = (
             })
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
-                newRecipientSlot.id,
-                newAmountSlot.id
+                newRecipientSlot.slot,
+                newAmountSlot.slot
             )
         }
 

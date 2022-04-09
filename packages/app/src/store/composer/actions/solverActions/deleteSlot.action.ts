@@ -20,8 +20,8 @@ const deleteSlotAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        currentSolver.deleteSlot(payload.slotToDelete.id)
-        currentSolver.deleteSlotTag(payload.slotToDelete.id)
+        currentSolver.deleteSlot(payload.slotToDelete.slot)
+        currentSolver.deleteSlotTag(payload.slotToDelete.slot)
 
         return {
             ...state,

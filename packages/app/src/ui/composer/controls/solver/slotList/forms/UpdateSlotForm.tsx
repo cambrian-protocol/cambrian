@@ -49,7 +49,7 @@ const UpdateSlotForm = ({ onClose, slot }: UpdateSlotFormProps) => {
             }
         })
 
-        const slotTag = currentSolver.slotTags[slot.id]
+        const slotTag = currentSolver.slotTags[slot.slot]
 
         setInput({
             slotType: slot.slotType,
@@ -91,7 +91,7 @@ const UpdateSlotForm = ({ onClose, slot }: UpdateSlotFormProps) => {
         dispatch({
             type: 'UPDATE_SLOT',
             payload: {
-                slotIdToUpdate: slot.id,
+                slotIdToUpdate: slot.slot,
                 updatedSlot: mapSlotFormTypeToSlotActionPayload(input),
             },
         })

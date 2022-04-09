@@ -27,7 +27,7 @@ export function isComposerSlot(
     if (!toBeDetermined) return false
     if (
         (toBeDetermined as ComposerSlotModel).slotType &&
-        (toBeDetermined as ComposerSlotModel).id
+        (toBeDetermined as ComposerSlotModel).slot
     ) {
         return true
     }
@@ -102,7 +102,7 @@ export const getSlotTitle = (
     currentSlotTags: SlotTagsHashMapType,
     solvers: ComposerSolverModel[]
 ): string | JSX.Element => {
-    const currentSlotTag = currentSlotTags[slotModel.id]
+    const currentSlotTag = currentSlotTags[slotModel.slot]
 
     if (currentSlotTag && currentSlotTag.label !== '') {
         return currentSlotTag.label
@@ -157,7 +157,7 @@ export const getRecipientData = (
     currentSolver: ComposerSolverModel,
     solvers: ComposerSolverModel[]
 ): ParticipantModel => {
-    const slotTag = currentSolver.slotTags[recipientSlot.id]
+    const slotTag = currentSolver.slotTags[recipientSlot.slot]
     if (isComposerSlot(recipientSlot)) {
         let address = 'No address defined yet'
 

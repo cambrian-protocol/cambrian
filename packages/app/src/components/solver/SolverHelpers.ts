@@ -38,10 +38,10 @@ export const getSolverIngestWithMetaData = (
     ingests: SlotModel[],
     slotTags?: SlotTagsHashMapType
 ): RichSlotModel => {
-    const ingestSlot = ingests.find((ingest) => ingest.id === slotId)
+    const ingestSlot = ingests.find((ingest) => ingest.slot === slotId)
     if (ingestSlot) {
         // Enrich with MetaData
-        const ulid = ethers.utils.parseBytes32String(ingestSlot.id)
+        const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
 
         // Fallback empty Slot
         const tag =
@@ -117,7 +117,7 @@ export const getManualSlots = (solverData: SolverModel): RichSlotModel[] => {
             if (ingest.ingestType === SlotType.Manual) {
                 filtered.push(
                     getSolverIngestWithMetaData(
-                        ingest.id,
+                        ingest.slot,
                         solverData.config.ingests,
                         solverData.slotTags
                     )

@@ -20,7 +20,7 @@ const createRecipientAction = (
 
         const newRecipientSlot = currentSolver.createRecipient(payload.address)
         currentSolver.addSlotTag({
-            slotId: newRecipientSlot.id,
+            slotId: newRecipientSlot.slot,
             label: payload.label,
             description: payload.description,
             isFlex: payload.isFlex,

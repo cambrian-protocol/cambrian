@@ -31,7 +31,7 @@ const updateRecipientAllocationAction = (
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 payload.recipientId,
-                payload.amount.id
+                payload.amount.slot
             )
         } else {
             const newAmountSlot = currentSolver.addSlot({
@@ -42,7 +42,7 @@ const updateRecipientAllocationAction = (
             currentSolver.updateRecipientAllocation(
                 state.currentIdPath.ocId,
                 payload.recipientId,
-                newAmountSlot.id
+                newAmountSlot.slot
             )
         }
 

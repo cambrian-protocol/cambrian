@@ -13,7 +13,7 @@ type UpdateSlotFormModalProps = {
 const UpdateSlotModal = ({ onClose, slotModel }: UpdateSlotFormModalProps) => (
     <BaseLayerModal onClose={onClose}>
         <HeaderTextSection
-            subTitle={`Slot ID: ${slotModel.id}`}
+            subTitle={`Slot ID: ${slotModel.slot}`}
             title="Edit Slot"
             paragraph="Update the slot which provides data to this Solver during runtime. If you don't know, you can ignore this."
         />

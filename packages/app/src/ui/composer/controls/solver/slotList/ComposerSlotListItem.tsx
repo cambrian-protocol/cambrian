@@ -50,7 +50,7 @@ const ComposerSlotListItem = ({ slotModel }: ComposerSlotListItemProps) => {
                 description={currentSlotTypeLabel}
                 title={currentTitle}
                 onEdit={toggleUpdateSlotModal}
-                onRemove={slotModel.id ? handleRemoveSlot : undefined}
+                onRemove={slotModel.slot ? handleRemoveSlot : undefined}
             />
             {showUpdateSlotModal && (
                 <UpdateSlotModal

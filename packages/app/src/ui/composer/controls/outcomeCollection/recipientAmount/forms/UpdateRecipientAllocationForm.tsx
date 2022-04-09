@@ -53,7 +53,7 @@ const UpdateRecipientAllocationForm = ({
             dispatch({
                 type: 'UPDATE_RECIPIENT_ALLOCATION',
                 payload: {
-                    recipientId: recipientAllocation.recipientModel.id,
+                    recipientId: recipientAllocation.recipientModel.slot,
                     amount: amountToDispatch,
                 },
             })

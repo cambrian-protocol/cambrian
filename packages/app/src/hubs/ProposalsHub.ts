@@ -46,7 +46,6 @@ export default class ProposalsHub {
             BigNumber.from(price),
             collateralToken
         ).toString()
-
         const solverConfigsHash = await Hash.of(JSON.stringify(solverConfigs))
         const tx: ethers.ContractTransaction =
             await this.contract.createIPFSSolutionAndProposal(

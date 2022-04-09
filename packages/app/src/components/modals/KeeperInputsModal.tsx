@@ -27,7 +27,7 @@ const KeeperInputsModal = ({
                         return (
                             // TODO dynamic datatype parsing
                             <BaseSlotInputItem
-                                key={manualSlot.slot.id}
+                                key={manualSlot.slot.slot}
                                 info={manualSlot.tag.description}
                                 title={manualSlot.tag.label}
                                 subTitle={decodeData(

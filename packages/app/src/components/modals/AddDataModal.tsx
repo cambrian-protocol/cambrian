@@ -74,7 +74,7 @@ const AddDataModal = ({
                 [input.data]
             )
             await solverMethods.addData(
-                input.slotWithMetaData.slot.id,
+                input.slotWithMetaData.slot.slot,
                 encodedData
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
@@ -89,7 +89,7 @@ const AddDataModal = ({
     if (manualInputs !== undefined) {
         ManualInputGroup = manualInputs.manualInputs?.map((input, idx) => {
             return (
-                <Box key={input.slotWithMetaData.slot.id}>
+                <Box key={input.slotWithMetaData.slot.slot}>
                     <Box direction="row" gap="medium" align="center">
                         <Box flex>
                             <FormField

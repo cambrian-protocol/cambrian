@@ -52,7 +52,7 @@ const createSlotAction = (
         }
 
         currentSolver.addSlotTag({
-            slotId: newSlot.id,
+            slotId: newSlot.slot,
             label: payload.label,
             description: payload.description,
             isFlex: payload.isFlex,

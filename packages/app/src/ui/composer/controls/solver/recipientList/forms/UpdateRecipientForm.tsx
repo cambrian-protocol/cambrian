@@ -42,7 +42,7 @@ const UpdateRecipientForm = ({
     //Init
     useEffect(() => {
         if (recipient.data.length === 1) {
-            const slotTag = currentSolver.slotTags[recipient.id]
+            const slotTag = currentSolver.slotTags[recipient.slot]
             setInput({
                 address: recipient.data[0].toString(),
                 label: (slotTag && slotTag.label) || '',
@@ -60,7 +60,7 @@ const UpdateRecipientForm = ({
         dispatch({
             type: 'UPDATE_RECIPIENT',
             payload: {
-                slotId: recipient.id,
+                slotId: recipient.slot,
                 recipientData: input,
             },
         })

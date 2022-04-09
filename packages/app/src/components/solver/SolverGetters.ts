@@ -47,7 +47,6 @@ export const getSolverConfig = async (
         const parsedIngests = res.ingests.map((ingest) => {
             return {
                 ...ingest,
-                id: ingest.slot,
                 executions: ingest.executions.toNumber(),
                 solverIndex: ingest.solverIndex.toNumber(),
             }
@@ -275,10 +274,10 @@ export const getSolverSlots = async (
     const slotsHistory: SlotsHistoryHashMapType = {}
     const currentSlotData = await Promise.all(
         ingests.map(async (ingest: SlotModel) => {
-            const dataArr: any[] = await solverContract.getAllData(ingest.id)
+            const dataArr: any[] = await solverContract.getAllData(ingest.slot)
             const slotHistory = dataArr.map((data, idx) => {
                 return {
-                    id: ingest.id,
+                    slot: ingest.slot,
                     executions: idx + 1,
                     solverIndex: ingest.solverIndex,
                     ingestType: ingest.ingestType,
@@ -297,10 +296,10 @@ export const getSolverSlots = async (
 
             if (currentSlot) {
                 // Enrich slot with Metadata
-                const ulid = ethers.utils.parseBytes32String(currentSlot.id)
+                const ulid = ethers.utils.parseBytes32String(currentSlot.slot)
 
                 // Fallback empty Slot
-                data[currentSlot.id] = {
+                data[currentSlot.slot] = {
                     slot: currentSlot,
                     tag: slotTags
                         ? slotTags[ulid]
