@@ -1,5 +1,5 @@
-import WriterSolverV1 from './WriterSolverV1'
+import React from 'react'
 
-export default {
-    WriterSolverV1: WriterSolverV1,
-}
+/* export default {
+    ContentMarketingSolverV1: ContentMarketingSolverV1,
+} */
