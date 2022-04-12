@@ -57,7 +57,7 @@ export const renderFlexInputs = (
     if (flexInputElements.length !== 0) {
         return (
             <BaseFormGroupContainer groupTitle="Flexible inputs">
-                {flexInputs}
+                {flexInputElements}
             </BaseFormGroupContainer>
         )
     }
