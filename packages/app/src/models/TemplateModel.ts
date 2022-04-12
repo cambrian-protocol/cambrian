@@ -1,5 +1,5 @@
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { FlexInputs } from './SlotTagModel'
+import { FlexInputFormType } from '../ui/templates/forms/CreateTemplateForm'
+import { TokenModel } from './TokenModel'
 
 export type TemplateModel = {
     pfp?: string
@@ -8,9 +8,10 @@ export type TemplateModel = {
     description: string
     price?: {
         amount: number
-        denominationToken: string
-        preferredTokens?: 'any' | string[]
+        denominationTokenAddress: string
+        preferredTokens?: TokenModel[]
+        allowAnyPaymentToken: boolean
     }
     compositionCID: string
-    flexInputs: FlexInputs
+    flexInputs: FlexInputFormType[]
 }

@@ -6,20 +6,25 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { FlexInputs, TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import React, { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { Coin } from 'phosphor-react'
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import { BigNumber } from 'ethers'
+import { CheckBox } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import FlexInput from '@cambrian/app/components/inputs/FlexInput'
+import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { Plus } from 'phosphor-react'
+import PreferredTokenItem from '@cambrian/app/components/list/PreferredTokenItem'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
+import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import { Text } from 'grommet'
+import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 
 interface CreateTemplateFormProps {
@@ -35,9 +40,15 @@ export type CreateTemplateFormType = {
     title: string
     description: string
     askingAmount: number
-    denominationToken: string // Token address for which to calculate equivalent value
-    preferredTokens: 'any' | string[]
-    flexInputs: FlexInputs
+    denominationTokenAddress: string // In case of possible alternative tokens - its the token address for which to calculate equivalent value
+    preferredTokens: TokenModel[]
+    allowAnyPaymentToken: boolean
+    flexInputs: FlexInputFormType[]
+}
+
+export type FlexInputFormType = TaggedInput & {
+    solverId: string
+    tagId: string
 }
 
 const initialInput = {
@@ -46,9 +57,10 @@ const initialInput = {
     title: '',
     description: '',
     askingAmount: 0,
-    denominationToken: '0xc778417e063141139fce010982780140aa0cd5ab', // Ropsten wETH // TODO
-    preferredTokens: 'any' as 'any',
-    flexInputs: {} as FlexInputs,
+    denominationTokenAddress: '',
+    preferredTokens: [],
+    allowAnyPaymentToken: false,
+    flexInputs: [] as FlexInputFormType[],
 }
 
 const CreateTemplateForm = ({
@@ -59,191 +71,119 @@ const CreateTemplateForm = ({
 }: CreateTemplateFormProps) => {
     const [transactionMsg, setTransactionMsg] = useState<string>()
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
-    const [denominationTokenSymbol, setDenominationTokenSymbol] = useState<
-        string | undefined
-    >('')
-    const [preferredTokenSymbols, setPreferredTokenSymbols] = useState<
-        (string | undefined)[] | undefined
-    >()
+    const [isCollateralFlex, setIsCollateralFlex] = useState<boolean>(false)
+    const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {
-        const initalInput = getInitialInput()
-        setInput(initalInput)
+        const formFlexInputs = parseFlexInputsToForm()
+        const ctAddress =
+            composition.solvers[0].config.collateralToken ||
+            '0xc778417e063141139fce010982780140aa0cd5ab' // Ropsten wETH
+        initCollateralToken(ctAddress)
+
+        setInput({
+            ...initialInput,
+            flexInputs: formFlexInputs,
+            denominationTokenAddress: ctAddress,
+        })
     }, [])
 
-    /**
-     * Initialize input.flexInputs from composition
-     */
-    const getInitialInput = () => {
-        const flexInputs = {} as {
-            [solverId: string]: {
-                [tagId: string]: TaggedInput
-            }
-        }
+    const initCollateralToken = async (address: string) => {
+        const token = await fetchTokenInfo(address)
+        setCollateralToken(token)
+    }
 
+    const parseFlexInputsToForm = (): FlexInputFormType[] => {
+        const flexInputs: FlexInputFormType[] = []
         composition.solvers.forEach((solver) => {
             Object.keys(solver.slotTags).forEach((tagId) => {
                 if (solver.slotTags[tagId].isFlex === true) {
-                    if (typeof flexInputs[solver.id] === 'undefined') {
-                        flexInputs[solver.id] = {}
+                    if (tagId === 'collateralToken') {
+                        setIsCollateralFlex(true)
                     }
-
-                    flexInputs[solver.id][tagId] = {
+                    flexInputs.push({
                         ...solver.slotTags[tagId],
-                        value: undefined,
-                    }
+                        solverId: solver.id,
+                        tagId: tagId,
+                        value: '',
+                    })
                 }
             })
         })
-
-        const updatedInputs = { ...initialInput }
-        updatedInputs.flexInputs = flexInputs
-
-        if (composition.solvers[0].config.collateralToken)
-            updatedInputs.denominationToken =
-                composition.solvers[0].config.collateralToken
-
-        return updatedInputs
+        return flexInputs
     }
 
-    const setFlexInputValue = (
-        solverId: string,
-        tagId: string,
-        value?: string
-    ) => {
-        const inputs: CreateTemplateFormType = { ...input }
-        inputs.flexInputs[solverId][tagId].value = value
-        setInput(inputs)
-        setIsFlex(solverId, tagId, !value)
-    }
-
-    const setIsFlex = (solverId: string, tagId: string, isFlex: boolean) => {
-        const inputs: CreateTemplateFormType = { ...input }
-        inputs.flexInputs[solverId][tagId].isFlex = isFlex
-        setInput(inputs)
-    }
-
-    /**
-     * Render an input for any fields in a Solver where "isFlex" == true
-     * Flex inputs are provided by the template or proposal
-     * These fields may be provided by the template or left "isFlex" for the Proposal stage
-     */
-    const renderFlexInputs = () => {
-        const flexInputs = Object.keys(input.flexInputs).map((solverId) =>
-            Object.keys(input.flexInputs[solverId]).map((tagId) => {
-                const currentFlexInput = input.flexInputs[solverId][tagId]
-                return (
-                    <FlexInput
-                        key={`${solverId}-${tagId}`}
-                        solverId={solverId}
-                        input={currentFlexInput}
-                        inputType={getFlexInputType(
-                            composition.solvers,
-                            currentFlexInput
-                        )}
-                        setIsFlex={setIsFlex}
-                        setFlexInputValue={setFlexInputValue}
-                    />
-                )
-            })
-        )
-
-        if (flexInputs.length !== 0) {
-            return <BaseFormGroupContainer>{flexInputs}</BaseFormGroupContainer>
+    const onAddPreferredToken = () => {
+        const newPreferredToken: TokenModel = {
+            address: '',
+            decimals: BigNumber.from(18),
+            totalSupply: BigNumber.from(0),
         }
-    }
-
-    const getFlexInputType = (
-        composition: ComposerSolverModel[],
-        tag: TaggedInput
-    ) => {
-        if (
-            tag.id === 'keeper' ||
-            tag.id === 'arbitrator' ||
-            tag.id === 'data' ||
-            tag.id === 'collateralToken'
-        ) {
-            return 'string'
-        } else if (tag.id === 'timelockSeconds') {
-            return 'number'
-        } else {
-            // Slot ID
-            const slot = composition.find(
-                (solver) => solver.config.slots[tag.id]
-            )?.config.slots[tag.id]
-            if (slot?.dataTypes[0] === SolidityDataTypes.Uint256) {
-                return 'number'
-            } else {
-                return 'string'
-            }
-        }
-    }
-
-    const fetchTokenSymbols = async (addresses: string) => {
-        if (addresses === 'any') {
-            return
-        } else {
-            const addressArray = addresses.split(',')
-            const tokenResponses = await Promise.allSettled(
-                addressArray.map((address) => TokenAPI.getTokenInfo(address))
-            )
-            const tokenSymbols = tokenResponses.map((res) =>
-                res.status === 'fulfilled' ? res.value?.symbol : undefined
-            )
-            return tokenSymbols
-        }
-    }
-
-    const updateDenominationTokenSymbol = async (address: string) => {
-        if (address.length === 42) {
-            const symbols = await fetchTokenSymbols(address)
-            if (symbols) {
-                setDenominationTokenSymbol(symbols[0])
-            } else {
-                setDenominationTokenSymbol(undefined)
-            }
-        }
-    }
-
-    const updatePreferredTokenSymbols = async (addresses: string) => {
-        if (addresses === 'any') {
-            setPreferredTokenSymbols(undefined)
-        }
-
-        const arr = addresses.split(',')
-        if (arr[0] !== '' && !arr.find((address) => address.length !== 42)) {
-            const symbols = await fetchTokenSymbols(addresses)
-            if (symbols) {
-                setPreferredTokenSymbols(symbols)
-            } else {
-                setPreferredTokenSymbols(undefined)
-            }
-        } else {
-            setPreferredTokenSymbols(undefined)
-        }
-    }
-
-    /**
-     * Checks if "collateralToken" is flagged as isFlex
-     * If so, it should be provided.
-     * If it's not provided, the templater can SUGGEST a few tokens they would prefer
-     */
-    const isUncertainCollateral = () => {
-        let bool = false
-        Object.keys(input.flexInputs).forEach((solverId) => {
-            if (input.flexInputs[solverId]['collateralToken']?.isFlex) {
-                bool = true
-            }
+        const newPrefferredTokens = [
+            ...input.preferredTokens,
+            newPreferredToken,
+        ]
+        setInput({
+            ...input,
+            preferredTokens: newPrefferredTokens,
         })
-        return bool
+    }
+
+    const onRemovePreferredToken = (index: number) => {
+        if (input.preferredTokens && input.preferredTokens.length > 0) {
+            setInput({
+                ...input,
+                preferredTokens: input.preferredTokens.filter(
+                    (v, _idx) => _idx !== index
+                ),
+            })
+        }
+    }
+
+    const updatePreferredToken = async (addressInput: string, idx: number) => {
+        const token = await fetchTokenInfo(addressInput)
+        if (token) {
+            const updatedPreferredTokens = [...input.preferredTokens]
+            updatedPreferredTokens[idx] = token
+            setInput({ ...input, preferredTokens: updatedPreferredTokens })
+        }
+    }
+
+    let PreferredTokenGroup = null
+    if (input.preferredTokens !== undefined) {
+        PreferredTokenGroup = input.preferredTokens.map(
+            (preferredToken, idx) => (
+                <PreferredTokenItem
+                    key={idx}
+                    idx={idx}
+                    token={preferredToken}
+                    updateToken={updatePreferredToken}
+                    onRemove={onRemovePreferredToken}
+                />
+            )
+        )
     }
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
         setTransactionMsg(TRANSACITON_MESSAGE['IPFS'])
+
+        const updatedInput = { ...input }
+        updatedInput.flexInputs.forEach((flexInput) => {
+            let stayFlex = flexInput.value === ''
+            if (flexInput.tagId === 'collateralToken') {
+                stayFlex =
+                    input.allowAnyPaymentToken ||
+                    input.preferredTokens.length > 0
+
+                flexInput.value = stayFlex ? '' : input.denominationTokenAddress
+            }
+            flexInput.isFlex = stayFlex
+        })
+
         const stagehand = new Stagehand()
         const templateCID = await stagehand.publishTemplate(
-            input,
+            updatedInput,
             compositionCID
         )
         if (templateCID) {
@@ -267,11 +207,12 @@ const CreateTemplateForm = ({
                     onChange={(nextValue: CreateTemplateFormType) => {
                         setInput(nextValue)
                     }}
+                    validate="blur"
                     value={input}
                     onSubmit={(event) => onSubmit(event)}
                 >
                     <Box gap="medium">
-                        <BaseFormGroupContainer>
+                        <BaseFormGroupContainer groupTitle="Template details">
                             <FormField
                                 name="name"
                                 label="Your/Organization Name"
@@ -294,52 +235,82 @@ const CreateTemplateForm = ({
                                 />
                             </FormField>
                         </BaseFormGroupContainer>
-                        {renderFlexInputs()}
+                        {renderFlexInputs(
+                            input.flexInputs,
+                            composition.solvers
+                        )}
                         <BaseFormGroupContainer
-                            direction="row"
                             gap="small"
-                            align="end"
+                            groupTitle="Payment details"
                         >
-                            <Box basis="1/4">
-                                <FormField
-                                    name="askingAmount"
-                                    label="Amount"
-                                    type="number"
-                                />
+                            <Box fill>
+                                <Box
+                                    direction="row"
+                                    fill
+                                    gap="small"
+                                    align="center"
+                                >
+                                    <Box basis="1/4">
+                                        <FormField
+                                            name="askingAmount"
+                                            label="Amount"
+                                            type="number"
+                                        />
+                                    </Box>
+                                    <Box fill direction="row" gap="small">
+                                        <Box flex>
+                                            <FormField
+                                                disabled={!isCollateralFlex}
+                                                name="denominationTokenAddress"
+                                                label="Collateral Token"
+                                                type="string"
+                                                onChange={(event) =>
+                                                    initCollateralToken(
+                                                        event.target.value
+                                                    )
+                                                }
+                                                validate={[
+                                                    (address) => {
+                                                        if (
+                                                            address.length !==
+                                                            42
+                                                        )
+                                                            return 'Not a valid address'
+                                                    },
+                                                ]}
+                                            />
+                                        </Box>
+                                        <TokenAvatar token={collateralToken} />
+                                    </Box>
+                                </Box>
+                                {isCollateralFlex && (
+                                    <Text size="xsmall" color="dark-4">
+                                        Will be used as denomination if
+                                        alternative tokens are allowed.
+                                    </Text>
+                                )}
                             </Box>
-                            <Box flex>
-                                <FormField
-                                    name="denominationToken"
-                                    label="Token address"
-                                    type="string"
-                                    onChange={(event) =>
-                                        updateDenominationTokenSymbol(
-                                            event.target.value
-                                        )
-                                    }
-                                />
-                            </Box>
-                            <Box margin={{ bottom: '1.5em' }}>
-                                {denominationTokenSymbol || <Coin size="24" />}
-                            </Box>
-                            {isUncertainCollateral() && (
-                                <FormField
-                                    name="preferredTokens"
-                                    label="Preferred tokens for payment"
-                                    help={
-                                        Array.isArray(preferredTokenSymbols)
-                                            ? preferredTokenSymbols
-                                                  .map((x) => x || 'error')
-                                                  .join(',')
-                                            : 'Comma-seperated list of token contract addresses, or "any"'
-                                    }
-                                    type="string"
-                                    onChange={(event) =>
-                                        updatePreferredTokenSymbols(
-                                            event.target.value
-                                        )
-                                    }
-                                />
+                            {isCollateralFlex && (
+                                <Box gap="small">
+                                    <Box pad={{ vertical: 'small' }}>
+                                        <CheckBox
+                                            name="allowAnyPaymentToken"
+                                            label="Allow payment in any token"
+                                        />
+                                    </Box>
+                                    {input.preferredTokens.length > 0 && (
+                                        <Text size="small">
+                                            Alternative or preferred token(s)
+                                            for payment:
+                                        </Text>
+                                    )}
+                                    {PreferredTokenGroup}
+                                    <FloatingActionButton
+                                        icon={<Plus />}
+                                        label="Add alternative or preferred token"
+                                        onClick={onAddPreferredToken}
+                                    />
+                                </Box>
                             )}
                         </BaseFormGroupContainer>
                         <Box>

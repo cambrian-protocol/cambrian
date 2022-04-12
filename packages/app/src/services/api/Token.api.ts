@@ -44,10 +44,7 @@ export const TokenAPI = {
                             ? decimals.value
                             : BigNumber.from(18),
                     name: name.status === 'fulfilled' ? name.value : undefined,
-                    symbol:
-                        symbol.status === 'fulfilled'
-                            ? symbol.value
-                            : undefined,
+                    symbol: symbol.status === 'fulfilled' ? symbol.value : '??',
                     totalSupply:
                         totalSupply.status === 'fulfilled'
                             ? totalSupply.value

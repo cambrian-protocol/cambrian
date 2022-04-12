@@ -143,8 +143,10 @@ export default class Stagehand {
             description: createTemplateInput.description,
             price: {
                 amount: createTemplateInput.askingAmount,
-                denominationToken: createTemplateInput.denominationToken,
+                denominationTokenAddress:
+                    createTemplateInput.denominationTokenAddress,
                 preferredTokens: createTemplateInput.preferredTokens,
+                allowAnyPaymentToken: createTemplateInput.allowAnyPaymentToken,
             },
             flexInputs: createTemplateInput.flexInputs,
             compositionCID: compositionCID,
@@ -189,8 +191,8 @@ export default class Stagehand {
                 name: createProposalInput.name,
                 pfp: createProposalInput.pfp,
                 description: createProposalInput.description,
-                flexInputs: createProposalInput.flexInputs,
                 templateCID: templateCID,
+                flexInputs: createProposalInput.flexInputs,
             }
 
             this.stages[StageNames.proposal] = proposal
