@@ -8,9 +8,9 @@ import "tsconfig-paths/register";
 // import 'hardhat-log-remover'
 // import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/types";
+import dotenv from "dotenv";
 
-const TESTNET_PRIVATE_KEY =
-  "33b3817e6e42e55a00c425e0a081dbf3e9a8672600d6527f3d0849f9c19b91c6";
+dotenv.config();
 
 export const config = {
   paths: {
@@ -23,12 +23,6 @@ export const config = {
     hardhat: {
       blockGasLimit: 15000000,
       // allowUnlimitedContractSize: true,
-    },
-    wlkrnet: {
-      url: `http://198.74.50.28:8000`,
-      blockGasLimit: 150000000000000,
-      gasPrice: 8000000000, // default is 'auto' which breaks chains without the london hardfork
-      accounts: [`0x${TESTNET_PRIVATE_KEY}`],
     },
   },
   solidity: {
