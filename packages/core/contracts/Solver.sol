@@ -17,7 +17,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     address ctfAddress; // Conditional token framework
     address deployerAddress; // Address which called SolverFactory to deploy this Solver
 
-    SolverLib.Multihash public uiCID; // Resource for Solver Front End
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
 
