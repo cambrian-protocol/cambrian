@@ -109,6 +109,9 @@ export const cpTheme = deepMerge(grommet, {
         error: {
             size: 'small',
         },
+        disabled: {
+            background: { color: 'none' },
+        },
     },
     meter: {
         color: 'brand',

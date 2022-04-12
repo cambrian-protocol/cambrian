@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import FormFieldInputWithTag from '@cambrian/app/components/inputs/FormFieldInputWithTag'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
@@ -49,6 +50,7 @@ const SolutionConfig = () => {
         dispatch({ type: 'UPDATE_SOLUTION_SETTINGS', payload: input })
     }
 
+    // TODO saving collateral Token must be possible without having to select a solver
     return (
         <>
             <HeaderTextSection
@@ -64,9 +66,11 @@ const SolutionConfig = () => {
                         setInput(nextValue)
                     }}
                 >
-                    <FormField label="Collateral token address">
-                        <TextInput name="collateralToken" />
-                    </FormField>
+                    <FormFieldInputWithTag
+                        slotId="collateralToken"
+                        label="Collateral token address"
+                        input={<TextInput name="collateralToken" />}
+                    />
                     <Box flex>
                         <Button
                             disabled={

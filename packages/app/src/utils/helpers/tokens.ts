@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 export const formatDecimals = (
@@ -29,5 +30,14 @@ export const addTokenDecimals = (
         )
     } else {
         return bigNumberAmount.mul(BigNumber.from(10).pow(BigNumber.from(18)))
+    }
+}
+
+export const fetchTokenInfo = async (address?: string) => {
+    if (address && address.length === 42) {
+        const token = await TokenAPI.getTokenInfo(address)
+        if (token) {
+            return token
+        }
     }
 }
