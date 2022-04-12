@@ -17,6 +17,7 @@
     "bs58": "^4.0.1",
     "chai": "4.3.4",
     "chai-as-promised": "^7.1.1",
+    "dotenv": "^16.0.0",
     "ethereum-waffle": "3.3.0",
     "glob-parent": "5.1.2",
     "hardhat": "2.5.0",
