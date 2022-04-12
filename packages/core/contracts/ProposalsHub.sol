@@ -213,13 +213,13 @@ contract ProposalsHub is ERC1155Receiver {
             "Can't fund more than goal"
         );
 
-        proposals[proposalId].funding += amount;
-        funderAmountMap[proposalId][msg.sender] += amount;
-
         require(
             token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
         );
+
+        proposals[proposalId].funding += amount;
+        funderAmountMap[proposalId][msg.sender] += amount;
 
         emit FundProposal(proposalId, amount, msg.sender);
     }
