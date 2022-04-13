@@ -364,6 +364,7 @@ export const getSolverData = async (
     const config = solverConfig
         ? solverConfig
         : await getSolverConfig(solverContract)
+    console.log(config)
 
     const conditions = await getSolverConditions(solverContract)
 
@@ -391,6 +392,7 @@ export const getSolverData = async (
     )
 
     const collateralBalance = await solverMethods.collateralBalance()
+    console.log(collateralBalance)
 
     const outcomeCollections = await getSolverOutcomeCollections(
         config,

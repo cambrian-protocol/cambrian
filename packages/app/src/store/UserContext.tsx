@@ -104,6 +104,8 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
             if (provider) {
                 const signer = provider.getSigner()
+                console.log('provider: ', signer.provider)
+
                 const address = await signer.getAddress()
                 setCurrentUser({
                     address: address,

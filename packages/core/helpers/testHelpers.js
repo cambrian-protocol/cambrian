@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const { object } = require("underscore");
 const CT_ABI =
   require("../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
 const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;

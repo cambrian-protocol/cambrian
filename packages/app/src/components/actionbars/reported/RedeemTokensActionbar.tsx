@@ -15,6 +15,10 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import {
+    calculateCollectionId,
+    calculatePositionId,
+} from '../../solver/SolverHelpers'
 
 interface RedeemTokensActionbarProps {
     currentUser: UserType
@@ -117,8 +121,7 @@ const RedeemTokensActionbar = ({
     }
 
     /**
-     * Mimics calculation from ConditionalToken.sol
-     * TODO, may not be calculating properly for multiple allocations to the same user from one OC
+     * Mostly mimics calculation from ConditionalToken.sol
      */
     const getTotalPayoutPct = (allocations: AllocationModel[]) => {
         const payoutNumerators = currentCondition.payouts
@@ -147,12 +150,23 @@ const RedeemTokensActionbar = ({
                     }
                 }
 
-                const payoutStake = allocations.find(
-                    (alloc) => oc.indexSet === indexSet
-                )?.amountPercentage
+                let payoutStake = '0'
+                const positionId = calculatePositionId(
+                    currentCondition.collateralToken,
+                    calculateCollectionId(
+                        currentCondition.conditionId,
+                        indexSet
+                    )
+                )
+                allocations.forEach((alloc) => {
+                    if (alloc.positionId === positionId) {
+                        payoutStake = (
+                            BigInt(payoutStake) + BigInt(alloc.amountPercentage)
+                        ).toString()
+                    }
+                })
 
                 if (payoutStake && BigNumber.from(payoutStake).gt(0)) {
-                    // payout = payout + (Number(payoutStake) * payoutNumerator) / den
                     payout = payout
                         .add(BigNumber.from(payoutStake).mul(payoutNumerator))
                         .div(den)

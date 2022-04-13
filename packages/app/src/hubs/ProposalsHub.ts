@@ -102,7 +102,9 @@ export default class ProposalsHub {
         proposalId: string,
         solverConfigs: SolverConfigModel[]
     ) => {
-        await this.contract.executeIPFSProposal(proposalId, solverConfigs)
+        await this.contract.executeIPFSProposal(proposalId, solverConfigs, {
+            gasLimit: '4000000', // TODO, can't estimate gas limit?
+        })
     }
 
     getProposalFunding = async (proposalId: string) => {
