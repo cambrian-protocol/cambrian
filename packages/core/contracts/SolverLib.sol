@@ -6,7 +6,6 @@ import "./interfaces/ISolver.sol";
 import "./interfaces/IConditionalTokens.sol";
 import "./interfaces/ISolverFactory.sol";
 import "./FullMath.sol";
-import "hardhat/console.sol";
 
 library SolverLib {
     // Ingest Types

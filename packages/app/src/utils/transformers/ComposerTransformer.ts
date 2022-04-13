@@ -84,7 +84,7 @@ export function parseComposerSolverConfig(
     )
 
     const conditionBase = parseComposerCondition(
-        composerSolverConfig.condition,
+        composerSolverConfig,
         currentSolverIndex,
         sortedSolvers
     )
@@ -226,51 +226,53 @@ export function parseComposerSlot(
 }
 
 export function parseComposerCondition(
-    inCondition: ComposerConditionModel,
+    config: ComposerSolverConfigModel,
     currentSolverIndex: number,
     sortedSolvers: ComposerSolverModel[]
 ): ConditionModel {
     const outCondition = <ConditionModel>{}
 
-    if (inCondition.outcomes.length < 2) {
+    if (config.condition.outcomes.length < 2) {
         throw 'Condition must have at least two outcomes'
     }
 
-    if (!inCondition.parentCollection && currentSolverIndex > 0) {
+    if (!config.condition.parentCollection && currentSolverIndex > 0) {
         throw 'Conditions of child Solvers must target a parentCollection'
     }
 
     if (
-        inCondition.parentCollection &&
-        inCondition.parentCollection.solverId &&
-        inCondition.parentCollection.solverId !==
+        config.condition.parentCollection &&
+        config.condition.parentCollection.solverId &&
+        config.condition.parentCollection.solverId !==
             sortedSolvers[currentSolverIndex - 1].id
     ) {
         throw 'parentCollectionIndex refers to a Solver which is not the immediate parent'
     }
 
     if (
-        inCondition.parentCollection?.ocId &&
-        inCondition.parentCollection.solverId &&
+        config.condition.parentCollection?.ocId &&
+        config.condition.parentCollection.solverId &&
         !sortedSolvers[currentSolverIndex - 1].config.condition.partition.find(
-            (oc) => oc.id === inCondition.parentCollection?.ocId
+            (oc) => oc.id === config.condition.parentCollection?.ocId
         )
     ) {
         throw 'parentCollectionId refers to an outcome collection which is out of scope'
     }
 
     if (
-        !sortedSolvers[currentSolverIndex].config.slots[inCondition.amountSlot]
+        !sortedSolvers[currentSolverIndex].config.slots[
+            config.condition.amountSlot
+        ]
     ) {
         throw 'amountSlot must refer to a slot on the current Solver'
     }
 
-    if (inCondition.recipients.length < 1) {
+    if (config.condition.recipients.length < 1) {
         throw 'condition has no recipients'
     }
 
     if (
-        inCondition.recipients.find(
+        config.condition.recipients.find(
             (slotPath) =>
                 slotPath.solverId !== sortedSolvers[currentSolverIndex].id
         )
@@ -279,8 +281,8 @@ export function parseComposerCondition(
     }
 
     if (
-        Object.keys(inCondition.recipientAmountSlots).find((key) =>
-            inCondition.recipientAmountSlots[key].find(
+        Object.keys(config.condition.recipientAmountSlots).find((key) =>
+            config.condition.recipientAmountSlots[key].find(
                 (recipientAmountPath) =>
                     recipientAmountPath.amount.solverId !==
                     sortedSolvers[currentSolverIndex].id
@@ -290,15 +292,21 @@ export function parseComposerCondition(
         throw 'recipientAmounts must refer to slots on the current solver'
     }
 
-    outCondition.collateralToken = '0x0165878A594ca255338adfa4d48449f69242Eb8F' // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
-    outCondition.outcomeSlots = filterOutcomes(inCondition.partition).length
+    if (!config.collateralToken) {
+        throw 'no collateral token in config'
+    }
+
+    outCondition.collateralToken = config.collateralToken
+    outCondition.outcomeSlots = filterOutcomes(
+        config.condition.partition
+    ).length
 
     const parentSolver = sortedSolvers.find(
-        (x) => x.id === inCondition.parentCollection?.solverId
+        (x) => x.id === config.condition.parentCollection?.solverId
     )
 
     const parentOC = parentSolver?.config.condition.partition.find(
-        (oc) => oc.id === inCondition.parentCollection?.ocId
+        (oc) => oc.id === config.condition.parentCollection?.ocId
     )
 
     if (parentSolver && parentOC) {
@@ -312,28 +320,28 @@ export function parseComposerCondition(
         outCondition.parentCollectionIndexSet = 0
     }
 
-    outCondition.partition = parsePartition(inCondition.partition)
+    outCondition.partition = parsePartition(config.condition.partition)
     outCondition.amountSlot = ethers.utils.formatBytes32String(
-        inCondition.amountSlot
+        config.condition.amountSlot
     )
 
     outCondition.allocations = [] as AllocationPathsType[]
 
-    inCondition.recipients.forEach((slotPath, i) => {
+    config.condition.recipients.forEach((slotPath, i) => {
         outCondition.allocations.push(<AllocationPathsType>{
             recipientAddressSlot: ethers.utils.formatBytes32String(
                 slotPath.slotId
             ),
             recipientAmountSlots: outCondition.partition.map((indexSet, j) => {
-                const ocId = inCondition.partition.find(
+                const ocId = config.condition.partition.find(
                     (oc) =>
                         indexSet ===
                         getIndexSetFromBinaryArray(
-                            getBinaryArrayFromOC(oc, inCondition.partition)
+                            getBinaryArrayFromOC(oc, config.condition.partition)
                         )
                 )?.id
                 if (ocId) {
-                    const amountSlotId = inCondition.recipientAmountSlots[
+                    const amountSlotId = config.condition.recipientAmountSlots[
                         ocId
                     ].find(
                         (alloc) => alloc.recipient.slotId === slotPath.slotId
@@ -366,8 +374,8 @@ export function parseComposerCondition(
         )
     }
 
-    outCondition.outcomeURIs = filterOutcomes(inCondition.partition).map((o) =>
-        getBytes32FromMultihash(o.uri)
+    outCondition.outcomeURIs = filterOutcomes(config.condition.partition).map(
+        (o) => getBytes32FromMultihash(o.uri)
     )
 
     return outCondition

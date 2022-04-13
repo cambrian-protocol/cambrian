@@ -5,12 +5,13 @@ import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-web3";
 import "tsconfig-paths/register";
+import "@nomiclabs/hardhat-etherscan";
 // import 'hardhat-log-remover'
 // import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/types";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: "../../.env" });
 
 export const config = {
   paths: {
@@ -26,6 +27,7 @@ export const config = {
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_ROPSTEN_ID}`,
       accounts: [`${process.env.ROPSTEN_PRIVATE_KEY}`],
+      blockGasLimit: 4000000,
     },
   },
   solidity: {
@@ -53,6 +55,9 @@ export const config = {
   typechain: {
     outDir: "./typechain-types",
     target: "ethers-v5",
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_KEY,
   },
   // contractSizer: {
   //   alphaSort: true,

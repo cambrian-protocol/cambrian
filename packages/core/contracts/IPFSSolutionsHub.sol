@@ -6,8 +6,6 @@ import "./Solver.sol";
 import "./SolverLib.sol";
 import "./interfaces/IProposalsHub.sol";
 
-// 0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0 DEV_ADDRESS
-
 contract IPFSSolutionsHub {
     address immutable factoryAddress;
 
@@ -48,9 +46,11 @@ contract IPFSSolutionsHub {
 
         for (uint256 i; i < solverConfigs.length; i++) {
             if (i == 0) {
-                _solverAddress = ISolverFactory(
-                    0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
-                ).createSolver(address(0), i, solverConfigs[i]);
+                _solverAddress = ISolverFactory(factoryAddress).createSolver(
+                    address(0),
+                    i,
+                    solverConfigs[i]
+                );
 
                 require(
                     _solverAddress != address(0),
