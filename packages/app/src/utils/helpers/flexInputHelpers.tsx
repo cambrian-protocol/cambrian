@@ -37,7 +37,8 @@ export const getFlexInputType = (
  */
 export const renderFlexInputs = (
     flexInputs: FlexInputFormType[],
-    solvers: ComposerSolverModel[]
+    solvers: ComposerSolverModel[],
+    required?: boolean
 ) => {
     const flexInputElements = flexInputs
         .map((flexInput, idx) => {
@@ -45,6 +46,7 @@ export const renderFlexInputs = (
             if (flexInput.tagId !== 'collateralToken')
                 return (
                     <FlexInput
+                        required={required}
                         key={idx}
                         input={flexInput}
                         name={`flexInputs[${idx}].value`}

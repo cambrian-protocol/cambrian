@@ -172,7 +172,8 @@ const CreateProposalForm = ({
                                 </BaseFormGroupContainer>
                                 {renderFlexInputs(
                                     input.flexInputs,
-                                    composition.solvers
+                                    composition.solvers,
+                                    true
                                 )}
                                 <BaseFormGroupContainer
                                     groupTitle="Payment details"
