@@ -29,11 +29,20 @@ contract IPFSSolutionsHub {
         factoryAddress = _factoryAddress;
     }
 
-    function linkToProposal(bytes32 _proposalId, bytes32 _solutionId) external {
+    function linkToProposal(
+        bytes32 _proposalId,
+        bytes32 _solutionId,
+        IERC20 collateralToken
+    ) external {
         require(
             IProposalsHub(msg.sender).isProposal(_proposalId),
             "Proposal is not valid at proposalHub"
         );
+        require(
+            solutions[_solutionId].collateralToken == collateralToken,
+            "Wrong collateral token"
+        );
+
         solutions[_solutionId].proposalHub = msg.sender;
         solutions[_solutionId].proposalId = _proposalId;
     }
@@ -157,5 +166,13 @@ contract IPFSSolutionsHub {
         returns (address[] memory solvers)
     {
         solvers = solutions[_solutionId].solverAddresses;
+    }
+
+    function getSolution(bytes32 solutionId)
+        public
+        view
+        returns (Solution memory solution)
+    {
+        solution = solutions[solutionId];
     }
 }

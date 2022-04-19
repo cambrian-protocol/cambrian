@@ -19,7 +19,7 @@ const {
 } = require("../../helpers/multihash.js");
 const Hash = require("ipfs-only-hash");
 
-describe("IPFSSolutionsHub", function () {
+describe("IPFSSolutionsHubV2", function () {
   this.beforeEach(async function () {
     const [buyer, seller, keeper, arbitrator] = await ethers.getSigners();
     this.buyer = buyer;
@@ -36,11 +36,12 @@ describe("IPFSSolutionsHub", function () {
       "ToyToken",
       "BasicSolverV1",
       "IPFSSolutionsHub",
+      "IPFSSolutionsHubV2",
     ]);
 
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
-    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHub");
+    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHubV2");
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");

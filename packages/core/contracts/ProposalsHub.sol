@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
 import "./interfaces/ISolutionsHub.sol";
-import "./interfaces/IPFSSolutionsHub.sol";
+import "./interfaces/IIPFSSolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
 
 import "./SolverLib.sol";
@@ -99,25 +99,34 @@ contract ProposalsHub is ERC1155Receiver {
 
     /**
         @dev Called by SolutionsHub after deploying Solvers
-        @param _proposalId Proposal that collateral is being transferred from
-        @param _solver Solver receiving collateral
+        @param proposalId Proposal that collateral is being transferred from
+        @param solver Solver receiving collateral
      */
-    function transferERC20(bytes32 _proposalId, address _solver) external {
+    function transferERC20(bytes32 proposalId, address solver) external {
         require(
-            msg.sender == proposals[_proposalId].solutionsHub,
+            msg.sender == proposals[proposalId].solutionsHub,
             "msg.sender not solutionsHub"
         );
-        require(_solver != address(0), "Invalid address");
+        require(solver != address(0), "Invalid address");
         require(
-            ISolutionsHub(proposals[_proposalId].solutionsHub).solverFromIndex(
-                proposals[_proposalId].solutionId,
+            ISolutionsHub(proposals[proposalId].solutionsHub).solverFromIndex(
+                proposals[proposalId].solutionId,
                 0
-            ) == _solver,
+            ) == solver,
             "Incorrect solver address"
         );
 
-        IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
-        _token.transfer(_solver, proposals[_proposalId].funding);
+        IERC20 _token = IERC20(proposals[proposalId].collateralToken);
+        uint256 beforeBalance = _token.balanceOf(address(this));
+        require(
+            _token.transfer(solver, proposals[proposalId].funding),
+            "Transfer failed"
+        );
+        require(
+            beforeBalance - _token.balanceOf(address(this)) ==
+                proposals[proposalId].fundingGoal,
+            "Incorrect balance after transfer"
+        );
     }
 
     /**
@@ -146,6 +155,12 @@ contract ProposalsHub is ERC1155Receiver {
             )
         );
 
+        ISolutionsHub(solutionsHub).linkToProposal(
+            proposalId,
+            solutionId,
+            collateralToken
+        );
+
         Proposal storage proposal = proposals[proposalId];
         proposal.collateralToken = collateralToken;
         proposal.proposer = msg.sender;
@@ -155,7 +170,6 @@ contract ProposalsHub is ERC1155Receiver {
         proposal.fundingGoal = fundingGoal;
         proposal.metadataCID = metadataCID;
 
-        ISolutionsHub(solutionsHub).linkToProposal(proposalId, solutionId);
         emit CreateProposal(proposalId);
     }
 
@@ -213,9 +227,14 @@ contract ProposalsHub is ERC1155Receiver {
             "Can't fund more than goal"
         );
 
+        uint256 beforeBalance = token.balanceOf(address(this));
         require(
             token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
+        );
+        require(
+            token.balanceOf(address(this)) - beforeBalance == amount,
+            "Incorrect balance after transfer"
         );
 
         proposals[proposalId].funding += amount;
@@ -254,7 +273,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposals[proposalId].funding -= amount;
         funderAmountMap[proposalId][msg.sender] -= amount;
 
-        token.transfer(msg.sender, amount);
+        require(token.transfer(msg.sender, amount), "Transfer failed");
 
         require(
             beforeBalance - token.balanceOf(address(this)) == amount,
@@ -332,8 +351,8 @@ contract ProposalsHub is ERC1155Receiver {
     /** 
         IMPORTANT!
         Any CTs sent to this contract are reclaimable by the funders in proportion to their funding.
-        If a user reclaims CTs and sends them back again to this contract, they will only be able
-        to reclaim the same fraction of it.
+        If a user reclaims CTs and sends them back again to this contract, they will only be able to 
+        regain from them a fraction of their original funding.
     */
     function onERC1155Received(
         address operator,

@@ -37,13 +37,14 @@ describe("ProposalsHub", function () {
       "ToyToken",
       "BasicSolverV1",
       "IPFSSolutionsHub",
+      "IPFSSolutionsHubV2",
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
-    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHub");
+    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHubV2");
 
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
@@ -171,7 +172,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -231,7 +232,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -298,7 +299,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -334,7 +335,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -399,7 +400,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -487,7 +488,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -601,7 +602,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -644,7 +645,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -688,7 +689,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -790,7 +791,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[1]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -816,10 +817,6 @@ describe("ProposalsHub", function () {
       proposalId,
       this.solverConfigs
     );
-    const res = await tx.wait();
-    res.logs.forEach((log) => {
-      console.log(JSON.stringify(log));
-    });
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       this.solutionId,
@@ -922,7 +919,10 @@ describe("ProposalsHub", function () {
 
     const res = await tx.wait();
 
-    // console.log(res);
-    expect(res.events[0].data).to.equal(this.solutionId);
+    const solutionId = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]).parseLog(res.logs[2]).args.id;
+
+    expect(solutionId).to.equal(this.solutionId);
   });
 });

@@ -14,7 +14,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("ProposalsHub", {
+  const proposalsHub = await deploy("ProposalsHub", {
     from: deployer,
     args: [conditionalTokens.address],
     log: true,
@@ -71,6 +71,12 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   await deploy("ArbitrationDispatch", {
     from: deployer,
     args: [],
+    log: true,
+  });
+
+  await deploy("IPFSSolutionsHubV2", {
+    from: deployer,
+    args: [solverFactory.address, proposalsHub.address],
     log: true,
   });
 };
