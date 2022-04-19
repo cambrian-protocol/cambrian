@@ -8,8 +8,6 @@ const {
 const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-const ctHelpers = require("../../helpers/ConditionalTokens.js");
-
 describe("Solver.sol | prepareSolve", function () {
   this.beforeEach(async function () {
     const [keeper, arbitrator] = await ethers.getSigners();
@@ -19,7 +17,6 @@ describe("Solver.sol | prepareSolve", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",

@@ -2,15 +2,12 @@ const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
   require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
-const SOLUTIONSHUB_ABI =
-  require("../../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
 const IPFSSOLUTIONSHUB_ABI =
   require("../../artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,
 } = require("../../helpers/ConditionalTokens.js");
-const { getSimpleSolutionConfig } = require("../../helpers/testHelpers.js");
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
@@ -32,25 +29,20 @@ describe("ProposalsHub", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
       "IPFSSolutionsHub",
-      "IPFSSolutionsHubV2",
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.Solver = await ethers.getContract("BasicSolverV1");
-    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHubV2");
+    this.IPFSSolutionsHub = await ethers.getContract("IPFSSolutionsHub");
 
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
-
-    this.ISolutionsHub = new ethers.utils.Interface(SOLUTIONSHUB_ABI);
-    this.ISolutionsHub.format(FormatTypes.full);
 
     this.IIPFSSolutionsHub = new ethers.utils.Interface(IPFSSOLUTIONSHUB_ABI);
     this.IIPFSSolutionsHub.format(FormatTypes.full);
@@ -59,7 +51,7 @@ describe("ProposalsHub", function () {
     await this.ToyToken.mint(this.user1.address, this.amount);
 
     //Create solution
-    this.solutionId = ethers.utils.formatBytes32String("TestID");
+    this.solutionBaseId = ethers.utils.formatBytes32String("TestID");
     this.ingests = [
       {
         executions: 0,
@@ -160,7 +152,7 @@ describe("ProposalsHub", function () {
     let tx2 = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -172,7 +164,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[2]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -220,7 +212,7 @@ describe("ProposalsHub", function () {
     let tx2 = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -232,7 +224,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[2]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -287,7 +279,7 @@ describe("ProposalsHub", function () {
     let tx2 = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -299,7 +291,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[2]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -313,17 +305,17 @@ describe("ProposalsHub", function () {
     );
 
     await expectRevert(
-      this.ProposalsHub.executeProposal(proposalId),
+      this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs),
       "Proposal not fully funded"
     );
   });
 
   it("can receive conditional tokens from a Solver", async function () {
     //Create proposal
-    let tx2 = await this.ProposalsHub.connect(
+    let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -331,11 +323,16 @@ describe("ProposalsHub", function () {
       getBytes32FromMultihash(this.cid),
       getBytes32FromMultihash(this.emptyCid)
     );
-    let receipt2 = await tx2.wait();
-    let iface2 = new ethers.utils.Interface([
+    let receipt = await tx.wait();
+    let iface = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface.parseLog(receipt.logs[2]).args.id;
+
+    let iface2 = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]);
+    const solutionId = iface2.parseLog(receipt.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -351,9 +348,10 @@ describe("ProposalsHub", function () {
     await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
-      this.solutionId,
+      solutionId,
       0
     );
+
     let solver = new ethers.Contract(
       solverAddress,
       SOLVER_ABI,
@@ -384,11 +382,10 @@ describe("ProposalsHub", function () {
   });
 
   it("conditional tokens can be reclaimed from the Proposal", async function () {
-    //Create proposal
-    let tx2 = await this.ProposalsHub.connect(
+    let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -396,11 +393,16 @@ describe("ProposalsHub", function () {
       getBytes32FromMultihash(this.cid),
       getBytes32FromMultihash(this.emptyCid)
     );
-    let receipt2 = await tx2.wait();
-    let iface2 = new ethers.utils.Interface([
+    let receipt = await tx.wait();
+    let iface = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface.parseLog(receipt.logs[2]).args.id;
+
+    let iface2 = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]);
+    const solutionId = iface2.parseLog(receipt.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -416,7 +418,7 @@ describe("ProposalsHub", function () {
     await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
-      this.solutionId,
+      solutionId,
       0
     );
     let solver = new ethers.Contract(
@@ -472,11 +474,10 @@ describe("ProposalsHub", function () {
   });
 
   it("Multiple users can reclaim CTs from Proposal", async function () {
-    //Create proposal
-    let tx2 = await this.ProposalsHub.connect(
+    let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -484,11 +485,16 @@ describe("ProposalsHub", function () {
       getBytes32FromMultihash(this.cid),
       getBytes32FromMultihash(this.emptyCid)
     );
-    let receipt2 = await tx2.wait();
-    let iface2 = new ethers.utils.Interface([
+    let receipt = await tx.wait();
+    let iface = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface.parseLog(receipt.logs[2]).args.id;
+
+    let iface2 = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]);
+    const solutionId = iface2.parseLog(receipt.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -513,7 +519,7 @@ describe("ProposalsHub", function () {
     await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
-      this.solutionId,
+      solutionId,
       0
     );
     let solver = new ethers.Contract(
@@ -590,7 +596,7 @@ describe("ProposalsHub", function () {
     let tx2 = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -602,7 +608,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[2]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -633,7 +639,7 @@ describe("ProposalsHub", function () {
     let tx2 = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -645,7 +651,7 @@ describe("ProposalsHub", function () {
     let iface2 = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface2.parseLog(receipt2.logs[2]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -673,11 +679,10 @@ describe("ProposalsHub", function () {
   });
 
   it("Allows reclaiming multiple tokens", async function () {
-    //Create proposal
-    let tx2 = await this.ProposalsHub.connect(
+    let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -685,11 +690,16 @@ describe("ProposalsHub", function () {
       getBytes32FromMultihash(this.cid),
       getBytes32FromMultihash(this.emptyCid)
     );
-    let receipt2 = await tx2.wait();
-    let iface2 = new ethers.utils.Interface([
+    let receipt = await tx.wait();
+    let iface = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface.parseLog(receipt.logs[2]).args.id;
+
+    let iface2 = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]);
+    const solutionId = iface2.parseLog(receipt.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -705,7 +715,7 @@ describe("ProposalsHub", function () {
     await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
-      this.solutionId,
+      solutionId,
       0
     );
     let solver = new ethers.Contract(
@@ -775,11 +785,10 @@ describe("ProposalsHub", function () {
   });
 
   it("Does not allow reclaiming too many tokens", async function () {
-    //Create proposal
-    let tx2 = await this.ProposalsHub.connect(
+    let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -787,11 +796,16 @@ describe("ProposalsHub", function () {
       getBytes32FromMultihash(this.cid),
       getBytes32FromMultihash(this.emptyCid)
     );
-    let receipt2 = await tx2.wait();
-    let iface2 = new ethers.utils.Interface([
+    let receipt = await tx.wait();
+    let iface = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
     ]);
-    const proposalId = iface2.parseLog(receipt2.logs[3]).args.id;
+    const proposalId = iface.parseLog(receipt.logs[2]).args.id;
+
+    let iface2 = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
+    ]);
+    const solutionId = iface2.parseLog(receipt.logs[1]).args.id;
 
     //Fund Proposal
     await this.ToyToken.connect(this.user0).approve(
@@ -813,13 +827,10 @@ describe("ProposalsHub", function () {
       this.amount / 2
     );
 
-    const tx = await this.ProposalsHub.executeIPFSProposal(
-      proposalId,
-      this.solverConfigs
-    );
+    await this.ProposalsHub.executeIPFSProposal(proposalId, this.solverConfigs);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
-      this.solutionId,
+      solutionId,
       0
     );
     let solver = new ethers.Contract(
@@ -908,7 +919,7 @@ describe("ProposalsHub", function () {
     let tx = await this.ProposalsHub.connect(
       this.keeper
     ).createIPFSSolutionAndProposal(
-      this.solutionId,
+      this.solutionBaseId,
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
@@ -921,8 +932,11 @@ describe("ProposalsHub", function () {
 
     const solutionId = new ethers.utils.Interface([
       "event CreateSolution(bytes32 id)",
-    ]).parseLog(res.logs[2]).args.id;
+    ]).parseLog(res.logs[1]).args.id;
 
-    expect(solutionId).to.equal(this.solutionId);
+    const solution = await this.IPFSSolutionsHub.getSolution(solutionId);
+
+    expect(solution.id).to.not.equal(ethers.constants.HashZero);
+    expect(solution.id).to.equal(solutionId);
   });
 });

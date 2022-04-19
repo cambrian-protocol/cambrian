@@ -21,7 +21,6 @@ describe("SolverCoop", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",

@@ -8,7 +8,6 @@ import "./interfaces/IConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
 
 import "./Solver.sol";
-import "./SolutionsHub.sol";
 import "./SolverLib.sol";
 import "hardhat/console.sol";
 

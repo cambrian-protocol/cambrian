@@ -16,6 +16,17 @@ interface IIPFSSolutionsHub {
         address[] solverAddresses;
     }
 
+    function createBase(
+        bytes32 baseId,
+        IERC20 collateralToken,
+        SolverLib.Config[] calldata solverConfigs,
+        SolverLib.Multihash calldata solverConfigsCID
+    ) external;
+
+    function createInstance(bytes32 baseId, bytes32 instanceId)
+        external
+        returns (bytes32 solutionId);
+
     function createSolution(
         bytes32 _id,
         IERC20 _collateralToken,
