@@ -7,12 +7,27 @@ import "./SolverLib.sol";
 import "./interfaces/IProposalsHub.sol";
 
 contract IPFSSolutionsHub {
-    address immutable factoryAddress;
+    ISolverFactory immutable solverFactory;
+    IProposalsHub immutable proposalsHub;
+
+    struct Base {
+        IERC20 collateralToken;
+        bytes32 id;
+        bytes32 solverConfigsHash;
+        SolverLib.Multihash solverConfigsCID;
+    }
+
+    struct Instance {
+        bool executed;
+        bytes32 id;
+        bytes32 baseId;
+        address[] solverAddresses;
+    }
 
     struct Solution {
         bool executed;
         IERC20 collateralToken;
-        address proposalHub;
+        address proposalsHub;
         bytes32 proposalId;
         bytes32 id;
         bytes32 solverConfigsHash;
@@ -20,31 +35,39 @@ contract IPFSSolutionsHub {
         address[] solverAddresses;
     }
 
-    mapping(bytes32 => Solution) public solutions;
+    mapping(bytes32 => Base) public bases;
+    mapping(bytes32 => Instance) public instances;
 
+    mapping(bytes32 => bytes32) instanceId_to_ProposalId;
+
+    event CreateBase(bytes32 id);
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
 
-    constructor(address _factoryAddress) {
-        factoryAddress = _factoryAddress;
+    constructor(
+        ISolverFactory factoryAddress,
+        IProposalsHub proposalsHubAddress
+    ) {
+        solverFactory = factoryAddress;
+        proposalsHub = proposalsHubAddress;
     }
 
     function linkToProposal(
-        bytes32 _proposalId,
-        bytes32 _solutionId,
+        bytes32 proposalId,
+        bytes32 solutionId,
         IERC20 collateralToken
     ) external {
         require(
-            IProposalsHub(msg.sender).isProposal(_proposalId),
-            "Proposal is not valid at proposalHub"
+            proposalsHub.isProposal(proposalId),
+            "Proposal is not valid at proposalsHub"
         );
         require(
-            solutions[_solutionId].collateralToken == collateralToken,
+            bases[instances[solutionId].baseId].collateralToken ==
+                collateralToken,
             "Wrong collateral token"
         );
 
-        solutions[_solutionId].proposalHub = msg.sender;
-        solutions[_solutionId].proposalId = _proposalId;
+        instanceId_to_ProposalId[solutionId] = proposalId;
     }
 
     function deploySolverChain(
@@ -55,7 +78,7 @@ contract IPFSSolutionsHub {
 
         for (uint256 i; i < solverConfigs.length; i++) {
             if (i == 0) {
-                _solverAddress = ISolverFactory(factoryAddress).createSolver(
+                _solverAddress = solverFactory.createSolver(
                     address(0),
                     i,
                     solverConfigs[i]
@@ -70,77 +93,100 @@ contract IPFSSolutionsHub {
                     solverConfigs[i]
                 );
             }
-            solutions[_solutionId].solverAddresses.push(_solverAddress);
+            instances[_solutionId].solverAddresses.push(_solverAddress);
         }
+    }
+
+    function createBase(
+        bytes32 baseId,
+        IERC20 collateralToken,
+        SolverLib.Config[] calldata solverConfigs,
+        SolverLib.Multihash calldata solverConfigsCID
+    ) public {
+        require(bases[baseId].id != baseId, "Base ID already exists");
+        Base storage base = bases[baseId];
+        base.id = baseId;
+        base.collateralToken = collateralToken;
+        base.solverConfigsHash = keccak256(abi.encode(solverConfigs));
+        base.solverConfigsCID = solverConfigsCID;
+        emit CreateBase(baseId);
+    }
+
+    function createInstance(bytes32 baseId, bytes32 instanceId)
+        public
+        returns (bytes32 solutionId)
+    {
+        require(
+            instances[instanceId].id != instanceId,
+            "Instance ID already exists"
+        );
+        require(bases[baseId].id != bytes32(""), "Base not found");
+
+        Instance storage instance = instances[instanceId];
+        instance.id = instanceId;
+        instance.baseId = baseId;
+
+        emit CreateSolution(instanceId);
+        return instanceId;
     }
 
     function createSolution(
-        bytes32 _id,
-        IERC20 _collateralToken,
-        SolverLib.Config[] calldata _solverConfigs,
-        SolverLib.Multihash calldata _solverConfigsCID
-    ) external returns (bytes32 _solutionId) {
+        bytes32 instanceId,
+        IERC20 collateralToken,
+        SolverLib.Config[] calldata solverConfigs,
+        SolverLib.Multihash calldata solverConfigsCID
+    ) public returns (bytes32 baseId, bytes32 solutionId) {
         require(
-            solutions[_id].id != _id,
-            "SolutionsHub::This ID already exists"
+            instances[instanceId].id != instanceId,
+            "SolutionsHub::Instance ID already exists"
         );
+        baseId = keccak256(abi.encodePacked(instanceId, instanceId));
+        createBase(baseId, collateralToken, solverConfigs, solverConfigsCID);
+        createInstance(baseId, instanceId);
 
-        Solution storage solution = solutions[_id];
-
-        solution.id = _id;
-        solution.collateralToken = _collateralToken;
-        solution.solverConfigsHash = keccak256(abi.encode(_solverConfigs));
-        solution.solverConfigsCID = _solverConfigsCID;
-
-        emit CreateSolution(_id);
-        return _id;
+        emit CreateSolution(instanceId);
+        return (baseId, instanceId);
     }
 
     function executeSolution(
-        bytes32 _proposalId,
-        bytes32 _solutionId,
+        bytes32 proposalId,
+        bytes32 solutionId,
         SolverLib.Config[] calldata solverConfigs
     ) external {
         require(
-            verifyHash(_solutionId, solverConfigs),
+            verifyHash(solutionId, solverConfigs),
             "Incorrect SolverConfig content"
         );
         require(
-            msg.sender == solutions[_solutionId].proposalHub,
-            "Not correct proposalHub"
+            msg.sender == address(proposalsHub),
+            "Not correct proposalsHub"
         );
         require(
-            solutions[_solutionId].proposalId == _proposalId,
+            instanceId_to_ProposalId[solutionId] == proposalId,
             "Wrong proposalId"
         );
         require(
-            solutions[_solutionId].executed == false,
+            instances[solutionId].executed == false,
             "Solution already executed"
         );
 
-        solutions[_solutionId].executed = true;
+        instances[solutionId].executed = true;
 
-        deploySolverChain(_solutionId, solverConfigs);
+        deploySolverChain(solutionId, solverConfigs);
 
         IProposalsHub(msg.sender).transferERC20(
-            _proposalId,
-            solutions[_solutionId].solverAddresses[0]
+            proposalId,
+            instances[solutionId].solverAddresses[0]
         );
 
-        for (
-            uint256 i;
-            i < solutions[_solutionId].solverAddresses.length;
-            i++
-        ) {
-            ISolver _solver = ISolver(
-                solutions[_solutionId].solverAddresses[i]
-            );
-            _solver.setTrackingId(solutions[_solutionId].proposalId);
+        for (uint256 i; i < instances[solutionId].solverAddresses.length; i++) {
+            ISolver _solver = ISolver(instances[solutionId].solverAddresses[i]);
+            _solver.setTrackingId(instanceId_to_ProposalId[solutionId]);
         }
         // Prepare first Solver
-        ISolver(solutions[_solutionId].solverAddresses[0]).prepareSolve(0);
+        ISolver(instances[solutionId].solverAddresses[0]).prepareSolve(0);
 
-        emit ExecuteSolution(_solutionId);
+        emit ExecuteSolution(solutionId);
     }
 
     function verifyHash(
@@ -148,31 +194,43 @@ contract IPFSSolutionsHub {
         SolverLib.Config[] memory solverConfigs
     ) public view returns (bool) {
         return
-            solutions[solutionId].solverConfigsHash ==
+            bases[instances[solutionId].baseId].solverConfigsHash ==
             keccak256(abi.encode(solverConfigs));
     }
 
-    function solverFromIndex(bytes32 _solutionId, uint256 _index)
+    function solverFromIndex(bytes32 solutionId, uint256 index)
         public
         view
-        returns (address _address)
+        returns (address solverAddress)
     {
-        _address = solutions[_solutionId].solverAddresses[_index];
+        if (instances[solutionId].solverAddresses.length > 0) {
+            return instances[solutionId].solverAddresses[index];
+        } else {
+            return address(0);
+        }
     }
 
-    function getSolvers(bytes32 _solutionId)
+    function getSolvers(bytes32 solutionId)
         public
         view
         returns (address[] memory solvers)
     {
-        solvers = solutions[_solutionId].solverAddresses;
+        solvers = instances[solutionId].solverAddresses;
     }
 
-    function getSolution(bytes32 solutionId)
+    function getSolution(bytes32 instanceId)
         public
         view
         returns (Solution memory solution)
     {
-        solution = solutions[solutionId];
+        Instance memory instance = instances[instanceId];
+        Base memory base = bases[instance.baseId];
+
+        solution.id = instance.id;
+        solution.executed = instance.executed;
+        solution.collateralToken = base.collateralToken;
+        solution.proposalId = instanceId_to_ProposalId[instanceId];
+        solution.solverConfigsHash = base.solverConfigsHash;
+        solution.solverConfigsCID = base.solverConfigsCID;
     }
 }

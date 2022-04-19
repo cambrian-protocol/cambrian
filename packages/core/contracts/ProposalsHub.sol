@@ -3,7 +3,6 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
-import "./interfaces/ISolutionsHub.sol";
 import "./interfaces/IIPFSSolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
 
@@ -43,29 +42,6 @@ contract ProposalsHub is ERC1155Receiver {
 
     constructor(address _ctfAddress) {
         conditionalTokens = IConditionalTokens(_ctfAddress);
-    }
-
-    /**
-        @dev Executes a proposal for Solutions where Solver configs are stored on-chain
-        @param proposalId ID of proposal
-     */
-    function executeProposal(bytes32 proposalId) external {
-        require(
-            proposals[proposalId].funding >= proposals[proposalId].fundingGoal,
-            "Proposal not fully funded"
-        );
-        require(
-            proposals[proposalId].isExecuted == false,
-            "ProposalsHub::Proposal already executed"
-        );
-        proposals[proposalId].isExecuted = true;
-
-        ISolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
-            proposalId,
-            proposals[proposalId].solutionId
-        );
-
-        emit ExecuteProposal(proposalId);
     }
 
     /**
@@ -109,10 +85,8 @@ contract ProposalsHub is ERC1155Receiver {
         );
         require(solver != address(0), "Invalid address");
         require(
-            ISolutionsHub(proposals[proposalId].solutionsHub).solverFromIndex(
-                proposals[proposalId].solutionId,
-                0
-            ) == solver,
+            IIPFSSolutionsHub(proposals[proposalId].solutionsHub)
+                .solverFromIndex(proposals[proposalId].solutionId, 0) == solver,
             "Incorrect solver address"
         );
 
@@ -130,74 +104,74 @@ contract ProposalsHub is ERC1155Receiver {
     }
 
     /**
-        @dev Creates a Proposal from an existing Solution
+        @dev Creates a Proposal from an existing Solution.Base
         @param collateralToken ERC20 token being used as collateral for conditional tokens
         @param solutionsHub Address of the SolutionsHub contract managing the Solution
         @param fundingGoal Amount of ERC20 collateral requested for the Proposal
-        @param solutionId ID of the Solution (from SolutionsHub) being proposed for
+        @param baseId ID of the Solution.Base for which a new instance and proposal is created
     */
     function createProposal(
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 solutionId,
+        bytes32 baseId,
         SolverLib.Multihash calldata metadataCID
-    ) public returns (bytes32 proposalId) {
+    ) public returns (bytes32 solutionId, bytes32 proposalId) {
         nonce++;
 
-        proposalId = keccak256(
-            abi.encodePacked(
-                msg.sender,
-                solutionId,
-                collateralToken,
-                fundingGoal,
-                nonce
+        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(
+            baseId,
+            keccak256(
+                abi.encodePacked(baseId, blockhash(block.number - 1), nonce)
             )
         );
 
-        ISolutionsHub(solutionsHub).linkToProposal(
+        proposalId = keccak256(abi.encodePacked(solutionId, nonce));
+
+        Proposal storage proposal = proposals[proposalId];
+        proposal.id = proposalId;
+
+        IIPFSSolutionsHub(solutionsHub).linkToProposal(
             proposalId,
             solutionId,
             collateralToken
         );
 
-        Proposal storage proposal = proposals[proposalId];
         proposal.collateralToken = collateralToken;
         proposal.proposer = msg.sender;
         proposal.solutionsHub = solutionsHub;
-        proposal.id = proposalId;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
         proposal.metadataCID = metadataCID;
 
         emit CreateProposal(proposalId);
+
+        return (solutionId, proposalId);
     }
 
     function createIPFSSolutionAndProposal(
-        bytes32 solutionId,
+        bytes32 baseId,
         IERC20 collateralToken,
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
         SolverLib.Multihash calldata solverConfigsCID,
         SolverLib.Multihash calldata metadataCID
-    ) external returns (bytes32 solutionID, bytes32 proposalID) {
-        solutionID = ipfsSolutionsHub.createSolution(
-            solutionId,
+    ) external returns (bytes32 solutionId, bytes32 proposalId) {
+        ipfsSolutionsHub.createBase(
+            baseId,
             collateralToken,
             solverConfigs,
             solverConfigsCID
         );
 
-        proposalID = createProposal(
+        (solutionId, proposalId) = createProposal(
             collateralToken,
             address(ipfsSolutionsHub),
             fundingGoal,
-            solutionId,
+            baseId,
             metadataCID
         );
-
-        return (solutionID, proposalID);
     }
 
     /**

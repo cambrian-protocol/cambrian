@@ -2,16 +2,7 @@ const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
   require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
-const SOLUTIONSHUB_ABI =
-  require("../../artifacts/contracts/SolutionsHub.sol/SolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
-const {
-  getIndexSetFromBinaryArray,
-} = require("../../helpers/ConditionalTokens.js");
-const { getSimpleSolutionConfig } = require("../../helpers/testHelpers.js");
-const {
-  expectRevert, // Assertions for transactions that should fail
-} = require("@openzeppelin/test-helpers");
 
 const {
   getMultihashFromBytes32,
@@ -31,7 +22,6 @@ describe("IPFSSolutionsHub", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
@@ -53,7 +43,7 @@ describe("IPFSSolutionsHub", function () {
 
   it("Should create, fund and execute proposal tied to hash of solver configs", async function () {
     //Create solution
-    const solutionId = ethers.utils.formatBytes32String("TestID");
+    const solutionBaseId = ethers.utils.formatBytes32String("TestID");
 
     const ingests = [
       {
@@ -149,8 +139,8 @@ describe("IPFSSolutionsHub", function () {
     const cid = await Hash.of(solverConfigs);
     const nullCid = await Hash.of(JSON.stringify({}));
 
-    await this.IPFSSolutionsHub.connect(this.keeper).createSolution(
-      solutionId,
+    await this.IPFSSolutionsHub.connect(this.keeper).createBase(
+      solutionBaseId,
       this.ToyToken.address,
       solverConfigs,
       getBytes32FromMultihash(cid)
@@ -160,12 +150,16 @@ describe("IPFSSolutionsHub", function () {
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
-      solutionId,
+      solutionBaseId,
       getBytes32FromMultihash(nullCid)
     );
     let rc = await tx.wait();
     const proposalId = new ethers.utils.Interface([
       "event CreateProposal(bytes32 indexed id)",
+    ]).parseLog(rc.logs[1]).args.id;
+
+    const solutionId = new ethers.utils.Interface([
+      "event CreateSolution(bytes32 id)",
     ]).parseLog(rc.logs[0]).args.id;
 
     //Fund Proposal

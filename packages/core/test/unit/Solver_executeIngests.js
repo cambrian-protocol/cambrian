@@ -2,9 +2,6 @@ const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
   require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
-const {
-  expectRevert, // Assertions for transactions that should fail
-} = require("@openzeppelin/test-helpers");
 const { FormatTypes } = require("ethers/lib/utils");
 
 const testHelpers = require("../../helpers/testHelpers.js");
@@ -23,7 +20,6 @@ describe("Solver.sol | executeIngests", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
