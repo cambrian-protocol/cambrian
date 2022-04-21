@@ -1,6 +1,6 @@
+import AvatarWithLabel from '@cambrian/app/components/avatars/AvatarWithLabel'
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import ParticipantAvatar from '@cambrian/app/components/avatars/AvatarWithTitle'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
@@ -31,13 +31,13 @@ const ProposalContextHeader = ({
                 justify="around"
                 align="start"
             >
-                <ParticipantAvatar
-                    title={template.name}
+                <AvatarWithLabel
+                    label={template.name}
                     pfpPath={template.pfp}
                     role="Seller"
                 />
-                <ParticipantAvatar
-                    title={proposal.name}
+                <AvatarWithLabel
+                    label={proposal.name}
                     pfpPath={proposal.pfp}
                     role="Buyer"
                 />

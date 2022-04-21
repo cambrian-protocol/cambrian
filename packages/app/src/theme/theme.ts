@@ -81,6 +81,7 @@ export const cpTheme = deepMerge(grommet, {
                 vertical: '12px',
                 horizontal: '24px',
             },
+            extend: 'box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);',
         },
         secondary: {
             background: { color: 'accent-1' },
@@ -88,6 +89,7 @@ export const cpTheme = deepMerge(grommet, {
                 vertical: '12px',
                 horizontal: '24px',
             },
+            extend: 'box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);',
         },
         hover: { background: { color: '#3F4C55' } },
         size: {

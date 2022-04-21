@@ -1,11 +1,17 @@
 import { BigNumber, ethers } from 'ethers'
-import { Box, Button, Form, FormField } from 'grommet'
+import { Box, Button, Form, FormField, Text } from 'grommet'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import {
     Stages,
     getSolverConfigsFromMetaStages,
 } from '@cambrian/app/classes/Stagehand'
+import {
+    addTokenDecimals,
+    formatDecimals,
+    getFormattedNumber,
+} from '@cambrian/app/utils/helpers/tokens'
 
+import { ArrowLineUp } from 'phosphor-react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ERC20_ABI } from '@cambrian/app/constants'
@@ -19,7 +25,6 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
@@ -46,7 +51,7 @@ const FundProposalForm = ({
 }: FundProposalFormProps) => {
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
 
-    // Necessary to access state in listener
+    // Necessary to access amount state in approvalListener
     const inputRef = useRef(input)
     const setInput = (newInput: FundProposalFormType) => {
         inputRef.current = newInput
@@ -54,7 +59,7 @@ const FundProposalForm = ({
     }
 
     const [funding, setFunding] = useState(BigNumber.from(0))
-    const [hasApprovedTokenAccess, setHasApprovedTokenAccess] = useState(false)
+    const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [transactionMessage, setTransactionMessage] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<string>()
@@ -72,7 +77,7 @@ const FundProposalForm = ({
     )
 
     useEffect(() => {
-        setHasApprovedTokenAccess(false)
+        initAllowance()
     }, [currentUser])
 
     useEffect(() => {
@@ -90,23 +95,45 @@ const FundProposalForm = ({
         }
     }, [input])
 
+    const initAllowance = async () => {
+        try {
+            const allowanceWei = await erc20TokenContract.allowance(
+                currentUser.address,
+                proposalsHub.contract.address
+            )
+            if (BigNumber.from(allowanceWei).gt(0)) {
+                setCurrentAllowance(allowanceWei)
+                setInput({
+                    amount: getFormattedNumber(allowanceWei),
+                })
+            } else {
+                setCurrentAllowance(undefined)
+                setInput(initialInput)
+            }
+        } catch (e) {
+            console.warn(e)
+        }
+    }
+
     const approvalListener = (
         owner: string,
         spender: string,
         amount: BigNumber
     ) => {
         if (
-            owner === currentUser.address &&
             Number(inputRef.current.amount) ===
-                Number(formatDecimals(proposal.collateralToken, amount))
+            Number(formatDecimals(proposal.collateralToken, amount))
         ) {
-            setHasApprovedTokenAccess(true)
+            setCurrentAllowance(amount)
         }
         setTransactionMessage(undefined)
     }
 
     const initTokenAndFunding = async () => {
-        const token = await TokenAPI.getTokenInfo(proposal.collateralToken)
+        const token = await TokenAPI.getTokenInfo(
+            proposal.collateralToken,
+            currentUser.web3Provider
+        )
         setCollateralToken(token)
 
         const funding = await proposalsHub.getProposalFunding(proposal.id)
@@ -118,7 +145,6 @@ const FundProposalForm = ({
             proposalsHub.contract.filters.FundProposal(null, null, null),
             async (proposalId) => {
                 await updateFunding(proposalId)
-                setHasApprovedTokenAccess(false)
             }
         )
 
@@ -148,7 +174,7 @@ const FundProposalForm = ({
             proposalId
         )
         if (proposalFunding) {
-            setInput(initialInput)
+            await initAllowance()
             setFunding(proposalFunding)
             setTransactionMessage(undefined)
         }
@@ -168,7 +194,7 @@ const FundProposalForm = ({
 
     const onApproveFunding = async () => {
         safeTransactionCall(() =>
-            proposalsHub.approveFunding(collateralToken!, input.amount)
+            proposalsHub.approveFunding(input.amount, collateralToken)
         )
     }
 
@@ -176,8 +202,8 @@ const FundProposalForm = ({
         safeTransactionCall(() =>
             proposalsHub.fundProposal(
                 proposal.id,
-                collateralToken!,
-                input.amount
+                input.amount,
+                collateralToken
             )
         )
     }
@@ -186,8 +212,8 @@ const FundProposalForm = ({
         safeTransactionCall(() =>
             proposalsHub.defundProposal(
                 proposal.id,
-                collateralToken!,
-                input.amount
+                input.amount,
+                collateralToken
             )
         )
     }
@@ -195,10 +221,16 @@ const FundProposalForm = ({
     const onExecuteProposal = async () => {
         safeTransactionCall(async () => {
             const solverConfigs = await getSolverConfigsFromMetaStages(
-                metaStages
+                metaStages,
+                currentUser.web3Provider
             )
             await proposalsHub.executeProposal(proposal.id, solverConfigs)
         })
+    }
+
+    const inputMaxAmount = () => {
+        const max = proposal.fundingGoal.sub(funding)
+        setInput({ amount: getFormattedNumber(max, collateralToken) })
     }
 
     return (
@@ -220,7 +252,12 @@ const FundProposalForm = ({
                         onSubmit={
                             funding.eq(proposal.fundingGoal)
                                 ? onExecuteProposal
-                                : hasApprovedTokenAccess
+                                : currentAllowance?.gte(
+                                      addTokenDecimals(
+                                          input.amount,
+                                          collateralToken
+                                      )
+                                  )
                                 ? onFundProposal
                                 : onApproveFunding
                         }
@@ -238,8 +275,25 @@ const FundProposalForm = ({
                                         type="number"
                                         required
                                     />
+                                    {currentAllowance !== undefined && (
+                                        <Text size="small" color="dark-4">
+                                            You have approved access to{' '}
+                                            {getFormattedNumber(
+                                                currentAllowance,
+                                                collateralToken
+                                            )}{' '}
+                                            {collateralToken.symbol}
+                                        </Text>
+                                    )}
                                 </Box>
                                 <TokenAvatar token={collateralToken} />
+                                <Box alignSelf="center">
+                                    <Button
+                                        label="Max"
+                                        icon={<ArrowLineUp />}
+                                        onClick={inputMaxAmount}
+                                    />
+                                </Box>
                             </BaseFormGroupContainer>
                             <Box direction="row" justify="between">
                                 <Button
@@ -253,7 +307,12 @@ const FundProposalForm = ({
                                         type="submit"
                                         label="Execute Proposal"
                                     />
-                                ) : hasApprovedTokenAccess ? (
+                                ) : currentAllowance?.gte(
+                                      addTokenDecimals(
+                                          input.amount,
+                                          collateralToken
+                                      )
+                                  ) ? (
                                     <Button
                                         primary
                                         type="submit"

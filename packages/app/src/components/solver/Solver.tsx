@@ -10,7 +10,6 @@ import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 import AddSolverDataContent from '@cambrian/app/ui/solvers/AddSolverDataContent'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
-import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '@cambrian/app/ui/interaction/bars/ConditionVersionSidebar'
 import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
@@ -24,7 +23,6 @@ import { MetadataModel } from '../../models/MetadataModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolutionSideNav from '../nav/SolutionSideNav'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
@@ -64,14 +62,13 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const { addPermission } = useCurrentUser()
 
-    const proposalsHub = new ProposalsHub(currentUser.signer)
-    const ctf = new CTFContract(currentUser.signer)
+    const solverInterface = new ethers.utils.Interface(abi)
+
     const solverContract = new ethers.Contract(
         address,
-        new ethers.utils.Interface(abi),
+        solverInterface,
         currentUser.signer
     )
-    const solverInterface = new ethers.utils.Interface(abi)
 
     // TODO Contract typescript. TypeChain??
     const solverMethods = getSolverMethods(
@@ -81,8 +78,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     )
 
     useEffect(() => {
-        init()
-    }, [])
+        if (currentUser.signer) init()
+    }, [currentUser])
 
     useEffect(() => {
         if (outcomes) {
@@ -131,8 +128,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     */
     const init = async () => {
         const fetchedMetadata = await getMetadataFromProposal(
-            solverContract,
-            proposalsHub,
+            currentUser,
             solverMethods
         )
 
@@ -142,7 +138,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         const fetchedSolverData = await getSolverData(
             solverContract,
             solverMethods,
-            ctf,
+            currentUser,
             fetchedOutcomes,
             fetchedMetadata,
             fetchedSolverConfig
@@ -185,7 +181,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             const updatedSolverData = await getSolverData(
                 solverContract,
                 solverMethods,
-                ctf,
+                currentUser,
                 outcomes,
                 metadata
             )

@@ -13,19 +13,20 @@ export type TokenResponseType = {
 }
 
 export const TokenAPI = {
-    getTokenInfo: async (address: string): Promise<TokenResponseType> => {
+    getTokenInfo: async (
+        address: string,
+        provider: ethers.providers.Provider
+    ): Promise<TokenResponseType> => {
         let erc20Contract
         try {
             erc20Contract = new ethers.Contract(
                 address,
                 new ethers.utils.Interface(ERC20_ABI),
-                process.env.NEXT_PUBLIC_LOCAL_NETWORK
-                    ? new ethers.providers.JsonRpcProvider(
-                          process.env.NEXT_PUBLIC_LOCAL_NETWORK
-                      )
-                    : ethers.getDefaultProvider()
+                provider
             )
-        } catch (e) {}
+        } catch (e) {
+            console.error(e)
+        }
 
         if (erc20Contract) {
             const [name, decimals, symbol, totalSupply] =
@@ -53,7 +54,7 @@ export const TokenAPI = {
 
                 return token
             } catch (e) {
-                console.log(e)
+                console.error(e)
             }
         }
 

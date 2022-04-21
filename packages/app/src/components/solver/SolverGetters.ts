@@ -19,6 +19,7 @@ import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { DEFAULT_ABI } from '@cambrian/app/constants'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { MetadataModel } from '../../models/MetadataModel'
@@ -356,7 +357,7 @@ export const getSolverNumMintedTokensForConditions = async (
 export const getSolverData = async (
     solverContract: ethers.Contract,
     solverMethods: GenericMethods,
-    ctf: CTFContract,
+    currentUser: UserType,
     storedOutcomes?: OutcomeModel[],
     storedMetadata?: MetadataModel,
     solverConfig?: SolverConfigModel
@@ -364,7 +365,6 @@ export const getSolverData = async (
     const config = solverConfig
         ? solverConfig
         : await getSolverConfig(solverContract)
-    console.log(config)
 
     const conditions = await getSolverConditions(solverContract)
 
@@ -375,15 +375,25 @@ export const getSolverData = async (
         storedMetadata?.slotTags
     )
 
+    if (!currentUser.chainId)
+        throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+
+    // ERC-1155 Conditional Token Framework
+    const ctfContract = new CTFContract(
+        currentUser.web3Provider,
+        currentUser.chainId
+    )
+
     const numMintedTokensByCondition =
         await getSolverNumMintedTokensForConditions(
-            ctf.contract,
+            ctfContract.contract,
             conditions,
             config.conditionBase.collateralToken
         )
 
     const collateralToken = await TokenAPI.getTokenInfo(
-        config.conditionBase.collateralToken
+        config.conditionBase.collateralToken,
+        currentUser.web3Provider
     )
 
     const timelocksHistory = await getSolverTimelocks(
@@ -392,7 +402,6 @@ export const getSolverData = async (
     )
 
     const collateralBalance = await solverMethods.collateralBalance()
-    console.log(collateralBalance)
 
     const outcomeCollections = await getSolverOutcomeCollections(
         config,
@@ -422,30 +431,37 @@ export const getSolverData = async (
  * TODO, extract this logic elsewhere so that Solvers are not dependent on Proposals - Proposal Getters??
  */
 export const getMetadataFromProposal = async (
-    solverContract: ethers.Contract,
-    proposalsHub: ProposalsHub,
+    currentUser: UserType,
     solverMethods: GenericMethods
 ): Promise<MetadataModel | undefined> => {
-    const proposalId = await solverContract.trackingId()
-    const metadataCID = await proposalsHub.getMetadataCID(proposalId)
-    if (metadataCID) {
-        const stagehand = new Stagehand()
-        const stages = await stagehand.loadStages(
-            metadataCID,
-            StageNames.proposal
+    const proposalId = await solverMethods.trackingId()
+    if (currentUser.chainId && currentUser.signer) {
+        const proposalsHub = new ProposalsHub(
+            currentUser.signer,
+            currentUser.chainId
         )
-        if (stages) {
-            const metaComposition = stages.composition as CompositionModel
-            if (metaComposition) {
-                const solverIndex = (await solverMethods.chainIndex()) as
-                    | number
-                    | undefined
-                if (solverIndex !== undefined) {
-                    return {
-                        slotTags: metaComposition.solvers[solverIndex].slotTags,
-                        solverTag:
-                            metaComposition.solvers[solverIndex].solverTag,
-                        proposal: stages.proposal as ProposalModel,
+
+        const metadataCID = await proposalsHub.getMetadataCID(proposalId)
+        if (metadataCID) {
+            const stagehand = new Stagehand()
+            const stages = await stagehand.loadStages(
+                metadataCID,
+                StageNames.proposal
+            )
+            if (stages) {
+                const metaComposition = stages.composition as CompositionModel
+                if (metaComposition) {
+                    const solverIndex = (await solverMethods.chainIndex()) as
+                        | number
+                        | undefined
+                    if (solverIndex !== undefined) {
+                        return {
+                            slotTags:
+                                metaComposition.solvers[solverIndex].slotTags,
+                            solverTag:
+                                metaComposition.solvers[solverIndex].solverTag,
+                            proposal: stages.proposal as ProposalModel,
+                        }
                     }
                 }
             }

@@ -9,10 +9,7 @@ import {
     ComposerSolverConfigModel,
     SolverConfigModel,
 } from '@cambrian/app/models/SolverConfigModel'
-import {
-    ComposerConditionModel,
-    ConditionModel,
-} from '@cambrian/app/models/ConditionModel'
+import { ConditionModel } from '@cambrian/app/models/ConditionModel'
 import { AllocationPathsType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 import {
@@ -27,7 +24,8 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 
 export async function parseComposerSolvers(
-    composerSolvers: ComposerSolverModel[]
+    composerSolvers: ComposerSolverModel[],
+    provider: ethers.providers.Provider
 ): Promise<SolverModel[] | undefined> {
     if (composerSolvers.length === 0) {
         console.error('No Solver existent.')
@@ -40,7 +38,8 @@ export async function parseComposerSolvers(
     }
 
     const collateralToken = await TokenAPI.getTokenInfo(
-        composerSolvers[0].config.collateralToken
+        composerSolvers[0].config.collateralToken,
+        provider
     )
 
     const sortedSolvers = getSolverHierarchy(

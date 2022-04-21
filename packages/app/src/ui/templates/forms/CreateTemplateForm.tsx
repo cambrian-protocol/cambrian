@@ -13,6 +13,7 @@ import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseForm
 import { BigNumber } from 'ethers'
 import { CheckBox } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { Plus } from 'phosphor-react'
@@ -26,11 +27,13 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
+import { supportedChains } from '@cambrian/app/constants/Chains'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
     compositionCID: string
-    onFailure: () => void
+    onFailure: (message?: string) => void
     onSuccess: () => void
 }
 
@@ -69,6 +72,7 @@ const CreateTemplateForm = ({
     onSuccess,
     onFailure,
 }: CreateTemplateFormProps) => {
+    const { currentUser } = useCurrentUser()
     const [transactionMsg, setTransactionMsg] = useState<string>()
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [isCollateralFlex, setIsCollateralFlex] = useState<boolean>(false)
@@ -76,9 +80,18 @@ const CreateTemplateForm = ({
 
     useEffect(() => {
         const formFlexInputs = parseFlexInputsToForm()
-        const ctAddress =
-            composition.solvers[0].config.collateralToken ||
-            '0xc778417e063141139fce010982780140aa0cd5ab' // Ropsten wETH
+
+        let ctAddress = ''
+        if (composition.solvers[0].config.collateralToken) {
+            ctAddress = composition.solvers[0].config.collateralToken
+        } else if (
+            currentUser.chainId &&
+            supportedChains[currentUser.chainId]
+        ) {
+            ctAddress =
+                supportedChains[currentUser.chainId].contracts
+                    .defaultDenominationToken
+        }
         initCollateralToken(ctAddress)
 
         setInput({
@@ -88,8 +101,8 @@ const CreateTemplateForm = ({
         })
     }, [])
 
-    const initCollateralToken = async (address: string) => {
-        const token = await fetchTokenInfo(address)
+    const initCollateralToken = async (ctAddress: string) => {
+        const token = await fetchTokenInfo(ctAddress, currentUser.web3Provider)
         setCollateralToken(token)
     }
 
@@ -140,8 +153,8 @@ const CreateTemplateForm = ({
         }
     }
 
-    const updatePreferredToken = async (addressInput: string, idx: number) => {
-        const token = await fetchTokenInfo(addressInput)
+    const updatePreferredToken = async (address: string, idx: number) => {
+        const token = await fetchTokenInfo(address, currentUser.web3Provider)
         if (token) {
             const updatedPreferredTokens = [...input.preferredTokens]
             updatedPreferredTokens[idx] = token
@@ -166,27 +179,32 @@ const CreateTemplateForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        setTransactionMsg(TRANSACITON_MESSAGE['IPFS'])
+        try {
+            setTransactionMsg(TRANSACITON_MESSAGE['IPFS'])
 
-        const updatedInput = { ...input }
-        updatedInput.flexInputs.forEach((flexInput) => {
-            let stayFlex = flexInput.value === ''
-            if (flexInput.tagId === 'collateralToken') {
-                stayFlex =
-                    input.allowAnyPaymentToken ||
-                    input.preferredTokens.length > 0
+            const updatedInput = { ...input }
+            updatedInput.flexInputs.forEach((flexInput) => {
+                let stayFlex = flexInput.value === ''
+                if (flexInput.tagId === 'collateralToken') {
+                    stayFlex =
+                        input.allowAnyPaymentToken ||
+                        input.preferredTokens.length > 0
 
-                flexInput.value = stayFlex ? '' : input.denominationTokenAddress
-            }
-            flexInput.isFlex = stayFlex
-        })
+                    flexInput.value = stayFlex
+                        ? ''
+                        : input.denominationTokenAddress
+                }
+                flexInput.isFlex = stayFlex
+            })
 
-        const stagehand = new Stagehand()
-        const templateCID = await stagehand.publishTemplate(
-            updatedInput,
-            compositionCID
-        )
-        if (templateCID) {
+            const stagehand = new Stagehand()
+            const templateCID = await stagehand.publishTemplate(
+                updatedInput,
+                compositionCID,
+                currentUser.web3Provider
+            )
+            if (!templateCID) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+
             storeIdInLocalStorage(
                 'templates',
                 compositionCID,
@@ -194,8 +212,8 @@ const CreateTemplateForm = ({
                 templateCID
             )
             onSuccess()
-        } else {
-            onFailure()
+        } catch (e: any) {
+            onFailure(e.message)
         }
         setTransactionMsg(undefined)
     }

@@ -1,9 +1,11 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
 import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
 
@@ -47,8 +49,8 @@ export default class Stagehand {
                 return res.IpfsHash
             }
         } catch (e) {
-            console.error(e, this.stages)
-            return undefined
+            console.error(e)
+            throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
         }
     }
 
@@ -61,8 +63,8 @@ export default class Stagehand {
             this.stages[stageType] = stage
             return this.stages[stageType]
         } catch (e) {
-            console.log(e)
-            return undefined
+            console.error(e)
+            throw new Error(ERROR_MESSAGE['IPFS_FETCH_ERROR'])
         }
     }
 
@@ -100,15 +102,15 @@ export default class Stagehand {
     /**
      * Creates a Composition and publishes it to IPFS
      */
-    publishComposition = async (composition: CompositionModel) => {
+    publishComposition = async (
+        composition: CompositionModel,
+        provider: ethers.providers.Provider
+    ) => {
         if (!this.isStageSchema(composition, StageNames.composition)) {
-            console.error(
-                `Error: ${composition} does not satisfy ${StageNames.composition} schema`
-            )
-            return undefined
+            throw new Error(ERROR_MESSAGE['WRONG_COMPOSITION_SCHEMA'])
         }
 
-        if (await parseComposerSolvers(composition.solvers)) {
+        if (await parseComposerSolvers(composition.solvers, provider)) {
             this.stages['composition'] = composition
             return this.publishStage(StageNames.composition)
         }
@@ -119,22 +121,18 @@ export default class Stagehand {
      */
     publishTemplate = async (
         createTemplateInput: CreateTemplateFormType,
-        compositionCID: string
+        compositionCID: string,
+        provider: ethers.providers.Provider
     ) => {
         if (!this.composition) {
-            try {
-                await this.loadStage(compositionCID, StageNames.composition)
-            } catch (e) {
-                console.log('Error finding composition')
-                return undefined
-            }
+            await this.loadStage(compositionCID, StageNames.composition)
         }
 
         const newComposition = mergeFlexIntoComposition(
             this.composition!,
             createTemplateInput.flexInputs
         )
-        await parseComposerSolvers(newComposition.solvers)
+        await parseComposerSolvers(newComposition.solvers, provider)
 
         const template: TemplateModel = {
             pfp: createTemplateInput.pfp,
@@ -153,10 +151,7 @@ export default class Stagehand {
         }
 
         if (!this.isStageSchema(template, StageNames.template)) {
-            console.error(
-                'Error: Generated template does not satisfy template schema'
-            )
-            return undefined
+            throw new Error(ERROR_MESSAGE['WRONG_TEMPLATE_SCHEMA'])
         }
         this.stages['template'] = template
         return this.publishStage(StageNames.template)
@@ -164,7 +159,8 @@ export default class Stagehand {
 
     publishProposal = async (
         createProposalInput: CreateProposalFormType,
-        templateCID: string
+        templateCID: string,
+        provider: ethers.providers.Provider
     ) => {
         if (!this.template) {
             await this.loadStage(templateCID, StageNames.template)
@@ -184,7 +180,10 @@ export default class Stagehand {
             ),
             createProposalInput.flexInputs
         )
-        const parsedSolvers = await parseComposerSolvers(newComposition.solvers)
+        const parsedSolvers = await parseComposerSolvers(
+            newComposition.solvers,
+            provider
+        )
         if (parsedSolvers) {
             const proposal: ProposalModel = {
                 title: createProposalInput.title,
@@ -207,7 +206,10 @@ export default class Stagehand {
     }
 }
 
-export const getSolverConfigsFromMetaStages = async (metaStages: Stages) => {
+export const getSolverConfigsFromMetaStages = async (
+    metaStages: Stages,
+    provider: ethers.providers.Provider
+) => {
     const metaTemplate = metaStages.template as TemplateModel
     const metaProposal = metaStages.proposal as ProposalModel
     const finalComposition = mergeFlexIntoComposition(
@@ -217,7 +219,10 @@ export const getSolverConfigsFromMetaStages = async (metaStages: Stages) => {
         ),
         metaProposal.flexInputs
     )
-    const parsedSolvers = await parseComposerSolvers(finalComposition.solvers)
-    if (!parsedSolvers) throw 'Error while parsing Solvers'
+    const parsedSolvers = await parseComposerSolvers(
+        finalComposition.solvers,
+        provider
+    )
+    if (!parsedSolvers) throw new Error(ERROR_MESSAGE['PARSE_SOLVER_ERROR'])
     return parsedSolvers.map((solver) => solver.config)
 }

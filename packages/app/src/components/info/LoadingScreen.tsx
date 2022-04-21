@@ -16,7 +16,7 @@ const LoadingScreen = ({ context }: LoadingScreenProps) => (
             <Spinner size="medium" />
             <Box width={'medium'}>
                 <Text textAlign="center" size="small" color="dark-4">
-                    {context}
+                    {context || 'Loading...'}
                 </Text>
             </Box>
         </Box>

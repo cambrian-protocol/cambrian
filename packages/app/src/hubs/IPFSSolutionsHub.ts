@@ -1,21 +1,24 @@
+import { ERROR_MESSAGE } from '../constants/ErrorMessages'
 import { ethers } from 'ethers'
+import { supportedChains } from '@cambrian/app/constants/Chains'
 
 const IPFS_SOLUTIONS_HUB_ABI =
     require('@artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json').abi
 
 export default class IPFSSolutionsHub {
     contract: ethers.Contract
-    signer: ethers.Signer
 
-    constructor(signer: ethers.Signer) {
-        if (!process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS)
-            throw new Error('No ipfsSolutionsHub address defined!')
+    constructor(
+        signerOrProvider: ethers.Signer | ethers.providers.Provider,
+        chainId: number
+    ) {
+        const chainData = supportedChains[chainId]
+        if (!chainData) throw new Error(ERROR_MESSAGE['CHAIN_NOT_SUPPORTED'])
 
-        this.signer = signer
         this.contract = new ethers.Contract(
-            process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS,
+            chainData.contracts.ipfsSolutionsHub,
             new ethers.utils.Interface(IPFS_SOLUTIONS_HUB_ABI),
-            signer
+            signerOrProvider
         )
     }
 

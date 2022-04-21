@@ -2,12 +2,12 @@ import { CeramicProvider, Networks } from 'use-ceramic'
 import React, { PropsWithChildren } from 'react'
 
 import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
-import { UserContext } from './UserContext'
+import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export const UserCeramicProvider = ({ children }: PropsWithChildren<{}>) => {
-    const user = React.useContext(UserContext)
+    const { currentUser } = useCurrentUser()
 
-    if (user?.currentProvider?.provider && user?.currentUser) {
+    if (currentUser.address) {
         return (
             <CeramicProvider
                 network={Networks.TESTNET_CLAY}
@@ -15,9 +15,9 @@ export const UserCeramicProvider = ({ children }: PropsWithChildren<{}>) => {
                 connect={async () =>
                     new EthereumAuthProvider(
                         // @ts-ignore: Object is possibly 'null'.
-                        user.currentProvider.provider,
+                        currentUser.web3Provider,
                         // @ts-ignore: Object is possibly 'null'.
-                        user.currentUser.address
+                        currentUser.address
                     )
                 }
             >
