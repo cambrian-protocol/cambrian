@@ -23,7 +23,7 @@ const BaseAvatar = ({ address, pfpPath, onClick }: BaseAvatarProps) => (
             elevation="small"
             width={{ min: 'xxsmall', max: 'xxsmall' }}
             height={{ min: 'xxsmall', max: 'xxsmall' }}
-            background="accent-2"
+            background="brand"
             justify="center"
             align="center"
             round="small"
@@ -40,7 +40,7 @@ const BaseAvatar = ({ address, pfpPath, onClick }: BaseAvatarProps) => (
                     }
                 />
             ) : (
-                <User size="24" />
+                <User size="24" color="white" />
             )}
         </Box>
     </Box>
