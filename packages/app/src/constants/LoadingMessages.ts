@@ -3,4 +3,7 @@ export const LOADING_MESSAGE = {
     METADATA: 'Loading meta data',
     SOLUTION: 'Loading solution',
     SOLVER: 'Loading solver',
+    COMPOSITION: 'Loading composition',
+    TEMPLATE: 'Loading template',
+    PROPOSAL: 'Loading proposal',
 }

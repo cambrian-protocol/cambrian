@@ -1,8 +1,8 @@
+import AvatarWithLabel from '@cambrian/app/components/avatars/AvatarWithLabel'
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalForm from './forms/CreateProposalForm'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import ParticipantAvatar from '@cambrian/app/components/avatars/AvatarWithTitle'
 import React from 'react'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
@@ -23,9 +23,9 @@ const CreateProposalUI = ({
             subTitle="Create Proposal"
             paragraph={template.description}
         />
-        <ParticipantAvatar
+        <AvatarWithLabel
             role="Seller"
-            title={template.name}
+            label={template.name}
             pfpPath={template.pfp}
         />
         <HeaderTextSection

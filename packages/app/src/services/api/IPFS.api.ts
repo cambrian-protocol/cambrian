@@ -16,8 +16,8 @@ export class IPFSAPI {
 
     constructor() {
         this.gateways = [
+            'https://us-central1-cambrian-app.cloudfunctions.net/pinPinata ',
             'cambrianprotocol.mypinata.cloud',
-            'localhost:8080',
             // 'ipfs.dweb.link',
             // 'ipfs.infura-ipfs.io',
             // 'ipfs.fleek.co',

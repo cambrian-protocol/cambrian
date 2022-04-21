@@ -5,20 +5,22 @@ import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalUI from '@cambrian/app/ui/proposals/CreateProposalUI'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FolderOpen } from 'phosphor-react'
-import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
+import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
+import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/dist/client/router'
 
 export default function CreateProposalPage() {
     const router = useRouter()
     const { templateCID } = router.query
-    const { currentUser, login } = useCurrentUser()
     const [metaStages, setMetaStages] = useState<Stages>()
-    const [showError, setShowError] = useState(false)
+    const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
+        useState(false)
+    const [errorMessage, setErrorMessage] = useState<string>()
     const [showRecentProposalsModal, setShowRecentProposalsModal] =
         useState(false)
 
@@ -26,30 +28,25 @@ export default function CreateProposalPage() {
         setShowRecentProposalsModal(!showRecentProposalsModal)
 
     useEffect(() => {
-        if (!currentUser) {
-            getLogin()
-        }
-    }, [currentUser])
-
-    useEffect(() => {
         if (router.isReady) fetchTemplate()
     }, [router])
 
-    const getLogin = async () => {
-        await login()
-    }
-
     const fetchTemplate = async () => {
         if (templateCID !== undefined && typeof templateCID === 'string') {
-            const stagehand = new Stagehand()
-            const stages = await stagehand.loadStages(
-                templateCID,
-                StageNames.template
-            )
+            try {
+                const stagehand = new Stagehand()
+                const stages = await stagehand.loadStages(
+                    templateCID,
+                    StageNames.template
+                )
 
-            if (stages) return setMetaStages(stages)
+                if (stages) return setMetaStages(stages)
+            } catch (e: any) {
+                console.error(e)
+                setErrorMessage(e.message)
+            }
         }
-        setShowError(true)
+        setShowInvalidQueryComponent(true)
     }
 
     return (
@@ -69,10 +66,10 @@ export default function CreateProposalPage() {
                         template={metaStages.template as TemplateModel}
                         templateCID={templateCID as string}
                     />
-                ) : showError ? (
-                    <InvalidCIDUI stageName={StageNames.template} />
+                ) : showInvalidQueryComponent ? (
+                    <InvalidQueryComponent context={StageNames.template} />
                 ) : (
-                    <LoadingScreen context="Loading composition" />
+                    <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
                 )}
             </BaseLayout>
             {showRecentProposalsModal && (
@@ -84,6 +81,12 @@ export default function CreateProposalPage() {
                     subTitle="Distribute on of your"
                     paragraph="Warning: These proposal IDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
                     onClose={toggleShowRecentProposalsModal}
+                />
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
                 />
             )}
         </>

@@ -4,10 +4,12 @@ import { Button } from 'grommet'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
 // TODO Integrate localstorage success modal
 const ComposerActionbar = () => {
+    const { currentUser } = useCurrentUser()
     const stageHand = new Stagehand()
     const { composer } = useComposerContext()
     const [exportedCompositionCID, setExportedCompositionCID] =
@@ -27,7 +29,10 @@ const ComposerActionbar = () => {
 
     const onExportComposition = async () => {
         try {
-            const ipfsHash = await stageHand.publishComposition(composer)
+            const ipfsHash = await stageHand.publishComposition(
+                composer,
+                currentUser.web3Provider
+            )
             if (ipfsHash) {
                 setExportedCompositionCID(ipfsHash)
                 toggleShowExportCompositionModal()

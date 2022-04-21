@@ -1,3 +1,7 @@
+import {
+    calculateCollectionId,
+    calculatePositionId,
+} from '../../solver/SolverHelpers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
@@ -15,10 +19,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import {
-    calculateCollectionId,
-    calculatePositionId,
-} from '../../solver/SolverHelpers'
 
 interface RedeemTokensActionbarProps {
     currentUser: UserType
@@ -31,7 +31,8 @@ const RedeemTokensActionbar = ({
     solverData,
     currentUser,
 }: RedeemTokensActionbarProps) => {
-    const ctf = new CTFContract(currentUser.signer)
+    // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
+    const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
 
     const [
         userPayoutPercentageForCondition,
