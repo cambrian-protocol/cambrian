@@ -14,4 +14,5 @@ export const ERROR_MESSAGE = {
     INVALID_METADATA: 'Error while loading metadata',
     INSUFFICIENT_FUNDS: 'Insufficient funds',
     MISSING_COLLATERAL_TOKEN: 'No collateral token defined',
+    CONTRACT_CALL_ERROR: 'Error while trying to reach the smartcontract',
 }
