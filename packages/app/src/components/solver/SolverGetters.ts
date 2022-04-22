@@ -160,26 +160,27 @@ export const getSolverOutcomeCollections = async (
                                 allocation.recipientAmountSlots[idx]
                             ]
 
-                        const amountPercentage = BigNumber.from(
+                        const amount = BigNumber.from(
                             decodeData(
                                 [SolidityDataTypes.Uint256],
                                 amountSlot.slot.data
                             )
-                        ).div(100)
+                        )
 
-                        const amount =
+                        let mintedAmountWei
+                        if (
                             numMintedTokensByCondition &&
-                            numMintedTokensByCondition[
+                            numMintedTokensByCondition[condition.conditionId] &&
+                            !numMintedTokensByCondition[
                                 condition.conditionId
-                            ].toString() !== '0'
-                                ? amountPercentage
-                                      .mul(
-                                          numMintedTokensByCondition[
-                                              condition.conditionId
-                                          ]
-                                      )
-                                      .div(100)
-                                : undefined
+                            ].isZero() &&
+                            !amount.isZero()
+                        ) {
+                            mintedAmountWei =
+                                numMintedTokensByCondition[
+                                    condition.conditionId
+                                ].mul(amount)
+                        }
 
                         const positionId = calculatePositionId(
                             config.conditionBase.collateralToken,
@@ -197,9 +198,9 @@ export const getSolverOutcomeCollections = async (
                                     config.ingests,
                                     slotTags
                                 ),
-                            amountPercentage: amountPercentage.toString(),
+                            amountPercentage: amount.div(100).toString(),
                             positionId: positionId,
-                            amount: amount,
+                            amount: mintedAmountWei,
                         }
                     })
 
