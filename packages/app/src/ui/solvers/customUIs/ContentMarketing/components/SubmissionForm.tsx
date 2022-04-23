@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import { Button } from 'grommet'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -75,6 +76,9 @@ const SubmissionForm = ({
                 )
             }
 
+            if (!currentUser.address)
+                throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+
             const workObj: SubmissionModel = {
                 submission: input.submission,
                 conditionId: currentCondition.conditionId,
@@ -84,8 +88,7 @@ const SubmissionForm = ({
 
             const response = await ipfs.pin(workObj)
 
-            if (!response)
-                throw new Error('Something went wrong while pinning to IPFS')
+            if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
 
             await solverContract.submitWork(
                 response.IpfsHash,

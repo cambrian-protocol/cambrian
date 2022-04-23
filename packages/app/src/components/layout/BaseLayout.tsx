@@ -1,12 +1,15 @@
 import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
-import React, { PropsWithChildren, useState } from 'react'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
+import ChainWarningContainer from '../containers/ChainWarningContainer'
 import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import ContextHelpModal from '../modals/ContextHelp'
 import Head from 'next/head'
 import SideNav from '../nav/SideNav'
 import styled from 'styled-components'
+import { supportedChains } from '@cambrian/app/constants/Chains'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export const siteTitle = 'Cambrian Protocol'
 
@@ -36,11 +39,21 @@ export const BaseLayout = ({
     notification,
     appbarItems,
 }: LayoutProps) => {
+    const { currentUser } = useCurrentUser()
     const [showSidebar, setShowSidebar] = useState(false)
     const [showHelp, setShowHelp] = useState(false)
+    const [isChainSupported, setIsChainSupported] = useState(true)
 
     const toggleSidebar = () => setShowSidebar(!showSidebar)
     const toggleHelp = () => setShowHelp(!showHelp)
+
+    useEffect(() => {
+        if (currentUser.chainId) {
+            const isSupported =
+                supportedChains[currentUser.chainId ? currentUser.chainId : -1]
+            setIsChainSupported(isSupported !== undefined)
+        }
+    }, [currentUser])
 
     return (
         <ResponsiveContext.Consumer>
@@ -113,6 +126,9 @@ export const BaseLayout = ({
                                         config={config}
                                         items={appbarItems}
                                     />
+                                    {!isChainSupported && (
+                                        <ChainWarningContainer />
+                                    )}
                                     <Box
                                         fill
                                         overflow={{

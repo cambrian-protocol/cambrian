@@ -23,7 +23,11 @@ const HeaderTextSection = ({
             </Heading>
             <Heading level="2">{title}</Heading>
         </Box>
-        <Paragraph style={{ whiteSpace: 'pre-line' }} fill color="dark-6">
+        <Paragraph
+            style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}
+            fill
+            color="dark-6"
+        >
             {paragraph}
         </Paragraph>
     </Box>

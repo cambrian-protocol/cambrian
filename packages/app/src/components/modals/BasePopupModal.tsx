@@ -17,15 +17,17 @@ const BasePopupModal = ({
     children,
 }: BaseModalProps) => (
     <Layer onEsc={onClose} background={'background-popup'}>
-        <Box direction="row">
-            <Box onClick={onClose} pad="small" focusIndicator={false}>
-                <X size={'24'} />
+        <Box width={{ max: 'large' }}>
+            <Box direction="row">
+                <Box onClick={onClose} pad="small" focusIndicator={false}>
+                    <X size={'24'} />
+                </Box>
+                <Box flex />
             </Box>
-            <Box flex />
-        </Box>
-        <Box pad="medium" fill justify="center">
-            <HeaderTextSection title={title} paragraph={description} />
-            {children}
+            <Box pad="medium" fill justify="center">
+                <HeaderTextSection title={title} paragraph={description} />
+                {children}
+            </Box>
         </Box>
     </Layer>
 )

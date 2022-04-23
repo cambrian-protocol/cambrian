@@ -5,9 +5,11 @@ import {
 } from '../utils/helpers/multihash'
 
 import { ERC20_ABI } from '../constants'
+import { ERROR_MESSAGE } from './../constants/ErrorMessages'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
 import { addTokenDecimals } from '../utils/helpers/tokens'
+import { supportedChains } from '@cambrian/app/constants/Chains'
 import { ulid } from 'ulid'
 
 const PROPOSALS_HUB_ABI =
@@ -17,22 +19,19 @@ const Hash = require('ipfs-only-hash')
 
 export default class ProposalsHub {
     contract: ethers.Contract
-    signer: ethers.Signer
+    signerOrProvider: ethers.Signer
+    chainId: number
 
-    constructor(signer: ethers.Signer) {
-        if (
-            !process.env.NEXT_PUBLIC_PROPOSALS_HUB_ADDRESS ||
-            !process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS
-        )
-            throw new Error(
-                'No proposalshub or ipfsSolutionsHub address defined!'
-            )
+    constructor(signerOrProvider: ethers.Signer, chainId: number) {
+        const chainData = supportedChains[chainId]
+        if (!chainData) throw new Error(ERROR_MESSAGE['CHAIN_NOT_SUPPORTED'])
 
-        this.signer = signer
+        this.chainId = chainId
+        this.signerOrProvider = signerOrProvider
         this.contract = new ethers.Contract(
-            process.env.NEXT_PUBLIC_PROPOSALS_HUB_ADDRESS,
+            chainData.contracts.proposalsHub,
             new ethers.utils.Interface(PROPOSALS_HUB_ABI),
-            signer
+            signerOrProvider
         )
     }
 
@@ -52,48 +51,55 @@ export default class ProposalsHub {
             await this.contract.createIPFSSolutionAndProposal(
                 ethers.utils.formatBytes32String(ulid()),
                 collateralToken.address,
-                process.env.NEXT_PUBLIC_IPFS_SOLUTIONS_HUB_ADDRESS,
+                supportedChains[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
                 getBytes32FromMultihash(solverConfigsHash),
                 getBytes32FromMultihash(proposalCID)
             )
-        let rc = await tx.wait()
-        const event = rc.events?.find(
-            (event) => event.event === 'CreateProposal'
-        ) // Less fragile to event param changes.
-        const proposalId = event?.args && event.args.id
-        return proposalId
+
+        return tx
     }
 
     getProposal = async (proposalId: string) => {
         return await this.contract.getProposal(proposalId)
     }
 
-    approveFunding = async (token: TokenModel, amount: number) => {
+    approveFunding = async (amount: number, token?: TokenModel) => {
+        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
         const weiAmount = addTokenDecimals(amount, token)
         const tokenContract = new ethers.Contract(
             token.address,
             ERC20_ABI,
-            this.signer
+            this.signerOrProvider
         )
+        const balance = await tokenContract.balanceOf(
+            await this.signerOrProvider.getAddress()
+        )
+
+        if (BigNumber.from(balance).lt(weiAmount))
+            throw new Error(ERROR_MESSAGE['INSUFFICIENT_FUNDS'])
+
         await tokenContract.approve(this.contract.address, weiAmount)
     }
 
     fundProposal = async (
         proposalId: string,
-        token: TokenModel,
-        amount: number
+        amount: number,
+        token?: TokenModel
     ) => {
+        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
+
         const weiAmount = addTokenDecimals(amount, token)
         await this.contract.fundProposal(proposalId, token.address, weiAmount)
     }
 
     defundProposal = async (
         proposalId: string,
-        token: TokenModel,
-        amount: number
+        amount: number,
+        token?: TokenModel
     ) => {
+        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
         const weiAmount = addTokenDecimals(amount, token)
         await this.contract.defundProposal(proposalId, token.address, weiAmount)
     }
@@ -102,9 +108,10 @@ export default class ProposalsHub {
         proposalId: string,
         solverConfigs: SolverConfigModel[]
     ) => {
-        await this.contract.executeIPFSProposal(proposalId, solverConfigs, {
-            gasLimit: '4000000', // TODO, can't estimate gas limit?
-        })
+        await this.contract.executeIPFSProposal(proposalId, solverConfigs)
+        /*      await this.contract.executeIPFSProposal(proposalId, solverConfigs, {
+            gasLimit: '4000000', // TODO, can't estimate gas limit? - worked for me...?
+        }) */
     }
 
     getProposalFunding = async (proposalId: string) => {

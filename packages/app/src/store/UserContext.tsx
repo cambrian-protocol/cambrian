@@ -1,155 +1,253 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react'
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useReducer,
+    useState,
+} from 'react'
 
 import PermissionProvider from './PermissionContext'
+import WalletConnectProvider from '@walletconnect/web3-provider'
+import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { ethers } from 'ethers'
-import { requestMetaMaskProvider } from '@cambrian/app/wallets/metamask/metamask'
 
-export type Permission = string
-
-export type UserType = {
-    address: string
-    signer: ethers.providers.JsonRpcSigner
-    permissions: Permission[]
-}
+export type PermissionType = string
 
 export type UserContextType = {
-    currentUser: UserType | null
-    currentProvider: ethers.providers.Web3Provider | null
-    addPermission: (permission: Permission) => void
-    logout: () => void
-    login: () => Promise<boolean>
+    currentUser: UserType
+    disconnectWallet: () => void
+    connectWallet: () => Promise<void>
+    addPermission: (permission: PermissionType) => void
+}
+
+export type UserType = {
+    provider?: any
+    web3Provider:
+        | ethers.providers.Web3Provider
+        | ethers.providers.JsonRpcProvider
+    signer?: ethers.Signer
+    address?: string
+    chainId?: number
+    permissions: PermissionType[]
+}
+
+type UserActionType =
+    | {
+          type: 'SET_WEB3_PROVIDER'
+          provider?: UserType['provider']
+          web3Provider: UserType['web3Provider']
+          signer?: UserType['signer']
+          address?: UserType['address']
+          chainId?: UserType['chainId']
+      }
+    | {
+          type: 'SET_SIGNER'
+          address?: UserType['address']
+          signer: UserType['signer']
+      }
+    | {
+          type: 'SET_CHAIN_ID'
+          chainId?: UserType['chainId']
+      }
+    | {
+          type: 'RESET_WEB3_PROVIDER'
+      }
+    | {
+          type: 'ADD_PERMISSION'
+          permission: PermissionType
+      }
+
+const initialUser: UserType = {
+    provider: undefined,
+    web3Provider: new ethers.providers.JsonRpcProvider(
+        process.env.NEXT_PUBLIC_ROPSTEN_ENDPOINT // TODO Change for prod
+    ),
+    signer: undefined,
+    address: undefined,
+    chainId: undefined,
+    permissions: [],
+}
+
+const providerOptions = {
+    injected: {
+        package: null,
+    },
+    walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+            infuraId: process.env.NEXT_PUBLIC_INFURA_ROPSTEN_PROJECTID, // TODO Change for prod
+        },
+    },
+}
+
+let web3Modal: any
+if (typeof window !== 'undefined') {
+    web3Modal = new Web3Modal({
+        network: 'mainnet',
+        cacheProvider: true,
+        providerOptions,
+        theme: 'dark',
+    })
+}
+
+function userReducer(state: UserType, action: UserActionType): UserType {
+    switch (action.type) {
+        case 'SET_WEB3_PROVIDER':
+            return {
+                ...state,
+                provider: action.provider,
+                web3Provider: action.web3Provider,
+                signer: action.signer,
+                address: action.address,
+                chainId: action.chainId,
+                permissions: [],
+            }
+        case 'SET_SIGNER':
+            return {
+                ...state,
+                address: action.address,
+                signer: action.signer,
+                permissions: [],
+            }
+        case 'SET_CHAIN_ID':
+            return {
+                ...state,
+                chainId: action.chainId,
+            }
+        case 'RESET_WEB3_PROVIDER':
+            return initialUser
+        case 'ADD_PERMISSION':
+            return {
+                ...state,
+                permissions: [...state.permissions, action.permission],
+            }
+        default:
+            throw new Error()
+    }
 }
 
 export const UserContext = React.createContext<UserContextType>({
-    currentUser: null,
-    currentProvider: null,
+    currentUser: initialUser,
     addPermission: () => {},
-    logout: () => {},
-    login: async () => false,
+    disconnectWallet: () => {},
+    connectWallet: async () => {},
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
-    const [currentUser, setCurrentUser] = useState<UserType | null>(null)
-    const [currentProvider, setCurrentProvider] =
-        useState<ethers.providers.Web3Provider | null>(null)
+    // Can be used to prevent Login Flicker
+    const [user, dispatch] = useReducer(userReducer, initialUser)
+    const { provider, web3Provider } = user
 
-    useEffect(() => {
-        if (window.ethereum) {
-            window.ethereum.on('connect', () => {
-                handleEthereumConnect()
+    const connectWallet = useCallback(async function () {
+        try {
+            const provider = await web3Modal.connect()
+            const web3Provider = new ethers.providers.Web3Provider(provider)
+            const signer = web3Provider.getSigner()
+            const address = await signer.getAddress()
+            const network = await web3Provider.getNetwork()
+
+            dispatch({
+                type: 'SET_WEB3_PROVIDER',
+                provider,
+                web3Provider,
+                signer,
+                address,
+                chainId: network.chainId,
             })
-
-            window.ethereum.on('accountsChanged', (accounts: string[]) =>
-                handleAccountChanged(accounts)
-            )
-
-            // Subscribe to chainId change
-            window.ethereum.on('chainChanged', (chainId: number) =>
-                handleChainChanged()
-            )
-
-            // Subscribe to session disconnection
-            window.ethereum.on('disconnect', (code: number, reason: string) =>
-                onLogout()
-            )
-        }
-
-        return () => {
-            if (window.ethereum) {
-                window.ethereum.on('accountsChanged', handleAccountChanged)
-                window.ethereum.on('chainChanged', handleChainChanged)
-                window.ethereum.on('connect', handleEthereumConnect)
-                window.ethereum.on('disconnect', onLogout)
-            }
+        } catch (e) {
+            console.warn(e)
         }
     }, [])
 
-    const handleEthereumConnect = async () => {
-        console.log('Handle connect')
-        const accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts',
-        })
-        handleAccountChanged(accounts)
-    }
+    const disconnectWallet = useCallback(
+        async function () {
+            await web3Modal.clearCachedProvider()
+            if (
+                provider?.disconnect &&
+                typeof provider.disconnect === 'function'
+            ) {
+                await provider.disconnect()
+            }
+            dispatch({
+                type: 'RESET_WEB3_PROVIDER',
+            })
+        },
+        [provider]
+    )
 
-    const handleAccountChanged = async (accounts?: string[]) => {
-        if (accounts && accounts.length === 0) {
-            // Disconnected
-            onLogout()
-        } else {
-            const provider = await requestMetaMaskProvider()
+    // Auto connect to the cached provider
+    useEffect(() => {
+        if (web3Modal.cachedProvider) {
+            connectWallet()
+        }
+    }, [connectWallet])
 
-            if (provider) {
-                const signer = provider.getSigner()
-                const address = await signer.getAddress()
-                setCurrentUser({
-                    address: address,
-                    signer: signer,
-                    permissions: [],
-                })
-                setCurrentProvider(provider)
+    // EIP-1193 Event Listener
+    useEffect(() => {
+        if (provider?.on) {
+            const handleAccountsChanged = async (accounts: string[]) => {
+                try {
+                    // Get the checksummed address to avoid Blockies seed differences
+                    const updatedSigner = web3Provider.getSigner()
+                    const updatedAddress = await updatedSigner.getAddress()
+                    dispatch({
+                        type: 'SET_SIGNER',
+                        address: updatedAddress,
+                        signer: updatedSigner,
+                    })
+                } catch (e) {
+                    disconnectWallet()
+                    console.warn(e)
+                }
+            }
+
+            const handleChainChanged = (_hexChainId: string) => {
+                window.location.reload()
+            }
+
+            const handleDisconnect = (error: {
+                code: number
+                message: string
+            }) => {
+                console.warn('disconnect', error)
+                disconnectWallet()
+            }
+
+            provider.on('accountsChanged', handleAccountsChanged)
+            provider.on('chainChanged', handleChainChanged)
+            provider.on('disconnect', handleDisconnect)
+
+            //  Listener Cleanup
+            return () => {
+                if (provider.removeListener) {
+                    provider.removeListener(
+                        'accountsChanged',
+                        handleAccountsChanged
+                    )
+                    provider.removeListener('chainChanged', handleChainChanged)
+                    provider.removeListener('disconnect', handleDisconnect)
+                }
             }
         }
-    }
+    }, [provider, disconnectWallet])
 
-    const handleChainChanged = () => {
-        // TODO Warn if on testnet
-        console.log('Chain has changed')
-    }
-
-    const onLogin = async () => {
-        try {
-            const provider = await requestMetaMaskProvider()
-
-            if (provider) {
-                const signer = provider.getSigner()
-                console.log('provider: ', signer.provider)
-
-                const address = await signer.getAddress()
-                setCurrentUser({
-                    address: address,
-                    signer: signer,
-                    permissions: [],
-                })
-                setCurrentProvider(provider)
-                return true
-            }
-        } catch (e) {
-            // TODO ERROR MESSAGE
-            console.error(e)
-        }
-        return false
-    }
-
-    const onLogout = () => {
-        setCurrentUser(null)
-    }
-
-    const addPermission = (newPermission: Permission) => {
-        if (currentUser && !currentUser.permissions.includes(newPermission)) {
-            const updatedPermissions = [...currentUser.permissions]
-            updatedPermissions.push(newPermission)
-            if (!_.isEqual(currentUser.permissions, updatedPermissions)) {
-                setCurrentUser({
-                    ...currentUser,
-                    permissions: updatedPermissions,
-                })
-            }
+    const addPermission = (newPermission: PermissionType) => {
+        if (user.signer && !user.permissions.includes(newPermission)) {
+            dispatch({ type: 'ADD_PERMISSION', permission: newPermission })
         }
     }
 
     return (
         <UserContext.Provider
             value={{
-                currentUser: currentUser,
-                currentProvider: currentProvider,
+                currentUser: user,
                 addPermission: addPermission,
-                logout: onLogout,
-                login: onLogin,
+                connectWallet: connectWallet,
+                disconnectWallet: disconnectWallet,
             }}
         >
-            <PermissionProvider permissions={currentUser?.permissions}>
+            <PermissionProvider permissions={user.permissions}>
                 {children}
             </PermissionProvider>
         </UserContext.Provider>

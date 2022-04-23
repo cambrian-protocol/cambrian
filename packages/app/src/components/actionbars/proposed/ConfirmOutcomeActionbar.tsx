@@ -2,6 +2,7 @@ import { BigNumber, EventFilter, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoadingScreen from '../../info/LoadingScreen'
@@ -67,12 +68,17 @@ const ConfirmOutcomeActionbar = ({
     }
 
     const initTimelock = async () => {
-        const timeLockResponse: BigNumber = await solverMethods.timelocks(
-            currentCondition.executions - 1
-        )
-        const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
-        setCurrentTimelock(timeLockMilliseconds)
-        setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
+        try {
+            const timeLockResponse: BigNumber = await solverMethods.timelocks(
+                currentCondition.executions - 1
+            )
+            const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
+            setCurrentTimelock(timeLockMilliseconds)
+            setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
+        } catch (e) {
+            console.error(e)
+            setErrMsg(ERROR_MESSAGE['CONTRACT_CALL_ERROR'])
+        }
     }
 
     const onConfirmOutcome = async () => {
@@ -109,13 +115,13 @@ const ConfirmOutcomeActionbar = ({
     return (
         <>
             <Actionbar actions={actions} />
+            {transactionMsg && <LoadingScreen context={transactionMsg} />}
             {errMsg && (
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}
                     errorMessage={errMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

@@ -17,17 +17,16 @@ const RecipientAllocationItem = ({
     subTitle,
     amount,
     token,
-}: RecipientAllocationItemProps) => {
-    return (
-        <BaseSlotInputItem title={title} subTitle={subTitle}>
-            <Box align="end">
-                <Text>{amountPercentage}%</Text>
-                <Text size="small" color="dark-6">
-                    {amount && Number(formatDecimals(token, amount))}
-                </Text>
-            </Box>
-        </BaseSlotInputItem>
-    )
-}
+}: RecipientAllocationItemProps) => (
+    <BaseSlotInputItem title={title} subTitle={subTitle}>
+        <Box align="end">
+            <Text>{amountPercentage}%</Text>
+            <Text size="small" color="dark-6">
+                {amount &&
+                    `Minted: ${Number(formatDecimals(token, amount)) / 10000}`}
+            </Text>
+        </Box>
+    </BaseSlotInputItem>
+)
 
 export default RecipientAllocationItem

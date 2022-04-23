@@ -10,11 +10,12 @@ import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 import AddSolverDataContent from '@cambrian/app/ui/solvers/AddSolverDataContent'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
-import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConditionVersionSidebar from '@cambrian/app/ui/interaction/bars/ConditionVersionSidebar'
 import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import ErrorPopupModal from '../modals/ErrorPopupModal'
 import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { JsonFragmentType } from '@ethersproject/abi'
@@ -24,7 +25,6 @@ import { MetadataModel } from '../../models/MetadataModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolutionSideNav from '../nav/SolutionSideNav'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
@@ -58,20 +58,20 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     // IPFS data
     const [metadata, setMetadata] = useState<MetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
+    const [errorMessage, setErrorMessage] = useState<string>()
 
     const [proposedOutcome, setProposedOutcome] =
         useState<OutcomeCollectionModel>()
 
     const { addPermission } = useCurrentUser()
 
-    const proposalsHub = new ProposalsHub(currentUser.signer)
-    const ctf = new CTFContract(currentUser.signer)
+    const solverInterface = new ethers.utils.Interface(abi)
+
     const solverContract = new ethers.Contract(
         address,
-        new ethers.utils.Interface(abi),
+        solverInterface,
         currentUser.signer
     )
-    const solverInterface = new ethers.utils.Interface(abi)
 
     // TODO Contract typescript. TypeChain??
     const solverMethods = getSolverMethods(
@@ -81,8 +81,8 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
     )
 
     useEffect(() => {
-        init()
-    }, [])
+        if (currentUser.signer) init()
+    }, [currentUser])
 
     useEffect(() => {
         if (outcomes) {
@@ -130,37 +130,41 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
         Note: SolverConfig is fetched outside of getSolverData() to store IPFS Outcomes into state. Integrated as optional param so the updateSolverData function gets a fresh solverConfig on update.  
     */
     const init = async () => {
-        const fetchedMetadata = await getMetadataFromProposal(
-            solverContract,
-            proposalsHub,
-            solverMethods
-        )
-
-        const fetchedSolverConfig = await getSolverConfig(solverContract)
-        const fetchedOutcomes = await getSolverOutcomes(fetchedSolverConfig)
-
-        const fetchedSolverData = await getSolverData(
-            solverContract,
-            solverMethods,
-            ctf,
-            fetchedOutcomes,
-            fetchedMetadata,
-            fetchedSolverConfig
-        )
-
-        if (fetchedSolverData.conditions.length) {
-            setCurrentCondition(
-                fetchedSolverData.conditions[
-                    fetchedSolverData.conditions.length - 1
-                ]
+        try {
+            const fetchedMetadata = await getMetadataFromProposal(
+                currentUser,
+                solverMethods
             )
+
+            const fetchedSolverConfig = await getSolverConfig(solverContract)
+            const fetchedOutcomes = await getSolverOutcomes(fetchedSolverConfig)
+
+            const fetchedSolverData = await getSolverData(
+                solverContract,
+                solverMethods,
+                currentUser,
+                fetchedOutcomes,
+                fetchedMetadata,
+                fetchedSolverConfig
+            )
+
+            if (fetchedSolverData.conditions.length) {
+                setCurrentCondition(
+                    fetchedSolverData.conditions[
+                        fetchedSolverData.conditions.length - 1
+                    ]
+                )
+            }
+
+            setSolverData(fetchedSolverData)
+
+            // Store ipfs data
+            setMetadata(fetchedMetadata)
+            setOutcomes(fetchedOutcomes)
+        } catch (e) {
+            console.error(e)
+            setErrorMessage(ERROR_MESSAGE['CONTRACT_CALL_ERROR'])
         }
-
-        setSolverData(fetchedSolverData)
-
-        // Store ipfs data
-        setMetadata(fetchedMetadata)
-        setOutcomes(fetchedOutcomes)
     }
 
     const initProposedOutcome = () => {
@@ -185,7 +189,7 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
             const updatedSolverData = await getSolverData(
                 solverContract,
                 solverMethods,
-                ctf,
+                currentUser,
                 outcomes,
                 metadata
             )
@@ -290,6 +294,11 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
                         />
                     </Box>
                 </BaseLayout>
+            ) : errorMessage ? (
+                <ErrorPopupModal
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
+                />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
             )}

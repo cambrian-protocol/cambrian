@@ -1,20 +1,20 @@
-import { useCeramic, CeramicService } from 'use-ceramic'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+
 import Head from 'next/head'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import StreamID from '@ceramicnetwork/streamid'
-import CID from 'cids'
-import { UserContext } from '@cambrian/app/store/UserContext'
+import { useCeramic } from 'use-ceramic'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
+// WIP Ceramic Integration
 function SignInWithCeramic() {
     const ceramic = useCeramic()
-    const user = useContext(UserContext)
+    const { currentUser, connectWallet } = useCurrentUser()
 
     const [authenticated, setAuthenticated] = useState(ceramic.isAuthenticated)
     const [progress, setProgress] = useState(false)
 
     useEffect(() => {
-        if (user.currentProvider) {
+        if (currentUser.web3Provider) {
             handleLogin()
         }
 
@@ -27,7 +27,7 @@ function SignInWithCeramic() {
         return () => {
             subscription.unsubscribe()
         }
-    }, [user])
+    }, [currentUser])
 
     const handleLogin = async () => {
         setProgress(true)
@@ -64,7 +64,7 @@ function SignInWithCeramic() {
         } else {
             return (
                 <>
-                    <button onClick={user.login}>Sign In</button>
+                    <button onClick={connectWallet}>Sign In</button>
                 </>
             )
         }

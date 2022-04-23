@@ -64,32 +64,43 @@ export const cpTheme = deepMerge(grommet, {
         },
     },
     button: {
+        hover: {
+            opacity: 0.8,
+        },
         default: {
-            color: 'white',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
             },
+            color: 'white',
         },
         border: {
             radius: '10px',
         },
         primary: {
-            background: { color: 'brand' },
-            color: 'white',
+            background:
+                'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
             },
+            extend: `
+            color: white;
+            box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            `,
         },
         secondary: {
-            background: { color: 'accent-1' },
+            background:
+                'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
             },
+            extend: `
+            color: white;
+            box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            `,
         },
-        hover: { background: { color: '#3F4C55' } },
         size: {
             small: {
                 border: {
