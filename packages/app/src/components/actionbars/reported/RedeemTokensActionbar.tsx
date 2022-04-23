@@ -1,3 +1,8 @@
+import { Coins, Handshake } from 'phosphor-react'
+import {
+    calculateCollectionId,
+    calculatePositionId,
+} from '../../solver/SolverHelpers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
@@ -5,7 +10,6 @@ import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BigNumber } from 'ethers'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
-import { Handshake } from 'phosphor-react'
 import LoadingScreen from '../../info/LoadingScreen'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
@@ -15,10 +19,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import {
-    calculateCollectionId,
-    calculatePositionId,
-} from '../../solver/SolverHelpers'
 
 interface RedeemTokensActionbarProps {
     currentUser: UserType
@@ -31,13 +31,10 @@ const RedeemTokensActionbar = ({
     solverData,
     currentUser,
 }: RedeemTokensActionbarProps) => {
-    const ctf = new CTFContract(currentUser.signer)
+    // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
+    const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
 
-    const [
-        userPayoutPercentageForCondition,
-        setUserPayoutPercentageForCondition,
-    ] = useState<BigNumber>()
-    const [isRedeemed, setIsRedeemed] = useState<boolean>(false)
+    const [payoutAmount, setPayoutAmount] = useState<number>()
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
     const [errMsg, setErrMsg] = useState<string>()
@@ -52,8 +49,7 @@ const RedeemTokensActionbar = ({
     )
 
     useEffect(() => {
-        initUserAllocations()
-        initListener()
+        init()
         return () => {
             ctf.contract.removeListener(
                 payoutRedemptionFilter,
@@ -62,29 +58,12 @@ const RedeemTokensActionbar = ({
         }
     }, [currentUser])
 
-    const initUserAllocations = () => {
-        const allocs: AllocationModel[] = []
-        solverData.outcomeCollections[currentCondition.conditionId].forEach(
-            (oc) => {
-                oc.allocations.forEach((allocation) => {
-                    const decodedAddress = decodeData(
-                        [SolidityDataTypes.Address],
-                        allocation.addressSlot.slot.data
-                    )
-                    if (decodedAddress === currentUser.address) {
-                        allocs.push(allocation)
-                    }
-                })
-            }
-        )
-        setUserPayoutPercentageForCondition(getTotalPayoutPct(allocs))
-    }
-
-    const initListener = async () => {
+    const init = async () => {
         const logs = await ctf.contract.queryFilter(payoutRedemptionFilter)
         const conditionLogs = logs.filter(
             (l) => l.args?.conditionId == currentCondition.conditionId
         )
+        ctf.contract.on(payoutRedemptionFilter, redeemedListener)
 
         if (conditionLogs.length > 0) {
             const amount = conditionLogs
@@ -94,14 +73,45 @@ const RedeemTokensActionbar = ({
                     return x + y
                 }, 0)
 
-            setIsRedeemed(true)
-            setRedeemedAmount(amount)
+            const formattedRedeemed = formatDecimals(
+                solverData.collateralToken,
+                BigNumber.from(amount).mul(100)
+            )
+            setRedeemedAmount(formattedRedeemed.toNumber() / 100)
         } else {
-            setIsRedeemed(false)
-            setRedeemedAmount(undefined)
+            const allocs: AllocationModel[] = []
+            solverData.outcomeCollections[currentCondition.conditionId].forEach(
+                (oc) => {
+                    oc.allocations.forEach((allocation) => {
+                        const decodedAddress = decodeData(
+                            [SolidityDataTypes.Address],
+                            allocation.addressSlot.slot.data
+                        )
+                        if (decodedAddress === currentUser.address) {
+                            allocs.push(allocation)
+                        }
+                    })
+                }
+            )
+            const payoutPercentage = getTotalPayoutPct(allocs)
+            if (
+                payoutPercentage &&
+                solverData.numMintedTokensByCondition?.[
+                    currentCondition.conditionId
+                ]
+            ) {
+                const amountWei = payoutPercentage.mul(
+                    solverData.numMintedTokensByCondition[
+                        currentCondition.conditionId
+                    ]
+                )
+                const amount = formatDecimals(
+                    solverData.collateralToken,
+                    amountWei
+                )
+                setPayoutAmount(amount.toNumber() / 100)
+            }
         }
-
-        ctf.contract.on(payoutRedemptionFilter, redeemedListener)
     }
 
     // TODO Types
@@ -114,8 +124,12 @@ const RedeemTokensActionbar = ({
         payout: any
     ) => {
         if (conditionId == currentCondition.conditionId) {
-            setIsRedeemed(true)
-            setRedeemedAmount(payout)
+            const payoutBigNumber = BigNumber.from(payout)
+            const formattedPayout = formatDecimals(
+                solverData.collateralToken,
+                BigNumber.from(payoutBigNumber).mul(100)
+            )
+            setRedeemedAmount(formattedPayout.toNumber() / 100)
             setTransactionMsg(undefined)
         }
     }
@@ -200,65 +214,43 @@ const RedeemTokensActionbar = ({
 
     return (
         <>
-            <Actionbar
-                actions={
-                    isRedeemed
-                        ? {
-                              info: {
-                                  icon: <Handshake />,
-                                  label: `${
-                                      (redeemedAmount !== undefined &&
-                                          formatDecimals(
-                                              solverData.collateralToken,
-                                              redeemedAmount
-                                          )) ||
-                                      '?'
-                                  } ${
-                                      solverData.collateralToken
-                                          ? solverData.collateralToken.symbol ||
-                                            solverData.collateralToken.name
-                                          : 'Tokens'
-                                  }`,
-                                  descLabel: 'You have redeemed',
-                              },
-                          }
-                        : {
-                              primaryAction: {
-                                  onClick: () => redeemCondition(),
-                                  label: 'Redeem tokens',
-                              },
-                              info: {
-                                  icon: <Handshake />,
-                                  label: `${
-                                      userPayoutPercentageForCondition !==
-                                          undefined &&
-                                      solverData.numMintedTokensByCondition?.[
-                                          currentCondition.conditionId
-                                      ]
-                                          ? formatDecimals(
-                                                solverData.collateralToken,
-                                                userPayoutPercentageForCondition
-                                                    .mul(
-                                                        solverData
-                                                            .numMintedTokensByCondition[
-                                                            currentCondition
-                                                                .conditionId
-                                                        ]
-                                                    )
-                                                    .div(BigNumber.from(100))
-                                            )
-                                          : ''
-                                  } ${
-                                      solverData.collateralToken
-                                          ? solverData.collateralToken.symbol ||
-                                            solverData.collateralToken.name
-                                          : 'Tokens'
-                                  }`,
-                                  descLabel: 'You have earned',
-                              },
-                          }
-                }
-            />
+            {redeemedAmount ? (
+                <Actionbar
+                    actions={{
+                        info: {
+                            icon: <Coins />,
+                            label: `${redeemedAmount} ${
+                                solverData.collateralToken
+                                    ? solverData.collateralToken.symbol ||
+                                      solverData.collateralToken.name
+                                    : 'Tokens'
+                            }`,
+                            descLabel: 'Succesfully redeemed',
+                        },
+                    }}
+                />
+            ) : payoutAmount ? (
+                <Actionbar
+                    actions={{
+                        primaryAction: {
+                            onClick: () => redeemCondition(),
+                            label: 'Redeem tokens',
+                        },
+                        info: {
+                            icon: <Handshake />,
+                            label: `${payoutAmount} ${
+                                solverData.collateralToken
+                                    ? solverData.collateralToken.symbol ||
+                                      solverData.collateralToken.name
+                                    : 'Tokens'
+                            }`,
+                            descLabel: 'You have earned',
+                        },
+                    }}
+                />
+            ) : (
+                <></>
+            )}
             {errMsg && (
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}

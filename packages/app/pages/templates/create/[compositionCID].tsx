@@ -5,8 +5,10 @@ import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FolderOpen } from 'phosphor-react'
-import InvalidCIDUI from '@cambrian/app/ui/general/InvalidCIDUI'
+import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
+import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
 import { useRouter } from 'next/dist/client/router'
@@ -16,7 +18,9 @@ export default function CreateTemplatePage() {
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
         useState<CompositionModel>()
-    const [showError, setShowError] = useState(false)
+    const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
+        useState(false)
+    const [errorMessage, setErrorMessage] = useState<string>()
     const [showRecentTemplatesModal, setShowRecentTemplatesModal] =
         useState(false)
 
@@ -32,15 +36,20 @@ export default function CreateTemplatePage() {
             compositionCID !== undefined &&
             typeof compositionCID === 'string'
         ) {
-            const stagehand = new Stagehand()
-            const composition = (await stagehand.loadStage(
-                compositionCID,
-                StageNames.composition
-            )) as CompositionModel
+            try {
+                const stagehand = new Stagehand()
+                const composition = (await stagehand.loadStage(
+                    compositionCID,
+                    StageNames.composition
+                )) as CompositionModel
 
-            if (composition) return setCurrentComposition(composition)
+                if (composition) return setCurrentComposition(composition)
+            } catch (e: any) {
+                console.error(e)
+                setErrorMessage(e.message)
+            }
         }
-        setShowError(true)
+        setShowInvalidQueryComponent(true)
     }
 
     return (
@@ -58,11 +67,12 @@ export default function CreateTemplatePage() {
                     <CreateTemplateUI
                         composition={currentComposition}
                         compositionCID={compositionCID as string}
+                        setErrorMessage={setErrorMessage}
                     />
-                ) : showError ? (
-                    <InvalidCIDUI stageName={StageNames.composition} />
+                ) : showInvalidQueryComponent ? (
+                    <InvalidQueryComponent context={StageNames.composition} />
                 ) : (
-                    <LoadingScreen context="Loading composition" />
+                    <LoadingScreen context={LOADING_MESSAGE['COMPOSITION']} />
                 )}
             </BaseLayout>
             {showRecentTemplatesModal && (
@@ -74,6 +84,12 @@ export default function CreateTemplatePage() {
                     subTitle="Distribute on of your"
                     paragraph="Warning: These template CIDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
                     onClose={toggleShowRecentTemplatesModal}
+                />
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
                 />
             )}
         </>

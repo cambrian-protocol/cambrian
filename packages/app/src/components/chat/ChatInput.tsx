@@ -2,6 +2,7 @@ import { Box, Button, Form, FormField, Spinner, TextInput } from 'grommet'
 import { SetStateAction, useState } from 'react'
 
 import { ChatMessageType } from './ChatMessage'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { PaperPlaneRight } from 'phosphor-react'
@@ -38,6 +39,9 @@ const ChatInput = ({
     const [errorMsg, setErrorMsg] = useState<string>()
 
     const onSubmit = async () => {
+        if (!currentUser.address)
+            throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+
         setTransactionMessage(TRANSACITON_MESSAGE['CONFIRM'])
         const messageObj: ChatMessageType = {
             text: input.text,

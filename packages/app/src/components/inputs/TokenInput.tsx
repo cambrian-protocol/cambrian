@@ -1,11 +1,12 @@
-import { Box, Select, TextInput } from 'grommet'
-import { useEffect, useState } from 'react'
+import { Box, Select } from 'grommet'
 
 import { FormField } from 'grommet'
 import { Text } from 'grommet'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import _ from 'lodash'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useState } from 'react'
 
 interface TokenInputProps {
     name: string
@@ -20,6 +21,7 @@ const TokenInput = ({
     preferredTokens,
     denominationToken,
 }: TokenInputProps) => {
+    const { currentUser } = useCurrentUser()
     const [options, setOptions] = useState<TokenModel[]>(
         denominationToken
             ? preferredTokens.concat(denominationToken)
@@ -27,7 +29,7 @@ const TokenInput = ({
     )
 
     const onChangeTokenAddress = async (address: string) => {
-        const token = await fetchTokenInfo(address)
+        const token = await fetchTokenInfo(address, currentUser.web3Provider)
         if (token) {
             const includesToken = options.find(
                 (option) => option.address === address

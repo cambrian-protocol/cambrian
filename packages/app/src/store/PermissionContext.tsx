@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-
-import { Permission } from './UserContext'
+import { PermissionType } from './UserContext'
+import React from 'react'
 
 type PermissionContextType = {
-    isAllowedTo: (permission: Permission) => boolean
+    isAllowedTo: (permission: PermissionType) => boolean
 }
 type PermissionProvicerProps = {
-    permissions?: Permission[]
+    permissions: PermissionType[]
 }
 
 const defaultBehaviour: PermissionContextType = {
@@ -20,7 +19,7 @@ const PermissionProvider: React.FunctionComponent<PermissionProvicerProps> = ({
     permissions,
     children,
 }) => {
-    const isAllowedTo = (permission: Permission): boolean => {
+    const isAllowedTo = (permission: PermissionType): boolean => {
         if (!permissions) return false
         return permissions.includes(permission)
     }

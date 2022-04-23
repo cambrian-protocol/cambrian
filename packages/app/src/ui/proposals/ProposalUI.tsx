@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
 import { Box } from 'grommet'
+import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -27,25 +28,33 @@ const ProposalUI = ({
     currentUser,
 }: ProposalUIProps) => {
     const [metaStages, setMetaStages] = useState<Stages>()
-    const [errorMsg, setErrorMsg] = useState<string>()
-    const [isProposalExecuted, setIsProposalExecuted] = useState(
-        proposal.isExecuted
-    )
+    const [errorMessage, setErrorMessage] = useState<string>()
+    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
 
     useEffect(() => {
+        initProposalStatus()
         initMetaData()
     }, [])
+
+    const initProposalStatus = async () => {
+        try {
+            setIsProposalExecuted(await proposal.isExecuted)
+        } catch (e) {
+            console.warn(e)
+        }
+    }
 
     const initMetaData = async () => {
         try {
             if (!proposal.metadataCID)
-                throw new Error('No metadata found for this proposal')
+                throw new Error(ERROR_MESSAGE['INVALID_METADATA'])
 
             const metadataCIDString = getMultihashFromBytes32(
                 proposal.metadataCID
             )
 
-            if (!metadataCIDString) throw new Error('Invalid proposal metadata')
+            if (!metadataCIDString)
+                throw new Error(ERROR_MESSAGE['INVALID_METADATA'])
 
             const stagehand = new Stagehand()
             const stages = await stagehand.loadStages(
@@ -53,13 +62,12 @@ const ProposalUI = ({
                 StageNames.proposal
             )
 
-            if (!stages)
-                throw new Error('Error while loading metadata from IPFS')
+            if (!stages) throw new Error(ERROR_MESSAGE['IPFS_FETCH_ERROR'])
 
             setMetaStages(stages)
         } catch (e: any) {
             console.error(e)
-            setErrorMsg(e.message)
+            setErrorMessage(e.message)
         }
     }
 
@@ -72,7 +80,10 @@ const ProposalUI = ({
                         template={metaStages.template as TemplateModel}
                     />
                     {isProposalExecuted ? (
-                        <VisitProposalCTA solutionId={proposal.solutionId} />
+                        <VisitProposalCTA
+                            solutionId={proposal.solutionId}
+                            currentUser={currentUser}
+                        />
                     ) : (
                         <FundProposalForm
                             currentUser={currentUser}
@@ -84,10 +95,10 @@ const ProposalUI = ({
                     )}
                     <Box pad="medium" />
                 </>
-            ) : errorMsg ? (
+            ) : errorMessage ? (
                 <ErrorPopupModal
-                    onClose={() => setErrorMsg(undefined)}
-                    errorMessage={errorMsg}
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
                 />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['METADATA']} />

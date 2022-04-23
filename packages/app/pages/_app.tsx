@@ -5,9 +5,14 @@ import { Grommet } from 'grommet'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
 
+// @ts-ignore
 declare global {
+    // tslint:disable-next-line
     interface Window {
+        web3: any
         ethereum: any
+        Web3Modal: any
+        [name: string]: any
     }
 }
 

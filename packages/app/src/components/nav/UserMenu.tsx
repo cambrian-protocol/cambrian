@@ -1,26 +1,72 @@
+import {
+    At,
+    IconContext,
+    Link,
+    SignIn,
+    SignOut,
+    UserCircle,
+    Wallet,
+} from 'phosphor-react'
 import { Box, Menu, Text } from 'grommet'
-import { IconContext, SignIn, SignOut, UserCircle } from 'phosphor-react'
 
+import BaseAvatar from '../avatars/BaseAvatar'
 import React from 'react'
-import RecipientAvatar from '../avatars/RecipientAvatar'
-import { useRouter } from 'next/dist/client/router'
+import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
+import { supportedChains } from '@cambrian/app/constants/Chains'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface UserMenuProps {}
 
 export default function UserMenu({}: UserMenuProps) {
-    const { currentUser, logout } = useCurrentUser()
-    const router = useRouter()
+    const { currentUser, disconnectWallet, connectWallet } = useCurrentUser()
 
-    const onLogout = () => {
-        logout()
-        router.push('/auth/login')
+    let chainName = 'Chain not supported'
+
+    if (currentUser.chainId && supportedChains[currentUser.chainId]) {
+        chainName = supportedChains[currentUser.chainId].chainData.name
     }
 
-    //TODO Display Profile Page if User is connected - no prio
-    const onProfileClicked = () => {
-        if (!currentUser) router.push('/auth/login')
-    }
+    const items =
+        currentUser.address && currentUser.chainId
+            ? [
+                  {
+                      label: (
+                          <UserMenuItemLabel
+                              truncateAddress
+                              label={currentUser.address}
+                          />
+                      ),
+                      icon: <UserMenuItemIcon icon={<At />} />,
+                  },
+                  {
+                      label: <UserMenuItemLabel label={chainName} />,
+                      icon: <UserMenuItemIcon icon={<Link />} />,
+                  },
+                  {
+                      label: (
+                          <UserMenuItemLabel
+                              label={currentUser ? 'Logout' : 'Login'}
+                          />
+                      ),
+                      onClick: disconnectWallet,
+                      icon: (
+                          <UserMenuItemIcon
+                              icon={currentUser ? <SignOut /> : <SignIn />}
+                          />
+                      ),
+                  },
+              ]
+            : [
+                  {
+                      label: (
+                          <UserMenuItemLabel
+                              label={currentUser?.address || 'Connect Wallet'}
+                          />
+                      ),
+                      onClick: connectWallet,
+                      icon: <UserMenuItemIcon icon={<Wallet />} />,
+                  },
+              ]
 
     return (
         <Menu
@@ -32,46 +78,27 @@ export default function UserMenu({}: UserMenuProps) {
                 },
             }}
             dropBackground="background-popup"
-            items={[
-                {
-                    label: (
-                        <UserMenuItemLabel
-                            label={currentUser?.address || 'Profile'}
-                        />
-                    ),
-                    onClick: onProfileClicked,
-                    icon: <UserMenuItemIcon icon={<UserCircle />} />,
-                },
-                {
-                    label: (
-                        <UserMenuItemLabel
-                            label={currentUser ? 'Logout' : 'Login'}
-                        />
-                    ),
-                    onClick: onLogout,
-                    icon: (
-                        <UserMenuItemIcon
-                            icon={currentUser ? <SignOut /> : <SignIn />}
-                        />
-                    ),
-                },
-            ]}
+            items={items}
         >
-            <IconContext.Provider value={{ size: '32' }}>
-                <RecipientAvatar />
-            </IconContext.Provider>
+            <BaseAvatar address={currentUser.address} />
         </Menu>
     )
 }
 
 interface UserMenuItemLabelProps {
     label: string
+    truncateAddress?: boolean
 }
 
-const UserMenuItemLabel = ({ label }: UserMenuItemLabelProps) => {
+const UserMenuItemLabel = ({
+    label,
+    truncateAddress,
+}: UserMenuItemLabelProps) => {
     return (
         <Box alignSelf="center" pad={{ horizontal: 'medium' }} width="small">
-            <Text truncate>{label}</Text>
+            <Text truncate={!truncateAddress}>
+                {truncateAddress ? ellipseAddress(label) : label}
+            </Text>
         </Box>
     )
 }
