@@ -19,11 +19,11 @@ jobs:
       - name: Archive Production Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: out
+          name: packages/app/out
           path: packages/app/out
   deploy:
     name: Deploy
-    needs: out
+    needs: packages/app/out
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -31,7 +31,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v2
         with:
-          name: out
+          name: packages/app/out
           path: packages/app/out
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
