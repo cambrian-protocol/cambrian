@@ -5,11 +5,6 @@ import {
     Stages,
     getSolverConfigsFromMetaStages,
 } from '@cambrian/app/classes/Stagehand'
-import {
-    addTokenDecimals,
-    formatDecimals,
-    getFormattedNumber,
-} from '@cambrian/app/utils/helpers/tokens'
 
 import { ArrowLineUp } from 'phosphor-react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
@@ -104,7 +99,12 @@ const FundProposalForm = ({
             if (BigNumber.from(allowanceWei).gt(0)) {
                 setCurrentAllowance(allowanceWei)
                 setInput({
-                    amount: getFormattedNumber(allowanceWei),
+                    amount: Number(
+                        ethers.utils.formatUnits(
+                            allowanceWei,
+                            collateralToken?.decimals
+                        )
+                    ),
                 })
             } else {
                 setCurrentAllowance(undefined)
@@ -122,7 +122,7 @@ const FundProposalForm = ({
     ) => {
         if (
             Number(inputRef.current.amount) ===
-            Number(formatDecimals(proposal.collateralToken, amount))
+            Number(ethers.utils.formatUnits(amount, collateralToken?.decimals))
         ) {
             setCurrentAllowance(amount)
         }
@@ -230,8 +230,24 @@ const FundProposalForm = ({
 
     const inputMaxAmount = () => {
         const max = proposal.fundingGoal.sub(funding)
-        setInput({ amount: getFormattedNumber(max, collateralToken) })
+        setInput({
+            amount: Number(
+                ethers.utils.formatUnits(max, collateralToken?.decimals)
+            ),
+        })
     }
+
+    const isValidInput =
+        typeof input.amount != 'undefined' &&
+        input.amount &&
+        input.amount > 0 &&
+        input.amount <=
+            Number(
+                ethers.utils.formatUnits(
+                    proposal.fundingGoal,
+                    collateralToken?.decimals
+                )
+            )
 
     return (
         <>
@@ -252,10 +268,11 @@ const FundProposalForm = ({
                         onSubmit={
                             funding.eq(proposal.fundingGoal)
                                 ? onExecuteProposal
-                                : currentAllowance?.gte(
-                                      addTokenDecimals(
-                                          input.amount,
-                                          collateralToken
+                                : input.amount &&
+                                  currentAllowance?.gte(
+                                      ethers.utils.parseUnits(
+                                          input.amount.toString(),
+                                          collateralToken.decimals
                                       )
                                   )
                                 ? onFundProposal
@@ -278,9 +295,11 @@ const FundProposalForm = ({
                                     {currentAllowance !== undefined && (
                                         <Text size="small" color="dark-4">
                                             You have approved access to{' '}
-                                            {getFormattedNumber(
-                                                currentAllowance,
-                                                collateralToken
+                                            {Number(
+                                                ethers.utils.formatUnits(
+                                                    currentAllowance,
+                                                    collateralToken.decimals
+                                                )
                                             )}{' '}
                                             {collateralToken.symbol}
                                         </Text>
@@ -297,6 +316,7 @@ const FundProposalForm = ({
                             </BaseFormGroupContainer>
                             <Box direction="row" justify="between">
                                 <Button
+                                    disabled={!isValidInput}
                                     secondary
                                     label="Defund Proposal"
                                     onClick={onDefundProposal}
@@ -307,19 +327,22 @@ const FundProposalForm = ({
                                         type="submit"
                                         label="Execute Proposal"
                                     />
-                                ) : currentAllowance?.gte(
-                                      addTokenDecimals(
-                                          input.amount,
-                                          collateralToken
+                                ) : input.amount &&
+                                  currentAllowance?.gte(
+                                      ethers.utils.parseUnits(
+                                          input.amount.toString(),
+                                          collateralToken.decimals
                                       )
                                   ) ? (
                                     <Button
+                                        disabled={!isValidInput}
                                         primary
                                         type="submit"
                                         label="Fund Proposal"
                                     />
                                 ) : (
                                     <Button
+                                        disabled={!isValidInput}
                                         primary
                                         type="submit"
                                         label="Approve Transfer"

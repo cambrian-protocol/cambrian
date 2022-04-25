@@ -1,3 +1,4 @@
+import { BigNumber, ethers } from 'ethers'
 import { Coins, Handshake } from 'phosphor-react'
 import {
     calculateCollectionId,
@@ -7,7 +8,6 @@ import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
-import { BigNumber } from 'ethers'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoadingScreen from '../../info/LoadingScreen'
@@ -17,7 +17,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 interface RedeemTokensActionbarProps {
@@ -57,7 +56,6 @@ const RedeemTokensActionbar = ({
             )
         }
     }, [currentUser])
-
     const init = async () => {
         const logs = await ctf.contract.queryFilter(payoutRedemptionFilter)
         const conditionLogs = logs.filter(
@@ -72,12 +70,11 @@ const RedeemTokensActionbar = ({
                 .reduce((x, y) => {
                     return x + y
                 }, 0)
-
-            const formattedRedeemed = formatDecimals(
-                solverData.collateralToken,
-                BigNumber.from(amount).mul(100)
+            const formattedRedeemed = ethers.utils.formatUnits(
+                BigNumber.from(amount),
+                solverData.collateralToken.decimals
             )
-            setRedeemedAmount(formattedRedeemed.toNumber() / 100)
+            setRedeemedAmount(Number(formattedRedeemed))
         } else {
             const allocs: AllocationModel[] = []
             solverData.outcomeCollections[currentCondition.conditionId].forEach(
@@ -105,11 +102,11 @@ const RedeemTokensActionbar = ({
                         currentCondition.conditionId
                     ]
                 )
-                const amount = formatDecimals(
-                    solverData.collateralToken,
-                    amountWei
+                const amount = ethers.utils.formatUnits(
+                    amountWei,
+                    solverData.collateralToken.decimals
                 )
-                setPayoutAmount(amount.toNumber() / 100)
+                setPayoutAmount(Number(amount) / 100)
             }
         }
     }
@@ -125,11 +122,11 @@ const RedeemTokensActionbar = ({
     ) => {
         if (conditionId == currentCondition.conditionId) {
             const payoutBigNumber = BigNumber.from(payout)
-            const formattedPayout = formatDecimals(
-                solverData.collateralToken,
-                BigNumber.from(payoutBigNumber).mul(100)
+            const formattedPayout = ethers.utils.formatUnits(
+                BigNumber.from(payoutBigNumber),
+                solverData.collateralToken.decimals
             )
-            setRedeemedAmount(formattedPayout.toNumber() / 100)
+            setRedeemedAmount(Number(formattedPayout))
             setTransactionMsg(undefined)
         }
     }
