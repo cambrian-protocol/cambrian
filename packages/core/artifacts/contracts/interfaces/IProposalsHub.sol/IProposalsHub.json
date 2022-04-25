@@ -24,6 +24,224 @@
     {
       "inputs": [
         {
+          "internalType": "bytes32",
+          "name": "solutionId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "contract IERC20",
+          "name": "collateralToken",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IIPFSSolutionsHub",
+          "name": "ipfsSolutionsHub",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fundingGoal",
+          "type": "uint256"
+        },
+        {
+          "components": [
+            {
+              "internalType": "contract Solver",
+              "name": "implementation",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "keeper",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "arbitrator",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timelockSeconds",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "executions",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum SolverLib.IngestType",
+                  "name": "ingestType",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "slot",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "solverIndex",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct SolverLib.Ingest[]",
+              "name": "ingests",
+              "type": "tuple[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "contract IERC20",
+                  "name": "collateralToken",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "outcomeSlots",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "parentCollectionIndexSet",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "amountSlot",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "partition",
+                  "type": "uint256[]"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "bytes32",
+                      "name": "recipientAddressSlot",
+                      "type": "bytes32"
+                    },
+                    {
+                      "internalType": "bytes32[]",
+                      "name": "recipientAmountSlots",
+                      "type": "bytes32[]"
+                    }
+                  ],
+                  "internalType": "struct SolverLib.Allocation[]",
+                  "name": "allocations",
+                  "type": "tuple[]"
+                },
+                {
+                  "components": [
+                    {
+                      "internalType": "bytes32",
+                      "name": "digest",
+                      "type": "bytes32"
+                    },
+                    {
+                      "internalType": "uint8",
+                      "name": "hashFunction",
+                      "type": "uint8"
+                    },
+                    {
+                      "internalType": "uint8",
+                      "name": "size",
+                      "type": "uint8"
+                    }
+                  ],
+                  "internalType": "struct SolverLib.Multihash[]",
+                  "name": "outcomeURIs",
+                  "type": "tuple[]"
+                }
+              ],
+              "internalType": "struct SolverLib.ConditionBase",
+              "name": "conditionBase",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct SolverLib.Config[]",
+          "name": "solverConfigs",
+          "type": "tuple[]"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "digest",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint8",
+              "name": "hashFunction",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "size",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct SolverLib.Multihash",
+          "name": "solverConfigsCID",
+          "type": "tuple"
+        },
+        {
+          "components": [
+            {
+              "internalType": "bytes32",
+              "name": "digest",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint8",
+              "name": "hashFunction",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint8",
+              "name": "size",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct SolverLib.Multihash",
+          "name": "metadataCID",
+          "type": "tuple"
+        }
+      ],
+      "name": "createIPFSSolutionAndProposal",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "solutionID",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "proposalID",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "contract IERC20",
           "name": "collateralToken",
           "type": "address"
@@ -286,6 +504,89 @@
           ],
           "internalType": "struct SolverLib.Multihash",
           "name": "",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "id",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getProposal",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "isExecuted",
+              "type": "bool"
+            },
+            {
+              "internalType": "contract IERC20",
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "proposer",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "solutionsHub",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "solutionId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "funding",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fundingGoal",
+              "type": "uint256"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "bytes32",
+                  "name": "digest",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "hashFunction",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "uint8",
+                  "name": "size",
+                  "type": "uint8"
+                }
+              ],
+              "internalType": "struct SolverLib.Multihash",
+              "name": "metadataCID",
+              "type": "tuple"
+            }
+          ],
+          "internalType": "struct ProposalsHub.Proposal",
+          "name": "proposal",
           "type": "tuple"
         }
       ],

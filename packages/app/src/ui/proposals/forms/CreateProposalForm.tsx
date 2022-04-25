@@ -110,6 +110,7 @@ const CreateProposalForm = ({
                 templateCID,
                 currentUser.web3Provider
             )
+
             if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
 
             const proposalsHub = new ProposalsHub(

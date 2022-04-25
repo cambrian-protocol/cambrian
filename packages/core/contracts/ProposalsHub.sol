@@ -3,8 +3,7 @@ pragma solidity 0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
-import "./interfaces/ISolutionsHub.sol";
-import "./interfaces/IPFSSolutionsHub.sol";
+import "./interfaces/IIPFSSolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
 
 import "./SolverLib.sol";
@@ -46,29 +45,6 @@ contract ProposalsHub is ERC1155Receiver {
     }
 
     /**
-        @dev Executes a proposal for Solutions where Solver configs are stored on-chain
-        @param proposalId ID of proposal
-     */
-    function executeProposal(bytes32 proposalId) external {
-        require(
-            proposals[proposalId].funding >= proposals[proposalId].fundingGoal,
-            "Proposal not fully funded"
-        );
-        require(
-            proposals[proposalId].isExecuted == false,
-            "ProposalsHub::Proposal already executed"
-        );
-        proposals[proposalId].isExecuted = true;
-
-        ISolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
-            proposalId,
-            proposals[proposalId].solutionId
-        );
-
-        emit ExecuteProposal(proposalId);
-    }
-
-    /**
         @dev Executes a proposal for Solutions where on the *hash* of solver configs is stored on-chain
         @param proposalId ID of proposal
         @param solverConfigs Configurations of Solvers to be run for the proposed solution
@@ -99,91 +75,103 @@ contract ProposalsHub is ERC1155Receiver {
 
     /**
         @dev Called by SolutionsHub after deploying Solvers
-        @param _proposalId Proposal that collateral is being transferred from
-        @param _solver Solver receiving collateral
+        @param proposalId Proposal that collateral is being transferred from
+        @param solver Solver receiving collateral
      */
-    function transferERC20(bytes32 _proposalId, address _solver) external {
+    function transferERC20(bytes32 proposalId, address solver) external {
         require(
-            msg.sender == proposals[_proposalId].solutionsHub,
+            msg.sender == proposals[proposalId].solutionsHub,
             "msg.sender not solutionsHub"
         );
-        require(_solver != address(0), "Invalid address");
+        require(solver != address(0), "Invalid address");
         require(
-            ISolutionsHub(proposals[_proposalId].solutionsHub).solverFromIndex(
-                proposals[_proposalId].solutionId,
-                0
-            ) == _solver,
+            IIPFSSolutionsHub(proposals[proposalId].solutionsHub)
+                .solverFromIndex(proposals[proposalId].solutionId, 0) == solver,
             "Incorrect solver address"
         );
 
-        IERC20 _token = IERC20(proposals[_proposalId].collateralToken);
-        _token.transfer(_solver, proposals[_proposalId].funding);
+        IERC20 _token = IERC20(proposals[proposalId].collateralToken);
+        uint256 beforeBalance = _token.balanceOf(address(this));
+        require(
+            _token.transfer(solver, proposals[proposalId].funding),
+            "Transfer failed"
+        );
+        require(
+            beforeBalance - _token.balanceOf(address(this)) ==
+                proposals[proposalId].fundingGoal,
+            "Incorrect balance after transfer"
+        );
     }
 
     /**
-        @dev Creates a Proposal from an existing Solution
+        @dev Creates a Proposal from an existing Solution.Base
         @param collateralToken ERC20 token being used as collateral for conditional tokens
         @param solutionsHub Address of the SolutionsHub contract managing the Solution
         @param fundingGoal Amount of ERC20 collateral requested for the Proposal
-        @param solutionId ID of the Solution (from SolutionsHub) being proposed for
+        @param baseId ID of the Solution.Base for which a new instance and proposal is created
     */
     function createProposal(
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 solutionId,
+        bytes32 baseId,
         SolverLib.Multihash calldata metadataCID
-    ) public returns (bytes32 proposalId) {
+    ) public returns (bytes32 solutionId, bytes32 proposalId) {
         nonce++;
 
-        proposalId = keccak256(
-            abi.encodePacked(
-                msg.sender,
-                solutionId,
-                collateralToken,
-                fundingGoal,
-                nonce
+        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(
+            baseId,
+            keccak256(
+                abi.encodePacked(baseId, blockhash(block.number - 1), nonce)
             )
         );
 
+        proposalId = keccak256(abi.encodePacked(solutionId, nonce));
+
         Proposal storage proposal = proposals[proposalId];
+        proposal.id = proposalId;
+
+        IIPFSSolutionsHub(solutionsHub).linkToProposal(
+            proposalId,
+            solutionId,
+            collateralToken
+        );
+
         proposal.collateralToken = collateralToken;
         proposal.proposer = msg.sender;
         proposal.solutionsHub = solutionsHub;
-        proposal.id = proposalId;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
         proposal.metadataCID = metadataCID;
 
-        ISolutionsHub(solutionsHub).linkToProposal(proposalId, solutionId);
         emit CreateProposal(proposalId);
+
+        return (solutionId, proposalId);
     }
 
     function createIPFSSolutionAndProposal(
-        bytes32 solutionId,
+        bytes32 baseId,
         IERC20 collateralToken,
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
         SolverLib.Multihash calldata solverConfigsCID,
         SolverLib.Multihash calldata metadataCID
-    ) external returns (bytes32 solutionID, bytes32 proposalID) {
-        solutionID = ipfsSolutionsHub.createSolution(
-            solutionId,
+    ) external returns (bytes32 solutionId, bytes32 proposalId) {
+        ipfsSolutionsHub.createBase(
+            baseId,
             collateralToken,
             solverConfigs,
             solverConfigsCID
         );
 
-        proposalID = createProposal(
+        (solutionId, proposalId) = createProposal(
             collateralToken,
             address(ipfsSolutionsHub),
             fundingGoal,
-            solutionId,
+            baseId,
             metadataCID
         );
-
-        return (solutionID, proposalID);
     }
 
     /**
@@ -213,9 +201,14 @@ contract ProposalsHub is ERC1155Receiver {
             "Can't fund more than goal"
         );
 
+        uint256 beforeBalance = token.balanceOf(address(this));
         require(
             token.transferFrom(msg.sender, address(this), amount),
             "Could not transfer from msg.sender"
+        );
+        require(
+            token.balanceOf(address(this)) - beforeBalance == amount,
+            "Incorrect balance after transfer"
         );
 
         proposals[proposalId].funding += amount;
@@ -254,7 +247,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposals[proposalId].funding -= amount;
         funderAmountMap[proposalId][msg.sender] -= amount;
 
-        token.transfer(msg.sender, amount);
+        require(token.transfer(msg.sender, amount), "Transfer failed");
 
         require(
             beforeBalance - token.balanceOf(address(this)) == amount,
@@ -332,8 +325,8 @@ contract ProposalsHub is ERC1155Receiver {
     /** 
         IMPORTANT!
         Any CTs sent to this contract are reclaimable by the funders in proportion to their funding.
-        If a user reclaims CTs and sends them back again to this contract, they will only be able
-        to reclaim the same fraction of it.
+        If a user reclaims CTs and sends them back again to this contract, they will only be able to 
+        regain from them a fraction of their original funding.
     */
     function onERC1155Received(
         address operator,

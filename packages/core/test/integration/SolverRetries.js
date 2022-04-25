@@ -25,7 +25,6 @@ describe("SolverRetries", async function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",
