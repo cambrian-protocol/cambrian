@@ -1,19 +1,19 @@
 import { BigNumber, ethers } from 'ethers'
 import {
+    ERC20_IFACE,
+    PROPOSALS_HUB_IFACE,
+} from '@cambrian/app/config/ContractInterfaces'
+import {
     getBytes32FromMultihash,
     getMultihashFromBytes32,
 } from '../utils/helpers/multihash'
 
-import { ERC20_ABI } from '../constants'
 import { ERROR_MESSAGE } from './../constants/ErrorMessages'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
 import { addTokenDecimals } from '../utils/helpers/tokens'
-import { supportedChains } from '@cambrian/app/constants/Chains'
 import { ulid } from 'ulid'
-
-const PROPOSALS_HUB_ABI =
-    require('@artifacts/contracts/ProposalsHub.sol/ProposalsHub.json').abi
 
 const Hash = require('ipfs-only-hash')
 
@@ -23,14 +23,14 @@ export default class ProposalsHub {
     chainId: number
 
     constructor(signerOrProvider: ethers.Signer, chainId: number) {
-        const chainData = supportedChains[chainId]
+        const chainData = SUPPORTED_CHAINS[chainId]
         if (!chainData) throw new Error(ERROR_MESSAGE['CHAIN_NOT_SUPPORTED'])
 
         this.chainId = chainId
         this.signerOrProvider = signerOrProvider
         this.contract = new ethers.Contract(
             chainData.contracts.proposalsHub,
-            new ethers.utils.Interface(PROPOSALS_HUB_ABI),
+            PROPOSALS_HUB_IFACE,
             signerOrProvider
         )
     }
@@ -51,7 +51,7 @@ export default class ProposalsHub {
             await this.contract.createIPFSSolutionAndProposal(
                 ethers.utils.formatBytes32String(ulid()),
                 collateralToken.address,
-                supportedChains[this.chainId].contracts.ipfsSolutionsHub,
+                SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
                 getBytes32FromMultihash(solverConfigsHash),
@@ -70,7 +70,7 @@ export default class ProposalsHub {
         const weiAmount = addTokenDecimals(amount, token)
         const tokenContract = new ethers.Contract(
             token.address,
-            ERC20_ABI,
+            ERC20_IFACE,
             this.signerOrProvider
         )
         const balance = await tokenContract.balanceOf(

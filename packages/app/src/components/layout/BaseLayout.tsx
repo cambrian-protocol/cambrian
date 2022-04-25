@@ -6,9 +6,9 @@ import ChainWarningContainer from '../containers/ChainWarningContainer'
 import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import ContextHelpModal from '../modals/ContextHelp'
 import Head from 'next/head'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import SideNav from '../nav/SideNav'
 import styled from 'styled-components'
-import { supportedChains } from '@cambrian/app/constants/Chains'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export const siteTitle = 'Cambrian Protocol'
@@ -50,7 +50,7 @@ export const BaseLayout = ({
     useEffect(() => {
         if (currentUser.chainId) {
             const isSupported =
-                supportedChains[currentUser.chainId ? currentUser.chainId : -1]
+                SUPPORTED_CHAINS[currentUser.chainId ? currentUser.chainId : -1]
             setIsChainSupported(isSupported !== undefined)
         }
     }, [currentUser])

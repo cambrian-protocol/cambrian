@@ -11,8 +11,8 @@ import { Box, Menu, Text } from 'grommet'
 
 import BaseAvatar from '../avatars/BaseAvatar'
 import React from 'react'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { supportedChains } from '@cambrian/app/constants/Chains'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface UserMenuProps {}
@@ -22,8 +22,8 @@ export default function UserMenu({}: UserMenuProps) {
 
     let chainName = 'Chain not supported'
 
-    if (currentUser.chainId && supportedChains[currentUser.chainId]) {
-        chainName = supportedChains[currentUser.chainId].chainData.name
+    if (currentUser.chainId && SUPPORTED_CHAINS[currentUser.chainId]) {
+        chainName = SUPPORTED_CHAINS[currentUser.chainId].chainData.name
     }
 
     const items =

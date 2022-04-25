@@ -1,3 +1,4 @@
+import { FALLBACK_RPC_URL, INFURA_ID } from 'packages/app/config'
 import React, {
     PropsWithChildren,
     useCallback,
@@ -60,9 +61,7 @@ type UserActionType =
 
 const initialUser: UserType = {
     provider: undefined,
-    web3Provider: new ethers.providers.JsonRpcProvider(
-        process.env.NEXT_PUBLIC_ROPSTEN_ENDPOINT // TODO Change for prod
-    ),
+    web3Provider: new ethers.providers.JsonRpcProvider(FALLBACK_RPC_URL),
     signer: undefined,
     address: undefined,
     chainId: undefined,
@@ -76,7 +75,7 @@ const providerOptions = {
     walletconnect: {
         package: WalletConnectProvider,
         options: {
-            infuraId: process.env.NEXT_PUBLIC_INFURA_ROPSTEN_PROJECTID, // TODO Change for prod
+            infuraId: INFURA_ID,
         },
     },
 }
@@ -135,7 +134,6 @@ export const UserContext = React.createContext<UserContextType>({
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
-    // Can be used to prevent Login Flicker
     const [user, dispatch] = useReducer(userReducer, initialUser)
     const { provider, web3Provider } = user
 

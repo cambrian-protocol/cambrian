@@ -18,6 +18,7 @@ import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActio
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { Plus } from 'phosphor-react'
 import PreferredTokenItem from '@cambrian/app/components/list/PreferredTokenItem'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
@@ -27,7 +28,6 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
-import { supportedChains } from '@cambrian/app/constants/Chains'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateTemplateFormProps {
@@ -86,10 +86,10 @@ const CreateTemplateForm = ({
             ctAddress = composition.solvers[0].config.collateralToken
         } else if (
             currentUser.chainId &&
-            supportedChains[currentUser.chainId]
+            SUPPORTED_CHAINS[currentUser.chainId]
         ) {
             ctAddress =
-                supportedChains[currentUser.chainId].contracts
+                SUPPORTED_CHAINS[currentUser.chainId].contracts
                     .defaultDenominationToken
         }
         initCollateralToken(ctAddress)

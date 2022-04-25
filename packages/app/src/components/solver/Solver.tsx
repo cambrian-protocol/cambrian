@@ -16,9 +16,7 @@ import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/Content
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
-import { Fragment } from 'ethers/lib/utils'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { JsonFragmentType } from '@ethersproject/abi'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
@@ -43,11 +41,11 @@ export type GenericMethods = { [name: string]: GenericMethod<any> }
 
 interface SolverProps {
     address: string
-    abi: (string | Fragment | JsonFragmentType)[]
+    iface: ethers.utils.Interface
     currentUser: UserType
 }
 
-const Solver = ({ address, abi, currentUser }: SolverProps) => {
+const Solver = ({ address, iface, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
 
     // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
@@ -65,17 +63,15 @@ const Solver = ({ address, abi, currentUser }: SolverProps) => {
 
     const { addPermission } = useCurrentUser()
 
-    const solverInterface = new ethers.utils.Interface(abi)
-
     const solverContract = new ethers.Contract(
         address,
-        solverInterface,
+        iface,
         currentUser.signer
     )
 
     // TODO Contract typescript. TypeChain??
     const solverMethods = getSolverMethods(
-        solverInterface,
+        iface,
         async (method: string, ...args: any[]) =>
             await solverContract[method](...args)
     )
