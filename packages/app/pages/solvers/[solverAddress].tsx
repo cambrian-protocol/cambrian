@@ -1,3 +1,7 @@
+import {
+    BASE_SOLVER_IFACE,
+    WRITER_IFACE,
+} from 'packages/app/config/ContractInterfaces'
 import React, { useEffect, useState } from 'react'
 
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
@@ -5,15 +9,11 @@ import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalle
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Solver from '@cambrian/app/components/solver/Solver'
 import { ethers } from 'ethers'
-import { supportedChains } from '@cambrian/app/constants/Chains'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
-
-const SOLVER_ABI = require('@artifacts/contracts/Solver.sol/Solver.json').abi
-const WRITER_ABI =
-    require('@artifacts/contracts/WriterSolverV1.sol/WriterSolverV1.json').abi
 
 export default function SolverPage() {
     const { currentUser } = useCurrentUser()
@@ -30,7 +30,7 @@ export default function SolverPage() {
         if (solverAddress !== undefined && typeof solverAddress === 'string') {
             if (
                 currentUser.chainId &&
-                supportedChains[currentUser.chainId] &&
+                SUPPORTED_CHAINS[currentUser.chainId] &&
                 ethers.utils.isAddress(solverAddress)
             ) {
                 setSolverContractAddress(solverAddress)
@@ -47,7 +47,7 @@ export default function SolverPage() {
                 solverContractAddress ? (
                     <Solver
                         address={solverContractAddress}
-                        abi={USE_WRITER ? WRITER_ABI : SOLVER_ABI}
+                        iface={USE_WRITER ? WRITER_IFACE : BASE_SOLVER_IFACE}
                         currentUser={currentUser}
                     />
                 ) : showInvalidQueryComponent ? (

@@ -31,10 +31,13 @@ type ContractAddresses = {
 }
 
 export type ChainDataHashMapType = {
-    [chainId: number]: { chainData: ChainInfo; contracts: ContractAddresses }
+    [chainId: number]: {
+        chainData: ChainInfo
+        contracts: ContractAddresses
+    }
 }
 
-export const supportedChains: ChainDataHashMapType = {
+export const SUPPORTED_CHAINS: ChainDataHashMapType = {
     31337: {
         chainData: {
             name: 'Hardhat',

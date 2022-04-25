@@ -16,7 +16,6 @@ import {
     OutcomeModel,
 } from '@cambrian/app/models/OutcomeModel'
 
-import * as Constants from '@cambrian/app/constants'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
 import _ from 'lodash'
@@ -26,6 +25,7 @@ import {
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -52,6 +52,7 @@ type AddSlotTagProps = {
     isFlex: boolean
 }
 
+const MAX_BASIS_POINTS = 10000
 export default class ComposerSolver {
     id: string
     iface: ethers.utils.Interface
@@ -60,7 +61,7 @@ export default class ComposerSolver {
     solverTag: SolverTagModel
 
     constructor(
-        iface = new ethers.utils.Interface(Constants.DEFAULT_ABI),
+        iface = BASE_SOLVER_IFACE,
         id?: string,
         config?: ComposerSolverConfigModel,
         slotTags?: SlotTagsHashMapType,
@@ -316,7 +317,7 @@ export default class ComposerSolver {
                     slotType: SlotType.Function,
                     dataTypes: [SolidityDataTypes.Uint256],
                     targetSolverId: this.id,
-                    solverFunction: Constants.DEFAULT_IFACE.getFunction(
+                    solverFunction: BASE_SOLVER_IFACE.getFunction(
                         'addressFromChainIndex'
                     ),
                 })
@@ -533,7 +534,7 @@ export default class ComposerSolver {
         }
 
         const amountSlotId = Object.keys(config.slots).find(
-            (key) => config.slots[key].data[0] === Constants.MAX_POINTS
+            (key) => config.slots[key].data[0] === MAX_BASIS_POINTS
         )
 
         if (amountSlotId) {
@@ -561,7 +562,7 @@ export default class ComposerSolver {
             id: id,
             slotType: SlotType.Constant,
             dataTypes: [SolidityDataTypes.Uint256],
-            data: [Constants.MAX_POINTS],
+            data: [MAX_BASIS_POINTS],
         }
 
         const slots = <ComposerSlotsHashMapType>{}

@@ -14,7 +14,7 @@ import {
 import { ArrowLineUp } from 'phosphor-react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { ERC20_ABI } from '@cambrian/app/constants'
+import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -66,7 +66,7 @@ const FundProposalForm = ({
 
     const erc20TokenContract = new ethers.Contract(
         proposal.collateralToken,
-        ERC20_ABI,
+        ERC20_IFACE,
         currentUser.signer
     )
 

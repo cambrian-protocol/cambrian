@@ -16,9 +16,9 @@ import {
 } from './SolverHelpers'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { DEFAULT_ABI } from '@cambrian/app/constants'
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -256,7 +256,7 @@ export const getChainDirection = async (
         addresses.push(fetchedAddress)
         nextContract = new ethers.Contract(
             fetchedAddress,
-            new ethers.utils.Interface(DEFAULT_ABI),
+            BASE_SOLVER_IFACE,
             currentUser.signer
         )
         fetchMethod =

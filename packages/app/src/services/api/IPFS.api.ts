@@ -1,4 +1,4 @@
-import { LOCAL_PIN_ENDPOINT, PIN_ENDPOINT } from '@cambrian/app/constants'
+import { IPFS_GATEWAYS, IPFS_PIN_ENDPOINT } from 'packages/app/config'
 
 import fetch from 'node-fetch'
 
@@ -12,18 +12,6 @@ type PinResponse = {
     isDuplicate: boolean
 }
 export class IPFSAPI {
-    gateways: string[]
-
-    constructor() {
-        this.gateways = [
-            'cambrianprotocol.mypinata.cloud',
-            'ipfs.dweb.link',
-            'ipfs.infura-ipfs.io',
-            // 'ipfs.fleek.co',
-            // 'infura-ipfs.io',
-        ]
-    }
-
     getLocalStorage = async (cid: string) => {
         try {
             const data = localStorage.getItem(cid)
@@ -50,10 +38,10 @@ export class IPFSAPI {
             }
         }
 
-        if (gatewayIndex && gatewayIndex >= this.gateways.length) {
+        if (gatewayIndex && gatewayIndex >= IPFS_GATEWAYS.length) {
             return undefined
         }
-        const gateway = this.gateways[gatewayIndex]
+        const gateway = IPFS_GATEWAYS[gatewayIndex]
         let base32 = undefined
         try {
             base32 = new CID(cid).toV1().toString('base32')
@@ -129,34 +117,12 @@ export class IPFSAPI {
     }
 
     pin = async (data: object): Promise<PinResponse | undefined> => {
-        // if (process.env.NEXT_PUBLIC_LOCAL_IPFS_API) {
-        //     return this.pinLocal(data)
-        // } else {
-        //     return this.pinRemote(data)
-        // }
         return this.pinRemote(data)
-    }
-
-    pinLocal = async (data: object): Promise<PinResponse | undefined> => {
-        try {
-            const res = await fetch(`${LOCAL_PIN_ENDPOINT}?pin=true`, {
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                method: 'POST',
-                body: JSON.stringify(data),
-            })
-
-            return res.json() as Promise<PinResponse>
-        } catch (e) {
-            console.log(e)
-        }
     }
 
     pinRemote = async (data: object): Promise<PinResponse | undefined> => {
         try {
-            const res = await fetch(PIN_ENDPOINT, {
+            const res = await fetch(IPFS_PIN_ENDPOINT, {
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
@@ -171,16 +137,3 @@ export class IPFSAPI {
         }
     }
 }
-
-// const wait = (ms: number) => new Promise((res) => setTimeout(res, ms))
-// export const callWithRetry = async (fn: any, depth = 0): Promise<any> => {
-//     try {
-//         return await fn
-//     } catch (err) {
-//         if (depth > 7) {
-//             console.error(err)
-//         }
-//         await wait(2 ** depth * 10)
-//         return callWithRetry(fn, depth + 1)
-//     }
-// }
