@@ -167,6 +167,9 @@ export const getSolverOutcomeCollections = async (
                             )
                         )
 
+                        let amountPercentage = amount.toNumber() / 100
+                        if (amountPercentage % 1) amountPercentage.toFixed(2)
+
                         let mintedAmountWei
                         if (
                             numMintedTokensByCondition &&
@@ -198,7 +201,7 @@ export const getSolverOutcomeCollections = async (
                                     config.ingests,
                                     slotTags
                                 ),
-                            amountPercentage: amount.div(100).toString(),
+                            amountPercentage: amountPercentage.toString(),
                             positionId: positionId,
                             amount: mintedAmountWei,
                         }
