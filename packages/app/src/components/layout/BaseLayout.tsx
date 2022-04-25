@@ -63,7 +63,6 @@ export const BaseLayout = ({
                         <title>
                             {contextTitle} | {siteTitle}
                         </title>
-                        <link rel="icon" href="../public/favicon.ico" />
                         <meta name="description" content={siteTitle} />
                         <meta name="og:title" content={siteTitle} />
                         <meta

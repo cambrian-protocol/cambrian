@@ -39,7 +39,11 @@ export default class MyDocument extends Document {
         return (
             <Html>
                 <Head>
-                    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+                    <link
+                        rel="icon"
+                        type="image/x-icon"
+                        href="/images/favicon.ico"
+                    />
                 </Head>
                 <body>
                     <Main />
