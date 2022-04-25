@@ -12,7 +12,6 @@ import { ERROR_MESSAGE } from './../constants/ErrorMessages'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
-import { addTokenDecimals } from '../utils/helpers/tokens'
 import { ulid } from 'ulid'
 
 const Hash = require('ipfs-only-hash')
@@ -41,10 +40,10 @@ export default class ProposalsHub {
         solverConfigs: SolverConfigModel[],
         proposalCID: string
     ) => {
-        const weiPrice = addTokenDecimals(
-            BigNumber.from(price),
-            collateralToken
-        ).toString()
+        const weiPrice = ethers.utils.parseUnits(
+            price.toString(),
+            collateralToken.decimals
+        )
 
         const solverConfigsHash = await Hash.of(JSON.stringify(solverConfigs))
         const tx: ethers.ContractTransaction =
@@ -67,7 +66,10 @@ export default class ProposalsHub {
 
     approveFunding = async (amount: number, token?: TokenModel) => {
         if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
-        const weiAmount = addTokenDecimals(amount, token)
+        const weiAmount = ethers.utils.parseUnits(
+            amount.toString(),
+            token.decimals
+        )
         const tokenContract = new ethers.Contract(
             token.address,
             ERC20_IFACE,
@@ -90,7 +92,10 @@ export default class ProposalsHub {
     ) => {
         if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
 
-        const weiAmount = addTokenDecimals(amount, token)
+        const weiAmount = ethers.utils.parseUnits(
+            amount.toString(),
+            token.decimals
+        )
         await this.contract.fundProposal(proposalId, token.address, weiAmount)
     }
 
@@ -100,7 +105,10 @@ export default class ProposalsHub {
         token?: TokenModel
     ) => {
         if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
-        const weiAmount = addTokenDecimals(amount, token)
+        const weiAmount = ethers.utils.parseUnits(
+            amount.toString(),
+            token.decimals
+        )
         await this.contract.defundProposal(proposalId, token.address, weiAmount)
     }
 

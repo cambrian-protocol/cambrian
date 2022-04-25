@@ -1,9 +1,8 @@
 import BaseSlotInputItem, { BaseSlotInputItemProps } from './BaseSlotInputItem'
+import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
 
-import { BigNumber } from 'ethers'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
 
 type RecipientAllocationItemProps = BaseSlotInputItemProps & {
     amountPercentage: string
@@ -23,7 +22,11 @@ const RecipientAllocationItem = ({
             <Text>{amountPercentage}%</Text>
             <Text size="small" color="dark-6">
                 {amount &&
-                    `Minted: ${Number(formatDecimals(token, amount)) / 10000}`}
+                    `Minted: ${
+                        Number(
+                            ethers.utils.formatUnits(amount, token.decimals)
+                        ) / 10000
+                    }`}
             </Text>
         </Box>
     </BaseSlotInputItem>

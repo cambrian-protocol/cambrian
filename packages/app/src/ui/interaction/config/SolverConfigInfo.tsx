@@ -21,7 +21,7 @@ import OutcomeCollectionModal from '../../../components/modals/OutcomeCollection
 import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { formatDecimals } from '@cambrian/app/utils/helpers/tokens'
+import { ethers } from 'ethers'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -97,22 +97,26 @@ const SolverConfigInfo = ({
                 <BaseMenuListItem
                     title="Collateral Balance"
                     icon={<Coins />}
-                    subTitle={`${formatDecimals(
-                        solverData.collateralToken,
-                        solverData.collateralBalance
-                    ).toString()}`}
+                    subTitle={`${ethers.utils
+                        .formatUnits(
+                            solverData.collateralBalance,
+                            solverData.collateralToken.decimals
+                        )
+                        .toString()}`}
                 />
                 <BaseMenuListItem
                     title="Escrow Balance"
                     icon={<Handshake />}
                     subTitle={
                         solverData.numMintedTokensByCondition
-                            ? `${formatDecimals(
-                                  solverData.collateralToken,
-                                  solverData.numMintedTokensByCondition[
-                                      currentCondition.conditionId
-                                  ]
-                              ).toString()}`
+                            ? `${ethers.utils
+                                  .formatUnits(
+                                      solverData.numMintedTokensByCondition[
+                                          currentCondition.conditionId
+                                      ],
+                                      solverData.collateralToken.decimals
+                                  )
+                                  .toString()}`
                             : '0'
                     }
                 />
