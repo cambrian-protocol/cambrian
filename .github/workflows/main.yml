@@ -23,7 +23,7 @@ jobs:
           path: packages/app/out
   deploy:
     name: Deploy
-    needs: packages/app/out
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
