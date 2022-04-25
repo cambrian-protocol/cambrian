@@ -34,7 +34,6 @@ jobs:
           name: out
           path: packages/app/out
       - name: Deploy to Firebase
-        run: cd packages/app
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
