@@ -5,10 +5,7 @@ const SOLVER_ABI =
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
-const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
-
-const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
 describe("SolverFactory | createSolver", function () {
   this.beforeEach(async function () {
@@ -19,7 +16,6 @@ describe("SolverFactory | createSolver", function () {
     await deployments.fixture([
       "ConditionalTokens",
       "SolverFactory",
-      "SolutionsHub",
       "ProposalsHub",
       "ToyToken",
       "BasicSolverV1",

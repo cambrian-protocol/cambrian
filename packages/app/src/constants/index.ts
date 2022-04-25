@@ -8,8 +8,9 @@ export const DEFAULT_ABI = BasicSolverArtifact.abi
 export const DEFAULT_IFACE = new utils.Interface(BasicSolverArtifact.abi)
 export const ERC20_ABI = new utils.Interface(ERC20.abi)
 export const CERAMIC_NETWORK = 'https://127.0.0.1:7001'
-export const PIN_ENDPOINT =
-    'https://kdjzxk3x7a.execute-api.us-east-1.amazonaws.com/pinPinata'
+// export const PIN_ENDPOINT =
+//     'https://us-central1-cambrian-app.cloudfunctions.net/pinPinata'
+export const PIN_ENDPOINT = 'https://app.cambrianprotocol.com/api/pinPinata'
 
 export const LOCAL_PIN_ENDPOINT = 'http://127.0.0.1:5002/api/v0/add'
 

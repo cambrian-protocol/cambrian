@@ -2,20 +2,10 @@ pragma solidity 0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../SolverLib.sol";
+import "../ProposalsHub.sol";
+import "./IIPFSSolutionsHub.sol";
 
 interface IProposalsHub {
-    struct Proposal {
-        IERC20 collateralToken;
-        address proposer;
-        address solutionsHub;
-        address primeSolver;
-        bytes32 id;
-        bytes32 solutionId;
-        uint256 funding;
-        uint256 fundingGoal;
-        mapping(address => uint256) funderAmount;
-    }
-
     function executeProposal(bytes32 proposalId) external;
 
     function executeIPFSProposal(
@@ -31,6 +21,16 @@ interface IProposalsHub {
         uint256 fundingGoal,
         bytes32 solutionId
     ) external;
+
+    function createIPFSSolutionAndProposal(
+        bytes32 solutionId,
+        IERC20 collateralToken,
+        IIPFSSolutionsHub ipfsSolutionsHub,
+        uint256 fundingGoal,
+        SolverLib.Config[] calldata solverConfigs,
+        SolverLib.Multihash calldata solverConfigsCID,
+        SolverLib.Multihash calldata metadataCID
+    ) external returns (bytes32 solutionID, bytes32 proposalID);
 
     function fundProposal(
         bytes32 proposalId,
@@ -50,6 +50,11 @@ interface IProposalsHub {
         returns (SolverLib.Multihash memory);
 
     function isProposal(bytes32 id) external view returns (bool);
+
+    function getProposal(bytes32 id)
+        external
+        view
+        returns (ProposalsHub.Proposal memory proposal);
 
     function transferERC20(bytes32 proposalId, address solver) external;
 
