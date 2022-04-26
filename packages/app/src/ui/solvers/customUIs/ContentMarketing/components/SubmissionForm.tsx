@@ -35,7 +35,6 @@ const SubmissionForm = ({
     solverContract,
     latestSubmission,
 }: WriterUIProps) => {
-    const ipfs = new IPFSAPI()
     const [input, setInput] = useState<SubmissionModel>(latestSubmission)
     const [errorMsg, setErrorMsg] = useState<string>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
@@ -50,7 +49,7 @@ const SubmissionForm = ({
                 submissionListener
             )
         }
-    }, [])
+    }, [currentUser])
 
     const submissionListener = async () => {
         try {
@@ -85,7 +84,7 @@ const SubmissionForm = ({
                 sender: { address: currentUser.address },
                 timestamp: new Date(),
             }
-
+            const ipfs = new IPFSAPI()
             const response = await ipfs.pin(workObj)
 
             if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])

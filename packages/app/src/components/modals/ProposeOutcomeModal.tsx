@@ -50,7 +50,7 @@ const ProposeOutcomeModal = ({
                 proposedOutcomeListener
             )
         }
-    }, [])
+    }, [currentUser])
 
     const proposedOutcomeListener = async () => {
         await updateSolverData()

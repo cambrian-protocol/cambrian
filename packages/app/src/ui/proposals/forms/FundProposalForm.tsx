@@ -70,6 +70,9 @@ const FundProposalForm = ({
         proposal.address,
         null
     )
+    useEffect(() => {
+        initTokenAndFunding()
+    }, [])
 
     useEffect(() => {
         initAllowance()
@@ -80,12 +83,11 @@ const FundProposalForm = ({
     }, [currentUser])
 
     useEffect(() => {
-        initTokenAndFunding()
         initProposalsHubListeners()
         return () => {
             proposalsHub.contract.removeAllListeners()
         }
-    }, [])
+    }, [currentUser])
 
     const initAllowance = async () => {
         try {

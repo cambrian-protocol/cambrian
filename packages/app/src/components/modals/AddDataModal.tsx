@@ -58,7 +58,7 @@ const AddDataModal = ({
         return () => {
             solverContract.removeListener(ingestedDataFilter, ingestListener)
         }
-    }, [])
+    }, [currentUser])
 
     const ingestListener = async () => {
         await updateSolverData()
