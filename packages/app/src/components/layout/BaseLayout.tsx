@@ -10,7 +10,7 @@ import { SHOW_BETA_WARNING } from 'packages/app/config'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import SideNav from '../nav/SideNav'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
-import WarningBanner from '../containers/ChainWarningContainer'
+import WarningBanner from '../containers/WarningBanner'
 import styled from 'styled-components'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
