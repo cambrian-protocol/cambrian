@@ -2,12 +2,15 @@ import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
-import ChainWarningContainer from '../containers/ChainWarningContainer'
 import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import ContextHelpModal from '../modals/ContextHelp'
 import Head from 'next/head'
+import { Link } from 'phosphor-react'
+import { SHOW_BETA_WARNING } from 'packages/app/config'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import SideNav from '../nav/SideNav'
+import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
+import WarningBanner from '../containers/ChainWarningContainer'
 import styled from 'styled-components'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
@@ -125,8 +128,22 @@ export const BaseLayout = ({
                                         config={config}
                                         items={appbarItems}
                                     />
+                                    {SHOW_BETA_WARNING && (
+                                        <WarningBanner
+                                            message={
+                                                WARNING_MESSAGE['BETA_WARNING']
+                                            }
+                                        />
+                                    )}
                                     {!isChainSupported && (
-                                        <ChainWarningContainer />
+                                        <WarningBanner
+                                            icon={<Link />}
+                                            message={
+                                                WARNING_MESSAGE[
+                                                    'UNSSUPPORTED_CHAIN'
+                                                ]
+                                            }
+                                        />
                                     )}
                                     <Box
                                         fill
