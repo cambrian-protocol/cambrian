@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
     getMetadataFromProposal,
+    getSolverChain,
     getSolverConfig,
     getSolverData,
     getSolverOutcomes,
@@ -51,6 +52,7 @@ interface SolverProps {
 const Solver = ({ address, iface, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
     const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const [solverAddressChain, setSolverAddessChain] = useState<string[]>([])
 
     // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
     const [isInitialized, setIsInitialized] = useState(false)
@@ -81,6 +83,10 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     )
     const toggleShowProposalInfoModal = () =>
         setShowProposalInfoModal(!showProposalInfoModal)
+
+    useEffect(() => {
+        initSolverChain()
+    }, [])
 
     useEffect(() => {
         if (currentUser.signer) init()
@@ -185,6 +191,14 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         }
     }
 
+    const initSolverChain = async () => {
+        const fetchedSolverChain = await getSolverChain(
+            currentUser,
+            solverContract
+        )
+        setSolverAddessChain(fetchedSolverChain)
+    }
+
     // Trigger Update for the listeners
     const updateSolverData = async () => {
         if (isInitialized) {
@@ -247,8 +261,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             customUI.sideNav
                         ) : (
                             <SolutionSideNav
-                                solverContract={solverContract}
-                                currentUser={currentUser}
+                                solverChainAddresses={solverAddressChain}
                                 activeSolverAddress={solverContract.address}
                             />
                         )
