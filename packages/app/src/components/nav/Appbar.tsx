@@ -59,16 +59,16 @@ const Appbar = ({
                                     items.map((item, idx) => (
                                         <Box key={idx}>{item}</Box>
                                     ))}
-                                <AppbarItem
-                                    icon={<Question />}
-                                    onClick={toggleHelp}
-                                />
                                 {config && (
                                     <AppbarItem
                                         icon={<Gear />}
                                         onClick={toggleShowConfig}
                                     />
                                 )}
+                                <AppbarItem
+                                    icon={<Question />}
+                                    onClick={toggleHelp}
+                                />
                             </Box>
                         </Nav>
                     </IconContext.Provider>

@@ -8,6 +8,7 @@ import {
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
 import AddSolverDataContent from '@cambrian/app/ui/solvers/AddSolverDataContent'
+import { AppbarItem } from '../nav/AppbarItem'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
@@ -17,12 +18,14 @@ import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverAction
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
+import { Info } from 'phosphor-react'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
+import ProposalInfoModal from '../modals/ProposalInfoModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolutionSideNav from '../nav/SolutionSideNav'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
@@ -47,6 +50,7 @@ interface SolverProps {
 
 const Solver = ({ address, iface, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
+    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
 
     // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
     const [isInitialized, setIsInitialized] = useState(false)
@@ -75,6 +79,8 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         async (method: string, ...args: any[]) =>
             await solverContract[method](...args)
     )
+    const toggleShowProposalInfoModal = () =>
+        setShowProposalInfoModal(!showProposalInfoModal)
 
     useEffect(() => {
         if (currentUser.signer) init()
@@ -266,9 +272,20 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             />
                         )
                     }
+                    appbarItems={
+                        metadata?.stages &&
+                        currentCondition.status !== ConditionStatus.Initiated
+                            ? [
+                                  <AppbarItem
+                                      icon={<Info />}
+                                      onClick={toggleShowProposalInfoModal}
+                                  />,
+                              ]
+                            : []
+                    }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
-                        <AddSolverDataContent />
+                        <AddSolverDataContent metadata={metadata} />
                     ) : loadWriter ? (
                         <ContentMarketingCustomUI
                             solverMethods={solverMethods}
@@ -276,6 +293,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
+                            metadata={metadata}
                         />
                     ) : (
                         <>No Solver UI found</>
@@ -297,6 +315,12 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                 />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
+            )}
+            {showProposalInfoModal && metadata?.stages && (
+                <ProposalInfoModal
+                    onClose={toggleShowProposalInfoModal}
+                    metadata={metadata}
+                />
             )}
         </>
     )
