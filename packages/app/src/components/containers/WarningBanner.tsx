@@ -8,7 +8,7 @@ interface WarningBannerProps {
 
 // TODO Change on Prod / Link to list of supported chains
 const WarningBanner = ({ message, icon }: WarningBannerProps) => (
-    <Box pad="small">
+    <Box pad="small" height={{ min: 'auto' }}>
         <Box
             pad="medium"
             background="status-warning"

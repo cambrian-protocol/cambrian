@@ -23,6 +23,7 @@ const ProposalInfoModal = ({ onClose, metadata }: ProposalInfoModalProps) => {
                     proposal={metadata?.stages?.proposal as ProposalModel}
                     template={metadata?.stages?.template as TemplateModel}
                 />
+                <Box pad="medium" />
             </Box>
         </BaseLayerModal>
     )
