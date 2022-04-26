@@ -1,10 +1,11 @@
+import { Box, Heading } from 'grommet'
 import React, { useEffect, useState } from 'react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
-import { Box } from 'grommet'
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalContextHeader from './ProposalContextHeader'
@@ -75,25 +76,35 @@ const ProposalUI = ({
         <>
             {metaStages ? (
                 <>
-                    <ProposalContextHeader
-                        proposal={metaStages.proposal as ProposalModel}
-                        template={metaStages.template as TemplateModel}
-                    />
                     {isProposalExecuted ? (
-                        <VisitProposalCTA
-                            solutionId={proposal.solutionId}
-                            currentUser={currentUser}
-                        />
+                        <Box gap="medium" pad={{ vertical: 'medium' }}>
+                            <VisitProposalCTA
+                                solutionId={proposal.solutionId}
+                                currentUser={currentUser}
+                            />
+                            <ProposalContextHeader
+                                proposal={metaStages.proposal as ProposalModel}
+                                template={metaStages.template as TemplateModel}
+                            />
+                            <Box pad="medium" />
+                        </Box>
                     ) : (
-                        <FundProposalForm
-                            currentUser={currentUser}
-                            metaStages={metaStages}
-                            proposalsHub={proposalsHub}
-                            proposal={proposal}
-                            setIsProposalExecuted={setIsProposalExecuted}
-                        />
+                        <Box gap="medium" pad={{ vertical: 'medium' }}>
+                            <Heading level="2">Proposal Funding</Heading>
+                            <ProposalContextHeader
+                                proposal={metaStages.proposal as ProposalModel}
+                                template={metaStages.template as TemplateModel}
+                            />
+                            <FundProposalForm
+                                currentUser={currentUser}
+                                metaStages={metaStages}
+                                proposalsHub={proposalsHub}
+                                proposal={proposal}
+                                setIsProposalExecuted={setIsProposalExecuted}
+                            />
+                            <Box pad="medium" />
+                        </Box>
                     )}
-                    <Box pad="medium" />
                 </>
             ) : errorMessage ? (
                 <ErrorPopupModal

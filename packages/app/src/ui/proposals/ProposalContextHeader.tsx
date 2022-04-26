@@ -1,5 +1,7 @@
 import AvatarWithLabel from '@cambrian/app/components/avatars/AvatarWithLabel'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Box } from 'grommet'
+import { Handshake } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -14,34 +16,39 @@ const ProposalContextHeader = ({
     template,
 }: ProposalContextHeaderProps) => {
     return (
-        <Box height={{ min: 'auto' }}>
-            <HeaderTextSection
-                title={proposal.title}
-                subTitle="Proposal Overview"
-                paragraph={proposal.description}
-            />
-            <HeaderTextSection
-                title={template.title}
-                subTitle="Template overview"
-                paragraph={template.description}
-            />
-            <Box
-                direction="row"
-                height={{ min: 'auto' }}
-                justify="around"
-                align="start"
-            >
-                <AvatarWithLabel
-                    label={template.name}
-                    pfpPath={template.pfp}
-                    role="Seller"
+        <Box gap="medium" height={{ min: 'auto' }}>
+            <BaseFormGroupContainer border groupTitle="Agreement between">
+                <Box
+                    direction="row"
+                    height={{ min: 'auto' }}
+                    justify="around"
+                    align="center"
+                >
+                    <AvatarWithLabel
+                        label={template.name}
+                        pfpPath={template.pfp}
+                        role="Seller"
+                    />
+                    <Handshake size="24" />
+                    <AvatarWithLabel
+                        label={proposal.name}
+                        pfpPath={proposal.pfp}
+                        role="Buyer"
+                    />
+                </Box>
+            </BaseFormGroupContainer>
+            <BaseFormGroupContainer groupTitle="Template details">
+                <HeaderTextSection
+                    title={template.title}
+                    paragraph={template.description}
                 />
-                <AvatarWithLabel
-                    label={proposal.name}
-                    pfpPath={proposal.pfp}
-                    role="Buyer"
+            </BaseFormGroupContainer>
+            <BaseFormGroupContainer groupTitle="Proposal details">
+                <HeaderTextSection
+                    title={proposal.title}
+                    paragraph={proposal.description}
                 />
-            </Box>
+            </BaseFormGroupContainer>
         </Box>
     )
 }

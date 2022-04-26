@@ -1,4 +1,5 @@
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SubmissionContainer from './components/SubmissionContainer'
@@ -13,6 +14,7 @@ interface ContentMarketingSolverProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
+    metadata?: MetadataModel
 }
 
 const ContentMarketingCustomUI = ({
@@ -21,6 +23,7 @@ const ContentMarketingCustomUI = ({
     solverMethods,
     solverData,
     currentCondition,
+    metadata,
 }: ContentMarketingSolverProps) => {
     const { addPermission } = useCurrentUser()
 
@@ -45,6 +48,7 @@ const ContentMarketingCustomUI = ({
             currentUser={currentUser}
             solverData={solverData}
             currentCondition={currentCondition}
+            metadata={metadata}
         />
     )
 }

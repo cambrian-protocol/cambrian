@@ -1,7 +1,6 @@
+import { Box, Button } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
-import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -39,18 +38,17 @@ const VisitProposalCTA = ({
     return (
         <>
             {solverAddress ? (
-                <BaseFormContainer>
+                <Box height={{ min: 'auto' }}>
                     <HeaderTextSection
-                        title="This proposal is executed"
-                        subTitle="In progress"
-                        paragraph="It has been successfully funded and is currently running"
+                        title="Solver in Progress"
+                        paragraph="This Proposal has been successfully funded and is currently running"
                     />
                     <Button
                         primary
                         label="Visit Solver"
                         href={`/solvers/${solverAddress}`}
                     />
-                </BaseFormContainer>
+                </Box>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['SOLUTION']} />
             )}

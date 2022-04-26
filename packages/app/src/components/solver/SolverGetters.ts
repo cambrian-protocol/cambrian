@@ -464,7 +464,7 @@ export const getMetadataFromProposal = async (
                                 metaComposition.solvers[solverIndex].slotTags,
                             solverTag:
                                 metaComposition.solvers[solverIndex].solverTag,
-                            proposal: stages.proposal as ProposalModel,
+                            stages: stages,
                         }
                     }
                 }

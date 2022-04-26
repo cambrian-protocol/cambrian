@@ -5,6 +5,8 @@ import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { SubmissionModel } from '../models/SubmissionModel'
@@ -20,6 +22,7 @@ interface ContentMarketingSolverContentProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
+    metadata?: MetadataModel
 }
 
 const SubmissionContainer = ({
@@ -27,12 +30,14 @@ const SubmissionContainer = ({
     solverContract,
     currentCondition,
     currentUser,
+    metadata,
 }: ContentMarketingSolverContentProps) => {
     const allowedToWrite = usePermission('Writer')
     const [latestSubmission, setLatestSubmission] =
         useState<SubmissionModel>(initialSubmission)
 
     const submittedWorkFilter = solverContract.filters.SubmittedWork()
+    const proposal = metadata?.stages?.proposal as ProposalModel
 
     useEffect(() => {
         let isMounted = true
@@ -50,14 +55,21 @@ const SubmissionContainer = ({
         const logs = await solverContract.queryFilter(submittedWorkFilter)
         return await fetchLatestSubmission(logs, currentCondition)
     }
-
     return (
         <>
             <Box gap="small" height={{ min: 'auto' }} fill>
                 <HeaderTextSection
-                    title={solverData.solverTag?.title || 'Solver'}
+                    title={
+                        proposal
+                            ? proposal.title
+                            : solverData.solverTag?.title || 'Solver'
+                    }
                     subTitle="Most recent state of"
-                    paragraph={solverData.solverTag?.description}
+                    paragraph={
+                        proposal
+                            ? proposal.description
+                            : solverData.solverTag?.description
+                    }
                 />
                 {allowedToWrite &&
                 currentCondition.status === ConditionStatus.Executed ? (
