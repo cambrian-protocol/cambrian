@@ -23,6 +23,7 @@ const colors: any = {
         'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
+    'status-warning': '#ffdc4d',
 }
 
 export const cpTheme = deepMerge(grommet, {
