@@ -70,25 +70,24 @@ const FundProposalForm = ({
         proposal.address,
         null
     )
-
-    useEffect(() => {
-        initAllowance()
-    }, [currentUser])
-
     useEffect(() => {
         initTokenAndFunding()
-        initProposalsHubListeners()
-        return () => {
-            proposalsHub.contract.removeAllListeners()
-        }
     }, [])
 
     useEffect(() => {
+        initAllowance()
         erc20TokenContract.on(approvalFilter, approvalListener)
         return () => {
             erc20TokenContract.removeListener(approvalFilter, approvalListener)
         }
-    }, [input])
+    }, [currentUser])
+
+    useEffect(() => {
+        initProposalsHubListeners()
+        return () => {
+            proposalsHub.contract.removeAllListeners()
+        }
+    }, [currentUser])
 
     const initAllowance = async () => {
         try {
@@ -253,7 +252,7 @@ const FundProposalForm = ({
         <>
             {collateralToken ? (
                 <BaseFormContainer>
-                    <BaseFormGroupContainer>
+                    <BaseFormGroupContainer groupTitle="Funding progress">
                         <FundingProgressMeter
                             token={collateralToken}
                             funding={funding}

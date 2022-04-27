@@ -13,14 +13,17 @@ const BaseFormGroupContainer = ({
     children,
     ...props
 }: BaseFormGroupContainerProps) => (
-    <Box gap="small">
-        {groupTitle && <Text color="dark-4">{groupTitle}</Text>}
+    <Box gap="small" height={{ min: 'auto' }}>
+        {groupTitle && (
+            <Text color="dark-4" size="small">
+                {groupTitle}
+            </Text>
+        )}
         <Box
             pad="medium"
             elevation="small"
             background={'background-contrast'}
             round="small"
-            height={{ min: 'auto' }}
             {...props}
         >
             {children}
