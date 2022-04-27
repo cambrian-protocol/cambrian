@@ -13,6 +13,7 @@ import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseForm
 import { BigNumber } from 'ethers'
 import { CheckBox } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -25,6 +26,7 @@ import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import { Text } from 'grommet'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
@@ -47,6 +49,7 @@ export type CreateTemplateFormType = {
     preferredTokens: TokenModel[]
     allowAnyPaymentToken: boolean
     flexInputs: FlexInputFormType[]
+    discordWebhook: string
 }
 
 export type FlexInputFormType = TaggedInput & {
@@ -64,6 +67,7 @@ const initialInput = {
     preferredTokens: [],
     allowAnyPaymentToken: false,
     flexInputs: [] as FlexInputFormType[],
+    discordWebhook: '',
 }
 
 const CreateTemplateForm = ({
@@ -205,6 +209,10 @@ const CreateTemplateForm = ({
             )
             if (!templateCID) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
 
+            if (input.discordWebhook !== '') {
+                await WebhookAPI.postWebhook(input.discordWebhook, templateCID)
+            }
+
             storeIdInLocalStorage(
                 'templates',
                 compositionCID,
@@ -330,6 +338,9 @@ const CreateTemplateForm = ({
                                     />
                                 </Box>
                             )}
+                        </BaseFormGroupContainer>
+                        <BaseFormGroupContainer groupTitle="Notification">
+                            <DiscordWebhookInput name="discordWebhook" />
                         </BaseFormGroupContainer>
                         <Box>
                             <Button

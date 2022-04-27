@@ -63,6 +63,7 @@ export const cpTheme = deepMerge(grommet, {
             maxWidth: '336px',
         },
     },
+    anchor: { color: 'brand' },
     button: {
         hover: {
             opacity: 0.8,

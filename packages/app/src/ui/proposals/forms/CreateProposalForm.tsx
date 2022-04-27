@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
 import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal'
@@ -24,6 +25,7 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
@@ -43,6 +45,7 @@ export type CreateProposalFormType = {
     price: number
     tokenAddress: string
     flexInputs: FlexInputFormType[]
+    discordWebhook: string
 }
 
 const initialInput = {
@@ -53,6 +56,7 @@ const initialInput = {
     price: 0,
     tokenAddress: '',
     flexInputs: [],
+    discordWebhook: '',
 }
 
 const CreateProposalForm = ({
@@ -133,6 +137,10 @@ const CreateProposalForm = ({
 
             if (!proposalId)
                 throw new Error(ERROR_MESSAGE['FAILED_PROPOSAL_DEPLOYMENT'])
+
+            if (input.discordWebhook !== '') {
+                await WebhookAPI.postWebhook(input.discordWebhook, proposalId)
+            }
 
             storeIdInLocalStorage(
                 'proposals',
@@ -252,6 +260,9 @@ const CreateProposalForm = ({
                         ) : (
                             <Spinner />
                         )}
+                        <BaseFormGroupContainer groupTitle="Notification">
+                            <DiscordWebhookInput name="discordWebhook" />
+                        </BaseFormGroupContainer>
                         <Box>
                             {currentUser.signer ? (
                                 <Button
