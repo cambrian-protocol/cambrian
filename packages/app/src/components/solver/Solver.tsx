@@ -243,19 +243,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             solverData={solverData}
                         />
                     }
-                    sidebar={
-                        customUI.sidebar ? (
-                            customUI.sidebar
-                        ) : (
-                            <ConditionVersionSidebar
-                                solverTag={metadata?.solverTag}
-                                solverMethods={solverMethods}
-                                currentCondition={currentCondition}
-                                setCurrentCondition={setCurrentCondition}
-                                solverConditions={solverData.conditions}
-                            />
-                        )
-                    }
                     sideNav={
                         customUI.sideNav ? (
                             customUI.sideNav
