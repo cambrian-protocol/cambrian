@@ -9,12 +9,14 @@ import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface OutcomeCollectionCardProps {
+    idx?: number
     outcomeCollection: OutcomeCollectionModel
     proposeMethod?: (indexSet: number) => void
     token: TokenModel
 }
 
 const OutcomeCollectionCard = ({
+    idx,
     outcomeCollection,
     proposeMethod,
     token,
@@ -32,7 +34,7 @@ const OutcomeCollectionCard = ({
                     elevation="small"
                     background="background-contrast"
                 >
-                    <Text truncate>Outcome #{outcomeCollection.indexSet}</Text>
+                    <Text truncate>Outcome {idx && `#${idx}`}</Text>
                 </CardHeader>
                 <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (

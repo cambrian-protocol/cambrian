@@ -20,9 +20,10 @@ const OutcomeCollectionModal = ({
         <BaseLayerModal {...rest}>
             <HeaderTextSection title={'Outcomes'} subTitle="What can happen?" />
             <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                {outcomeCollections.map((outcomeCollection) => {
+                {outcomeCollections.map((outcomeCollection, idx) => {
                     return (
                         <OutcomeCollectionCard
+                            idx={idx + 1}
                             token={token}
                             key={outcomeCollection.indexSet}
                             outcomeCollection={outcomeCollection}
