@@ -1,33 +1,37 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "out",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "cleanUrls": true,
-    "rewrites": [
-      {
-        "source": "/api/pinPinata",
-        "function": "pinPinata"
-      },
-      {
-        "destination": "/proposals/[proposalId].html",
-        "regex": "^/proposals/([^/]+?)(?:/)?$"
-      },
-      {
-        "destination": "/solvers/[solverAddress].html",
-        "regex": "^/solvers/([^/]+?)(?:/)?$"
-      },
-      {
-        "destination": "/templates/create/[compositionCID].html",
-        "regex": "^/templates/create/([^/]+?)(?:/)?$"
-      },
-      {
-        "destination": "/templates/[templateCID].html",
-        "regex": "^/templates/([^/]+?)(?:/)?$"
-      }
-    ]
-  }
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
+    },
+    "hosting": {
+        "public": "out",
+        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+        "cleanUrls": true,
+        "rewrites": [
+            {
+                "source": "/api/pinPinata",
+                "function": "pinPinata"
+            },
+            {
+                "source": "/api/addWebhook",
+                "function": "addWebhook"
+            },
+            {
+                "destination": "/proposals/[proposalId].html",
+                "regex": "^/proposals/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/solvers/[solverAddress].html",
+                "regex": "^/solvers/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/templates/create/[compositionCID].html",
+                "regex": "^/templates/create/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/templates/[templateCID].html",
+                "regex": "^/templates/([^/]+?)(?:/)?$"
+            }
+        ]
+    }
 }
