@@ -74,12 +74,6 @@ const ConfirmOutcomeActionbar = ({
             )
 
             const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
-            console.log(
-                'Fetched timelockseconds: ',
-                timeLockResponse.toNumber()
-            )
-            console.log('now ms: ', new Date().getTime() / 1000)
-
             setCurrentTimelock(timeLockMilliseconds)
             setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
         } catch (e) {
