@@ -11,14 +11,12 @@ const WarningBanner = ({ message, icon }: WarningBannerProps) => (
     <ResponsiveContext.Consumer>
         {(screenSize) => (
             <Box
-                pad="small"
                 width={screenSize === 'small' ? { min: '100vw' } : undefined}
                 height={{ min: 'auto' }}
             >
                 <Box
-                    pad="medium"
+                    pad="xsmall"
                     background="status-warning"
-                    round="small"
                     align="center"
                     justify="center"
                     direction="row"
@@ -26,11 +24,11 @@ const WarningBanner = ({ message, icon }: WarningBannerProps) => (
                     elevation="small"
                 >
                     <Box width={{ min: 'auto' }}>
-                        <IconContext.Provider value={{ size: '24' }}>
+                        <IconContext.Provider value={{ size: '18' }}>
                             {icon ? icon : <Warning />}
                         </IconContext.Provider>
                     </Box>
-                    <Text>{message}</Text>
+                    <Text size="small">{message}</Text>
                 </Box>
             </Box>
         )}
