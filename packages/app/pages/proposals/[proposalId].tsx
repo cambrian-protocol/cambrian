@@ -41,10 +41,15 @@ export default function ProposalPage() {
                     currentUser.signer,
                     currentUser.chainId
                 )
+                console.log('Proposal Id:', proposalId)
+                console.log('ProposalsHub:', proposalsHub)
+                console.log('Current User:', currentUser)
                 setProposalsHub(proposalsHub)
-                return setCurrentProposal(
-                    await proposalsHub.getProposal(proposalId as string)
+                const proposal = await proposalsHub.getProposal(
+                    proposalId as string
                 )
+                console.log('Fetched proposal:', proposal)
+                return setCurrentProposal(proposal)
             } catch (e: any) {
                 console.error(e)
                 setErrorMessage(e.message)

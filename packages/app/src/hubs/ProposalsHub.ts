@@ -61,7 +61,9 @@ export default class ProposalsHub {
     }
 
     getProposal = async (proposalId: string) => {
-        return await this.contract.getProposal(proposalId)
+        const res = await this.contract.getProposal(proposalId)
+        console.log('getProposal res:', res)
+        return res
     }
 
     approveFunding = async (amount: number, token?: TokenModel) => {
