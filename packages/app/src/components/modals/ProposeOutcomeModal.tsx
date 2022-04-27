@@ -83,9 +83,10 @@ const ProposeOutcomeModal = ({
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[
                         currentCondition.conditionId
-                    ].map((outcomeCollection) => {
+                    ].map((outcomeCollection, idx) => {
                         return (
                             <OutcomeCollectionCard
+                                idx={idx + 1}
                                 token={solverData.collateralToken}
                                 key={outcomeCollection.indexSet}
                                 outcomeCollection={outcomeCollection}
