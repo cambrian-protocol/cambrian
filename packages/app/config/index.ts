@@ -12,4 +12,4 @@ export const IPFS_GATEWAYS = [
 ]
 
 export const WEBHOOK_API_ENDPOINT =
-    'https://app.cambrianprotocol.com/addWebhook'
+    'https://app.cambrianprotocol.com/api/addWebhook'
