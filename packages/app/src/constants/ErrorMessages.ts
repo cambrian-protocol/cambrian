@@ -15,4 +15,5 @@ export const ERROR_MESSAGE = {
     INSUFFICIENT_FUNDS: 'Insufficient funds',
     MISSING_COLLATERAL_TOKEN: 'No collateral token defined',
     CONTRACT_CALL_ERROR: 'Error while trying to reach the smartcontract',
+    POST_WEBHOOK_ERROR: 'Error while saving your provided Webhook URL',
 }

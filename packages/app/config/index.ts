@@ -10,3 +10,6 @@ export const IPFS_GATEWAYS = [
     'ipfs.dweb.link',
     'ipfs.infura-ipfs.io',
 ]
+
+export const WEBHOOK_API_ENDPOINT =
+    'https://app.cambrianprotocol.com/addWebhook'
