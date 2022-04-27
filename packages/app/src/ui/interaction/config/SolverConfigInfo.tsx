@@ -2,10 +2,10 @@ import {
     ArrowSquareIn,
     Coin,
     Coins,
-    Handshake,
     Timer,
     TreeStructure,
     UsersThree,
+    Vault,
 } from 'phosphor-react'
 import React, { useState } from 'react'
 import {
@@ -106,7 +106,7 @@ const SolverConfigInfo = ({
                 />
                 <BaseMenuListItem
                     title="Escrow Balance"
-                    icon={<Handshake />}
+                    icon={<Vault />}
                     subTitle={
                         solverData.numMintedTokensByCondition
                             ? `${ethers.utils

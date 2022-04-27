@@ -40,7 +40,7 @@ const ExecuteSolveActionbar = ({
         return () => {
             solverContract.removeListener(changedStatusFilter, executedListener)
         }
-    }, [])
+    }, [currentUser])
 
     const executedListener = async () => {
         await updateSolverData()
