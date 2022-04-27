@@ -68,7 +68,7 @@ const ExecuteSolveActionbar = ({
             <Actionbar
                 actions={{
                     primaryAction: {
-                        label: 'Execute Solve',
+                        label: 'Advance Solver',
                         onClick: onExecuteSolve,
                     },
                     info: {
