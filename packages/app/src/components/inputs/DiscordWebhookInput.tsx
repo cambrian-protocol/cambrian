@@ -21,10 +21,13 @@ const DiscordWebhookInput = ({ name }: DiscordWebhookInputProps) => (
         />
         <Text size="xsmall" color="dark-4">
             Add a{' '}
-            <Anchor href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks">
+            <Anchor
+                target="_blank"
+                href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
+            >
                 Discord webhook
             </Anchor>{' '}
-            to receive notifications about this Template
+            to receive relevant notifications.
         </Text>
     </>
 )

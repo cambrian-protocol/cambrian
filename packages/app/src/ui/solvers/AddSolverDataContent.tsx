@@ -20,7 +20,7 @@ const AddSolverDataContent = ({ metadata }: AddSolverDataContentProps) => {
                         <HeaderTextSection
                             title="Initiated Solver"
                             subTitle="Please follow the instructions"
-                            paragraph="Add required data and execute this Solver in order to use and interact with it."
+                            paragraph="Add required data and progress to begin work."
                         />
                         {metadata?.stages && (
                             <ProposalContextHeader

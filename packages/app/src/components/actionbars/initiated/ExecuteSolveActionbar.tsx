@@ -68,13 +68,13 @@ const ExecuteSolveActionbar = ({
             <Actionbar
                 actions={{
                     primaryAction: {
-                        label: 'Advance Solver',
+                        label: 'Progress',
                         onClick: onExecuteSolve,
                     },
                     info: {
                         icon: <Info />,
                         descLabel: 'Info',
-                        label: 'Solver is ready to execute',
+                        label: 'Ready to progress',
                     },
                 }}
             />
