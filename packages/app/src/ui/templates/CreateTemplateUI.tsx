@@ -41,7 +41,7 @@ const CreateTemplateUI = ({
                     keyId={compositionCID}
                     prefix="templates"
                     link="/templates/"
-                    description="This is your link to your freshly created template. Share it with your clients and receive proposals."
+                    description="This is the link to your freshly created template. Share it with your clients and receive proposals."
                     title="New template created!"
                     onClose={toggleShowSuccessModal}
                 />

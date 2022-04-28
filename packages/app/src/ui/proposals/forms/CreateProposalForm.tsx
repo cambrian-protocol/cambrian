@@ -286,7 +286,7 @@ const CreateProposalForm = ({
                     keyId={templateCID}
                     prefix="proposals"
                     link="/proposals/"
-                    description="This is your Proposal Id. Share it with your community and fund the proposal."
+                    description="This is your Proposal ID. Share it with your community and fund the proposal."
                     title="Proposal created"
                     onClose={() => setProposalId(undefined)}
                 />
