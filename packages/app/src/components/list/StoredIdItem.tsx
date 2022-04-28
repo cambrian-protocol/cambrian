@@ -25,8 +25,7 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
             <Box>
                 <Text>{title}</Text>
                 <Text truncate size="small" color="dark-4">
-                    {route}
-                    {cid}
+                    https://app.cambrianprotocol.com{link}
                 </Text>
             </Box>
             <Box direction="row" justify="end" gap="xsmall" flex="grow">
@@ -34,7 +33,9 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
                     secondary
                     icon={<Link size="24" />}
                     onClick={() => {
-                        navigator.clipboard.writeText(link)
+                        navigator.clipboard.writeText(
+                            `https://app.cambrianprotocol.com${link}`
+                        )
                     }}
                 />
                 <Button
