@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { Box, Anchor } from 'grommet'
+import { Box, Anchor, Paragraph } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import StoredIdItem from '@cambrian/app/components/list/StoredIdItem'
 import { Text } from 'grommet'
@@ -39,18 +39,28 @@ const ExportSuccessModal = ({
                 subTitle="Success"
                 paragraph={description}
             />
-            <Box margin={{ top: 'small', bottom: 'small' }} fill gap="small">
-                <Text size="xsmall" color="dark-4">
+            <Box
+                height={{ min: 'auto' }}
+                gap="small"
+                pad={{ bottom: 'medium' }}
+                fill="horizontal"
+            >
+                <Paragraph
+                    style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}
+                    fill
+                    color="dark-6"
+                >
                     <Anchor
                         target="_blank"
                         href="https://discord.gg/pZP4HNYrZs"
                     >
                         Join our Discord
                     </Anchor>{' '}
-                    and use the "/watch {storedExports[0].cid}" command to
-                    receive notification DMs.
-                </Text>
+                    and use the "/watch {keyId}" command to receive notification
+                    DMs.
+                </Paragraph>
             </Box>
+
             {storedExports.length > 0 ? (
                 <>
                     <StoredIdItem
