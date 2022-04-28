@@ -57,8 +57,8 @@ const ExportSuccessModal = ({
                         Join our Discord
                     </Anchor>{' '}
                     and use the "/watch{' '}
-                    {storedExports.length > 0 ? storedExports[0].cid : '<word>'}{' '}
-                    command to receive notification DMs.
+                    {storedExports.length > 0 ? storedExports[0].cid : '<word>'}
+                    " command to receive notification DMs.
                 </Paragraph>
             </Box>
 
