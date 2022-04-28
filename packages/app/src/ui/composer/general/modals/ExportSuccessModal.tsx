@@ -56,8 +56,8 @@ const ExportSuccessModal = ({
                     >
                         Join our Discord
                     </Anchor>{' '}
-                    and use the "/watch {keyId}" command to receive notification
-                    DMs.
+                    and use the "/watch {storedExports[0].cid}" command to
+                    receive notification DMs.
                 </Paragraph>
             </Box>
 
