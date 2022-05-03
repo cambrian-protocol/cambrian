@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 
+import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
+import { CoinVertical } from 'phosphor-react'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
+import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -41,14 +44,10 @@ export default function ProposalPage() {
                     currentUser.signer,
                     currentUser.chainId
                 )
-                console.log('Proposal Id:', proposalId)
-                console.log('ProposalsHub:', proposalsHub)
-                console.log('Current User:', currentUser)
                 setProposalsHub(proposalsHub)
                 const proposal = await proposalsHub.getProposal(
                     proposalId as string
                 )
-                console.log('Fetched proposal:', proposal)
                 return setCurrentProposal(proposal)
             } catch (e: any) {
                 console.error(e)
@@ -58,9 +57,26 @@ export default function ProposalPage() {
         setShowInvalidQueryComponent(true)
     }
 
+    // Temporarily added for demo purposes
+    const onMintTOY = async () => {
+        if (currentUser.signer) {
+            const ToyToken = new ethers.Contract(
+                '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79',
+                ERC20_IFACE,
+                currentUser.signer
+            )
+            await ToyToken.mint(currentUser.address, '1000000000000000000000')
+        }
+    }
+
     return (
         <>
-            <BaseLayout contextTitle="Proposal">
+            <BaseLayout
+                contextTitle="Proposal"
+                appbarItems={[
+                    <AppbarItem icon={<CoinVertical />} onClick={onMintTOY} />,
+                ]}
+            >
                 {currentUser.signer ? (
                     showInvalidQueryComponent ? (
                         <InvalidQueryComponent context={StageNames.proposal} />
