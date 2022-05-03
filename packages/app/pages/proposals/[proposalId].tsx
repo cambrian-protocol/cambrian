@@ -5,6 +5,7 @@ import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CoinVertical } from 'phosphor-react'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -12,6 +13,7 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { StageNames } from '@cambrian/app/classes/Stagehand'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/dist/client/router'
@@ -25,7 +27,7 @@ export default function ProposalPage() {
     const [currentProposal, setCurrentProposal] = useState<ethers.Contract>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
         useState(false)
-    const [errorMessage, setErrorMessage] = useState<string>()
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         if (router.isReady && currentUser.signer !== undefined) fetchProposal()
@@ -49,9 +51,8 @@ export default function ProposalPage() {
                     proposalId as string
                 )
                 return setCurrentProposal(proposal)
-            } catch (e: any) {
-                console.error(e)
-                setErrorMessage(e.message)
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
             }
         }
         setShowInvalidQueryComponent(true)

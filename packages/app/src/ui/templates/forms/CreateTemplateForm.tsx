@@ -6,6 +6,10 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import React, { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
@@ -14,7 +18,6 @@ import { BigNumber } from 'ethers'
 import { CheckBox } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { Plus } from 'phosphor-react'
@@ -27,15 +30,17 @@ import { Text } from 'grommet'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface CreateTemplateFormProps {
     composition: CompositionModel
     compositionCID: string
-    onFailure: (message?: string) => void
+    onFailure: (error?: ErrorMessageType) => void
     onSuccess: () => void
 }
 
@@ -207,7 +212,7 @@ const CreateTemplateForm = ({
                 compositionCID,
                 currentUser.web3Provider
             )
-            if (!templateCID) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+            if (!templateCID) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
             if (input.discordWebhook !== '') {
                 await WebhookAPI.postWebhook(input.discordWebhook, templateCID)
@@ -220,8 +225,8 @@ const CreateTemplateForm = ({
                 templateCID
             )
             onSuccess()
-        } catch (e: any) {
-            onFailure(e.message)
+        } catch (e) {
+            onFailure(await cpLogger.push(e))
         }
         setTransactionMsg(undefined)
     }
@@ -295,15 +300,7 @@ const CreateTemplateForm = ({
                                                         event.target.value
                                                     )
                                                 }
-                                                validate={[
-                                                    (address) => {
-                                                        if (
-                                                            address.length !==
-                                                            42
-                                                        )
-                                                            return 'Not a valid address'
-                                                    },
-                                                ]}
+                                                validate={validateAddress}
                                             />
                                         </Box>
                                         <TokenAvatar token={collateralToken} />

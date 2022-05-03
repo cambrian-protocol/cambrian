@@ -8,7 +8,7 @@ import {
     getMultihashFromBytes32,
 } from '../utils/helpers/multihash'
 
-import { ERROR_MESSAGE } from './../constants/ErrorMessages'
+import { GENERAL_ERROR } from './../constants/ErrorMessages'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
@@ -23,7 +23,7 @@ export default class ProposalsHub {
 
     constructor(signerOrProvider: ethers.Signer, chainId: number) {
         const chainData = SUPPORTED_CHAINS[chainId]
-        if (!chainData) throw new Error(ERROR_MESSAGE['CHAIN_NOT_SUPPORTED'])
+        if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
 
         this.chainId = chainId
         this.signerOrProvider = signerOrProvider
@@ -62,12 +62,11 @@ export default class ProposalsHub {
 
     getProposal = async (proposalId: string) => {
         const res = await this.contract.getProposal(proposalId)
-        console.log('getProposal res:', res)
         return res
     }
 
     approveFunding = async (amount: number, token?: TokenModel) => {
-        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
+        if (!token) throw GENERAL_ERROR['MISSING_COLLATERAL_TOKEN']
         const weiAmount = ethers.utils.parseUnits(
             amount.toString(),
             token.decimals
@@ -82,7 +81,7 @@ export default class ProposalsHub {
         )
 
         if (BigNumber.from(balance).lt(weiAmount))
-            throw new Error(ERROR_MESSAGE['INSUFFICIENT_FUNDS'])
+            throw GENERAL_ERROR['INSUFFICIENT_FUNDS']
 
         await tokenContract.approve(this.contract.address, weiAmount)
     }
@@ -92,7 +91,7 @@ export default class ProposalsHub {
         amount: number,
         token?: TokenModel
     ) => {
-        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
+        if (!token) throw GENERAL_ERROR['MISSING_COLLATERAL_TOKEN']
 
         const weiAmount = ethers.utils.parseUnits(
             amount.toString(),
@@ -106,7 +105,7 @@ export default class ProposalsHub {
         amount: number,
         token?: TokenModel
     ) => {
-        if (!token) throw new Error(ERROR_MESSAGE['MISSING_COLLATERAL_TOKEN'])
+        if (!token) throw GENERAL_ERROR['MISSING_COLLATERAL_TOKEN']
         const weiAmount = ethers.utils.parseUnits(
             amount.toString(),
             token.decimals

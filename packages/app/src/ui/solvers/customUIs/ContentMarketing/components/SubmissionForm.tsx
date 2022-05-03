@@ -1,8 +1,11 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import { Button } from 'grommet'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -13,6 +16,7 @@ import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages
 import { Text } from 'grommet'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { fetchLatestSubmission } from '../helpers/fetchLatestSubmission'
 
@@ -36,7 +40,7 @@ const SubmissionForm = ({
     latestSubmission,
 }: WriterUIProps) => {
     const [input, setInput] = useState<SubmissionModel>(latestSubmission)
-    const [errorMsg, setErrorMsg] = useState<string>()
+    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
 
     const submittedWorkFilter = solverContract.filters.SubmittedWork()
@@ -59,9 +63,8 @@ const SubmissionForm = ({
                 currentCondition
             )
             if (fetchedLatesSubmission) setInput(fetchedLatesSubmission)
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
         }
         setTransactionMsg(undefined)
     }
@@ -76,7 +79,7 @@ const SubmissionForm = ({
             }
 
             if (!currentUser.address)
-                throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+                throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
             const workObj: SubmissionModel = {
                 submission: input.submission,
@@ -87,16 +90,15 @@ const SubmissionForm = ({
             const ipfs = new IPFSAPI()
             const response = await ipfs.pin(workObj)
 
-            if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
             await solverContract.submitWork(
                 response.IpfsHash,
                 currentCondition.conditionId
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
         }
     }

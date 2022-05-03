@@ -1,4 +1,5 @@
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 export const decodeData = (types: SolidityDataTypes[], data: any) => {
@@ -8,6 +9,7 @@ export const decodeData = (types: SolidityDataTypes[], data: any) => {
         decoded = ethers.utils.defaultAbiCoder.decode(types, data)
     } catch (e) {
         decoded = [`Invalid decoding`]
+        cpLogger.push(e)
         console.log(`Error decoding "${data}"`, e)
     }
     return decoded.toString()

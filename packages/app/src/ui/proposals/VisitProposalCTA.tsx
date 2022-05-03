@@ -1,11 +1,13 @@
 import { Box, Button } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface VisitProposalCTAProps {
     solutionId: string
@@ -24,13 +26,17 @@ const VisitProposalCTA = ({
 
     const initSolverAddress = async () => {
         if (currentUser.chainId && currentUser.signer) {
-            const ipfsSolutionsHub = new IPFSSolutionsHub(
-                currentUser.signer,
-                currentUser.chainId
-            )
-            const solvers = await ipfsSolutionsHub.getSolvers(solutionId)
-            if (solvers) {
+            try {
+                const ipfsSolutionsHub = new IPFSSolutionsHub(
+                    currentUser.signer,
+                    currentUser.chainId
+                )
+                const solvers = await ipfsSolutionsHub.getSolvers(solutionId)
+                if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
+
                 setSolverAddress(solvers[0])
+            } catch (e) {
+                cpLogger.push(e)
             }
         }
     }

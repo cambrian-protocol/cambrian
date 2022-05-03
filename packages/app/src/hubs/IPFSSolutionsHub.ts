@@ -1,4 +1,4 @@
-import { ERROR_MESSAGE } from '../constants/ErrorMessages'
+import { GENERAL_ERROR } from '../constants/ErrorMessages'
 import { IPFS_SOLUTIONS_HUB_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { ethers } from 'ethers'
@@ -11,7 +11,7 @@ export default class IPFSSolutionsHub {
         chainId: number
     ) {
         const chainData = SUPPORTED_CHAINS[chainId]
-        if (!chainData) throw new Error(ERROR_MESSAGE['CHAIN_NOT_SUPPORTED'])
+        if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
 
         this.contract = new ethers.Contract(
             chainData.contracts.ipfsSolutionsHub,

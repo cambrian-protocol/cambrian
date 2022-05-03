@@ -1,10 +1,11 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
 import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
@@ -49,8 +50,8 @@ export default class Stagehand {
                 return res.IpfsHash
             }
         } catch (e) {
-            console.error(e)
-            throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+            cpLogger.push(e)
+            throw GENERAL_ERROR['IPFS_PIN_ERROR']
         }
     }
 
@@ -63,8 +64,8 @@ export default class Stagehand {
             this.stages[stageType] = stage
             return this.stages[stageType]
         } catch (e) {
-            console.error(e)
-            throw new Error(ERROR_MESSAGE['IPFS_FETCH_ERROR'])
+            await cpLogger.push(e)
+            throw GENERAL_ERROR['IPFS_FETCH_ERROR']
         }
     }
 
@@ -107,7 +108,7 @@ export default class Stagehand {
         provider: ethers.providers.Provider
     ) => {
         if (!this.isStageSchema(composition, StageNames.composition)) {
-            throw new Error(ERROR_MESSAGE['WRONG_COMPOSITION_SCHEMA'])
+            throw GENERAL_ERROR['WRONG_COMPOSITION_SCHEMA']
         }
 
         if (await parseComposerSolvers(composition.solvers, provider)) {
@@ -151,7 +152,7 @@ export default class Stagehand {
         }
 
         if (!this.isStageSchema(template, StageNames.template)) {
-            throw new Error(ERROR_MESSAGE['WRONG_TEMPLATE_SCHEMA'])
+            throw GENERAL_ERROR['WRONG_TEMPLATE_SCHEMA']
         }
         this.stages['template'] = template
         return this.publishStage(StageNames.template)
@@ -223,6 +224,6 @@ export const getSolverConfigsFromMetaStages = async (
         finalComposition.solvers,
         provider
     )
-    if (!parsedSolvers) throw new Error(ERROR_MESSAGE['PARSE_SOLVER_ERROR'])
+    if (!parsedSolvers) throw GENERAL_ERROR['PARSE_SOLVER_ERROR']
     return parsedSolvers.map((solver) => solver.config)
 }

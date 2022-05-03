@@ -3,6 +3,7 @@ import { EventFilter, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from './ErrorPopupModal'
 import { GenericMethods } from '../solver/Solver'
 import HeaderTextSection from '../sections/HeaderTextSection'
@@ -10,6 +11,8 @@ import LoadingScreen from '../info/LoadingScreen'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface ExecuteSolverModalProps {
     onBack: () => void
@@ -37,7 +40,7 @@ const AddDataModal = ({
 }: ExecuteSolverModalProps) => {
     const [manualInputs, setManualInputs] = useState<ManualInputsFormType>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
     const ingestedDataFilter = {
         address: currentUser.address,
         topics: [ethers.utils.id('IngestedData()')],
@@ -78,10 +81,9 @@ const AddDataModal = ({
                 encodedData
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 
@@ -96,6 +98,7 @@ const AddDataModal = ({
                                 name={`manualInputs[${idx}].data`}
                                 label={input.slotWithMetaData.tag.label}
                                 required
+                                validate={validateAddress}
                             />
                         </Box>
                         <Box>

@@ -1,14 +1,18 @@
-import { Box, Button, Form, FormField, Spinner, TextInput } from 'grommet'
+import { Box, Button, Form, FormField, TextInput } from 'grommet'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { SetStateAction, useState } from 'react'
 
 import { ChatMessageType } from './ChatMessage'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { PaperPlaneRight } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface ChatInputProps {
@@ -36,11 +40,10 @@ const ChatInput = ({
 }: ChatInputProps) => {
     const [input, setInput] = useState(initialInput)
 
-    const [errorMsg, setErrorMsg] = useState<string>()
+    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
 
     const onSubmit = async () => {
-        if (!currentUser.address)
-            throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+        if (!currentUser.address) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
         setTransactionMessage(TRANSACITON_MESSAGE['CONFIRM'])
         const messageObj: ChatMessageType = {
@@ -60,10 +63,9 @@ const ChatInput = ({
                 setTransactionMessage(TRANSACITON_MESSAGE['WAIT'])
                 setInput(initialInput)
             }
-        } catch (error: any) {
-            setErrorMsg(error.message)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
             setTransactionMessage(undefined)
-            console.error(error)
         }
     }
 

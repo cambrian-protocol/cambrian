@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoadingScreen from '../../info/LoadingScreen'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -16,6 +17,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
@@ -36,7 +38,7 @@ const RedeemTokensActionbar = ({
     const [payoutAmount, setPayoutAmount] = useState<number>()
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const payoutRedemptionFilter = ctf.contract.filters.PayoutRedemption(
         currentUser.address,
@@ -202,10 +204,9 @@ const RedeemTokensActionbar = ({
                 solverData.config.conditionBase.partition
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 

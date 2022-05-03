@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from './ErrorPopupModal'
 import { GenericMethods } from '../solver/Solver'
 import HeaderTextSection from '../sections/HeaderTextSection'
@@ -13,6 +14,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ProposeOutcomeModalProps {
     solverContract: ethers.Contract
@@ -34,7 +36,7 @@ const ProposeOutcomeModal = ({
     onBack,
 }: ProposeOutcomeModalProps) => {
     const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const changedStatusFilter = {
         address: currentUser.address,
@@ -69,10 +71,9 @@ const ProposeOutcomeModal = ({
                 binaryArray
             )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 
