@@ -1,5 +1,6 @@
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { WEBHOOK_API_ENDPOINT } from 'packages/app/config'
+import { cpLogger } from './Logger.api'
 
 export const WebhookAPI = {
     postWebhook: async (
@@ -20,8 +21,8 @@ export const WebhookAPI = {
                 body: JSON.stringify(data),
             })
         } catch (e: any) {
-            console.error(e)
-            throw new Error(ERROR_MESSAGE['POST_WEBHOOK_ERROR'])
+            cpLogger.push(e)
+            throw GENERAL_ERROR['POST_WEBHOOK_ERROR']
         }
     },
 }

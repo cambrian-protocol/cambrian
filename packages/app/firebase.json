@@ -17,6 +17,10 @@
                 "function": "addWebhook"
             },
             {
+                "source": "/api/errorLog",
+                "function": "errorLog"
+            },
+            {
                 "destination": "/proposals/[proposalId].html",
                 "regex": "^/proposals/([^/]+?)(?:/)?$"
             },

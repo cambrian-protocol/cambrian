@@ -1,5 +1,6 @@
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { BigNumber, ethers } from 'ethers'
+import { cpLogger } from './Logger.api'
 
 const ERC20_ABI =
     require('@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json').abi
@@ -25,7 +26,7 @@ export const TokenAPI = {
                 provider
             )
         } catch (e) {
-            console.error(e)
+            cpLogger.push(e)
         }
 
         if (erc20Contract) {
@@ -54,7 +55,7 @@ export const TokenAPI = {
 
                 return token
             } catch (e) {
-                console.error(e)
+                cpLogger.push(e)
             }
         }
 

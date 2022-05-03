@@ -3,13 +3,16 @@ import React, { SetStateAction, useState } from 'react'
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateForm from './forms/CreateTemplateForm'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 
 interface CreateTemplateUIProps {
     composition: CompositionModel
     compositionCID: string
-    setErrorMessage: React.Dispatch<SetStateAction<string | undefined>>
+    setErrorMessage: React.Dispatch<
+        SetStateAction<ErrorMessageType | undefined>
+    >
 }
 
 const CreateTemplateUI = ({

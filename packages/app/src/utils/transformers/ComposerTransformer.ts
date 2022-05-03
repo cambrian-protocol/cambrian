@@ -22,6 +22,7 @@ import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -121,7 +122,7 @@ export function parseCoreDataInput(datas: SolverCoreDataInputType[]) {
     try {
         return ethers.utils.defaultAbiCoder.encode([...types], [...values])
     } catch (e) {
-        console.error(e)
+        cpLogger.push(e)
         return ethers.constants.HashZero
     }
 }

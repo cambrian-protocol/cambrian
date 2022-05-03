@@ -10,6 +10,7 @@ import { ArrowLineUp } from 'phosphor-react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -20,6 +21,7 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
@@ -57,7 +59,7 @@ const FundProposalForm = ({
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [transactionMessage, setTransactionMessage] = useState<string>()
-    const [errorMsg, setErrorMsg] = useState<string>()
+    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
 
     const erc20TokenContract = new ethers.Contract(
         proposal.collateralToken,
@@ -110,7 +112,7 @@ const FundProposalForm = ({
                 setInput(initialInput)
             }
         } catch (e) {
-            console.warn(e)
+            cpLogger.push(e)
         }
     }
 
@@ -184,9 +186,8 @@ const FundProposalForm = ({
         try {
             await contractCall()
             setTransactionMessage(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
             setTransactionMessage(undefined)
         }
     }

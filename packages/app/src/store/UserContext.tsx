@@ -11,6 +11,7 @@ import PermissionProvider from './PermissionContext'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3Modal from 'web3modal'
 import _ from 'lodash'
+import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
 export type PermissionType = string
@@ -154,7 +155,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 chainId: network.chainId,
             })
         } catch (e) {
-            console.warn(e)
+            cpLogger.push(e)
         }
     }, [])
 

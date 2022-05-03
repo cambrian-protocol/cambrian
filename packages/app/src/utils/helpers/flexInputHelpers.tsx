@@ -24,6 +24,8 @@ export const getFlexInputType = (
             ?.config.slots[tag.id]
         if (slot?.dataTypes[0] === SolidityDataTypes.Uint256) {
             return 'number'
+        } else if (slot?.dataTypes[0] === SolidityDataTypes.Address) {
+            return 'address'
         } else {
             return 'string'
         }
