@@ -24,7 +24,7 @@ const BaseMenuListItem = ({
     hideDivider,
 }: BaseMenuListItemProps) => {
     return (
-        <IconContext.Provider value={{ size: '24', color: 'white' }}>
+        <IconContext.Provider value={{ size: '32', color: 'white' }}>
             <Box
                 direction="row"
                 justify="between"
@@ -37,8 +37,10 @@ const BaseMenuListItem = ({
                 height={{ min: 'auto' }}
                 width={{ min: 'auto' }}
             >
-                <Box direction="row" gap="large" align="center">
-                    <Box width={{ min: '2em' }}>{icon}</Box>
+                <Box direction="row" gap="medium" align="center">
+                    <Box width={{ min: '5em' }} align="center">
+                        {icon}
+                    </Box>
                     <Box>
                         <Text color="white">{title}</Text>
                         <Text size="small" color="light-4" truncate>
