@@ -1,3 +1,4 @@
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
@@ -13,8 +14,7 @@ export const fetchLatestSubmission = async (
         cids
     )) as SubmissionModel[]
 
-    if (!allSubmissions)
-        throw new Error('Something went wrong whole fetching from IPFS')
+    if (!allSubmissions) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
 
     const currentConditionSubmissions = allSubmissions.filter(
         (x) => x.conditionId === currentCondition.conditionId

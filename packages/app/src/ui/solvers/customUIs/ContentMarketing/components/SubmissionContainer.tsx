@@ -12,6 +12,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { SubmissionModel } from '../models/SubmissionModel'
 import SubmissionView from './SubmissionView'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { fetchLatestSubmission } from '../helpers/fetchLatestSubmission'
 import usePermission from '@cambrian/app/hooks/usePermission'
@@ -41,10 +42,12 @@ const SubmissionContainer = ({
 
     useEffect(() => {
         let isMounted = true
-        initLatestSubmission().then((submission) => {
-            if (isMounted && submission !== undefined)
-                setLatestSubmission(submission)
-        })
+        initLatestSubmission()
+            .then((submission) => {
+                if (isMounted && submission !== undefined)
+                    setLatestSubmission(submission)
+            })
+            .catch((e) => cpLogger.push(e))
 
         return () => {
             isMounted = false

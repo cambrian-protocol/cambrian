@@ -2,6 +2,7 @@ import { EventFilter, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import { Info } from 'phosphor-react'
@@ -9,6 +10,7 @@ import LoadingScreen from '../../info/LoadingScreen'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ExecuteSolveActionbarProps {
     currentCondition: SolverContractCondition
@@ -26,7 +28,7 @@ const ExecuteSolveActionbar = ({
     updateSolverData,
 }: ExecuteSolveActionbarProps) => {
     const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const changedStatusFilter = {
         address: currentUser.address,
@@ -56,10 +58,9 @@ const ExecuteSolveActionbar = ({
                     : currentCondition.executions - 1
             await solverMethods.executeSolve(conditionIndex)
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 

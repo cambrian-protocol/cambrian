@@ -2,7 +2,7 @@ import { BigNumber, EventFilter, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoadingScreen from '../../info/LoadingScreen'
@@ -11,6 +11,7 @@ import { Spinner } from 'grommet'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { Timer } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ConfirmOutcomeActionbarProps {
     currentUser: UserType
@@ -32,7 +33,7 @@ const ConfirmOutcomeActionbar = ({
     // Necessary for the time gap between block timestamps
     const [isUnlockingTimestamp, setIsUnlockingTimestamp] = useState(false)
     const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const changedStatusFilter = {
         address: currentUser.address,
@@ -81,8 +82,7 @@ const ConfirmOutcomeActionbar = ({
             setTimelock(timeLockSeconds)
             await updateTimeLock(timeLockSeconds)
         } catch (e) {
-            console.error(e)
-            setErrMsg(ERROR_MESSAGE['CONTRACT_CALL_ERROR'])
+            setErrMsg(await cpLogger.push(e))
         }
     }
 
@@ -103,10 +103,9 @@ const ConfirmOutcomeActionbar = ({
         try {
             await solverMethods.confirmPayouts(currentCondition.executions - 1)
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
             setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 

@@ -5,6 +5,7 @@ import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalUI from '@cambrian/app/ui/proposals/CreateProposalUI'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FolderOpen } from 'phosphor-react'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
@@ -12,6 +13,7 @@ import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useRouter } from 'next/dist/client/router'
 
 export default function CreateProposalPage() {
@@ -20,7 +22,7 @@ export default function CreateProposalPage() {
     const [metaStages, setMetaStages] = useState<Stages>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
         useState(false)
-    const [errorMessage, setErrorMessage] = useState<string>()
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [showRecentProposalsModal, setShowRecentProposalsModal] =
         useState(false)
 
@@ -41,9 +43,8 @@ export default function CreateProposalPage() {
                 )
 
                 if (stages) return setMetaStages(stages)
-            } catch (e: any) {
-                console.error(e)
-                setErrorMessage(e.message)
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
             }
         }
         setShowInvalidQueryComponent(true)

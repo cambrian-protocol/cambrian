@@ -9,6 +9,7 @@ import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoadingScreen from '../info/LoadingScreen'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface ChatModalProps {
@@ -67,8 +68,8 @@ const ChatModal = ({
                         )
                         setTransactionMessage(undefined)
                     }
-                } catch (error) {
-                    console.error(error)
+                } catch (e) {
+                    cpLogger.push(e)
                 }
             }
         )

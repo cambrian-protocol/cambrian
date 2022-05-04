@@ -18,13 +18,13 @@ declare global {
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
-        <ErrorBoundary>
-            <Store>
-                <Grommet full theme={cpTheme} themeMode="dark">
-                    <GlobalStyle />
+        <Store>
+            <Grommet full theme={cpTheme} themeMode="dark">
+                <GlobalStyle />
+                <ErrorBoundary>
                     <Component {...pageProps} />
-                </Grommet>
-            </Store>
-        </ErrorBoundary>
+                </ErrorBoundary>
+            </Grommet>
+        </Store>
     )
 }

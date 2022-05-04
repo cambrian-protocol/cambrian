@@ -3,6 +3,7 @@ import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
 import { Button } from 'grommet'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
 import Stagehand from '@cambrian/app/classes/Stagehand'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
@@ -37,8 +38,8 @@ const ComposerActionbar = () => {
                 setExportedCompositionCID(ipfsHash)
                 toggleShowExportCompositionModal()
             }
-        } catch (err) {
-            console.error(err)
+        } catch (e) {
+            cpLogger.push(e)
         }
     }
 
