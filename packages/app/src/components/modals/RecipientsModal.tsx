@@ -28,7 +28,7 @@ const RecipientsModal = ({
                             info={recipientAddress.tag?.description}
                             key={idx}
                             title={recipientAddress.tag?.label}
-                            subTitle={decodeData(
+                            address={decodeData(
                                 [SolidityDataTypes.Address],
                                 recipientAddress.slot.data
                             )}

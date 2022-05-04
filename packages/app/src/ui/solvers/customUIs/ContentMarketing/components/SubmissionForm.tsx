@@ -13,24 +13,16 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Stack } from 'grommet'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
-import { Text } from 'grommet'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { fetchLatestSubmission } from '../helpers/fetchLatestSubmission'
 
 interface WriterUIProps {
     currentCondition: SolverContractCondition
     currentUser: UserType
     solverContract: ethers.Contract
     latestSubmission: SubmissionModel
-}
-
-export const initialSubmission = {
-    conditionId: '',
-    sender: { address: '' },
-    submission: '',
 }
 
 const SubmissionForm = ({
@@ -43,31 +35,9 @@ const SubmissionForm = ({
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [transactionMsg, setTransactionMsg] = useState<string>()
 
-    const submittedWorkFilter = solverContract.filters.SubmittedWork()
-
     useEffect(() => {
-        solverContract.on(submittedWorkFilter, submissionListener)
-        return () => {
-            solverContract.removeListener(
-                submittedWorkFilter,
-                submissionListener
-            )
-        }
-    }, [currentUser])
-
-    const submissionListener = async () => {
-        try {
-            const logs = await solverContract.queryFilter(submittedWorkFilter)
-            const fetchedLatesSubmission = await fetchLatestSubmission(
-                logs,
-                currentCondition
-            )
-            if (fetchedLatesSubmission) setInput(fetchedLatesSubmission)
-        } catch (e) {
-            setErrorMsg(await cpLogger.push(e))
-        }
-        setTransactionMsg(undefined)
-    }
+        setInput(latestSubmission)
+    }, [latestSubmission])
 
     const onSubmit = async (): Promise<void> => {
         setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
@@ -81,37 +51,34 @@ const SubmissionForm = ({
             if (!currentUser.address)
                 throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const workObj: SubmissionModel = {
+            const submission: SubmissionModel = {
                 submission: input.submission,
                 conditionId: currentCondition.conditionId,
                 sender: { address: currentUser.address },
                 timestamp: new Date(),
             }
             const ipfs = new IPFSAPI()
-            const response = await ipfs.pin(workObj)
+            const response = await ipfs.pin(submission)
 
             if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
-            await solverContract.submitWork(
-                response.IpfsHash,
-                currentCondition.conditionId
-            )
+            const transaction: ethers.ContractTransaction =
+                await solverContract.submitWork(
+                    response.IpfsHash,
+                    currentCondition.conditionId
+                )
             setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
+            const rc = await transaction.wait()
+            if (!rc.events?.find((event) => event.event === 'SubmittedWork'))
+                throw new Error('Error while submitting work')
         } catch (e) {
             setErrorMsg(await cpLogger.push(e))
-            setTransactionMsg(undefined)
         }
+        setTransactionMsg(undefined)
     }
-
     return (
         <>
             <Box fill gap="medium">
-                {input.timestamp !== undefined && (
-                    <Text size="small" color="dark-4">
-                        Last submission:
-                        {new Date(input.timestamp).toLocaleString()}
-                    </Text>
-                )}
                 <Stack anchor="center" fill>
                     <TextArea
                         placeholder="Type your article here..."
@@ -127,7 +94,15 @@ const SubmissionForm = ({
                         }
                     />
                 </Stack>
-                <Button primary label="Submit work" onClick={onSubmit} />
+                <Button
+                    disabled={
+                        input.submission === latestSubmission.submission ||
+                        input.submission.trim() === ''
+                    }
+                    primary
+                    label="Submit work"
+                    onClick={onSubmit}
+                />
                 <Box pad="small" />
             </Box>
             {errorMsg && (

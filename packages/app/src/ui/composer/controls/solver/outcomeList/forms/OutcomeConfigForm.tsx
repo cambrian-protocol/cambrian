@@ -4,7 +4,6 @@ import React, { SetStateAction } from 'react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { IconContext } from 'phosphor-react'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { required } from '@cambrian/app/utils/helpers/validation'
 
 interface OutcomeConfigFormProps {
     onSubmit: (event: FormExtendedEvent<OutcomeModel, Element>) => void
@@ -27,13 +26,9 @@ const OutcomeConfigForm = ({
                 setOutcomeInput(nextValue)
             }}
         >
-            <FormField name="title" label="Title*" validate={required} />
-            <FormField
-                name="description"
-                label="Description*"
-                validate={required}
-            />
-            <FormField name="uri" label="URI*" validate={required} />
+            <FormField name="title" label="Title" required />
+            <FormField name="description" label="Description" required />
+            <FormField name="uri" label="URI" required />
             <FormField name="context" label="Context" />
             <IconContext.Provider value={{ size: '24' }}>
                 <Box>
