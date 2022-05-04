@@ -20,7 +20,7 @@ const AddSolverDataContent = ({ metadata }: AddSolverDataContentProps) => {
                         <HeaderTextSection
                             title="Initiated Solver"
                             subTitle="Please follow the instructions"
-                            paragraph="Add required data and progress to begin work."
+                            paragraph="Begin when ready! Add data if required."
                         />
                         {metadata?.stages && (
                             <ProposalContextHeader
@@ -38,7 +38,7 @@ const AddSolverDataContent = ({ metadata }: AddSolverDataContentProps) => {
                     <HeaderTextSection
                         subTitle="Please come back later..."
                         title="Solver not ready yet"
-                        paragraph="Required data still needs to be added to the Solver in order to use and interact with it."
+                        paragraph="This Solver is waiting to begin. The Keeper may need to add required data first."
                     />
                 )}
             </Box>
