@@ -1,11 +1,13 @@
 import { Box, Heading } from 'grommet'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import React, { useEffect, useState } from 'react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalContextHeader from './ProposalContextHeader'
@@ -14,6 +16,7 @@ import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import VisitProposalCTA from './VisitProposalCTA'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
@@ -29,7 +32,7 @@ const ProposalUI = ({
     currentUser,
 }: ProposalUIProps) => {
     const [metaStages, setMetaStages] = useState<Stages>()
-    const [errorMessage, setErrorMessage] = useState<string>()
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(false)
 
     useEffect(() => {
@@ -41,21 +44,19 @@ const ProposalUI = ({
         try {
             setIsProposalExecuted(await proposal.isExecuted)
         } catch (e) {
-            console.warn(e)
+            cpLogger.push(e)
         }
     }
 
     const initMetaData = async () => {
         try {
-            if (!proposal.metadataCID)
-                throw new Error(ERROR_MESSAGE['INVALID_METADATA'])
+            if (!proposal.metadataCID) throw GENERAL_ERROR['INVALID_METADATA']
 
             const metadataCIDString = getMultihashFromBytes32(
                 proposal.metadataCID
             )
 
-            if (!metadataCIDString)
-                throw new Error(ERROR_MESSAGE['INVALID_METADATA'])
+            if (!metadataCIDString) throw GENERAL_ERROR['INVALID_METADATA']
 
             const stagehand = new Stagehand()
             const stages = await stagehand.loadStages(
@@ -63,12 +64,11 @@ const ProposalUI = ({
                 StageNames.proposal
             )
 
-            if (!stages) throw new Error(ERROR_MESSAGE['IPFS_FETCH_ERROR'])
+            if (!stages) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
 
             setMetaStages(stages)
-        } catch (e: any) {
-            console.error(e)
-            setErrorMessage(e.message)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 

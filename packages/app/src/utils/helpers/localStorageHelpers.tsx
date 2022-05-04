@@ -1,3 +1,5 @@
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+
 export const storeIdInLocalStorage = (
     prefix: string,
     key: string,
@@ -21,6 +23,7 @@ export const storeIdInLocalStorage = (
         localStorage.setItem(keyWithPrefix, JSON.stringify(arr))
     } catch (e) {
         console.warn('Error while trying to save to local storage', e)
+        cpLogger.push(e)
     }
 }
 

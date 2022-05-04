@@ -19,7 +19,7 @@ import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { MetadataModel } from '../../models/MetadataModel'
@@ -36,6 +36,7 @@ import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
@@ -67,7 +68,7 @@ export const getSolverConfig = async (
             conditionBase: parsedCondition,
         }
     } catch (e) {
-        console.error(e)
+        cpLogger.push(e)
         return Promise.reject()
     }
 }
@@ -87,7 +88,7 @@ export const getSolverConditions = async (
             }
         })
     } catch (e) {
-        console.error(e)
+        cpLogger.push(e)
         return Promise.reject()
     }
 }
@@ -379,8 +380,7 @@ export const getSolverData = async (
         storedMetadata?.slotTags
     )
 
-    if (!currentUser.chainId)
-        throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+    if (!currentUser.chainId) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
     // ERC-1155 Conditional Token Framework
     const ctfContract = new CTFContract(

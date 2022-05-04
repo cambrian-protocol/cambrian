@@ -13,10 +13,9 @@ import { AppbarItem } from '../nav/AppbarItem'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import ConditionVersionSidebar from '@cambrian/app/ui/interaction/bars/ConditionVersionSidebar'
 import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { Info } from 'phosphor-react'
@@ -33,6 +32,7 @@ import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigIn
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
@@ -62,7 +62,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     // IPFS data
     const [metadata, setMetadata] = useState<MetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
-    const [errorMessage, setErrorMessage] = useState<string>()
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const [proposedOutcome, setProposedOutcome] =
         useState<OutcomeCollectionModel>()
@@ -170,8 +170,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             setMetadata(fetchedMetadata)
             setOutcomes(fetchedOutcomes)
         } catch (e) {
-            console.error(e)
-            setErrorMessage(ERROR_MESSAGE['CONTRACT_CALL_ERROR'])
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
