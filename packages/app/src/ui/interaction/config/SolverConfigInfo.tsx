@@ -22,6 +22,7 @@ import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'
+import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -77,7 +78,9 @@ const SolverConfigInfo = ({
                     }
                     title="Timelock"
                     icon={<Timer />}
-                    subTitle={solverData.config.timelockSeconds.toString()}
+                    subTitle={parseSecondsToDisplay(
+                        solverData.config.timelockSeconds
+                    )}
                 />
                 <BaseMenuListItem
                     info={

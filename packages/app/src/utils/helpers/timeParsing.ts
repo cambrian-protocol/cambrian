@@ -28,3 +28,28 @@ export const parseSecondsToForm = (
         minutes: minutes,
     }
 }
+
+export const parseSecondsToDisplay = (seconds: number): string => {
+    const parsedSeconds = parseSecondsToForm(seconds)
+
+    let timelockDisplay = ''
+
+    if (parsedSeconds.days > 0)
+        timelockDisplay += `${parsedSeconds.days} Day${
+            parsedSeconds.days > 1 ? 's' : ''
+        } `
+    if (parsedSeconds.hours > 0)
+        timelockDisplay += `${parsedSeconds.hours} Hour${
+            parsedSeconds.hours > 1 ? 's' : ''
+        } `
+    if (parsedSeconds.minutes > 0)
+        timelockDisplay += `${parsedSeconds.minutes} Minute${
+            parsedSeconds.minutes > 1 ? 's' : ''
+        } `
+
+    if (timelockDisplay === '') {
+        return 'No timelock set'
+    } else {
+        return timelockDisplay
+    }
+}
