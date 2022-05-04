@@ -13,11 +13,11 @@ type RecipientAllocationItemProps = BaseSlotInputItemProps & {
 const RecipientAllocationItem = ({
     amountPercentage,
     title,
-    subTitle,
+    address,
     amount,
     token,
 }: RecipientAllocationItemProps) => (
-    <BaseSlotInputItem title={title} subTitle={subTitle}>
+    <BaseSlotInputItem title={title} address={address}>
         <Box align="end">
             <Text>{amountPercentage}%</Text>
             <Text size="small" color="dark-6">
