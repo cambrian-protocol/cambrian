@@ -7,6 +7,7 @@ import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoadingScreen from '../../info/LoadingScreen'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { Spinner } from 'grommet'
 import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { Timer } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -26,8 +27,10 @@ const ConfirmOutcomeActionbar = ({
     currentCondition,
     updateSolverData,
 }: ConfirmOutcomeActionbarProps) => {
-    const [currentTimelock, setCurrentTimelock] = useState(0)
+    const [timelock, setTimelock] = useState(0)
     const [isTimelockActive, setIsTimelockActive] = useState(false)
+    // Necessary for the time gap between block timestamps
+    const [isUnlockingTimestamp, setIsUnlockingTimestamp] = useState(false)
     const [transactionMsg, setTransactionMsg] = useState<string>()
     const [errMsg, setErrMsg] = useState<string>()
 
@@ -54,13 +57,15 @@ const ConfirmOutcomeActionbar = ({
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
-        if (isTimelockActive) {
-            intervalId = setInterval(() => {
-                setIsTimelockActive(new Date().getTime() < currentTimelock)
-            }, 1000)
+        if (timelock) {
+            if (isTimelockActive || isUnlockingTimestamp) {
+                intervalId = setInterval(() => {
+                    updateTimeLock(timelock)
+                }, 1500)
+            }
         }
         return () => clearInterval(intervalId)
-    }, [currentTimelock, isTimelockActive])
+    }, [timelock, isTimelockActive, isUnlockingTimestamp])
 
     const confirmOutcomeListener = async () => {
         await updateSolverData()
@@ -69,17 +74,28 @@ const ConfirmOutcomeActionbar = ({
 
     const initTimelock = async () => {
         try {
-            const timeLockResponse: BigNumber = await solverMethods.timelocks(
+            const fetchedTimeLock: BigNumber = await solverMethods.timelocks(
                 currentCondition.executions - 1
             )
-
-            const timeLockMilliseconds = timeLockResponse.toNumber() * 1000
-            setCurrentTimelock(timeLockMilliseconds)
-            setIsTimelockActive(new Date().getTime() < timeLockMilliseconds)
+            const timeLockSeconds = fetchedTimeLock.toNumber()
+            setTimelock(timeLockSeconds)
+            await updateTimeLock(timeLockSeconds)
         } catch (e) {
             console.error(e)
             setErrMsg(ERROR_MESSAGE['CONTRACT_CALL_ERROR'])
         }
+    }
+
+    const updateTimeLock = async (currentTimelock: number) => {
+        const latestBlockTimestamp = (
+            await currentUser.web3Provider.getBlock('latest')
+        ).timestamp
+
+        setIsTimelockActive(latestBlockTimestamp < currentTimelock)
+        const isTimeExpired = new Date().getTime() / 1000 > currentTimelock
+        setIsUnlockingTimestamp(
+            isTimeExpired && latestBlockTimestamp < currentTimelock
+        )
     }
 
     const onConfirmOutcome = async () => {
@@ -94,7 +110,19 @@ const ConfirmOutcomeActionbar = ({
         }
     }
 
-    const actions = isTimelockActive
+    const actions = isUnlockingTimestamp
+        ? {
+              primaryAction: {
+                  label: 'Confirm Outcome',
+                  disabled: true,
+              },
+              info: {
+                  icon: <Spinner />,
+                  label: `${new Date(timelock * 1000).toLocaleString()}`,
+                  descLabel: 'Releasing Timelock...',
+              },
+          }
+        : isTimelockActive
         ? {
               primaryAction: {
                   label: 'Confirm Outcome',
@@ -102,7 +130,7 @@ const ConfirmOutcomeActionbar = ({
               },
               info: {
                   icon: <Timer />,
-                  label: `${new Date(currentTimelock).toLocaleString()}`,
+                  label: `${new Date(timelock * 1000).toLocaleString()}`,
                   descLabel: 'Timelock active until',
               },
           }
