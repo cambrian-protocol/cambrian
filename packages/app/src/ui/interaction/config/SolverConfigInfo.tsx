@@ -1,6 +1,5 @@
 import {
     ArrowSquareIn,
-    Coin,
     Coins,
     Timer,
     TreeStructure,
@@ -21,6 +20,7 @@ import OutcomeCollectionModal from '../../../components/modals/OutcomeCollection
 import RecipientsModal from '../../../components/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { ethers } from 'ethers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
@@ -83,45 +83,33 @@ const SolverConfigInfo = ({
                     )}
                 />
                 <BaseMenuListItem
+                    title="Escrow Balance"
+                    icon={<Vault />}
+                    subTitle={
+                        solverData.numMintedTokensByCondition
+                            ? `${ethers.utils.formatUnits(
+                                  solverData.numMintedTokensByCondition[
+                                      currentCondition.conditionId
+                                  ],
+                                  solverData.collateralToken.decimals
+                              )}  ${
+                                  solverData.collateralToken.symbol ||
+                                  solverData.collateralToken.name ||
+                                  ''
+                              }`
+                            : '0'
+                    }
+                />
+                <BaseMenuListItem
                     info={
                         solverData.slotTags
                             ? solverData.slotTags['collateralToken']
                                   ?.description
                             : undefined
                     }
-                    title="Token"
-                    icon={<Coin />}
-                    subTitle={`${solverData.collateralToken.address} ${
-                        solverData.collateralToken.symbol ||
-                        solverData.collateralToken.name ||
-                        ''
-                    }`}
-                />
-                <BaseMenuListItem
-                    title="Collateral Balance"
-                    icon={<Coins />}
-                    subTitle={`${ethers.utils
-                        .formatUnits(
-                            solverData.collateralBalance,
-                            solverData.collateralToken.decimals
-                        )
-                        .toString()}`}
-                />
-                <BaseMenuListItem
-                    title="Escrow Balance"
-                    icon={<Vault />}
-                    subTitle={
-                        solverData.numMintedTokensByCondition
-                            ? `${ethers.utils
-                                  .formatUnits(
-                                      solverData.numMintedTokensByCondition[
-                                          currentCondition.conditionId
-                                      ],
-                                      solverData.collateralToken.decimals
-                                  )
-                                  .toString()}`
-                            : '0'
-                    }
+                    title="Token Info"
+                    icon={<TokenAvatar token={solverData.collateralToken} />}
+                    subTitle={solverData.collateralToken.address}
                 />
             </Box>
             {showRecipientModal && (
