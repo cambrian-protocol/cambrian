@@ -35,7 +35,7 @@ const RecipientAllocationModal = ({
                         <RecipientAllocationItem
                             key={idx}
                             title={allocation.addressSlot.tag?.label}
-                            subTitle={decodedAddress}
+                            address={decodedAddress}
                             amount={allocation.amount}
                             amountPercentage={allocation.amountPercentage}
                             token={token}

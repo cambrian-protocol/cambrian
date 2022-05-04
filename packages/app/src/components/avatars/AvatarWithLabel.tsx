@@ -27,11 +27,11 @@ const AvatarWithLabel = ({
             <BaseAvatar pfpPath={pfpPath} address={address} />
             <Box justify="center" align="center">
                 {role !== undefined && (
-                    <Text size="xmall" color="dark-5">
+                    <Text size="xmall" color="dark-5" textAlign="center">
                         {role}
                     </Text>
                 )}
-                <Text size="small" weight="bold">
+                <Text size="small" weight="bold" textAlign="center">
                     {label || 'Anonym'}
                 </Text>
             </Box>

@@ -30,7 +30,7 @@ const KeeperInputsModal = ({
                                 key={manualSlot.slot.slot}
                                 info={manualSlot.tag.description}
                                 title={manualSlot.tag.label}
-                                subTitle={decodeData(
+                                address={decodeData(
                                     [SolidityDataTypes.Address],
                                     manualSlot.slot.data
                                 )}
