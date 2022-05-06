@@ -57,7 +57,7 @@ interface ISolver {
 
     function arbitrate(uint256 _index, uint256[] calldata _payouts) external;
 
-    function nullArbitrate(uint256 _index) external;
+    function arbitrateNull(uint256 _index) external;
 
     function arbitrationRequested(uint256 _index) external;
 
@@ -95,6 +95,21 @@ interface ISolver {
     function arbitrator() external view returns (address);
 
     function collateralBalance() external view returns (uint256 balance);
+
+    function timelocks(uint256 conditionIndex)
+        external
+        view
+        returns (uint256 timelock);
+
+    function isRecipient(address account, uint256 conditionIndex)
+        external
+        view
+        returns (bool);
+
+    function getStatus(uint256 conditionIndex)
+        external
+        view
+        returns (SolverLib.Status status);
 
     function redeemPosition(
         IERC20 _collateralToken,
