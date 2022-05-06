@@ -434,25 +434,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function arbitrationRequested(uint256 _index) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
-            conditions[_index].status == SolverLib.Status.OutcomeProposed,
-            "Not OutcomeProposed"
+            conditions[_index].status == SolverLib.Status.OutcomeProposed ||
+                conditions[_index].status ==
+                SolverLib.Status.ArbitrationRequested,
+            "Cannot request"
         );
 
         SolverLib.arbitrationRequested(conditions[_index]);
-        updateTimelock(_index);
-    }
-
-    /**
-        @dev Sets condition.status to ArbitrationPending.
-        @param _index Index of condition
-     */
-    function arbitrationPending(uint256 _index) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
-        require(
-            conditions[_index].status == SolverLib.Status.ArbitrationRequested,
-            "Not ArbitrationRequested"
-        );
-        SolverLib.arbitrationPending(conditions[_index]);
         updateTimelock(_index);
     }
 
@@ -464,8 +452,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function arbitrate(uint256 _index, uint256[] memory payouts) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
-            conditions[_index].status == SolverLib.Status.ArbitrationPending,
-            "Not ArbitrationPending"
+            conditions[_index].status == SolverLib.Status.ArbitrationRequested,
+            "Not ArbitrationRequested"
         );
         require(block.timestamp > timelocks[_index], "Timelock still locked");
         require(
@@ -482,8 +470,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function arbitrateNull(uint256 _index) external {
         require(msg.sender == config.arbitrator, "Only arbitrator");
         require(
-            conditions[_index].status == SolverLib.Status.ArbitrationPending,
-            "Not ArbitrationPending"
+            conditions[_index].status == SolverLib.Status.ArbitrationRequested,
+            "Not ArbitrationRequested"
         );
         SolverLib.arbitrateNull(conditions[_index]);
         updateTimelock(_index);
@@ -523,6 +511,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return config;
     }
 
+    function keeper() public view returns (address) {
+        return config.keeper;
+    }
+
     function arbitrator() public view returns (address) {
         return config.arbitrator;
     }
@@ -543,6 +535,37 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         balance = IERC20(config.conditionBase.collateralToken).balanceOf(
             address(this)
         );
+    }
+
+    /**
+     * @notice Returns recipient addresses for a condition
+     */
+    function isRecipient(address account, uint256 conditionIndex)
+        public
+        view
+        returns (bool)
+    {
+        for (uint256 i; i < config.conditionBase.allocations.length; i++) {
+            address recipient = abi.decode(
+                datas.slots[
+                    config.conditionBase.allocations[i].recipientAddressSlot
+                ][conditionIndex],
+                (address)
+            );
+
+            if (account == recipient) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getStatus(uint256 conditionIndex)
+        public
+        view
+        returns (SolverLib.Status status)
+    {
+        status = conditions[conditionIndex].status;
     }
 
     // ********************************************************************************** //

@@ -23,8 +23,7 @@ library SolverLib {
         Initiated, // Default state
         Executed, // Solver has executed according to configuration
         OutcomeProposed, // Outcome has been proposed for reporting
-        ArbitrationRequested, // One party has requested arbitration on this condition
-        ArbitrationPending, // An official dispute has been raised and requires arbitration
+        ArbitrationRequested, // Arbitration has been requested for this condition
         ArbitrationDelivered, // Arbitration (except 'null' arbitration) has been delivered for this condition
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
     }
@@ -281,11 +280,6 @@ library SolverLib {
     {
         condition.status = Status.OutcomeReported;
         reportPayouts(ctfAddress, condition);
-    }
-
-    function arbitrationPending(Condition storage condition) public {
-        condition.status = Status.ArbitrationPending;
-        emit ChangedStatus(condition.conditionId);
     }
 
     function arbitrationRequested(Condition storage condition) public {
