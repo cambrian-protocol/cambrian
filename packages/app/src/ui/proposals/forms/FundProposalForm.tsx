@@ -14,9 +14,9 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -58,7 +58,9 @@ const FundProposalForm = ({
     const [funding, setFunding] = useState(BigNumber.from(0))
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [transactionMessage, setTransactionMessage] = useState<string>()
+    const [isInPrimaryTransaction, setIsInPrimaryTransaction] = useState(false)
+    const [isInSecondaryTransaction, setIsInSecondaryTransaction] =
+        useState(false)
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
 
     const erc20TokenContract = new ethers.Contract(
@@ -127,7 +129,7 @@ const FundProposalForm = ({
         ) {
             setCurrentAllowance(amount)
         }
-        setTransactionMessage(undefined)
+        setIsInPrimaryTransaction(false)
     }
 
     const initTokenAndFunding = async () => {
@@ -146,6 +148,7 @@ const FundProposalForm = ({
             proposalsHub.contract.filters.FundProposal(null, null, null),
             async (proposalId) => {
                 await updateFunding(proposalId)
+                setIsInPrimaryTransaction(false)
             }
         )
 
@@ -153,6 +156,7 @@ const FundProposalForm = ({
             proposalsHub.contract.filters.DefundProposal(null, null, null),
             async (proposalId) => {
                 await updateFunding(proposalId)
+                setIsInSecondaryTransaction(false)
             }
         )
 
@@ -164,7 +168,7 @@ const FundProposalForm = ({
                 )
                 if (updatedProposal && updatedProposal.isExecuted) {
                     setIsProposalExecuted(true)
-                    setTransactionMessage(undefined)
+                    setIsInPrimaryTransaction(false)
                 }
             }
         )
@@ -177,44 +181,50 @@ const FundProposalForm = ({
         if (proposalFunding) {
             await initAllowance()
             setFunding(proposalFunding)
-            setTransactionMessage(undefined)
         }
     }
 
-    const safeTransactionCall = async (contractCall: () => Promise<void>) => {
-        setTransactionMessage(TRANSACITON_MESSAGE['CONFIRM'])
+    const safeTransactionCall = async (
+        contractCall: () => Promise<void>,
+        isLoading: React.Dispatch<SetStateAction<boolean>>
+    ) => {
+        isLoading(true)
         try {
             await contractCall()
-            setTransactionMessage(TRANSACITON_MESSAGE['WAIT'])
         } catch (e) {
+            isLoading(false)
             setErrorMsg(await cpLogger.push(e))
-            setTransactionMessage(undefined)
         }
     }
 
     const onApproveFunding = async () => {
-        safeTransactionCall(() =>
-            proposalsHub.approveFunding(input.amount, collateralToken)
+        safeTransactionCall(
+            () => proposalsHub.approveFunding(input.amount, collateralToken),
+            setIsInPrimaryTransaction
         )
     }
 
     const onFundProposal = async () => {
-        safeTransactionCall(() =>
-            proposalsHub.fundProposal(
-                proposal.id,
-                input.amount,
-                collateralToken
-            )
+        safeTransactionCall(
+            () =>
+                proposalsHub.fundProposal(
+                    proposal.id,
+                    input.amount,
+                    collateralToken
+                ),
+            setIsInPrimaryTransaction
         )
     }
 
     const onDefundProposal = async () => {
-        safeTransactionCall(() =>
-            proposalsHub.defundProposal(
-                proposal.id,
-                input.amount,
-                collateralToken
-            )
+        safeTransactionCall(
+            () =>
+                proposalsHub.defundProposal(
+                    proposal.id,
+                    input.amount,
+                    collateralToken
+                ),
+            setIsInSecondaryTransaction
         )
     }
 
@@ -225,7 +235,7 @@ const FundProposalForm = ({
                 currentUser.web3Provider
             )
             await proposalsHub.executeProposal(proposal.id, solverConfigs)
-        })
+        }, setIsInPrimaryTransaction)
     }
 
     const inputMaxAmount = () => {
@@ -248,6 +258,8 @@ const FundProposalForm = ({
                     collateralToken?.decimals
                 )
             )
+
+    const disableButtons = isInPrimaryTransaction || isInSecondaryTransaction
 
     return (
         <>
@@ -290,20 +302,24 @@ const FundProposalForm = ({
                                         name="amount"
                                         label="Amount"
                                         type="number"
-                                        required
+                                        required={
+                                            !funding.eq(proposal.fundingGoal)
+                                        }
+                                        disabled={disableButtons}
                                     />
-                                    {currentAllowance !== undefined && (
-                                        <Text size="small" color="dark-4">
-                                            You have approved access to{' '}
-                                            {Number(
-                                                ethers.utils.formatUnits(
-                                                    currentAllowance,
-                                                    collateralToken.decimals
-                                                )
-                                            )}{' '}
-                                            {collateralToken.symbol}
-                                        </Text>
-                                    )}
+                                    {currentAllowance !== undefined &&
+                                        !currentAllowance.isZero() && (
+                                            <Text size="small" color="dark-4">
+                                                You have approved access to{' '}
+                                                {Number(
+                                                    ethers.utils.formatUnits(
+                                                        currentAllowance,
+                                                        collateralToken.decimals
+                                                    )
+                                                )}{' '}
+                                                {collateralToken.symbol}
+                                            </Text>
+                                        )}
                                 </Box>
                                 <TokenAvatar token={collateralToken} />
                                 <Box alignSelf="center">
@@ -315,14 +331,17 @@ const FundProposalForm = ({
                                 </Box>
                             </BaseFormGroupContainer>
                             <Box direction="row" justify="between">
-                                <Button
-                                    disabled={!isValidInput}
+                                <LoaderButton
+                                    isLoading={isInSecondaryTransaction}
+                                    disabled={!isValidInput || disableButtons}
                                     secondary
                                     label="Defund Proposal"
                                     onClick={onDefundProposal}
                                 />
                                 {funding.eq(proposal.fundingGoal) ? (
-                                    <Button
+                                    <LoaderButton
+                                        isLoading={isInPrimaryTransaction}
+                                        disabled={disableButtons}
                                         primary
                                         type="submit"
                                         label="Execute Proposal"
@@ -334,15 +353,21 @@ const FundProposalForm = ({
                                           collateralToken.decimals
                                       )
                                   ) ? (
-                                    <Button
-                                        disabled={!isValidInput}
+                                    <LoaderButton
+                                        isLoading={isInPrimaryTransaction}
+                                        disabled={
+                                            !isValidInput || disableButtons
+                                        }
                                         primary
                                         type="submit"
                                         label="Fund Proposal"
                                     />
                                 ) : (
-                                    <Button
-                                        disabled={!isValidInput}
+                                    <LoaderButton
+                                        isLoading={isInPrimaryTransaction}
+                                        disabled={
+                                            !isValidInput || disableButtons
+                                        }
                                         primary
                                         type="submit"
                                         label="Approve Transfer"
@@ -360,9 +385,6 @@ const FundProposalForm = ({
                     onClose={() => setErrorMsg(undefined)}
                     errorMessage={errorMsg}
                 />
-            )}
-            {transactionMessage && (
-                <LoadingScreen context={transactionMessage} />
             )}
         </>
     )
