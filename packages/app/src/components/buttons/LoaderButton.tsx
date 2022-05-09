@@ -7,7 +7,7 @@ import { ButtonExtendedProps } from 'grommet'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
 
-type LoaderButtonProps = ButtonExtendedProps & {
+export type LoaderButtonProps = ButtonExtendedProps & {
     isLoading: boolean
 }
 
