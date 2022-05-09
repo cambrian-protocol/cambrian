@@ -18,7 +18,7 @@ const ErrorScreen = () => (
                     <Box flex>
                         <Button
                             secondary
-                            label="Contact"
+                            label="Support"
                             href="https://discord.gg/pZP4HNYrZs"
                             icon={<DiscordLogo />}
                         />
