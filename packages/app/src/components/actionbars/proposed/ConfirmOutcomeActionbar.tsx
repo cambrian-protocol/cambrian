@@ -1,60 +1,40 @@
-import { BigNumber, EventFilter, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import { BigNumber } from 'ethers'
+import { Button } from 'grommet'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
-import LoadingScreen from '../../info/LoadingScreen'
+import LoaderButton from '../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Spinner } from 'grommet'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { Timer } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 
 interface ConfirmOutcomeActionbarProps {
     currentUser: UserType
-    solverContract: ethers.Contract
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
-    updateSolverData: () => Promise<void>
 }
 
 const ConfirmOutcomeActionbar = ({
     currentUser,
-    solverContract,
     solverMethods,
     currentCondition,
-    updateSolverData,
 }: ConfirmOutcomeActionbarProps) => {
     const [timelock, setTimelock] = useState(0)
     const [isTimelockActive, setIsTimelockActive] = useState(false)
     // Necessary for the time gap between block timestamps
     const [isUnlockingTimestamp, setIsUnlockingTimestamp] = useState(false)
-    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [isConfirming, setIsConfirming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-
-    const changedStatusFilter = {
-        address: currentUser.address,
-        topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
-        fromBlock: 'latest',
-    } as EventFilter
 
     useEffect(() => {
         initTimelock()
     }, [])
-
-    useEffect(() => {
-        solverContract.on(changedStatusFilter, confirmOutcomeListener)
-
-        return () => {
-            solverContract.removeListener(
-                changedStatusFilter,
-                confirmOutcomeListener
-            )
-        }
-    }, [currentUser])
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -67,11 +47,6 @@ const ConfirmOutcomeActionbar = ({
         }
         return () => clearInterval(intervalId)
     }, [timelock, isTimelockActive, isUnlockingTimestamp])
-
-    const confirmOutcomeListener = async () => {
-        await updateSolverData()
-        setTransactionMsg(undefined)
-    }
 
     const initTimelock = async () => {
         try {
@@ -99,22 +74,25 @@ const ConfirmOutcomeActionbar = ({
     }
 
     const onConfirmOutcome = async () => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
-        try {
-            await solverMethods.confirmPayouts(currentCondition.executions - 1)
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e) {
-            setErrMsg(await cpLogger.push(e))
-            setTransactionMsg(undefined)
-        }
+        await invokeContractFunction(
+            'ChangedStatus',
+            () => solverMethods.confirmPayouts(currentCondition.executions - 1),
+            setIsConfirming,
+            setErrMsg,
+            'CONFIRM_OUTCOME_ERROR'
+        )
     }
 
     const actions = isUnlockingTimestamp
         ? {
-              primaryAction: {
-                  label: 'Confirm Outcome',
-                  disabled: true,
-              },
+              primaryAction: (
+                  <Button
+                      size="small"
+                      primary
+                      label="Confirm Outcome"
+                      disabled
+                  />
+              ),
               info: {
                   icon: <Spinner />,
                   label: `${new Date(timelock * 1000).toLocaleString()}`,
@@ -123,10 +101,14 @@ const ConfirmOutcomeActionbar = ({
           }
         : isTimelockActive
         ? {
-              primaryAction: {
-                  label: 'Confirm Outcome',
-                  disabled: true,
-              },
+              primaryAction: (
+                  <Button
+                      size="small"
+                      primary
+                      label="Confirm Outcome"
+                      disabled
+                  />
+              ),
               info: {
                   icon: <Timer />,
                   label: `${new Date(timelock * 1000).toLocaleString()}`,
@@ -134,16 +116,19 @@ const ConfirmOutcomeActionbar = ({
               },
           }
         : {
-              primaryAction: {
-                  onClick: onConfirmOutcome,
-                  label: 'Confirm Outcome',
-              },
+              primaryAction: (
+                  <LoaderButton
+                      primary
+                      onClick={onConfirmOutcome}
+                      label="Confirm Outcome"
+                      isLoading={isConfirming}
+                  />
+              ),
           }
 
     return (
         <>
             <Actionbar actions={actions} />
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
             {errMsg && (
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}

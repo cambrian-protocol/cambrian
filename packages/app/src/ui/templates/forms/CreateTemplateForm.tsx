@@ -1,11 +1,4 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextArea,
-} from 'grommet'
+import { Box, Form, FormExtendedEvent, FormField, TextArea } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -19,12 +12,11 @@ import { CheckBox } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { Plus } from 'phosphor-react'
 import PreferredTokenItem from '@cambrian/app/components/list/PreferredTokenItem'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Stagehand from '@cambrian/app/classes/Stagehand'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import { Text } from 'grommet'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
@@ -82,7 +74,7 @@ const CreateTemplateForm = ({
     onFailure,
 }: CreateTemplateFormProps) => {
     const { currentUser } = useCurrentUser()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [isPinning, setIsPinning] = useState(false)
     const [input, setInput] = useState<CreateTemplateFormType>(initialInput)
     const [isCollateralFlex, setIsCollateralFlex] = useState<boolean>(false)
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
@@ -188,9 +180,8 @@ const CreateTemplateForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
+        setIsPinning(true)
         try {
-            setTransactionMsg(TRANSACITON_MESSAGE['IPFS'])
-
             const updatedInput = { ...input }
             updatedInput.flexInputs.forEach((flexInput) => {
                 let stayFlex = flexInput.value === ''
@@ -228,7 +219,7 @@ const CreateTemplateForm = ({
         } catch (e) {
             onFailure(await cpLogger.push(e))
         }
-        setTransactionMsg(undefined)
+        setIsPinning(false)
     }
 
     return (
@@ -339,17 +330,15 @@ const CreateTemplateForm = ({
                         <BaseFormGroupContainer groupTitle="Notification">
                             <DiscordWebhookInput name="discordWebhook" />
                         </BaseFormGroupContainer>
-                        <Box>
-                            <Button
-                                primary
-                                type="submit"
-                                label="Create Template"
-                            />
-                        </Box>
+                        <LoaderButton
+                            primary
+                            isLoading={isPinning}
+                            type="submit"
+                            label="Create template"
+                        />
                     </Box>
                 </Form>
             </BaseFormContainer>
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }
