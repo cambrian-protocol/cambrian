@@ -90,6 +90,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Error while confirming outcome',
         logLevel: 1,
     },
+    PREPARE_SOLVE_ERROR: {
+        message: 'Error while preparing solve',
+        logLevel: 1,
+    },
 }
 
 export const CONTRACT_ERROR: ErrorMessagesType = {
