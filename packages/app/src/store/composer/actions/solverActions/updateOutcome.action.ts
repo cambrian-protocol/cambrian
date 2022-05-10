@@ -22,6 +22,7 @@ const updateOutcomeAction = (
             outcome.id,
             outcome.title,
             outcome.description,
+            outcome.context,
             outcome.uri
         )
 

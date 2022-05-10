@@ -2,7 +2,9 @@ import { Box, FormExtendedEvent } from 'grommet'
 import React, { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import OutcomeConfigForm from '../forms/OutcomeConfigForm'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { initialOutcomeInput } from './CreateOutcomeModal'
@@ -16,6 +18,7 @@ interface UpdateOutcomeModalProps {
 const UpdateOutcomeModal = ({ outcome, onClose }: UpdateOutcomeModalProps) => {
     const { dispatch } = useComposerContext()
     const [input, setInput] = useState<OutcomeModel>(initialOutcomeInput)
+    const [isPinning, setIsPinning] = useState(false)
 
     useEffect(() => {
         // Init
@@ -28,10 +31,27 @@ const UpdateOutcomeModal = ({ outcome, onClose }: UpdateOutcomeModalProps) => {
         })
     }, [])
 
-    const onSubmit = (event: FormExtendedEvent<OutcomeModel, Element>) => {
+    const onSubmit = async (
+        event: FormExtendedEvent<OutcomeModel, Element>
+    ) => {
         event.preventDefault()
-        dispatch({ type: 'UPDATE_OUTCOME', payload: input })
-        onClose()
+        try {
+            setIsPinning(true)
+            const ipfs = new IPFSAPI()
+            const res = await ipfs.pinRemote({
+                title: input.title,
+                description: input.description,
+                context: input.context,
+            })
+            if (!res || !res.IpfsHash) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+
+            const outcomeToSave: OutcomeModel = { ...input, uri: res.IpfsHash }
+            dispatch({ type: 'UPDATE_OUTCOME', payload: outcomeToSave })
+            onClose()
+        } catch (e) {
+            console.error(e)
+        }
+        setIsPinning(false)
     }
 
     return (
@@ -47,6 +67,7 @@ const UpdateOutcomeModal = ({ outcome, onClose }: UpdateOutcomeModalProps) => {
                     outcomeInput={input}
                     setOutcomeInput={setInput}
                     submitLabel="Save"
+                    isPinning={isPinning}
                 />
             </Box>
         </BaseLayerModal>
