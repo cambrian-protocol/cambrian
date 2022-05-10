@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { ButtonExtendedProps } from 'grommet'
+import { IconContext } from 'phosphor-react'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
 
@@ -15,6 +16,7 @@ const LoaderButton = ({
     children,
     isLoading,
     label,
+    icon,
     ...props
 }: LoaderButtonProps) => {
     const [showLoader, setShowLoader] = useState(false)
@@ -62,17 +64,38 @@ const LoaderButton = ({
             }
             disabled={showLoader}
             label={
-                <Box justify="center" align="center">
-                    {!showLoader ? (
-                        <animated.div style={fadeInProps}>
-                            <Text size="small">{label}</Text>
-                        </animated.div>
-                    ) : (
-                        <animated.div style={fadeOutProps}>
-                            <Spinner color={'white'} />
-                        </animated.div>
-                    )}
-                </Box>
+                label && (
+                    <Box justify="center" align="center">
+                        {!showLoader ? (
+                            <animated.div style={fadeInProps}>
+                                <Text size="small">{label}</Text>
+                            </animated.div>
+                        ) : (
+                            <animated.div style={fadeOutProps}>
+                                <Spinner color={'white'} />
+                            </animated.div>
+                        )}
+                    </Box>
+                )
+            }
+            icon={
+                icon && !label ? (
+                    <Box justify="center" align="center">
+                        {!showLoader ? (
+                            <animated.div style={fadeInProps}>
+                                <IconContext.Provider value={{ size: '24' }}>
+                                    <Box align="center">{icon}</Box>
+                                </IconContext.Provider>
+                            </animated.div>
+                        ) : (
+                            <animated.div style={fadeOutProps}>
+                                <Spinner color={'white'} size="xsmall" />
+                            </animated.div>
+                        )}
+                    </Box>
+                ) : !showLoader ? (
+                    icon
+                ) : undefined
             }
             {...props}
         />
