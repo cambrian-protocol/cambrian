@@ -64,7 +64,7 @@ const CreateTemplateNotificationStep = ({
                         input.flexInputs.length > 0 ? 5 : 4
                     }`}
                     title="Almost done, how can we notify you in case somebody is interested?"
-                    paragraph={`You can also join our Discord Server and use the /watch functionality to receive notificatoin DMs. More on that as soon as you hit the Create Template Button. `}
+                    paragraph={`You can also join our Discord Server and use the /watch functionality to receive notification DMs. More on that as soon as you hit the Create Template Button. `}
                 />
                 <DiscordWebhookInput name="discordWebhook" />
             </MultiStepFormLayout>
