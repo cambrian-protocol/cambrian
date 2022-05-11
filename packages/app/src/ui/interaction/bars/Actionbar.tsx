@@ -3,7 +3,7 @@ import { Box, Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
 import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
 
 export type ActionbarActionsType = {
-    primaryAction?: ButtonExtendedProps
+    primaryAction?: JSX.Element
 } & (
     | {
           secondaryAction?: ButtonExtendedProps
@@ -52,17 +52,11 @@ const Actionbar = ({ actions }: ActionbarProps) => {
                         ) : (
                             <Box flex />
                         )}
-                        <Box width={{ min: 'auto' }}>
-                            {actions.primaryAction && (
-                                <Button
-                                    {...actions.primaryAction}
-                                    disabled={actions.primaryAction.disabled}
-                                    label={actions.primaryAction.label}
-                                    size="small"
-                                    primary
-                                />
-                            )}
-                        </Box>
+                        {actions.primaryAction && (
+                            <Box width={{ min: 'auto' }}>
+                                {actions.primaryAction}
+                            </Box>
+                        )}
                     </Box>
                 </Box>
             )}

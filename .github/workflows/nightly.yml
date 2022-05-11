@@ -1,0 +1,43 @@
+name: Firebase Nightly
+on:
+  push:
+    branches:
+      - nightly
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2.3.2
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build
+        run: cd packages/app && yarn next build
+      - name: Export
+        run: cd packages/app && yarn next export
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: out
+          path: packages/app/out
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2.3.2
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: out
+          path: packages/app/out
+      - name: Deploy to Firebase Nightly
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
+        env:
+          PROJECT_ID: ${{ secrets.NIGHTLY_PROJECT_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}

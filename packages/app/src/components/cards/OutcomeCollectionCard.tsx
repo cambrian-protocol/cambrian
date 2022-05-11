@@ -1,25 +1,31 @@
-import { Box, Button, Card, CardBody, CardHeader, Text } from 'grommet'
+import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
 import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Coins } from 'phosphor-react'
+import LoaderButton from '../buttons/LoaderButton'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../buttons/OutcomeListItem'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
-interface OutcomeCollectionCardProps {
+type OutcomeCollectionCardProps = {
     idx?: number
     outcomeCollection: OutcomeCollectionModel
-    proposeMethod?: (indexSet: number) => void
     token: TokenModel
-}
+    proposedIndexSet?: number
+} & (
+    | { onPropose?: (indexSet: number) => Promise<void>; onArbitrate?: never }
+    | { onArbitrate?: (indexSet: number) => Promise<void>; onPropose?: never }
+)
 
 const OutcomeCollectionCard = ({
     idx,
     outcomeCollection,
-    proposeMethod,
     token,
+    onPropose,
+    onArbitrate,
+    proposedIndexSet,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -46,14 +52,35 @@ const OutcomeCollectionCard = ({
                         icon={<Coins />}
                         onClick={toggleShowAllocationModal}
                     />
-                    {proposeMethod && (
+                    {onPropose && (
                         <Box pad="small" gap="small">
-                            <Button
-                                onClick={() =>
-                                    proposeMethod(outcomeCollection.indexSet)
-                                }
+                            <LoaderButton
                                 primary
+                                disabled={proposedIndexSet !== undefined}
+                                isLoading={
+                                    proposedIndexSet ===
+                                    outcomeCollection.indexSet
+                                }
+                                onClick={() =>
+                                    onPropose(outcomeCollection.indexSet)
+                                }
                                 label="Propose Outcome"
+                            />
+                        </Box>
+                    )}
+                    {onArbitrate && (
+                        <Box pad="small" gap="small">
+                            <LoaderButton
+                                primary
+                                disabled={proposedIndexSet !== undefined}
+                                isLoading={
+                                    proposedIndexSet ===
+                                    outcomeCollection.indexSet
+                                }
+                                onClick={() =>
+                                    onArbitrate(outcomeCollection.indexSet)
+                                }
+                                label="Report Outcome"
                             />
                         </Box>
                     )}

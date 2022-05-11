@@ -21,6 +21,7 @@ const createOutcomeAction = (
         currentSolver.addOutcome(
             outcome.title,
             outcome.description,
+            outcome.context,
             outcome.uri
         )
         return { ...state, solvers: updatedSolvers }

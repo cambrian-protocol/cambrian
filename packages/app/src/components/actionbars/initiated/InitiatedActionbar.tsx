@@ -6,26 +6,18 @@ import { GenericMethods } from '../../solver/Solver'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { ethers } from 'ethers'
 import { getManualSlots } from '../../solver/SolverHelpers'
 
 interface InitiatedActionbarProps {
-    currentUser: UserType
     solverMethods: GenericMethods
     solverData: SolverModel
-    solverContract: ethers.Contract
     currentCondition: SolverContractCondition
-    updateSolverData: () => Promise<void>
 }
 
 const InitiatedActionbar = ({
-    currentUser,
     solverData,
     solverMethods,
-    solverContract,
     currentCondition,
-    updateSolverData,
 }: InitiatedActionbarProps) => {
     const [emptyManualSlots, setEmptyManualSlots] = useState<RichSlotModel[]>(
         []
@@ -51,18 +43,12 @@ const InitiatedActionbar = ({
         <>
             {emptyManualSlots.length === 0 ? (
                 <ExecuteSolveActionbar
-                    currentUser={currentUser}
-                    solverContract={solverContract}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
-                    updateSolverData={updateSolverData}
                 />
             ) : (
                 <AddDataActionbar
-                    currentUser={currentUser}
-                    solverContract={solverContract}
                     solverMethods={solverMethods}
-                    updateSolverData={updateSolverData}
                     manualSlots={emptyManualSlots}
                 />
             )}

@@ -181,12 +181,18 @@ export default class ComposerSolver {
 
     /*************************** Outcomes & Collections ***************************/
 
-    addOutcome(title: string, description: string, uri: string) {
+    addOutcome(
+        title: string,
+        description: string,
+        context: string,
+        uri: string
+    ) {
         const outcome = {
             id: ulid(),
             title: title,
             uri: uri,
             description: description,
+            context: context,
         } as OutcomeModel
         this.config.condition.outcomes.push(outcome)
         return outcome
@@ -196,6 +202,7 @@ export default class ComposerSolver {
         id: string,
         title: string,
         description: string,
+        context: string,
         uri: string
     ): OutcomeModel {
         const outcome = this.config.condition.outcomes.find((o) => o.id === id)
@@ -203,6 +210,7 @@ export default class ComposerSolver {
             outcome.title = title
             outcome.uri = uri
             outcome.description = description
+            outcome.context = context
         } else {
             throw new Error('Could not find outcome for updating')
         }
@@ -213,6 +221,7 @@ export default class ComposerSolver {
                     outcome.title = title
                     outcome.uri = uri
                     outcome.description = description
+                    outcome.context = context
                 }
             })
         })

@@ -20,6 +20,7 @@ const PreferredTokenItem = ({
 }: PreferredTokenItemProps) => {
     return (
         <Box
+            animation={'fadeIn'}
             key={idx}
             direction="row"
             gap="small"

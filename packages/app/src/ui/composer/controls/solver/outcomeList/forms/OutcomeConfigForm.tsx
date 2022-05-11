@@ -1,15 +1,21 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
-import React, { SetStateAction } from 'react'
+import React, { SetStateAction, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
-import { IconContext } from 'phosphor-react'
+import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
+import { CloudArrowDown } from 'phosphor-react'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { Text } from 'grommet'
+import { TextArea } from 'grommet'
 
 interface OutcomeConfigFormProps {
     onSubmit: (event: FormExtendedEvent<OutcomeModel, Element>) => void
     outcomeInput: OutcomeModel
     setOutcomeInput: React.Dispatch<SetStateAction<OutcomeModel>>
     submitLabel: string
+    isPinning: boolean
 }
 
 const OutcomeConfigForm = ({
@@ -17,26 +23,124 @@ const OutcomeConfigForm = ({
     outcomeInput,
     setOutcomeInput,
     submitLabel,
-}: OutcomeConfigFormProps) => (
-    <BaseFormContainer>
-        <Form<OutcomeModel>
-            value={outcomeInput}
-            onSubmit={(event) => onSubmit(event)}
-            onChange={(nextValue: OutcomeModel) => {
-                setOutcomeInput(nextValue)
-            }}
-        >
-            <FormField name="title" label="Title" required />
-            <FormField name="description" label="Description" required />
-            <FormField name="uri" label="URI" required />
-            <FormField name="context" label="Context" />
-            <IconContext.Provider value={{ size: '24' }}>
-                <Box>
-                    <Button primary type="submit" label={submitLabel} />
-                </Box>
-            </IconContext.Provider>
-        </Form>
-    </BaseFormContainer>
-)
+    isPinning,
+}: OutcomeConfigFormProps) => {
+    const [showLoadCIDModal, setShowLoadCIDModal] = useState(false)
+    const [err, setErr] = useState<string>()
+    const [isLoading, setIsLoading] = useState(false)
+    
+    const toggleShowLoadCIDModal = () => setShowLoadCIDModal(!showLoadCIDModal)
+    
+    const onLoadCID = async () => {
+        if (outcomeInput.uri.trim() !== '') {
+            setIsLoading(true)
+            try {
+                const ipfsAPI = new IPFSAPI()
+                const res = (await ipfsAPI.getFromCID(
+                    outcomeInput.uri
+                )) as OutcomeModel
+
+                if (!res || !res.title || !res.description)
+                    throw 'Invalid response'
+                setOutcomeInput({ ...outcomeInput, ...res })
+            } catch (e) {
+                console.warn(e)
+                setErr('Something went wrong, please check your CID')
+            }
+            setIsLoading(false)
+        }
+    }
+
+    return (
+        <>
+            <BaseFormContainer>
+                <Form<OutcomeModel>
+                    value={outcomeInput}
+                    onSubmit={(event) => onSubmit(event)}
+                    onChange={(nextValue: OutcomeModel) => {
+                        if (
+                            nextValue.title !== outcomeInput.title ||
+                            nextValue.description !==
+                                outcomeInput.description ||
+                            nextValue.context !== outcomeInput.context
+                        ) {
+                            nextValue.uri = ''
+                        }
+                        if (nextValue.uri !== outcomeInput.uri) {
+                            setErr(undefined)
+                        }
+
+                        setOutcomeInput(nextValue)
+                    }}
+                >
+                    <Box gap="medium">
+                        <>
+                            <FormField name="title" label="Title" required />
+                            <FormField
+                                name="description"
+                                label="Description"
+                                required
+                            >
+                                <TextArea
+                                    name="description"
+                                    resize={false}
+                                    rows={5}
+                                />
+                            </FormField>
+                            <FormField name="context" label="Context">
+                                <TextArea
+                                    name="context"
+                                    resize={false}
+                                    rows={5}
+                                />
+                            </FormField>
+                        </>
+                        <Box
+                            border
+                            pad="small"
+                            elevation="small"
+                            round="small"
+                            background="background-contrast"
+                        >
+                            <Box direction="row" gap="small">
+                                <Box flex>
+                                    <FormField name="uri" label="IPFS CID" />
+                                </Box>
+                                <Box justify="center">
+                                    <LoaderButton
+                                        isLoading={isLoading}
+                                        secondary
+                                        icon={<CloudArrowDown />}
+                                        onClick={onLoadCID}
+                                    />
+                                </Box>
+                            </Box>
+                            {err && (
+                                <Text size="small" color="status-error">
+                                    {err}
+                                </Text>
+                            )}
+                        </Box>
+                        <Box>
+                            <LoaderButton
+                                isLoading={isPinning}
+                                primary
+                                type="submit"
+                                label={submitLabel}
+                            />
+                        </Box>
+                    </Box>
+                </Form>
+            </BaseFormContainer>
+            {showLoadCIDModal && (
+                <BasePopupModal
+                    title="Load from CID"
+                    description="Bla"
+                    onClose={toggleShowLoadCIDModal}
+                />
+            )}
+        </>
+    )
+}
 
 export default OutcomeConfigForm
