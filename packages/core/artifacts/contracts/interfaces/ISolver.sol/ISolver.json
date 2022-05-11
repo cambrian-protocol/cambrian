@@ -85,6 +85,19 @@
           "type": "uint256"
         }
       ],
+      "name": "arbitrateNull",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        }
+      ],
       "name": "arbitrationPending",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -448,6 +461,25 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "getStatus",
+      "outputs": [
+        {
+          "internalType": "enum SolverLib.Status",
+          "name": "status",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "bytes32",
           "name": "_slot",
           "type": "bytes32"
@@ -627,14 +659,25 @@
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
-          "name": "_index",
+          "name": "conditionIndex",
           "type": "uint256"
         }
       ],
-      "name": "nullArbitrate",
-      "outputs": [],
-      "stateMutability": "nonpayable",
+      "name": "isRecipient",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -725,6 +768,25 @@
       "name": "setTrackingId",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "conditionIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "timelocks",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "timelock",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ],

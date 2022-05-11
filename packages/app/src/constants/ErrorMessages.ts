@@ -31,6 +31,11 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         info: 'Please try again later...',
         logLevel: 1,
     },
+    PROPOSE_OUTCOME_ERROR: {
+        message: 'Error while proposing the outcome',
+        info: 'Please try again later...',
+        logLevel: 1,
+    },
     WRONG_TEMPLATE_SCHEMA: {
         message: 'Generated template does not satisfy template schema',
         logLevel: 1,
@@ -67,6 +72,26 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     NO_SOLVER_FOUND: {
         message: 'Error while fetching Solvers from SolutionsHub',
+        logLevel: 1,
+    },
+    ARBITRATION_ERROR: {
+        message: 'Error while arbitration progress',
+        logLevel: 1,
+    },
+    ADD_DATA_ERROR: {
+        message: 'Error while adding data to the solver',
+        logLevel: 1,
+    },
+    EXECUTE_SOLVER_ERROR: {
+        message: 'Error while executing the solver',
+        logLevel: 1,
+    },
+    CONFIRM_OUTCOME_ERROR: {
+        message: 'Error while confirming outcome',
+        logLevel: 1,
+    },
+    PREPARE_SOLVE_ERROR: {
+        message: 'Error while preparing solve',
         logLevel: 1,
     },
 }

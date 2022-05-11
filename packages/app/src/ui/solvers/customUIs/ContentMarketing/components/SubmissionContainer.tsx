@@ -26,7 +26,7 @@ interface ContentMarketingSolverContentProps {
     metadata?: MetadataModel
 }
 
-const initialSubmission = {
+export const initialSubmission = {
     conditionId: '',
     sender: { address: '' },
     submission: '',
@@ -86,7 +86,7 @@ const SubmissionContainer = ({
                 />
                 {latestSubmission.timestamp !== undefined && (
                     <Text size="small" color="brand">
-                        Last submission:{' '}
+                        Latest submission:{' '}
                         {new Date(latestSubmission.timestamp).toLocaleString()}
                     </Text>
                 )}

@@ -1,3 +1,4 @@
+import { EventFilter, ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import {
     getMetadataFromProposal,
@@ -8,7 +9,6 @@ import {
 } from './SolverGetters'
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
-import AddSolverDataContent from '@cambrian/app/ui/solvers/AddSolverDataContent'
 import { AppbarItem } from '../nav/AppbarItem'
 import { BaseLayout } from '../layout/BaseLayout'
 import { Box } from 'grommet'
@@ -19,6 +19,7 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import { Info } from 'phosphor-react'
+import InitiatedSolverContent from '@cambrian/app/ui/solvers/InitiatedSolverContent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
@@ -34,7 +35,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
@@ -74,6 +74,18 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         iface,
         currentUser.signer
     )
+
+    const changedStatusFilter = {
+        address: currentUser.address,
+        topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
+        fromBlock: 'latest',
+    } as EventFilter
+
+    const ingestedDataFilter = {
+        address: currentUser.address,
+        topics: [ethers.utils.id('IngestedData()')],
+        fromBlock: 'latest',
+    } as EventFilter
 
     // TODO Contract typescript. TypeChain??
     const solverMethods = getSolverMethods(
@@ -132,6 +144,31 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             initProposedOutcome()
         }
     }, [currentCondition, solverData])
+
+    useEffect(() => {
+        solverContract.on(changedStatusFilter, updateSolverDataListener)
+
+        if (currentCondition?.status === ConditionStatus.Initiated) {
+            solverContract.on(ingestedDataFilter, updateSolverDataListener)
+        }
+
+        return () => {
+            solverContract.removeListener(
+                changedStatusFilter,
+                updateSolverDataListener
+            )
+            if (currentCondition?.status === ConditionStatus.Initiated) {
+                solverContract.removeListener(
+                    ingestedDataFilter,
+                    updateSolverDataListener
+                )
+            }
+        }
+    }, [currentUser, currentCondition])
+
+    const updateSolverDataListener = async () => {
+        await updateSolverData()
+    }
 
     /* 
         Initializes solver data and stores ipfs data into state. 
@@ -254,7 +291,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     }
                     actionBar={
                         <DefaultSolverActionbar
-                            solverContract={solverContract}
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
@@ -284,7 +320,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
-                        <AddSolverDataContent metadata={metadata} />
+                        <InitiatedSolverContent metadata={metadata} />
                     ) : loadWriter ? (
                         <ContentMarketingCustomUI
                             solverMethods={solverMethods}

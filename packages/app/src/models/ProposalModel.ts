@@ -1,4 +1,4 @@
-import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/CreateTemplateForm'
+import { FlexInputFormType } from '../ui/templates/forms/steps/CreateTemplateFlexInputStep'
 
 export type ProposalModel = {
     title: string
