@@ -2,7 +2,9 @@ import Actionbar from '../../interaction/bars/Actionbar'
 import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
 import { Button } from 'grommet'
 import LoadCompositionModal from '../general/modals/LoadCompositionModal'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Stagehand from '@cambrian/app/classes/Stagehand'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
@@ -14,6 +16,7 @@ const ComposerActionbar = () => {
     const { composer } = useComposerContext()
     const [exportedCompositionCID, setExportedCompositionCID] =
         useState<string>('')
+    const [isPinning, setIsPinning] = useState(false)
 
     const [showLoadCompositionModal, setShowLoadCompositionModal] =
         useState(false)
@@ -28,6 +31,7 @@ const ComposerActionbar = () => {
         setShowLoadCompositionModal(!showLoadCompositionModal)
 
     const onExportComposition = async () => {
+        setIsPinning(true)
         try {
             const ipfsHash = await stageHand.publishComposition(
                 composer,
@@ -37,19 +41,24 @@ const ComposerActionbar = () => {
                 setExportedCompositionCID(ipfsHash)
                 toggleShowExportCompositionModal()
             }
-        } catch (err) {
-            console.error(err)
+        } catch (e) {
+            cpLogger.push(e)
         }
+        setIsPinning(false)
     }
 
     return (
         <>
             <Actionbar
                 actions={{
-                    primaryAction: {
-                        label: 'Export Composition',
-                        onClick: onExportComposition,
-                    },
+                    primaryAction: (
+                        <LoaderButton
+                            primary
+                            label="Export Composition"
+                            onClick={onExportComposition}
+                            isLoading={isPinning}
+                        />
+                    ),
                     secondaryAction: {
                         label: 'Load Composition',
                         onClick: toggleShowLoadCompositionModal,

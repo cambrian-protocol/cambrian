@@ -1,20 +1,21 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { Button } from 'grommet'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Stack } from 'grommet'
 import { SubmissionModel } from '../models/SubmissionModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
-import { Text } from 'grommet'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { fetchLatestSubmission } from '../helpers/fetchLatestSubmission'
+import { initialSubmission } from './SubmissionContainer'
 
 interface WriterUIProps {
     currentCondition: SolverContractCondition
@@ -23,51 +24,22 @@ interface WriterUIProps {
     latestSubmission: SubmissionModel
 }
 
-export const initialSubmission = {
-    conditionId: '',
-    sender: { address: '' },
-    submission: '',
-}
-
 const SubmissionForm = ({
     currentCondition,
     currentUser,
     solverContract,
     latestSubmission,
 }: WriterUIProps) => {
-    const [input, setInput] = useState<SubmissionModel>(latestSubmission)
-    const [errorMsg, setErrorMsg] = useState<string>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
-
-    const submittedWorkFilter = solverContract.filters.SubmittedWork()
+    const [input, setInput] = useState<SubmissionModel>(initialSubmission)
+    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
     useEffect(() => {
-        solverContract.on(submittedWorkFilter, submissionListener)
-        return () => {
-            solverContract.removeListener(
-                submittedWorkFilter,
-                submissionListener
-            )
-        }
-    }, [currentUser])
-
-    const submissionListener = async () => {
-        try {
-            const logs = await solverContract.queryFilter(submittedWorkFilter)
-            const fetchedLatesSubmission = await fetchLatestSubmission(
-                logs,
-                currentCondition
-            )
-            if (fetchedLatesSubmission) setInput(fetchedLatesSubmission)
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
-        }
-        setTransactionMsg(undefined)
-    }
+        setInput(latestSubmission)
+    }, [latestSubmission])
 
     const onSubmit = async (): Promise<void> => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsSubmitting(true)
         try {
             if (input.submission === '') {
                 throw new Error(
@@ -76,42 +48,38 @@ const SubmissionForm = ({
             }
 
             if (!currentUser.address)
-                throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+                throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const workObj: SubmissionModel = {
+            const submission: SubmissionModel = {
                 submission: input.submission,
                 conditionId: currentCondition.conditionId,
                 sender: { address: currentUser.address },
                 timestamp: new Date(),
             }
             const ipfs = new IPFSAPI()
-            const response = await ipfs.pin(workObj)
+            const response = await ipfs.pin(submission)
 
-            if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
-            await solverContract.submitWork(
-                response.IpfsHash,
-                currentCondition.conditionId
-            )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
-            setTransactionMsg(undefined)
+            const transaction: ethers.ContractTransaction =
+                await solverContract.submitWork(
+                    response.IpfsHash,
+                    currentCondition.conditionId
+                )
+            const rc = await transaction.wait()
+            if (!rc.events?.find((event) => event.event === 'SubmittedWork'))
+                throw new Error('Error while submitting work')
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
         }
+        setIsSubmitting(false)
     }
-
     return (
         <>
             <Box fill gap="medium">
-                {input.timestamp !== undefined && (
-                    <Text size="small" color="dark-4">
-                        Last submission:
-                        {new Date(input.timestamp).toLocaleString()}
-                    </Text>
-                )}
                 <Stack anchor="center" fill>
                     <TextArea
+                        disabled={isSubmitting}
                         placeholder="Type your article here..."
                         fill
                         size="medium"
@@ -125,7 +93,17 @@ const SubmissionForm = ({
                         }
                     />
                 </Stack>
-                <Button primary label="Submit work" onClick={onSubmit} />
+                <LoaderButton
+                    isLoading={isSubmitting}
+                    disabled={
+                        input.submission === latestSubmission.submission ||
+                        input.submission.trim() === '' ||
+                        isSubmitting
+                    }
+                    primary
+                    label={'Submit work'}
+                    onClick={onSubmit}
+                />
                 <Box pad="small" />
             </Box>
             {errorMsg && (
@@ -134,7 +112,6 @@ const SubmissionForm = ({
                     errorMessage={errorMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

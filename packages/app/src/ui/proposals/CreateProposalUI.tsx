@@ -30,7 +30,7 @@ const CreateProposalUI = ({
         />
         <HeaderTextSection
             subTitle="Define your proposal"
-            paragraph='Enter the details of your proposal below. Enter the total funding required as "price".'
+            paragraph="Enter the details of your Proposal below. Be sure to include information requested by the Template description."
         />
         <Box fill>
             <CreateProposalForm

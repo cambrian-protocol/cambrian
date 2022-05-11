@@ -10,12 +10,6 @@ interface PublicUIProps {
 const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
     <>
         <Box gap="medium" height={{ min: 'auto' }}>
-            {latestSubmission.timestamp !== undefined && (
-                <Text size="small" color="dark-4">
-                    Last submission:
-                    {new Date(latestSubmission.timestamp).toLocaleString()}
-                </Text>
-            )}
             <Box
                 fill
                 background={'background-front'}

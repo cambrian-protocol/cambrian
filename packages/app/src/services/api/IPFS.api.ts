@@ -1,5 +1,6 @@
 import { IPFS_GATEWAYS, IPFS_PIN_ENDPOINT } from 'packages/app/config'
 
+import { cpLogger } from './Logger.api'
 import fetch from 'node-fetch'
 
 const Hash = require('ipfs-only-hash')
@@ -19,7 +20,7 @@ export class IPFSAPI {
                 return this.tryParseJson(data)
             }
         } catch (e) {
-            console.log(e)
+            cpLogger.push(e)
         }
     }
 
@@ -34,7 +35,7 @@ export class IPFSAPI {
                     return obj
                 }
             } catch (e) {
-                console.log('Not available in localstorage')
+                cpLogger.push(e)
             }
         }
 
@@ -45,13 +46,12 @@ export class IPFSAPI {
         let base32 = undefined
         try {
             base32 = new CID(cid).toV1().toString('base32')
-        } catch {
-            console.warn('Could not create base32 CID from: ', cid)
+        } catch (e) {
+            cpLogger.push(e)
             return undefined
         }
 
         const timeout = setTimeout(() => {
-            console.log('Gateway timed out')
             return this.getFromCID(cid, gatewayIndex + 1)
         }, 5000)
 
@@ -67,13 +67,13 @@ export class IPFSAPI {
                 try {
                     localStorage.setItem(cid, JSON.stringify(obj))
                 } catch (e) {
-                    console.log(e)
+                    cpLogger.push(e)
                 }
                 return obj
             } else {
                 return this.getFromCID(cid, gatewayIndex + 1)
             }
-        } catch (e) {
+        } catch {
             return this.getFromCID(cid, gatewayIndex + 1)
         } finally {
             clearTimeout(timeout)
@@ -111,7 +111,7 @@ export class IPFSAPI {
                 return false
             }
         } catch (e) {
-            console.log(e)
+            cpLogger.push(e)
             return false
         }
     }
@@ -133,7 +133,7 @@ export class IPFSAPI {
 
             return res.json() as Promise<PinResponse>
         } catch (e) {
-            console.log(e)
+            cpLogger.push(e)
         }
     }
 }

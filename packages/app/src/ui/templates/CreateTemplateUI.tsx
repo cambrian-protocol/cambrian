@@ -2,14 +2,16 @@ import React, { SetStateAction, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import CreateTemplateForm from './forms/CreateTemplateForm'
+import { CreateTemplateMultiStepForm } from './forms/CreateTemplateMultiStepForm'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 
 interface CreateTemplateUIProps {
     composition: CompositionModel
     compositionCID: string
-    setErrorMessage: React.Dispatch<SetStateAction<string | undefined>>
+    setErrorMessage: React.Dispatch<
+        SetStateAction<ErrorMessageType | undefined>
+    >
 }
 
 const CreateTemplateUI = ({
@@ -22,13 +24,8 @@ const CreateTemplateUI = ({
 
     return (
         <>
-            <HeaderTextSection
-                title="Create your own Template"
-                subTitle="Configure a shareable template that can be filled in to propose a solution."
-                paragraph="The blueprint you're using may require some inputs be completed. Inputs you do not complete will be completed by the customer."
-            />
             <Box fill>
-                <CreateTemplateForm
+                <CreateTemplateMultiStepForm
                     composition={composition}
                     compositionCID={compositionCID}
                     onFailure={(errMsg) => setErrorMessage(errMsg)}

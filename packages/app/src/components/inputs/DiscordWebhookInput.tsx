@@ -15,7 +15,7 @@ const DiscordWebhookInput = ({ name }: DiscordWebhookInputProps) => (
                         url !== '' &&
                         !url.startsWith('https://discord.com/api/webhooks/')
                     )
-                        return 'Not a valid discord webhook'
+                        return 'Please provide a valid Discord Webhook'
                 },
             ]}
         />

@@ -1,5 +1,8 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react'
 
+import ErrorScreen from './ErrorScreen'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+
 interface Props {
     children: ReactNode
 }
@@ -14,19 +17,16 @@ class ErrorBoundary extends Component<Props, State> {
     }
 
     public static getDerivedStateFromError(_: Error): State {
-        // Update state so the next render will show the fallback UI.
         return { hasError: true }
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        // TODO Integrate Error reporting service
-        console.error('Uncaught error:', error, errorInfo)
+        cpLogger.push({ error, errorInfo })
     }
 
     public render() {
         if (this.state.hasError) {
-            // TODO Custom Error screen
-            return <h1>Sorry.. there was an error</h1>
+            return <ErrorScreen />
         }
 
         return this.props.children

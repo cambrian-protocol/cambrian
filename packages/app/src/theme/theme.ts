@@ -48,7 +48,7 @@ export const cpTheme = deepMerge(grommet, {
             },
         },
         drop: {
-            background: 'background-front',
+            background: 'background-popup',
             border: { radius: '10px' },
         },
     },

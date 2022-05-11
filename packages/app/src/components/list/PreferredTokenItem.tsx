@@ -3,6 +3,7 @@ import { FormField } from 'grommet'
 import TokenAvatar from '../avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { X } from 'phosphor-react'
+import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface PreferredTokenItemProps {
     idx: number
@@ -19,6 +20,7 @@ const PreferredTokenItem = ({
 }: PreferredTokenItemProps) => {
     return (
         <Box
+            animation={'fadeIn'}
             key={idx}
             direction="row"
             gap="small"
@@ -37,12 +39,7 @@ const PreferredTokenItem = ({
                     name={`preferredTokens[${idx}].address`}
                     required
                     onChange={(event) => updateToken(event.target.value, idx)}
-                    validate={[
-                        (address) => {
-                            if (address.length !== 42)
-                                return 'Not a valid address'
-                        },
-                    ]}
+                    validate={validateAddress}
                 />
             </Box>
             <Box

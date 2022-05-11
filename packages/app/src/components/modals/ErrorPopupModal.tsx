@@ -1,21 +1,42 @@
-import BasePopupModal from './BasePopupModal'
+import { Box, Layer } from 'grommet'
+import { Warning, X } from 'phosphor-react'
+
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import HeaderTextSection from '../sections/HeaderTextSection'
 
 interface ErrorPopupModalProps {
     onClose: () => void
-    title?: string
-    errorMessage?: string
+    errorMessage: ErrorMessageType
 }
 
-const ErrorPopupModal = ({
-    onClose,
-    title,
-    errorMessage,
-}: ErrorPopupModalProps) => (
-    <BasePopupModal
-        onClose={onClose}
-        title={title ? title : 'Something went wrong'}
-        description={errorMessage ? errorMessage : 'Please try again later...'}
-    />
-)
+const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
+    return (
+        <Layer
+            onEsc={onClose}
+            background={'background-popup'}
+            responsive={false}
+        >
+            <Box width={{ min: 'auto' }} pad="small" border round="small">
+                <Box direction="row">
+                    <Box onClick={onClose} pad="small" focusIndicator={false}>
+                        <X size={'24'} />
+                    </Box>
+                    <Box flex />
+                </Box>
+                <HeaderTextSection
+                    size="small"
+                    icon={<Warning />}
+                    subTitle={
+                        errorMessage.code
+                            ? `Code: ${errorMessage.code}`
+                            : undefined
+                    }
+                    title={errorMessage.message}
+                    paragraph={errorMessage.info}
+                />
+            </Box>
+        </Layer>
+    )
+}
 
 export default ErrorPopupModal
