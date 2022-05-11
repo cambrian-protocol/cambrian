@@ -1,118 +1,96 @@
-import { Box, Button, Form, FormField, Text } from 'grommet'
-import { EventFilter, ethers } from 'ethers'
-import { useEffect, useState } from 'react'
+import { Box, Form } from 'grommet'
+import React, { SetStateAction, useEffect, useState } from 'react'
 
+import AddManualSlotDataInput from '../inputs/AddManualSlotDataInput'
 import BaseLayerModal from './BaseLayerModal'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from './ErrorPopupModal'
 import { GenericMethods } from '../solver/Solver'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import LoadingScreen from '../info/LoadingScreen'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
-import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
+import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
+import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface ExecuteSolverModalProps {
+    isAddingData: boolean
+    setIsAddingData: React.Dispatch<SetStateAction<boolean>>
     onBack: () => void
     manualSlots: RichSlotModel[]
-    solverContract: ethers.Contract
     solverMethods: GenericMethods
-    currentUser: UserType
-    updateSolverData: () => Promise<void>
 }
 
-export type ManualInputsFormType = { manualInputs: ManualInputType[] }
-
-export type ManualInputType = {
+export type ManualInputFormType = {
     data: any
     slotWithMetaData: RichSlotModel
 }
 
+// TODO Test adding multiple Manual Slots handling, integrate different manualInput type validation
 const AddDataModal = ({
+    isAddingData,
+    setIsAddingData,
     onBack,
     manualSlots,
-    solverContract,
-    currentUser,
     solverMethods,
-    updateSolverData,
 }: ExecuteSolverModalProps) => {
-    const [manualInputs, setManualInputs] = useState<ManualInputsFormType>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
-    const ingestedDataFilter = {
-        address: currentUser.address,
-        topics: [ethers.utils.id('IngestedData()')],
-        fromBlock: 'latest',
-    } as EventFilter
+    const [manualInputs, setManualInputs] = useState<ManualInputFormType[]>()
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     useEffect(() => {
         const manualInputs = manualSlots.map((slot) => {
             return { data: '', slotWithMetaData: slot }
         })
 
-        setManualInputs({ manualInputs: manualInputs })
+        setManualInputs(manualInputs)
     }, [])
 
-    useEffect(() => {
-        solverContract.on(ingestedDataFilter, ingestListener)
-
-        return () => {
-            solverContract.removeListener(ingestedDataFilter, ingestListener)
-        }
-    }, [currentUser])
-
-    const ingestListener = async () => {
-        await updateSolverData()
-        setTransactionMsg(undefined)
-    }
-
-    const onAddData = async (input: ManualInputType) => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
-        try {
-            // TODO Encode the right type (tags)
+    const onAddData = async (idx: number) => {
+        if (manualInputs) {
             const encodedData = ethers.utils.defaultAbiCoder.encode(
                 ['address'],
-                [input.data]
+                [manualInputs[idx].data]
             )
-            await solverMethods.addData(
-                input.slotWithMetaData.slot.slot,
-                encodedData
+            await invokeContractFunction(
+                'IngestedData',
+                () =>
+                    solverMethods.addData(
+                        manualInputs[idx].slotWithMetaData.slot.slot,
+                        encodedData
+                    ),
+                setIsAddingData,
+                setErrMsg,
+                'ADD_DATA_ERROR'
             )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
-            setTransactionMsg(undefined)
-            console.error(e)
         }
     }
 
     let ManualInputGroup = null
     if (manualInputs !== undefined) {
-        ManualInputGroup = manualInputs.manualInputs?.map((input, idx) => {
+        ManualInputGroup = manualInputs?.map((input, idx) => {
             return (
-                <Box key={input.slotWithMetaData.slot.slot}>
-                    <Box direction="row" gap="medium" align="center">
-                        <Box flex>
-                            <FormField
-                                name={`manualInputs[${idx}].data`}
-                                label={input.slotWithMetaData.tag.label}
-                                required
-                            />
-                        </Box>
-                        <Box>
-                            <Button
-                                primary
-                                type="submit"
-                                label="Add Data"
-                                onClick={() =>
-                                    onAddData(manualInputs.manualInputs[idx])
-                                }
-                            />
-                        </Box>
-                    </Box>
-                    <Text size="small" color="dark-6">
-                        {input.slotWithMetaData.tag.description}
-                    </Text>
-                </Box>
+                <Form<ManualInputFormType>
+                    key={input.slotWithMetaData.slot.slot}
+                    onSubmit={(e) => {
+                        e.preventDefault()
+                        onAddData(idx)
+                    }}
+                    onChange={(newFormState) => {
+                        const updatedManualInputs = [...manualInputs]
+                        updatedManualInputs[idx] = newFormState
+                        setManualInputs(updatedManualInputs)
+                    }}
+                    value={manualInputs[idx]}
+                    validate="blur"
+                >
+                    <AddManualSlotDataInput
+                        name={'data'}
+                        isAddingData={isAddingData}
+                        label={input.slotWithMetaData.tag.label}
+                        required
+                        validate={validateAddress}
+                        description={input.slotWithMetaData.tag.description}
+                    />
+                </Form>
             )
         })
     }
@@ -126,17 +104,7 @@ const AddDataModal = ({
                     paragraph='This Solver requires the following data. Fields marked "*" must be added before execution.'
                 />
                 <Box gap="medium" fill>
-                    {ManualInputGroup && (
-                        <Form<ManualInputsFormType>
-                            onSubmit={(e) => e.preventDefault()}
-                            value={manualInputs}
-                            onChange={(newFormState) =>
-                                setManualInputs(newFormState)
-                            }
-                        >
-                            {ManualInputGroup}
-                        </Form>
-                    )}
+                    {ManualInputGroup}
                 </Box>
             </BaseLayerModal>
             {errMsg && (
@@ -145,7 +113,6 @@ const AddDataModal = ({
                     errorMessage={errMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

@@ -5,6 +5,7 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverRegisteryAPI from '@cambrian/app/services/api/SolverRegistry.api'
 import _ from 'lodash'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export type SolverCoreDataInputType = {
@@ -56,7 +57,7 @@ const ComposerSolverCoreDataInputControl = () => {
                     )
                 setDataLabel(dataLabel)
             } catch (e) {
-                console.log(e)
+                cpLogger.push(e)
             }
         }
     }
@@ -98,9 +99,10 @@ const ComposerSolverCoreDataInputControl = () => {
                     setValue({ inputs: JSON.parse(JSON.stringify(inputData)) })
                 }
             } catch (e) {
-                console.log(
+                console.error(
                     'Error getting registered core data input for Solver'
                 )
+                cpLogger.push(e)
             }
         }
     }

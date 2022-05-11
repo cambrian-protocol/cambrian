@@ -7,25 +7,28 @@ import {
     Spinner,
     TextArea,
 } from 'grommet'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import React, { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
-import { ERROR_MESSAGE } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal'
-import { FlexInputFormType } from '../../templates/forms/CreateTemplateForm'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFlexInputStep'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import Stagehand from '@cambrian/app/classes/Stagehand'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { renderFlexInputs } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
@@ -69,8 +72,8 @@ const CreateProposalForm = ({
     const [input, setInput] = useState<CreateProposalFormType>(initialInput)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
     const [proposalId, setProposalId] = useState<string>()
-    const [errorMsg, setErrorMsg] = useState<string>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
+    const [isInTransaction, setIsInTransaction] = useState(false)
 
     useEffect(() => {
         const updatedInputs = { ...input }
@@ -95,10 +98,10 @@ const CreateProposalForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsInTransaction(true)
         try {
             if (!currentUser.signer || !currentUser.chainId)
-                throw new Error(ERROR_MESSAGE['NO_WALLET_CONNECTION'])
+                throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
             const updatedInput = { ...input }
             updatedInput.flexInputs.forEach((flexInput) => {
@@ -115,7 +118,7 @@ const CreateProposalForm = ({
                 currentUser.web3Provider
             )
 
-            if (!response) throw new Error(ERROR_MESSAGE['IPFS_PIN_ERROR'])
+            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
             const proposalsHub = new ProposalsHub(
                 currentUser.signer,
@@ -128,15 +131,13 @@ const CreateProposalForm = ({
                 response.parsedSolvers.map((solver) => solver.config),
                 response.cid
             )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
             let rc = await transaction.wait()
             const event = rc.events?.find(
                 (event) => event.event === 'CreateProposal'
             ) // Less fragile to event param changes.
             const proposalId = event?.args && event.args.id
 
-            if (!proposalId)
-                throw new Error(ERROR_MESSAGE['FAILED_PROPOSAL_DEPLOYMENT'])
+            if (!proposalId) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
 
             if (input.discordWebhook !== '') {
                 await WebhookAPI.postWebhook(input.discordWebhook, proposalId)
@@ -149,11 +150,10 @@ const CreateProposalForm = ({
                 proposalId
             )
             setProposalId(proposalId)
-        } catch (e: any) {
-            console.error(e)
-            setErrorMsg(e.message)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
         }
-        setTransactionMsg(undefined)
+        setIsInTransaction(false)
     }
 
     // TODO Form Validate Type Error handling, Skeleton Loader integration
@@ -265,7 +265,8 @@ const CreateProposalForm = ({
                         </BaseFormGroupContainer>
                         <Box>
                             {currentUser.signer ? (
-                                <Button
+                                <LoaderButton
+                                    isLoading={isInTransaction}
                                     primary
                                     type="submit"
                                     label="Create Proposal"
@@ -297,7 +298,6 @@ const CreateProposalForm = ({
                     onClose={() => setErrorMsg(undefined)}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

@@ -3,7 +3,7 @@ export type OutcomeModel = {
     title: string
     uri: string
     description: string
-    context?: string
+    context: string
 }
 
 export type OutcomeCollectionModel = {

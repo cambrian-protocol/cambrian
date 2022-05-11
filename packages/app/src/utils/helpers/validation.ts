@@ -1,9 +1,4 @@
-export const required = [
-    (value: string) =>
-        value == null || value === undefined || value.length === 0
-            ? 'is required'
-            : undefined,
-]
+import { ethers } from 'ethers'
 
 export const isBoolean = (value: string) => {
     if (value != null || value !== undefined) {
@@ -32,3 +27,19 @@ export const isArray = (value: string) => {
     }
     return false
 }
+
+export const isAddress = (address: string) => {
+    if (
+        address.length !== 42 ||
+        !address.startsWith('0x') ||
+        !ethers.utils.isAddress(address)
+    ) {
+        return 'Invalid address'
+    }
+}
+
+export const validateAddress = [
+    (value: string) => {
+        return isAddress(value)
+    },
+]

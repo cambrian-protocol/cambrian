@@ -1,7 +1,6 @@
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
-import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/CreateTemplateForm'
+import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/steps/CreateTemplateFlexInputStep'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 
@@ -24,6 +23,8 @@ export const getFlexInputType = (
             ?.config.slots[tag.id]
         if (slot?.dataTypes[0] === SolidityDataTypes.Uint256) {
             return 'number'
+        } else if (slot?.dataTypes[0] === SolidityDataTypes.Address) {
+            return 'address'
         } else {
             return 'string'
         }
@@ -57,10 +58,6 @@ export const renderFlexInputs = (
         .filter((item) => item !== undefined)
 
     if (flexInputElements.length !== 0) {
-        return (
-            <BaseFormGroupContainer groupTitle="Flexible inputs">
-                {flexInputElements}
-            </BaseFormGroupContainer>
-        )
+        return <>{flexInputElements}</>
     }
 }

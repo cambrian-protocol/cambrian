@@ -9,13 +9,14 @@ import { useEffect, useState } from 'react'
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
-import LoadingScreen from '../../info/LoadingScreen'
+import LoaderButton from '../../buttons/LoaderButton'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
@@ -35,8 +36,8 @@ const RedeemTokensActionbar = ({
 
     const [payoutAmount, setPayoutAmount] = useState<number>()
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
-    const [errMsg, setErrMsg] = useState<string>()
+    const [isRedeeming, setIsRedeeming] = useState(false)
+    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const payoutRedemptionFilter = ctf.contract.filters.PayoutRedemption(
         currentUser.address,
@@ -56,6 +57,7 @@ const RedeemTokensActionbar = ({
             )
         }
     }, [currentUser])
+
     const init = async () => {
         const logs = await ctf.contract.queryFilter(payoutRedemptionFilter)
         const conditionLogs = logs.filter(
@@ -127,7 +129,7 @@ const RedeemTokensActionbar = ({
                 solverData.collateralToken.decimals
             )
             setRedeemedAmount(Number(formattedPayout))
-            setTransactionMsg(undefined)
+            setIsRedeeming(false)
         }
     }
 
@@ -193,7 +195,7 @@ const RedeemTokensActionbar = ({
      * TODO "Redeem Tokens" action may want to open a modal showing seperate redeemable value for each condition
      */
     const redeemCondition = async () => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsRedeeming(true)
         try {
             await ctf.contract.redeemPositions(
                 solverData.config.conditionBase.collateralToken,
@@ -201,11 +203,9 @@ const RedeemTokensActionbar = ({
                 currentCondition.conditionId,
                 solverData.config.conditionBase.partition
             )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-        } catch (e: any) {
-            setErrMsg(e.message)
-            setTransactionMsg(undefined)
-            console.error(e)
+        } catch (e) {
+            setErrMsg(await cpLogger.push(e))
+            setIsRedeeming(false)
         }
     }
 
@@ -229,10 +229,14 @@ const RedeemTokensActionbar = ({
             ) : payoutAmount ? (
                 <Actionbar
                     actions={{
-                        primaryAction: {
-                            onClick: () => redeemCondition(),
-                            label: 'Redeem tokens',
-                        },
+                        primaryAction: (
+                            <LoaderButton
+                                primary
+                                isLoading={isRedeeming}
+                                onClick={redeemCondition}
+                                label="Redeem tokens"
+                            />
+                        ),
                         info: {
                             icon: <Handshake />,
                             label: `${payoutAmount} ${
@@ -254,7 +258,6 @@ const RedeemTokensActionbar = ({
                     errorMessage={errMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

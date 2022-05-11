@@ -1,6 +1,6 @@
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/CreateTemplateForm'
+import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/steps/CreateTemplateFlexInputStep'
 
 export const mergeFlexIntoComposition = (
     oldComposition: CompositionModel,

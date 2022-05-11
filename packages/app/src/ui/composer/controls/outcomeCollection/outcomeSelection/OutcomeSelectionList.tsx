@@ -46,6 +46,7 @@ const OutcomeSelectionList = () => {
                                 )
                             }
                         )}
+                        <Box pad="small" />
                     </Box>
                 </Box>
                 <SidebarCardFooter>

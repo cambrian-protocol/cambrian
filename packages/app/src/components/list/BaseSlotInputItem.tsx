@@ -7,15 +7,18 @@ import { PropsWithChildren } from 'react'
 export type BaseSlotInputItemProps = PropsWithChildren<{}> & {
     info?: string
     title?: string
-    subTitle?: string
     onClick?: () => void
-}
+} & (
+        | { subTitle?: string; address?: never }
+        | { subTitle?: never; address?: string }
+    )
 
 const BaseSlotInputItem = ({
     info,
     title,
     onClick,
     subTitle,
+    address,
     children,
 }: BaseSlotInputItemProps) => {
     return (
@@ -34,12 +37,12 @@ const BaseSlotInputItem = ({
             >
                 <Box gap="medium" direction="row">
                     <Box width={{ min: 'xxsmall' }}>
-                        <BaseAvatar />
+                        <BaseAvatar address={address} />
                     </Box>
                     <Box justify="center">
                         <Text truncate>{title}</Text>
                         <Text size="small" color="dark-4" truncate>
-                            {subTitle}
+                            {address || subTitle}
                         </Text>
                     </Box>
                 </Box>
