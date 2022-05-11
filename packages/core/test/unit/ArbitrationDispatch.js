@@ -234,38 +234,6 @@ describe("ArbitrationDispatch", function () {
     );
   });
 
-  it("Rejects requesting arbitration when status.ArbitrationPending", async function () {
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
-    );
-
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [0, 1]);
-
-    await solvers[0].connect(this.arbitrator).arbitrationRequested(0);
-    await solvers[0].connect(this.arbitrator).arbitrationPending(0);
-
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
-      "Condition status invalid for arbitration"
-    );
-  });
-
   it("Rejects requesting arbitration when status.OutcomeReported", async function () {
     const solverConfigs = [
       [

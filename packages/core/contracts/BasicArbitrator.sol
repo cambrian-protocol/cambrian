@@ -3,20 +3,23 @@ pragma solidity 0.8.0;
 
 import "./interfaces/ISolver.sol";
 import "./SolverLib.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract BasicArbitrator is Ownable, ReentrancyGuard {
+contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     struct Dispute {
         ISolver solver;
         uint256 conditionIndex;
         uint256 fee;
+        uint256 lapse;
         bytes32 id;
         address[] disputers;
         uint256[][] choices;
     }
 
     uint256 public fee; // wei
+    uint256 public lapse; // Seconds after timelock ends when a Dispute is considered to have "lapsed"
 
     mapping(bytes32 => Dispute) public disputes; // keccak256(abi.encode(address solver, conditionIndex)) => Dispute
 
@@ -37,9 +40,17 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
      * @notice Sets fee and immediately transfers ownership to _newOwner
      * @param _fee Arbitration fee (per disputer) in wei
      * @param _newOwner Address to immediately transfer ownership to
+     * @param _lapse Seconds after timelock ends when a Dispute is considered to have "lapsed"
      */
-    constructor(uint256 _fee, address _newOwner) {
+    function init(
+        address _newOwner,
+        uint256 _fee,
+        uint256 _lapse
+    ) external initializer {
         fee = _fee;
+        lapse = _lapse;
+
+        __Ownable_init();
         transferOwnership(_newOwner);
     }
 
@@ -63,6 +74,39 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
      */
     function setFee(uint256 _fee) external onlyOwner {
         fee = _fee;
+    }
+
+    /**
+     * @notice Set a new lapse duration. Does not affect active Disputes
+     * @dev onlyOwner
+     * @param _lapse New lapse in seconds
+     */
+    function setLapse(uint256 _lapse) external onlyOwner {
+        require(_lapse > 0, "Lapse cannot be 0 days");
+        lapse = _lapse;
+    }
+
+    /**
+     * @notice Add additional lapse duration to an active dispute
+     * @dev onlyOwner
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param extraTime Additional lapse in seconds
+     */
+    function extendLapse(bytes32 disputeId, uint256 extraTime)
+        external
+        onlyOwner
+    {
+        require(disputes[disputeId].id != bytes32(""), "Invalid dispute");
+        disputes[disputeId].lapse += extraTime;
+    }
+
+    /**
+     * @notice True when a dispute has lapsed
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     */
+    function isLapsed(bytes32 disputeId) public view returns (bool) {
+        return
+            block.timestamp > (disputes[disputeId].lapse + timelock(disputeId));
     }
 
     /**
@@ -101,6 +145,7 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
         bytes32 _disputeId = keccak256(abi.encode(solver, conditionIndex));
 
         require(msg.value >= getFee(_disputeId), "Insufficient fee");
+        balances[msg.sender] += msg.value - fee; // Refund the difference to msg.sender's balance
 
         Dispute storage dispute = disputes[_disputeId];
 
@@ -110,6 +155,16 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
             dispute.solver = solver;
             dispute.conditionIndex = conditionIndex;
             dispute.fee = fee;
+            dispute.lapse = lapse;
+
+            // First Disputer is the Keeper
+            dispute.disputers.push(solver.keeper());
+
+            //  First Choice is the disputed payouts
+            SolverLib.Condition memory condition = solver.conditions(
+                conditionIndex
+            );
+            dispute.choices.push(condition.payouts);
         }
 
         dispute.disputers.push(msg.sender);
@@ -120,6 +175,7 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
     /**
      * @notice Deliver a null arbitration
      * @dev Callable on any active dispute
+     * @dev Resets disputes and choices to empty arrays and reimburses disputers
      * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
      */
     function arbitrateNull(bytes32 disputeId)
@@ -131,6 +187,12 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
         require(dispute.id == disputeId, "Invalid Dispute");
 
         dispute.solver.arbitrateNull(dispute.conditionIndex);
+
+        // Reset disputers & choices
+        dispute.disputers = [];
+        dispute.choices = [];
+
+        reimburse(disputeId);
     }
 
     /**
@@ -160,8 +222,28 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
         imburse(disputeId, choice);
     }
 
+    function claimLapse(bytes32 disputeId) external {
+        Dispute memory dispute = disputes[disputeId];
+
+        require(dispute.id != bytes32(""), "Not a dispute");
+        require(
+            dispute.solver.getStatus(dispute.conditionIndex) ==
+                SolverLib.Status.ArbitrationRequested,
+            "Arbitration not requested"
+        );
+        require(isLapsed(disputeId), "Not lapsed");
+
+        SolverLib.Condition memory condition = disputes[disputeId]
+            .solver
+            .conditions(dispute.conditionIndex);
+
+        dispute.solver.arbitrate(dispute.conditionIndex, condition.payouts);
+        reimburse(disputeId);
+    }
+
     /**
-     * @notice Adds withdrawal balance to the arbitrator and disputers who's choice matched the arbitrator's ruling
+     * @notice Adds withdrawal balance to the arbitrator and disputers whose choice matched the arbitrator's ruling
+     * @dev Arbitrator must select from disputed choices
      * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
      * @param choice index of the chosen desiredOutcome from dispute.choices
      */
@@ -170,7 +252,8 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
 
         uint256 remainingFee = dispute.fee * dispute.disputers.length;
 
-        for (uint256 i; i < dispute.disputers.length; i++) {
+        // Skip first disputer/choice, they are automatically the Keeper/proposed payouts
+        for (uint256 i = 1; i < dispute.disputers.length; i++) {
             if (
                 keccak256(abi.encode(dispute.choices[i])) ==
                 keccak256(abi.encode(dispute.choices[choice]))
@@ -181,6 +264,17 @@ contract BasicArbitrator is Ownable, ReentrancyGuard {
         }
 
         balances[owner()] += remainingFee;
+    }
+
+    /**
+     * @notice Adds withdrawal balance to all disputers
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     */
+    function reimburse(bytes32 disputeId) private {
+        // Skip first disputer/choice, they are automatically the Keeper/proposed payouts
+        for (uint256 i = 1; i < dispute.disputers.length; i++) {
+            balances[dispute.disputers[i]] += dispute.fee;
+        }
     }
 
     /**
