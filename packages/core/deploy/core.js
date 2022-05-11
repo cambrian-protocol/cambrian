@@ -61,7 +61,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     args: [solverFactory.address, proposalsHub.address],
     log: true,
   });
+
+  await deploy("pWRK", {
+    from: deployer,
+    args: ["Placeholder WRK", "pWRK"],
+    log: true,
+  });
 };
+
 module.exports.tags = [
   "ConditionalTokens",
   "SolverFactory",
@@ -72,4 +79,5 @@ module.exports.tags = [
   "WriterSolverV1",
   "ArbitrationDispatch",
   "IPFSSolutionsHub",
+  "pWRK",
 ];
