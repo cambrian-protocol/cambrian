@@ -56,9 +56,9 @@ export const config = {
     outDir: "./typechain-types",
     target: "ethers-v5",
   },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_KEY,
-  },
+  // etherscan: {
+  //   apiKey: process.env.ETHERSCAN_KEY,
+  // },
   // contractSizer: {
   //   alphaSort: true,
   //   runOnCompile: true,
