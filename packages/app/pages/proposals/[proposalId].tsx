@@ -58,26 +58,9 @@ export default function ProposalPage() {
         setShowInvalidQueryComponent(true)
     }
 
-    // Temporarily added for demo purposes
-    const onMintTOY = async () => {
-        if (currentUser.signer) {
-            const ToyToken = new ethers.Contract(
-                '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79',
-                ERC20_IFACE,
-                currentUser.signer
-            )
-            await ToyToken.mint(currentUser.address, '1000000000000000000000')
-        }
-    }
-
     return (
         <>
-            <BaseLayout
-                contextTitle="Proposal"
-                appbarItems={[
-                    <AppbarItem icon={<CoinVertical />} onClick={onMintTOY} />,
-                ]}
-            >
+            <BaseLayout contextTitle="Proposal">
                 {currentUser.signer ? (
                     showInvalidQueryComponent ? (
                         <InvalidQueryComponent context={StageNames.proposal} />

@@ -1,8 +1,8 @@
-name: Firebase Deploy
+name: Firebase Nightly
 on:
   push:
     branches:
-      - main
+      - nightly
 jobs:
   build:
     name: Build
@@ -33,11 +33,11 @@ jobs:
         with:
           name: out
           path: packages/app/out
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase Nightly
         uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
         env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          PROJECT_ID: ${{ secrets.NIGHTLY_PROJECT_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           PROJECT_PATH: ${{ secrets.PROJECT_PATH }}

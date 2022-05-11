@@ -1,5 +1,6 @@
 {
-  "projects": {
-    "default": "cambrian-app"
-  }
+    "projects": {
+        "default": "cambrian-app",
+        "nightly": "nightly-cambrian-app"
+    }
 }

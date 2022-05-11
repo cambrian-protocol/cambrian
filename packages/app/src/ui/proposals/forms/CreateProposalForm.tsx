@@ -19,11 +19,10 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DiscordWebhookInput from '@cambrian/app/components/inputs/DiscordWebhookInput'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal'
-import { FlexInputFormType } from '../../templates/forms/CreateTemplateForm'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFlexInputStep'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import Stagehand from '@cambrian/app/classes/Stagehand'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
@@ -74,7 +73,7 @@ const CreateProposalForm = ({
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
     const [proposalId, setProposalId] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [isInTransaction, setIsInTransaction] = useState(false)
 
     useEffect(() => {
         const updatedInputs = { ...input }
@@ -99,7 +98,7 @@ const CreateProposalForm = ({
 
     const onSubmit = async (event: FormExtendedEvent) => {
         event.preventDefault()
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsInTransaction(true)
         try {
             if (!currentUser.signer || !currentUser.chainId)
                 throw GENERAL_ERROR['NO_WALLET_CONNECTION']
@@ -132,7 +131,6 @@ const CreateProposalForm = ({
                 response.parsedSolvers.map((solver) => solver.config),
                 response.cid
             )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
             let rc = await transaction.wait()
             const event = rc.events?.find(
                 (event) => event.event === 'CreateProposal'
@@ -155,7 +153,7 @@ const CreateProposalForm = ({
         } catch (e) {
             setErrorMsg(await cpLogger.push(e))
         }
-        setTransactionMsg(undefined)
+        setIsInTransaction(false)
     }
 
     // TODO Form Validate Type Error handling, Skeleton Loader integration
@@ -267,7 +265,8 @@ const CreateProposalForm = ({
                         </BaseFormGroupContainer>
                         <Box>
                             {currentUser.signer ? (
-                                <Button
+                                <LoaderButton
+                                    isLoading={isInTransaction}
                                     primary
                                     type="submit"
                                     label="Create Proposal"
@@ -299,7 +298,6 @@ const CreateProposalForm = ({
                     onClose={() => setErrorMsg(undefined)}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }
