@@ -1,4 +1,4 @@
-import { FlexInputFormType } from '../ui/templates/forms/CreateTemplateForm'
+import { FlexInputFormType } from '../ui/templates/forms/steps/CreateTemplateFlexInputStep'
 import { TokenModel } from './TokenModel'
 
 export type TemplateModel = {

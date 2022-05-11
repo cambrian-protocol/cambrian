@@ -5,18 +5,17 @@ import {
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { Button } from 'grommet'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Stack } from 'grommet'
 import { SubmissionModel } from '../models/SubmissionModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { initialSubmission } from './SubmissionContainer'
 
 interface WriterUIProps {
     currentCondition: SolverContractCondition
@@ -31,16 +30,16 @@ const SubmissionForm = ({
     solverContract,
     latestSubmission,
 }: WriterUIProps) => {
-    const [input, setInput] = useState<SubmissionModel>(latestSubmission)
+    const [input, setInput] = useState<SubmissionModel>(initialSubmission)
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
-    const [transactionMsg, setTransactionMsg] = useState<string>()
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
     useEffect(() => {
         setInput(latestSubmission)
     }, [latestSubmission])
 
     const onSubmit = async (): Promise<void> => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsSubmitting(true)
         try {
             if (input.submission === '') {
                 throw new Error(
@@ -67,20 +66,20 @@ const SubmissionForm = ({
                     response.IpfsHash,
                     currentCondition.conditionId
                 )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
             const rc = await transaction.wait()
             if (!rc.events?.find((event) => event.event === 'SubmittedWork'))
                 throw new Error('Error while submitting work')
         } catch (e) {
             setErrorMsg(await cpLogger.push(e))
         }
-        setTransactionMsg(undefined)
+        setIsSubmitting(false)
     }
     return (
         <>
             <Box fill gap="medium">
                 <Stack anchor="center" fill>
                     <TextArea
+                        disabled={isSubmitting}
                         placeholder="Type your article here..."
                         fill
                         size="medium"
@@ -94,13 +93,15 @@ const SubmissionForm = ({
                         }
                     />
                 </Stack>
-                <Button
+                <LoaderButton
+                    isLoading={isSubmitting}
                     disabled={
                         input.submission === latestSubmission.submission ||
-                        input.submission.trim() === ''
+                        input.submission.trim() === '' ||
+                        isSubmitting
                     }
                     primary
-                    label="Submit work"
+                    label={'Submit work'}
                     onClick={onSubmit}
                 />
                 <Box pad="small" />
@@ -111,7 +112,6 @@ const SubmissionForm = ({
                     errorMessage={errorMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

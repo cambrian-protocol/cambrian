@@ -1,6 +1,6 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
-import { CreateTemplateFormType } from '../ui/templates/forms/CreateTemplateForm'
+import { CreateTemplateMultiStepFormType } from '../ui/templates/forms/CreateTemplateMultiStepForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -121,7 +121,7 @@ export default class Stagehand {
      * Creates a template by applying CreateTemplateForm to a loaded composition and publishes it to IPFS
      */
     publishTemplate = async (
-        createTemplateInput: CreateTemplateFormType,
+        createTemplateInput: CreateTemplateMultiStepFormType,
         compositionCID: string,
         provider: ethers.providers.Provider
     ) => {
