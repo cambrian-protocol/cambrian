@@ -40,4 +40,4 @@ jobs:
         env:
           PROJECT_ID: ${{ secrets.NIGHTLY_PROJECT_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_PATH: ${{ secrets.NIGHTLY_PROJECT_PATH }}
+          PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
