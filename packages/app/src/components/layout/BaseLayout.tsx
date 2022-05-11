@@ -2,6 +2,7 @@ import { Box, Collapsible, Main, ResponsiveContext } from 'grommet'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import Appbar from '../nav/Appbar'
+import BaseFooter from './footer/BaseFooter'
 import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import ContextHelpModal from '../modals/ContextHelp'
 import Head from 'next/head'
@@ -27,6 +28,7 @@ type LayoutProps = PropsWithChildren<{}> & {
     notification?: JSX.Element
     appbarTitle?: string
     appbarItems?: JSX.Element[]
+    showFooter?: boolean
 }
 
 export const BaseLayout = ({
@@ -41,6 +43,7 @@ export const BaseLayout = ({
     appbarTitle,
     notification,
     appbarItems,
+    showFooter,
 }: LayoutProps) => {
     const { currentUser } = useCurrentUser()
     const [showSidebar, setShowSidebar] = useState(false)
@@ -203,6 +206,7 @@ export const BaseLayout = ({
                             </Box>
                         </Box>
                     </Main>
+                    {showFooter && <BaseFooter />}
                     {showHelp && <ContextHelpModal onClose={toggleHelp} />}
                 </>
             )}

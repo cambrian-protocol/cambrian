@@ -7,7 +7,7 @@ const colors: any = {
         dark: '#4e94bd',
     },
     active: '#799AB850',
-    'background-back': { dark: '#212121', light: '#EFEFEF' },
+    'background-back': { dark: '#0A1F23', light: '#0A1F23' },
     'background-front': {
         dark: '#2f2f2f',
         light: '#FFFFFF',
@@ -31,7 +31,7 @@ export const cpTheme = deepMerge(grommet, {
     global: {
         colors,
         font: {
-            family: 'Roboto, sans-serif;',
+            family: 'Segoe UI, sans-serif;',
             size: '12px',
         },
         input: {
@@ -67,7 +67,7 @@ export const cpTheme = deepMerge(grommet, {
     anchor: { color: 'brand' },
     button: {
         hover: {
-            opacity: 0.8,
+            background: '#315e79',
         },
         default: {
             padding: {
@@ -77,18 +77,16 @@ export const cpTheme = deepMerge(grommet, {
             color: 'white',
         },
         border: {
-            radius: '10px',
+            radius: '5px',
         },
         primary: {
-            background:
-                'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
+            background: 'brand',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
             },
             extend: `
             color: white;
-            box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
             `,
         },
         secondary: {
