@@ -4,7 +4,7 @@ import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 
 export default function Home() {
     return (
-        <BaseLayout contextTitle="Index">
+        <BaseLayout contextTitle="Index" showFooter>
             <section id="index">
                 <Box width="medium">
                     <Heading level="5">Cambrian Protocol</Heading>
