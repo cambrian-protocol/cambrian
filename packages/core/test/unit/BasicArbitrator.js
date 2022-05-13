@@ -1,38 +1,79 @@
 const { ethers, deployments } = require("hardhat");
-const { expect } = require("chai");
-const SOLVER_ABI =
-  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
 const {
-  expectRevert, // Assertions for transactions that should fail
+  expectRevert,
+  expectEvent, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
-const { FormatTypes } = require("ethers/lib/utils");
-
-const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-describe("ArbitrationDispatch", function () {
+const { expect } = require("chai");
+const testHelpers = require("../../helpers/testHelpers.js");
+
+const Arb_ABI =
+  require("../../artifacts/contracts/BasicArbitrator.sol/BasicArbitrator.json").abi;
+
+describe("BasicArbitrator", function () {
   this.beforeEach(async function () {
-    const [buyer, seller, keeper, arbitrator] = await ethers.getSigners();
-    this.buyer = buyer;
-    this.seller = seller;
+    const [
+      deployer,
+      arbitratorOwner,
+      keeper,
+      disputer0,
+      disputer1,
+      nonRecipient,
+    ] = await ethers.getSigners();
+    this.deployer = deployer;
+    this.arbitratorOwner = arbitratorOwner;
     this.keeper = keeper;
-    this.arbitrator = arbitrator;
+    this.disputer0 = disputer0;
+    this.disputer1 = disputer1;
+    this.nonRecipient = nonRecipient;
 
     await deployments.fixture([
+      "ArbitratorFactory",
+      "BasicArbitrator",
       "SolverFactory",
       "ToyToken",
       "BasicSolverV1",
-      "ArbitrationDispatch",
     ]);
 
-    this.ArbitrationDispatch = await ethers.getContract("ArbitrationDispatch");
-    this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
-    this.Solver = await ethers.getContract("BasicSolverV1");
-    this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
-    this.ISolver.format(FormatTypes.full);
+    this.SolverFactory = await ethers.getContract("SolverFactory");
+    this.ArbitratorFactory = await ethers.getContract("ArbitratorFactory");
+    this.BasicArbitrator = await ethers.getContract("BasicArbitrator");
+    this.BasicSolverV1 = await ethers.getContract("BasicSolverV1");
 
-    this.timelockSeconds = 0;
+    // Enable BasicArbitrator implementation
+    await this.ArbitratorFactory.connect(this.deployer).enableImplementation(
+      this.BasicArbitrator.address
+    );
+
+    // Get init params
+    this.options = {
+      address: this.arbitratorOwner.address,
+      fee: ethers.utils.parseEther("0.01"),
+      lapse: 0,
+    };
+
+    this.initParams = ethers.utils.defaultAbiCoder.encode(
+      ["address", "uint256", "uint256"],
+      [this.options.address, this.options.fee, this.options.lapse]
+    );
+
+    // Deploy a BasicArbitrator clone
+    await this.ArbitratorFactory.connect(this.arbitratorOwner).createArbitrator(
+      this.BasicArbitrator.address,
+      this.initParams
+    );
+
+    this.Arbitrator = await ethers.getContractAt(
+      "BasicArbitrator",
+      (
+        await this.ArbitratorFactory.arbitrators(0)
+      ).arbitrator
+    );
+
+    // Solver Config
+    this.timelockSeconds = 100;
     this.ingests = [
       {
         executions: 0,
@@ -51,7 +92,7 @@ describe("ArbitrationDispatch", function () {
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
-          [this.buyer.address]
+          [this.disputer0.address]
         ),
       },
       {
@@ -61,7 +102,7 @@ describe("ArbitrationDispatch", function () {
         solverIndex: 0,
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
-          [this.seller.address]
+          [this.disputer1.address]
         ),
       },
       {
@@ -110,15 +151,12 @@ describe("ArbitrationDispatch", function () {
         ),
       ],
     };
-  });
-
-  it("Allows requesting arbitration when status.OutcomeProposed", async function () {
-    const solverConfigs = [
+    this.solverConfigs = [
       [
-        this.Solver.address,
+        this.BasicSolverV1.address,
         this.keeper.address,
-        this.arbitrator.address,
-        0,
+        this.Arbitrator.address,
+        this.timelockSeconds,
         ethers.utils.formatBytes32String(""),
         this.ingests,
         this.conditionBase,
@@ -126,174 +164,243 @@ describe("ArbitrationDispatch", function () {
     ];
 
     const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
+      this.solverConfigs,
       this.SolverFactory,
       this.keeper
     );
 
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [1, 0]);
+    this.Solver = solvers[0];
 
-    tx = await this.ArbitrationDispatch.requestArbitration(
-      solvers[0].address,
-      0
+    this.keeperReport = [1, 0];
+    this.disputeReport0 = [0, 1];
+    this.disputeReport1 = [1, 1];
+
+    this.conditionIndex = 0;
+
+    await this.Solver.connect(this.keeper).prepareSolve(this.conditionIndex);
+    await this.Solver.connect(this.keeper).executeSolve(this.conditionIndex);
+    await this.Solver.connect(this.keeper).proposePayouts(
+      this.conditionIndex,
+      this.keeperReport
     );
-    await tx.wait();
-    res = await tx.wait();
 
-    expect(res.events[0].event).to.equal("RequestedArbitration");
+    await this.Arbitrator.connect(this.disputer0).requestArbitration(
+      this.Solver.address,
+      this.conditionIndex,
+      this.disputeReport0,
+      { value: this.options.fee }
+    );
+
+    await this.Arbitrator.connect(this.disputer1).requestArbitration(
+      this.Solver.address,
+      this.conditionIndex,
+      this.disputeReport1,
+      { value: this.options.fee }
+    );
+
+    this.disputeId = ethers.utils.keccak256(
+      ethers.utils.defaultAbiCoder.encode(
+        ["address", "uint256"],
+        [this.Solver.address, this.conditionIndex]
+      )
+    );
+
+    this.dispute = await this.Arbitrator.getDispute(this.disputeId);
   });
 
-  it("Allows requesting arbitration when status.ArbitrationRequested", async function () {
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
+  it("Requests arbitration", async function () {
+    // Condition Status = Arbitration Requested
+    expect((await this.Solver.conditions(this.conditionIndex)).status).to.equal(
+      3
     );
 
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [1, 0]);
+    expect(this.dispute.id).to.equal(this.disputeId);
+    expect(this.dispute.fee).to.equal(this.options.fee);
+    expect(this.dispute.lapse).to.equal(this.options.lapse);
+    expect(this.dispute.conditionIndex).to.equal(this.conditionIndex);
+    expect(this.dispute.solver).to.equal(this.Solver.address);
 
-    await solvers[0].connect(this.arbitrator).arbitrationRequested(0);
-
-    tx = await this.ArbitrationDispatch.requestArbitration(
-      solvers[0].address,
-      0
+    // First "disputer" and choice is Keeper
+    expect(this.dispute.disputers[0]).to.equal(this.keeper.address);
+    expect(this.dispute.choices[0].map((x) => x.toNumber())).to.deep.equal(
+      this.keeperReport
     );
-    await tx.wait();
-    res = await tx.wait();
-    expect(res.events[0].event).to.equal("RequestedArbitration");
+
+    // Second is the user who requested arbitration
+    expect(this.dispute.disputers[1]).to.equal(this.disputer0.address);
+    expect(this.dispute.choices[1].map((x) => x.toNumber())).to.deep.equal(
+      this.disputeReport0
+    );
+    // And so on for subsequent disputers
+    expect(this.dispute.disputers[2]).to.equal(this.disputer1.address);
+    expect(this.dispute.choices[2].map((x) => x.toNumber())).to.deep.equal(
+      this.disputeReport1
+    );
   });
 
-  it("Rejects requesting arbitration when status.Initiated", async function () {
-    const solverConfigs = [
-      [
+  it("Reverts requestArbitration from non-recipient", async function () {
+    expectRevert(
+      this.Arbitrator.connect(this.disputer0).requestArbitration(
         this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
+        this.conditionIndex,
+        this.disputeReport0,
+        { value: this.options.fee }
+      ),
+      "Only recipients"
+    );
+  });
 
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
+  it("Reverts if condition not Status.OutcomeReported", async function () {
+    await this.Solver.connect(this.keeper).prepareSolve(
+      this.conditionIndex + 1
     );
 
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
+    expectRevert(
+      this.Arbitrator.connect(this.disputer0).requestArbitration(
+        this.Solver.address,
+        this.conditionIndex + 1,
+        this.disputeReport0,
+        { value: this.options.fee }
+      ),
       "Condition status invalid for arbitration"
     );
   });
 
-  it("Rejects requesting arbitration when status.Executed", async function () {
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
+  it("Adds withdrawable balance if fee is overpaid", async function () {
+    const doubleFee = this.options.fee.mul(2);
 
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
+    await this.Arbitrator.connect(this.disputer0).requestArbitration(
+      this.Solver.address,
+      this.conditionIndex,
+      this.disputeReport0,
+      { value: doubleFee }
     );
 
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(
+      this.options.fee
+    );
 
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
-      "Condition status invalid for arbitration"
+    await this.Arbitrator.connect(this.disputer0).withdraw();
+
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(0);
+  });
+
+  it("Reverts requestArbitration when outside timelock", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds]);
+    await ethers.provider.send("evm_mine");
+
+    expectRevert(
+      this.Arbitrator.connect(this.nonRecipient).requestArbitration(
+        this.Solver.address,
+        this.conditionIndex,
+        this.disputeReport0,
+        { value: this.options.fee }
+      ),
+      "Timelock elapsed"
     );
   });
 
-  it("Rejects requesting arbitration when status.OutcomeReported", async function () {
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
-    );
-
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [0, 1]);
-    await solvers[0].connect(this.keeper).confirmPayouts(0);
-
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
-      "Condition status invalid for arbitration"
+  it("Reverts arbitrateNull for non-Owner", async function () {
+    expectRevert(
+      this.Arbitrator.connect(this.nonRecipient).arbitrateNull(this.disputeId),
+      "Ownable: caller is not the owner"
     );
   });
 
-  it("Rejects requesting arbitration when contract arbitrator reverts", async function () {
-    this.arbitrator = {
-      address: this.SolverFactory.address,
-    }; // Nonsense arbitrator to check revert
-
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
+  it("arbitrateNull sets condition status to OutcomeProposed (2)", async function () {
+    await this.Arbitrator.connect(this.arbitratorOwner).arbitrateNull(
+      this.disputeId
     );
 
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [0, 1]);
-
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
-      "Arbitrator reverted"
+    expect((await this.Solver.condition(this.conditionIndex)).status).to.equal(
+      2
     );
+  });
+
+  it("arbitrateNull resets dispute choices/disputers", async function () {
+    await this.Arbitrator.connect(this.arbitratorOwner).arbitrateNull(
+      this.disputeId
+    );
+
+    const dispute = await this.Arbitrator.getDispute(this.disputeId);
+
+    expect(dispute.disputers).to.deep.equal([]);
+    expect(dispute.choices).to.deep.equal([]);
+  });
+
+  it("arbitrateNull reimburses balances", async function () {
+    await this.Arbitrator.connect(this.arbitratorOwner).arbitrateNull(
+      this.disputeId
+    );
+
+    expect(await this.Arbitrator.balances(this.keeper.address)).to.equal(0);
+    expect(
+      await this.Arbitrator.balances(this.arbitratorOwner.address)
+    ).to.equal(0);
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(
+      this.options.fee
+    );
+    expect(await this.Arbitrator.balances(this.disputer1.address)).to.equal(
+      this.options.fee
+    );
+  });
+
+  it("arbitrate sets payout to choice & condition status to ArbitrationDelivered (4)", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 2]);
+    await ethers.provider.send("evm_mine");
+
+    await this.Arbitrator.connect(this.arbitratorOwner).arbitrate(
+      this.disputeId,
+      0 // Keeper's choice
+    );
+
+    const condition = await this.Solver.condition(this.conditionIndex);
+    expect(condition.status).to.equal(4);
+    expect(condition.payouts.map((x) => x.toNumber())).to.deep.equal(
+      this.keeperReport
+    );
+  });
+
+  it("arbitrate imburses owner and winners", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 2]);
+    await ethers.provider.send("evm_mine");
+
+    await this.Arbitrator.connect(this.arbitratorOwner).arbitrate(
+      this.disputeId,
+      1 // Disputer0's choice
+    );
+
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(
+      this.options.fee
+    );
+
+    expect(
+      await this.Arbitrator.balances(this.arbitratorOwner.address)
+    ).to.equal(this.options.fee);
+
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(
+      this.options.fee
+    );
+
+    expect(await this.Arbitrator.balances(this.keeper.address)).to.equal(0);
+  });
+
+  it("Extends lapse time for a dispute", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 2]);
+    await ethers.provider.send("evm_mine");
+
+    expect(await this.Arbitrator.isLapsed(this.disputeId)).to.equal(true);
+
+    await this.Arbitrator.connect(this.arbitratorOwner).extendLapse(
+      this.disputeId,
+      this.timelockSeconds * 10
+    );
+
+    expect(await this.Arbitrator.isLapsed(this.disputeId)).to.equal(false);
+
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 20]);
+    await ethers.provider.send("evm_mine");
+
+    expect(await this.Arbitrator.isLapsed(this.disputeId)).to.equal(true);
   });
 });

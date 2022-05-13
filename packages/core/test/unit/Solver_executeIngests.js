@@ -100,7 +100,7 @@ describe("Solver.sol | executeIngests", function () {
     let rc = await tx.wait();
 
     const solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );
@@ -161,7 +161,7 @@ describe("Solver.sol | executeIngests", function () {
     let rc = await tx.wait();
 
     const solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );

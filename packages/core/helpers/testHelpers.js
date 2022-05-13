@@ -200,7 +200,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
         new ethers.Contract(
           ethers.utils.defaultAbiCoder.decode(
             ["address"],
-            rc.events[0].data
+            rc.events[1].data
           )[0],
           SOLVER_ABI,
           ethers.provider
@@ -219,7 +219,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
             new ethers.Contract(
               ethers.utils.defaultAbiCoder.decode(
                 ["address"],
-                rc.events[0].data
+                rc.events[1].data
               )[0],
               SOLVER_ABI,
               ethers.provider

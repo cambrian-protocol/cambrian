@@ -150,32 +150,44 @@
           "type": "uint256"
         }
       ],
-      "name": "conditions",
+      "name": "condition",
       "outputs": [
         {
-          "internalType": "contract IERC20",
+          "components": [
+            {
+              "internalType": "contract IERC20",
+              "name": "collateralToken",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "questionId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "parentCollectionId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "conditionId",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "payouts",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "enum SolverLib.Status",
+              "name": "status",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct SolverLib.Condition",
           "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint8",
-          "name": "",
-          "type": "uint8"
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -675,6 +687,19 @@
           "internalType": "bool",
           "name": "",
           "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "keeper",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
         }
       ],
       "stateMutability": "view",

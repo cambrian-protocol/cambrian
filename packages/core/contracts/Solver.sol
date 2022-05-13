@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.0;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./interfaces/IConditionalTokens.sol";
 import "./interfaces/ISolver.sol";
@@ -40,6 +40,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     event IngestedData(); // Emited on executeIngests(), handleCallback(), addData()
 
     event PreparedSolve(address solver, uint256 solveIndex);
+
+    // Recommended disabling of initializer for the implementation. Not called by clones
+    constructor() {
+        _disableInitializers();
+    }
 
     /**
         @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
@@ -497,6 +502,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         } else if (_index > chainIndex) {
             _address = ISolver(chainChild).addressFromChainIndex(_index);
         }
+    }
+
+    function condition(uint256 index)
+        public
+        view
+        returns (SolverLib.Condition memory)
+    {
+        return conditions[index];
     }
 
     function getConditions()

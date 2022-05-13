@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.0;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ArbitratorFactory is Ownable {
+    bytes4 private constant CLONE_INIT_SELECTOR =
+        bytes4(keccak256("init(bytes)"));
+
     enum Deployability {
         Null,
         Enabled,
@@ -47,7 +50,7 @@ contract ArbitratorFactory is Ownable {
         emit DisabledImplementation(implementation);
     }
 
-    function createArbitrator(address implementation, bytes memory initCall)
+    function createArbitrator(address implementation, bytes calldata initParams)
         external
         returns (address)
     {
@@ -58,9 +61,19 @@ contract ArbitratorFactory is Ownable {
 
         address clone = Clones.clone(implementation);
 
-        (bool success, bytes memory retData) = clone.call{value: 0}(initCall);
+        bytes memory data = abi.encodeWithSelector(
+            CLONE_INIT_SELECTOR,
+            initParams
+        );
+        (bool success, bytes memory retData) = clone.call{value: 0}(data);
 
         require(success, "Initialization call failed");
+
+        Arbitrator memory arbitrator;
+        arbitrator.arbitrator = clone;
+        arbitrator.implementation = implementation;
+
+        arbitrators.push(arbitrator);
 
         emit CreatedArbitrator(clone, implementation);
         return clone;
