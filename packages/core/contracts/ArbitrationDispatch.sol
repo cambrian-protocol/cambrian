@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.0;
+pragma solidity ^0.8.13;
 
 import "./interfaces/ISolver.sol";
 
@@ -35,17 +35,11 @@ contract ArbitrationDispatch {
         address _arbitrator = solver.arbitrator();
         require(_arbitrator != address(0), "Arbitrator can't be zero address");
 
-        (
-            IERC20 _c,
-            bytes32 _qid,
-            bytes32 _pcid,
-            bytes32 _cid,
-            uint8 status
-        ) = solver.conditions(conditionIndex);
+        SolverLib.Condition memory condition = solver.condition(conditionIndex);
 
         require(
-            status == uint8(SolverLib.Status.OutcomeProposed) ||
-                status == uint8(SolverLib.Status.ArbitrationRequested),
+            condition.status == SolverLib.Status.OutcomeProposed ||
+                condition.status == SolverLib.Status.ArbitrationRequested,
             "Condition status invalid for arbitration"
         );
 

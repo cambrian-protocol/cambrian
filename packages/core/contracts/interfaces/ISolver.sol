@@ -1,4 +1,4 @@
-pragma solidity 0.8.0;
+pragma solidity ^0.8.13;
 
 import "../ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -81,16 +81,12 @@ interface ISolver {
         view
         returns (SolverLib.Condition[] memory);
 
-    function conditions(uint256 index)
+    function condition(uint256 index)
         external
         view
-        returns (
-            IERC20,
-            bytes32,
-            bytes32,
-            bytes32,
-            uint8
-        );
+        returns (SolverLib.Condition memory);
+
+    function keeper() external view returns (address);
 
     function arbitrator() external view returns (address);
 

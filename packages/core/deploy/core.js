@@ -67,6 +67,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     args: ["Placeholder WRK", "pWRK"],
     log: true,
   });
+
+  await deploy("ArbitratorFactory", {
+    from: deployer,
+    log: true,
+  });
+
+  await deploy("BasicArbitrator", {
+    from: deployer,
+    log: true,
+  });
 };
 
 module.exports.tags = [
@@ -80,4 +90,6 @@ module.exports.tags = [
   "ArbitrationDispatch",
   "IPFSSolutionsHub",
   "pWRK",
+  "ArbitratorFactory",
+  "BasicArbitrator",
 ];

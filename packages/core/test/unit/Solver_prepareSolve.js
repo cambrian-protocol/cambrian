@@ -78,7 +78,7 @@ describe("Solver.sol | prepareSolve", function () {
     let rc = await tx.wait();
 
     this.solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );
