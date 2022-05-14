@@ -3,45 +3,61 @@ import { Box, Heading, Paragraph, Button, Anchor } from 'grommet'
 import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { ethers } from 'ethers'
-import { ERC20_IFACE } from '../config/ContractInterfaces'
+import { ERC20_IFACE } from '../../config/ContractInterfaces'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import { SUPPORTED_CHAINS } from '../config/SupportedChains'
+import { useState } from 'react'
 
-export default function MintToy() {
+// TODO: INCOMPLETE
+export default function CreateArbitrator() {
+    const [arbitrator, setArbitrator] = useState('')
+
     const { currentUser } = useCurrentUser()
 
-    const onMintTOY = async () => {
+    // Temp default config for testing
+    const onCreate = async () => {
         if (!currentUser.signer || !currentUser.chainId)
             throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
 
         const chainData = SUPPORTED_CHAINS[currentUser.chainId]
-        if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
+        if (!chainData || !chainData.contracts.arbitratorFactory)
+            throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
 
-        const ToyToken = new ethers.Contract(
-            chainData.contracts.toyToken,
+        const ArbitratorFactory = new ethers.Contract(
+            chainData.contracts.arbitratorFactory,
             ERC20_IFACE,
             currentUser.signer
         )
-        await ToyToken.mint(currentUser.address, '1000000000000000000000')
+
+        const options = {
+            address: currentUser.address,
+            fee: ethers.utils.parseEther('0.00001'),
+            lapse: 0,
+        }
+
+        const initParams = ethers.utils.defaultAbiCoder.encode(
+            ['address', 'uint256', 'uint256'],
+            [options.address, options.fee, options.lapse]
+        )
     }
 
     return (
-        <BaseLayout contextTitle="Mint Toy">
-            <section id="mintToy">
+        <BaseLayout contextTitle="Create Arbitrator">
+            <section id="createArbitrator">
                 <Box width="large" align="center">
                     <Heading
                         level="3"
                         margin={{ bottom: 'small', top: 'large' }}
                     >
-                        Mint TOY
+                        Create Arbitrator
                     </Heading>
                     <Paragraph textAlign="center">
-                        TOY is a simple ERC20 token on Ropsten for testing
-                        purposes that anybody can mint. Get yours now!
+                        Create an arbitration smart contract tied to your
+                        account.
                     </Paragraph>
                 </Box>
 
-                <Box
+                {/* <Box
                     width="large"
                     align="center"
                     direction="row"
@@ -62,10 +78,10 @@ export default function MintToy() {
                     >
                         Github
                     </Anchor>
-                </Box>
+                </Box> */}
 
                 <Box width="large" align="center" margin={{ top: 'large' }}>
-                    <Button primary label="Mint" onClick={() => onMintTOY()} />
+                    <Button primary label="Mint" onClick={() => onCreate()} />
                 </Box>
             </section>
         </BaseLayout>
