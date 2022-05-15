@@ -16,7 +16,7 @@ const BasePopupModal = ({
     onClose,
     children,
 }: BaseModalProps) => (
-    <Layer onEsc={onClose} background={'background-popup'}>
+    <Layer onEsc={onClose} background={'background-back'}>
         <Box width={{ max: 'large' }}>
             <Box direction="row">
                 <Box onClick={onClose} pad="small" focusIndicator={false}>

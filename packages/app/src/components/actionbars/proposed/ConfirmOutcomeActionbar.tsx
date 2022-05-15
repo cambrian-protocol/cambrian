@@ -1,15 +1,30 @@
+import Actionbar, {
+    ActionbarItemType,
+} from '@cambrian/app/ui/interaction/bars/Actionbar'
+import {
+    Coins,
+    Faders,
+    Info,
+    Lock,
+    Question,
+    Timer,
+    UsersThree,
+} from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
+import BaseLayerModal from '../../modals/BaseLayerModal'
 import { BigNumber } from 'ethers'
-import { Button } from 'grommet'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoaderButton from '../../buttons/LoaderButton'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
+import ProposalInfoModal from '../../modals/ProposalInfoModal'
+import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Spinner } from 'grommet'
-import { Timer } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
@@ -18,12 +33,16 @@ interface ConfirmOutcomeActionbarProps {
     currentUser: UserType
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
+    solverData: SolverModel
+    metadata?: MetadataModel
 }
 
 const ConfirmOutcomeActionbar = ({
     currentUser,
     solverMethods,
     currentCondition,
+    solverData,
+    metadata,
 }: ConfirmOutcomeActionbarProps) => {
     const [timelock, setTimelock] = useState(0)
     const [isTimelockActive, setIsTimelockActive] = useState(false)
@@ -31,6 +50,16 @@ const ConfirmOutcomeActionbar = ({
     const [isUnlockingTimestamp, setIsUnlockingTimestamp] = useState(false)
     const [isConfirming, setIsConfirming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+
+    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
+        useState(false)
+
+    const toggleShowSolverConfigInfoModal = () =>
+        setSolverConfigInfoModal(!showSolverConfigInfoModal)
+
+    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const toggleShowProposalInfoModal = () =>
+        setShowProposalInfoModal(!showProposalInfoModal)
 
     useEffect(() => {
         initTimelock()
@@ -83,56 +112,121 @@ const ConfirmOutcomeActionbar = ({
         )
     }
 
-    const actions = isUnlockingTimestamp
-        ? {
-              primaryAction: (
-                  <Button
-                      size="small"
-                      primary
-                      label="Confirm Outcome"
-                      disabled
-                  />
-              ),
-              info: {
-                  icon: <Spinner />,
-                  label: `${new Date(timelock * 1000).toLocaleString()}`,
-                  descLabel: 'Releasing Timelock...',
-              },
-          }
-        : isTimelockActive
-        ? {
-              primaryAction: (
-                  <Button
-                      size="small"
-                      primary
-                      label="Confirm Outcome"
-                      disabled
-                  />
-              ),
-              info: {
-                  icon: <Timer />,
-                  label: `${new Date(timelock * 1000).toLocaleString()}`,
-                  descLabel: 'Timelock active until',
-              },
-          }
-        : {
-              primaryAction: (
-                  <LoaderButton
-                      primary
-                      onClick={onConfirmOutcome}
-                      label="Confirm Outcome"
-                      isLoading={isConfirming}
-                  />
-              ),
-          }
+    const actionbarItems: ActionbarItemType[] = [
+        {
+            icon: <Faders />,
+            onClick: toggleShowSolverConfigInfoModal,
+            label: 'Solver',
+        },
+    ]
+
+    if (isUnlockingTimestamp || isTimelockActive) {
+        actionbarItems.unshift({
+            icon: <Question />,
+            dropContent: (
+                <ActionbarItemDropContainer
+                    title="Active Timelock"
+                    description="Please wait until the timelock has been released. The timelock makes it possible to the participants to disagree with the proposed outcome before it gets confirmed."
+                    list={
+                        isUnlockingTimestamp
+                            ? [
+                                  {
+                                      icon: <Spinner />,
+                                      label: 'Releasing timelock... ( Waiting for the next available block )',
+                                  },
+                                  {
+                                      icon: <Timer />,
+                                      label: `Locked until: ${new Date(
+                                          timelock * 1000
+                                      ).toLocaleString()}`,
+                                  },
+                              ]
+                            : [
+                                  {
+                                      icon: <Lock />,
+                                      label: 'Timelock still active',
+                                  },
+                                  {
+                                      icon: <Timer />,
+                                      label: `Locked until: ${new Date(
+                                          timelock * 1000
+                                      ).toLocaleString()}`,
+                                  },
+                              ]
+                    }
+                />
+            ),
+            label: 'Help',
+        })
+    } else {
+        actionbarItems.unshift({
+            icon: <Question />,
+            dropContent: (
+                <ActionbarItemDropContainer
+                    title="Confirming an outcome"
+                    description='Please hit the "Confirm Outcome"-Button at your
+                right to confirm the proposed outcome.'
+                    list={[
+                        {
+                            icon: <UsersThree />,
+                            label: 'This can be done by anyone',
+                        },
+                        {
+                            icon: <Coins />,
+                            label: 'Final token allocation ahead',
+                        },
+                    ]}
+                />
+            ),
+            label: 'Help',
+        })
+    }
+
+    if (metadata) {
+        actionbarItems.push({
+            icon: <Info />,
+            label: 'Gig',
+            onClick: toggleShowProposalInfoModal,
+        })
+    }
 
     return (
         <>
-            <Actionbar actions={actions} />
+            <Actionbar
+                actionbarItems={actionbarItems}
+                primaryAction={
+                    <LoaderButton
+                        disabled={isUnlockingTimestamp || isTimelockActive}
+                        primary
+                        onClick={onConfirmOutcome}
+                        label="Confirm Outcome"
+                        icon={
+                            isUnlockingTimestamp || isTimelockActive ? (
+                                <Lock />
+                            ) : undefined
+                        }
+                        isLoading={isConfirming}
+                    />
+                }
+            />
             {errMsg && (
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}
                     errorMessage={errMsg}
+                />
+            )}
+            {showSolverConfigInfoModal && (
+                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
+                    <SolverConfigInfo
+                        solverData={solverData}
+                        currentCondition={currentCondition}
+                    />
+                </BaseLayerModal>
+            )}
+            {showProposalInfoModal && metadata?.stages && (
+                <ProposalInfoModal
+                    onClose={toggleShowProposalInfoModal}
+                    metadata={metadata}
                 />
             )}
         </>

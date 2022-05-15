@@ -8,7 +8,7 @@ const BaseFormContainer = ({
 }: PropsWithChildren<{}> & BoxExtendedProps) => {
     return (
         <Box
-            background={'background-front'}
+            background={'background-contrast'}
             pad="medium"
             elevation="small"
             round="small"

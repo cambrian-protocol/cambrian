@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react'
 
-import { AppbarItem } from '@cambrian/app/components/nav/AppbarItem'
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
-import { CoinVertical } from 'phosphor-react'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
-import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { StageNames } from '@cambrian/app/classes/Stagehand'
@@ -60,7 +57,7 @@ export default function ProposalPage() {
 
     return (
         <>
-            <BaseLayout contextTitle="Proposal">
+            <PageLayout contextTitle="Proposal">
                 {currentUser.signer ? (
                     showInvalidQueryComponent ? (
                         <InvalidQueryComponent context={StageNames.proposal} />
@@ -76,7 +73,7 @@ export default function ProposalPage() {
                 ) : (
                     <ConnectWalletSection />
                 )}
-            </BaseLayout>
+            </PageLayout>
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}

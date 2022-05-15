@@ -1,13 +1,13 @@
 import { ArrowClockwise, DiscordLogo, XCircle } from 'phosphor-react'
 import { Box, Button } from 'grommet'
 
-import { BaseLayout } from '../layout/BaseLayout'
 import HeaderTextSection from '../sections/HeaderTextSection'
+import PageLayout from '../layout/PageLayout'
 
 const ErrorScreen = () => (
-    <BaseLayout contextTitle="Ooops">
-        <Box fill justify="center">
-            <Box gap="medium">
+    <PageLayout contextTitle="Ooops">
+        <Box fill justify="center" align="center">
+            <Box gap="medium" width={'large'}>
                 <HeaderTextSection
                     subTitle="Oooops"
                     title="Something went wrong"
@@ -36,7 +36,7 @@ const ErrorScreen = () => (
                 </Box>
             </Box>
         </Box>
-    </BaseLayout>
+    </PageLayout>
 )
 
 export default ErrorScreen

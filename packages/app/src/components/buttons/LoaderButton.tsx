@@ -11,6 +11,7 @@ export type LoaderButtonProps = ButtonExtendedProps & {
     isLoading: boolean
 }
 
+// TODO Spinner is not centered
 const LoaderButton = ({
     children,
     isLoading,
@@ -49,6 +50,7 @@ const LoaderButton = ({
     }, [isLoading, showLoader])
     return (
         <Button
+            {...props}
             ref={ref}
             style={
                 showLoader
@@ -58,7 +60,7 @@ const LoaderButton = ({
                       }
                     : {}
             }
-            disabled={showLoader}
+            disabled={showLoader || props.disabled}
             label={
                 label && (
                     <Box justify="center" align="center">
@@ -93,7 +95,6 @@ const LoaderButton = ({
                     icon
                 ) : undefined
             }
-            {...props}
         />
     )
 }

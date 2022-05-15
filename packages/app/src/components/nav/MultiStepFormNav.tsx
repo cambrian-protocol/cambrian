@@ -11,37 +11,31 @@ interface MultiStepFormNavProps {
 
 const MultiStepFormNav = ({ backward, submitForm }: MultiStepFormNavProps) => {
     return (
-        <Box>
-            <Box direction="row" justify="between">
-                {backward ? (
-                    <Button
-                        type="button"
-                        secondary
-                        onClick={backward}
-                        icon={<ArrowLeft />}
-                        size="small"
-                        label="Back"
-                    />
-                ) : (
-                    <Box />
-                )}
-                {submitForm ? (
-                    <LoaderButton
-                        {...submitForm}
-                        icon={<CloudArrowUp />}
-                        reverse
-                    />
-                ) : (
-                    <Button
-                        size="small"
-                        type="submit"
-                        primary
-                        icon={<ArrowRight />}
-                        label="Next"
-                        reverse
-                    />
-                )}
-            </Box>
+        <Box direction="row" justify="between" pad="xsmall">
+            {backward ? (
+                <Button
+                    type="button"
+                    secondary
+                    onClick={backward}
+                    icon={<ArrowLeft />}
+                    size="small"
+                    label="Back"
+                />
+            ) : (
+                <Box />
+            )}
+            {submitForm ? (
+                <LoaderButton {...submitForm} icon={<CloudArrowUp />} reverse />
+            ) : (
+                <Button
+                    size="small"
+                    type="submit"
+                    primary
+                    icon={<ArrowRight />}
+                    label="Next"
+                    reverse
+                />
+            )}
         </Box>
     )
 }

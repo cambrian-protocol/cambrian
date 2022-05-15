@@ -1,31 +1,46 @@
-import styled from 'styled-components'
+import { Box } from 'grommet'
+import { BoxExtendedProps } from 'grommet'
 
-const Inner = styled.div`
-    position: absolute;
-    bottom: 0;
-    right: 100px;
-    height: 100%;
-    width: 100%;
-    background: radial-gradient(closest-side, #4e94bd 10%, transparent 100%);
-    opacity: 0.1;
-`
+interface GlowProps {
+    left?: string
+    bottom?: string
+    top?: string
+}
 
-const Outer = styled.div`
-    position: absolute;
-    bottom: -150px;
-    left: 0;
-    height: 800px;
-    width: 1000px;
-    max-width: 100vw;
-
-    overflow: hidden;
-`
-
-const Glow = () => {
+const Glow = ({
+    height,
+    width,
+    left,
+    bottom,
+    top,
+    ...rest
+}: GlowProps & BoxExtendedProps) => {
     return (
-        <Outer>
-            <Inner />
-        </Outer>
+        <Box
+            style={{
+                position: 'absolute',
+                overflow: 'hidden',
+                left: left || 0,
+                bottom: bottom || 0,
+                top: top || undefined,
+                maxWidth: '100vw',
+            }}
+            height={height}
+            width={width}
+        >
+            <Box
+                style={{
+                    position: 'absolute',
+                    opacity: 0.1,
+                    right: 0,
+                    bottom: 0,
+                }}
+                width="100%"
+                height="100%"
+                background="radial-gradient(closest-side, #4e94bd 10%, transparent 100%)"
+                {...rest}
+            />
+        </Box>
     )
 }
 

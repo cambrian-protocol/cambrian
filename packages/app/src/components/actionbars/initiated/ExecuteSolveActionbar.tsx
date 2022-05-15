@@ -1,8 +1,10 @@
+import { Question, RocketLaunch, UsersThree } from 'phosphor-react'
+
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
-import { Info } from 'phosphor-react'
 import LoaderButton from '../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
@@ -38,21 +40,36 @@ const ExecuteSolveActionbar = ({
     return (
         <>
             <Actionbar
-                actions={{
-                    primaryAction: (
-                        <LoaderButton
-                            primary
-                            isLoading={isExecuting}
-                            label="Progress"
-                            onClick={onExecuteSolve}
-                        />
-                    ),
-                    info: {
-                        icon: <Info />,
-                        descLabel: 'Info',
-                        label: 'Ready to progress',
+                primaryAction={
+                    <LoaderButton
+                        primary
+                        isLoading={isExecuting}
+                        label="Progress"
+                        onClick={onExecuteSolve}
+                    />
+                }
+                actionbarItems={[
+                    {
+                        icon: <Question />,
+                        dropContent: (
+                            <ActionbarItemDropContainer
+                                title="Ready to progress"
+                                description='Please hit on the "Progress"-Button at your right and confirm the transaction.'
+                                list={[
+                                    {
+                                        icon: <UsersThree />,
+                                        label: 'This can be done by anyone',
+                                    },
+                                    {
+                                        icon: <RocketLaunch />,
+                                        label: 'After this step, we can start working!',
+                                    },
+                                ]}
+                            />
+                        ),
+                        label: 'Help',
                     },
-                }}
+                ]}
             />
             {errMsg && (
                 <ErrorPopupModal

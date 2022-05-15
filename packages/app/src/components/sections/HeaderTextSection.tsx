@@ -27,7 +27,7 @@ const HeaderTextSection = ({
                 align="center"
                 gap="small"
                 direction="row"
-                width={{ min: 'medium' }}
+                width={{ min: 'auto' }}
             >
                 <Box pad="medium" align="center">
                     <IconContext.Provider value={{ size: '48' }}>

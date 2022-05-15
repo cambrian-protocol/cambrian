@@ -17,30 +17,32 @@ const CreateProposalUI = ({
     template,
     templateCID,
 }: CreateProposalUIProps) => (
-    <>
-        <HeaderTextSection
-            title={template.title}
-            subTitle="Create Proposal"
-            paragraph={template.description}
-        />
-        <AvatarWithLabel
-            role="Seller"
-            label={template.name}
-            pfpPath={template.pfp}
-        />
-        <HeaderTextSection
-            subTitle="Define your proposal"
-            paragraph="Enter the details of your Proposal below. Be sure to include information requested by the Template description."
-        />
-        <Box fill>
-            <CreateProposalForm
-                composition={composition}
-                template={template}
-                templateCID={templateCID}
+    <Box align="center" pad={{ top: 'large', horizontal: 'medium' }}>
+        <Box width={{ max: 'large' }}>
+            <HeaderTextSection
+                title={template.title}
+                subTitle="Create Proposal"
+                paragraph={template.description}
             />
-            <Box pad="medium" />
+            <AvatarWithLabel
+                role="Seller"
+                label={template.name}
+                pfpPath={template.pfp}
+            />
+            <HeaderTextSection
+                subTitle="Define your proposal"
+                paragraph="Enter the details of your Proposal below. Be sure to include information requested by the Template description."
+            />
+            <Box fill>
+                <CreateProposalForm
+                    composition={composition}
+                    template={template}
+                    templateCID={templateCID}
+                />
+                <Box pad="medium" />
+            </Box>
         </Box>
-    </>
+    </Box>
 )
 
 export default CreateProposalUI

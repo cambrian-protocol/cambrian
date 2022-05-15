@@ -1,18 +1,26 @@
+import Actionbar, {
+    ActionbarItemType,
+} from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { BigNumber, ethers } from 'ethers'
-import { Coins, Handshake } from 'phosphor-react'
+import { Box, Text } from 'grommet'
+import { Coin, Confetti, Faders, Info, Question } from 'phosphor-react'
 import {
     calculateCollectionId,
     calculatePositionId,
 } from '../../solver/SolverHelpers'
 import { useEffect, useState } from 'react'
 
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
+import BaseLayerModal from '../../modals/BaseLayerModal'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoaderButton from '../../buttons/LoaderButton'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
+import ProposalInfoModal from '../../modals/ProposalInfoModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -24,12 +32,14 @@ interface RedeemTokensActionbarProps {
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
+    metadata?: MetadataModel
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
     currentUser,
+    metadata,
 }: RedeemTokensActionbarProps) => {
     // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
     const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
@@ -38,6 +48,16 @@ const RedeemTokensActionbar = ({
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
     const [isRedeeming, setIsRedeeming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+
+    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
+        useState(false)
+
+    const toggleShowSolverConfigInfoModal = () =>
+        setSolverConfigInfoModal(!showSolverConfigInfoModal)
+
+    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const toggleShowProposalInfoModal = () =>
+        setShowProposalInfoModal(!showProposalInfoModal)
 
     const payoutRedemptionFilter = ctf.contract.filters.PayoutRedemption(
         currentUser.address,
@@ -209,45 +229,104 @@ const RedeemTokensActionbar = ({
         }
     }
 
+    const actionbarItems: ActionbarItemType[] = [
+        {
+            icon: <Faders />,
+            onClick: toggleShowSolverConfigInfoModal,
+            label: 'Solver',
+        },
+    ]
+
+    if (metadata) {
+        actionbarItems.push({
+            icon: <Info />,
+            label: 'Gig',
+            onClick: toggleShowProposalInfoModal,
+        })
+    }
+
+    if (redeemedAmount) {
+        actionbarItems.unshift({
+            icon: <Question />,
+            label: 'Help',
+            dropContent: (
+                <ActionbarItemDropContainer
+                    title="Tokens redeemed"
+                    description="You have sucessfully redeemed your token. There is nothing more to do here."
+                    list={[
+                        {
+                            icon: <Info />,
+                            label: "If you can't see the token in your wallet, try to import the token manually",
+                        },
+                        {
+                            icon: <Coin />,
+                            label: `Token address: ${solverData.collateralToken.address}`,
+                        },
+                    ]}
+                />
+            ),
+        })
+    } else {
+        actionbarItems.unshift({
+            icon: <Question />,
+            label: 'Help',
+            dropContent: (
+                <ActionbarItemDropContainer
+                    title="Redeem tokens"
+                    description='Hit the "Redeem Tokens"-Button and confirm the transaction to receive your share.'
+                    list={[
+                        {
+                            icon: <Confetti />,
+                            label: `You have earned ${payoutAmount} ${
+                                solverData.collateralToken
+                                    ? solverData.collateralToken.symbol ||
+                                      solverData.collateralToken.name
+                                    : 'Tokens'
+                            }`,
+                        },
+                    ]}
+                />
+            ),
+        })
+    }
+
     return (
         <>
             {redeemedAmount ? (
                 <Actionbar
-                    actions={{
-                        info: {
-                            icon: <Coins />,
-                            label: `${redeemedAmount} ${
+                    actionbarItems={actionbarItems}
+                    primaryAction={
+                        <Box>
+                            <Text size="small" color="dark-4">
+                                Succesfully redeemed
+                            </Text>
+                            <Text textAlign="end">{`${redeemedAmount} ${
                                 solverData.collateralToken
                                     ? solverData.collateralToken.symbol ||
                                       solverData.collateralToken.name
                                     : 'Tokens'
-                            }`,
-                            descLabel: 'Succesfully redeemed',
-                        },
-                    }}
+                            }`}</Text>
+                        </Box>
+                    }
                 />
             ) : payoutAmount ? (
                 <Actionbar
-                    actions={{
-                        primaryAction: (
-                            <LoaderButton
-                                primary
-                                isLoading={isRedeeming}
-                                onClick={redeemCondition}
-                                label="Redeem tokens"
-                            />
-                        ),
-                        info: {
-                            icon: <Handshake />,
-                            label: `${payoutAmount} ${
+                    actionbarItems={actionbarItems}
+                    primaryAction={
+                        <LoaderButton
+                            primary
+                            isLoading={isRedeeming}
+                            onClick={redeemCondition}
+                            label={`Redeem ${payoutAmount.toFixed(2)}${
+                                payoutAmount.toString().length > 4 ? '...' : ''
+                            } ${
                                 solverData.collateralToken
                                     ? solverData.collateralToken.symbol ||
                                       solverData.collateralToken.name
                                     : 'Tokens'
-                            }`,
-                            descLabel: 'You have earned',
-                        },
-                    }}
+                            }`}
+                        />
+                    }
                 />
             ) : (
                 <></>
@@ -256,6 +335,20 @@ const RedeemTokensActionbar = ({
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}
                     errorMessage={errMsg}
+                />
+            )}
+            {showSolverConfigInfoModal && (
+                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
+                    <SolverConfigInfo
+                        solverData={solverData}
+                        currentCondition={currentCondition}
+                    />
+                </BaseLayerModal>
+            )}
+            {showProposalInfoModal && metadata?.stages && (
+                <ProposalInfoModal
+                    onClose={toggleShowProposalInfoModal}
+                    metadata={metadata}
                 />
             )}
         </>

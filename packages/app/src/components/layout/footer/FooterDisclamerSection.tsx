@@ -24,7 +24,7 @@ const FooterDisclamerSection = () => (
             recommendations prove to be inaccurate, incomplete or unreliable, or
             result in any investment or other losses.
         </Text>
-        <Box gap="small">
+        <Box gap="small" pad={{ bottom: 'large' }} border={{ side: 'bottom' }}>
             <Text size="xsmall" color="dark-4">
                 Content contained on or made available through the website is
                 not intended to and does not constitute legal advice or

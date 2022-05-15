@@ -6,6 +6,7 @@ import FooterDisclamerSection from './FooterDisclamerSection'
 import FooterLinksSection from './FooterLinksSection'
 import FooterPrivacyPolicySection from './FooterPrivacyPolicySection'
 import FooterTermsSection from './FooterTermsSection'
+import ThemeToogleButton from '../../buttons/ThemeToogleButton'
 
 const MobileFooter = () => (
     <Box
@@ -29,6 +30,7 @@ const MobileFooter = () => (
         >
             <FooterDisclamerSection />
             <Box align="center" gap="medium">
+                <ThemeToogleButton size="small" />
                 <FooterPrivacyPolicySection />
                 <FooterTermsSection />
                 <FooterCopyrightSection />

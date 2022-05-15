@@ -83,7 +83,7 @@ const LoadCompositionModal = ({ onClose }: LoadCompositionModalProps) => {
                             disabled={showErrorMessage}
                             primary
                             type="submit"
-                            label="Load Composition"
+                            label="Load"
                         />
                     </Box>
                 </Form>

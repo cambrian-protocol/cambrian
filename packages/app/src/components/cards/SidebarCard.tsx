@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 
 const SidebarCard = ({ children }: PropsWithChildren<{}>) => {
     return (
-        <Card background="background-front" fill margin={{ right: 'small' }}>
+        <Card background="background-contrast" fill>
             {children}
         </Card>
     )

@@ -99,9 +99,9 @@ const ProposalUI = ({
     }
 
     return (
-        <>
+        <Box align="center">
             {metaStages ? (
-                <Box gap="medium" pad={{ vertical: 'medium' }}>
+                <Box gap="medium" pad="medium" width={{ max: 'large' }}>
                     <Heading level="2">Proposal Funding</Heading>
                     <ProposalContextHeader
                         proposal={metaStages.proposal as ProposalModel}
@@ -124,7 +124,7 @@ const ProposalUI = ({
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['METADATA']} />
             )}
-        </>
+        </Box>
     )
 }
 

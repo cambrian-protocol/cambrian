@@ -22,6 +22,7 @@ import ExportSuccessModal from '../../composer/general/modals/ExportSuccessModal
 import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFlexInputStep'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
@@ -74,6 +75,12 @@ const CreateProposalForm = ({
     const [proposalId, setProposalId] = useState<string>()
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [isInTransaction, setIsInTransaction] = useState(false)
+
+    const [showRecentProposalsModal, setShowRecentProposalsModal] =
+        useState(false)
+
+    const toggleShowRecentProposalsModal = () =>
+        setShowRecentProposalsModal(!showRecentProposalsModal)
 
     useEffect(() => {
         const updatedInputs = { ...input }
@@ -265,14 +272,23 @@ const CreateProposalForm = ({
                         </BaseFormGroupContainer>
                         <Box>
                             {currentUser.signer ? (
-                                <LoaderButton
-                                    isLoading={isInTransaction}
-                                    primary
-                                    type="submit"
-                                    label="Create Proposal"
-                                />
+                                <Box direction="row" justify="between">
+                                    <Button
+                                        size="small"
+                                        secondary
+                                        label="Finished Proposals"
+                                        onClick={toggleShowRecentProposalsModal}
+                                    />
+                                    <LoaderButton
+                                        isLoading={isInTransaction}
+                                        primary
+                                        type="submit"
+                                        label="Create Proposal"
+                                    />
+                                </Box>
                             ) : (
                                 <Button
+                                    size="small"
                                     primary
                                     label="Connect Wallet"
                                     onClick={connectWallet}
@@ -282,6 +298,17 @@ const CreateProposalForm = ({
                     </Box>
                 </Form>
             </BaseFormContainer>
+            {showRecentProposalsModal && (
+                <RecentExportsModal
+                    prefix="proposals"
+                    route="/proposals/"
+                    keyCID={templateCID as string}
+                    title="Recent proposals"
+                    subTitle="Distribute on of your"
+                    paragraph="Warning: These proposal IDs are just stored in your local storage. They will be lost if you clear the cache of your browser."
+                    onClose={toggleShowRecentProposalsModal}
+                />
+            )}
             {proposalId && (
                 <ExportSuccessModal
                     keyId={templateCID}

@@ -21,12 +21,13 @@ const SolverStatusNotification = ({
             elevation="small"
             height={{ min: 'auto' }}
             margin={{ bottom: 'medium' }}
+            border
         >
-            <Box pad="small" gap="small">
-                <Text weight={'bold'}>{title}</Text>
-                <Text size="small" color="light-4">
-                    {message}
+            <Box pad="small">
+                <Text weight={'bold'} size="large">
+                    {title}
                 </Text>
+                <Text size="small">{message}</Text>
             </Box>
             {children}
         </Box>

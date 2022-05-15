@@ -4,6 +4,7 @@ import { GlobalStyle } from '@cambrian/app/src/theme/globalStyle'
 import { Grommet } from 'grommet'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
+import { useTheme } from '@cambrian/app/hooks/useTheme'
 
 // @ts-ignore
 declare global {
@@ -16,15 +17,27 @@ declare global {
     }
 }
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ ...props }: AppProps) {
     return (
         <Store>
-            <Grommet full theme={cpTheme} themeMode="dark">
-                <GlobalStyle />
-                <ErrorBoundary>
-                    <Component {...pageProps} />
-                </ErrorBoundary>
-            </Grommet>
+            <Core {...props} />
         </Store>
+    )
+}
+
+const Core = ({ Component, pageProps }: AppProps) => {
+    const { themeMode } = useTheme()
+    return (
+        <Grommet
+            full
+            theme={cpTheme}
+            themeMode={themeMode}
+            background={'background-back'}
+        >
+            <GlobalStyle />
+            <ErrorBoundary>
+                <Component {...pageProps} />
+            </ErrorBoundary>
+        </Grommet>
     )
 }

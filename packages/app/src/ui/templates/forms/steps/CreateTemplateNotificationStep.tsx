@@ -50,7 +50,7 @@ const CreateTemplateNotificationStep = ({
                         submitForm={{
                             isLoading: isCreating,
                             onClick: onSubmit,
-                            label: 'Create Template',
+                            label: 'Finish',
                             primary: true,
                         }}
                         backward={() =>

@@ -1,8 +1,10 @@
+import { Question, Shield } from 'phosphor-react'
+
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
-import { Info } from 'phosphor-react'
 import LoaderButton from '../../buttons/LoaderButton'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { useState } from 'react'
@@ -30,20 +32,31 @@ const PrepareSolveActionbar = ({
     return (
         <>
             <Actionbar
-                actions={{
-                    primaryAction: (
-                        <LoaderButton
-                            onClick={onPrepareSolve}
-                            label="Prepare Solve"
-                            isLoading={isPreparing}
-                        />
-                    ),
-                    info: {
-                        icon: <Info />,
-                        descLabel: 'Info',
-                        label: 'Click Prepare Solve to continue',
+                primaryAction={
+                    <LoaderButton
+                        onClick={onPrepareSolve}
+                        label="Prepare Solve"
+                        isLoading={isPreparing}
+                    />
+                }
+                actionbarItems={[
+                    {
+                        icon: <Question />,
+                        label: 'Help',
+                        dropContent: (
+                            <ActionbarItemDropContainer
+                                title="Prepare Solver"
+                                description='Hit the "Prepare Solve"-Button and confirm the transaction to initialize this Solver.'
+                                list={[
+                                    {
+                                        icon: <Shield />,
+                                        label: `This can just be done by the Keeper or a parent Solver`,
+                                    },
+                                ]}
+                            />
+                        ),
                     },
-                }}
+                ]}
             />
             {errorMessage && (
                 <ErrorPopupModal
