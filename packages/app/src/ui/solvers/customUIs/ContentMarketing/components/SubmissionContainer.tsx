@@ -69,40 +69,38 @@ const SubmissionContainer = ({
         return await fetchLatestSubmission(logs, currentCondition)
     }
     return (
-        <>
-            <Box gap="small" height={{ min: 'auto' }} fill>
-                <HeaderTextSection
-                    title={
-                        proposal
-                            ? proposal.title
-                            : solverData.solverTag?.title || 'Solver'
-                    }
-                    subTitle="Most recent state of"
-                    paragraph={
-                        proposal
-                            ? proposal.description
-                            : solverData.solverTag?.description
-                    }
+        <Box gap="small" flex>
+            <HeaderTextSection
+                title={
+                    proposal
+                        ? proposal.title
+                        : solverData.solverTag?.title || 'Solver'
+                }
+                subTitle="Most recent state of"
+                paragraph={
+                    proposal
+                        ? proposal.description
+                        : solverData.solverTag?.description
+                }
+            />
+            {latestSubmission.timestamp !== undefined && (
+                <Text size="small" color="brand">
+                    Latest submission:{' '}
+                    {new Date(latestSubmission.timestamp).toLocaleString()}
+                </Text>
+            )}
+            {allowedToWrite &&
+            currentCondition.status === ConditionStatus.Executed ? (
+                <SubmissionForm
+                    currentCondition={currentCondition}
+                    currentUser={currentUser}
+                    solverContract={solverContract}
+                    latestSubmission={latestSubmission}
                 />
-                {latestSubmission.timestamp !== undefined && (
-                    <Text size="small" color="brand">
-                        Latest submission:{' '}
-                        {new Date(latestSubmission.timestamp).toLocaleString()}
-                    </Text>
-                )}
-                {allowedToWrite &&
-                currentCondition.status === ConditionStatus.Executed ? (
-                    <SubmissionForm
-                        currentCondition={currentCondition}
-                        currentUser={currentUser}
-                        solverContract={solverContract}
-                        latestSubmission={latestSubmission}
-                    />
-                ) : (
-                    <SubmissionView latestSubmission={latestSubmission} />
-                )}
-            </Box>
-        </>
+            ) : (
+                <SubmissionView latestSubmission={latestSubmission} />
+            )}
+        </Box>
     )
 }
 

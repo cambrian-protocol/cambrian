@@ -34,7 +34,7 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-front">
+            <Card background="background-contrast">
                 <CardHeader
                     pad="medium"
                     elevation="small"

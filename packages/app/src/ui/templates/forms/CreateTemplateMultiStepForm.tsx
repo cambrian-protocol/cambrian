@@ -87,6 +87,10 @@ export const CreateTemplateMultiStepForm = ({
         useState<CreateTemplateMultiStepStepsType>(CREATE_TEMPLATE_STEPS.START)
 
     useEffect(() => {
+        initInput()
+    }, [])
+
+    const initInput = () => {
         const formFlexInputs = parseFlexInputsToForm()
 
         let ctAddress = ''
@@ -107,7 +111,7 @@ export const CreateTemplateMultiStepForm = ({
             flexInputs: formFlexInputs,
             denominationTokenAddress: ctAddress,
         })
-    }, [])
+    }
 
     const initCollateralToken = async (ctAddress: string) => {
         const token = await fetchTokenInfo(ctAddress, currentUser.web3Provider)
@@ -169,6 +173,10 @@ export const CreateTemplateMultiStepForm = ({
                 input.title,
                 templateCID
             )
+
+            initInput()
+            setCurrentStep(CREATE_TEMPLATE_STEPS.START)
+
             onSuccess()
         } catch (e) {
             onFailure(await cpLogger.push(e))
@@ -180,6 +188,7 @@ export const CreateTemplateMultiStepForm = ({
             case CREATE_TEMPLATE_STEPS.START:
                 return (
                     <CreateTemplateStartStep
+                        compositionCID={compositionCID}
                         input={input}
                         stepperCallback={setCurrentStep}
                     />

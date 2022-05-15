@@ -1,22 +1,29 @@
-import Actionbar from '../../interaction/bars/Actionbar'
-import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
+import { ArrowSquareRight, CloudArrowDown, Gear } from 'phosphor-react'
+
+import BaseLayerModal from '../modals/BaseLayerModal'
+import BasePopupModal from '../modals/BasePopupModal'
+import { Box } from 'grommet'
 import { Button } from 'grommet'
-import LoadCompositionModal from '../general/modals/LoadCompositionModal'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
+import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
+import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
-// TODO Integrate localstorage success modal
-const ComposerActionbar = () => {
+interface ComposerToolbarProps {}
+
+const ComposerToolbar = ({}: ComposerToolbarProps) => {
     const { currentUser } = useCurrentUser()
     const stageHand = new Stagehand()
     const { composer } = useComposerContext()
     const [exportedCompositionCID, setExportedCompositionCID] =
         useState<string>('')
-    const [isPinning, setIsPinning] = useState(false)
+    const [showConfig, setShowConfig] = useState(false)
+
+    const toggleShowConfig = () => setShowConfig(!showConfig)
 
     const [showLoadCompositionModal, setShowLoadCompositionModal] =
         useState(false)
@@ -31,7 +38,6 @@ const ComposerActionbar = () => {
         setShowLoadCompositionModal(!showLoadCompositionModal)
 
     const onExportComposition = async () => {
-        setIsPinning(true)
         try {
             const ipfsHash = await stageHand.publishComposition(
                 composer,
@@ -44,27 +50,36 @@ const ComposerActionbar = () => {
         } catch (e) {
             cpLogger.push(e)
         }
-        setIsPinning(false)
     }
 
     return (
         <>
-            <Actionbar
-                actions={{
-                    primaryAction: (
-                        <LoaderButton
-                            primary
-                            label="Export Composition"
-                            onClick={onExportComposition}
-                            isLoading={isPinning}
-                        />
-                    ),
-                    secondaryAction: {
-                        label: 'Load Composition',
-                        onClick: toggleShowLoadCompositionModal,
-                    },
-                }}
-            />
+            <Box
+                pad="small"
+                fill
+                round="small"
+                background={'background-contrast'}
+                align="center"
+                gap="medium"
+                justify="end"
+                elevation="small"
+            >
+                <ComposerToolbarButton
+                    onClick={toggleShowConfig}
+                    label="Solution"
+                    icon={<Gear />}
+                />
+                <ComposerToolbarButton
+                    onClick={toggleShowLoadCompositionModal}
+                    label="Load"
+                    icon={<CloudArrowDown />}
+                />
+                <ComposerToolbarButton
+                    onClick={onExportComposition}
+                    label="Export"
+                    icon={<ArrowSquareRight />}
+                />
+            </Box>
             {showLoadCompositionModal && (
                 <LoadCompositionModal
                     onClose={toggleShowLoadCompositionModal}
@@ -83,8 +98,13 @@ const ComposerActionbar = () => {
                     />
                 </BasePopupModal>
             )}
+            {showConfig && (
+                <BaseLayerModal onBack={toggleShowConfig}>
+                    <SolutionConfig />
+                </BaseLayerModal>
+            )}
         </>
     )
 }
 
-export default ComposerActionbar
+export default ComposerToolbar

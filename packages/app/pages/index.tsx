@@ -1,23 +1,25 @@
-import { Box, Heading, Paragraph } from 'grommet'
+import { Box, Heading } from 'grommet'
 
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
+import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { useRef } from 'react'
 
 export default function Home() {
+    const startRef = useRef<HTMLDivElement | null>(null)
+
+    function handleClickHeaderCTA() {
+        if (startRef) startRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
     return (
-        <BaseLayout contextTitle="Index" showFooter>
-            <section id="index">
-                <Box width="medium">
-                    <Heading level="5">Cambrian Protocol</Heading>
-                    <Heading level="3" margin={{ bottom: 'small' }}>
-                        Evolving the way we work.
-                    </Heading>
-                    <Paragraph textAlign="justify">
-                        We are turning digital organizations into the next
-                        generation of Fortune 500 companies by connecting teams
-                        and empowering community members. Find out how.
-                    </Paragraph>
+        <PageLayout contextTitle="Index">
+            <Box style={{ position: 'relative', overflow: 'hidden' }} fill>
+                <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
+                <Box ref={startRef} />
+                <Box pad="large">
+                    <Heading>Stay tuned for the next commit...</Heading>
                 </Box>
-            </section>
-        </BaseLayout>
+            </Box>
+        </PageLayout>
     )
 }

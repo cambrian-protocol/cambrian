@@ -58,6 +58,7 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
                 <Box flex width={{ min: 'small' }} pad="xsmall">
                     <Button
                         label="Follow link"
+                        reverse
                         primary
                         icon={<ArrowCircleRight size="24" />}
                         href={link}

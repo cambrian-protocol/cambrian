@@ -63,7 +63,7 @@ const CreateTemplateSellerStep = ({
                 <HeaderTextSection
                     subTitle={`${1}/${input.flexInputs.length > 0 ? 5 : 4}`}
                     title="Who are you?"
-                    paragraph="Give us some details about your Identity or leave blank if you want to stay anonymous."
+                    paragraph="Please provide us with some detail about your Identity or leave blank if you want to stay anonymous."
                 />
                 <FormField name="name" label="Your/Organization Name" />
                 <FormField

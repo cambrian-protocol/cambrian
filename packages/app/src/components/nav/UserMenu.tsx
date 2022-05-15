@@ -1,10 +1,9 @@
 import {
-    At,
+    Books,
     IconContext,
-    Link,
+    Question,
     SignIn,
     SignOut,
-    UserCircle,
     Wallet,
 } from 'phosphor-react'
 import { Box, Menu, Text } from 'grommet'
@@ -32,15 +31,19 @@ export default function UserMenu({}: UserMenuProps) {
                   {
                       label: (
                           <UserMenuItemLabel
-                              truncateAddress
-                              label={currentUser.address}
+                              subTitle={chainName}
+                              label={ellipseAddress(currentUser.address, 9)}
                           />
                       ),
-                      icon: <UserMenuItemIcon icon={<At />} />,
+                      icon: <UserMenuItemIcon icon={<Wallet />} />,
                   },
                   {
-                      label: <UserMenuItemLabel label={chainName} />,
-                      icon: <UserMenuItemIcon icon={<Link />} />,
+                      label: <UserMenuItemLabel label="Learn" />,
+                      icon: <UserMenuItemIcon icon={<Books />} />,
+                  },
+                  {
+                      label: <UserMenuItemLabel label="Support" />,
+                      icon: <UserMenuItemIcon icon={<Question />} />,
                   },
                   {
                       label: (
@@ -70,35 +73,35 @@ export default function UserMenu({}: UserMenuProps) {
 
     return (
         <Menu
-            dropAlign={{ left: 'right', top: 'bottom' }}
+            dropAlign={{ top: 'bottom', right: 'right' }}
             dropProps={{
                 round: {
-                    corner: 'right',
+                    corner: 'bottom',
                     size: 'small',
                 },
             }}
             dropBackground="background-popup"
             items={items}
         >
-            <BaseAvatar address={currentUser.address} />
+            <BaseAvatar icon={<Wallet />} address={currentUser.address} />
         </Menu>
     )
 }
 
 interface UserMenuItemLabelProps {
+    subTitle?: string
     label: string
-    truncateAddress?: boolean
 }
 
-const UserMenuItemLabel = ({
-    label,
-    truncateAddress,
-}: UserMenuItemLabelProps) => {
+const UserMenuItemLabel = ({ subTitle, label }: UserMenuItemLabelProps) => {
     return (
-        <Box alignSelf="center" pad={{ horizontal: 'medium' }} width="small">
-            <Text truncate={!truncateAddress}>
-                {truncateAddress ? ellipseAddress(label) : label}
-            </Text>
+        <Box alignSelf="center" pad={{ horizontal: 'medium' }} width="medium">
+            {subTitle && (
+                <Text size="xsmall" color="dark-4">
+                    {subTitle}
+                </Text>
+            )}
+            <Text>{label}</Text>
         </Box>
     )
 }

@@ -1,17 +1,18 @@
 import * as blockies from 'blockies-ts'
 
 import { Box, Image } from 'grommet'
+import { IconContext, User } from 'phosphor-react'
 
 import React from 'react'
-import { User } from 'phosphor-react'
 
 interface BaseAvatarProps {
     pfpPath?: string
     onClick?: () => void
     address?: string
+    icon?: JSX.Element
 }
 
-const BaseAvatar = ({ address, pfpPath, onClick }: BaseAvatarProps) => (
+const BaseAvatar = ({ address, pfpPath, icon, onClick }: BaseAvatarProps) => (
     <Box
         onClick={onClick}
         justify="center"
@@ -21,27 +22,31 @@ const BaseAvatar = ({ address, pfpPath, onClick }: BaseAvatarProps) => (
     >
         <Box
             elevation="small"
-            width={{ min: 'xxsmall', max: 'xxsmall' }}
-            height={{ min: 'xxsmall', max: 'xxsmall' }}
+            width={{ min: '3em', max: '3em' }}
+            height={{ min: '3em', max: '3em' }}
             background="brand"
             justify="center"
             align="center"
-            round="small"
+            round="xsmall"
             overflow="hidden"
         >
-            {(pfpPath !== undefined && pfpPath !== '') ||
-            address !== undefined ? (
-                <Image
-                    fit="cover"
-                    src={
-                        pfpPath !== undefined && pfpPath !== ''
-                            ? pfpPath
-                            : blockies.create({ seed: address }).toDataURL()
-                    }
-                />
-            ) : (
-                <User size="24" color="white" />
-            )}
+            <IconContext.Provider value={{ color: 'white', size: '24' }}>
+                {(pfpPath !== undefined && pfpPath !== '') ||
+                address !== undefined ? (
+                    <Image
+                        fit="cover"
+                        src={
+                            pfpPath !== undefined && pfpPath !== ''
+                                ? pfpPath
+                                : blockies.create({ seed: address }).toDataURL()
+                        }
+                    />
+                ) : icon ? (
+                    icon
+                ) : (
+                    <User />
+                )}
+            </IconContext.Provider>
         </Box>
     </Box>
 )

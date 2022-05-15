@@ -1,6 +1,5 @@
 import React, { SetStateAction, useState } from 'react'
 
-import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateTemplateMultiStepForm } from './forms/CreateTemplateMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -24,15 +23,12 @@ const CreateTemplateUI = ({
 
     return (
         <>
-            <Box fill>
-                <CreateTemplateMultiStepForm
-                    composition={composition}
-                    compositionCID={compositionCID}
-                    onFailure={(errMsg) => setErrorMessage(errMsg)}
-                    onSuccess={toggleShowSuccessModal}
-                />
-                <Box pad="medium" />
-            </Box>
+            <CreateTemplateMultiStepForm
+                composition={composition}
+                compositionCID={compositionCID}
+                onFailure={(errMsg) => setErrorMessage(errMsg)}
+                onSuccess={toggleShowSuccessModal}
+            />
             {showSuccessModal && (
                 <ExportSuccessModal
                     keyId={compositionCID}

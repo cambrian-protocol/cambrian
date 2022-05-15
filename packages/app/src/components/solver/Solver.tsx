@@ -2,34 +2,28 @@ import { EventFilter, ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import {
     getMetadataFromProposal,
-    getSolverChain,
     getSolverConfig,
     getSolverData,
     getSolverOutcomes,
 } from './SolverGetters'
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
-import { AppbarItem } from '../nav/AppbarItem'
-import { BaseLayout } from '../layout/BaseLayout'
-import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import { Info } from 'phosphor-react'
 import InitiatedSolverContent from '@cambrian/app/ui/solvers/InitiatedSolverContent'
+import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
-import ProposalInfoModal from '../modals/ProposalInfoModal'
+import PageLayout from '../layout/PageLayout'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import SolutionSideNav from '../nav/SolutionSideNav'
-import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -51,8 +45,6 @@ interface SolverProps {
 
 const Solver = ({ address, iface, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const [solverAddressChain, setSolverAddessChain] = useState<string[]>([])
 
     // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
     const [isInitialized, setIsInitialized] = useState(false)
@@ -93,12 +85,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         async (method: string, ...args: any[]) =>
             await solverContract[method](...args)
     )
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
-
-    useEffect(() => {
-        initSolverChain()
-    }, [])
 
     useEffect(() => {
         if (currentUser.signer) init()
@@ -227,14 +213,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         }
     }
 
-    const initSolverChain = async () => {
-        const fetchedSolverChain = await getSolverChain(
-            currentUser,
-            solverContract
-        )
-        setSolverAddessChain(fetchedSolverChain)
-    }
-
     // Trigger Update for the listeners
     const updateSolverData = async () => {
         if (isInitialized) {
@@ -271,31 +249,15 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     return (
         <>
             {solverData && currentCondition && solverMethods ? (
-                <BaseLayout
+                <InteractionLayout
                     contextTitle="Solver"
-                    config={
-                        <SolverConfigInfo
-                            currentCondition={currentCondition}
-                            solverData={solverData}
-                        />
-                    }
-                    sideNav={
-                        customUI.sideNav ? (
-                            customUI.sideNav
-                        ) : (
-                            <SolutionSideNav
-                                solverChainAddresses={solverAddressChain}
-                                activeSolverAddress={solverContract.address}
-                            />
-                        )
-                    }
                     actionBar={
                         <DefaultSolverActionbar
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
-                            updateSolverData={updateSolverData}
                             solverMethods={solverMethods}
+                            metadata={metadata}
                         />
                     }
                     notification={
@@ -306,17 +268,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                                 status={currentCondition.status}
                             />
                         )
-                    }
-                    appbarItems={
-                        metadata?.stages &&
-                        currentCondition.status !== ConditionStatus.Initiated
-                            ? [
-                                  <AppbarItem
-                                      icon={<Info />}
-                                      onClick={toggleShowProposalInfoModal}
-                                  />,
-                              ]
-                            : []
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
@@ -333,16 +284,15 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     ) : (
                         <>No Solver UI found</>
                     )}
-                </BaseLayout>
+                </InteractionLayout>
             ) : solverData && solverMethods ? (
-                <BaseLayout contextTitle="Uninitialzed Solve">
-                    <Box fill justify="center">
-                        <HeaderTextSection
-                            subTitle="Uninitialized Solver"
-                            paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
-                        />
-                    </Box>
-                </BaseLayout>
+                <PageLayout contextTitle="Uninitialzed Solve">
+                    {/* TODO, integrate Interaction Layout */}
+                    <HeaderTextSection
+                        subTitle="Uninitialized Solver"
+                        paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
+                    />
+                </PageLayout>
             ) : errorMessage ? (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}
@@ -350,12 +300,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                 />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
-            )}
-            {showProposalInfoModal && metadata?.stages && (
-                <ProposalInfoModal
-                    onClose={toggleShowProposalInfoModal}
-                    metadata={metadata}
-                />
             )}
         </>
     )

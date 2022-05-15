@@ -12,6 +12,7 @@ const CambrianLogo = ({ align }: CambrianLogoProps) => {
             direction={align === 'center' ? 'column' : 'row'}
             width={{ min: 'auto' }}
             align="center"
+            pad={{ vertical: 'medium' }}
         >
             <CambrianLogoMark />
             <Box direction="row" pad="small" gap="xsmall">

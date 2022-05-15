@@ -1,67 +1,129 @@
-import { Box, Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
+import { Box } from 'grommet'
+import { Button } from 'grommet'
+import { DropButton } from 'grommet'
+import { IconContext } from 'phosphor-react'
+import { ResponsiveContext } from 'grommet'
+import { Text } from 'grommet'
 
-import ActionbarInfo from '@cambrian/app/components/info/ActionbarInfo'
-
-export type ActionbarActionsType = {
-    primaryAction?: JSX.Element
-} & (
-    | {
-          secondaryAction?: ButtonExtendedProps
-          info?: never
-      }
-    | {
-          info?: { icon: JSX.Element; label: string; descLabel: string }
-          secondaryAction?: never
-      }
-)
+export type ActionbarItemType = {
+    icon: JSX.Element
+    label: string
+    dropContent?: JSX.Element
+    onClick?: () => void
+}
 
 interface ActionbarProps {
-    actions: ActionbarActionsType
+    primaryAction?: JSX.Element
+    actionbarItems?: {
+        icon: JSX.Element
+        label: string
+        dropContent?: JSX.Element
+        onClick?: () => void
+    }[]
 }
 
-const Actionbar = ({ actions }: ActionbarProps) => {
-    return (
-        <ResponsiveContext.Consumer>
-            {(screenSize) => (
-                <Box
-                    width={screenSize === 'small' ? { min: '100vw' } : '100%'}
-                    fill="horizontal"
-                    pad="small"
-                    align="center"
-                    background="background-front"
-                    border={{ side: 'top', color: 'background-contrast' }}
-                    height={{ min: 'auto' }}
-                >
-                    <Box
-                        width="large"
-                        direction="row"
-                        align="center"
-                        pad={{ horizontal: 'small' }}
-                        justify="between"
-                    >
-                        {actions.info ? (
-                            <Box flex>
-                                <ActionbarInfo {...actions.info} />
+const Actionbar = ({ primaryAction, actionbarItems }: ActionbarProps) => (
+    <Box fill="horizontal" height={{ min: 'auto' }}>
+        <Box
+            background="background-back"
+            border={{ side: 'top' }}
+            align="center"
+        >
+            <ResponsiveContext.Consumer>
+                {(screenSize) => {
+                    return (
+                        <Box
+                            width="large"
+                            direction="row"
+                            align="center"
+                            pad={
+                                screenSize === 'small'
+                                    ? { horizontal: 'small' }
+                                    : undefined
+                            }
+                            justify="between"
+                        >
+                            <Box direction="row" flex justify="between">
+                                <IconContext.Provider value={{ size: '32' }}>
+                                    {actionbarItems &&
+                                        actionbarItems?.length > 0 &&
+                                        actionbarItems?.map((item, idx) => {
+                                            if (item.onClick) {
+                                                return (
+                                                    <Button
+                                                        key={idx}
+                                                        plain
+                                                        onClick={item.onClick}
+                                                        label={
+                                                            <Box
+                                                                pad="small"
+                                                                justify="center"
+                                                            >
+                                                                {item.icon}
+                                                                <Text
+                                                                    size="xsmall"
+                                                                    textAlign="center"
+                                                                    color={
+                                                                        'dark-4'
+                                                                    }
+                                                                >
+                                                                    {item.label}
+                                                                </Text>
+                                                            </Box>
+                                                        }
+                                                    />
+                                                )
+                                            } else {
+                                                return (
+                                                    <DropButton
+                                                        key={idx}
+                                                        plain
+                                                        label={
+                                                            <Box
+                                                                pad="small"
+                                                                justify="center"
+                                                            >
+                                                                {item.icon}
+                                                                <Text
+                                                                    size="xsmall"
+                                                                    textAlign="center"
+                                                                    color={
+                                                                        'dark-4'
+                                                                    }
+                                                                >
+                                                                    {item.label}
+                                                                </Text>
+                                                            </Box>
+                                                        }
+                                                        dropContent={
+                                                            <>
+                                                                {
+                                                                    item.dropContent
+                                                                }
+                                                            </>
+                                                        }
+                                                        dropAlign={{
+                                                            bottom: 'top',
+                                                            left: 'left',
+                                                        }}
+                                                    />
+                                                )
+                                            }
+                                        })}
+                                </IconContext.Provider>
+                                <Box />
                             </Box>
-                        ) : actions.secondaryAction ? (
-                            <Button
-                                size="small"
-                                secondary
-                                {...actions.secondaryAction}
-                            />
-                        ) : (
-                            <Box flex />
-                        )}
-                        {actions.primaryAction && (
-                            <Box width={{ min: 'auto' }}>
-                                {actions.primaryAction}
-                            </Box>
-                        )}
-                    </Box>
-                </Box>
-            )}
-        </ResponsiveContext.Consumer>
-    )
-}
+                            {primaryAction && (
+                                <Box width={{ min: 'auto' }}>
+                                    {primaryAction}
+                                </Box>
+                            )}
+                        </Box>
+                    )
+                }}
+            </ResponsiveContext.Consumer>
+        </Box>
+    </Box>
+)
 
 export default Actionbar

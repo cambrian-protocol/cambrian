@@ -1,9 +1,9 @@
-import { Box, Heading, Paragraph, Button, Anchor } from 'grommet'
+import { Anchor, Box, Button, Heading, Paragraph } from 'grommet'
 
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { ethers } from 'ethers'
 import { ERC20_IFACE } from '../config/ContractInterfaces'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { ethers } from 'ethers'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export default function MintToy() {
     const { currentUser } = useCurrentUser()
@@ -21,7 +21,7 @@ export default function MintToy() {
     }
 
     return (
-        <BaseLayout contextTitle="Mint Toy">
+        <PageLayout contextTitle="Mint Toy">
             <section id="mintToy">
                 <Box width="large" align="center">
                     <Heading
@@ -63,6 +63,6 @@ export default function MintToy() {
                     <Button primary label="Mint" onClick={() => onMintTOY()} />
                 </Box>
             </section>
-        </BaseLayout>
+        </PageLayout>
     )
 }

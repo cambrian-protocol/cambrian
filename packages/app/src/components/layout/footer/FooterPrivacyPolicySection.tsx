@@ -4,7 +4,7 @@ import { Text } from 'grommet'
 const FooterPrivacyPolicySection = () => {
     return (
         <Anchor>
-            <Text size="small" color="white">
+            <Text size="small" color="dark-4">
                 Privacy Policy
             </Text>
         </Anchor>
