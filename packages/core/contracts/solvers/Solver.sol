@@ -6,12 +6,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./interfaces/IConditionalTokens.sol";
-import "./interfaces/ISolver.sol";
+import "../interfaces/IConditionalTokens.sol";
+import "../interfaces/ISolver.sol";
 
 import "./Solver.sol";
 import "./SolverLib.sol";
-import "hardhat/console.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
     address factoryAddress; // Factory which creates Solver proxies

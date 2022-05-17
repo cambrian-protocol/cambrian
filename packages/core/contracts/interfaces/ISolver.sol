@@ -1,9 +1,9 @@
 pragma solidity ^0.8.13;
 
-import "../ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../Solver.sol";
-import "../SolverLib.sol";
+import "../conditionalTokens/ConditionalTokens.sol";
+import "../solvers/Solver.sol";
+import "../solvers/SolverLib.sol";
 
 interface ISolver {
     // INITIALIZATION - Only called by SolverFactory

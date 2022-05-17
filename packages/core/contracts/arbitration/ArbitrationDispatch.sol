@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
 
-import "./interfaces/ISolver.sol";
+import "../interfaces/ISolver.sol";
 
 contract ArbitrationDispatch {
     bool internal locked;

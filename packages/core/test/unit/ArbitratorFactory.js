@@ -6,7 +6,7 @@ const {
 const { expect } = require("chai");
 
 const Arb_ABI =
-  require("../../artifacts/contracts/BasicArbitrator.sol/BasicArbitrator.json").abi;
+  require("../../artifacts/contracts/arbitration/BasicArbitrator.sol/BasicArbitrator.json").abi;
 
 describe("ArbitratorFactory", function () {
   this.beforeEach(async function () {

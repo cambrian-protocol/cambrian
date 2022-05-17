@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./ConditionalTokens.sol";
+import "../conditionalTokens/ConditionalTokens.sol";
 import "./Solver.sol";
 import "./SolverLib.sol";
 

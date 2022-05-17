@@ -9,7 +9,7 @@ const { expect } = require("chai");
 const testHelpers = require("../../helpers/testHelpers.js");
 
 const Arb_ABI =
-  require("../../artifacts/contracts/BasicArbitrator.sol/BasicArbitrator.json").abi;
+  require("../../artifacts/contracts/arbitration/BasicArbitrator.sol/BasicArbitrator.json").abi;
 
 describe("BasicArbitrator", function () {
   this.beforeEach(async function () {
@@ -465,6 +465,22 @@ describe("BasicArbitrator", function () {
           this.Arbitrator.address
         )
       ).visible
+    ).to.equal(true);
+  });
+
+  it("Supports ERC165 and ArbitratorInterface", async function () {
+    expect(await this.Arbitrator.supportsInterface("0x01ffc9a7")).to.equal(
+      true
+    );
+
+    expect(await this.Arbitrator.supportsInterface("0xffffffff")).to.equal(
+      false
+    );
+
+    const arbitratorInterface = await this.Arbitrator.calculateInterface();
+
+    expect(
+      await this.Arbitrator.supportsInterface(arbitratorInterface)
     ).to.equal(true);
   });
 });

@@ -1,11 +1,11 @@
-import BaseSolverArtifact from '@cambrian/core/artifacts/contracts/Solver.sol/Solver.json'
-import CTFArtifact from '@cambrian/core/artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json'
-import ERC20Artifact from '@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json'
+import BaseSolverArtifact from '@cambrian/core/artifacts/contracts/solvers/Solver.sol/Solver.json'
+import CTFArtifact from '@cambrian/core/artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json'
+import ERC20Artifact from '@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json'
 import IpfsSolutionsHubArtifact from '@cambrian/core/artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json'
 import ProposalsHubArtifact from '@cambrian/core/artifacts/contracts/ProposalsHub.sol/ProposalsHub.json'
-import WriterSolverArtifact from '@cambrian/core/artifacts/contracts/WriterSolverV1.sol/WriterSolverV1.json'
+import WriterSolverArtifact from '@cambrian/core/artifacts/contracts/solvers/WriterSolverV1.sol/WriterSolverV1.json'
 import ArbitratorFactoryArtifact from '@cambrian/core/artifacts/contracts/ArbitratorFactory.sol/ArbitratorFactory.json'
-import BasicArbitratorArtifact from '@cambrian/core/artifacts/contracts/BasicArbitrator.sol/BasicArbitrator.json'
+import BasicArbitratorArtifact from '@cambrian/core/artifacts/contracts/arbitration/BasicArbitrator.sol/BasicArbitrator.json'
 
 import { utils } from 'ethers'
 

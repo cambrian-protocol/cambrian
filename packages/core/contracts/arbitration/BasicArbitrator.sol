@@ -1,13 +1,19 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.13;
 
-import "./interfaces/ISolver.sol";
-import "./interfaces/IArbitratorFactory.sol";
-import "./SolverLib.sol";
+import "../interfaces/ISolver.sol";
+import "../interfaces/IArbitratorFactory.sol";
+import "../solvers/SolverLib.sol";
+import "./ArbitratorInterface.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
+contract BasicArbitrator is
+    ArbitratorInterface,
+    Initializable,
+    OwnableUpgradeable,
+    ReentrancyGuard
+{
     struct Dispute {
         ISolver solver;
         uint256 conditionIndex;
@@ -136,7 +142,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
         ISolver solver,
         uint256 conditionIndex,
         uint256[] calldata desiredOutcome
-    ) external payable {
+    ) external payable override {
         address _arbitrator = solver.arbitrator();
 
         require(_arbitrator == address(this), "Wrong arbitrator");
@@ -193,6 +199,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
      */
     function arbitrateNull(bytes32 disputeId)
         external
+        override
         onlyOwner
         isRequested(disputeId)
     {
@@ -217,6 +224,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
      */
     function arbitrate(bytes32 disputeId, uint256 choice)
         external
+        override
         onlyOwner
         isRequested(disputeId)
     {

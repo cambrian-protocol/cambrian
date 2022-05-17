@@ -4,10 +4,10 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Solver.sol";
-import "./interfaces/ISolver.sol";
-import "./interfaces/IConditionalTokens.sol";
-import "./interfaces/ISolverFactory.sol";
-import "./FullMath.sol";
+import "../interfaces/ISolver.sol";
+import "../interfaces/IConditionalTokens.sol";
+import "../interfaces/ISolverFactory.sol";
+import "../FullMath.sol";
 
 library SolverLib {
     // Ingest Types
