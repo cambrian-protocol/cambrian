@@ -1,7 +1,7 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
-  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
@@ -227,38 +227,6 @@ describe("ArbitrationDispatch", function () {
 
     await solvers[0].connect(this.keeper).prepareSolve(0);
     await solvers[0].connect(this.keeper).executeSolve(0);
-
-    return expectRevert(
-      this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),
-      "Condition status invalid for arbitration"
-    );
-  });
-
-  it("Rejects requesting arbitration when status.ArbitrationPending", async function () {
-    const solverConfigs = [
-      [
-        this.Solver.address,
-        this.keeper.address,
-        this.arbitrator.address,
-        0,
-        ethers.utils.formatBytes32String(""),
-        this.ingests,
-        this.conditionBase,
-      ],
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
-    );
-
-    await solvers[0].connect(this.keeper).prepareSolve(0);
-    await solvers[0].connect(this.keeper).executeSolve(0);
-    await solvers[0].connect(this.keeper).proposePayouts(0, [0, 1]);
-
-    await solvers[0].connect(this.arbitrator).arbitrationRequested(0);
-    await solvers[0].connect(this.arbitrator).arbitrationPending(0);
 
     return expectRevert(
       this.ArbitrationDispatch.requestArbitration(solvers[0].address, 0),

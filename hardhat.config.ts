@@ -26,14 +26,16 @@ export const config = {
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_ROPSTEN_ID}`,
-      accounts: [`${process.env.ROPSTEN_PRIVATE_KEY}`],
+      accounts: process.env.ROPSTEN_PRIVATE_KEY
+        ? [`${process.env.ROPSTEN_PRIVATE_KEY}`]
+        : [],
       blockGasLimit: 4000000,
     },
   },
   solidity: {
     compilers: [
       {
-        version: "0.8.0",
+        version: "0.8.13",
         settings: {
           optimizer: {
             enabled: true,

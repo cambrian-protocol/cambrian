@@ -1,8 +1,8 @@
 const { ethers, deployments } = require("hardhat");
 const SOLVER_ABI =
-  require("@cambrian/core/artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("@cambrian/core/artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const ARBITRATION_DISPATCH_ABI =
-  require("@cambrian/core/artifacts/contracts/ArbitrationDispatch.sol/ArbitrationDispatch.json").abi;
+  require("@cambrian/core/artifacts/contracts/arbitration/ArbitrationDispatch.sol/ArbitrationDispatch.json").abi;
 
 const { FormatTypes } = require("ethers/lib/utils");
 

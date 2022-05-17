@@ -4,20 +4,25 @@ import { ERC20_IFACE } from '../config/ContractInterfaces'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { ethers } from 'ethers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import { SUPPORTED_CHAINS } from '../config/SupportedChains'
 
 export default function MintToy() {
     const { currentUser } = useCurrentUser()
 
-    // Temporarily added for demo purposes
     const onMintTOY = async () => {
-        if (currentUser.signer) {
-            const ToyToken = new ethers.Contract(
-                '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79', // Ropsten
-                ERC20_IFACE,
-                currentUser.signer
-            )
-            await ToyToken.mint(currentUser.address, '1000000000000000000000')
-        }
+        if (!currentUser.signer || !currentUser.chainId)
+            throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
+
+        const chainData = SUPPORTED_CHAINS[currentUser.chainId]
+        if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
+
+        const ToyToken = new ethers.Contract(
+            chainData.contracts.toyToken,
+            ERC20_IFACE,
+            currentUser.signer
+        )
+        await ToyToken.mint(currentUser.address, '1000000000000000000000')
     }
 
     return (

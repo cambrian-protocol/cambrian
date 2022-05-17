@@ -1,7 +1,7 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
-  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const {
   expectRevert, // Assertions for transactions that should fail
 } = require("@openzeppelin/test-helpers");
@@ -80,7 +80,7 @@ describe("Solver | deployChild", function () {
     let rc = await tx.wait();
 
     const solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );
@@ -103,7 +103,7 @@ describe("Solver | deployChild", function () {
     let rc = await tx.wait();
 
     const solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );
@@ -128,7 +128,7 @@ describe("Solver | deployChild", function () {
     let rc = await tx.wait();
 
     const solver = new ethers.Contract(
-      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[0].data)[0],
+      ethers.utils.defaultAbiCoder.decode(["address"], rc.events[1].data)[0],
       SOLVER_ABI,
       ethers.provider
     );

@@ -1,3 +1,15 @@
+import LOCAL_ArbitrationDispatch from '@cambrian/core/deployments/localhost/ArbitrationDispatch.json'
+import LOCAL_ArbitratorFactory from '@cambrian/core/deployments/localhost/ArbitratorFactory.json'
+import LOCAL_BasicArbitrator from '@cambrian/core/deployments/localhost/BasicArbitrator.json'
+import LOCAL_BasicSolverV1 from '@cambrian/core/deployments/localhost/BasicSolverV1.json'
+import LOCAL_ConditionalTokens from '@cambrian/core/deployments/localhost/ConditionalTokens.json'
+import LOCAL_IPFSSolutionsHub from '@cambrian/core/deployments/localhost/IPFSSolutionsHub.json'
+import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHub.json'
+import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
+import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
+import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
+import LOCAL_WriterSolverV1 from '@cambrian/core/deployments/localhost/WriterSolverV1.json'
+
 interface ChainInfo {
     name: string
     shortName: string
@@ -18,7 +30,9 @@ interface NativeCurrencyType {
 }
 
 type ContractAddresses = {
+    arbitratorFactory?: string // Only hardhat
     arbitrationDispatch: string
+    basicArbitrator?: string // Only hardhat
     basicSolverV1: string
     conditionalTokens: string
     ipfsSolutionsHub: string
@@ -44,8 +58,8 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             shortName: 'eth',
             chain: 'ETH',
             network: 'mainnet',
-            chainId: 1,
-            networkId: 1,
+            chainId: 31337,
+            networkId: 31337,
             rpcUrl: 'localhost:8545',
             nativeCurrency: {
                 symbol: 'ETH',
@@ -56,15 +70,17 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             },
         },
         contracts: {
-            arbitrationDispatch: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
-            basicSolverV1: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-            conditionalTokens: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-            ipfsSolutionsHub: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-            proposalsHub: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
-            solverFactory: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
-            solverLib: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
-            toyToken: '0x0165878A594ca255338adfa4d48449f69242Eb8F',
-            writerSolverV1: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
+            arbitratorFactory: LOCAL_ArbitratorFactory.address,
+            arbitrationDispatch: LOCAL_ArbitrationDispatch.address,
+            basicArbitrator: LOCAL_BasicArbitrator.address,
+            basicSolverV1: LOCAL_BasicSolverV1.address,
+            conditionalTokens: LOCAL_ConditionalTokens.address,
+            ipfsSolutionsHub: LOCAL_IPFSSolutionsHub.address,
+            proposalsHub: LOCAL_ProposalsHub.address,
+            solverFactory: LOCAL_SolverFactory.address,
+            solverLib: LOCAL_SolverLib.address,
+            toyToken: LOCAL_ToyToken.address,
+            writerSolverV1: LOCAL_WriterSolverV1.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
