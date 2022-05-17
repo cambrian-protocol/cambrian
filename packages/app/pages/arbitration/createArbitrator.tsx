@@ -1,11 +1,11 @@
-import { Box, Heading, Paragraph, Button, Anchor } from 'grommet'
+import { Anchor, Box, Button, Heading, Paragraph } from 'grommet'
 
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { ethers } from 'ethers'
 import { ERC20_IFACE } from '../../config/ContractInterfaces'
-import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { ethers } from 'ethers'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
 // TODO: INCOMPLETE
@@ -42,7 +42,7 @@ export default function CreateArbitrator() {
     }
 
     return (
-        <BaseLayout contextTitle="Create Arbitrator">
+        <PageLayout contextTitle="Create Arbitrator">
             <section id="createArbitrator">
                 <Box width="large" align="center">
                     <Heading
@@ -84,6 +84,6 @@ export default function CreateArbitrator() {
                     <Button primary label="Mint" onClick={() => onCreate()} />
                 </Box>
             </section>
-        </BaseLayout>
+        </PageLayout>
     )
 }
