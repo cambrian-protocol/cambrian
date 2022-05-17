@@ -1,9 +1,9 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const CT_ABI =
-  require("../../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
+  require("../../artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json").abi;
 const SOLVER_ABI =
-  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,

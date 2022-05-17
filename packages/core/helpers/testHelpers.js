@@ -1,7 +1,8 @@
 const { ethers } = require("hardhat");
 const CT_ABI =
-  require("../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
-const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json").abi;
+const SOLVER_ABI =
+  require("../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const { getBytes32FromMultihash } = require("./multihash.js");
 
 const getSimpleSolverConfig = (

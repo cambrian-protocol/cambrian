@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "./interfaces/IIPFSSolutionsHub.sol";
 import "./interfaces/IConditionalTokens.sol";
 
-import "./SolverLib.sol";
+import "./solvers/SolverLib.sol";
 
 // 0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9 DEV_ADDRESS
 contract ProposalsHub is ERC1155Receiver {
