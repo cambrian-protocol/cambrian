@@ -49,6 +49,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     /**
      * @notice Sets fee and immediately transfers ownership to _newOwner
      * @param initParams bytearray of init parameters
+     * @dev initializer
      * @dev _newOwner | Address to immediately transfer ownership to
      * @dev _fee | Arbitration fee (per disputer) in wei
      * @dev _lapse | Seconds after timelock ends when a Dispute is considered to have "lapsed"
@@ -184,9 +185,10 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     }
 
     /**
-     * @notice Deliver a null arbitration
+     * @notice Deliver a null arbitration. Resets disputes and choices to empty arrays and reimburses disputers
      * @dev Callable on any active dispute
-     * @dev Resets disputes and choices to empty arrays and reimburses disputers
+     * @dev onlyOwner
+     * @dev isRequested
      * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
      */
     function arbitrateNull(bytes32 disputeId)
@@ -208,6 +210,8 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     /**
      * @notice Deliver arbitration
      * @dev Callable only when timelock has passed
+     * @dev onlyOwner
+     * @dev isRequested
      * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
      * @param choice index of the chosen desiredOutcome from dispute.choices
      */
@@ -235,6 +239,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     /**
      * @notice Delivers arbitration as the Keeper's proposed report and refunds all disputers who requested arbitration
      * @dev Callable when a dispute has lapsed. Also hides this arbitrator in ArbitratorFactory
+     * @dev isRequested
      * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
      */
     function claimLapse(bytes32 disputeId) external isRequested(disputeId) {
@@ -316,6 +321,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
 
     /**
      * @notice Withdraws ETH and reduces balance of msg.sender
+     * @dev nonReentrant
      */
     function withdraw() external nonReentrant {
         require(balances[msg.sender] > 0, "No balance");
@@ -329,6 +335,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
 
     /**
      * @notice Sets visible=true on ArbitratorFactory's list of arbitrators
+     * @dev onlyOwner
      */
     function unhideArbitrator() external onlyOwner {
         arbitratorFactory.unhideArbitrator();
@@ -336,6 +343,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
 
     /**
      * @notice Sets visible=false on ArbitratorFactory's list of arbitrators
+     * @dev onlyOwner
      */
     function hideArbitrator() external onlyOwner {
         _hideArbitrator();
