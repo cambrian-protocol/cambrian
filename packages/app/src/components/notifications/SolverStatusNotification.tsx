@@ -16,7 +16,7 @@ const SolverStatusNotification = ({
         <Box
             pad="small"
             round="small"
-            background="active"
+            background="background-contrast-hover"
             gap="medium"
             elevation="small"
             height={{ min: 'auto' }}
