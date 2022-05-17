@@ -84,7 +84,10 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 >
                                     <Chats size="32" />
                                     <Text>Curious?</Text>
-                                    <Anchor href="mailto:paul@cambrianprotocol.com">
+                                    <Anchor
+                                        color="brand"
+                                        href="mailto:paul@cambrianprotocol.com"
+                                    >
                                         <Text>Get in touch</Text>
                                     </Anchor>
                                 </Box>

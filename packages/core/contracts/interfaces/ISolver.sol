@@ -1,9 +1,9 @@
-pragma solidity 0.8.0;
+pragma solidity ^0.8.13;
 
-import "../ConditionalTokens.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../Solver.sol";
-import "../SolverLib.sol";
+import "../conditionalTokens/ConditionalTokens.sol";
+import "../solvers/Solver.sol";
+import "../solvers/SolverLib.sol";
 
 interface ISolver {
     // INITIALIZATION - Only called by SolverFactory
@@ -57,7 +57,7 @@ interface ISolver {
 
     function arbitrate(uint256 _index, uint256[] calldata _payouts) external;
 
-    function nullArbitrate(uint256 _index) external;
+    function arbitrateNull(uint256 _index) external;
 
     function arbitrationRequested(uint256 _index) external;
 
@@ -81,20 +81,31 @@ interface ISolver {
         view
         returns (SolverLib.Condition[] memory);
 
-    function conditions(uint256 index)
+    function condition(uint256 index)
         external
         view
-        returns (
-            IERC20,
-            bytes32,
-            bytes32,
-            bytes32,
-            uint8
-        );
+        returns (SolverLib.Condition memory);
+
+    function keeper() external view returns (address);
 
     function arbitrator() external view returns (address);
 
     function collateralBalance() external view returns (uint256 balance);
+
+    function timelocks(uint256 conditionIndex)
+        external
+        view
+        returns (uint256 timelock);
+
+    function isRecipient(address account, uint256 conditionIndex)
+        external
+        view
+        returns (bool);
+
+    function getStatus(uint256 conditionIndex)
+        external
+        view
+        returns (SolverLib.Status status);
 
     function redeemPosition(
         IERC20 _collateralToken,

@@ -25,51 +25,51 @@ export default function UserMenu({}: UserMenuProps) {
         chainName = SUPPORTED_CHAINS[currentUser.chainId].chainData.name
     }
 
-    const items =
-        currentUser.address && currentUser.chainId
-            ? [
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              subTitle={chainName}
-                              label={ellipseAddress(currentUser.address, 9)}
-                          />
-                      ),
-                      icon: <UserMenuItemIcon icon={<Wallet />} />,
-                  },
-                  {
-                      label: <UserMenuItemLabel label="Learn" />,
-                      icon: <UserMenuItemIcon icon={<Books />} />,
-                  },
-                  {
-                      label: <UserMenuItemLabel label="Support" />,
-                      icon: <UserMenuItemIcon icon={<Question />} />,
-                  },
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              label={currentUser ? 'Logout' : 'Login'}
-                          />
-                      ),
-                      onClick: disconnectWallet,
-                      icon: (
-                          <UserMenuItemIcon
-                              icon={currentUser ? <SignOut /> : <SignIn />}
-                          />
-                      ),
-                  },
-              ]
-            : [
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              label={currentUser?.address || 'Connect Wallet'}
-                          />
-                      ),
-                      onClick: connectWallet,
-                      icon: <UserMenuItemIcon icon={<Wallet />} />,
-                  },
-              ]
+    const menuItems: {}[] = [
+        {
+            label: <UserMenuItemLabel label="Learn" />,
+            icon: <UserMenuItemIcon icon={<Books />} />,
+            href: 'https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70',
+        },
+        {
+            label: <UserMenuItemLabel label="Support" />,
+            icon: <UserMenuItemIcon icon={<Question />} />,
+            href: 'https://discord.com/channels/856113492348108882/968295116576026625',
+        },
+    ]
+
+    if (currentUser.address && currentUser.chainId) {
+        menuItems.unshift({
+            label: (
+                <UserMenuItemLabel
+                    subTitle={chainName}
+                    label={ellipseAddress(currentUser.address, 9)}
+                />
+            ),
+            icon: <UserMenuItemIcon icon={<Wallet />} />,
+        })
+        menuItems.push({
+            label: (
+                <UserMenuItemLabel label={currentUser ? 'Logout' : 'Login'} />
+            ),
+            onClick: disconnectWallet,
+            icon: (
+                <UserMenuItemIcon
+                    icon={currentUser ? <SignOut /> : <SignIn />}
+                />
+            ),
+        })
+    } else {
+        menuItems.unshift({
+            label: (
+                <UserMenuItemLabel
+                    label={currentUser?.address || 'Connect Wallet'}
+                />
+            ),
+            onClick: connectWallet,
+            icon: <UserMenuItemIcon icon={<Wallet />} />,
+        })
+    }
 
     return (
         <Menu
@@ -81,7 +81,7 @@ export default function UserMenu({}: UserMenuProps) {
                 },
             }}
             dropBackground="background-popup"
-            items={items}
+            items={menuItems}
         >
             <BaseAvatar icon={<Wallet />} address={currentUser.address} />
         </Menu>

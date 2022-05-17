@@ -20,10 +20,16 @@ const FooterLinksSection = () => (
                         items={[
                             {
                                 label: 'Support',
-                                href: 'https://discord.gg/pZP4HNYrZs',
+                                href: 'https://discord.com/channels/856113492348108882/968295116576026625',
                             },
-                            { label: 'Docs', href: '#' },
-                            { label: 'Notion', href: '#' },
+                            {
+                                label: 'Learn',
+                                href: 'https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70',
+                            },
+                            {
+                                label: 'Notion',
+                                href: 'https://www.notion.so/cambrianprotocol/Project-Description-97ba57659ed2421386065588ee052600',
+                            },
                         ]}
                     />
                     <FooterLinksContainer
