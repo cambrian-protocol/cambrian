@@ -403,4 +403,68 @@ describe("BasicArbitrator", function () {
 
     expect(await this.Arbitrator.isLapsed(this.disputeId)).to.equal(true);
   });
+
+  it("Allows claiming lapse when lapsed", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 10]);
+    await ethers.provider.send("evm_mine");
+
+    expect(await this.Arbitrator.isLapsed(this.disputeId)).to.equal(true);
+
+    expect(await this.Arbitrator.balances(this.keeper.address)).to.equal(0);
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(0);
+    expect(await this.Arbitrator.balances(this.disputer1.address)).to.equal(0);
+
+    await this.Arbitrator.connect(this.disputer0).claimLapse(this.disputeId);
+
+    expect(await this.Arbitrator.balances(this.keeper.address)).to.equal(0);
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(
+      this.options.fee
+    );
+    expect(await this.Arbitrator.balances(this.disputer1.address)).to.equal(
+      this.options.fee
+    );
+
+    await this.Arbitrator.connect(this.disputer0).withdraw();
+    await this.Arbitrator.connect(this.disputer1).withdraw();
+
+    expect(await this.Arbitrator.balances(this.disputer0.address)).to.equal(0);
+    expect(await this.Arbitrator.balances(this.disputer1.address)).to.equal(0);
+  });
+
+  it("Hides Arbitrator when claimLapse() is called", async function () {
+    await ethers.provider.send("evm_increaseTime", [this.timelockSeconds * 10]);
+    await ethers.provider.send("evm_mine");
+
+    await this.Arbitrator.connect(this.disputer0).claimLapse(this.disputeId);
+
+    expect(
+      (
+        await this.ArbitratorFactory.address_to_arbitrator(
+          this.Arbitrator.address
+        )
+      ).visible
+    ).to.equal(false);
+  });
+
+  it("Hides and Unhides Arbitrator when called by owner", async function () {
+    await this.Arbitrator.connect(this.arbitratorOwner).hideArbitrator();
+
+    expect(
+      (
+        await this.ArbitratorFactory.address_to_arbitrator(
+          this.Arbitrator.address
+        )
+      ).visible
+    ).to.equal(false);
+
+    await this.Arbitrator.connect(this.arbitratorOwner).unhideArbitrator();
+
+    expect(
+      (
+        await this.ArbitratorFactory.address_to_arbitrator(
+          this.Arbitrator.address
+        )
+      ).visible
+    ).to.equal(true);
+  });
 });

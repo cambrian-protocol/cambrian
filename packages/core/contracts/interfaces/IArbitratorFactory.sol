@@ -15,5 +15,5 @@ interface IArbitratorFactory {
 
     function hideArbitrator() external;
 
-    function unhideArbitrator() external
+    function unhideArbitrator() external;
 }

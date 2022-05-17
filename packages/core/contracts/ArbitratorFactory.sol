@@ -25,7 +25,7 @@ contract ArbitratorFactory is Ownable {
     Arbitrator[] public arbitrators; // All available arbitrators
     address[] public implementations; // All implementations that have ever been allowed
 
-    mapping(address => Arbitrator) address_to_arbitrator;
+    mapping(address => Arbitrator) public address_to_arbitrator;
     mapping(address => Deployability) public deployable; // Currently deployable implementations
 
     event CreatedArbitrator(
