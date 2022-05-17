@@ -2,10 +2,10 @@
 pragma solidity ^0.8.13;
 
 import "./interfaces/ISolver.sol";
+import "./interfaces/IArbitratorFactory.sol";
 import "./SolverLib.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 
 contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
     struct Dispute {
@@ -18,11 +18,12 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
         uint256[][] choices;
     }
 
+    IArbitratorFactory private arbitratorFactory; // Set during init
+
     uint256 public fee; // wei
     uint256 public lapse; // Seconds after timelock ends when a Dispute is considered to have "lapsed"
 
     mapping(address => uint256) public balances;
-
     mapping(bytes32 => Dispute) private disputes; // keccak256(abi.encode(address solver, conditionIndex)) => Dispute
 
     event Withdrawal(address indexed to, uint256 amount);
@@ -57,6 +58,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
             initParams,
             (address, uint256, uint256)
         );
+        arbitratorFactory = IArbitratorFactory(msg.sender);
         fee = _fee;
         lapse = _lapse;
 
@@ -230,6 +232,11 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
         imburse(disputeId, choice);
     }
 
+    /**
+     * @notice Delivers arbitration as the Keeper's proposed report and refunds all disputers who requested arbitration
+     * @dev Callable when a dispute has lapsed. Also hides this arbitrator in ArbitratorFactory
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     */
     function claimLapse(bytes32 disputeId) external isRequested(disputeId) {
         Dispute memory dispute = disputes[disputeId];
 
@@ -241,6 +248,7 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
 
         dispute.solver.arbitrate(dispute.conditionIndex, condition.payouts);
         reimburse(disputeId);
+        _hideArbitrator();
     }
 
     /**
@@ -317,6 +325,28 @@ contract BasicArbitrator is Initializable, OwnableUpgradeable, ReentrancyGuard {
         require(success, "Transfer failed");
 
         emit Withdrawal(msg.sender, balance);
+    }
+
+    /**
+     * @notice Sets visible=true on ArbitratorFactory's list of arbitrators
+     */
+    function unhideArbitrator() external onlyOwner {
+        arbitratorFactory.unhideArbitrator();
+    }
+
+    /**
+     * @notice Sets visible=false on ArbitratorFactory's list of arbitrators
+     */
+    function hideArbitrator() external onlyOwner {
+        _hideArbitrator();
+    }
+
+    /**
+     * @notice Sets visible=false on ArbitratorFactory's list of arbitrators
+     * @dev Called by owner through hideArbitrator() or automatically by claimlapse()
+     */
+    function _hideArbitrator() internal {
+        arbitratorFactory.hideArbitrator();
     }
 
     /**
