@@ -4,10 +4,10 @@ const ethers = hre.ethers;
 const FACTORY_ABI =
   require("../artifacts/contracts/SolverFactory.sol/SolverFactory.json").abi;
 const ERC20_ABI =
-  require("../artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
+  require("../artifacts/contracts/tokens/ToyToken.sol/ToyToken.json").abi;
 
 const WRITER_ABI =
-  require("../artifacts/contracts/WriterSolverV1.sol/WriterSolverV1.json").abi;
+  require("../artifacts/contracts/solvers/WriterSolverV1.sol/WriterSolverV1.json").abi;
 const { getBytes32FromMultihash } = require("../helpers/multihash.js");
 
 async function main() {

@@ -1,7 +1,8 @@
 const { ethers } = require("hardhat");
 const CT_ABI =
-  require("../artifacts/contracts/ConditionalTokens.sol/ConditionalTokens.json").abi;
-const SOLVER_ABI = require("../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json").abi;
+const SOLVER_ABI =
+  require("../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const { getBytes32FromMultihash } = require("./multihash.js");
 
 const getSimpleSolverConfig = (
@@ -200,7 +201,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
         new ethers.Contract(
           ethers.utils.defaultAbiCoder.decode(
             ["address"],
-            rc.events[0].data
+            rc.events[1].data
           )[0],
           SOLVER_ABI,
           ethers.provider
@@ -219,7 +220,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
             new ethers.Contract(
               ethers.utils.defaultAbiCoder.decode(
                 ["address"],
-                rc.events[0].data
+                rc.events[1].data
               )[0],
               SOLVER_ABI,
               ethers.provider
