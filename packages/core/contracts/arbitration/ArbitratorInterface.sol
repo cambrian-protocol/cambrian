@@ -4,22 +4,6 @@ pragma solidity ^0.8.13;
 import "../interfaces/ISolver.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-/**
-
-How to Detect if a Contract Implements ERC-165
-
-The source contract makes a STATICCALL to the destination address with input data: 0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000 and gas 30,000. This corresponds to contract.supportsInterface(0x01ffc9a7).
-
-If the call fails or return false, the destination contract does not implement ERC-165.
-
-If the call returns true, a second call is made with input data 0x01ffc9a7ffffffff00000000000000000000000000000000000000000000000000000000.
-
-If the second call fails or returns true, the destination contract does not implement ERC-165.
-
-Otherwise it implements ERC-165.
-
-*/
-
 abstract contract ArbitratorInterface is ERC165 {
     function requestArbitration(
         ISolver solver,

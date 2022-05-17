@@ -39,6 +39,11 @@ contract ArbitratorFactory is Ownable {
     event EnabledImplementation(address indexed implementation);
     event DisabledImplementation(address indexed implementation);
 
+    /**
+     * @notice Enables an implementation address, allowing clones of it to be deployed as Arbitrators
+     * @dev onlyOwner
+     * @param implementation Address of the implementation contract
+     */
     function enableImplementation(address implementation) external onlyOwner {
         if (deployable[implementation] == Deployability.Null) {
             implementations.push(implementation);
@@ -49,12 +54,22 @@ contract ArbitratorFactory is Ownable {
         emit EnabledImplementation(implementation);
     }
 
+    /**
+     * @notice Disables an implementation address, preventing clones of it from deploying
+     * @dev onlyOwner
+     * @param implementation Address of the implementation contract
+     */
     function disableImplementation(address implementation) external onlyOwner {
         deployable[implementation] = Deployability.Disabled;
 
         emit DisabledImplementation(implementation);
     }
 
+    /**
+     * @notice Deploys a clone of an implementation and initializes it
+     * @param implementation Address of the implementation contract
+     * @param initParams Params for the initializer function of the implementation
+     */
     function createArbitrator(address implementation, bytes calldata initParams)
         external
         returns (address)
@@ -88,6 +103,10 @@ contract ArbitratorFactory is Ownable {
         return clone;
     }
 
+    /**
+     * @notice Sets visibility = false on an arbitrator. Does NOT prevent it from being used, but should not show in any lists of selectable arbitrators
+     * @dev Called by an Arbitrator
+     */
     function hideArbitrator() external {
         require(
             msg.sender == address_to_arbitrator[msg.sender].arbitrator,
@@ -99,6 +118,10 @@ contract ArbitratorFactory is Ownable {
         emit HidArbitrator(msg.sender);
     }
 
+    /**
+     * @notice Sets visibility = true on an arbitrator. Should show in lists of selectable arbitrators
+     * @dev Called by an Arbitrator
+     */
     function unhideArbitrator() external {
         require(
             msg.sender == address_to_arbitrator[msg.sender].arbitrator,
