@@ -1,7 +1,7 @@
-import { Box, Heading } from 'grommet'
-
+import { Box } from 'grommet'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import USPSection from '@cambrian/app/components/sections/USPSection'
 import { useRef } from 'react'
 
 export default function Home() {
@@ -16,9 +16,7 @@ export default function Home() {
             <Box style={{ position: 'relative', overflow: 'hidden' }} fill>
                 <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
                 <Box ref={startRef} />
-                <Box pad="large">
-                    <Heading>Stay tuned for the next commit...</Heading>
-                </Box>
+                <USPSection />
             </Box>
         </PageLayout>
     )
