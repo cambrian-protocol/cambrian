@@ -46,7 +46,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Called by SolverFactory when contract is created. Nothing else should ever need to call this
+        @notice Called by SolverFactory when contract is created. Nothing else should ever need to call this
+        @dev initializer
         @param _chainParent The address of the Solver above this one in the chain. address(0) if this Solver is first.
         @param _chainIndex The index of this Solver in the chain
         @param _solverConfig The configuration of this Solver
@@ -76,7 +77,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Creates a new condition, associated timelock, and executes ingests for this Solver and any child Solvers
+        @notice Creates a new condition, associated timelock, and executes ingests for this Solver and any child Solvers
         @param _index Index of the new condition to be created.
     */
     function prepareSolve(uint256 _index) external {
@@ -111,8 +112,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Deploys a new Solver as a child
+        @notice Deploys a new Solver as a child
         @param _config Configuration of the child Solver
+        @return address
     */
     function deployChild(SolverLib.Config calldata _config)
         public
@@ -136,7 +138,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Mints conditional tokens, allocates them to recipients specified by ingested data, runs arbitrary `postroll()` function and tries to do the same for child Solver
+        @notice Mints conditional tokens, allocates them to recipients specified by ingested data, runs arbitrary `postroll()` function and tries to do the same for child Solver
+        @dev require(ingestsValid())
         @param _index Index of condition to execute on
      */
     function executeSolve(uint256 _index) public {
@@ -221,21 +224,25 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Verifies that all ingests have been performed for a condition
+        @notice Verifies that all ingests have been performed for a condition
+        @return bool
      */
     function ingestsValid() public view returns (bool) {
         return SolverLib.ingestsValid(config.ingests, conditions.length);
     }
 
     /**
-        @dev Verifies that all slots corresponding to recipients have been filled before CT allocation
+        @notice Verifies that all slots corresponding to recipients have been filled before CT allocation
+        @param _index Condition index
+        @return bool
      */
     function allocationsValid(uint256 _index) public view returns (bool) {
         return SolverLib.allocationsValid(_index, datas, config.conditionBase);
     }
 
     /**
-        @dev Allows keeper to manually add data to IngestType.Manual slots after executeIngests
+        @notice Allows keeper to manually add data to IngestType.Manual slots after executeIngests
+        @dev Only Keeper, only manual slots
         @param _slot Destination slot
         @param _data Data to be added
      */
@@ -251,10 +258,20 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         emit IngestedData();
     }
 
+    /**
+        @notice Get most recent data of a slot
+        @param _slot slotId
+        @return data
+     */
     function getData(bytes32 _slot) public view returns (bytes memory data) {
         data = datas.slots[_slot][datas.slots[_slot].length - 1];
     }
 
+    /**
+        @notice Get data for each condition from a slot
+        @param _slot slotId
+        @return data
+     */
     function getAllData(bytes32 _slot)
         public
         view
@@ -287,13 +304,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Register callback expected by a downstream Solver for some data
+        @notice Register callback expected by a downstream Solver for some data
+        @dev only downstream Solver
         @param _slot Slot being waited on by downstream Solver
         @param _chainIndex Index of the Solver requesting this callback
      */
     function registerOutgoingCallback(bytes32 _slot, uint256 _chainIndex)
         external
     {
+        require(_chainIndex > chainIndex, "solver not downstream");
         require(
             msg.sender == addressFromChainIndex(_chainIndex),
             "msg.sender not solver"
@@ -312,7 +331,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Handle upstream Solver making callback and ingest the data
+        @notice Handle upstream Solver making callback and ingest the data
+        @dev only upstream Solver
         @param _slot Destination slot for the data being sent
      */
     function handleCallback(bytes32 _slot) external {
@@ -364,8 +384,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev A simple getter that requires upstream slot ver. == our condition ver.
+        @notice A simple getter that requires upstream slot ver. == our condition ver.
         @param _slot Slot containing data
+        @return data
      */
     function getCallbackOutput(bytes32 _slot)
         public
@@ -380,12 +401,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         data = datas.slots[_slot][datas.slots[_slot].length - 1];
     }
 
+    /**
+        @notice Returns addresses waiting for callback from slot
+        @param slot Slot we're checking callbacks for
+        @return outgoing
+     */
     function getOutgoingCallbacks(bytes32 slot)
         public
         view
-        returns (address[] memory)
+        returns (address[] memory outgoing)
     {
-        return callbacks.outgoing[slot];
+        outgoing = callbacks.outgoing[slot];
     }
 
     // ********************************************************************************** //
@@ -393,7 +419,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Propose payouts (AKA outcomes) for a condition
+        @notice Propose payouts (AKA outcomes) for a condition
         @param _index Index of condition
         @param _payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
      */
@@ -415,7 +441,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Confirm payouts for condition (reportPayouts to ConditionalTokens contract)
+        @notice Confirm payouts for condition (reportPayouts to ConditionalTokens contract)
         @param _index Index of condition
      */
     function confirmPayouts(uint256 _index) external {
@@ -432,7 +458,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Sets condition.status to ArbitrationRequested.
+        @notice Sets condition.status to ArbitrationRequested.
         @param _index Index of condition
      */
     function arbitrationRequested(uint256 _index) external {
@@ -449,7 +475,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Allows arbitrator to unilaterally make a payout report.
+        @notice Allows arbitrator to unilaterally make a payout report.
         @param _index Index of condition
         @param payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
      */
@@ -468,7 +494,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @dev Returns condition.status to OutcomeProposed without a ruling.
+        @notice Returns condition.status to OutcomeProposed without a ruling.
         @param _index Index of condition
      */
     function arbitrateNull(uint256 _index) external {
@@ -486,8 +512,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Get address for a Solver by its index in the chain
+        @notice Get address for a Solver by its index in the chain
         @param _index Index of Solver
+        @return _address
      */
     function addressFromChainIndex(uint256 _index)
         public
@@ -503,6 +530,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
     }
 
+    /**
+        @notice Get one condition
+        @param index Index of condition
+     */
     function condition(uint256 index)
         public
         view
@@ -511,6 +542,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return conditions[index];
     }
 
+    /**
+        @notice Get all conditions
+     */
     function getConditions()
         public
         view
@@ -519,30 +553,51 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return conditions;
     }
 
+    /**
+        @notice Get Solver config
+     */
     function getConfig() public view returns (SolverLib.Config memory) {
         return config;
     }
 
+    /**
+        @notice Get Keeper address 
+    */
     function keeper() public view returns (address) {
         return config.keeper;
     }
 
+    /**
+        @notice Get Arbitrator address 
+    */
     function arbitrator() public view returns (address) {
         return config.arbitrator;
     }
 
+    /**
+        @notice set ID that will be passed as data for conditional token transfers
+        @param _trackingId bytes32
+    */
     function setTrackingId(bytes32 _trackingId) public {
         require(trackingId == bytes32(0), "TrackingId set");
         require(msg.sender == deployerAddress);
         trackingId = _trackingId;
     }
 
+    /**
+        @notice Set new timelock for a condition
+        @param _index Timelock/Condition index to be updated
+    */
     function updateTimelock(uint256 _index) internal {
         timelocks[_index] =
             block.timestamp +
             (config.timelockSeconds * 1 seconds);
     }
 
+    /**
+        @notice Get balance of collateral token on Solver
+        @return balance
+    */
     function collateralBalance() public view returns (uint256 balance) {
         balance = IERC20(config.conditionBase.collateralToken).balanceOf(
             address(this)
@@ -550,7 +605,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-     * @notice Returns recipient addresses for a condition
+        @notice Returns recipient addresses for a condition
+        @param account address to check
+        @param conditionIndex condition to check
+        @return bool
      */
     function isRecipient(address account, uint256 conditionIndex)
         public
@@ -572,6 +630,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return false;
     }
 
+    /**
+        @notice Get status of a condition
+        @param conditionIndex index of condition
+        @return status
+     */
     function getStatus(uint256 conditionIndex)
         public
         view
@@ -585,7 +648,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @dev Redeems CTs held by this Solver. See ConditionalTokens contract for more info.
+        @notice Redeems CTs held by this Solver. See ConditionalTokens contract for more info.
+        @dev only Keeper
      */
     function redeemPosition(
         IERC20 _collateralToken,
