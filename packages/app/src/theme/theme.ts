@@ -13,8 +13,12 @@ const colors: any = {
         light: '#FFFFFF',
     },
     'background-contrast': {
-        dark: '#FFFFFF08',
-        light: '#11111108',
+        dark: '#00202b',
+        light: '#b5e7f7',
+    },
+    'background-contrast-hover': {
+        dark: '#012e3d',
+        light: '#95d4e8',
     },
     'background-popup': { dark: '#132e33', light: '#0A1F23' },
     'primary-gradient':
@@ -64,7 +68,6 @@ export const cpTheme = deepMerge(grommet, {
             maxWidth: '336px',
         },
     },
-    anchor: { color: 'brand' },
     button: {
         hover: {
             background: '#315e79',

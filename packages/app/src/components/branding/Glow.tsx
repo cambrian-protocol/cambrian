@@ -31,7 +31,7 @@ const Glow = ({
             <Box
                 style={{
                     position: 'absolute',
-                    opacity: 0.1,
+                    opacity: 0.18,
                     right: 0,
                     bottom: 0,
                 }}
