@@ -75,7 +75,7 @@ const SubmissionForm = ({
     }
     return (
         <>
-            <Box fill gap="medium">
+            <Box fill gap="medium" height={{ min: 'large' }}>
                 <TextArea
                     disabled={isSubmitting}
                     placeholder="Type your article here..."
