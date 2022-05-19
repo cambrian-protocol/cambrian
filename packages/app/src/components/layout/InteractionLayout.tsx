@@ -40,7 +40,7 @@ const InteractionLayout = ({
                                 <Appbar />
                                 <Box
                                     flex
-                                    width={{ max: 'large' }}
+                                    width={'large'}
                                     pad={
                                         screenSize === 'small'
                                             ? {
