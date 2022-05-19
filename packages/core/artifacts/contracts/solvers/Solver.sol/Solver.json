@@ -360,11 +360,6 @@
           "type": "uint256"
         },
         {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        },
-        {
           "components": [
             {
               "internalType": "contract IERC20",
@@ -477,9 +472,26 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct SolverLib.InitCall[]",
+              "name": "initCalls",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -724,9 +736,26 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct SolverLib.InitCall[]",
+              "name": "initCalls",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -871,7 +900,7 @@
       "outputs": [
         {
           "internalType": "address[]",
-          "name": "",
+          "name": "outgoing",
           "type": "address[]"
         }
       ],
@@ -968,9 +997,26 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "to",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "value",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct SolverLib.InitCall[]",
+              "name": "initCalls",
+              "type": "tuple[]"
             },
             {
               "components": [

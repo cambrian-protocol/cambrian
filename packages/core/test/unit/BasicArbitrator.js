@@ -157,7 +157,7 @@ describe("BasicArbitrator", function () {
         this.keeper.address,
         this.Arbitrator.address,
         this.timelockSeconds,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],

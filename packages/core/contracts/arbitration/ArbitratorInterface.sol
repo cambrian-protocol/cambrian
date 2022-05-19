@@ -4,6 +4,10 @@ pragma solidity ^0.8.13;
 import "../interfaces/ISolver.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
+/**
+  The virtual functions in this contract are the minimum required for an Arbitrator to interfact with a Solver.
+ */
+
 abstract contract ArbitratorInterface is ERC165 {
     function requestArbitration(
         ISolver solver,

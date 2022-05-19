@@ -12,14 +12,18 @@ contract WriterSolverV1 is Solver {
     event SentMessage(string cid, address sender, bytes32 conditionId);
     event SubmittedWork(string cid, address submitter, bytes32 conditionId);
 
-    function postroll(uint256 _index) internal override {
-        (bytes32 _writer, bytes32 _buyer) = abi.decode(
-            config.data,
-            (bytes32, bytes32)
-        );
+    // function postroll(uint256 _index) internal override {
+    //     (bytes32 _writer, bytes32 _buyer) = abi.decode(
+    //         config.data,
+    //         (bytes32, bytes32)
+    //     );
 
-        writer = abi.decode(datas.slots[_writer][_index], (address));
-        buyer = abi.decode(datas.slots[_buyer][_index], (address));
+    //     writer = abi.decode(datas.slots[_writer][_index], (address));
+    //     buyer = abi.decode(datas.slots[_buyer][_index], (address));
+    // }
+
+    function postroll(uint256 _index) internal pure override {
+        _index;
     }
 
     function sendMessage(string calldata cid, bytes32 conditionId) external {

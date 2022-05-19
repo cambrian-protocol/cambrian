@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolver.sol";
 
-import "./Solver.sol";
 import "./SolverLib.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
@@ -69,6 +68,28 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
         for (uint256 i = 0; i < _solverConfig.ingests.length; i++) {
             datas.slotIngestIdx[_solverConfig.ingests[i].slot] = i;
+        }
+
+        initCalls(_solverConfig.initCalls);
+    }
+
+    /** 
+        @notice Make calls on initialization
+        @param _txs Transactions to call
+    */
+    function initCalls(SolverLib.InitCall[] calldata _txs) internal {
+        for (uint256 i; i < _txs.length; i++) {
+            SolverLib.InitCall memory _tx = _txs[i];
+
+            if (_tx.to == address(0)) {
+                _tx.to = address(this);
+            }
+
+            (bool success, bytes memory retData) = _tx.to.call{
+                value: _tx.value
+            }(_tx.data);
+
+            require(success, "InitCall failed");
         }
     }
 
@@ -513,6 +534,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     /**
         @notice Get address for a Solver by its index in the chain
+        @dev Returns address(0) if no child or parent
         @param _index Index of Solver
         @return _address
      */
@@ -524,9 +546,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         if (_index == chainIndex) {
             _address = address(this);
         } else if (_index < chainIndex) {
-            _address = ISolver(chainParent).addressFromChainIndex(_index);
+            if (chainParent == address(0)) {
+                _address = address(0);
+            } else {
+                _address = ISolver(chainParent).addressFromChainIndex(_index);
+            }
         } else if (_index > chainIndex) {
-            _address = ISolver(chainChild).addressFromChainIndex(_index);
+            if (chainChild == address(0)) {
+                _address = address(0);
+            } else {
+                _address = ISolver(chainChild).addressFromChainIndex(_index);
+            }
         }
     }
 
