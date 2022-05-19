@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react'
+import React, { MutableRefObject, SetStateAction, useState } from 'react'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateTemplateMultiStepForm } from './forms/CreateTemplateMultiStepForm'
@@ -6,6 +6,7 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 
 interface CreateTemplateUIProps {
+    topRef: MutableRefObject<HTMLDivElement | null>
     composition: CompositionModel
     compositionCID: string
     setErrorMessage: React.Dispatch<
@@ -14,6 +15,7 @@ interface CreateTemplateUIProps {
 }
 
 const CreateTemplateUI = ({
+    topRef,
     composition,
     compositionCID,
     setErrorMessage,
@@ -24,6 +26,7 @@ const CreateTemplateUI = ({
     return (
         <>
             <CreateTemplateMultiStepForm
+                topRef={topRef}
                 composition={composition}
                 compositionCID={compositionCID}
                 onFailure={(errMsg) => setErrorMessage(errMsg)}

@@ -1,5 +1,5 @@
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -15,6 +15,7 @@ import { useRouter } from 'next/dist/client/router'
 
 export default function CreateTemplatePage() {
     const router = useRouter()
+    const topRef = useRef<HTMLDivElement | null>(null)
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
         useState<CompositionModel>()
@@ -48,10 +49,12 @@ export default function CreateTemplatePage() {
 
     return (
         <>
+            <div ref={topRef} />
             <PageLayout contextTitle="Create Template">
                 <Box alignSelf="center">
                     {currentComposition ? (
                         <CreateTemplateUI
+                            topRef={topRef}
                             composition={currentComposition}
                             compositionCID={compositionCID as string}
                             setErrorMessage={setErrorMessage}
