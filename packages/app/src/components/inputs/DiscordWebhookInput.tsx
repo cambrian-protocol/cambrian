@@ -23,6 +23,7 @@ const DiscordWebhookInput = ({ name }: DiscordWebhookInputProps) => (
             Add a{' '}
             <Anchor
                 target="_blank"
+                color="brand"
                 href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
             >
                 Discord webhook
