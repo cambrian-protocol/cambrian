@@ -74,7 +74,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 </Box>
                                 <Box
                                     direction="row"
-                                    gap="xsmall"
+                                    gap="small"
                                     align="center"
                                     pad={{
                                         horizontal: 'medium',
