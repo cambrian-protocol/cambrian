@@ -1,5 +1,5 @@
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -14,8 +14,8 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useRouter } from 'next/dist/client/router'
 
-// Todo Multistep form
 export default function CreateProposalPage() {
+    const topRef = useRef<HTMLDivElement | null>(null)
     const router = useRouter()
     const { templateCID } = router.query
     const [metaStages, setMetaStages] = useState<Stages>()
@@ -46,15 +46,18 @@ export default function CreateProposalPage() {
 
     return (
         <>
+            <div ref={topRef} />
             <PageLayout contextTitle="Create Proposal">
                 <Box alignSelf="center">
                     {metaStages ? (
                         <CreateProposalUI
+                            topRef={topRef}
                             composition={
                                 metaStages.composition as CompositionModel
                             }
                             template={metaStages.template as TemplateModel}
                             templateCID={templateCID as string}
+                            setErrorMessage={setErrorMessage}
                         />
                     ) : showInvalidQueryComponent ? (
                         <InvalidQueryComponent context={StageNames.template} />

@@ -30,7 +30,12 @@ const PageLayout = ({ contextTitle, children }: PageLayoutProps) => {
                 align="center"
                 justify="center"
             >
-                <Glow height="800px" width="1000px" left={'5%'} top={'-10%'} />
+                <Glow
+                    height="800px"
+                    width="1000px"
+                    left={'5%'}
+                    top={'-200px'}
+                />
                 <Box fill style={{ position: 'relative' }}>
                     {children}
                 </Box>

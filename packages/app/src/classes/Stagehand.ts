@@ -1,5 +1,5 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { CreateProposalFormType } from './../ui/proposals/forms/CreateProposalForm'
+import { CreateProposalMultiStepFormType } from './../ui/proposals/forms/CreateProposalMultiStepForm'
 import { CreateTemplateMultiStepFormType } from '../ui/templates/forms/CreateTemplateMultiStepForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '../services/api/IPFS.api'
@@ -159,7 +159,7 @@ export default class Stagehand {
     }
 
     publishProposal = async (
-        createProposalInput: CreateProposalFormType,
+        createProposalInput: CreateProposalMultiStepFormType,
         templateCID: string,
         provider: ethers.providers.Provider
     ) => {

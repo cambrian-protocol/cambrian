@@ -5,14 +5,14 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import React, { useEffect, useState } from 'react'
+import React, { MutableRefObject, useEffect, useState } from 'react'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CreateTemplateDetailStep from './steps/CreateTemplateDetailStep'
 import CreateTemplateNotificationStep from './steps/CreateTemplateNotificationStep'
 import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
 import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
 import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
-import CreateTemplateTemplateStep from './steps/CreateTemplateTemplateStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -23,6 +23,7 @@ import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageH
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateTemplateMultiStepFormProps {
+    topRef: MutableRefObject<HTMLDivElement | null>
     composition: CompositionModel
     compositionCID: string
     onFailure: (error?: ErrorMessageType) => void
@@ -73,6 +74,7 @@ export type CreateTemplateMultiStepStepsType =
     | CREATE_TEMPLATE_STEPS.NOTIFICATION
 
 export const CreateTemplateMultiStepForm = ({
+    topRef,
     composition,
     compositionCID,
     onSuccess,
@@ -89,6 +91,10 @@ export const CreateTemplateMultiStepForm = ({
     useEffect(() => {
         initInput()
     }, [])
+
+    useEffect(() => {
+        if (topRef) topRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentStep])
 
     const initInput = () => {
         const formFlexInputs = parseFlexInputsToForm()
@@ -203,7 +209,7 @@ export const CreateTemplateMultiStepForm = ({
                 )
             case CREATE_TEMPLATE_STEPS.TEMPLATE_DETAILS:
                 return (
-                    <CreateTemplateTemplateStep
+                    <CreateTemplateDetailStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}

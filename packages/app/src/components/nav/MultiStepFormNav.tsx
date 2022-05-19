@@ -14,6 +14,7 @@ const MultiStepFormNav = ({ backward, submitForm }: MultiStepFormNavProps) => {
         <Box direction="row" justify="between" pad="xsmall">
             {backward ? (
                 <Button
+                    disabled={submitForm && submitForm.isLoading}
                     type="button"
                     secondary
                     onClick={backward}
@@ -25,7 +26,11 @@ const MultiStepFormNav = ({ backward, submitForm }: MultiStepFormNavProps) => {
                 <Box />
             )}
             {submitForm ? (
-                <LoaderButton {...submitForm} icon={<CloudArrowUp />} reverse />
+                <LoaderButton
+                    {...submitForm}
+                    icon={submitForm.icon || <CloudArrowUp />}
+                    reverse
+                />
             ) : (
                 <Button
                     size="small"
