@@ -137,7 +137,7 @@ describe("ProposalsHub", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],

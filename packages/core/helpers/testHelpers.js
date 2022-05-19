@@ -89,7 +89,7 @@ const getSimpleSolverConfig = (
       keeperAddress,
       arbitratorAddress,
       0,
-      ethers.utils.formatBytes32String(""),
+      [],
       ingests,
       canon,
     ],

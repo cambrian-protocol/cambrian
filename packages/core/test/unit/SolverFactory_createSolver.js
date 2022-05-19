@@ -60,7 +60,7 @@ describe("SolverFactory | createSolver", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: this.ingests,
         conditionBase: this.conditionBase,
       },

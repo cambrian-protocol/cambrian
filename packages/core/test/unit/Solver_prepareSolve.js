@@ -61,7 +61,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: this.ingests,
         conditionBase: this.conditionBase,
       },
@@ -158,7 +158,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -167,7 +167,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [
           {
             executions: 0,
@@ -201,7 +201,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -210,7 +210,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [
           {
             executions: 0,
@@ -244,7 +244,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -253,7 +253,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [
           {
             executions: 0,
@@ -286,7 +286,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [
           {
             executions: 0,
@@ -303,7 +303,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        initCalls: [],
         ingests: [
           {
             executions: 0,
