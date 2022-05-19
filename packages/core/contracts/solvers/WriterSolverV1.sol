@@ -4,45 +4,49 @@ pragma solidity ^0.8.13;
 
 import "./SolverLib.sol";
 import "./Solver.sol";
+import "../Module.sol";
 
-contract WriterSolverV1 is Solver {
-    address public writer;
-    address public buyer;
+contract WriterSolverV1 is Solver, Module {
+    bytes32 writerSlot;
 
-    event SentMessage(string cid, address sender, bytes32 conditionId);
     event SubmittedWork(string cid, address submitter, bytes32 conditionId);
 
-    // function postroll(uint256 _index) internal override {
-    //     (bytes32 _writer, bytes32 _buyer) = abi.decode(
-    //         config.data,
-    //         (bytes32, bytes32)
-    //     );
-
-    //     writer = abi.decode(datas.slots[_writer][_index], (address));
-    //     buyer = abi.decode(datas.slots[_buyer][_index], (address));
-    // }
-
-    function postroll(uint256 _index) internal pure override {
-        _index;
+    function load(bytes calldata data) public override {
+        require(msg.sender == address(this), "Only this");
+        writerSlot = abi.decode(data, (bytes32));
     }
 
-    function sendMessage(string calldata cid, bytes32 conditionId) external {
-        require(
-            msg.sender == config.keeper ||
-                msg.sender == config.arbitrator ||
-                msg.sender == writer ||
-                msg.sender == buyer
-        );
-        emit SentMessage(cid, msg.sender, conditionId);
+    function roles()
+        public
+        pure
+        override
+        returns (bytes32[] memory requestedRoles)
+    {
+        return requestedRoles;
+    }
+
+    function writer() public view returns (address) {
+        return abi.decode(getData(writerSlot), (address));
     }
 
     function submitWork(string calldata cid, bytes32 conditionId) external {
-        require(msg.sender == writer, "Only Writer");
+        require(msg.sender == writer(), "Only Writer");
         require(
             conditions[conditions.length - 1].status ==
                 SolverLib.Status.Executed,
             "Disabled"
         );
         emit SubmittedWork(cid, msg.sender, conditionId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC1155Receiver, Module)
+        returns (bool)
+    {
+        return
+            Module.supportsInterface(interfaceId) ||
+            ERC1155Receiver.supportsInterface(interfaceId);
     }
 }

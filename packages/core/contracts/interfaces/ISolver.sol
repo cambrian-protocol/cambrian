@@ -108,16 +108,6 @@ interface ISolver {
         returns (bytes memory data);
 
     /**
-        @notice Returns addresses waiting for callback from slot
-        @param slot Slot we're checking callbacks for
-        @return outgoing
-     */
-    function getOutgoingCallbacks(bytes32 slot)
-        external
-        view
-        returns (address[] memory outgoing);
-
-    /**
         @notice Propose payouts (AKA outcomes) for a condition
         @param _index Index of condition
         @param _payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount

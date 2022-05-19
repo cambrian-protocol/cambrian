@@ -10,10 +10,9 @@ import "../interfaces/ISolver.sol";
 import "../interfaces/ISolver.sol";
 import "../solvers/SolverLib.sol";
 
-/**
-  The virtual functions in this contract are the minimum required for a Keeper to interact with a basic Solver.
- */
-abstract contract KeeperInterface is ERC165 {
+import "../Module.sol";
+
+abstract contract Keeper is Module {
     function prepareSolve(address solver, uint256 conditionIndex)
         public
         virtual
@@ -70,25 +69,15 @@ abstract contract KeeperInterface is ERC165 {
         );
     }
 
-    function calculateInterface() public pure returns (bytes4) {
-        return
-            this.prepareSolve.selector ^
-            this.deployChild.selector ^
-            this.executeSolve.selector ^
-            this.addData.selector ^
-            this.proposePayouts.selector ^
-            this.confirmPayouts.selector ^
-            this.redeemPosition.selector;
-    }
-
     function supportsInterface(bytes4 interfaceId)
         public
-        pure
+        view
+        virtual
         override
         returns (bool)
     {
         return
-            interfaceId == this.supportsInterface.selector ||
-            interfaceId == calculateInterface();
+            interfaceId == type(Keeper).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }

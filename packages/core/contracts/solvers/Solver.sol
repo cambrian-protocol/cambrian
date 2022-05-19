@@ -12,9 +12,12 @@ import "../interfaces/ISolver.sol";
 import "./SolverLib.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
-    address factoryAddress; // Factory which creates Solver proxies
-    address ctfAddress; // Conditional token framework
-    address deployerAddress; // Address which called SolverFactory to deploy this Solver
+    bytes32 public constant KEEPER_ROLE = keccak256("KEEPER_ROLE");
+    bytes32 public constant ARBITRATOR_ROLE = keccak256("ARBITRATOR_ROLE");
+
+    address private factoryAddress; // Factory which creates Solver proxies
+    address private ctfAddress; // Conditional token framework
+    address private deployerAddress; // Address which called SolverFactory to deploy this Solver
 
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
@@ -28,6 +31,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
+
+    mapping(bytes32 => mapping(address => bool)) private roles;
 
     event ChangedStatus(bytes32 conditionId);
 
@@ -70,26 +75,33 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             datas.slotIngestIdx[_solverConfig.ingests[i].slot] = i;
         }
 
-        initCalls(_solverConfig.initCalls);
+        setRole(KEEPER_ROLE, config.keeper, true);
+        if (config.arbitrator != address(0)) {
+            setRole(ARBITRATOR_ROLE, config.arbitrator, true);
+        }
+
+        loadModules(_solverConfig.moduleLoaders);
     }
 
-    /** 
-        @notice Make calls on initialization
-        @param _txs Transactions to call
-    */
-    function initCalls(SolverLib.InitCall[] calldata _txs) internal {
-        for (uint256 i; i < _txs.length; i++) {
-            SolverLib.InitCall memory _tx = _txs[i];
+    function loadModules(SolverLib.ModuleLoader[] calldata loaders) internal {
+        for (uint256 i; i < loaders.length; i++) {
+            SolverLib.ModuleLoader memory loader = loaders[i];
 
-            if (_tx.to == address(0)) {
-                _tx.to = address(this);
+            if (loader.module == address(0)) {
+                loader.module = address(this);
             }
 
-            (bool success, bytes memory retData) = _tx.to.call{
-                value: _tx.value
-            }(_tx.data);
+            (bool success, bytes memory retData) = loader.module.call{value: 0}(
+                loader.data
+            );
 
-            require(success, "InitCall failed");
+            bytes32[] memory requestedRoles = abi.decode(retData, (bytes32[]));
+
+            for (uint256 j; j < requestedRoles.length; j++) {
+                setRole(requestedRoles[i], loader.module, true);
+            }
+
+            require(success, "loadModules failed");
         }
     }
 
@@ -104,14 +116,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function prepareSolve(uint256 _index) external {
         if (conditions.length > 0) {
             require(
-                msg.sender == config.keeper || msg.sender == chainParent,
+                hasRole(KEEPER_ROLE, msg.sender) || msg.sender == chainParent,
                 "Only keeper/parent"
             );
         }
 
-        require(_index == conditions.length, "Invalid index to prepare");
-        require(callbacks.numOutgoing == 0, "Fulfill outgoing callbacks first");
-        require(callbacks.numIncoming == 0, "Fulfill incoming callbacks first");
+        require(_index == conditions.length, "Invalid index");
+        require(callbacks.numOutgoing == 0, "outgoing cbs");
+        require(callbacks.numIncoming == 0, "incoming cbs");
 
         conditions.push(
             SolverLib.createCondition(
@@ -141,8 +153,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         public
         returns (address)
     {
-        require(msg.sender == config.keeper, "Only keeper");
-        require(chainChild == address(0), "Solver has child");
+        require(hasRole(KEEPER_ROLE, msg.sender), "Only keeper");
+        require(chainChild == address(0), "Has child");
 
         chainChild = SolverLib.deployChild(
             factoryAddress,
@@ -180,11 +192,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             )
         );
 
-        postroll(_index);
         cascade(_index);
     }
-
-    function postroll(uint256 _index) internal virtual;
 
     function cascade(uint256 _index) internal {
         if (
@@ -268,7 +277,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _data Data to be added
      */
     function addData(bytes32 _slot, bytes memory _data) external {
-        require(msg.sender == config.keeper, "OnlyKeeper");
+        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
         require(
             config.ingests[datas.slotIngestIdx[_slot]].ingestType ==
                 SolverLib.IngestType.Manual,
@@ -368,7 +377,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         require(
             config.ingests[callbacks.incoming[_cb]].ingestType ==
                 SolverLib.IngestType.Callback,
-            "Ingest not Callback"
+            "not Cb"
         );
 
         config.ingests[callbacks.incoming[_cb]].executions++;
@@ -422,19 +431,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         data = datas.slots[_slot][datas.slots[_slot].length - 1];
     }
 
-    /**
-        @notice Returns addresses waiting for callback from slot
-        @param slot Slot we're checking callbacks for
-        @return outgoing
-     */
-    function getOutgoingCallbacks(bytes32 slot)
-        public
-        view
-        returns (address[] memory outgoing)
-    {
-        outgoing = callbacks.outgoing[slot];
-    }
-
     // ********************************************************************************** //
     // ****************************** REPORTING ***************************************** //
     // ********************************************************************************** //
@@ -447,14 +443,14 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external
     {
-        require(msg.sender == config.keeper, "Only Keeper");
+        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
         require(
             _payouts.length == config.conditionBase.outcomeSlots,
-            "payouts.length must match outcomeSlots"
+            "length must match outcomeSlots"
         );
         require(
             conditions[_index].status == SolverLib.Status.Executed,
-            "Condition not Executed"
+            "Cnot Executed"
         );
 
         SolverLib.proposePayouts(conditions[_index], _payouts);
@@ -466,10 +462,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition
      */
     function confirmPayouts(uint256 _index) external {
-        require(block.timestamp > timelocks[_index], "Timelock still locked");
+        require(block.timestamp > timelocks[_index], "Timelocked");
         require(
             conditions[_index].status == SolverLib.Status.OutcomeProposed,
-            "Outcome not proposed"
+            "Not proposed"
         );
         SolverLib.confirmPayouts(ctfAddress, conditions[_index]);
     }
@@ -483,7 +479,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition
      */
     function arbitrationRequested(uint256 _index) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
+        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
         require(
             conditions[_index].status == SolverLib.Status.OutcomeProposed ||
                 conditions[_index].status ==
@@ -501,15 +497,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
      */
     function arbitrate(uint256 _index, uint256[] memory payouts) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
+        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
         require(
             conditions[_index].status == SolverLib.Status.ArbitrationRequested,
             "Not ArbitrationRequested"
         );
-        require(block.timestamp > timelocks[_index], "Timelock still locked");
+        require(block.timestamp > timelocks[_index], "Timelocked");
         require(
             payouts.length == config.conditionBase.outcomeSlots,
-            "payouts.length must match outcomeSlots"
+            "length must match outcomeSlots"
         );
         SolverLib.arbitrate(ctfAddress, conditions[_index], payouts);
     }
@@ -519,7 +515,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition
      */
     function arbitrateNull(uint256 _index) external {
-        require(msg.sender == config.arbitrator, "Only arbitrator");
+        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
         require(
             conditions[_index].status == SolverLib.Status.ArbitrationRequested,
             "Not ArbitrationRequested"
@@ -673,6 +669,18 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         status = conditions[conditionIndex].status;
     }
 
+    function setRole(
+        bytes32 role,
+        address account,
+        bool boolean
+    ) internal {
+        roles[role][account] = boolean;
+    }
+
+    function hasRole(bytes32 role, address account) public view returns (bool) {
+        return roles[role][account];
+    }
+
     // ********************************************************************************** //
     // ******************************** TOKENS ****************************************** //
     // ********************************************************************************** //
@@ -687,7 +695,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         bytes32 _conditionId,
         uint256[] calldata _indexSets
     ) external {
-        require(msg.sender == config.keeper, "Only Keeper");
+        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
         IConditionalTokens(ctfAddress).redeemPositions(
             _collateralToken,
             _parentCollectionId,
