@@ -61,7 +61,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: this.ingests,
         conditionBase: this.conditionBase,
       },
@@ -135,19 +135,19 @@ describe("Solver.sol | prepareSolve", function () {
     await this.solver.connect(this.keeper).prepareSolve(0);
     expectRevert(
       this.solver.connect(this.keeper).prepareSolve(0),
-      "Invalid index to prepare"
+      "Invalid index"
     );
   });
 
   it("Can't prepare solve with index > conditions.length", async function () {
     expectRevert(
       this.solver.connect(this.keeper).prepareSolve(1),
-      "Invalid index to prepare"
+      "Invalid index"
     );
     await this.solver.connect(this.keeper).prepareSolve(0);
     expectRevert(
       this.solver.connect(this.keeper).prepareSolve(2),
-      "Invalid index to prepare"
+      "Invalid index"
     );
   });
 
@@ -158,7 +158,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -167,7 +167,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -190,7 +190,7 @@ describe("Solver.sol | prepareSolve", function () {
     await solvers[0].connect(this.keeper).prepareSolve(0);
     return expectRevert(
       solvers[0].connect(this.keeper).prepareSolve(1),
-      "Fulfill outgoing callbacks first"
+      "outgoing cbs"
     );
   });
 
@@ -201,7 +201,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -210,7 +210,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -233,7 +233,7 @@ describe("Solver.sol | prepareSolve", function () {
     await solvers[0].connect(this.keeper).prepareSolve(0);
     return expectRevert(
       solvers[1].connect(this.keeper).prepareSolve(1),
-      "Fulfill incoming callbacks first"
+      "incoming cbs"
     );
   });
 
@@ -244,7 +244,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -253,7 +253,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -286,7 +286,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -303,7 +303,7 @@ describe("Solver.sol | prepareSolve", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,

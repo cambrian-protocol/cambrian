@@ -613,7 +613,7 @@ describe("Solver", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: 0,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: ingests0,
         conditionBase: canon0,
       },

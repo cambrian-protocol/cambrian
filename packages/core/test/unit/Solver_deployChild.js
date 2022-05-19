@@ -60,7 +60,7 @@ describe("Solver | deployChild", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: this.ingests,
         conditionBase: this.conditionBase,
       },
@@ -111,7 +111,7 @@ describe("Solver | deployChild", function () {
     await solver.connect(this.keeper).deployChild(this.solverConfigs[0]);
     return expectRevert(
       solver.connect(this.keeper).deployChild(this.solverConfigs[0]),
-      "Solver has child"
+      "Has child"
     );
   });
 

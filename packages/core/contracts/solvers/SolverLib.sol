@@ -28,9 +28,8 @@ library SolverLib {
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
     }
 
-    struct InitCall {
-        address to; // If address(0), use address(this) of caller instead
-        uint256 value;
+    struct ModuleLoader {
+        address module; // If address(0), use address(this) of caller instead
         bytes data;
     }
 
@@ -65,7 +64,7 @@ library SolverLib {
         address keeper; // Keeper address
         address arbitrator; // Arbitrator address
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
-        InitCall[] initCalls; // Arbitrary data
+        ModuleLoader[] moduleLoaders; // Arbitrary data
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
         ConditionBase conditionBase; // Base to create conditions from
     }

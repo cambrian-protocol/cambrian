@@ -69,7 +69,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -103,7 +103,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -120,7 +120,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -155,7 +155,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -172,7 +172,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -218,7 +218,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -238,7 +238,7 @@ describe("Solver.sol | callbacks", function () {
           ethers.utils.formatBytes32String("0"),
           ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
         ),
-      "OnlyKeeper"
+      "Only Keeper"
     );
   });
 
@@ -249,7 +249,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -266,7 +266,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        initCalls: [],
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,

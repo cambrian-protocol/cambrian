@@ -221,13 +221,8 @@
               "components": [
                 {
                   "internalType": "address",
-                  "name": "to",
+                  "name": "module",
                   "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
                 },
                 {
                   "internalType": "bytes",
@@ -235,8 +230,8 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.InitCall[]",
-              "name": "initCalls",
+              "internalType": "struct SolverLib.ModuleLoader[]",
+              "name": "moduleLoaders",
               "type": "tuple[]"
             },
             {
@@ -485,13 +480,8 @@
               "components": [
                 {
                   "internalType": "address",
-                  "name": "to",
+                  "name": "module",
                   "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
                 },
                 {
                   "internalType": "bytes",
@@ -499,8 +489,8 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.InitCall[]",
-              "name": "initCalls",
+              "internalType": "struct SolverLib.ModuleLoader[]",
+              "name": "moduleLoaders",
               "type": "tuple[]"
             },
             {
@@ -637,25 +627,6 @@
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "slot",
-          "type": "bytes32"
-        }
-      ],
-      "name": "getOutgoingCallbacks",
-      "outputs": [
-        {
-          "internalType": "address[]",
-          "name": "outgoing",
-          "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "uint256",
           "name": "conditionIndex",
           "type": "uint256"
@@ -746,13 +717,8 @@
               "components": [
                 {
                   "internalType": "address",
-                  "name": "to",
+                  "name": "module",
                   "type": "address"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "value",
-                  "type": "uint256"
                 },
                 {
                   "internalType": "bytes",
@@ -760,8 +726,8 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.InitCall[]",
-              "name": "initCalls",
+              "internalType": "struct SolverLib.ModuleLoader[]",
+              "name": "moduleLoaders",
               "type": "tuple[]"
             },
             {
