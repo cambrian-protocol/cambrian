@@ -12,6 +12,7 @@ import "../interfaces/ISolver.sol";
 import "./SolverLib.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
+    bytes32 public constant SOLVER_ROLE = keccak256("SOLVER_ROLE");
     bytes32 public constant KEEPER_ROLE = keccak256("KEEPER_ROLE");
     bytes32 public constant ARBITRATOR_ROLE = keccak256("ARBITRATOR_ROLE");
 
@@ -450,7 +451,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         );
         require(
             conditions[_index].status == SolverLib.Status.Executed,
-            "Cnot Executed"
+            "Not Executed"
         );
 
         SolverLib.proposePayouts(conditions[_index], _payouts);
@@ -611,13 +612,22 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     }
 
     /**
-        @notice Set new timelock for a condition
+        @notice Update timelock for a condition
         @param _index Timelock/Condition index to be updated
     */
     function updateTimelock(uint256 _index) internal {
         timelocks[_index] =
             block.timestamp +
             (config.timelockSeconds * 1 seconds);
+    }
+
+    /**
+        @notice Set new timelock for a condition
+        @param _index Timelock/Condition index to be updated
+    */
+    function updateTimelock(uint256 _index, uint256 _date) external {
+        require(hasRole("SOLVER_ROLE", msg.sender));
+        timelocks[_index] = _date * 1 seconds;
     }
 
     /**
@@ -681,6 +691,15 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return roles[role][account];
     }
 
+    function setState(bytes32 key, bytes calldata data) external {
+        require(hasRole("SOLVER_ROLE", msg.sender), "SOLVER_ROLE");
+        datas.state[key] = data;
+    }
+
+    function getState(bytes32 key) public view returns (bytes memory data) {
+        data = datas.state[key];
+    }
+
     // ********************************************************************************** //
     // ******************************** TOKENS ****************************************** //
     // ********************************************************************************** //
@@ -695,7 +714,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         bytes32 _conditionId,
         uint256[] calldata _indexSets
     ) external {
-        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
+        require(
+            hasRole(KEEPER_ROLE, msg.sender) ||
+                hasRole(SOLVER_ROLE, msg.sender),
+            "Only Keeper/Solver"
+        );
         IConditionalTokens(ctfAddress).redeemPositions(
             _collateralToken,
             _parentCollectionId,

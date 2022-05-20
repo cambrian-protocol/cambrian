@@ -72,6 +72,7 @@ library SolverLib {
     struct Datas {
         mapping(bytes32 => bytes[]) slots;
         mapping(bytes32 => uint256) slotIngestIdx;
+        mapping(bytes32 => bytes) state;
     }
 
     struct Callbacks {
