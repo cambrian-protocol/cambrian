@@ -77,6 +77,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: deployer,
     log: true,
   });
+
+  await deploy("IPFSTextSubmitter", {
+    from: deployer,
+    log: true,
+  });
 };
 
 module.exports.tags = [
@@ -92,4 +97,5 @@ module.exports.tags = [
   "pWRK",
   "ArbitratorFactory",
   "BasicArbitrator",
+  "IPFSTextSubmitter",
 ];

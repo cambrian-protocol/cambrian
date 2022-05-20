@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolver.sol";
+import "../interfaces/IModule.sol";
 
 import "./SolverLib.sol";
 
@@ -88,21 +89,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         for (uint256 i; i < loaders.length; i++) {
             SolverLib.ModuleLoader memory loader = loaders[i];
 
-            if (loader.module == address(0)) {
-                loader.module = address(this);
-            }
-
-            (bool success, bytes memory retData) = loader.module.call{value: 0}(
-                loader.data
-            );
-
-            bytes32[] memory requestedRoles = abi.decode(retData, (bytes32[]));
+            bytes32[] memory requestedRoles = loader.module.roles();
 
             for (uint256 j; j < requestedRoles.length; j++) {
-                setRole(requestedRoles[i], loader.module, true);
+                setRole(requestedRoles[i], address(loader.module), true);
             }
 
-            require(success, "loadModules failed");
+            loader.module.load(loader.data);
         }
     }
 
@@ -626,7 +619,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Timelock/Condition index to be updated
     */
     function updateTimelock(uint256 _index, uint256 _date) external {
-        require(hasRole("SOLVER_ROLE", msg.sender));
+        require(hasRole(SOLVER_ROLE, msg.sender));
         timelocks[_index] = _date * 1 seconds;
     }
 
@@ -691,8 +684,8 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         return roles[role][account];
     }
 
-    function setState(bytes32 key, bytes calldata data) external {
-        require(hasRole("SOLVER_ROLE", msg.sender), "SOLVER_ROLE");
+    function setState(bytes32 key, bytes memory data) external {
+        require(hasRole(SOLVER_ROLE, msg.sender), "SOLVER_ROLE");
         datas.state[key] = data;
     }
 

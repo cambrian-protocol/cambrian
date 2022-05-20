@@ -6,7 +6,11 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 abstract contract Module is ERC165 {
-    function load(bytes calldata data) external virtual;
+    event LoadedModule(address module, address solver);
+
+    function load(bytes calldata data) external virtual {
+        emit LoadedModule(address(this), msg.sender);
+    }
 
     function roles()
         external
