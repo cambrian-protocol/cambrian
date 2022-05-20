@@ -7,13 +7,13 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "module",
           "type": "address"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "solver",
           "type": "address"
@@ -21,6 +21,25 @@
       ],
       "name": "LoadedModule",
       "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "isPermitted",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
     },
     {
       "inputs": [
@@ -33,19 +52,6 @@
       "name": "load",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "roles",
-      "outputs": [
-        {
-          "internalType": "bytes32[]",
-          "name": "requestedRoles",
-          "type": "bytes32[]"
-        }
-      ],
-      "stateMutability": "pure",
       "type": "function"
     },
     {
@@ -62,6 +68,19 @@
           "internalType": "bool",
           "name": "",
           "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "viewPermits",
+      "outputs": [
+        {
+          "internalType": "bytes4[]",
+          "name": "allPermits",
+          "type": "bytes4[]"
         }
       ],
       "stateMutability": "view",
