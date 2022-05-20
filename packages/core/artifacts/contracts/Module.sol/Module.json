@@ -4,6 +4,25 @@
   "sourceName": "contracts/Module.sol",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "module",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "solver",
+          "type": "address"
+        }
+      ],
+      "name": "LoadedModule",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "bytes",
@@ -26,7 +45,7 @@
           "type": "bytes32[]"
         }
       ],
-      "stateMutability": "nonpayable",
+      "stateMutability": "pure",
       "type": "function"
     },
     {

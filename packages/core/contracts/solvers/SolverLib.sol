@@ -7,6 +7,7 @@ import "./Solver.sol";
 import "../interfaces/ISolver.sol";
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolverFactory.sol";
+import "../interfaces/IModule.sol";
 import "../FullMath.sol";
 
 library SolverLib {
@@ -29,7 +30,7 @@ library SolverLib {
     }
 
     struct ModuleLoader {
-        address module; // If address(0), use address(this) of caller instead
+        IModule module;
         bytes data;
     }
 

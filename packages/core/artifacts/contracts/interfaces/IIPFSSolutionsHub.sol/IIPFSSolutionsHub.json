@@ -40,7 +40,7 @@
             {
               "components": [
                 {
-                  "internalType": "address",
+                  "internalType": "contract IModule",
                   "name": "module",
                   "type": "address"
                 },
@@ -251,7 +251,7 @@
             {
               "components": [
                 {
-                  "internalType": "address",
+                  "internalType": "contract IModule",
                   "name": "module",
                   "type": "address"
                 },
@@ -444,7 +444,7 @@
             {
               "components": [
                 {
-                  "internalType": "address",
+                  "internalType": "contract IModule",
                   "name": "module",
                   "type": "address"
                 },
@@ -748,7 +748,7 @@
             {
               "components": [
                 {
-                  "internalType": "address",
+                  "internalType": "contract IModule",
                   "name": "module",
                   "type": "address"
                 },

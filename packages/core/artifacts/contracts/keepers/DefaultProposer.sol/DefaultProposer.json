@@ -4,6 +4,25 @@
   "sourceName": "contracts/keepers/DefaultProposer.sol",
   "abi": [
     {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "module",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "solver",
+          "type": "address"
+        }
+      ],
+      "name": "LoadedModule",
+      "type": "event"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -76,7 +95,7 @@
             {
               "components": [
                 {
-                  "internalType": "address",
+                  "internalType": "contract IModule",
                   "name": "module",
                   "type": "address"
                 },
