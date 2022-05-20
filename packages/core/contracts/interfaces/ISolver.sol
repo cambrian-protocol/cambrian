@@ -230,4 +230,13 @@ interface ISolver {
         bytes32 _conditionId,
         uint256[] calldata _indexSets
     ) external;
+
+    function hasRole(bytes32 role, address account)
+        external
+        view
+        returns (bool);
+
+    function setState(bytes32 key, bytes calldata data) external;
+
+    function getState(bytes32 key) external view returns (bytes memory data);
 }

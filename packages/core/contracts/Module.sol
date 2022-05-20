@@ -8,7 +8,11 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 abstract contract Module is ERC165 {
     function load(bytes calldata data) external virtual;
 
-    function roles() public virtual returns (bytes32[] memory requestedRoles);
+    function roles()
+        external
+        pure
+        virtual
+        returns (bytes32[] memory requestedRoles);
 
     function supportsInterface(bytes4 interfaceId)
         public
