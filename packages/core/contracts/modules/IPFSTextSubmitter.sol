@@ -6,13 +6,15 @@ import "../solvers/SolverLib.sol";
 import "../interfaces/ISolver.sol";
 import "../Module.sol";
 
-import "hardhat/console.sol";
-
 contract IPFSTextSubmitter is Module {
-    bytes32 constant SOLVER_ROLE = keccak256("SOLVER_ROLE");
     bytes32 public immutable SUBMITTER_SLOT_STATE_KEY;
+    bytes4[] private permits = [ISolver.setState.selector];
 
-    event SubmittedWork(string cid, address submitter, bytes32 conditionId);
+    event SubmittedWork(
+        string cid,
+        address submitter,
+        bytes32 indexed conditionId
+    );
 
     constructor() {
         SUBMITTER_SLOT_STATE_KEY = keccak256(
@@ -26,14 +28,22 @@ contract IPFSTextSubmitter is Module {
         emit LoadedModule(address(this), msg.sender);
     }
 
-    function roles()
-        public
-        pure
+    function isPermitted(bytes4 selector)
+        external
+        view
         override
-        returns (bytes32[] memory requestedRoles)
+        returns (bool)
     {
-        requestedRoles = new bytes32[](1);
-        requestedRoles[0] = SOLVER_ROLE;
+        for (uint256 i = 0; i < permits.length; i++) {
+            if (permits[i] == selector) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function viewPermits() external view override returns (bytes4[] memory) {
+        return permits;
     }
 
     function submitter(ISolver solver) public view returns (address) {

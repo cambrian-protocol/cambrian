@@ -13,10 +13,6 @@ import "../interfaces/IModule.sol";
 import "./SolverLib.sol";
 
 abstract contract Solver is Initializable, ERC1155Receiver {
-    bytes32 public constant SOLVER_ROLE = keccak256("SOLVER_ROLE");
-    bytes32 public constant KEEPER_ROLE = keccak256("KEEPER_ROLE");
-    bytes32 public constant ARBITRATOR_ROLE = keccak256("ARBITRATOR_ROLE");
-
     address private factoryAddress; // Factory which creates Solver proxies
     address private ctfAddress; // Conditional token framework
     address private deployerAddress; // Address which called SolverFactory to deploy this Solver
@@ -34,7 +30,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
 
-    mapping(bytes32 => mapping(address => bool)) private roles;
+    mapping(address => bool) private modules;
 
     event ChangedStatus(bytes32 conditionId);
 
@@ -77,24 +73,13 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             datas.slotIngestIdx[_solverConfig.ingests[i].slot] = i;
         }
 
-        setRole(KEEPER_ROLE, config.keeper, true);
-        if (config.arbitrator != address(0)) {
-            setRole(ARBITRATOR_ROLE, config.arbitrator, true);
-        }
-
         loadModules(_solverConfig.moduleLoaders);
     }
 
     function loadModules(SolverLib.ModuleLoader[] calldata loaders) internal {
         for (uint256 i; i < loaders.length; i++) {
             SolverLib.ModuleLoader memory loader = loaders[i];
-
-            bytes32[] memory requestedRoles = loader.module.roles();
-
-            for (uint256 j; j < requestedRoles.length; j++) {
-                setRole(requestedRoles[i], address(loader.module), true);
-            }
-
+            modules[address(loader.module)] = true;
             loader.module.load(loader.data);
         }
     }
@@ -110,7 +95,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function prepareSolve(uint256 _index) external {
         if (conditions.length > 0) {
             require(
-                hasRole(KEEPER_ROLE, msg.sender) || msg.sender == chainParent,
+                msg.sender == config.keeper ||
+                    msg.sender == chainParent ||
+                    isPermittedModule(this.prepareSolve.selector),
                 "Only keeper/parent"
             );
         }
@@ -147,7 +134,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         public
         returns (address)
     {
-        require(hasRole(KEEPER_ROLE, msg.sender), "Only keeper");
+        require(
+            msg.sender == config.keeper ||
+                isPermittedModule(this.deployChild.selector),
+            "Only keeper"
+        );
         require(chainChild == address(0), "Has child");
 
         chainChild = SolverLib.deployChild(
@@ -271,7 +262,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _data Data to be added
      */
     function addData(bytes32 _slot, bytes memory _data) external {
-        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
+        require(
+            msg.sender == config.keeper ||
+                isPermittedModule(this.addData.selector),
+            "Only Keeper"
+        );
         require(
             config.ingests[datas.slotIngestIdx[_slot]].ingestType ==
                 SolverLib.IngestType.Manual,
@@ -437,7 +432,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
     function proposePayouts(uint256 _index, uint256[] calldata _payouts)
         external
     {
-        require(hasRole(KEEPER_ROLE, msg.sender), "Only Keeper");
+        require(
+            msg.sender == config.keeper ||
+                isPermittedModule(this.proposePayouts.selector),
+            "Only Keeper"
+        );
         require(
             _payouts.length == config.conditionBase.outcomeSlots,
             "length must match outcomeSlots"
@@ -473,7 +472,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition
      */
     function arbitrationRequested(uint256 _index) external {
-        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
+        require(
+            msg.sender == config.arbitrator ||
+                isPermittedModule(this.arbitrationRequested.selector),
+            "Only arbitrator"
+        );
         require(
             conditions[_index].status == SolverLib.Status.OutcomeProposed ||
                 conditions[_index].status ==
@@ -491,7 +494,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param payouts Array of uint256 values representing the ratio of the collateral that each outcome can claim. The length of this array must be equal to the outcomeSlotCount
      */
     function arbitrate(uint256 _index, uint256[] memory payouts) external {
-        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
+        require(
+            msg.sender == config.arbitrator ||
+                isPermittedModule(this.arbitrate.selector),
+            "Only arbitrator"
+        );
         require(
             conditions[_index].status == SolverLib.Status.ArbitrationRequested,
             "Not ArbitrationRequested"
@@ -509,7 +516,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Index of condition
      */
     function arbitrateNull(uint256 _index) external {
-        require(hasRole(ARBITRATOR_ROLE, msg.sender), "Only arbitrator");
+        require(
+            msg.sender == config.arbitrator ||
+                isPermittedModule(this.arbitrateNull.selector),
+            "Only arbitrator"
+        );
         require(
             conditions[_index].status == SolverLib.Status.ArbitrationRequested,
             "Not ArbitrationRequested"
@@ -618,8 +629,11 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @notice Set new timelock for a condition
         @param _index Timelock/Condition index to be updated
     */
-    function updateTimelock(uint256 _index, uint256 _date) external {
-        require(hasRole(SOLVER_ROLE, msg.sender));
+    function setTimelock(uint256 _index, uint256 _date) external {
+        require(
+            isPermittedModule(this.setTimelock.selector),
+            "Only Time Wizard"
+        );
         timelocks[_index] = _date * 1 seconds;
     }
 
@@ -672,20 +686,17 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         status = conditions[conditionIndex].status;
     }
 
-    function setRole(
-        bytes32 role,
-        address account,
-        bool boolean
-    ) internal {
-        roles[role][account] = boolean;
-    }
-
-    function hasRole(bytes32 role, address account) public view returns (bool) {
-        return roles[role][account];
+    function isPermittedModule(bytes4 selector) public view returns (bool) {
+        if (modules[msg.sender] == true) {
+            bool res = IModule(msg.sender).isPermitted(selector);
+            return res;
+        } else {
+            return false;
+        }
     }
 
     function setState(bytes32 key, bytes memory data) external {
-        require(hasRole(SOLVER_ROLE, msg.sender), "SOLVER_ROLE");
+        require(isPermittedModule(this.setState.selector), "Not permitted");
         datas.state[key] = data;
     }
 
@@ -708,9 +719,9 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         uint256[] calldata _indexSets
     ) external {
         require(
-            hasRole(KEEPER_ROLE, msg.sender) ||
-                hasRole(SOLVER_ROLE, msg.sender),
-            "Only Keeper/Solver"
+            msg.sender == config.keeper ||
+                isPermittedModule(this.redeemPosition.selector),
+            "Only Keeper"
         );
         IConditionalTokens(ctfAddress).redeemPositions(
             _collateralToken,

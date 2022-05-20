@@ -16,15 +16,6 @@ contract WriterSolverV1 is Solver, Module {
         writerSlot = abi.decode(data, (bytes32));
     }
 
-    function roles()
-        public
-        pure
-        override
-        returns (bytes32[] memory requestedRoles)
-    {
-        return requestedRoles;
-    }
-
     function writer() public view returns (address) {
         return abi.decode(getData(writerSlot), (address));
     }

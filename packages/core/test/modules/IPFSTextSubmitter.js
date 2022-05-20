@@ -43,7 +43,7 @@ describe("IPFSTextSubmitter", function () {
       outcomeSlots: 2,
       parentCollectionIndexSet: 0,
       amountSlot: ethers.utils.formatBytes32String("0"),
-      partition: [0, 0],
+      partition: [1, 2],
       allocations: [
         {
           recipientAddressSlot: ethers.utils.formatBytes32String("0"),
@@ -119,7 +119,7 @@ describe("IPFSTextSubmitter", function () {
     )[0];
   });
 
-  it("Works", async function () {
+  it("Updates slot key and submitter", async function () {
     await this.Solver.connect(this.keeper).prepareSolve(0);
 
     const SUBMITTER_SLOT_STATE_KEY = ethers.utils.keccak256(
@@ -136,5 +136,25 @@ describe("IPFSTextSubmitter", function () {
     expect(
       await this.IPFSTextSubmitter.submitter(this.Solver.address)
     ).to.equal(this.submitter.address);
+  });
+
+  it("Allows only submitter to submit", async function () {
+    await this.Solver.connect(this.keeper).prepareSolve(0);
+    await this.Solver.connect(this.keeper).executeSolve(0);
+
+    await this.IPFSTextSubmitter.connect(this.submitter).submit(
+      this.Solver.address,
+      "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
+      0
+    );
+
+    await expectRevert(
+      this.IPFSTextSubmitter.connect(this.user1).submit(
+        this.Solver.address,
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
+        0
+      ),
+      "Only Submitter"
+    );
   });
 });
