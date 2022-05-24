@@ -43,7 +43,7 @@ export default function CreateArbitrator() {
 
     return (
         <PageLayout contextTitle="Create Arbitrator">
-            <section id="createArbitrator">
+            <Box height={{ min: '90vh' }} justify="center" align="center">
                 <Box width="large" align="center">
                     <Heading
                         level="3"
@@ -83,7 +83,7 @@ export default function CreateArbitrator() {
                 <Box width="large" align="center" margin={{ top: 'large' }}>
                     <Button primary label="Mint" onClick={() => onCreate()} />
                 </Box>
-            </section>
+            </Box>
         </PageLayout>
     )
 }
