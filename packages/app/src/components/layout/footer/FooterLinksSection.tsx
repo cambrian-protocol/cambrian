@@ -35,8 +35,6 @@ const FooterLinksSection = () => (
                     <FooterLinksContainer
                         title="Company"
                         items={[
-                            { label: 'About us', href: '#' },
-                            { label: 'Partners', href: '#' },
                             {
                                 label: 'Contact us',
                                 href: 'mailto:paul@cambrianprotocol.com',
