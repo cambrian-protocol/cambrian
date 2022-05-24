@@ -9,7 +9,7 @@ const BaseFooter = () => (
     <ResponsiveContext.Consumer>
         {(screenSize) => {
             return (
-                <Box>
+                <Box height={{ min: 'auto' }}>
                     <Box style={{ position: 'relative', overflow: 'hidden' }}>
                         <WorldMap
                             color="brand"

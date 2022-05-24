@@ -7,7 +7,6 @@ import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface CreateProposalUIProps {
-    topRef: MutableRefObject<HTMLDivElement | null>
     composition: CompositionModel
     template: TemplateModel
     templateCID: string
@@ -17,7 +16,6 @@ interface CreateProposalUIProps {
 }
 
 const CreateProposalUI = ({
-    topRef,
     composition,
     template,
     templateCID,
@@ -29,7 +27,6 @@ const CreateProposalUI = ({
     return (
         <>
             <CreateProposalMultiStepForm
-                topRef={topRef}
                 composition={composition}
                 template={template}
                 templateCID={templateCID}

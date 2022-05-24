@@ -80,7 +80,7 @@ export default function Home() {
                                     overflow="hidden"
                                     style={{ pointerEvents: 'none' }}
                                 >
-                                    <PageLayout contextTitle="Preview">
+                                    <PageLayout contextTitle="Index" hideBanner>
                                         <Box pad={{ top: 'medium' }}>
                                             <CreateTemplateDetailStep
                                                 input={{

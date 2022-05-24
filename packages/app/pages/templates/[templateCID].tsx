@@ -1,5 +1,5 @@
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -15,7 +15,6 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useRouter } from 'next/dist/client/router'
 
 export default function CreateProposalPage() {
-    const topRef = useRef<HTMLDivElement | null>(null)
     const router = useRouter()
     const { templateCID } = router.query
     const [metaStages, setMetaStages] = useState<Stages>()
@@ -46,12 +45,10 @@ export default function CreateProposalPage() {
 
     return (
         <>
-            <div ref={topRef} />
             <PageLayout contextTitle="Create Proposal">
                 <Box alignSelf="center">
                     {metaStages ? (
                         <CreateProposalUI
-                            topRef={topRef}
                             composition={
                                 metaStages.composition as CompositionModel
                             }
