@@ -2,8 +2,9 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
+import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalBuyerStep from './steps/CreateProposalBuyerStep'
 import CreateProposalDetailStep from './steps/CreateProposalDetailStep'
@@ -16,6 +17,7 @@ import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -62,7 +64,6 @@ const initialInput = {
 }
 
 interface CreateProposalMultiStepFormProps {
-    topRef: MutableRefObject<HTMLDivElement | null>
     templateCID: string
     composition: CompositionModel
     template: TemplateModel
@@ -71,7 +72,6 @@ interface CreateProposalMultiStepFormProps {
 }
 
 const CreateProposalMultiStepForm = ({
-    topRef,
     composition,
     templateCID,
     template,
@@ -85,13 +85,16 @@ const CreateProposalMultiStepForm = ({
     const [currentStep, setCurrentStep] =
         useState<CreateProposalMultiStepStepsType>(CREATE_PROPOSAL_STEPS.START)
 
+    // Scroll up when step changes
+    const topRefContext = useContext(TopRefContext)
+    useEffect(() => {
+        if (topRefContext)
+            topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentStep])
+
     useEffect(() => {
         initInput()
     }, [])
-
-    useEffect(() => {
-        if (topRef) topRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [currentStep])
 
     const initInput = () => {
         const updatedInputs = { ...initialInput }
@@ -242,7 +245,11 @@ const CreateProposalMultiStepForm = ({
                 )
         }
     }
-    return <>{renderCurrentFormStep()}</>
+    return (
+        <Box height={{ min: '90vh' }} justify="center">
+            {renderCurrentFormStep()}
+        </Box>
+    )
 }
 
 export default CreateProposalMultiStepForm

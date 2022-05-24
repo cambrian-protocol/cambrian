@@ -2,9 +2,12 @@ import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../nav/Appbar'
 import { Box } from 'grommet'
+import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
 import { ResponsiveContext } from 'grommet'
+import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
+import WarningBanner from '../containers/WarningBanner'
 
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar: JSX.Element
@@ -31,16 +34,30 @@ const InteractionLayout = ({
                 {(screenSize) => {
                     return (
                         <Box height={'100vh'}>
+                            <WarningBanner
+                                message={WARNING_MESSAGE['BETA_WARNING']}
+                            />
                             <Page
-                                overflow={{ vertical: 'auto' }}
+                                style={{ position: 'relative' }}
+                                overflow={{
+                                    vertical: 'auto',
+                                    horizontal: 'hidden',
+                                }}
                                 justify="center"
                                 align="center"
                                 flex
                             >
                                 <Appbar />
+                                <Glow
+                                    height="800px"
+                                    width="1000px"
+                                    left={'5%'}
+                                    top={'-200px'}
+                                />
                                 <Box
                                     flex
                                     width={'large'}
+                                    style={{ position: 'relative' }}
                                     pad={
                                         screenSize === 'small'
                                             ? {
