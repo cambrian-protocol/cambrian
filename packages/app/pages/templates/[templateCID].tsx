@@ -14,7 +14,6 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useRouter } from 'next/dist/client/router'
 
-// Todo Multistep form
 export default function CreateProposalPage() {
     const router = useRouter()
     const { templateCID } = router.query
@@ -55,6 +54,7 @@ export default function CreateProposalPage() {
                             }
                             template={metaStages.template as TemplateModel}
                             templateCID={templateCID as string}
+                            setErrorMessage={setErrorMessage}
                         />
                     ) : showInvalidQueryComponent ? (
                         <InvalidQueryComponent context={StageNames.template} />

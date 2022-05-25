@@ -9,7 +9,6 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { Stack } from 'grommet'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { TextArea } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -76,23 +75,21 @@ const SubmissionForm = ({
     }
     return (
         <>
-            <Box fill gap="medium">
-                <Stack anchor="center" fill>
-                    <TextArea
-                        disabled={isSubmitting}
-                        placeholder="Type your article here..."
-                        fill
-                        size="medium"
-                        resize={false}
-                        value={input.submission}
-                        onChange={(event) =>
-                            setInput({
-                                ...input,
-                                submission: event.target.value,
-                            })
-                        }
-                    />
-                </Stack>
+            <Box fill gap="medium" height={{ min: 'large' }}>
+                <TextArea
+                    disabled={isSubmitting}
+                    placeholder="Type your article here..."
+                    fill
+                    size="medium"
+                    resize={false}
+                    value={input.submission}
+                    onChange={(event) =>
+                        setInput({
+                            ...input,
+                            submission: event.target.value,
+                        })
+                    }
+                />
                 <LoaderButton
                     isLoading={isSubmitting}
                     disabled={

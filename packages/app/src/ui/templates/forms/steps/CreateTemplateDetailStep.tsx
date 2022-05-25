@@ -13,29 +13,29 @@ import MultiStepFormLayout from '@cambrian/app/components/layout/MultiStepFormLa
 import MultiStepFormNav from '@cambrian/app/components/nav/MultiStepFormNav'
 import { TextArea } from 'grommet'
 
-interface CreateTemplateTemplateStepProps {
+interface CreateTemplateDetailStepProps {
     input: CreateTemplateMultiStepFormType
     setInput: React.Dispatch<SetStateAction<CreateTemplateMultiStepFormType>>
     stepperCallback: (step: CreateTemplateMultiStepStepsType) => void
 }
-type CreateTemplateTemplateStepFormType = {
+type CreateTemplateDetailStepFormType = {
     title: string
     description: string
 }
 
-const CreateTemplateTemplateStep = ({
+const CreateTemplateDetailStep = ({
     stepperCallback,
     input,
     setInput,
-}: CreateTemplateTemplateStepProps) => {
+}: CreateTemplateDetailStepProps) => {
     const [templateInput, setTemplateInput] =
-        useState<CreateTemplateTemplateStepFormType>({
+        useState<CreateTemplateDetailStepFormType>({
             title: input.title || '',
             description: input.description || '',
         })
 
     const onSubmit = (
-        e: FormExtendedEvent<CreateTemplateTemplateStepFormType, Element>
+        e: FormExtendedEvent<CreateTemplateDetailStepFormType, Element>
     ) => {
         e.preventDefault()
         const updatedInput = { ...input, ...templateInput }
@@ -44,8 +44,8 @@ const CreateTemplateTemplateStep = ({
     }
 
     return (
-        <Form<CreateTemplateTemplateStepFormType>
-            onChange={(nextValue: CreateTemplateTemplateStepFormType) => {
+        <Form<CreateTemplateDetailStepFormType>
+            onChange={(nextValue: CreateTemplateDetailStepFormType) => {
                 setTemplateInput(nextValue)
             }}
             value={templateInput}
@@ -81,7 +81,7 @@ const CreateTemplateTemplateStep = ({
                     <TextArea
                         name="description"
                         placeholder="Nothing will be like it was before..."
-                        rows={5}
+                        rows={9}
                         resize={false}
                     />
                 </FormField>
@@ -90,4 +90,4 @@ const CreateTemplateTemplateStep = ({
     )
 }
 
-export default CreateTemplateTemplateStep
+export default CreateTemplateDetailStep
