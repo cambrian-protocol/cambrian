@@ -12,7 +12,7 @@ const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
 const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
-describe("IPFSTextSubmitter", function () {
+describe("Multiple modules", function () {
   this.beforeEach(async function () {
     const [user1, submitter, keeper, arbitrator] = await ethers.getSigners();
     this.user1 = user1;
@@ -28,8 +28,10 @@ describe("IPFSTextSubmitter", function () {
       "BasicSolverV1",
       "IPFSSolutionsHub",
       "IPFSTextSubmitter",
+      "Unanimity",
     ]);
 
+    this.Unanimity = await ethers.getContract("Unanimity");
     this.IPFSTextSubmitter = await ethers.getContract("IPFSTextSubmitter");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
@@ -38,6 +40,9 @@ describe("IPFSTextSubmitter", function () {
     this.ISolver.format(FormatTypes.full);
 
     this.timelockSeconds = 1;
+
+    this.submitterSlot = ethers.utils.formatBytes32String("submitter");
+
     this.conditionBase = {
       collateralToken: this.ToyToken.address,
       outcomeSlots: 2,
@@ -46,7 +51,14 @@ describe("IPFSTextSubmitter", function () {
       partition: [1, 2],
       allocations: [
         {
-          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+        {
+          recipientAddressSlot: this.submitterSlot,
           recipientAmountSlots: [
             ethers.utils.formatBytes32String("0"),
             ethers.utils.formatBytes32String("0"),
@@ -63,13 +75,18 @@ describe("IPFSTextSubmitter", function () {
       ],
     };
 
-    this.submitterSlot = ethers.utils.formatBytes32String("submitter");
-
     this.ingests = [
       {
         executions: 0,
         ingestType: 1,
         slot: ethers.utils.formatBytes32String("0"),
+        solverIndex: 0, // Ignored for ingestType.constant
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], ["1"]),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 0, // Ignored for ingestType.constant
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -96,6 +113,10 @@ describe("IPFSTextSubmitter", function () {
           [this.submitterSlot]
         ),
       },
+      {
+        module: this.Unanimity.address,
+        data: ethers.constants.HashZero,
+      },
     ];
 
     this.solverConfigs = [
@@ -119,8 +140,9 @@ describe("IPFSTextSubmitter", function () {
     )[0];
   });
 
-  it("Updates slot key and submitter", async function () {
+  it("Works with both IPFSTextSubmitter and Inanimity", async function () {
     await this.Solver.connect(this.keeper).prepareSolve(0);
+    await this.Solver.connect(this.keeper).executeSolve(0);
 
     const STATEKEY = ethers.utils.keccak256(
       ethers.utils.defaultAbiCoder.encode(
@@ -136,11 +158,6 @@ describe("IPFSTextSubmitter", function () {
     expect(
       await this.IPFSTextSubmitter.submitter(this.Solver.address)
     ).to.equal(this.submitter.address);
-  });
-
-  it("Allows only submitter to submit", async function () {
-    await this.Solver.connect(this.keeper).prepareSolve(0);
-    await this.Solver.connect(this.keeper).executeSolve(0);
 
     await this.IPFSTextSubmitter.connect(this.submitter).submit(
       this.Solver.address,
@@ -156,5 +173,20 @@ describe("IPFSTextSubmitter", function () {
       ),
       "Only Submitter"
     );
+
+    await this.Solver.connect(this.keeper).proposePayouts(0, [1, 0]);
+    await this.Unanimity.connect(this.user1).approveOutcome(
+      this.Solver.address,
+      0
+    );
+
+    expect(await this.Solver.connect(this.keeper).getStatus(0)).to.equal(2); // Outcome Proposed
+
+    await this.Unanimity.connect(this.submitter).approveOutcome(
+      this.Solver.address,
+      0
+    );
+
+    expect(await this.Solver.connect(this.keeper).getStatus(0)).to.equal(5); // Outcome Reported
   });
 });

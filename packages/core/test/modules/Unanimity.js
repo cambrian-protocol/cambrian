@@ -12,11 +12,11 @@ const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
 const ctHelpers = require("../../helpers/ConditionalTokens.js");
 
-describe("IPFSTextSubmitter", function () {
+describe("Unanimity", function () {
   this.beforeEach(async function () {
-    const [user1, submitter, keeper, arbitrator] = await ethers.getSigners();
+    const [user1, user2, keeper, arbitrator] = await ethers.getSigners();
     this.user1 = user1;
-    this.submitter = submitter;
+    this.user2 = user2;
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
@@ -27,10 +27,10 @@ describe("IPFSTextSubmitter", function () {
       "ToyToken",
       "BasicSolverV1",
       "IPFSSolutionsHub",
-      "IPFSTextSubmitter",
+      "Unanimity",
     ]);
 
-    this.IPFSTextSubmitter = await ethers.getContract("IPFSTextSubmitter");
+    this.Unanimity = await ethers.getContract("Unanimity");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
     this.BasicSolverV1 = await ethers.getContract("BasicSolverV1");
@@ -46,7 +46,21 @@ describe("IPFSTextSubmitter", function () {
       partition: [1, 2],
       allocations: [
         {
-          recipientAddressSlot: ethers.utils.formatBytes32String("0"),
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("1"),
+          recipientAmountSlots: [
+            ethers.utils.formatBytes32String("0"),
+            ethers.utils.formatBytes32String("0"),
+          ],
+        },
+        {
+          recipientAddressSlot: ethers.utils.formatBytes32String("2"),
           recipientAmountSlots: [
             ethers.utils.formatBytes32String("0"),
             ethers.utils.formatBytes32String("0"),
@@ -63,13 +77,18 @@ describe("IPFSTextSubmitter", function () {
       ],
     };
 
-    this.submitterSlot = ethers.utils.formatBytes32String("submitter");
-
     this.ingests = [
       {
         executions: 0,
         ingestType: 1,
         slot: ethers.utils.formatBytes32String("0"),
+        solverIndex: 0, // Ignored for ingestType.constant
+        data: ethers.utils.defaultAbiCoder.encode(["uint256"], ["1"]),
+      },
+      {
+        executions: 0,
+        ingestType: 1,
+        slot: ethers.utils.formatBytes32String("1"),
         solverIndex: 0, // Ignored for ingestType.constant
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
@@ -79,22 +98,19 @@ describe("IPFSTextSubmitter", function () {
       {
         executions: 0,
         ingestType: 1,
-        slot: this.submitterSlot,
+        slot: ethers.utils.formatBytes32String("2"),
         solverIndex: 0, // Ignored for ingestType.constant
         data: ethers.utils.defaultAbiCoder.encode(
           ["address"],
-          [this.submitter.address]
+          [this.user2.address]
         ),
       },
     ];
 
     this.moduleLoaders = [
       {
-        module: this.IPFSTextSubmitter.address,
-        data: ethers.utils.defaultAbiCoder.encode(
-          ["bytes32"],
-          [this.submitterSlot]
-        ),
+        module: this.Unanimity.address,
+        data: ethers.constants.HashZero,
       },
     ];
 
@@ -119,42 +135,28 @@ describe("IPFSTextSubmitter", function () {
     )[0];
   });
 
-  it("Updates slot key and submitter", async function () {
-    await this.Solver.connect(this.keeper).prepareSolve(0);
-
-    const STATEKEY = ethers.utils.keccak256(
-      ethers.utils.defaultAbiCoder.encode(
-        ["address"],
-        [this.IPFSTextSubmitter.address]
-      )
-    );
-
-    expect(await this.Solver.getState(STATEKEY)).to.equal(
-      ethers.utils.defaultAbiCoder.encode(["bytes32"], [this.submitterSlot])
-    );
-
-    expect(
-      await this.IPFSTextSubmitter.submitter(this.Solver.address)
-    ).to.equal(this.submitter.address);
-  });
-
-  it("Allows only submitter to submit", async function () {
+  it("Allows confirming outcome if all recipients agree", async function () {
     await this.Solver.connect(this.keeper).prepareSolve(0);
     await this.Solver.connect(this.keeper).executeSolve(0);
+    await this.Solver.connect(this.keeper).proposePayouts(0, [1, 0]);
 
-    await this.IPFSTextSubmitter.connect(this.submitter).submit(
+    await this.Unanimity.connect(this.user1).approveOutcome(
       this.Solver.address,
-      "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       0
     );
 
-    await expectRevert(
-      this.IPFSTextSubmitter.connect(this.user1).submit(
-        this.Solver.address,
-        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
-        0
-      ),
-      "Only Submitter"
+    expectRevert(
+      this.Unanimity.connect(this.user1).approveOutcome(this.Solver.address, 0),
+      "Already approved"
     );
+
+    expect(await this.Solver.connect(this.keeper).getStatus(0)).to.equal(2); // Outcome Proposed
+
+    await this.Unanimity.connect(this.user2).approveOutcome(
+      this.Solver.address,
+      0
+    );
+
+    expect(await this.Solver.connect(this.keeper).getStatus(0)).to.equal(5); // Outcome Reported
   });
 });

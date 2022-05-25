@@ -82,6 +82,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: deployer,
     log: true,
   });
+
+  await deploy("Unanimity", {
+    from: deployer,
+    log: true,
+  });
 };
 
 module.exports.tags = [
@@ -98,4 +103,5 @@ module.exports.tags = [
   "ArbitratorFactory",
   "BasicArbitrator",
   "IPFSTextSubmitter",
+  "Unanimity",
 ];

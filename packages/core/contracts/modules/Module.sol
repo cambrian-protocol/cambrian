@@ -5,23 +5,36 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./interfaces/IModule.sol";
+import "./Modulated.sol";
+
+import "../interfaces/IModule.sol";
 
 abstract contract Module is IModule {
+    bytes4[] permits;
+    bytes32 immutable STATEKEY = keccak256(abi.encode(address(this)));
+
     event LoadedModule(address indexed module, address indexed solver);
 
-    function viewPermits()
-        external
-        view
-        virtual
-        returns (bytes4[] memory allPermits)
-    {}
+    constructor() {
+        permits.push(Modulated.setState.selector);
+    }
 
-    function isPermitted(bytes4 selector) external view virtual returns (bool) {
+    function fetchPermits() external view returns (bytes4[] memory) {
+        return permits;
+    }
+
+    function isPermitted(bytes4 selector) external view returns (bool) {
+        for (uint256 i = 0; i < permits.length; i++) {
+            if (permits[i] == selector) {
+                return true;
+            }
+        }
+
         return false;
     }
 
     function load(bytes calldata data) external virtual {
+        Modulated(msg.sender).setState(STATEKEY, data);
         emit LoadedModule(address(this), msg.sender);
     }
 

@@ -3,10 +3,10 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./interfaces/ISolverFactory.sol";
-import "./solvers/Solver.sol";
-import "./solvers/SolverLib.sol";
-import "./interfaces/IProposalsHub.sol";
+import "../interfaces/ISolverFactory.sol";
+import "../interfaces/IProposalsHub.sol";
+import "../solvers/Solver.sol";
+import "../solvers/SolverLib.sol";
 
 contract IPFSSolutionsHub {
     ISolverFactory immutable solverFactory;

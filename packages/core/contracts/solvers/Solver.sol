@@ -12,7 +12,9 @@ import "../interfaces/IModule.sol";
 
 import "./SolverLib.sol";
 
-abstract contract Solver is Initializable, ERC1155Receiver {
+import "../modules/Modulated.sol";
+
+abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
     address private factoryAddress; // Factory which creates Solver proxies
     address private ctfAddress; // Conditional token framework
     address private deployerAddress; // Address which called SolverFactory to deploy this Solver
@@ -29,8 +31,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
 
     SolverLib.Callbacks callbacks;
     SolverLib.Datas datas;
-
-    mapping(address => bool) private modules;
 
     event ChangedStatus(bytes32 conditionId);
 
@@ -74,14 +74,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         }
 
         loadModules(_solverConfig.moduleLoaders);
-    }
-
-    function loadModules(SolverLib.ModuleLoader[] calldata loaders) internal {
-        for (uint256 i; i < loaders.length; i++) {
-            SolverLib.ModuleLoader memory loader = loaders[i];
-            modules[address(loader.module)] = true;
-            loader.module.load(loader.data);
-        }
     }
 
     // ********************************************************************************** //
@@ -471,10 +463,10 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @notice Sets condition.status to ArbitrationRequested.
         @param _index Index of condition
      */
-    function arbitrationRequested(uint256 _index) external {
+    function requestArbitration(uint256 _index) external {
         require(
             msg.sender == config.arbitrator ||
-                isPermittedModule(this.arbitrationRequested.selector),
+                isPermittedModule(this.requestArbitration.selector),
             "Only arbitrator"
         );
         require(
@@ -484,7 +476,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
             "Cannot request"
         );
 
-        SolverLib.arbitrationRequested(conditions[_index]);
+        SolverLib.requestArbitration(conditions[_index]);
         updateTimelock(_index);
     }
 
@@ -630,10 +622,7 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         @param _index Timelock/Condition index to be updated
     */
     function setTimelock(uint256 _index, uint256 _date) external {
-        require(
-            isPermittedModule(this.setTimelock.selector),
-            "Only Time Wizard"
-        );
+        require(isPermittedModule(this.setTimelock.selector), "Not permitted");
         timelocks[_index] = _date * 1 seconds;
     }
 
@@ -684,24 +673,6 @@ abstract contract Solver is Initializable, ERC1155Receiver {
         returns (SolverLib.Status status)
     {
         status = conditions[conditionIndex].status;
-    }
-
-    function isPermittedModule(bytes4 selector) public view returns (bool) {
-        if (modules[msg.sender] == true) {
-            bool res = IModule(msg.sender).isPermitted(selector);
-            return res;
-        } else {
-            return false;
-        }
-    }
-
-    function setState(bytes32 key, bytes memory data) external {
-        require(isPermittedModule(this.setState.selector), "Not permitted");
-        datas.state[key] = data;
-    }
-
-    function getState(bytes32 key) public view returns (bytes memory data) {
-        data = datas.state[key];
     }
 
     // ********************************************************************************** //

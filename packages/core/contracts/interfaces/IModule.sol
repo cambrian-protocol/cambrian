@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 interface IModule is IERC165 {
     function load(bytes calldata data) external;
 
-    function viewPermits() external view returns (bytes4[] memory);
+    function fetchPermits() external view returns (bytes4[] memory);
 
     function isPermitted(bytes4 selector) external view returns (bool);
 }
