@@ -119,7 +119,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],
@@ -152,7 +152,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],
@@ -168,7 +168,7 @@ describe("ArbitrationDispatch", function () {
     await solvers[0].connect(this.keeper).executeSolve(0);
     await solvers[0].connect(this.keeper).proposePayouts(0, [1, 0]);
 
-    await solvers[0].connect(this.arbitrator).arbitrationRequested(0);
+    await solvers[0].connect(this.arbitrator).requestArbitration(0);
 
     tx = await this.ArbitrationDispatch.requestArbitration(
       solvers[0].address,
@@ -186,7 +186,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],
@@ -213,7 +213,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],
@@ -241,7 +241,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],
@@ -275,7 +275,7 @@ describe("ArbitrationDispatch", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],

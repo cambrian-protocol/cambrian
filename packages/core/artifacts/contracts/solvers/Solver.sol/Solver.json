@@ -168,19 +168,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "arbitrationRequested",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "arbitrator",
       "outputs": [
@@ -360,11 +347,6 @@
           "type": "uint256"
         },
         {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        },
-        {
           "components": [
             {
               "internalType": "contract IERC20",
@@ -477,9 +459,21 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -724,9 +718,21 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -863,16 +869,16 @@
       "inputs": [
         {
           "internalType": "bytes32",
-          "name": "slot",
+          "name": "key",
           "type": "bytes32"
         }
       ],
-      "name": "getOutgoingCallbacks",
+      "name": "getState",
       "outputs": [
         {
-          "internalType": "address[]",
-          "name": "",
-          "type": "address[]"
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
         }
       ],
       "stateMutability": "view",
@@ -968,9 +974,21 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -1084,6 +1102,25 @@
       "name": "init",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes4",
+          "name": "selector",
+          "type": "bytes4"
+        }
+      ],
+      "name": "isPermittedModule",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -1274,6 +1311,55 @@
         }
       ],
       "name": "registerOutgoingCallback",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestArbitration",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "key",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "setState",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_date",
+          "type": "uint256"
+        }
+      ],
+      "name": "setTimelock",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

@@ -2,10 +2,11 @@ import BaseSolverArtifact from '@cambrian/core/artifacts/contracts/solvers/Solve
 import BasicArbitratorArtifact from '@cambrian/core/artifacts/contracts/arbitration/BasicArbitrator.sol/BasicArbitrator.json'
 import CTFArtifact from '@cambrian/core/artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json'
 import ERC20Artifact from '@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json'
-import IpfsSolutionsHubArtifact from '@cambrian/core/artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json'
-import ProposalsHubArtifact from '@cambrian/core/artifacts/contracts/ProposalsHub.sol/ProposalsHub.json'
+import IpfsSolutionsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/IPFSSolutionsHub.sol/IPFSSolutionsHub.json'
+import ProposalsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/ProposalsHub.sol/ProposalsHub.json'
 import WriterSolverArtifact from '@cambrian/core/artifacts/contracts/solvers/WriterSolverV1.sol/WriterSolverV1.json'
 import { utils } from 'ethers'
+
 
 // Solvers
 export const BASE_SOLVER_IFACE = new utils.Interface(BaseSolverArtifact.abi)

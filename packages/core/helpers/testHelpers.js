@@ -89,7 +89,7 @@ const getSimpleSolverConfig = (
       keeperAddress,
       arbitratorAddress,
       0,
-      ethers.utils.formatBytes32String(""),
+      [],
       ingests,
       canon,
     ],
@@ -201,7 +201,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
         new ethers.Contract(
           ethers.utils.defaultAbiCoder.decode(
             ["address"],
-            rc.events[1].data
+            rc.events.find((event) => event.event === "SolverCreated").data
           )[0],
           SOLVER_ABI,
           ethers.provider
@@ -220,7 +220,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
             new ethers.Contract(
               ethers.utils.defaultAbiCoder.decode(
                 ["address"],
-                rc.events[1].data
+                rc.events.find((event) => event.event === "DeployedChild").data
               )[0],
               SOLVER_ABI,
               ethers.provider

@@ -66,9 +66,21 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
             },
             {
               "components": [
@@ -320,9 +332,21 @@
               "type": "uint256"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "components": [
+                {
+                  "internalType": "contract IModule",
+                  "name": "module",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct Modulated.Loader[]",
+              "name": "moduleLoaders",
+              "type": "tuple[]"
             },
             {
               "components": [
