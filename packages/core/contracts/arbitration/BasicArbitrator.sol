@@ -4,12 +4,12 @@ pragma solidity ^0.8.13;
 import "../interfaces/ISolver.sol";
 import "../interfaces/IArbitratorFactory.sol";
 import "../solvers/SolverLib.sol";
-import "./ArbitratorInterface.sol";
+import "../modules/arbitration/Arbitrator.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract BasicArbitrator is
-    ArbitratorInterface,
+    Arbitrator,
     Initializable,
     OwnableUpgradeable,
     ReentrancyGuard
@@ -142,7 +142,7 @@ contract BasicArbitrator is
         ISolver solver,
         uint256 conditionIndex,
         uint256[] calldata desiredOutcome
-    ) external payable override {
+    ) external payable {
         address _arbitrator = solver.arbitrator();
 
         require(_arbitrator == address(this), "Wrong arbitrator");
@@ -187,7 +187,7 @@ contract BasicArbitrator is
 
         dispute.disputers.push(msg.sender);
         dispute.choices.push(desiredOutcome);
-        solver.arbitrationRequested(conditionIndex);
+        solver.requestArbitration(conditionIndex);
     }
 
     /**
@@ -199,7 +199,6 @@ contract BasicArbitrator is
      */
     function arbitrateNull(bytes32 disputeId)
         external
-        override
         onlyOwner
         isRequested(disputeId)
     {
@@ -224,7 +223,6 @@ contract BasicArbitrator is
      */
     function arbitrate(bytes32 disputeId, uint256 choice)
         external
-        override
         onlyOwner
         isRequested(disputeId)
     {

@@ -122,14 +122,14 @@ describe("IPFSTextSubmitter", function () {
   it("Updates slot key and submitter", async function () {
     await this.Solver.connect(this.keeper).prepareSolve(0);
 
-    const SUBMITTER_SLOT_STATE_KEY = ethers.utils.keccak256(
+    const STATEKEY = ethers.utils.keccak256(
       ethers.utils.defaultAbiCoder.encode(
-        ["address", "string"],
-        [this.IPFSTextSubmitter.address, "SUBMITTER_SLOT_STATE_KEY"]
+        ["address"],
+        [this.IPFSTextSubmitter.address]
       )
     );
 
-    expect(await this.Solver.getState(SUBMITTER_SLOT_STATE_KEY)).to.equal(
+    expect(await this.Solver.getState(STATEKEY)).to.equal(
       ethers.utils.defaultAbiCoder.encode(["bytes32"], [this.submitterSlot])
     );
 

@@ -91,19 +91,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_index",
-          "type": "uint256"
-        }
-      ],
-      "name": "arbitrationRequested",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "arbitrator",
       "outputs": [
@@ -230,7 +217,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -489,7 +476,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -769,7 +756,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -1004,6 +991,19 @@
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestArbitration",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
           "internalType": "bytes32",
           "name": "key",
           "type": "bytes32"
@@ -1015,6 +1015,24 @@
         }
       ],
       "name": "setState",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_date",
+          "type": "uint256"
+        }
+      ],
+      "name": "setTimelock",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

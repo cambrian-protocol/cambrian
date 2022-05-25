@@ -4,10 +4,10 @@ pragma solidity ^0.8.13;
 
 import "./SolverLib.sol";
 import "./Solver.sol";
-import "../Module.sol";
+import "../modules/Module.sol";
 
 contract WriterSolverV1 is Solver, Module {
-    bytes32 writerSlot;
+    bytes32 writerSlot; // TODO replace with state
 
     event SubmittedWork(string cid, address submitter, bytes32 conditionId);
 

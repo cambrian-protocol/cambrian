@@ -50,7 +50,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -261,7 +261,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -454,7 +454,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },
@@ -758,7 +758,7 @@
                   "type": "bytes"
                 }
               ],
-              "internalType": "struct SolverLib.ModuleLoader[]",
+              "internalType": "struct Modulated.Loader[]",
               "name": "moduleLoaders",
               "type": "tuple[]"
             },

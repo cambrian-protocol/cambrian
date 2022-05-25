@@ -2,7 +2,7 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../solvers/SolverLib.sol";
-import "../ProposalsHub.sol";
+import "../hubs/ProposalsHub.sol";
 import "./IIPFSSolutionsHub.sol";
 
 interface IProposalsHub {

@@ -42,11 +42,6 @@ describe("BasicArbitrator", function () {
     this.BasicArbitrator = await ethers.getContract("BasicArbitrator");
     this.BasicSolverV1 = await ethers.getContract("BasicSolverV1");
 
-    // Enable BasicArbitrator implementation
-    await this.ArbitratorFactory.connect(this.deployer).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
     // Get init params
     this.options = {
       address: this.arbitratorOwner.address,

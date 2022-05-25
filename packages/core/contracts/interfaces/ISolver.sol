@@ -125,7 +125,7 @@ interface ISolver {
         @notice Sets condition.status to ArbitrationRequested.
         @param _index Index of condition
      */
-    function arbitrationRequested(uint256 _index) external;
+    function requestArbitration(uint256 _index) external;
 
     /**
         @notice Allows arbitrator to unilaterally make a payout report.
@@ -219,6 +219,8 @@ interface ISolver {
         external
         view
         returns (SolverLib.Status status);
+
+    function setTimelock(uint256 _index, uint256 _date) external;
 
     /**
         @notice Redeems CTs held by this Solver. See ConditionalTokens contract for more info.

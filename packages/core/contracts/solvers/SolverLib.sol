@@ -8,6 +8,7 @@ import "../interfaces/ISolver.sol";
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolverFactory.sol";
 import "../interfaces/IModule.sol";
+import "../modules/Modulated.sol";
 import "../FullMath.sol";
 
 library SolverLib {
@@ -27,11 +28,6 @@ library SolverLib {
         ArbitrationRequested, // Arbitration has been requested for this condition
         ArbitrationDelivered, // Arbitration (except 'null' arbitration) has been delivered for this condition
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
-    }
-
-    struct ModuleLoader {
-        IModule module;
-        bytes data;
     }
 
     struct Multihash {
@@ -65,7 +61,7 @@ library SolverLib {
         address keeper; // Keeper address
         address arbitrator; // Arbitrator address
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
-        ModuleLoader[] moduleLoaders; // Arbitrary data
+        Modulated.Loader[] moduleLoaders; // Arbitrary data
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
         ConditionBase conditionBase; // Base to create conditions from
     }
@@ -73,7 +69,6 @@ library SolverLib {
     struct Datas {
         mapping(bytes32 => bytes[]) slots;
         mapping(bytes32 => uint256) slotIngestIdx;
-        mapping(bytes32 => bytes) state;
     }
 
     struct Callbacks {
@@ -289,7 +284,7 @@ library SolverLib {
         reportPayouts(ctfAddress, condition);
     }
 
-    function arbitrationRequested(Condition storage condition) public {
+    function requestArbitration(Condition storage condition) public {
         condition.status = Status.ArbitrationRequested;
         emit ChangedStatus(condition.conditionId);
     }
