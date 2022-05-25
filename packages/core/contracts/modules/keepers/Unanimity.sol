@@ -12,7 +12,7 @@ import "../Module.sol";
 
 contract Unanimity is Module {
     constructor() {
-        permits.push(Solver.setTimelock.selector);
+        permits.push(ISolver.setTimelock.selector);
     }
 
     function load(bytes calldata data) external override {
