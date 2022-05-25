@@ -1,46 +1,50 @@
-import AvatarWithLabel from '@cambrian/app/components/avatars/AvatarWithLabel'
-import { Box } from 'grommet'
+import React, { MutableRefObject, SetStateAction, useState } from 'react'
+
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import CreateProposalForm from './forms/CreateProposalForm'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import React from 'react'
+import CreateProposalMultiStepForm from './forms/CreateProposalMultiStepForm'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface CreateProposalUIProps {
     composition: CompositionModel
     template: TemplateModel
     templateCID: string
+    setErrorMessage: React.Dispatch<
+        SetStateAction<ErrorMessageType | undefined>
+    >
 }
 
 const CreateProposalUI = ({
     composition,
     template,
     templateCID,
-}: CreateProposalUIProps) => (
-    <>
-        <HeaderTextSection
-            title={template.title}
-            subTitle="Create Proposal"
-            paragraph={template.description}
-        />
-        <AvatarWithLabel
-            role="Seller"
-            label={template.name}
-            pfpPath={template.pfp}
-        />
-        <HeaderTextSection
-            subTitle="Define your proposal"
-            paragraph="Enter the details of your Proposal below. Be sure to include information requested by the Template description."
-        />
-        <Box fill>
-            <CreateProposalForm
+    setErrorMessage,
+}: CreateProposalUIProps) => {
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
+
+    return (
+        <>
+            <CreateProposalMultiStepForm
                 composition={composition}
                 template={template}
                 templateCID={templateCID}
+                onFailure={(errMsg) => setErrorMessage(errMsg)}
+                onSuccess={toggleShowSuccessModal}
             />
-            <Box pad="medium" />
-        </Box>
-    </>
-)
+            {showSuccessModal && (
+                <ExportSuccessModal
+                    keyId={templateCID}
+                    prefix="proposals"
+                    link="/proposals/"
+                    description="This is your Proposal ID. Share it with your community and fund the proposal."
+                    title="Proposal created"
+                    onClose={toggleShowSuccessModal}
+                />
+            )}
+        </>
+    )
+}
 
 export default CreateProposalUI

@@ -4,11 +4,11 @@ import {
 } from 'packages/app/config/ContractInterfaces'
 import React, { useEffect, useState } from 'react'
 
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Solver from '@cambrian/app/components/solver/Solver'
 import { ethers } from 'ethers'
@@ -51,16 +51,16 @@ export default function SolverPage() {
                         currentUser={currentUser}
                     />
                 ) : showInvalidQueryComponent ? (
-                    <BaseLayout contextTitle="Solver">
+                    <PageLayout contextTitle="Solver">
                         <InvalidQueryComponent context="Solver" />
-                    </BaseLayout>
+                    </PageLayout>
                 ) : (
                     <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
                 )
             ) : (
-                <BaseLayout contextTitle="Solver">
+                <PageLayout contextTitle="Solver">
                     <ConnectWalletSection />
-                </BaseLayout>
+                </PageLayout>
             )}
         </>
     )

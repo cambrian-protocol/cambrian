@@ -1,7 +1,7 @@
 const { ethers, deployments } = require("hardhat");
 const { expect } = require("chai");
 const SOLVER_ABI =
-  require("../../artifacts/contracts/Solver.sol/Solver.json").abi;
+  require("../../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const IPFSSOLUTIONSHUB_ABI =
   require("../../artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");

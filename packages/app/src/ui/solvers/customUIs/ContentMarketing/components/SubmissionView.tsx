@@ -9,14 +9,15 @@ interface PublicUIProps {
 
 const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
     <>
-        <Box gap="medium" height={{ min: 'auto' }}>
+        <Box gap="medium" height={{ min: 'auto' }} flex>
             <Box
                 fill
-                background={'background-front'}
+                background={'background-contrast'}
                 pad="medium"
                 round="small"
                 elevation="small"
                 border
+                height={{ min: 'small' }}
             >
                 {!latestSubmission || latestSubmission.submission === '' ? (
                     <Box fill justify="center" align="center" gap="small">

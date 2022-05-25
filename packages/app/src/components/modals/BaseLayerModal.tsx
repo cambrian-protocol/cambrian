@@ -25,7 +25,7 @@ const BaseLayerModal = ({
         full="vertical"
         position="bottom"
         margin={{ top: 'small' }}
-        background="background-popup"
+        background="background-back"
     >
         <Box align="center" flex width="large">
             <Box
@@ -41,10 +41,10 @@ const BaseLayerModal = ({
                     <Box onClick={onBack || onClose} focusIndicator={false}>
                         {onClose !== undefined ? <X /> : <CaretLeft />}
                     </Box>
-                    <Text size="small" weight="bold">
-                        {title}
-                    </Text>
                 </IconContext.Provider>
+                <Text size="small" weight="bold">
+                    {title}
+                </Text>
             </Box>
             <Box
                 pad="medium"

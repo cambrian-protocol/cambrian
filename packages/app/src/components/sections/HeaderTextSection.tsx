@@ -1,7 +1,8 @@
-import { Box, Heading, Paragraph } from 'grommet'
+import { Box, Heading } from 'grommet'
 
 import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
 import { IconContext } from 'phosphor-react'
+import { Text } from 'grommet'
 
 type HeaderTextSectionProps = {
     title?: string
@@ -45,19 +46,14 @@ const HeaderTextSection = ({
             fill="horizontal"
             justify="center"
         >
-            <Box gap="xsmall">
-                <Heading level="5" color="brand">
-                    {subTitle}
-                </Heading>
-                <Heading level={size === 'small' ? '3' : '2'}>{title}</Heading>
-            </Box>
-            <Paragraph
+            <Text color="brand">{subTitle}</Text>
+            <Heading level={size === 'small' ? '3' : '1'}>{title}</Heading>
+            <Text
                 style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}
-                fill
-                color="dark-6"
+                color="dark-4"
             >
                 {paragraph}
-            </Paragraph>
+            </Text>
         </Box>
     </ConditionalWrapper>
 )

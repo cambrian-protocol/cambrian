@@ -5,17 +5,19 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
+import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CreateTemplateDetailStep from './steps/CreateTemplateDetailStep'
 import CreateTemplateNotificationStep from './steps/CreateTemplateNotificationStep'
 import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
 import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
 import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
-import CreateTemplateTemplateStep from './steps/CreateTemplateTemplateStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -86,7 +88,18 @@ export const CreateTemplateMultiStepForm = ({
     const [currentStep, setCurrentStep] =
         useState<CreateTemplateMultiStepStepsType>(CREATE_TEMPLATE_STEPS.START)
 
+    // Scroll up when step changes
+    const topRefContext = useContext(TopRefContext)
     useEffect(() => {
+        if (topRefContext)
+            topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentStep])
+
+    useEffect(() => {
+        initInput()
+    }, [])
+
+    const initInput = () => {
         const formFlexInputs = parseFlexInputsToForm()
 
         let ctAddress = ''
@@ -107,7 +120,7 @@ export const CreateTemplateMultiStepForm = ({
             flexInputs: formFlexInputs,
             denominationTokenAddress: ctAddress,
         })
-    }, [])
+    }
 
     const initCollateralToken = async (ctAddress: string) => {
         const token = await fetchTokenInfo(ctAddress, currentUser.web3Provider)
@@ -169,6 +182,10 @@ export const CreateTemplateMultiStepForm = ({
                 input.title,
                 templateCID
             )
+
+            initInput()
+            setCurrentStep(CREATE_TEMPLATE_STEPS.START)
+
             onSuccess()
         } catch (e) {
             onFailure(await cpLogger.push(e))
@@ -180,6 +197,7 @@ export const CreateTemplateMultiStepForm = ({
             case CREATE_TEMPLATE_STEPS.START:
                 return (
                     <CreateTemplateStartStep
+                        compositionCID={compositionCID}
                         input={input}
                         stepperCallback={setCurrentStep}
                     />
@@ -194,7 +212,7 @@ export const CreateTemplateMultiStepForm = ({
                 )
             case CREATE_TEMPLATE_STEPS.TEMPLATE_DETAILS:
                 return (
-                    <CreateTemplateTemplateStep
+                    <CreateTemplateDetailStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
@@ -241,5 +259,9 @@ export const CreateTemplateMultiStepForm = ({
         }
     }
 
-    return <>{renderCurrentFormStep()}</>
+    return (
+        <Box height={{ min: '90vh' }} justify="center">
+            {renderCurrentFormStep()}
+        </Box>
+    )
 }

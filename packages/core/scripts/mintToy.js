@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const ethers = hre.ethers;
 
 const ERC20_ABI =
-  require("../artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
+  require("../artifacts/contracts/tokens/ToyToken.sol/ToyToken.json").abi;
 
 async function main() {
   const [user0, user1, keeper] = await ethers.getSigners();

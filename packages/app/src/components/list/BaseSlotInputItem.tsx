@@ -25,7 +25,7 @@ const BaseSlotInputItem = ({
         <Box gap="xsmall" height={{ min: 'auto' }}>
             <Box
                 round="small"
-                background="background-front"
+                background="background-contrast"
                 pad="medium"
                 direction="row"
                 align="center"

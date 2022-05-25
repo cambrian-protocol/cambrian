@@ -1,10 +1,9 @@
 import {
-    At,
+    Books,
     IconContext,
-    Link,
+    Question,
     SignIn,
     SignOut,
-    UserCircle,
     Wallet,
 } from 'phosphor-react'
 import { Box, Menu, Text } from 'grommet'
@@ -26,79 +25,83 @@ export default function UserMenu({}: UserMenuProps) {
         chainName = SUPPORTED_CHAINS[currentUser.chainId].chainData.name
     }
 
-    const items =
-        currentUser.address && currentUser.chainId
-            ? [
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              truncateAddress
-                              label={currentUser.address}
-                          />
-                      ),
-                      icon: <UserMenuItemIcon icon={<At />} />,
-                  },
-                  {
-                      label: <UserMenuItemLabel label={chainName} />,
-                      icon: <UserMenuItemIcon icon={<Link />} />,
-                  },
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              label={currentUser ? 'Logout' : 'Login'}
-                          />
-                      ),
-                      onClick: disconnectWallet,
-                      icon: (
-                          <UserMenuItemIcon
-                              icon={currentUser ? <SignOut /> : <SignIn />}
-                          />
-                      ),
-                  },
-              ]
-            : [
-                  {
-                      label: (
-                          <UserMenuItemLabel
-                              label={currentUser?.address || 'Connect Wallet'}
-                          />
-                      ),
-                      onClick: connectWallet,
-                      icon: <UserMenuItemIcon icon={<Wallet />} />,
-                  },
-              ]
+    const menuItems: {}[] = [
+        {
+            label: <UserMenuItemLabel label="Learn" />,
+            icon: <UserMenuItemIcon icon={<Books />} />,
+            href: 'https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70',
+        },
+        {
+            label: <UserMenuItemLabel label="Support" />,
+            icon: <UserMenuItemIcon icon={<Question />} />,
+            href: 'https://discord.com/channels/856113492348108882/968295116576026625',
+        },
+    ]
+
+    if (currentUser.address && currentUser.chainId) {
+        menuItems.unshift({
+            label: (
+                <UserMenuItemLabel
+                    subTitle={chainName}
+                    label={ellipseAddress(currentUser.address, 9)}
+                />
+            ),
+            icon: <UserMenuItemIcon icon={<Wallet />} />,
+        })
+        menuItems.push({
+            label: (
+                <UserMenuItemLabel label={currentUser ? 'Logout' : 'Login'} />
+            ),
+            onClick: disconnectWallet,
+            icon: (
+                <UserMenuItemIcon
+                    icon={currentUser ? <SignOut /> : <SignIn />}
+                />
+            ),
+        })
+    } else {
+        menuItems.unshift({
+            label: (
+                <UserMenuItemLabel
+                    label={currentUser?.address || 'Connect Wallet'}
+                />
+            ),
+            onClick: connectWallet,
+            icon: <UserMenuItemIcon icon={<Wallet />} />,
+        })
+    }
 
     return (
         <Menu
-            dropAlign={{ left: 'right', top: 'bottom' }}
+            dropAlign={{ top: 'bottom', right: 'right' }}
             dropProps={{
                 round: {
-                    corner: 'right',
+                    corner: 'bottom',
                     size: 'small',
                 },
             }}
             dropBackground="background-popup"
-            items={items}
+            items={menuItems}
         >
-            <BaseAvatar address={currentUser.address} />
+            <BaseAvatar icon={<Wallet />} address={currentUser.address} />
         </Menu>
     )
 }
 
 interface UserMenuItemLabelProps {
+    subTitle?: string
     label: string
-    truncateAddress?: boolean
 }
 
-const UserMenuItemLabel = ({
-    label,
-    truncateAddress,
-}: UserMenuItemLabelProps) => {
+const UserMenuItemLabel = ({ subTitle, label }: UserMenuItemLabelProps) => {
     return (
-        <Box alignSelf="center" pad={{ horizontal: 'medium' }} width="small">
-            <Text truncate={!truncateAddress}>
-                {truncateAddress ? ellipseAddress(label) : label}
-            </Text>
+        <Box alignSelf="center" pad={{ horizontal: 'medium' }} width="medium">
+            {subTitle && (
+                <Text size="xsmall" color="dark-4">
+                    {subTitle}
+                </Text>
+            )}
+            <Text>{label}</Text>
         </Box>
     )
 }

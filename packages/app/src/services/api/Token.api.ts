@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers'
 import { cpLogger } from './Logger.api'
 
 const ERC20_ABI =
-    require('@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json').abi
+    require('@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json').abi
 
 export type TokenResponseType = {
     address: string

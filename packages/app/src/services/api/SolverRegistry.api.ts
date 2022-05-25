@@ -13,7 +13,7 @@ type Registry = {
 
 // TODO
 const stubRegistry: Registry = {
-    '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6': {
+    '0x0165878a594ca255338adfa4d48449f69242eb8f': {
         name: 'Writer Solver',
         dataLabel:
             'Whitelisted submitters and chatters are controlled here. If the Writer and Buyer are moved to a different slot, these inputs must be updated.',

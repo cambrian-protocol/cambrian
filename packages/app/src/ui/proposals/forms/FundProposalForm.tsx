@@ -324,6 +324,8 @@ const FundProposalForm = ({
                                 <TokenAvatar token={collateralToken} />
                                 <Box alignSelf="center">
                                     <Button
+                                        disabled={disableButtons}
+                                        secondary
                                         label="Max"
                                         icon={<ArrowLineUp />}
                                         onClick={inputMaxAmount}

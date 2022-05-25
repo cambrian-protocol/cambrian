@@ -1,4 +1,3 @@
-import { animated, useSpring } from 'react-spring'
 import { useEffect, useRef, useState } from 'react'
 
 import { Box } from 'grommet'
@@ -12,6 +11,7 @@ export type LoaderButtonProps = ButtonExtendedProps & {
     isLoading: boolean
 }
 
+// TODO Spinner is not centered
 const LoaderButton = ({
     children,
     isLoading,
@@ -23,9 +23,6 @@ const LoaderButton = ({
     const [width, setWidth] = useState(0)
     const [height, setHeight] = useState(0)
     const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null)
-
-    const fadeOutProps = useSpring({ opacity: showLoader ? 1 : 0 })
-    const fadeInProps = useSpring({ opacity: showLoader ? 0 : 1 })
 
     useEffect(() => {
         if (ref.current && ref.current.getBoundingClientRect().width) {
@@ -53,6 +50,7 @@ const LoaderButton = ({
     }, [isLoading, showLoader])
     return (
         <Button
+            {...props}
             ref={ref}
             style={
                 showLoader
@@ -62,18 +60,18 @@ const LoaderButton = ({
                       }
                     : {}
             }
-            disabled={showLoader}
+            disabled={showLoader || props.disabled}
             label={
                 label && (
                     <Box justify="center" align="center">
                         {!showLoader ? (
-                            <animated.div style={fadeInProps}>
+                            <Box animation="fadeIn">
                                 <Text size="small">{label}</Text>
-                            </animated.div>
+                            </Box>
                         ) : (
-                            <animated.div style={fadeOutProps}>
+                            <Box animation="fadeIn">
                                 <Spinner color={'white'} />
-                            </animated.div>
+                            </Box>
                         )}
                     </Box>
                 )
@@ -82,22 +80,21 @@ const LoaderButton = ({
                 icon && !label ? (
                     <Box justify="center" align="center">
                         {!showLoader ? (
-                            <animated.div style={fadeInProps}>
-                                <IconContext.Provider value={{ size: '24' }}>
-                                    <Box align="center">{icon}</Box>
-                                </IconContext.Provider>
-                            </animated.div>
+                            <IconContext.Provider value={{ size: '24' }}>
+                                <Box align="center" animation="fadeIn">
+                                    {icon}
+                                </Box>
+                            </IconContext.Provider>
                         ) : (
-                            <animated.div style={fadeOutProps}>
+                            <Box animation="fadeIn">
                                 <Spinner color={'white'} size="xsmall" />
-                            </animated.div>
+                            </Box>
                         )}
                     </Box>
                 ) : !showLoader ? (
                     icon
                 ) : undefined
             }
-            {...props}
         />
     )
 }

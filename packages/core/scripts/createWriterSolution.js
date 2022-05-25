@@ -3,7 +3,7 @@ const ethers = hre.ethers;
 const Hash = require("ipfs-only-hash");
 const { getBytes32FromMultihash } = require("../helpers/multihash");
 const ERC20_ABI =
-  require("@cambrian/core/artifacts/contracts/ToyToken.sol/ToyToken.json").abi;
+  require("@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json").abi;
 
 const IPFSSOLUTIONSHUB_ABI =
   require("@cambrian/core/artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;

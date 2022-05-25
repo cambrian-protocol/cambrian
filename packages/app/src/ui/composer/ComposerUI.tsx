@@ -1,19 +1,19 @@
 import ReactFlow, {
+    Background,
     FlowElement,
     Node,
     Controls as ReactFlowControls,
     isNode,
 } from 'react-flow-renderer'
 
-import { BaseLayout } from '@cambrian/app/components/layout/BaseLayout'
 import { Box } from 'grommet'
-import ComposerActionbar from './bars/ComposerActionbar'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
+import ComposerLayout from '@cambrian/app/components/layout/ComposerLayout'
 import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
 import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
+import ComposerToolbar from '@cambrian/app/components/nav/ComposerToolbar'
 import { MouseEvent } from 'react'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
-import SolutionConfig from './config/SolutionConfig'
 import { SolverNode } from './nodes/SolverNode'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 
@@ -72,12 +72,10 @@ export const ComposerUI = () => {
 
     return (
         <>
-            <BaseLayout
-                fill
+            <ComposerLayout
                 contextTitle="Composer"
-                config={<SolutionConfig />}
                 sidebar={<>{renderControl()}</>}
-                actionBar={<ComposerActionbar />}
+                toolbar={<ComposerToolbar />}
             >
                 <Box direction="row" justify="between" fill>
                     <ReactFlow
@@ -95,9 +93,10 @@ export const ComposerUI = () => {
                         snapGrid={snapGrid}
                     >
                         <ReactFlowControls />
+                        <Background />
                     </ReactFlow>
                 </Box>
-            </BaseLayout>
+            </ComposerLayout>
         </>
     )
 }

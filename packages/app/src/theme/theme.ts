@@ -3,20 +3,24 @@ import { grommet } from 'grommet'
 
 const colors: any = {
     brand: {
-        light: '#4e94bd',
-        dark: '#4e94bd',
+        light: '#2d7dac',
+        dark: '#2d7dac',
     },
     active: '#799AB850',
-    'background-back': { dark: '#212121', light: '#EFEFEF' },
+    'background-back': { dark: '#040f11', light: '#ecfcff' },
     'background-front': {
         dark: '#2f2f2f',
         light: '#FFFFFF',
     },
     'background-contrast': {
-        dark: '#FFFFFF08',
-        light: '#11111108',
+        dark: '#00202b',
+        light: '#b5e7f7',
     },
-    'background-popup': { dark: '#262626', light: '#EFEFEF' },
+    'background-contrast-hover': {
+        dark: '#012e3d',
+        light: '#95d4e8',
+    },
+    'background-popup': { dark: '#132e33', light: '#0A1F23' },
     'primary-gradient':
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
     'secondary-gradient':
@@ -31,7 +35,7 @@ export const cpTheme = deepMerge(grommet, {
     global: {
         colors,
         font: {
-            family: 'Roboto, sans-serif;',
+            family: 'Segoe UI, sans-serif;',
             size: '12px',
         },
         input: {
@@ -49,7 +53,7 @@ export const cpTheme = deepMerge(grommet, {
         },
         drop: {
             background: 'background-popup',
-            border: { radius: '10px' },
+            border: { radius: '5px' },
         },
     },
     paragraph: {
@@ -64,10 +68,9 @@ export const cpTheme = deepMerge(grommet, {
             maxWidth: '336px',
         },
     },
-    anchor: { color: 'brand' },
     button: {
         hover: {
-            opacity: 0.8,
+            background: '#315e79',
         },
         default: {
             padding: {
@@ -77,11 +80,10 @@ export const cpTheme = deepMerge(grommet, {
             color: 'white',
         },
         border: {
-            radius: '10px',
+            radius: '5px',
         },
         primary: {
-            background:
-                'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
+            background: 'brand',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
@@ -92,8 +94,7 @@ export const cpTheme = deepMerge(grommet, {
             `,
         },
         secondary: {
-            background:
-                'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
+            background: '#00375b',
             padding: {
                 vertical: '12px',
                 horizontal: '24px',
@@ -106,7 +107,7 @@ export const cpTheme = deepMerge(grommet, {
         size: {
             small: {
                 border: {
-                    radius: '10px',
+                    radius: '5px',
                 },
             },
         },
@@ -145,6 +146,12 @@ export const cpTheme = deepMerge(grommet, {
     select: {
         icons: {
             color: 'white',
+        },
+    },
+    spinner: {
+        container: {
+            pad: 'none',
+            size: '20px',
         },
     },
 })

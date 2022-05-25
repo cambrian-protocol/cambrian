@@ -2,6 +2,7 @@ import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/proposed/ConfirmOutcomeActionbar'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import InitiatedActionbar from '@cambrian/app/components/actionbars/initiated/InitiatedActionbar'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import PrepareSolveActionbar from '@cambrian/app/components/actionbars/prepare/PrepareSolveActionbar'
 import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/executed/ProposeOutcomeActionbar'
 import RedeemTokensActionbar from '@cambrian/app/components/actionbars/reported/RedeemTokensActionbar'
@@ -15,15 +16,15 @@ interface DefaultSolverActionbarProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition?: SolverContractCondition
-    updateSolverData: () => Promise<void>
+    metadata?: MetadataModel
 }
 
 const DefaultSolverActionbar = ({
     currentUser,
     solverData,
     solverMethods,
-    updateSolverData,
     currentCondition,
+    metadata,
 }: DefaultSolverActionbarProps) => {
     const allowedForKeeper = usePermission('Keeper')
     const allowedForRecipients = usePermission('Recipient')
@@ -47,6 +48,7 @@ const DefaultSolverActionbar = ({
                         solverData={solverData}
                         solverMethods={solverMethods}
                         currentCondition={currentCondition}
+                        metadata={metadata}
                     />
                 )
             }
@@ -54,6 +56,8 @@ const DefaultSolverActionbar = ({
         case ConditionStatus.OutcomeProposed:
             return (
                 <ConfirmOutcomeActionbar
+                    metadata={metadata}
+                    solverData={solverData}
                     currentUser={currentUser}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
@@ -63,6 +67,7 @@ const DefaultSolverActionbar = ({
             if (allowedForRecipients) {
                 return (
                     <RedeemTokensActionbar
+                        metadata={metadata}
                         currentUser={currentUser}
                         currentCondition={currentCondition}
                         solverData={solverData}

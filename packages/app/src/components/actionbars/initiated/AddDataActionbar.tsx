@@ -1,8 +1,10 @@
+import { Question, Shield } from 'phosphor-react'
+
 import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import AddDataModal from '../../modals/AddDataModal'
-import { Button, } from 'grommet'
+import { Button } from 'grommet'
 import { GenericMethods } from '../../solver/Solver'
-import { Info } from 'phosphor-react'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import usePermission from '@cambrian/app/hooks/usePermission'
 import { useState } from 'react'
@@ -28,21 +30,32 @@ const AddDataActionbar = ({
             {allowed ? (
                 <>
                     <Actionbar
-                        actions={{
-                            primaryAction: (
-                                <Button
-                                    size="small"
-                                    primary
-                                    label="Submit Data"
-                                    onClick={toggleShowAddDataModal}
-                                />
-                            ),
-                            info: {
-                                icon: <Info />,
-                                descLabel: 'Info',
-                                label: 'Additional data required',
+                        primaryAction={
+                            <Button
+                                size="small"
+                                primary
+                                label="Submit Data"
+                                onClick={toggleShowAddDataModal}
+                            />
+                        }
+                        actionbarItems={[
+                            {
+                                icon: <Question />,
+                                dropContent: (
+                                    <ActionbarItemDropContainer
+                                        title="Additional data required"
+                                        description='Please hit on the "Submit Data"-Button at your right and follow the instructions.'
+                                        list={[
+                                            {
+                                                icon: <Shield />,
+                                                label: 'This must be done by the Keeper',
+                                            },
+                                        ]}
+                                    />
+                                ),
+                                label: 'Help',
                             },
-                        }}
+                        ]}
                     />
                     {showAddDataModal && (
                         <AddDataModal
