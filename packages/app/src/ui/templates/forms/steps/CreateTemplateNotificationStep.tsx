@@ -53,9 +53,23 @@ const CreateTemplateNotificationStep = ({
                             label: 'Finish',
                             primary: true,
                         }}
-                        backward={() =>
-                            stepperCallback(CREATE_TEMPLATE_STEPS.FLEX_INPUTS)
-                        }
+                        backward={() => {
+                            // Filter out Collateral Token - as this FlexInput is handled by its own
+                            const filteredFlexInputs = input.flexInputs.filter(
+                                (flexInput) =>
+                                    flexInput.id !== 'collateralToken'
+                            )
+
+                            if (filteredFlexInputs.length > 0) {
+                                stepperCallback(
+                                    CREATE_TEMPLATE_STEPS.FLEX_INPUTS
+                                )
+                            } else {
+                                stepperCallback(
+                                    CREATE_TEMPLATE_STEPS.PAYMENT_DETAILS
+                                )
+                            }
+                        }}
                     />
                 }
             >

@@ -51,7 +51,12 @@ const CreateProposalPaymentStep = ({
         const updatedInput = { ...input, ...paymentInput }
         setInput(updatedInput)
 
-        if (input.flexInputs.length > 0) {
+        // Filter out Collateral Token - as this FlexInput is handled by its own
+        const filteredFlexInputs = input.flexInputs.filter(
+            (flexInput) => flexInput.id !== 'collateralToken'
+        )
+
+        if (filteredFlexInputs.length > 0) {
             stepperCallback(CREATE_PROPOSAL_STEPS.FLEX_INPUTS)
         } else {
             stepperCallback(CREATE_PROPOSAL_STEPS.NOTIFICATION)
