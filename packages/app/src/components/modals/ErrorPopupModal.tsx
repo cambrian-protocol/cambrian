@@ -16,7 +16,12 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
             background={'background-popup'}
             responsive={false}
         >
-            <Box width={{ min: 'auto' }} pad="small" border round="small">
+            <Box
+                width={{ min: 'auto', max: 'large' }}
+                pad="small"
+                border
+                round="small"
+            >
                 <Box direction="row">
                     <Box onClick={onClose} pad="small" focusIndicator={false}>
                         <X size={'24'} />

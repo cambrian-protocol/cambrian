@@ -148,4 +148,10 @@ export const cpTheme = deepMerge(grommet, {
             color: 'white',
         },
     },
+    spinner: {
+        container: {
+            pad: 'none',
+            size: '20px',
+        },
+    },
 })

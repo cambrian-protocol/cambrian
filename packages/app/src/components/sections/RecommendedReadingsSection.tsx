@@ -70,13 +70,13 @@ const RecommendedReadingsSection = () => (
                                 title="Conversations With The Norm"
                                 author="Paul Malin"
                                 href="https://mirror.xyz/0xDbd6EDa9C8D51a8503A6C4e8494Ee51210B3dA1d/SSnmQPe6S7NXfxY-fyxWbBhHQFWO5UyVlxJs2iUp_dU"
-                                imageUrl="https://miro.medium.com/max/996/1*wfIFsy9EGy9ckI3L34QbTw.png"
+                                imageUrl="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cordial_Thanksgiving_Greetings%2C_two_turkeys_%28NBY_20341%29.jpg?20180305102248"
                             />
                             <RecommendedReadingCard
                                 title="Wishing for the Pre-Mine IDO"
                                 author="Paul Malin"
                                 href="https://mirror.xyz/0xDbd6EDa9C8D51a8503A6C4e8494Ee51210B3dA1d/JixHZ2MCVl29SdN7ThODsn_yPu8Kc13QsVbGgL1RrVI"
-                                imageUrl="https://miro.medium.com/max/996/1*wfIFsy9EGy9ckI3L34QbTw.png"
+                                imageUrl="https://mirror.xyz/_next/image?url=https%3A%2F%2Fimages.mirror-media.xyz%2Fpublication-images%2F5AUX6WW5P3jmEYOydu2hH.jpg&w=640&q=90"
                             />
                         </Box>
                     </Box>
