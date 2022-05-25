@@ -21,7 +21,7 @@ const USPSection = () => {
             style={{ position: 'relative', overflow: 'hidden' }}
             pad="large"
         >
-            <Glow height="800px" width="2000px" left={'30%'} top={'10%'} />
+            <Glow height="800px" width="2000px" left={'40%'} top={'10%'} />
             <Box gap="medium" align="center" style={{ position: 'relative' }}>
                 <Heading textAlign="center">Turn-Key, Web 3</Heading>
                 <Box width={'large'} gap="medium">

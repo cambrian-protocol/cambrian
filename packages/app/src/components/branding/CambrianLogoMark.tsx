@@ -13,7 +13,7 @@ const CambrianLogoMark = () => {
                 max: 'xxsmall',
             }}
         >
-            <Image src="/images/cambrian_protocol_logo_400x400.png" />
+            <Image src="/images/logo/cambrian_protocol_logo.svg" />
         </Box>
     )
 }

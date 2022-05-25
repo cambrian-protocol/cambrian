@@ -45,7 +45,7 @@ const TokenInput = ({
     return (
         <Box direction="row" fill gap="small" align="start">
             <Box basis="1/4">
-                <FormField label="Token Symbol">
+                <FormField label="Token">
                     <Select
                         name={name}
                         options={options}

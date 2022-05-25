@@ -1,7 +1,7 @@
+import { Anchor, Box, Paragraph } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { Box, Anchor, Paragraph } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import StoredIdItem from '@cambrian/app/components/list/StoredIdItem'
 import { Text } from 'grommet'
@@ -51,6 +51,7 @@ const ExportSuccessModal = ({
                     color="dark-6"
                 >
                     <Anchor
+                        color="brand"
                         target="_blank"
                         href="https://discord.gg/pZP4HNYrZs"
                     >
