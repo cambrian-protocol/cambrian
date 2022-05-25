@@ -5,17 +5,19 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 
+import { Box } from 'grommet'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CreateTemplateDetailStep from './steps/CreateTemplateDetailStep'
 import CreateTemplateNotificationStep from './steps/CreateTemplateNotificationStep'
 import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
 import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
 import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
-import CreateTemplateTemplateStep from './steps/CreateTemplateTemplateStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -85,6 +87,13 @@ export const CreateTemplateMultiStepForm = ({
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [currentStep, setCurrentStep] =
         useState<CreateTemplateMultiStepStepsType>(CREATE_TEMPLATE_STEPS.START)
+
+    // Scroll up when step changes
+    const topRefContext = useContext(TopRefContext)
+    useEffect(() => {
+        if (topRefContext)
+            topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
+    }, [currentStep])
 
     useEffect(() => {
         initInput()
@@ -203,7 +212,7 @@ export const CreateTemplateMultiStepForm = ({
                 )
             case CREATE_TEMPLATE_STEPS.TEMPLATE_DETAILS:
                 return (
-                    <CreateTemplateTemplateStep
+                    <CreateTemplateDetailStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
@@ -250,5 +259,9 @@ export const CreateTemplateMultiStepForm = ({
         }
     }
 
-    return <>{renderCurrentFormStep()}</>
+    return (
+        <Box height={{ min: '90vh' }} justify="center">
+            {renderCurrentFormStep()}
+        </Box>
+    )
 }
