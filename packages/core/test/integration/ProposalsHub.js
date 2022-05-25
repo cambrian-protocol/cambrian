@@ -3,7 +3,7 @@ const { expect } = require("chai");
 const SOLVER_ABI =
   require("../../artifacts/contracts/solvers/Solver.sol/Solver.json").abi;
 const IPFSSOLUTIONSHUB_ABI =
-  require("../../artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
+  require("../../artifacts/contracts/hubs/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
 const { FormatTypes } = require("ethers/lib/utils");
 const {
   getIndexSetFromBinaryArray,
@@ -137,7 +137,7 @@ describe("ProposalsHub", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         this.ingests,
         this.conditionBase,
       ],

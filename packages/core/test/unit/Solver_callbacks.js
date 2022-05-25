@@ -62,14 +62,14 @@ describe("Solver.sol | callbacks", function () {
     };
   });
 
-  it("Reverts when non-Solver calls registerOutgoingCallback", async function () {
+  it("Reverts when non-Solver or 'upstream' Solver calls registerOutgoingCallback", async function () {
     const solverConfigs = [
       {
         implementation: this.Solver.address,
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -81,10 +81,17 @@ describe("Solver.sol | callbacks", function () {
       this.keeper
     );
 
-    return expectRevert(
+    await expectRevert(
       solvers[0]
         .connect(this.keeper)
         .registerOutgoingCallback(ethers.utils.formatBytes32String("0"), 0),
+      "solver not downstream"
+    );
+
+    await expectRevert(
+      solvers[0]
+        .connect(this.keeper)
+        .registerOutgoingCallback(ethers.utils.formatBytes32String("0"), 1),
       "msg.sender not solver"
     );
   });
@@ -96,7 +103,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -113,7 +120,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -148,7 +155,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -165,7 +172,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -211,7 +218,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -231,7 +238,7 @@ describe("Solver.sol | callbacks", function () {
           ethers.utils.formatBytes32String("0"),
           ethers.utils.defaultAbiCoder.encode(["uint256"], [42])
         ),
-      "OnlyKeeper"
+      "Only Keeper"
     );
   });
 
@@ -242,7 +249,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -259,7 +266,7 @@ describe("Solver.sol | callbacks", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,

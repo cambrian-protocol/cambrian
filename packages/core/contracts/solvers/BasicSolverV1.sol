@@ -4,8 +4,4 @@ pragma solidity ^0.8.13;
 
 import "./Solver.sol";
 
-contract BasicSolverV1 is Solver {
-    function postroll(uint256 _index) internal override {
-        //
-    }
-}
+contract BasicSolverV1 is Solver {}

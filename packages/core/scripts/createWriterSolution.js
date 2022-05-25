@@ -6,7 +6,7 @@ const ERC20_ABI =
   require("@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json").abi;
 
 const IPFSSOLUTIONSHUB_ABI =
-  require("@cambrian/core/artifacts/contracts/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
+  require("@cambrian/core/artifacts/contracts/hubs/IPFSSolutionsHub.sol/IPFSSolutionsHub.json").abi;
 
 async function main() {
   const [user1] = await ethers.getSigners();

@@ -130,7 +130,7 @@ describe("IPFSSolutionsHub", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests,
         conditionBase,
       ],

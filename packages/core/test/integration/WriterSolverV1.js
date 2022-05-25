@@ -11,7 +11,7 @@ const {
 const testHelpers = require("../../helpers/testHelpers.js");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-describe("SolverCoopCallbacks", async function () {
+describe("WriterSolverV1_SolverCoopCallbacks", async function () {
   this.beforeEach(async function () {
     const [buyer, seller, keeper, seller2, arbitrator] =
       await ethers.getSigners();
@@ -27,13 +27,13 @@ describe("SolverCoopCallbacks", async function () {
       "SolverFactory",
       "ProposalsHub",
       "ToyToken",
-      "BasicSolverV1",
+      "WriterSolverV1",
       "IPFSSolutionsHub",
     ]);
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");
-    this.Solver = await ethers.getContract("BasicSolverV1");
+    this.Solver = await ethers.getContract("WriterSolverV1");
     this.ISolver = new ethers.utils.Interface(SOLVER_ABI);
     this.ISolver.format(FormatTypes.full);
     await this.ToyToken.mint(this.buyer.address, "100");

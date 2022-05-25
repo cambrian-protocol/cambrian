@@ -33,55 +33,7 @@ describe("ArbitratorFactory", function () {
     );
   });
 
-  it("Allows enabling and disabling an implementation by owner", async function () {
-    // Deployability before enable should equal 0 (Null)
-    expect(
-      await this.ArbitratorFactory.deployable(this.BasicArbitrator.address)
-    ).to.equal(0);
-
-    // Enable implementation
-    await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
-    // Deployability after enable should equal 1 (Enabled)
-    expect(
-      await this.ArbitratorFactory.deployable(this.BasicArbitrator.address)
-    ).to.equal(1);
-
-    // Disable implementation
-    this.ArbitratorFactory.connect(this.owner).disableImplementation(
-      await this.BasicArbitrator.address
-    );
-
-    // Deployability after enable should equal 2 (Disabled)
-    expect(
-      await this.ArbitratorFactory.deployable(this.BasicArbitrator.address)
-    ).to.equal(2);
-  });
-
-  it("Reverts enabling and disabling an implementation by non-owner", async function () {
-    await expectRevert(
-      this.ArbitratorFactory.connect(this.user).enableImplementation(
-        this.BasicArbitrator.address
-      ),
-      "Ownable: caller is not the owner"
-    );
-
-    await expectRevert(
-      this.ArbitratorFactory.connect(this.user).disableImplementation(
-        this.BasicArbitrator.address
-      ),
-      "Ownable: caller is not the owner"
-    );
-  });
-
-  it("Allows creating an arbitrator for an enabled implementation", async function () {
-    // Enable implementation
-    await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
+  it("Allows creating an arbitrator", async function () {
     // Create Arbitrator
     await this.ArbitratorFactory.connect(this.user).createArbitrator(
       this.BasicArbitrator.address,
@@ -92,37 +44,7 @@ describe("ArbitratorFactory", function () {
     expect(arbitrator.arbitrator).to.exist;
   });
 
-  it("Reverts creating an arbitrator for a Null or Disabled implementation", async function () {
-    // Null
-    await expectRevert(
-      this.ArbitratorFactory.connect(this.user).createArbitrator(
-        this.BasicArbitrator.address,
-        this.initParams
-      ),
-      "ProxyFactory::Invalid implementation address"
-    );
-
-    // Disable implementation
-    await this.ArbitratorFactory.connect(this.owner).disableImplementation(
-      this.BasicArbitrator.address
-    );
-
-    // Disabled
-    await expectRevert(
-      this.ArbitratorFactory.connect(this.user).createArbitrator(
-        this.BasicArbitrator.address,
-        this.initParams
-      ),
-      "ProxyFactory::Invalid implementation address"
-    );
-  });
-
   it("Properly initializes clones from provided initCall data", async function () {
-    // Enable implementation
-    await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
     // Create Arbitrator
     await this.ArbitratorFactory.connect(this.user).createArbitrator(
       this.BasicArbitrator.address,
@@ -141,11 +63,6 @@ describe("ArbitratorFactory", function () {
   });
 
   it("Properly initializes clones from provided initCall data", async function () {
-    // Enable implementation
-    await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
     // Create Arbitrator
     await this.ArbitratorFactory.connect(this.user).createArbitrator(
       this.BasicArbitrator.address,
@@ -164,11 +81,6 @@ describe("ArbitratorFactory", function () {
   });
 
   it("Reverts creating clones with invalid initCall data", async function () {
-    // Enable implementation
-    await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-      this.BasicArbitrator.address
-    );
-
     // Wrong args
     let initParams = ethers.utils.defaultAbiCoder.encode(
       ["address", "address", "address"],
