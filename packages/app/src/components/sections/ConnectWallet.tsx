@@ -7,7 +7,13 @@ const ConnectWalletSection = () => {
     const { connectWallet } = useCurrentUser()
 
     return (
-        <Box fill justify="center" align="center">
+        <Box
+            fill
+            justify="center"
+            align="center"
+            height={{ min: '90vh' }}
+            pad="large"
+        >
             <Box width={'large'}>
                 <HeaderTextSection
                     title="Wallet Connection necessary"
