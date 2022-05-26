@@ -194,6 +194,7 @@ const deploySolverChain = async (solverConfigs, factory, signer) => {
   let promises = [];
 
   await factory
+    .connect(signer)
     .createSolver(ethers.constants.AddressZero, 0, solverConfigs[0])
     .then((tx) => tx.wait())
     .then((rc) => {

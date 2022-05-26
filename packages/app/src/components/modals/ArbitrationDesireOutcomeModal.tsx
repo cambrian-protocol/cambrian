@@ -3,7 +3,10 @@ import { SetStateAction, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from './ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
@@ -12,6 +15,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 interface ArbitrationDesireOutcomeModalProps {
     currentUser: UserType
@@ -20,6 +24,7 @@ interface ArbitrationDesireOutcomeModalProps {
     proposedOutcomeCollection: OutcomeCollectionModel
     desiredIndexSet?: number
     setDesiredIndexSet: React.Dispatch<SetStateAction<number | undefined>>
+    fee: ethers.BigNumber
     solverData: SolverModel
     currentCondition: SolverContractCondition
     onBack: () => void
@@ -35,34 +40,28 @@ const ArbitrationDesireOutcomeModal = ({
     currentCondition,
     onBack,
     solverAddress,
+    fee,
 }: ArbitrationDesireOutcomeModalProps) => {
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     const onDesireOutcome = async (indexSet: number) => {
         setDesiredIndexSet(indexSet)
         try {
-            // TODO Implement proper Info fetching
-            let info: { address?: string; fee?: BigNumber; lapse?: BigNumber } =
-                {
-                    address: currentUser.address,
-                }
+            const desiredOutcomeArray = binaryArrayFromIndexSet(
+                indexSet,
+                solverData.config.conditionBase.outcomeSlots
+            ).map((x) => ethers.BigNumber.from(x))
 
-            try {
-                const fee: BigNumber = await arbitratorContract.getFee()
-                info = { ...info, fee: fee }
-            } catch {}
-            try {
-                const lapse: BigNumber = await arbitratorContract.lapse()
-                info = { ...info, lapse: lapse }
-            } catch {}
+            console.log(arbitratorContract)
 
-            const tx = await arbitratorContract.requestArbitration(
+            const tx = await arbitratorContract[
+                'requestArbitration(address,uint256,uint256[])'
+            ](
                 solverAddress,
                 currentCondition.executions - 1,
-                indexSet,
-                info
+                desiredOutcomeArray,
+                { value: fee }
             )
-            const receipt = await tx.wait()
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
             setDesiredIndexSet(undefined)
