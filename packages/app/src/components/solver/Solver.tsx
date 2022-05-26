@@ -125,6 +125,8 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     useEffect(() => {
         if (
             currentCondition?.status === ConditionStatus.OutcomeProposed ||
+            currentCondition?.status === ConditionStatus.ArbitrationRequested ||
+            currentCondition?.status === ConditionStatus.ArbitrationDelivered ||
             currentCondition?.status === ConditionStatus.OutcomeReported
         ) {
             initProposedOutcome()
@@ -245,7 +247,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         sidebar: undefined,
         sideNav: undefined,
     }
-
     return (
         <>
             {solverData && currentCondition && solverMethods ? (
@@ -263,9 +264,13 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     notification={
                         proposedOutcome && (
                             <OutcomeNotification
+                                solverMethods={solverMethods}
                                 token={solverData.collateralToken}
                                 outcomeCollection={proposedOutcome}
-                                status={currentCondition.status}
+                                condition={currentCondition}
+                                currentUser={currentUser}
+                                solverAddress={address}
+                                solverData={solverData}
                             />
                         )
                     }

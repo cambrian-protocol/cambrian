@@ -3,7 +3,6 @@ export enum ConditionStatus {
     Executed,
     OutcomeProposed,
     ArbitrationRequested,
-    ArbitrationPending,
     ArbitrationDelivered,
     OutcomeReported,
 }

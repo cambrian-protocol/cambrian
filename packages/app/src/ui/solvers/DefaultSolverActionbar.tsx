@@ -1,7 +1,9 @@
+import ArbitrateActionbar from '@cambrian/app/components/actionbars/arbitrate/ArbitrateActionbar'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/proposed/ConfirmOutcomeActionbar'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import InitiatedActionbar from '@cambrian/app/components/actionbars/initiated/InitiatedActionbar'
+import LockedByArbitrationActionbar from '@cambrian/app/components/actionbars/arbitrate/LockedByArbitrationActionbar'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import PrepareSolveActionbar from '@cambrian/app/components/actionbars/prepare/PrepareSolveActionbar'
 import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/executed/ProposeOutcomeActionbar'
@@ -28,6 +30,7 @@ const DefaultSolverActionbar = ({
 }: DefaultSolverActionbarProps) => {
     const allowedForKeeper = usePermission('Keeper')
     const allowedForRecipients = usePermission('Recipient')
+    const allowedForArbitrator = usePermission('Arbitrator')
 
     if (!currentCondition)
         return <PrepareSolveActionbar solverMethods={solverMethods} />
@@ -63,6 +66,26 @@ const DefaultSolverActionbar = ({
                     currentCondition={currentCondition}
                 />
             )
+        case ConditionStatus.ArbitrationRequested:
+            if (allowedForArbitrator) {
+                return (
+                    <ArbitrateActionbar
+                        metadata={metadata}
+                        solverData={solverData}
+                        solverMethods={solverMethods}
+                        currentCondition={currentCondition}
+                    />
+                )
+            } else {
+                return (
+                    <LockedByArbitrationActionbar
+                        solverData={solverData}
+                        metadata={metadata}
+                        currentCondition={currentCondition}
+                    />
+                )
+            }
+        case ConditionStatus.ArbitrationDelivered:
         case ConditionStatus.OutcomeReported:
             if (allowedForRecipients) {
                 return (

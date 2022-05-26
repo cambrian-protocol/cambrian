@@ -1,3 +1,5 @@
+import ArbitrationDispatchArtifact from '@cambrian/core/artifacts/contracts/arbitration/ArbitrationDispatch.sol/ArbitrationDispatch.json'
+import ArbitratorFactoryArtifact from '@cambrian/core/artifacts/contracts/arbitration/ArbitratorFactory.sol/ArbitratorFactory.json'
 import BaseSolverArtifact from '@cambrian/core/artifacts/contracts/solvers/Solver.sol/Solver.json'
 import BasicArbitratorArtifact from '@cambrian/core/artifacts/contracts/arbitration/BasicArbitrator.sol/BasicArbitrator.json'
 import CTFArtifact from '@cambrian/core/artifacts/contracts/conditionalTokens/ConditionalTokens.sol/ConditionalTokens.json'
@@ -17,12 +19,15 @@ export const IPFS_SOLUTIONS_HUB_IFACE = new utils.Interface(
     IpfsSolutionsHubArtifact.abi
 )
 
-/* // Arbitration
-export const ARBITRATOR_FACTORY_IFACE = new utils.Interface(
-    ArbitratorFactoryArtifact.abi
-) */
+// Arbitration
 export const BASIC_ARBITRATOR_IFACE = new utils.Interface(
     BasicArbitratorArtifact.abi
+)
+export const ARBITRATOR_FACTORY_IFACE = new utils.Interface(
+    ArbitratorFactoryArtifact.abi
+)
+export const ARBITRATION_DISPATCH_IFACE = new utils.Interface(
+    ArbitrationDispatchArtifact.abi
 )
 
 // External Interfaces
