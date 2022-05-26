@@ -242,7 +242,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     }
 
     // TODO Intergrate Custom UI Loading. Pass props via Provider?
-    const loadWriter = true
+    const loadWriter = false
     const customUI = {
         sidebar: undefined,
         sideNav: undefined,
@@ -291,7 +291,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     )}
                 </InteractionLayout>
             ) : solverData && solverMethods ? (
-                <PageLayout contextTitle="Uninitialzed Solve">
+                <PageLayout contextTitle="Uninitialized Solve">
                     {/* TODO, integrate Interaction Layout */}
                     <HeaderTextSection
                         subTitle="Uninitialized Solver"

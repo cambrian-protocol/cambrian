@@ -17,7 +17,7 @@
         },
         {
           "internalType": "uint256[]",
-          "name": "payouts",
+          "name": "outcomes",
           "type": "uint256[]"
         }
       ],
@@ -59,7 +59,7 @@
       ],
       "name": "requestArbitration",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "payable",
       "type": "function"
     }
   ],

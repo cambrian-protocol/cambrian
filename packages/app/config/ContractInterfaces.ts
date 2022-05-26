@@ -6,12 +6,11 @@ import CTFArtifact from '@cambrian/core/artifacts/contracts/conditionalTokens/Co
 import ERC20Artifact from '@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json'
 import IpfsSolutionsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/IPFSSolutionsHub.sol/IPFSSolutionsHub.json'
 import ProposalsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/ProposalsHub.sol/ProposalsHub.json'
-import WriterSolverArtifact from '@cambrian/core/artifacts/contracts/deprecated/WriterSolverV1.json'
 import { utils } from 'ethers'
 
 // Solvers
 export const BASE_SOLVER_IFACE = new utils.Interface(BaseSolverArtifact.abi)
-export const WRITER_IFACE = new utils.Interface(WriterSolverArtifact.abi)
+// export const WRITER_IFACE = new utils.Interface(WriterSolverArtifact.abi)
 
 // Hubs
 export const PROPOSALS_HUB_IFACE = new utils.Interface(ProposalsHubArtifact.abi)

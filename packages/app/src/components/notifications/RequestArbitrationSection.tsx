@@ -18,7 +18,7 @@ import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface RequestArbitrationSectionProps {
     solverMethods: GenericMethods
@@ -37,7 +37,11 @@ const RequestArbitrationSection = ({
     currentUser,
     solverAddress,
 }: RequestArbitrationSectionProps) => {
-    const isArbitrator = currentUser.address === solverData.config.arbitrator
+    const isArbitrator = currentUser.address == solverData.config.arbitrator
+
+    const [isArbitratorContract, setIsArbitratorContract] = useState(false)
+    const [fee, setFee] = useState(ethers.BigNumber.from('0'))
+
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isRequestingArbitration, setIsRequestingArbitration] =
         useState(false)
@@ -50,29 +54,48 @@ const RequestArbitrationSection = ({
     const toggleShowDesiredOutcomeModal = () =>
         setShowDesiredOutcomeModal(!showDesiredOutcomeModal)
 
+    useEffect(() => {
+        async function checkArbitratorIsContract() {
+            const arbitratorCode = await currentUser.signer?.provider?.getCode(
+                solverData.config.arbitrator
+            )
+            const isContract = arbitratorCode == '0x' || true
+
+            if (isContract) {
+                const contract = await new ethers.Contract(
+                    solverData.config.arbitrator,
+                    BASIC_ARBITRATOR_IFACE,
+                    currentUser.signer
+                )
+                console.log(contract)
+                setArbitratorContract(contract)
+            }
+            setIsArbitratorContract(isContract)
+        }
+        checkArbitratorIsContract()
+    }, [currentUser])
+
+    useEffect(() => {
+        async function getFee() {
+            const fee = await arbitratorContract?.getFee(
+                solverAddress,
+                condition.executions - 1
+            )
+            console.log(fee)
+            if (fee) {
+                setFee(fee)
+            }
+        }
+        if (isArbitratorContract && arbitratorContract) {
+            getFee()
+        }
+    }, [isArbitratorContract])
+
     const onDispatchArbitration = async () => {
         setIsRequestingArbitration(true)
         if (currentUser.signer && currentUser.chainId) {
             try {
-                const arbitratorCode =
-                    await currentUser.signer.provider?.getCode(
-                        solverData.config.arbitrator
-                    )
-                /* 
-                          1. <arbitrator>.supportsInterface(”0x01ffc9a7”) // Should successfully return true
-                    2. <arbitrator>.supportsInterface(”0xffffffff”) // Should successfully return false
-                    3. <arbitrator>.supportsInterface(”0x8feb9498”) // Should successfully return true  (NOTE: Made a change here.. wrong hash. ignore step 3 until I give you the right one)
-                        */
-                const isArbitratorContract = false
-
                 if (isArbitratorContract) {
-                    setArbitratorContract(
-                        new ethers.Contract(
-                            solverData.config.arbitrator,
-                            BASIC_ARBITRATOR_IFACE,
-                            currentUser.signer
-                        )
-                    )
                     toggleShowDesiredOutcomeModal()
                 } else {
                     const arbitrationDispatch = new ArbitrationDispatch(
@@ -82,7 +105,8 @@ const RequestArbitrationSection = ({
                     const transaction: ethers.ContractTransaction =
                         await arbitrationDispatch.contract.requestArbitration(
                             solverAddress,
-                            condition.executions - 1
+                            condition.executions - 1,
+                            { value: fee }
                         )
 
                     const rc = await transaction.wait()
@@ -100,14 +124,11 @@ const RequestArbitrationSection = ({
         setIsRequestingArbitration(false)
     }
 
-    const onRequestArbitration = async () => {
+    const onArbitratorRequestArbitration = async () => {
         setIsRequestingArbitration(true)
         try {
-            // TODO change to requestArbitration when SOlver Contract updated
             const transaction: ethers.ContractTransaction =
-                await solverMethods.arbitrationRequested(
-                    condition.executions - 1
-                )
+                await solverMethods.requestArbitration(condition.executions - 1)
 
             const rc = await transaction.wait()
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
@@ -125,8 +146,8 @@ const RequestArbitrationSection = ({
                     <Box pad="small">
                         <Heading level="3">Arbitration</Heading>
                         <Text size="small">
-                            If you have received an Arbitration Request
-                            Notfication, please lock the Solver here
+                            If you have received an Arbitration Request, please
+                            lock the Solver here
                         </Text>
                     </Box>
                     <LoaderButton
@@ -134,19 +155,28 @@ const RequestArbitrationSection = ({
                         isLoading={isRequestingArbitration}
                         label={'Lock Solver'}
                         icon={<Lock />}
-                        onClick={onRequestArbitration}
+                        onClick={onArbitratorRequestArbitration}
                     />
                 </>
             ) : (
                 <>
                     <Box pad="small">
-                        <Heading level="3">Arbitration</Heading>
+                        <Heading level="4">Arbitration</Heading>
                         <Text size="small">
-                            If you don't agree with the proposed outcome, please
-                            consider reaching out to the Keeper before
-                            requesting arbitration
+                            You may request arbitration if you believe this
+                            proposed outcome in incorrect.
                         </Text>
                     </Box>
+                    {fee != ethers.BigNumber.from('0') && (
+                        <Box pad="small">
+                            <Heading level="3">Fee</Heading>
+                            <Text size="small">
+                                {ethers.utils.formatEther(fee).toString()} ETH
+                                refundable if you win arbitration.
+                            </Text>
+                        </Box>
+                    )}
+
                     <LoaderButton
                         secondary
                         isLoading={isRequestingArbitration}
@@ -164,8 +194,9 @@ const RequestArbitrationSection = ({
                     proposedOutcomeCollection={outcomeCollection}
                     currentCondition={condition}
                     onBack={toggleShowDesiredOutcomeModal}
-                    solverData={solverData}
                     setDesiredIndexSet={setDesiredOutcomeIndexSet}
+                    solverData={solverData}
+                    fee={fee}
                 />
             )}
             {errorMessage && (
