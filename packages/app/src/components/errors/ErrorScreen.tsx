@@ -6,7 +6,13 @@ import PageLayout from '../layout/PageLayout'
 
 const ErrorScreen = () => (
     <PageLayout contextTitle="Ooops">
-        <Box fill justify="center" align="center" height={{ min: '90vh' }}>
+        <Box
+            fill
+            justify="center"
+            align="center"
+            height={{ min: '90vh' }}
+            pad="large"
+        >
             <Box gap="medium" width={'large'}>
                 <HeaderTextSection
                     subTitle="Oooops"
