@@ -24,8 +24,12 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
-import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+import {
+    ModuleSettings,
+    SolverModuleInputType,
+} from '../ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { ComposerModuleLoaderModel } from '../models/ModuleLoaderModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -128,8 +132,13 @@ export default class ComposerSolver {
         this.config.implementation = implementation
     }
 
-    updateData(data: SolverCoreDataInputType[]) {
-        this.config.data = data
+    updateModuleLoader(moduleSettings: ModuleSettings) {
+        this.config.modules = Object.keys(moduleSettings).map((key) => {
+            return {
+                module: moduleSettings[key].module,
+                data: moduleSettings[key].data,
+            }
+        })
     }
 
     /*********************************** Tags *************************************/
@@ -537,7 +546,7 @@ export default class ComposerSolver {
             keeperAddress: '',
             arbitratorAddress: '',
             timelockSeconds: 0,
-            data: [],
+            modules: [],
             slots: this.getDefaultSlots(),
             condition: this.getDefaultCondition(),
         }

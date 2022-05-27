@@ -1,14 +1,18 @@
 import { ComposerConditionModel, ConditionModel } from './ConditionModel'
 import { ComposerSlotModel, SlotModel } from './SlotModel'
 
-import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+import { SolverModuleInputType } from '../ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
+import {
+    ComposerModuleLoaderModel,
+    ModuleLoaderModel,
+} from './ModuleLoaderModel'
 
 export type SolverConfigModel = {
     implementation: string
     keeper: string
     arbitrator: string
     timelockSeconds: number
-    data: string
+    moduleLoaders: ModuleLoaderModel[]
     ingests: SlotModel[]
     conditionBase: ConditionModel
 }
@@ -23,7 +27,7 @@ export type ComposerSolverConfigModel = {
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds?: number
-    data?: SolverCoreDataInputType[]
+    modules: ComposerModuleLoaderModel[]
     slots: {
         [key: string]: ComposerSlotModel
     }

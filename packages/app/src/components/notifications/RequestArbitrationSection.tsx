@@ -67,7 +67,6 @@ const RequestArbitrationSection = ({
                     BASIC_ARBITRATOR_IFACE,
                     currentUser.signer
                 )
-                console.log(contract)
                 setArbitratorContract(contract)
             }
             setIsArbitratorContract(isContract)
@@ -77,13 +76,16 @@ const RequestArbitrationSection = ({
 
     useEffect(() => {
         async function getFee() {
-            const fee = await arbitratorContract?.getFee(
-                solverAddress,
-                condition.executions - 1
-            )
-            console.log(fee)
-            if (fee) {
-                setFee(fee)
+            try {
+                const fee = await arbitratorContract?.getFee(
+                    solverAddress,
+                    condition.executions - 1
+                )
+                if (fee) {
+                    setFee(fee)
+                }
+            } catch (e) {
+                console.log(e)
             }
         }
         if (isArbitratorContract && arbitratorContract) {

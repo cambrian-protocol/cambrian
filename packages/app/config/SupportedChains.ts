@@ -8,7 +8,9 @@ import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHu
 import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
 import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
 import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
-import LOCAL_WriterSolverV1 from '@cambrian/core/deployments/localhost/WriterSolverV1.json'
+import LOCAL_IPFSTextSubmitter from '@cambrian/core/deployments/localhost/IPFSTextSubmitter.json'
+import LOCAL_Unanimity from '@cambrian/core/deployments/localhost/Unanimity.json'
+
 import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
 import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
 import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
@@ -39,18 +41,7 @@ interface NativeCurrencyType {
 }
 
 type ContractAddresses = {
-    arbitratorFactory?: string // Only hardhat
-    arbitrationDispatch: string
-    basicArbitrator?: string // Only hardhat
-    basicSolverV1: string
-    conditionalTokens: string
-    ipfsSolutionsHub: string
-    proposalsHub: string
-    solverFactory: string
-    solverLib: string
-    toyToken: string
-    writerSolverV1: string
-    defaultDenominationToken: string
+    [key: string]: string
 }
 
 export type ChainDataHashMapType = {
@@ -89,7 +80,8 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverFactory: LOCAL_SolverFactory.address,
             solverLib: LOCAL_SolverLib.address,
             toyToken: LOCAL_ToyToken.address,
-            writerSolverV1: LOCAL_WriterSolverV1.address,
+            ipfsTextSubmitter: LOCAL_IPFSTextSubmitter.address,
+            unanimity: LOCAL_Unanimity.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
@@ -120,7 +112,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverFactory: ROPSTEN_SolverFactory.address,
             solverLib: ROPSTEN_SolverLib.address,
             toyToken: ROPSTEN_ToyToken.address,
-            writerSolverV1: ROPSTEN_WriterSolverV1.address,
+            // ipfsTextSubmitter: ROPSTEN_IPFSTextSubmitter.address, // not deployed
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
