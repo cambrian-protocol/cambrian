@@ -6,6 +6,7 @@ import CTFArtifact from '@cambrian/core/artifacts/contracts/conditionalTokens/Co
 import ERC20Artifact from '@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json'
 import IpfsSolutionsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/IPFSSolutionsHub.sol/IPFSSolutionsHub.json'
 import ProposalsHubArtifact from '@cambrian/core/artifacts/contracts/hubs/ProposalsHub.sol/ProposalsHub.json'
+import IPFSTextSubmitterArtifact from '@cambrian/core/artifacts/contracts/modules/IPFSTextSubmitter.sol/IPFSTextSubmitter.json'
 import { utils } from 'ethers'
 
 // Solvers
@@ -27,6 +28,11 @@ export const ARBITRATOR_FACTORY_IFACE = new utils.Interface(
 )
 export const ARBITRATION_DISPATCH_IFACE = new utils.Interface(
     ArbitrationDispatchArtifact.abi
+)
+
+// Modules
+export const IPFS_TEXT_SUBMITTER_IFACE = new utils.Interface(
+    IPFSTextSubmitterArtifact.abi
 )
 
 // External Interfaces

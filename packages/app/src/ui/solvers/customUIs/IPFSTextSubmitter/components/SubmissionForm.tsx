@@ -20,6 +20,7 @@ interface WriterUIProps {
     currentCondition: SolverContractCondition
     currentUser: UserType
     solverContract: ethers.Contract
+    moduleContract: ethers.Contract
     latestSubmission: SubmissionModel
 }
 
@@ -27,6 +28,7 @@ const SubmissionForm = ({
     currentCondition,
     currentUser,
     solverContract,
+    moduleContract,
     latestSubmission,
 }: WriterUIProps) => {
     const [input, setInput] = useState<SubmissionModel>(initialSubmission)
@@ -61,9 +63,10 @@ const SubmissionForm = ({
             if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
             const transaction: ethers.ContractTransaction =
-                await solverContract.submitWork(
+                await moduleContract.submit(
+                    solverContract.address,
                     response.IpfsHash,
-                    currentCondition.conditionId
+                    currentCondition.executions - 1
                 )
             const rc = await transaction.wait()
             if (!rc.events?.find((event) => event.event === 'SubmittedWork'))

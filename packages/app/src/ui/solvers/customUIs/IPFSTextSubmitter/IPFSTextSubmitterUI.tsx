@@ -7,25 +7,33 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useEffect } from 'react'
+import { IPFS_TEXT_SUBMITTER_IFACE } from 'packages/app/config/ContractInterfaces'
 
-interface ContentMarketingSolverProps {
+interface IPFSTextSubmitterUIProps {
     currentUser: UserType
-    solverContract: ethers.Contract
     solverData: SolverModel
+    solverContract: ethers.Contract
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
     metadata?: MetadataModel
+    moduleAddress: string
 }
 
-const ContentMarketingCustomUI = ({
-    solverContract,
+const IPFSTextSubmitterUI = ({
     currentUser,
     solverMethods,
     solverData,
+    solverContract,
     currentCondition,
     metadata,
-}: ContentMarketingSolverProps) => {
+    moduleAddress,
+}: IPFSTextSubmitterUIProps) => {
     const { addPermission } = useCurrentUser()
+    const moduleContract = new ethers.Contract(
+        moduleAddress,
+        IPFS_TEXT_SUBMITTER_IFACE,
+        currentUser.signer
+    )
 
     useEffect(() => {
         if (currentUser) {
@@ -34,16 +42,17 @@ const ContentMarketingCustomUI = ({
     }, [currentUser])
 
     const initPermissions = async () => {
-        const writerAddress = await solverContract.writer()
-        const buyerAddress = await solverContract.buyer()
+        const submitterAddress = await moduleContract.submitter(
+            solverContract.address
+        )
 
-        if (currentUser.address === writerAddress) addPermission('Writer')
-        if (currentUser.address === buyerAddress) addPermission('Buyer')
+        if (currentUser.address === submitterAddress) addPermission('Submitter')
     }
 
     return (
         <SubmissionContainer
             solverMethods={solverMethods}
+            moduleContract={moduleContract}
             solverContract={solverContract}
             currentUser={currentUser}
             solverData={solverData}
@@ -53,4 +62,4 @@ const ContentMarketingCustomUI = ({
     )
 }
 
-export default ContentMarketingCustomUI
+export default IPFSTextSubmitterUI

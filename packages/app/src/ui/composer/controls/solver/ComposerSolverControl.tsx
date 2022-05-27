@@ -14,7 +14,7 @@ import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
 import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
 import ComposerRecipientList from './recipientList/ComposerRecipientList'
 import ComposerSlotList from './slotList/ComposerSlotList'
-import ComposerSolverCoreDataInputControl from './general/ComposerSolverCoreDataInputControl'
+import ComposerSolverModuleInputControl from './general/ComposerSolverModuleInputControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
@@ -30,7 +30,7 @@ export type SolverControllerType =
     | 'RecipientListControl'
     | 'OutcomeListControl'
     | 'TimingControl'
-    | 'CoreInput'
+    | 'Modules'
 
 export const ComposerSolverControl = () => {
     const { dispatch, currentSolver } = useComposerContext()
@@ -62,8 +62,8 @@ export const ComposerSolverControl = () => {
                 return <ComposerOutcomeList />
             case 'SlotControl':
                 return <ComposerSlotList />
-            case 'CoreInput':
-                return <ComposerSolverCoreDataInputControl />
+            case 'Modules':
+                return <ComposerSolverModuleInputControl />
             default:
                 return <></>
         }
@@ -124,10 +124,8 @@ export const ComposerSolverControl = () => {
                                     />
                                     <BaseMenuListItem
                                         icon={<Cube />}
-                                        title={'Core Input'}
-                                        onClick={() =>
-                                            setController('CoreInput')
-                                        }
+                                        title={'Modules'}
+                                        onClick={() => setController('Modules')}
                                     />
                                 </Box>
                             </Box>

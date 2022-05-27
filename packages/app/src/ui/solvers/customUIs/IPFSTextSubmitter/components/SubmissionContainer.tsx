@@ -20,6 +20,7 @@ import usePermission from '@cambrian/app/hooks/usePermission'
 interface ContentMarketingSolverContentProps {
     currentUser: UserType
     solverContract: ethers.Contract
+    moduleContract: ethers.Contract
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
@@ -35,24 +36,30 @@ export const initialSubmission = {
 const SubmissionContainer = ({
     solverData,
     solverContract,
+    moduleContract,
     currentCondition,
     currentUser,
     metadata,
 }: ContentMarketingSolverContentProps) => {
-    const allowedToWrite = usePermission('Writer')
+    const allowedToWrite = usePermission('Submitter')
     const [latestSubmission, setLatestSubmission] =
         useState<SubmissionModel>(initialSubmission)
 
-    const submittedWorkFilter = solverContract.filters.SubmittedWork()
+    const submittedWorkFilter = moduleContract.filters.SubmittedWork(
+        solverContract.address,
+        null,
+        null,
+        null
+    )
     const proposal = metadata?.stages?.proposal as ProposalModel
 
     useEffect(() => {
         let isMounted = true
         initSubmission()
-        solverContract.on(submittedWorkFilter, initSubmission)
+        moduleContract.on(submittedWorkFilter, initSubmission)
         return () => {
             isMounted = false
-            solverContract.removeListener(submittedWorkFilter, initSubmission)
+            moduleContract.removeListener(submittedWorkFilter, initSubmission)
         }
     }, [currentUser])
 
@@ -65,7 +72,7 @@ const SubmissionContainer = ({
     }
 
     const initLatestSubmission = async () => {
-        const logs = await solverContract.queryFilter(submittedWorkFilter)
+        const logs = await moduleContract.queryFilter(submittedWorkFilter)
         return await fetchLatestSubmission(logs, currentCondition)
     }
     return (
@@ -95,6 +102,7 @@ const SubmissionContainer = ({
                     currentCondition={currentCondition}
                     currentUser={currentUser}
                     solverContract={solverContract}
+                    moduleContract={moduleContract}
                     latestSubmission={latestSubmission}
                 />
             ) : (

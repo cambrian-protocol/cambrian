@@ -14,6 +14,7 @@ import { SlotTagsHashMapType } from './SlotTagModel'
 import { SolverTagModel } from './SolverTagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
+import { ModuleLoaderModel } from './ModuleLoaderModel'
 
 export type SolverModel = {
     config: SolverConfigModel
@@ -36,7 +37,7 @@ export type SolverResponseModel = {
     keeper: string
     arbitrator: string
     timelockSeconds: number
-    data: string
+    moduleLoaders: ModuleLoaderModel[]
     ingests: SlotResponseType[]
     conditionBase: ConditionResponseType
 }

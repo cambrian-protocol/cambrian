@@ -9,6 +9,7 @@ import {
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
+import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
@@ -31,7 +32,6 @@ import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
-import IPFSTextSubmitterUI from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -282,16 +282,13 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                               loader.module ===
                               '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e' // TEMP, Local hardhat IPFSTextSubmitter address
                       ) ? (
-                        <IPFSTextSubmitterUI
+                        <ContentMarketingCustomUI
                             solverMethods={solverMethods}
-                            currentUser={currentUser}
                             solverContract={solverContract}
+                            currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
                             metadata={metadata}
-                            moduleAddress={
-                                '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e'
-                            } // TEMP!
                         />
                     ) : (
                         <></>

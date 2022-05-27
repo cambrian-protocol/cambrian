@@ -106,7 +106,15 @@ async function main() {
       keeper.address,
       ArbitratorAddress,
       timelockSeconds,
-      [],
+      [
+        {
+          module: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+          data: ethers.utils.defaultAbiCoder.encode(
+            ["bytes32"],
+            [ethers.utils.formatBytes32String("1")]
+          ),
+        },
+      ],
       ingests,
       conditionBase,
     ],

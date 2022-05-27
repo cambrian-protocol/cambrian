@@ -9,14 +9,17 @@ import { SelectRecipientType } from '@cambrian/app/components/selects/SelectReci
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
 import { SlotTagFormFieldsType } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
-import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
+import {
+    ModuleSettings,
+    SolverModuleInputType,
+} from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { UpdateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/UpdateRecipientForm'
 
 export type ComposerAction =
     | UpdateSelectionActionType
-    | UpdateSolverDataActionType
+    | UpdateModuleDataActionType
     | UpdateSolverMainConfigActionType
     | AttachNewOutcomeCollectionActionType
     | OutcomeCollectionActionType
@@ -56,9 +59,9 @@ type LoadComposerAction = {
     payload: CompositionModel
 }
 
-type UpdateSolverDataActionType = {
-    type: 'UPDATE_SOLVER_DATA'
-    payload: SolverCoreDataInputType[]
+type UpdateModuleDataActionType = {
+    type: 'UPDATE_MODULE_DATA'
+    payload: ModuleSettings
 }
 
 type UpdateSolverMainConfigActionType = {
