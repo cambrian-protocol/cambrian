@@ -67,7 +67,7 @@ const RecommendedReadingsSection = () => (
                                 imageUrl="https://miro.medium.com/max/1400/1*5-cNAqKkvtklmn9UUs6AdA.png"
                             />
                             <RecommendedReadingCard
-                                title="Conversations With The Norm"
+                                title="Conversations With Norm"
                                 author="Paul Malin"
                                 href="https://mirror.xyz/0xDbd6EDa9C8D51a8503A6C4e8494Ee51210B3dA1d/SSnmQPe6S7NXfxY-fyxWbBhHQFWO5UyVlxJs2iUp_dU"
                                 imageUrl="https://upload.wikimedia.org/wikipedia/commons/4/4d/Cordial_Thanksgiving_Greetings%2C_two_turkeys_%28NBY_20341%29.jpg?20180305102248"
