@@ -19,7 +19,7 @@ import { initialSubmission } from './SubmissionContainer'
 interface WriterUIProps {
     currentCondition: SolverContractCondition
     currentUser: UserType
-    solverContract: ethers.Contract
+    solverAddress: string
     moduleContract: ethers.Contract
     latestSubmission: SubmissionModel
 }
@@ -27,7 +27,7 @@ interface WriterUIProps {
 const SubmissionForm = ({
     currentCondition,
     currentUser,
-    solverContract,
+    solverAddress,
     moduleContract,
     latestSubmission,
 }: WriterUIProps) => {
@@ -64,7 +64,7 @@ const SubmissionForm = ({
 
             const transaction: ethers.ContractTransaction =
                 await moduleContract.submit(
-                    solverContract.address,
+                    solverAddress,
                     response.IpfsHash,
                     currentCondition.executions - 1
                 )
