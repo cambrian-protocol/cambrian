@@ -6,6 +6,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
+import { Button } from 'grommet'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
@@ -35,6 +36,7 @@ const ProposalUI = ({
     const [metaStages, setMetaStages] = useState<Stages>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(false)
+    const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
     const router = useRouter()
 
     useEffect(() => {
@@ -44,11 +46,11 @@ const ProposalUI = ({
 
     useEffect(() => {
         if (isProposalExecuted) {
-            pushToSolver()
+            initSolver()
         }
     }, [isProposalExecuted])
 
-    const pushToSolver = async () => {
+    const initSolver = async () => {
         if (currentUser.chainId && currentUser.signer) {
             try {
                 const ipfsSolutionsHub = new IPFSSolutionsHub(
@@ -59,7 +61,7 @@ const ProposalUI = ({
                     proposal.solutionId
                 )
                 if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
-                router.push(`/solvers/${solvers[0]}`)
+                setFirstSolverAddress(solvers[0])
             } catch (e) {
                 cpLogger.push(e)
             }
@@ -107,13 +109,22 @@ const ProposalUI = ({
                         proposal={metaStages.proposal as ProposalModel}
                         template={metaStages.template as TemplateModel}
                     />
-                    <FundProposalForm
-                        currentUser={currentUser}
-                        metaStages={metaStages}
-                        proposalsHub={proposalsHub}
-                        proposal={proposal}
-                        setIsProposalExecuted={setIsProposalExecuted}
-                    />
+                    {firstSolverAddress ? (
+                        <Button
+                            primary
+                            size="small"
+                            label="Go to Solver"
+                            onClick={() => router.push(firstSolverAddress)}
+                        />
+                    ) : (
+                        <FundProposalForm
+                            currentUser={currentUser}
+                            metaStages={metaStages}
+                            proposalsHub={proposalsHub}
+                            proposal={proposal}
+                            setIsProposalExecuted={setIsProposalExecuted}
+                        />
+                    )}
                     <Box pad="medium" />
                 </Box>
             ) : errorMessage ? (
