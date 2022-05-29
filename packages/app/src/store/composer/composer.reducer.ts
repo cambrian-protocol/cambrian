@@ -1,4 +1,5 @@
 import {
+    ADD_MODULE,
     ADD_RECIPIENT,
     ADD_RECIPIENT_WITH_ALLOCATION,
     ATTACH_NEW_OUTCOME_COLLECTION,
@@ -8,12 +9,14 @@ import {
     CREATE_RECIPIENT_WITH_ALLOCATION,
     CREATE_SLOT,
     CREATE_SOLVER,
+    DELETE_MODULE,
     DELETE_NODE,
     DELETE_OUTCOME,
     DELETE_SLOT,
     DRAG_NODE,
     LOAD_COMPOSITION,
     TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION,
+    UPDATE_MODULE,
     UPDATE_OUTCOME,
     UPDATE_RECIPIENT,
     UPDATE_RECIPIENT_ALLOCATION,
@@ -21,11 +24,11 @@ import {
     UPDATE_SLOT,
     UPDATE_SLOT_TAG,
     UPDATE_SOLUTION_SETTINGS,
-    UPDATE_MODULE_DATA,
     UPDATE_SOLVER_MAIN_CONFIG,
     UPDATE_SOLVER_TAG,
 } from './composer.constants'
 import {
+    addModuleAction,
     addRecipientAction,
     addRecipientAllocationAction,
     attachNewOutcomeCollectionAction,
@@ -35,12 +38,14 @@ import {
     createRecipientAllocationAction,
     createSlotAction,
     createSolverAction,
+    deleteModuleAction,
     deleteNodeAction,
     deleteOutcomeAction,
     deleteSlotAction,
     dragNodeAction,
     loadCompositionAction,
     toggleOutcomeOfOutcomeCollectionAction,
+    updateModuleAction,
     updateOutcomeAction,
     updateRecipientAction,
     updateRecipientAllocationAction,
@@ -48,7 +53,6 @@ import {
     updateSlotAction,
     updateSlotTagAction,
     updateSolutionSettingsAction,
-    updateModuleDataAction,
     updateSolverMainConfigAction,
     updateSolverTagAction,
 } from './actions'
@@ -66,8 +70,12 @@ export const composerReducer = (
                 state,
                 action.payload.selectedElement
             )
-        case UPDATE_MODULE_DATA:
-            return updateModuleDataAction(state, action.payload)
+        case ADD_MODULE:
+            return addModuleAction(state, action.payload)
+        case UPDATE_MODULE:
+            return updateModuleAction(state, action.payload)
+        case DELETE_MODULE:
+            return deleteModuleAction(state, action.payload)
         case UPDATE_SOLVER_MAIN_CONFIG:
             return updateSolverMainConfigAction(state, action.payload)
         case TOGGLE_OUTCOME_OF_OUTCOME_COLLECTION:

@@ -1,11 +1,6 @@
 import { ComposerConditionModel, ConditionModel } from './ConditionModel'
 import { ComposerSlotModel, SlotModel } from './SlotModel'
-
-import { SolverModuleInputType } from '../ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
-import {
-    ComposerModuleLoaderModel,
-    ModuleLoaderModel,
-} from './ModuleLoaderModel'
+import { ModuleLoaderModel, ModuleModel } from './ModuleModel'
 
 export type SolverConfigModel = {
     implementation: string
@@ -27,7 +22,7 @@ export type ComposerSolverConfigModel = {
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds?: number
-    modules: ComposerModuleLoaderModel[]
+    modules: ModuleModel[]
     slots: {
         [key: string]: ComposerSlotModel
     }

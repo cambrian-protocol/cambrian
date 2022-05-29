@@ -22,8 +22,8 @@ import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { ComposerModuleLoaderModel } from '@cambrian/app/models/ModuleLoaderModel'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -114,23 +114,21 @@ export function parseComposerSolverConfig(
     }
 }
 
-export function parseModuleLoaders(
-    modules: ComposerModuleLoaderModel[],
-    chainId: number
-) {
+export function parseModuleLoaders(modules: ModuleModel[], chainId: number) {
     try {
         const parsedModuleLoaders = modules.map((module) => {
-            const types = module.data.map((x) => x.type)
-            const values = module.data.map((x, i) => {
-                if (types[i] === SolidityDataTypes.Bytes32) {
-                    return ethers.utils.formatBytes32String(x.data)
-                } else {
-                    return x.data
-                }
-            })
+            const types = module.dataInputs?.map((x) => x.type) || []
+            const values =
+                module.dataInputs?.map((x, i) => {
+                    if (types[i] === SolidityDataTypes.Bytes32) {
+                        return ethers.utils.formatBytes32String(x.value)
+                    } else {
+                        return x.value
+                    }
+                }) || []
 
             const moduleAddress =
-                SUPPORTED_CHAINS[chainId].contracts[module.module.key]
+                SUPPORTED_CHAINS[chainId].contracts[module.key]
 
             if (moduleAddress) {
                 return {

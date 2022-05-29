@@ -1,10 +1,9 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SolverModuleInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
 import _ from 'lodash'
 
-const updateModuleDataAction = (
+const deleteModuleAction = (
     state: CompositionModel,
-    payload: SolverModuleInputType[]
+    payload: { key: string }
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&
@@ -20,7 +19,7 @@ const updateModuleDataAction = (
             throw new Error('currentSolver is undefined')
         }
 
-        currentSolver.updateModuleLoader(payload)
+        currentSolver.deleteModule(payload.key)
 
         return {
             ...state,
@@ -31,4 +30,4 @@ const updateModuleDataAction = (
     return state
 }
 
-export default updateModuleDataAction
+export default deleteModuleAction
