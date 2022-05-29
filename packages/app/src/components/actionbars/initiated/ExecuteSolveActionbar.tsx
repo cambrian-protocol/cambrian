@@ -7,16 +7,19 @@ import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoaderButton from '../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { useState } from 'react'
 
 interface ExecuteSolveActionbarProps {
     currentCondition: SolverContractCondition
     solverMethods: GenericMethods
+    solverData: SolverModel
 }
 const ExecuteSolveActionbar = ({
     currentCondition,
     solverMethods,
+    solverData,
 }: ExecuteSolveActionbarProps) => {
     const [isExecuting, setIsExecuting] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
@@ -70,6 +73,8 @@ const ExecuteSolveActionbar = ({
                         label: 'Help',
                     },
                 ]}
+                solverData={solverData}
+                currentCondition={currentCondition}
             />
             {errMsg && (
                 <ErrorPopupModal

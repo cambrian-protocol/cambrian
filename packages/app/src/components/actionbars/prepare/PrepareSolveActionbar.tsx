@@ -6,15 +6,24 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoaderButton from '../../buttons/LoaderButton'
+import { MetadataModel } from '@cambrian/app/models/MetadataModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { useState } from 'react'
 
 interface PrepareSolveActionbarProps {
     solverMethods: GenericMethods
+    solverData: SolverModel
+    currentCondition: SolverContractCondition
+    metadata?: MetadataModel
 }
 
 const PrepareSolveActionbar = ({
     solverMethods,
+    solverData,
+    currentCondition,
+    metadata,
 }: PrepareSolveActionbarProps) => {
     const [isPreparing, setIsPreparing] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -57,6 +66,9 @@ const PrepareSolveActionbar = ({
                         ),
                     },
                 ]}
+                metadata={metadata}
+                solverData={solverData}
+                currentCondition={currentCondition}
             />
             {errorMessage && (
                 <ErrorPopupModal
