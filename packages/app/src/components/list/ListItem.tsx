@@ -41,7 +41,8 @@ const ListItem = ({
             round="small"
             gap="small"
             height={{ min: 'auto' }}
-            background={isActive ? 'primary-gradient' : 'background-contrast'}
+            background={isActive ? 'brand' : 'background-front'}
+            border
             elevation="small"
         >
             <Box direction="row" justify="between" align="center">
@@ -49,7 +50,7 @@ const ListItem = ({
                     <Box
                         width={{ min: 'xxsmall' }}
                         pad="small"
-                        background={'secondary-gradient'}
+                        background={'accent-1'}
                         round="small"
                         elevation="small"
                     >
@@ -59,7 +60,7 @@ const ListItem = ({
                         <Text color="dark-4" size="small">
                             {description}
                         </Text>
-                        <Text color="white" truncate="tip" weight={'bold'}>
+                        <Text truncate="tip" weight={'bold'}>
                             {title}
                         </Text>
                     </Box>
@@ -87,11 +88,7 @@ const ListItem = ({
                         onClick={onRemove}
                         label="Remove"
                         icon={
-                            <StackedIcon
-                                stackBackground="background-contrast"
-                                icon={icon}
-                                stackedIcon={<Trash />}
-                            />
+                            <StackedIcon icon={icon} stackedIcon={<Trash />} />
                         }
                     />
                 )}
@@ -99,12 +96,7 @@ const ListItem = ({
                     <ListItemButton
                         onClick={onEdit}
                         label="Edit"
-                        icon={
-                            <StackedIcon
-                                stackBackground="background-contrast"
-                                icon={icon}
-                            />
-                        }
+                        icon={<StackedIcon icon={icon} />}
                     />
                 )}
                 {onSelect && (
@@ -118,12 +110,7 @@ const ListItem = ({
                     <ListItemButton
                         onClick={onAllocate}
                         label={'Edit BPs'}
-                        icon={
-                            <StackedIcon
-                                stackBackground="background-contrast"
-                                icon={<ChartPieSlice />}
-                            />
-                        }
+                        icon={<StackedIcon icon={<ChartPieSlice />} />}
                     />
                 )}
             </Box>

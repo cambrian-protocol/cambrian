@@ -9,8 +9,8 @@ const colors: any = {
     active: '#799AB850',
     'background-back': { dark: '#040f11', light: '#ecfcff' },
     'background-front': {
-        dark: '#2f2f2f',
-        light: '#FFFFFF',
+        dark: '#012b39',
+        light: '#76d3e6',
     },
     'background-contrast': {
         dark: '#00202b',
