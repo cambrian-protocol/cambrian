@@ -18,7 +18,7 @@ const ListItemButton = ({ onClick, label, icon }: ListItemButtonProps) => (
         <Box height={{ min: 'xxsmall' }} justify="center">
             {icon}
         </Box>
-        <Text color="light-5" size="xsmall" textAlign="center">
+        <Text size="xsmall" textAlign="center">
             {label}
         </Text>
     </Box>
