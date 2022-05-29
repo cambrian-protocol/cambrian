@@ -1,27 +1,16 @@
 import Actionbar, {
     ActionbarItemType,
 } from '@cambrian/app/ui/interaction/bars/Actionbar'
-import {
-    Coins,
-    Faders,
-    Info,
-    Lock,
-    Question,
-    Timer,
-    UsersThree,
-} from 'phosphor-react'
+import { Coins, Lock, Question, Timer, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
-import BaseLayerModal from '../../modals/BaseLayerModal'
 import { BigNumber } from 'ethers'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoaderButton from '../../buttons/LoaderButton'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
-import ProposalInfoModal from '../../modals/ProposalInfoModal'
-import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Spinner } from 'grommet'
@@ -50,16 +39,6 @@ const ConfirmOutcomeActionbar = ({
     const [isUnlockingTimestamp, setIsUnlockingTimestamp] = useState(false)
     const [isConfirming, setIsConfirming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-
-    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
-        useState(false)
-
-    const toggleShowSolverConfigInfoModal = () =>
-        setSolverConfigInfoModal(!showSolverConfigInfoModal)
-
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
 
     useEffect(() => {
         initTimelock()
@@ -112,16 +91,10 @@ const ConfirmOutcomeActionbar = ({
         )
     }
 
-    const actionbarItems: ActionbarItemType[] = [
-        {
-            icon: <Faders />,
-            onClick: toggleShowSolverConfigInfoModal,
-            label: 'Solver',
-        },
-    ]
+    const actionbarItems: ActionbarItemType[] = []
 
     if (isUnlockingTimestamp || isTimelockActive) {
-        actionbarItems.unshift({
+        actionbarItems.push({
             icon: <Question />,
             dropContent: (
                 <ActionbarItemDropContainer
@@ -159,7 +132,7 @@ const ConfirmOutcomeActionbar = ({
             label: 'Help',
         })
     } else {
-        actionbarItems.unshift({
+        actionbarItems.push({
             icon: <Question />,
             dropContent: (
                 <ActionbarItemDropContainer
@@ -182,14 +155,6 @@ const ConfirmOutcomeActionbar = ({
         })
     }
 
-    if (metadata) {
-        actionbarItems.push({
-            icon: <Info />,
-            label: 'Gig',
-            onClick: toggleShowProposalInfoModal,
-        })
-    }
-
     return (
         <>
             <Actionbar
@@ -208,25 +173,14 @@ const ConfirmOutcomeActionbar = ({
                         isLoading={isConfirming}
                     />
                 }
+                metadata={metadata}
+                solverData={solverData}
+                currentCondition={currentCondition}
             />
             {errMsg && (
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}
                     errorMessage={errMsg}
-                />
-            )}
-            {showSolverConfigInfoModal && (
-                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
-                    <SolverConfigInfo
-                        solverData={solverData}
-                        currentCondition={currentCondition}
-                    />
-                </BaseLayerModal>
-            )}
-            {showProposalInfoModal && metadata?.stages && (
-                <ProposalInfoModal
-                    onClose={toggleShowProposalInfoModal}
-                    metadata={metadata}
                 />
             )}
         </>

@@ -3,7 +3,7 @@ import Actionbar, {
 } from '@cambrian/app/ui/interaction/bars/Actionbar'
 import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
-import { Coin, Confetti, Faders, Info, Question } from 'phosphor-react'
+import { Coin, Confetti, Info, Question } from 'phosphor-react'
 import {
     calculateCollectionId,
     calculatePositionId,
@@ -12,15 +12,12 @@ import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
-import BaseLayerModal from '../../modals/BaseLayerModal'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoaderButton from '../../buttons/LoaderButton'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
-import ProposalInfoModal from '../../modals/ProposalInfoModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -48,16 +45,6 @@ const RedeemTokensActionbar = ({
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
     const [isRedeeming, setIsRedeeming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-
-    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
-        useState(false)
-
-    const toggleShowSolverConfigInfoModal = () =>
-        setSolverConfigInfoModal(!showSolverConfigInfoModal)
-
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
 
     const payoutRedemptionFilter = ctf.contract.filters.PayoutRedemption(
         currentUser.address,
@@ -229,24 +216,10 @@ const RedeemTokensActionbar = ({
         }
     }
 
-    const actionbarItems: ActionbarItemType[] = [
-        {
-            icon: <Faders />,
-            onClick: toggleShowSolverConfigInfoModal,
-            label: 'Solver',
-        },
-    ]
-
-    if (metadata) {
-        actionbarItems.push({
-            icon: <Info />,
-            label: 'Gig',
-            onClick: toggleShowProposalInfoModal,
-        })
-    }
+    const actionbarItems: ActionbarItemType[] = []
 
     if (redeemedAmount) {
-        actionbarItems.unshift({
+        actionbarItems.push({
             icon: <Question />,
             label: 'Help',
             dropContent: (
@@ -267,7 +240,7 @@ const RedeemTokensActionbar = ({
             ),
         })
     } else {
-        actionbarItems.unshift({
+        actionbarItems.push({
             icon: <Question />,
             label: 'Help',
             dropContent: (
@@ -308,6 +281,9 @@ const RedeemTokensActionbar = ({
                             }`}</Text>
                         </Box>
                     }
+                    metadata={metadata}
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                 />
             ) : payoutAmount ? (
                 <Actionbar
@@ -327,6 +303,9 @@ const RedeemTokensActionbar = ({
                             }`}
                         />
                     }
+                    metadata={metadata}
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                 />
             ) : (
                 <></>
@@ -335,20 +314,6 @@ const RedeemTokensActionbar = ({
                 <ErrorPopupModal
                     onClose={() => setErrMsg(undefined)}
                     errorMessage={errMsg}
-                />
-            )}
-            {showSolverConfigInfoModal && (
-                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
-                    <SolverConfigInfo
-                        solverData={solverData}
-                        currentCondition={currentCondition}
-                    />
-                </BaseLayerModal>
-            )}
-            {showProposalInfoModal && metadata?.stages && (
-                <ProposalInfoModal
-                    onClose={toggleShowProposalInfoModal}
-                    metadata={metadata}
                 />
             )}
         </>

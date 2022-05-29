@@ -1,8 +1,6 @@
-import Actionbar, {
-    ActionbarItemType,
-} from '@cambrian/app/ui/interaction/bars/Actionbar'
-import { Faders, Info, Question, Scales } from 'phosphor-react'
+import { Question, Scales } from 'phosphor-react'
 
+import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import ArbitrateModal from '../../modals/ArbitrateModal'
 import { GenericMethods } from '../../solver/Solver'
@@ -30,46 +28,6 @@ const ArbitrateActionbar = ({
     const toggleShowArbitrateModal = () =>
         setShowArbitrateModal(!showArbitrateModal)
 
-    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
-        useState(false)
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
-    const toggleShowSolverConfigInfoModal = () =>
-        setSolverConfigInfoModal(!showSolverConfigInfoModal)
-
-    const actionbarItems: ActionbarItemType[] = [
-        {
-            icon: <Question />,
-            dropContent: (
-                <ActionbarItemDropContainer
-                    title="Arbitration in Progress"
-                    description="Somebody has disagreed with the proposed outcome and raised a dispute"
-                    list={[
-                        {
-                            icon: <Scales />,
-                            label: 'Please reach out to the Arbitrator for more Information',
-                        },
-                    ]}
-                />
-            ),
-            label: 'Help',
-        },
-        {
-            icon: <Faders />,
-            onClick: toggleShowSolverConfigInfoModal,
-            label: 'Solver',
-        },
-    ]
-
-    if (metadata) {
-        actionbarItems.push({
-            icon: <Info />,
-            label: 'Gig',
-            onClick: toggleShowProposalInfoModal,
-        })
-    }
-
     return (
         <>
             <Actionbar
@@ -81,7 +39,27 @@ const ArbitrateActionbar = ({
                         primary
                     />
                 }
-                actionbarItems={actionbarItems}
+                actionbarItems={[
+                    {
+                        icon: <Question />,
+                        dropContent: (
+                            <ActionbarItemDropContainer
+                                title="Arbitration in Progress"
+                                description="Somebody has disagreed with the proposed outcome and raised a dispute"
+                                list={[
+                                    {
+                                        icon: <Scales />,
+                                        label: 'Please reach out to the Arbitrator for more Information',
+                                    },
+                                ]}
+                            />
+                        ),
+                        label: 'Help',
+                    },
+                ]}
+                metadata={metadata}
+                solverData={solverData}
+                currentCondition={currentCondition}
             />
             {showArbitrateModal && (
                 <ArbitrateModal
