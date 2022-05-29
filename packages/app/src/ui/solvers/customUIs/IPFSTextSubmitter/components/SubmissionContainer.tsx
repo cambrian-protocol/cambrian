@@ -2,12 +2,7 @@ import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import { GenericMethods } from '@cambrian/app/components/solver/Solver'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SubmissionForm from './SubmissionForm'
 import { SubmissionModel } from '../models/SubmissionModel'
 import SubmissionView from './SubmissionView'
@@ -19,12 +14,9 @@ import usePermission from '@cambrian/app/hooks/usePermission'
 
 interface ContentMarketingSolverContentProps {
     currentUser: UserType
-    solverContract: ethers.Contract
+    solverAddress: string
     moduleContract: ethers.Contract
-    solverData: SolverModel
-    solverMethods: GenericMethods
     currentCondition: SolverContractCondition
-    metadata?: MetadataModel
 }
 
 export const initialSubmission = {
@@ -34,25 +26,21 @@ export const initialSubmission = {
 }
 
 const SubmissionContainer = ({
-    solverData,
-    solverContract,
+    solverAddress,
     moduleContract,
     currentCondition,
     currentUser,
-    metadata,
 }: ContentMarketingSolverContentProps) => {
     const allowedToWrite = usePermission('Submitter')
     const [latestSubmission, setLatestSubmission] =
         useState<SubmissionModel>(initialSubmission)
 
     const submittedWorkFilter = moduleContract.filters.SubmittedWork(
-        solverContract.address,
+        solverAddress,
         null,
         null,
         null
     )
-    const proposal = metadata?.stages?.proposal as ProposalModel
-
     useEffect(() => {
         let isMounted = true
         initSubmission()
@@ -77,19 +65,6 @@ const SubmissionContainer = ({
     }
     return (
         <Box gap="small" flex>
-            <HeaderTextSection
-                title={
-                    proposal
-                        ? proposal.title
-                        : solverData.solverTag?.title || 'Solver'
-                }
-                subTitle="Most recent state of"
-                paragraph={
-                    proposal
-                        ? proposal.description
-                        : solverData.solverTag?.description
-                }
-            />
             {latestSubmission.timestamp !== undefined && (
                 <Text size="small" color="brand">
                     Latest submission:{' '}
@@ -101,7 +76,7 @@ const SubmissionContainer = ({
                 <SubmissionForm
                     currentCondition={currentCondition}
                     currentUser={currentUser}
-                    solverContract={solverContract}
+                    solverAddress={solverAddress}
                     moduleContract={moduleContract}
                     latestSubmission={latestSubmission}
                 />

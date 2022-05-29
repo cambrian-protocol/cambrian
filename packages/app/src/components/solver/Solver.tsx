@@ -13,6 +13,7 @@ import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverAction
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
+import IPFSTextSubmitterUI from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 import InitiatedSolverContent from '@cambrian/app/ui/solvers/InitiatedSolverContent'
 import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -22,6 +23,7 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
 import PageLayout from '../layout/PageLayout'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -30,8 +32,6 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import SolverConfigInfo from '@cambrian/app/ui/interaction/config/SolverConfigInfo'
-import IPFSTextSubmitterUI from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -242,6 +242,8 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         }
     }
 
+    const proposal = metadata?.stages?.proposal as ProposalModel
+
     // TODO Intergrate Custom UI Loading. Pass props via Provider?
     const customUI = {
         sidebar: undefined,
@@ -282,17 +284,32 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                               loader.module ===
                               '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e' // TEMP, Local hardhat IPFSTextSubmitter address
                       ) ? (
-                        <IPFSTextSubmitterUI
-                            solverMethods={solverMethods}
-                            currentUser={currentUser}
-                            solverContract={solverContract}
-                            solverData={solverData}
-                            currentCondition={currentCondition}
-                            metadata={metadata}
-                            moduleAddress={
-                                '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e'
-                            } // TEMP!
-                        />
+                        <>
+                            {proposal && (
+                                <HeaderTextSection
+                                    title={
+                                        proposal
+                                            ? proposal.title
+                                            : solverData.solverTag?.title ||
+                                              'Solver'
+                                    }
+                                    subTitle="Most recent state of"
+                                    paragraph={
+                                        proposal
+                                            ? proposal.description
+                                            : solverData.solverTag?.description
+                                    }
+                                />
+                            )}
+                            <IPFSTextSubmitterUI
+                                solverAddress={address}
+                                currentUser={currentUser}
+                                currentCondition={currentCondition}
+                                moduleAddress={
+                                    '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e'
+                                } // TEMP!
+                            />
+                        </>
                     ) : (
                         <></>
                     )}
