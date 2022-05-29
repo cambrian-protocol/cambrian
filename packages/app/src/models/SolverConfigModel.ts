@@ -22,7 +22,7 @@ export type ComposerSolverConfigModel = {
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds?: number
-    modules: ModuleModel[]
+    modules?: ModuleModel[]
     slots: {
         [key: string]: ComposerSlotModel
     }

@@ -82,7 +82,7 @@ export const SolverNode = memo((props: FlowElement) => {
                             Modules
                         </Text>
                         <Text color="white" size="small">
-                            {currentSolverNode?.config.modules.length}
+                            {currentSolverNode?.config.modules?.length || 0}
                         </Text>
                     </Box>
                 </Box>
