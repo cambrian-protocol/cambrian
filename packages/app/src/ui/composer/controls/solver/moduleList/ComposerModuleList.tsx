@@ -28,7 +28,7 @@ const ComposerModuleList = () => {
                         subTitle="Add modules to this Solver"
                     />
                     <Box gap="small" fill>
-                        {currentSolver.config.modules.length === 0 ? (
+                        {currentSolver.config.modules?.length === 0 ? (
                             <Box
                                 fill
                                 justify="center"
@@ -41,7 +41,7 @@ const ComposerModuleList = () => {
                                 </Text>
                             </Box>
                         ) : (
-                            currentSolver.config.modules.map((module, idx) => (
+                            currentSolver.config.modules?.map((module, idx) => (
                                 <ComposerModuleListItem
                                     key={idx}
                                     module={module}

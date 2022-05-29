@@ -131,26 +131,30 @@ export default class ComposerSolver {
     /*********************************** Modules *************************************/
 
     addModule(moduleToAdd: ModuleModel) {
+        if (!this.config.modules) this.config.modules = []
         this.config.modules.push(moduleToAdd)
     }
 
     updateModule(updatedModule: ModuleModel) {
-        const updatedModules = [...this.config.modules]
-        const idx = updatedModules.findIndex(
-            (module) => module.key === updatedModule.key
-        )
-        updatedModules[idx] = updatedModule
+        if (this.config.modules) {
+            const updatedModules = [...this.config.modules]
+            const idx = updatedModules.findIndex(
+                (module) => module.key === updatedModule.key
+            )
+            updatedModules[idx] = updatedModule
 
-        this.config.modules = updatedModules
+            this.config.modules = updatedModules
+        }
     }
 
     deleteModule(moduleKeyToDelete: string) {
-        const updatedModules = [...this.config.modules]
-        const filteredModules = updatedModules.filter(
-            (module) => module.key !== moduleKeyToDelete
-        )
-
-        this.config.modules = filteredModules
+        if (this.config.modules) {
+            const updatedModules = [...this.config.modules]
+            const filteredModules = updatedModules.filter(
+                (module) => module.key !== moduleKeyToDelete
+            )
+            this.config.modules = filteredModules
+        }
     }
 
     /*********************************** Tags *************************************/

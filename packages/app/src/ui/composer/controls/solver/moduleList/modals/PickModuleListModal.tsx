@@ -27,7 +27,7 @@ const PickModuleListModal = ({ onClose }: PickModuleListModalProps) => {
 
     // Display just the modules which have not already been added
     const existantModulesHash: { [key: string]: boolean } = {}
-    currentSolver.config.modules.forEach(
+    currentSolver.config.modules?.forEach(
         (module) => (existantModulesHash[module.key] = true)
     )
     const filteredModules = Object.keys(ModuleRegistryAPI.modules).filter(
