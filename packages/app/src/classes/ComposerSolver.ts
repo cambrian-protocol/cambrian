@@ -24,12 +24,8 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
-import {
-    ModuleSettings,
-    SolverModuleInputType,
-} from '../ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import { ComposerModuleLoaderModel } from '../models/ModuleLoaderModel'
+import { ModuleModel } from '../models/ModuleModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -132,13 +128,29 @@ export default class ComposerSolver {
         this.config.implementation = implementation
     }
 
-    updateModuleLoader(moduleSettings: ModuleSettings) {
-        this.config.modules = Object.keys(moduleSettings).map((key) => {
-            return {
-                module: moduleSettings[key].module,
-                data: moduleSettings[key].data,
-            }
-        })
+    /*********************************** Modules *************************************/
+
+    addModule(moduleToAdd: ModuleModel) {
+        this.config.modules.push(moduleToAdd)
+    }
+
+    updateModule(updatedModule: ModuleModel) {
+        const updatedModules = [...this.config.modules]
+        const idx = updatedModules.findIndex(
+            (module) => module.key === updatedModule.key
+        )
+        updatedModules[idx] = updatedModule
+
+        this.config.modules = updatedModules
+    }
+
+    deleteModule(moduleKeyToDelete: string) {
+        const updatedModules = [...this.config.modules]
+        const filteredModules = updatedModules.filter(
+            (module) => module.key !== moduleKeyToDelete
+        )
+
+        this.config.modules = filteredModules
     }
 
     /*********************************** Tags *************************************/

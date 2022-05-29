@@ -1,23 +1,11 @@
+import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
-export type RegisteredModule = {
-    key: string
-    name: string
-    description: string
-    dataInputs?: {
-        type: SolidityDataTypes
-        default: string
-        label: string
-    }[]
-    supportedChains: number[]
+type ModuleRegistryType = {
+    [key: string]: ModuleModel
 }
 
-type Registry = {
-    [key: string]: RegisteredModule
-}
-
-// TODO
-const moduleRegistry: Registry = {
+const moduleRegistry: ModuleRegistryType = {
     ipfsTextSubmitter: {
         key: 'ipfsTextSubmitter',
         name: 'IPFS Text Submitter',
@@ -26,8 +14,9 @@ const moduleRegistry: Registry = {
         dataInputs: [
             {
                 type: SolidityDataTypes.Bytes32,
-                default: '',
-                label: 'Slot containing the approved submitter address',
+                value: '',
+                label: 'Submitter',
+                description: 'Slot containing the approved submitter address',
             },
         ],
         supportedChains: [31337],
@@ -37,7 +26,6 @@ const moduleRegistry: Registry = {
         name: 'Unanimity',
         description:
             'Immediately confirm an outcome report, regardless of remaining timelock, if all recipients agree.',
-        dataInputs: [],
         supportedChains: [31337],
     },
 }

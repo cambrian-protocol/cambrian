@@ -9,12 +9,12 @@ import {
 } from './ConditionModel'
 import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
+import { ModuleLoaderModel } from './ModuleModel'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
 import { SlotTagsHashMapType } from './SlotTagModel'
 import { SolverTagModel } from './SolverTagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
-import { ModuleLoaderModel } from './ModuleLoaderModel'
 
 export type SolverModel = {
     config: SolverConfigModel

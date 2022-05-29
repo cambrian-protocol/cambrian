@@ -1,3 +1,4 @@
+import addModuleAction from './solverActions/addModule.action'
 import addRecipientAction from './solverActions/addRecipient.action'
 import addRecipientAllocationAction from './outcomeCollectionActions/addRecipientAllocation.action'
 import attachNewOutcomeCollectionAction from './solverActions/attachNewOutcomeCollection.action'
@@ -7,12 +8,14 @@ import createRecipientAction from './solverActions/createRecipient.action'
 import createRecipientAllocationAction from './outcomeCollectionActions/createRecipientAllocation.action'
 import createSlotAction from './solverActions/createSlot.action'
 import createSolverAction from './flow/createSolver.action'
+import deleteModuleAction from './solverActions/deleteModule.action'
 import deleteNodeAction from './flow/deleteNode.action'
 import deleteOutcomeAction from './solverActions/deleteOutcome.action'
 import deleteSlotAction from './solverActions/deleteSlot.action'
 import dragNodeAction from './flow/dragNode.action'
 import loadCompositionAction from './general/loadComposition.action'
 import toggleOutcomeOfOutcomeCollectionAction from './outcomeCollectionActions/toggleOutcomeOfOutcomeCollection.action'
+import updateModuleAction from './solverActions/updateModule.action'
 import updateOutcomeAction from './solverActions/updateOutcome.action'
 import updateRecipientAction from './solverActions/updateRecipient.action'
 import updateRecipientAllocationAction from './outcomeCollectionActions/updateRecipientAllocation.action'
@@ -22,13 +25,11 @@ import updateSlotTagAction from './solverActions/updateSlotTag.action'
 import updateSolutionSettingsAction from './general/updateSolutionSettings.action'
 import updateSolverMainConfigAction from './solverActions/updateSolverMainConfig.action'
 import updateSolverTagAction from './solverActions/updateSolverTag.action'
-import updateModuleDataAction from './solverActions/updateModuleData.action'
 
 export {
     updateSolverTagAction,
     updateSolutionSettingsAction,
     updateSolverMainConfigAction,
-    updateModuleDataAction,
     dragNodeAction,
     loadCompositionAction,
     deleteOutcomeAction,
@@ -50,4 +51,7 @@ export {
     updateRecipientAction,
     deleteSlotAction,
     updateSlotTagAction,
+    addModuleAction,
+    updateModuleAction,
+    deleteModuleAction,
 }

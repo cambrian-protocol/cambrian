@@ -11,10 +11,10 @@ import { useEffect, useState } from 'react'
 import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
 import { Box } from 'grommet'
 import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
+import ComposerModuleList from './moduleList/ComposerModuleList'
 import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
 import ComposerRecipientList from './recipientList/ComposerRecipientList'
 import ComposerSlotList from './slotList/ComposerSlotList'
-import ComposerSolverModuleInputControl from './general/ComposerSolverModuleInputControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
@@ -63,7 +63,7 @@ export const ComposerSolverControl = () => {
             case 'SlotControl':
                 return <ComposerSlotList />
             case 'Modules':
-                return <ComposerSolverModuleInputControl />
+                return <ComposerModuleList />
             default:
                 return <></>
         }
@@ -127,6 +127,7 @@ export const ComposerSolverControl = () => {
                                         title={'Modules'}
                                         onClick={() => setController('Modules')}
                                     />
+                                    <Box pad="medium" />
                                 </Box>
                             </Box>
                             <SidebarCardFooter>

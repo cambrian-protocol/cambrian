@@ -4,22 +4,18 @@ import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '../../models/CompositionModel'
 import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { CreateSlotActionPayload } from './actions/solverActions/createSlot.action'
+import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
 import { SlotTagFormFieldsType } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
-import {
-    ModuleSettings,
-    SolverModuleInputType,
-} from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverModuleInputControl'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { UpdateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/UpdateRecipientForm'
 
 export type ComposerAction =
     | UpdateSelectionActionType
-    | UpdateModuleDataActionType
     | UpdateSolverMainConfigActionType
     | AttachNewOutcomeCollectionActionType
     | OutcomeCollectionActionType
@@ -40,6 +36,9 @@ export type ComposerAction =
     | UpdateSolutionSettingsActionType
     | UpdateSolverTagActionType
     | UpdateSlotTagActionType
+    | AddModuleActionType
+    | UpdateModuleActionType
+    | DeleteModuleActionType
 
 type UpdateSolverTagActionType = {
     type: 'UPDATE_SOLVER_TAG'
@@ -59,9 +58,19 @@ type LoadComposerAction = {
     payload: CompositionModel
 }
 
-type UpdateModuleDataActionType = {
-    type: 'UPDATE_MODULE_DATA'
-    payload: ModuleSettings
+type AddModuleActionType = {
+    type: 'ADD_MODULE'
+    payload: ModuleModel
+}
+
+type UpdateModuleActionType = {
+    type: 'UPDATE_MODULE'
+    payload: ModuleModel
+}
+
+type DeleteModuleActionType = {
+    type: 'DELETE_MODULE'
+    payload: { key: string }
 }
 
 type UpdateSolverMainConfigActionType = {
