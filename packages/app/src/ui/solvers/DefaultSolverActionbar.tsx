@@ -33,7 +33,13 @@ const DefaultSolverActionbar = ({
     const allowedForArbitrator = usePermission('Arbitrator')
 
     if (!currentCondition)
-        return <PrepareSolveActionbar solverMethods={solverMethods} />
+        return (
+            <PrepareSolveActionbar
+                solverData={solverData}
+                solverMethods={solverMethods}
+                metadata={metadata}
+            />
+        )
 
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:

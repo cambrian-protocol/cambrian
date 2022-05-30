@@ -30,7 +30,7 @@ interface ActionbarProps {
     }[]
     metadata?: MetadataModel
     solverData: SolverModel
-    currentCondition: SolverContractCondition
+    currentCondition?: SolverContractCondition
 }
 
 const Actionbar = ({
@@ -50,11 +50,13 @@ const Actionbar = ({
 
     const items = actionbarItems ? [...actionbarItems] : []
 
-    items.push({
-        icon: <Faders />,
-        onClick: toggleShowSolverConfigInfoModal,
-        label: 'Solver',
-    })
+    if (currentCondition) {
+        items.push({
+            icon: <Faders />,
+            onClick: toggleShowSolverConfigInfoModal,
+            label: 'Solver',
+        })
+    }
 
     if (metadata) {
         items.push({
@@ -90,83 +92,75 @@ const Actionbar = ({
                                         <IconContext.Provider
                                             value={{ size: '32' }}
                                         >
-                                            {actionbarItems &&
-                                                actionbarItems?.length > 0 &&
-                                                actionbarItems?.map(
-                                                    (item, idx) => {
-                                                        if (item.onClick) {
-                                                            return (
-                                                                <Button
-                                                                    key={idx}
-                                                                    plain
-                                                                    onClick={
-                                                                        item.onClick
+                                            {items.map((item, idx) => {
+                                                if (item.onClick) {
+                                                    return (
+                                                        <Button
+                                                            key={idx}
+                                                            plain
+                                                            onClick={
+                                                                item.onClick
+                                                            }
+                                                            label={
+                                                                <Box
+                                                                    pad="small"
+                                                                    justify="center"
+                                                                >
+                                                                    {item.icon}
+                                                                    <Text
+                                                                        size="xsmall"
+                                                                        textAlign="center"
+                                                                        color={
+                                                                            'dark-4'
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </Text>
+                                                                </Box>
+                                                            }
+                                                        />
+                                                    )
+                                                } else {
+                                                    return (
+                                                        <DropButton
+                                                            key={idx}
+                                                            plain
+                                                            label={
+                                                                <Box
+                                                                    pad="small"
+                                                                    justify="center"
+                                                                >
+                                                                    {item.icon}
+                                                                    <Text
+                                                                        size="xsmall"
+                                                                        textAlign="center"
+                                                                        color={
+                                                                            'dark-4'
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            item.label
+                                                                        }
+                                                                    </Text>
+                                                                </Box>
+                                                            }
+                                                            dropContent={
+                                                                <>
+                                                                    {
+                                                                        item.dropContent
                                                                     }
-                                                                    label={
-                                                                        <Box
-                                                                            pad="small"
-                                                                            justify="center"
-                                                                        >
-                                                                            {
-                                                                                item.icon
-                                                                            }
-                                                                            <Text
-                                                                                size="xsmall"
-                                                                                textAlign="center"
-                                                                                color={
-                                                                                    'dark-4'
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    item.label
-                                                                                }
-                                                                            </Text>
-                                                                        </Box>
-                                                                    }
-                                                                />
-                                                            )
-                                                        } else {
-                                                            return (
-                                                                <DropButton
-                                                                    key={idx}
-                                                                    plain
-                                                                    label={
-                                                                        <Box
-                                                                            pad="small"
-                                                                            justify="center"
-                                                                        >
-                                                                            {
-                                                                                item.icon
-                                                                            }
-                                                                            <Text
-                                                                                size="xsmall"
-                                                                                textAlign="center"
-                                                                                color={
-                                                                                    'dark-4'
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    item.label
-                                                                                }
-                                                                            </Text>
-                                                                        </Box>
-                                                                    }
-                                                                    dropContent={
-                                                                        <>
-                                                                            {
-                                                                                item.dropContent
-                                                                            }
-                                                                        </>
-                                                                    }
-                                                                    dropAlign={{
-                                                                        bottom: 'top',
-                                                                        left: 'left',
-                                                                    }}
-                                                                />
-                                                            )
-                                                        }
-                                                    }
-                                                )}
+                                                                </>
+                                                            }
+                                                            dropAlign={{
+                                                                bottom: 'top',
+                                                                left: 'left',
+                                                            }}
+                                                        />
+                                                    )
+                                                }
+                                            })}
                                         </IconContext.Provider>
                                         <Box />
                                     </Box>
@@ -187,7 +181,7 @@ const Actionbar = ({
                     metadata={metadata}
                 />
             )}
-            {showSolverConfigInfoModal && (
+            {showSolverConfigInfoModal && currentCondition && (
                 <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
                     <SolverConfigInfo
                         solverData={solverData}
