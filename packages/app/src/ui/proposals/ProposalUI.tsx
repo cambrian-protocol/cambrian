@@ -6,6 +6,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
@@ -16,6 +17,7 @@ import ProposalContextHeader from './ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -103,19 +105,30 @@ const ProposalUI = ({
     return (
         <Box align="center">
             {metaStages ? (
-                <Box gap="medium" pad="medium" width={{ max: 'large' }}>
+                <Box gap="medium" pad="medium" width={'large'}>
                     <Heading level="2">Proposal Funding</Heading>
                     <ProposalContextHeader
                         proposal={metaStages.proposal as ProposalModel}
                         template={metaStages.template as TemplateModel}
                     />
                     {firstSolverAddress ? (
-                        <Button
-                            primary
-                            size="small"
-                            label="Go to Solver"
-                            onClick={() => router.push(firstSolverAddress)}
-                        />
+                        <BaseFormContainer>
+                            <Text color="dark-4">
+                                This Proposal has been funded and executed. To
+                                start working with this Solution visit the first
+                                Solver
+                            </Text>
+                            <Button
+                                primary
+                                size="small"
+                                label="Go to Solver"
+                                onClick={() =>
+                                    router.push(
+                                        `/solvers/${firstSolverAddress}`
+                                    )
+                                }
+                            />
+                        </BaseFormContainer>
                     ) : (
                         <FundProposalForm
                             currentUser={currentUser}
