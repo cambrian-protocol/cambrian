@@ -57,23 +57,27 @@ export default function ProposalPage() {
 
     return (
         <>
-            <PageLayout contextTitle="Proposal">
-                {currentUser.signer ? (
-                    showInvalidQueryComponent ? (
+            {currentUser.signer ? (
+                showInvalidQueryComponent ? (
+                    <PageLayout contextTitle="Invalid Query">
                         <InvalidQueryComponent context={StageNames.proposal} />
-                    ) : proposalsHub && currentProposal ? (
+                    </PageLayout>
+                ) : proposalsHub && currentProposal ? (
+                    <PageLayout contextTitle="Proposal">
                         <ProposalUI
                             currentUser={currentUser}
                             proposal={currentProposal}
                             proposalsHub={proposalsHub}
                         />
-                    ) : (
-                        <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-                    )
+                    </PageLayout>
                 ) : (
+                    <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
+                )
+            ) : (
+                <PageLayout contextTitle="Connect Wallet">
                     <ConnectWalletSection />
-                )}
-            </PageLayout>
+                </PageLayout>
+            )}
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}
