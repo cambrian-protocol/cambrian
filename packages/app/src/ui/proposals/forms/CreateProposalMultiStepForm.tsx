@@ -13,6 +13,8 @@ import CreateProposalNotificationStep from './steps/CreateProposalNotificationSt
 import CreateProposalPaymentStep from './steps/CreateProposalPaymentStep'
 import CreateProposalStartStep from './steps/CreateProposalStartStep'
 import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFlexInputStep'
+import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -246,9 +248,15 @@ const CreateProposalMultiStepForm = ({
         }
     }
     return (
-        <Box height={{ min: '90vh' }} justify="center">
-            {renderCurrentFormStep()}
-        </Box>
+        <>
+            {denominationToken ? (
+                <Box height={{ min: '90vh' }} justify="center">
+                    {renderCurrentFormStep()}
+                </Box>
+            ) : (
+                <LoadingScreen context={LOADING_MESSAGE['TOKEN']} />
+            )}
+        </>
     )
 }
 
