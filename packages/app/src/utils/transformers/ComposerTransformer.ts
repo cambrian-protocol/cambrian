@@ -22,8 +22,8 @@ import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
-import { ModuleModel } from '@cambrian/app/models/ModuleModel'
+import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -114,7 +114,10 @@ export function parseComposerSolverConfig(
     }
 }
 
-export function parseModuleLoaders(modules: ModuleModel[], chainId: number) {
+export function parseModuleLoaders(
+    modules: ComposerModuleModel[],
+    chainId: number
+) {
     try {
         const parsedModuleLoaders = modules.map((module) => {
             const types = module.dataInputs?.map((x) => x.type) || []
@@ -127,12 +130,12 @@ export function parseModuleLoaders(modules: ModuleModel[], chainId: number) {
                     }
                 }) || []
 
-            const moduleAddress =
-                SUPPORTED_CHAINS[chainId].contracts[module.key]
+            const moduleDeploymentAddress = ModuleRegistryAPI.module(module.key)
+                .deployments[chainId]
 
-            if (moduleAddress) {
+            if (moduleDeploymentAddress) {
                 return {
-                    module: moduleAddress,
+                    module: moduleDeploymentAddress,
                     data: ethers.utils.defaultAbiCoder.encode(
                         [...types],
                         [...values]

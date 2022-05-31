@@ -1,6 +1,6 @@
 import { ComposerConditionModel, ConditionModel } from './ConditionModel'
+import { ComposerModuleModel, ModuleLoaderModel } from './ModuleModel'
 import { ComposerSlotModel, SlotModel } from './SlotModel'
-import { ModuleLoaderModel, ModuleModel } from './ModuleModel'
 
 export type SolverConfigModel = {
     implementation: string
@@ -22,7 +22,7 @@ export type ComposerSolverConfigModel = {
     keeperAddress: string
     arbitratorAddress: string
     timelockSeconds?: number
-    modules?: ModuleModel[]
+    modules?: ComposerModuleModel[]
     slots: {
         [key: string]: ComposerSlotModel
     }

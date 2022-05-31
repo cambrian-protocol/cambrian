@@ -1,12 +1,12 @@
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import ListItem from '@cambrian/app/components/list/ListItem'
-import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import { Plug } from 'phosphor-react'
 import UpdateModuleModal from './modals/UpdateModuleModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
 interface ComposerModuleListItemProps {
-    module: ModuleModel
+    module: ComposerModuleModel
 }
 
 const ComposerModuleListItem = ({ module }: ComposerModuleListItemProps) => {
