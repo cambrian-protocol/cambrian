@@ -3,9 +3,9 @@ import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { CircleDashed } from 'phosphor-react'
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { Heading } from 'grommet'
-import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
 import { Text } from 'grommet'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -17,7 +17,7 @@ interface PickModuleListModalProps {
 
 const PickModuleListModal = ({ onClose }: PickModuleListModalProps) => {
     const { currentSolver, dispatch } = useComposerContext()
-    const [pickedModule, setPickedModule] = useState<ModuleModel>()
+    const [pickedModule, setPickedModule] = useState<ComposerModuleModel>()
     const [showAddModuleModal, setShowAddModuleModal] = useState(false)
 
     if (!currentSolver) return null
@@ -34,7 +34,7 @@ const PickModuleListModal = ({ onClose }: PickModuleListModalProps) => {
         (module) => !existantModulesHash[ModuleRegistryAPI.modules[module].key]
     )
 
-    const onAddModule = (module: ModuleModel) => {
+    const onAddModule = (module: ComposerModuleModel) => {
         if (!module.dataInputs || module.dataInputs.length === 0) {
             dispatch({
                 type: 'ADD_MODULE',

@@ -25,7 +25,7 @@ import {
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import { ModuleModel } from '../models/ModuleModel'
+import { ComposerModuleModel } from '../models/ModuleModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -130,12 +130,12 @@ export default class ComposerSolver {
 
     /*********************************** Modules *************************************/
 
-    addModule(moduleToAdd: ModuleModel) {
+    addModule(moduleToAdd: ComposerModuleModel) {
         if (!this.config.modules) this.config.modules = []
         this.config.modules.push(moduleToAdd)
     }
 
-    updateModule(updatedModule: ModuleModel) {
+    updateModule(updatedModule: ComposerModuleModel) {
         if (this.config.modules) {
             const updatedModules = [...this.config.modules]
             const idx = updatedModules.findIndex(
