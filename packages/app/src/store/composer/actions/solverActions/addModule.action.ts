@@ -1,10 +1,10 @@
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import _ from 'lodash'
 
 const addModuleAction = (
     state: CompositionModel,
-    payload: ModuleModel
+    payload: ComposerModuleModel
 ): CompositionModel => {
     if (
         state.currentIdPath !== undefined &&

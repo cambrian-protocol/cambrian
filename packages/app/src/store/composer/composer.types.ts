@@ -1,10 +1,10 @@
 import { FlowElement, Node } from 'react-flow-renderer'
 
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '../../models/CompositionModel'
 import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
 import { CreateSlotActionPayload } from './actions/solverActions/createSlot.action'
-import { ModuleModel } from '@cambrian/app/models/ModuleModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
@@ -60,12 +60,12 @@ type LoadComposerAction = {
 
 type AddModuleActionType = {
     type: 'ADD_MODULE'
-    payload: ModuleModel
+    payload: ComposerModuleModel
 }
 
 type UpdateModuleActionType = {
     type: 'UPDATE_MODULE'
-    payload: ModuleModel
+    payload: ComposerModuleModel
 }
 
 type DeleteModuleActionType = {
