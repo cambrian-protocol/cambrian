@@ -1,6 +1,6 @@
 import {
-    ModuleDataInputType,
-    ModuleModel,
+    ComposerModuleDataInputType,
+    ComposerModuleModel,
 } from '@cambrian/app/models/ModuleModel'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
@@ -11,12 +11,13 @@ import { FormField } from 'grommet'
 import { SetStateAction } from 'react'
 import { Text } from 'grommet'
 import { TextInput } from 'grommet'
-import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface ModuleConfigFormProps {
-    inputs?: ModuleDataInputType[]
-    setInputs: React.Dispatch<SetStateAction<ModuleDataInputType[] | undefined>>
-    module: ModuleModel
+    inputs?: ComposerModuleDataInputType[]
+    setInputs: React.Dispatch<
+        SetStateAction<ComposerModuleDataInputType[] | undefined>
+    >
+    module: ComposerModuleModel
     onSubmit: () => void
     submitLabel: string
 }
@@ -40,7 +41,7 @@ const ModuleConfigForm = ({
         <>
             {inputs ? (
                 <BaseFormContainer justify="between">
-                    <Form<ModuleDataInputType[]> onSubmit={onSubmit}>
+                    <Form<ComposerModuleDataInputType[]> onSubmit={onSubmit}>
                         <Box gap="medium" justify="between">
                             {module.dataInputs?.map((input, idx) => (
                                 <Box key={idx}>

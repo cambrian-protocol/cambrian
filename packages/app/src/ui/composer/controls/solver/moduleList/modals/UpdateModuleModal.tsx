@@ -1,6 +1,6 @@
 import {
-    ModuleDataInputType,
-    ModuleModel,
+    ComposerModuleDataInputType,
+    ComposerModuleModel,
 } from '@cambrian/app/models/ModuleModel'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
@@ -11,14 +11,14 @@ import { useState } from 'react'
 
 interface UpdateModuleModalProps {
     onClose: () => void
-    module: ModuleModel
+    module: ComposerModuleModel
 }
 
 const UpdateModuleModal = ({ onClose, module }: UpdateModuleModalProps) => {
     const { dispatch } = useComposerContext()
-    const [inputs, setInputs] = useState<ModuleDataInputType[] | undefined>(
-        module.dataInputs
-    )
+    const [inputs, setInputs] = useState<
+        ComposerModuleDataInputType[] | undefined
+    >(module.dataInputs)
     const onSubmit = () => {
         dispatch({
             type: 'UPDATE_MODULE',

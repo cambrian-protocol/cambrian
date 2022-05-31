@@ -13,12 +13,12 @@ import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverAction
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import IPFSTextSubmitterUI from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 import InitiatedSolverContent from '@cambrian/app/ui/solvers/InitiatedSolverContent'
 import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
+import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import OutcomeNotification from '../notifications/OutcomeNotification'
@@ -98,7 +98,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     }, [outcomes])
 
     useEffect(() => {
-        if (solverData && currentUser) {
+        if (solverData && currentUser.address) {
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 
@@ -242,18 +242,16 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         }
     }
 
-    const proposal = metadata?.stages?.proposal as ProposalModel
+    const proposalMetadata = metadata?.stages?.proposal as ProposalModel
 
-    // TODO Intergrate Custom UI Loading. Pass props via Provider?
-    const customUI = {
-        sidebar: undefined,
-        sideNav: undefined,
-    }
     return (
         <>
-            {solverData && currentCondition && solverMethods ? (
+            {solverData &&
+            currentCondition &&
+            solverMethods &&
+            currentUser.chainId ? (
                 <InteractionLayout
-                    contextTitle="Solver"
+                    contextTitle={proposalMetadata?.title || 'Solver'}
                     actionBar={
                         <DefaultSolverActionbar
                             currentUser={currentUser}
@@ -279,39 +277,29 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
                         <InitiatedSolverContent metadata={metadata} />
-                    ) : solverData.config.moduleLoaders.find(
-                          (loader) =>
-                              loader.module ===
-                              '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e' // TEMP, Local hardhat IPFSTextSubmitter address
-                      ) ? (
+                    ) : (
                         <>
-                            {proposal && (
-                                <HeaderTextSection
-                                    title={
-                                        proposal
-                                            ? proposal.title
-                                            : solverData.solverTag?.title ||
-                                              'Solver'
-                                    }
-                                    subTitle="Most recent state of"
-                                    paragraph={
-                                        proposal
-                                            ? proposal.description
-                                            : solverData.solverTag?.description
-                                    }
-                                />
-                            )}
-                            <IPFSTextSubmitterUI
+                            <HeaderTextSection
+                                title={
+                                    proposalMetadata
+                                        ? proposalMetadata.title
+                                        : solverData.solverTag?.title ||
+                                          'Solver'
+                                }
+                                subTitle="Most recent state of"
+                                paragraph={
+                                    proposalMetadata
+                                        ? proposalMetadata.description
+                                        : solverData.solverTag?.description
+                                }
+                            />
+                            <ModuleUIManager
+                                solverData={solverData}
+                                chainId={currentUser.chainId}
                                 solverAddress={address}
-                                currentUser={currentUser}
                                 currentCondition={currentCondition}
-                                moduleAddress={
-                                    '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e'
-                                } // TEMP!
                             />
                         </>
-                    ) : (
-                        <></>
                     )}
                 </InteractionLayout>
             ) : solverData && solverMethods ? (

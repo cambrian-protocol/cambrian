@@ -94,6 +94,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Error while preparing solve',
         logLevel: 1,
     },
+    MODULE_ERROR: {
+        message: 'Error initializing module',
+        logLevel: 1,
+    },
 }
 
 export const CONTRACT_ERROR: ErrorMessagesType = {
