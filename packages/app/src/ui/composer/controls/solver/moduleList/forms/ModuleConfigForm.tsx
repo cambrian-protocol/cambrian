@@ -45,11 +45,8 @@ const ModuleConfigForm = ({
                             {module.dataInputs?.map((input, idx) => (
                                 <Box key={idx}>
                                     <FormField
-                                        label={input.label + '*'}
+                                        label={input.label}
                                         type={input.type}
-                                        validate={() =>
-                                            isRequired(inputs[idx].value)
-                                        }
                                     >
                                         <TextInput
                                             value={inputs[idx].value}
