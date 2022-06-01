@@ -25,6 +25,7 @@ const BaseFormGroupContainer = ({
             background={'background-contrast'}
             round="small"
             {...props}
+            border
         >
             {children}
         </Box>
