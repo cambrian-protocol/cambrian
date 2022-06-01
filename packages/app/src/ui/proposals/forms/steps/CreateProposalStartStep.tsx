@@ -80,7 +80,7 @@ const CreateProposalStartStep = ({
             {showRecentProposalsModal && (
                 <RecentExportsModal
                     prefix="proposals"
-                    route="/proposals/"
+                    route="https://app.cambrianprotocol.com/proposals/"
                     keyCID={templateCID as string}
                     title="Recent proposals"
                     subTitle="Distribute on of your"

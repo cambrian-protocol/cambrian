@@ -56,7 +56,7 @@ const RecentExportsModal = ({
                     <Box fill justify="center" align="center" gap="medium">
                         <CircleDashed size="48" />
                         <Text color="dark-4" size="small">
-                            No exported {prefix} found in local storage
+                            No {prefix} found in local storage
                         </Text>
                     </Box>
                 )}
