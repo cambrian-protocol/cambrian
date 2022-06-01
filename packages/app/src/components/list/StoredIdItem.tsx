@@ -7,7 +7,7 @@ import { Button } from 'grommet'
 import { Text } from 'grommet'
 
 interface StoredIdItemProps {
-    route: string
+    route?: string
     title: string
     cid: string
     border?: boolean
@@ -32,13 +32,13 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
             <Box width={{ max: 'large' }} pad="xsmall">
                 <Text>{title}</Text>
                 <Text truncate size="small" color="dark-4">
-                    https://app.cambrianprotocol.com{link}
+                    {link}
                 </Text>
             </Box>
             <Box direction="row" flex wrap>
                 <Box flex width={{ min: 'small' }} pad="xsmall">
                     <Button
-                        label={isSavedToClipboard ? 'Copied!' : 'Copy link'}
+                        label={isSavedToClipboard ? 'Copied!' : 'Copy'}
                         secondary
                         icon={
                             isSavedToClipboard ? (
@@ -48,22 +48,22 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
                             )
                         }
                         onClick={() => {
-                            navigator.clipboard.writeText(
-                                `https://app.cambrianprotocol.com${link}`
-                            )
+                            navigator.clipboard.writeText(link)
                             setIsSavedToClipboard(true)
                         }}
                     />
                 </Box>
-                <Box flex width={{ min: 'small' }} pad="xsmall">
-                    <Button
-                        label="Follow link"
-                        reverse
-                        primary
-                        icon={<ArrowCircleRight size="24" />}
-                        href={link}
-                    />
-                </Box>
+                {route && (
+                    <Box flex width={{ min: 'small' }} pad="xsmall">
+                        <Button
+                            label="Follow link"
+                            reverse
+                            primary
+                            icon={<ArrowCircleRight size="24" />}
+                            href={link}
+                        />
+                    </Box>
+                )}
             </Box>
         </BaseFormContainer>
     )
