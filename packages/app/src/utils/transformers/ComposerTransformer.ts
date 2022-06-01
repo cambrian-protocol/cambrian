@@ -24,6 +24,8 @@ import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
 import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -84,6 +86,10 @@ export function parseComposerSolverConfig(
     sortedSolvers: ComposerSolverModel[],
     chainId: number
 ): SolverConfigModel {
+    const chainData = SUPPORTED_CHAINS[chainId]
+    if (!chainData || !chainData.contracts['basicSolverV1'])
+        throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
+
     const ingests = Object.keys(composerSolverConfig.slots).map((slotId) =>
         parseComposerSlot(composerSolverConfig.slots[slotId], sortedSolvers)
     )
@@ -95,9 +101,7 @@ export function parseComposerSolverConfig(
     )
 
     return {
-        implementation: composerSolverConfig.implementation
-            ? composerSolverConfig.implementation
-            : '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
+        implementation: chainData.contracts['basicSolverV1'],
         keeper: composerSolverConfig.keeperAddress,
         arbitrator: composerSolverConfig.arbitratorAddress
             ? composerSolverConfig.arbitratorAddress
