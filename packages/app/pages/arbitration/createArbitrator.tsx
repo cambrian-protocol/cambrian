@@ -25,10 +25,10 @@ export default function CreateArbitrator() {
                     </Box>
                 </Box>
             </PageLayout>
-            {showSuccessModal && currentUser.chainId && (
+            {showSuccessModal && currentUser.chainId && currentUser.address && (
                 <ExportSuccessModal
                     keyId={currentUser.chainId.toString()}
-                    prefix="arbitrator"
+                    prefix={currentUser.address}
                     link=""
                     description="This is your Arbitrator Contract Address. Share it with your community and offer Arbitration Services for Solutions with it."
                     title="Arbitrator Contract created"

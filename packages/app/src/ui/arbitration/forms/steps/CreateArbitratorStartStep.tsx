@@ -63,17 +63,19 @@ const CreateArbitratorStartStep = ({
                 />
                 <Box pad="medium" />
             </MultiStepFormLayout>
-            {showRecentArbitratorsModal && currentUser.chainId && (
-                <RecentExportsModal
-                    prefix="arbitrator"
-                    route=""
-                    keyCID={currentUser.chainId.toString()}
-                    title="Recent Arbitrator Contracts"
-                    subTitle="Use on of your"
-                    paragraph="Warning: These arbitrator contract addresses are just stored in your local storage. They will be lost if you clear the cache of your browser."
-                    onClose={toggleShowRecentArbitratorsModal}
-                />
-            )}
+            {showRecentArbitratorsModal &&
+                currentUser.chainId &&
+                currentUser.address && (
+                    <RecentExportsModal
+                        prefix={currentUser.address}
+                        route=""
+                        keyCID={currentUser.chainId.toString()}
+                        title="Recent Arbitrator Contracts"
+                        subTitle="Use on of your"
+                        paragraph="Warning: These arbitrator contract addresses are just stored in your local storage. They will be lost if you clear the cache of your browser."
+                        onClose={toggleShowRecentArbitratorsModal}
+                    />
+                )}
         </>
     )
 }

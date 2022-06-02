@@ -103,7 +103,7 @@ const CreateArbitratorMultiStepForm = ({
                 throw GENERAL_ERROR['CREATE_ARBITRATOR_ERROR']
 
             storeIdInLocalStorage(
-                'arbitrator',
+                currentUser.address,
                 currentUser.chainId.toString(),
                 'Arbitrator Contract',
                 arbitratorContract
