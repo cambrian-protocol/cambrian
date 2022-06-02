@@ -71,7 +71,7 @@ const CreateTemplateStartStep = ({
             {showRecentTemplatesModal && (
                 <RecentExportsModal
                     prefix="templates"
-                    route="https://app.cambrianprotocol.com/templates/"
+                    route={`${window.location.origin}/templates/`}
                     keyCID={compositionCID as string}
                     title="Recent templates"
                     subTitle="Distribute on of your"
