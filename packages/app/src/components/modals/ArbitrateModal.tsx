@@ -2,59 +2,78 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
+import { SetStateAction, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
 import ErrorPopupModal from './ErrorPopupModal'
 import { GenericMethods } from '../solver/Solver'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import LoadingScreen from '../info/LoadingScreen'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { TRANSACITON_MESSAGE } from '@cambrian/app/constants/TransactionMessages'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { useState } from 'react'
 
 interface ArbitrateModalProps {
+    arbitratorContract?: ethers.Contract
     solverMethods: GenericMethods
     solverData: SolverModel
     currentCondition: SolverContractCondition
     onBack: () => void
+    isArbitrating?: number
+    setIsArbitrating: React.Dispatch<SetStateAction<number | undefined>>
+    solverAddress: string
 }
 
 const ArbitrateModal = ({
+    arbitratorContract,
     solverMethods,
     solverData,
     currentCondition,
     onBack,
+    isArbitrating,
+    setIsArbitrating,
+    solverAddress,
 }: ArbitrateModalProps) => {
-    const [transactionMsg, setTransactionMsg] = useState<string>()
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const disputeId = ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(
+            ['address', 'uint256'],
+            [solverAddress, currentCondition.executions - 1]
+        )
+    )
 
     const onArbitrate = async (indexSet: number) => {
-        setTransactionMsg(TRANSACITON_MESSAGE['CONFIRM'])
+        setIsArbitrating(indexSet)
         try {
             const binaryArray = binaryArrayFromIndexSet(
                 indexSet,
                 solverData.config.conditionBase.outcomeSlots
             )
-            const transaction: ethers.ContractTransaction =
-                await solverMethods.arbitrate(
-                    currentCondition.executions - 1,
-                    binaryArray
-                )
-            setTransactionMsg(TRANSACITON_MESSAGE['WAIT'])
-            const rc = await transaction.wait()
 
-            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
-                throw GENERAL_ERROR['ARBITRATION_ERROR']
+            if (arbitratorContract !== undefined) {
+                const tx: ethers.ContractTransaction = await arbitratorContract[
+                    'arbitrate(bytes32,uint256)'
+                ](disputeId, binaryArray)
+                await tx.wait()
+            } else {
+                const tx: ethers.ContractTransaction =
+                    await solverMethods.arbitrate(
+                        currentCondition.executions - 1,
+                        binaryArray
+                    )
+                const rc = await tx.wait()
+                if (
+                    !rc.events?.find((event) => event.event === 'ChangedStatus')
+                )
+                    throw GENERAL_ERROR['ARBITRATION_ERROR']
+            }
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
         }
-        setTransactionMsg(undefined)
+        setIsArbitrating(undefined)
     }
 
     return (
@@ -75,6 +94,7 @@ const ArbitrateModal = ({
                                 key={outcomeCollection.indexSet}
                                 outcomeCollection={outcomeCollection}
                                 onArbitrate={onArbitrate}
+                                proposedIndexSet={isArbitrating}
                             />
                         )
                     })}
@@ -86,7 +106,6 @@ const ArbitrateModal = ({
                     errorMessage={errMsg}
                 />
             )}
-            {transactionMsg && <LoadingScreen context={transactionMsg} />}
         </>
     )
 }

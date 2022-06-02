@@ -1,24 +1,22 @@
 import { BigNumber, ethers } from 'ethers'
-import { SetStateAction, useState } from 'react'
-
-import BaseLayerModal from './BaseLayerModal'
-import { Box } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
+import { SetStateAction, useState } from 'react'
+
+import BaseLayerModal from './BaseLayerModal'
+import { Box } from 'grommet'
 import ErrorPopupModal from './ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ArbitrationDesireOutcomeModalProps {
-    currentUser: UserType
     solverAddress: string
     arbitratorContract: ethers.Contract
     proposedOutcomeCollection: OutcomeCollectionModel
@@ -31,7 +29,6 @@ interface ArbitrationDesireOutcomeModalProps {
 }
 
 const ArbitrationDesireOutcomeModal = ({
-    currentUser,
     arbitratorContract,
     proposedOutcomeCollection,
     setDesiredIndexSet,
@@ -52,9 +49,7 @@ const ArbitrationDesireOutcomeModal = ({
                 solverData.config.conditionBase.outcomeSlots
             ).map((x) => ethers.BigNumber.from(x))
 
-            console.log(arbitratorContract)
-
-            const tx = await arbitratorContract[
+            const tx: ethers.ContractTransaction = await arbitratorContract[
                 'requestArbitration(address,uint256,uint256[])'
             ](
                 solverAddress,
@@ -62,10 +57,13 @@ const ArbitrationDesireOutcomeModal = ({
                 desiredOutcomeArray,
                 { value: fee }
             )
+
+            await tx.wait()
+            onBack()
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
-            setDesiredIndexSet(undefined)
         }
+        setDesiredIndexSet(undefined)
     }
 
     const filteredOutcomes = solverData.outcomeCollections[

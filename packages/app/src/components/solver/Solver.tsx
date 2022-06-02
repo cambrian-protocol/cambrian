@@ -8,6 +8,7 @@ import {
 } from './SolverGetters'
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
+import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -102,8 +103,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 
-            if (currentUser.address === solverData.config.arbitrator)
-                addPermission('Arbitrator')
+            initArbitratorPermission()
 
             if (currentCondition) {
                 const recipients = getSolverRecipientSlots(
@@ -154,6 +154,27 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             }
         }
     }, [currentUser, currentCondition])
+
+    const initArbitratorPermission = async () => {
+        if (solverData) {
+            const arbitratorCode = await currentUser.signer?.provider?.getCode(
+                solverData.config.arbitrator
+            )
+            const isContract = arbitratorCode !== '0x'
+
+            if (isContract) {
+                const arbitratorContract = new ethers.Contract(
+                    solverData.config.arbitrator,
+                    BASIC_ARBITRATOR_IFACE,
+                    currentUser.signer
+                )
+                const owner = await arbitratorContract.owner()
+                if (owner && currentUser.address === owner)
+                    addPermission('Arbitrator')
+            } else if (currentUser.address === solverData.config.arbitrator)
+                addPermission('Arbitrator')
+        }
+    }
 
     const updateSolverDataListener = async () => {
         await updateSolverData()
@@ -254,6 +275,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                     contextTitle={proposalMetadata?.title || 'Solver'}
                     actionBar={
                         <DefaultSolverActionbar
+                            solverAddress={address}
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
