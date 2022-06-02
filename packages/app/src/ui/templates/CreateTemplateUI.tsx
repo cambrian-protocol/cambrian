@@ -33,7 +33,7 @@ const CreateTemplateUI = ({
                 <ExportSuccessModal
                     keyId={compositionCID}
                     prefix="templates"
-                    link="https://app.cambrianprotocol.com/templates/"
+                    link={`${window.location.origin}/templates/`}
                     description="This is the link to your freshly created template. Share it with your clients and receive proposals."
                     title="New template created!"
                     onClose={toggleShowSuccessModal}
