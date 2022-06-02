@@ -1,6 +1,6 @@
 import {
     ArrowSquareIn,
-    Coins,
+    Scales,
     Timer,
     TreeStructure,
     UsersThree,
@@ -111,6 +111,18 @@ const SolverConfigInfo = ({
                     icon={<TokenAvatar token={solverData.collateralToken} />}
                     subTitle={solverData.collateralToken.address}
                 />
+                {solverData.config.arbitrator !== '' && (
+                    <BaseMenuListItem
+                        info={
+                            solverData.slotTags
+                                ? solverData.slotTags['arbitrator']?.description
+                                : undefined
+                        }
+                        title="Arbitrator"
+                        icon={<Scales />}
+                        subTitle={solverData.config.arbitrator}
+                    />
+                )}
             </Box>
             {showRecipientModal && (
                 <RecipientsModal
