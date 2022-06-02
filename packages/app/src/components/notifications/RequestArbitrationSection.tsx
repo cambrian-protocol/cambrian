@@ -4,10 +4,12 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 import { Lock, Scales } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
 import ArbitrationDesireOutcomeModal from '../modals/ArbitrationDesireOutcomeModal'
 import ArbitrationDispatch from '@cambrian/app/contracts/ArbitrationDispatch'
 import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
+import BaseFormContainer from '../containers/BaseFormContainer'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import { GenericMethods } from '../solver/Solver'
 import LoaderButton from '../buttons/LoaderButton'
@@ -18,7 +20,6 @@ import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { useEffect, useState } from 'react'
 
 interface RequestArbitrationSectionProps {
     solverMethods: GenericMethods
@@ -39,8 +40,7 @@ const RequestArbitrationSection = ({
 }: RequestArbitrationSectionProps) => {
     const isArbitrator = currentUser.address == solverData.config.arbitrator
 
-    const [isArbitratorContract, setIsArbitratorContract] = useState(false)
-    const [fee, setFee] = useState(ethers.BigNumber.from('0'))
+    const [fee, setFee] = useState(ethers.BigNumber.from(0))
 
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isRequestingArbitration, setIsRequestingArbitration] =
@@ -59,17 +59,16 @@ const RequestArbitrationSection = ({
             const arbitratorCode = await currentUser.signer?.provider?.getCode(
                 solverData.config.arbitrator
             )
-            const isContract = arbitratorCode == '0x' || true
+            const isContract = arbitratorCode !== '0x'
 
             if (isContract) {
-                const contract = await new ethers.Contract(
+                const contract = new ethers.Contract(
                     solverData.config.arbitrator,
                     BASIC_ARBITRATOR_IFACE,
                     currentUser.signer
                 )
                 setArbitratorContract(contract)
             }
-            setIsArbitratorContract(isContract)
         }
         checkArbitratorIsContract()
     }, [currentUser])
@@ -88,16 +87,16 @@ const RequestArbitrationSection = ({
                 console.log(e)
             }
         }
-        if (isArbitratorContract && arbitratorContract) {
+        if (arbitratorContract !== undefined) {
             getFee()
         }
-    }, [isArbitratorContract])
+    }, [arbitratorContract])
 
     const onDispatchArbitration = async () => {
         setIsRequestingArbitration(true)
         if (currentUser.signer && currentUser.chainId) {
             try {
-                if (isArbitratorContract) {
+                if (arbitratorContract !== undefined) {
                     toggleShowDesiredOutcomeModal()
                 } else {
                     const arbitrationDispatch = new ArbitrationDispatch(
@@ -143,60 +142,65 @@ const RequestArbitrationSection = ({
 
     return (
         <>
-            {isArbitrator ? (
-                <>
-                    <Box pad="small">
-                        <Heading level="3">Arbitration</Heading>
-                        <Text size="small">
-                            If you have received an Arbitration Request, please
-                            lock the Solver here
-                        </Text>
-                    </Box>
-                    <LoaderButton
-                        primary
-                        isLoading={isRequestingArbitration}
-                        label={'Lock Solver'}
-                        icon={<Lock />}
-                        onClick={onArbitratorRequestArbitration}
-                    />
-                </>
-            ) : (
-                <>
-                    <Box pad="small">
-                        <Heading level="4">Arbitration</Heading>
-                        <Text size="small">
-                            You may request arbitration if you believe this
-                            proposed outcome in incorrect.
-                        </Text>
-                    </Box>
-                    {fee != ethers.BigNumber.from('0') && (
-                        <Box pad="small">
-                            <Heading level="3">Fee</Heading>
+            <BaseFormContainer>
+                {isArbitrator ? (
+                    <Box gap="medium">
+                        <>
+                            <Heading level="4">Arbitration</Heading>
                             <Text size="small">
-                                {ethers.utils.formatEther(fee).toString()} ETH
-                                refundable if you win arbitration.
+                                If you have received an Arbitration Request,
+                                please lock the Solver here
                             </Text>
-                        </Box>
-                    )}
-
-                    <LoaderButton
-                        secondary
-                        isLoading={isRequestingArbitration}
-                        label={'Request Arbitration'}
-                        icon={<Scales />}
-                        onClick={onDispatchArbitration}
-                    />
-                </>
-            )}
+                        </>
+                        <LoaderButton
+                            primary
+                            isLoading={isRequestingArbitration}
+                            label={'Lock Solver'}
+                            icon={<Lock />}
+                            onClick={onArbitratorRequestArbitration}
+                        />
+                    </Box>
+                ) : (
+                    <Box gap="medium">
+                        <>
+                            <Heading level="4">Arbitration</Heading>
+                            <Text size="small">
+                                You may request arbitration if you believe this
+                                proposed outcome is incorrect.
+                            </Text>
+                            {!fee.isZero() && (
+                                <Text size="small">
+                                    The initialized fee for an arbitration
+                                    service is{' '}
+                                    <Text weight={'bold'}>
+                                        {ethers.utils
+                                            .formatEther(fee)
+                                            .toString()}{' '}
+                                        ETH{' '}
+                                    </Text>
+                                    and is refundable if you win arbitration.
+                                </Text>
+                            )}
+                        </>
+                        <LoaderButton
+                            secondary
+                            isLoading={isRequestingArbitration}
+                            label={'Request Arbitration'}
+                            icon={<Scales />}
+                            onClick={onDispatchArbitration}
+                        />
+                    </Box>
+                )}
+            </BaseFormContainer>
             {showDesiredOutcomeModal && arbitratorContract && (
                 <ArbitrationDesireOutcomeModal
-                    currentUser={currentUser}
                     arbitratorContract={arbitratorContract}
                     solverAddress={solverAddress}
                     proposedOutcomeCollection={outcomeCollection}
                     currentCondition={condition}
                     onBack={toggleShowDesiredOutcomeModal}
                     setDesiredIndexSet={setDesiredOutcomeIndexSet}
+                    desiredIndexSet={desiredOutcomeIndexSet}
                     solverData={solverData}
                     fee={fee}
                 />

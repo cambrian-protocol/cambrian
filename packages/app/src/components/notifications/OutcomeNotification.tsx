@@ -2,6 +2,7 @@ import SolverStatusNotification, {
     SolverStatusNotificationProps,
 } from './SolverStatusNotification'
 
+import ArbitrateNullSection from './ArbitrateNullSection'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { GenericMethods } from '../solver/Solver'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
@@ -32,6 +33,7 @@ const OutcomeNotification = ({
     currentUser,
     solverAddress,
 }: OutcomeNotificationProps) => {
+    const isArbitrator = usePermission('Arbitrator')
     const isAllowedToRequestArbitration =
         usePermission('Recipient') ||
         solverData.config.arbitrator === currentUser.address
@@ -70,6 +72,25 @@ const OutcomeNotification = ({
                     token={token}
                     outcomeCollection={outcomeCollection}
                 />
+                {hasArbitration && isAllowedToRequestArbitration && (
+                    <RequestArbitrationSection
+                        solverMethods={solverMethods}
+                        currentUser={currentUser}
+                        condition={condition}
+                        solverData={solverData}
+                        outcomeCollection={outcomeCollection}
+                        solverAddress={solverAddress}
+                    />
+                )}
+                {isArbitrator && (
+                    <ArbitrateNullSection
+                        solverData={solverData}
+                        currentUser={currentUser}
+                        solverAddress={solverAddress}
+                        solverMethods={solverMethods}
+                        currentCondition={condition}
+                    />
+                )}
             </SolverStatusNotification>
         ) : condition.status === ConditionStatus.OutcomeReported ||
           condition.status === ConditionStatus.ArbitrationDelivered ? (

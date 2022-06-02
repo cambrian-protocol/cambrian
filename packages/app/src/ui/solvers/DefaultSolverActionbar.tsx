@@ -19,6 +19,7 @@ interface DefaultSolverActionbarProps {
     solverMethods: GenericMethods
     currentCondition?: SolverContractCondition
     metadata?: MetadataModel
+    solverAddress: string
 }
 
 const DefaultSolverActionbar = ({
@@ -27,6 +28,7 @@ const DefaultSolverActionbar = ({
     solverMethods,
     currentCondition,
     metadata,
+    solverAddress,
 }: DefaultSolverActionbarProps) => {
     const allowedForKeeper = usePermission('Keeper')
     const allowedForRecipients = usePermission('Recipient')
@@ -76,6 +78,7 @@ const DefaultSolverActionbar = ({
             if (allowedForArbitrator) {
                 return (
                     <ArbitrateActionbar
+                        solverAddress={solverAddress}
                         metadata={metadata}
                         solverData={solverData}
                         solverMethods={solverMethods}
