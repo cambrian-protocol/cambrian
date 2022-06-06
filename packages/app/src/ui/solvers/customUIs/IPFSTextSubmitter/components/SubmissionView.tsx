@@ -17,7 +17,7 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                 round="small"
                 elevation="small"
                 border
-                height={{ min: 'small' }}
+                height={{ min: 'medium' }}
             >
                 {!latestSubmission || latestSubmission.submission === '' ? (
                     <Box fill justify="center" align="center" gap="small">
