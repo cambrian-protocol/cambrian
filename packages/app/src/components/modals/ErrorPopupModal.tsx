@@ -13,7 +13,7 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
     return (
         <Layer
             onEsc={onClose}
-            background={'background-popup'}
+            background={'background-contrast'}
             responsive={false}
         >
             <Box
