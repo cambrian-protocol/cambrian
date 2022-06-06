@@ -37,16 +37,16 @@ const ProposalContextHeader = ({
                     />
                 </Box>
             </BaseFormGroupContainer>
-            <BaseFormGroupContainer groupTitle="Template details">
-                <HeaderTextSection
-                    title={template.title}
-                    paragraph={template.description}
-                />
-            </BaseFormGroupContainer>
             <BaseFormGroupContainer groupTitle="Proposal details">
                 <HeaderTextSection
                     title={proposal.title}
                     paragraph={proposal.description}
+                />
+            </BaseFormGroupContainer>
+            <BaseFormGroupContainer groupTitle="Template details">
+                <HeaderTextSection
+                    title={template.title}
+                    paragraph={template.description}
                 />
             </BaseFormGroupContainer>
         </Box>

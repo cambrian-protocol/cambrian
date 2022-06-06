@@ -64,7 +64,7 @@ const SubmissionContainer = ({
         return await fetchLatestSubmission(logs, currentCondition)
     }
     return (
-        <Box gap="small" flex>
+        <Box gap="small">
             {latestSubmission.timestamp !== undefined && (
                 <Text size="small" color="brand">
                     Latest submission:{' '}
