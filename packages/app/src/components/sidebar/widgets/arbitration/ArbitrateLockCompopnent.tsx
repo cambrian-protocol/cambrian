@@ -16,15 +16,15 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useState } from 'react'
 
-interface ArbitrateLockWidgetProps {
+interface ArbitrateLockComponentProps {
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
 }
 
-const ArbitrateLockWidget = ({
+const ArbitrateLockComponent = ({
     solverMethods,
     currentCondition,
-}: ArbitrateLockWidgetProps) => {
+}: ArbitrateLockComponentProps) => {
     const [isRequestingArbitration, setIsRequestingArbitration] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -101,4 +101,4 @@ const ArbitrateLockWidget = ({
     )
 }
 
-export default ArbitrateLockWidget
+export default ArbitrateLockComponent

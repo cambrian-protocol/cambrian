@@ -8,19 +8,19 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'
 import { getSolverRecipientAddressHashmap } from '@cambrian/app/components/solver/SolverHelpers'
 
-interface DisputerListWidgetProps {
+interface DisputerListComponentProps {
     arbitratorContract: ethers.Contract
     disputeId: string
     solverData: SolverModel
     currentCondition: SolverContractCondition
 }
 
-const DisputerListWidget = ({
+const DisputerListComponent = ({
     arbitratorContract,
     disputeId,
     solverData,
     currentCondition,
-}: DisputerListWidgetProps) => {
+}: DisputerListComponentProps) => {
     const [dispute, setDispute] = useState<DisputeModel>()
 
     const recipientsHashmap = getSolverRecipientAddressHashmap(
@@ -57,4 +57,4 @@ const DisputerListWidget = ({
     )
 }
 
-export default DisputerListWidget
+export default DisputerListComponent

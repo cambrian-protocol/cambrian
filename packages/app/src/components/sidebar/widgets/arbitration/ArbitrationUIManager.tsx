@@ -1,11 +1,11 @@
-import ArbitrateLockWidget from './ArbitrateLockWidget'
-import ArbitrateNullWidget from './ArbitrateNullWidget'
+import ArbitrateLockComponent from './ArbitrateLockCompopnent'
+import ArbitrateNullComponent from './ArbitrateNullComponent'
 import ArbitrationTimelockInfoComponent from './ArbitrationTimelockInfoComponent'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DispatchArbitrationComponent from './DispatchArbitrationComponent'
-import DisputerListWidget from './DisputerListWidget'
+import DisputerListComponent from './DisputerListComponent'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import RequestContractArbitrationComponent from './RequestContractArbitrationComponent'
@@ -89,7 +89,7 @@ const ArbitrationUIManager = ({
         ArbitrationUI = (
             <Box gap="medium">
                 {ArbitrationUI}
-                <ArbitrateLockWidget
+                <ArbitrateLockComponent
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
@@ -106,7 +106,7 @@ const ArbitrationUIManager = ({
         ArbitrationUI = (
             <Box gap="medium">
                 {ArbitrationUI}
-                <ArbitrateNullWidget
+                <ArbitrateNullComponent
                     arbitratorContract={arbitratorContract}
                     disputeId={disputeId}
                     currentUser={currentUser}
@@ -125,7 +125,7 @@ const ArbitrationUIManager = ({
         ArbitrationUI = (
             <Box gap="medium">
                 {ArbitrationUI}
-                <DisputerListWidget
+                <DisputerListComponent
                     currentCondition={currentCondition}
                     solverData={solverData}
                     arbitratorContract={arbitratorContract}

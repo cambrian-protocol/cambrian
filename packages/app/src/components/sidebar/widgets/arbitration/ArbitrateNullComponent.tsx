@@ -16,7 +16,7 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useState } from 'react'
 
-interface ArbitrateNullSectionProps {
+interface ArbitrateNullComponentProps {
     arbitratorContract?: ethers.Contract
     disputeId?: string
     currentUser: UserType
@@ -24,12 +24,12 @@ interface ArbitrateNullSectionProps {
     solverMethods: GenericMethods
 }
 
-const ArbitrateNullWidget = ({
+const ArbitrateNullComponent = ({
     arbitratorContract,
     disputeId,
     currentCondition,
     solverMethods,
-}: ArbitrateNullSectionProps) => {
+}: ArbitrateNullComponentProps) => {
     const [isArbitrating, setIsArbitrating] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -86,4 +86,4 @@ const ArbitrateNullWidget = ({
     )
 }
 
-export default ArbitrateNullWidget
+export default ArbitrateNullComponent
