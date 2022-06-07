@@ -1,4 +1,4 @@
-import ArbitrationUIManager from './widgets/arbitration/ArbitrationUIManager'
+import ArbitrationUIManager from './arbitration/ArbitrationUIManager'
 import BaseFormContainer from '../containers/BaseFormContainer'
 import { Box } from 'grommet'
 import { GenericMethods } from '../solver/Solver'

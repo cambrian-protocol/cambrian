@@ -4,10 +4,10 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
-import { GenericMethods } from '../../../solver/Solver'
+import ErrorPopupModal from '../../modals/ErrorPopupModal'
+import { GenericMethods } from '../../solver/Solver'
 import { Heading } from 'grommet'
-import LoaderButton from '../../../buttons/LoaderButton'
+import LoaderButton from '../../buttons/LoaderButton'
 import { ProhibitInset } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Text } from 'grommet'
