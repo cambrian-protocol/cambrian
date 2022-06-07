@@ -2,6 +2,7 @@ import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../nav/Appbar'
 import { Box } from 'grommet'
+import { DotsThreeOutlineVertical } from 'phosphor-react'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
@@ -11,14 +12,17 @@ import WarningBanner from '../containers/WarningBanner'
 
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar: JSX.Element
-    notification?: JSX.Element
+    sidebar?: JSX.Element
+    header: JSX.Element
 }
 
+// TODO Mobile responsive toggle Sidebar
 const InteractionLayout = ({
     contextTitle,
     children,
     actionBar,
-    notification,
+    sidebar,
+    header,
 }: InteractionLayoutProps) => {
     return (
         <>
@@ -33,7 +37,7 @@ const InteractionLayout = ({
             <ResponsiveContext.Consumer>
                 {(screenSize) => {
                     return (
-                        <Box height={'100vh'}>
+                        <Box height="100vh">
                             <WarningBanner
                                 message={WARNING_MESSAGE['BETA_WARNING']}
                             />
@@ -43,9 +47,6 @@ const InteractionLayout = ({
                                     vertical: 'auto',
                                     horizontal: 'hidden',
                                 }}
-                                justify="center"
-                                align="center"
-                                flex
                             >
                                 <Appbar />
                                 <Glow
@@ -55,20 +56,22 @@ const InteractionLayout = ({
                                     top={'-200px'}
                                 />
                                 <Box
-                                    flex
-                                    width={'large'}
+                                    align="center"
+                                    pad="large"
+                                    height={{ min: 'auto' }}
                                     style={{ position: 'relative' }}
-                                    pad={
-                                        screenSize === 'small'
-                                            ? {
-                                                  vertical: 'large',
-                                                  horizontal: 'large',
-                                              }
-                                            : { vertical: 'large' }
-                                    }
                                 >
-                                    {notification}
-                                    {children}
+                                    {header}
+                                    <Box
+                                        pad={{ top: 'large' }}
+                                        direction="row"
+                                        width="xlarge"
+                                        gap="large"
+                                        height={{ min: '90vh' }}
+                                    >
+                                        <Box width="medium">{sidebar}</Box>
+                                        <Box flex>{children}</Box>
+                                    </Box>
                                 </Box>
                             </Page>
                             {actionBar}

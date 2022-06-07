@@ -59,6 +59,11 @@ const ArbitrateModal = ({
                 ](disputeId, binaryArray)
                 await tx.wait()
             } else {
+                console.log(
+                    'currentCondition.payouts:',
+                    currentCondition.payouts
+                )
+                console.log('Binary array to report:', binaryArray)
                 const tx: ethers.ContractTransaction =
                     await solverMethods.arbitrate(
                         currentCondition.executions - 1,
@@ -73,7 +78,6 @@ const ArbitrateModal = ({
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
         }
-        setIsArbitrating(undefined)
     }
 
     return (
@@ -86,10 +90,9 @@ const ArbitrateModal = ({
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[
                         currentCondition.conditionId
-                    ].map((outcomeCollection, idx) => {
+                    ].map((outcomeCollection) => {
                         return (
                             <OutcomeCollectionCard
-                                idx={idx + 1}
                                 token={solverData.collateralToken}
                                 key={outcomeCollection.indexSet}
                                 outcomeCollection={outcomeCollection}

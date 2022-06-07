@@ -4,7 +4,6 @@ import ConfirmOutcomeActionbar from '@cambrian/app/components/actionbars/propose
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import InitiatedActionbar from '@cambrian/app/components/actionbars/initiated/InitiatedActionbar'
 import LockedByArbitrationActionbar from '@cambrian/app/components/actionbars/arbitrate/LockedByArbitrationActionbar'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import PrepareSolveActionbar from '@cambrian/app/components/actionbars/prepare/PrepareSolveActionbar'
 import ProposeOutcomeActionbar from '@cambrian/app/components/actionbars/executed/ProposeOutcomeActionbar'
 import RedeemTokensActionbar from '@cambrian/app/components/actionbars/reported/RedeemTokensActionbar'
@@ -18,16 +17,14 @@ interface DefaultSolverActionbarProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition?: SolverContractCondition
-    metadata?: MetadataModel
     solverAddress: string
 }
 
-const DefaultSolverActionbar = ({
+const SolverActionbar = ({
     currentUser,
     solverData,
     solverMethods,
     currentCondition,
-    metadata,
     solverAddress,
 }: DefaultSolverActionbarProps) => {
     const allowedForKeeper = usePermission('Keeper')
@@ -35,13 +32,7 @@ const DefaultSolverActionbar = ({
     const allowedForArbitrator = usePermission('Arbitrator')
 
     if (!currentCondition)
-        return (
-            <PrepareSolveActionbar
-                solverData={solverData}
-                solverMethods={solverMethods}
-                metadata={metadata}
-            />
-        )
+        return <PrepareSolveActionbar solverMethods={solverMethods} />
 
     switch (currentCondition.status) {
         case ConditionStatus.Initiated:
@@ -59,7 +50,6 @@ const DefaultSolverActionbar = ({
                         solverData={solverData}
                         solverMethods={solverMethods}
                         currentCondition={currentCondition}
-                        metadata={metadata}
                     />
                 )
             }
@@ -67,8 +57,6 @@ const DefaultSolverActionbar = ({
         case ConditionStatus.OutcomeProposed:
             return (
                 <ConfirmOutcomeActionbar
-                    metadata={metadata}
-                    solverData={solverData}
                     currentUser={currentUser}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
@@ -79,27 +67,19 @@ const DefaultSolverActionbar = ({
                 return (
                     <ArbitrateActionbar
                         solverAddress={solverAddress}
-                        metadata={metadata}
                         solverData={solverData}
                         solverMethods={solverMethods}
                         currentCondition={currentCondition}
                     />
                 )
             } else {
-                return (
-                    <LockedByArbitrationActionbar
-                        solverData={solverData}
-                        metadata={metadata}
-                        currentCondition={currentCondition}
-                    />
-                )
+                return <LockedByArbitrationActionbar />
             }
         case ConditionStatus.ArbitrationDelivered:
         case ConditionStatus.OutcomeReported:
             if (allowedForRecipients) {
                 return (
                     <RedeemTokensActionbar
-                        metadata={metadata}
                         currentUser={currentUser}
                         currentCondition={currentCondition}
                         solverData={solverData}
@@ -112,4 +92,4 @@ const DefaultSolverActionbar = ({
     return <></>
 }
 
-export default DefaultSolverActionbar
+export default SolverActionbar

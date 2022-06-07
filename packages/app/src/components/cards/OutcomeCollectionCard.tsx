@@ -1,4 +1,4 @@
-import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
+import { Box, Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
 import BaseMenuListItem from '../buttons/BaseMenuListItem'
@@ -10,22 +10,22 @@ import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionCardProps = {
-    idx?: number
     outcomeCollection: OutcomeCollectionModel
     token: TokenModel
     proposedIndexSet?: number
+    cardHeader?: JSX.Element
 } & (
     | { onPropose?: (indexSet: number) => Promise<void>; onArbitrate?: never }
     | { onArbitrate?: (indexSet: number) => Promise<void>; onPropose?: never }
 )
 
 const OutcomeCollectionCard = ({
-    idx,
     outcomeCollection,
     token,
     onPropose,
     onArbitrate,
     proposedIndexSet,
+    cardHeader,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -34,14 +34,8 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-contrast">
-                <CardHeader
-                    pad="medium"
-                    elevation="small"
-                    background="background-contrast"
-                >
-                    <Text truncate>Outcome {idx && `#${idx}`}</Text>
-                </CardHeader>
+            <Card background="background-contrast-hover">
+                {cardHeader && cardHeader}
                 <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />

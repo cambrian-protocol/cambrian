@@ -2,67 +2,36 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import { useEffect, useState } from 'react'
 
-import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
-import BaseFormContainer from '../containers/BaseFormContainer'
 import { Box } from 'grommet'
-import ErrorPopupModal from '../modals/ErrorPopupModal'
-import { GenericMethods } from '../solver/Solver'
+import ErrorPopupModal from '../../../modals/ErrorPopupModal'
+import { GenericMethods } from '../../../solver/Solver'
 import { Heading } from 'grommet'
-import LoaderButton from '../buttons/LoaderButton'
+import LoaderButton from '../../../buttons/LoaderButton'
+import { ProhibitInset } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useState } from 'react'
 
 interface ArbitrateNullSectionProps {
-    solverData: SolverModel
+    arbitratorContract?: ethers.Contract
+    disputeId?: string
     currentUser: UserType
-    solverAddress: string
     currentCondition: SolverContractCondition
     solverMethods: GenericMethods
 }
 
-const ArbitrateNullSection = ({
-    solverData,
-    currentUser,
+const ArbitrateNullWidget = ({
+    arbitratorContract,
+    disputeId,
     currentCondition,
-    solverAddress,
     solverMethods,
 }: ArbitrateNullSectionProps) => {
     const [isArbitrating, setIsArbitrating] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [arbitratorContract, setArbitratorContract] =
-        useState<ethers.Contract>()
-    const disputeId = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(
-            ['address', 'uint256'],
-            [solverAddress, currentCondition.executions - 1]
-        )
-    )
-
-    useEffect(() => {
-        async function checkArbitratorIsContract() {
-            const arbitratorCode = await currentUser.signer?.provider?.getCode(
-                solverData.config.arbitrator
-            )
-            const isContract = arbitratorCode !== '0x'
-
-            if (isContract) {
-                const contract = new ethers.Contract(
-                    solverData.config.arbitrator,
-                    BASIC_ARBITRATOR_IFACE,
-                    currentUser.signer
-                )
-
-                setArbitratorContract(contract)
-            }
-        }
-        checkArbitratorIsContract()
-    }, [currentUser])
 
     const onArbitrateNull = async () => {
         setIsArbitrating(true)
@@ -85,27 +54,28 @@ const ArbitrateNullSection = ({
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
+            setIsArbitrating(false)
         }
-        setIsArbitrating(false)
     }
 
     return (
         <>
-            <BaseFormContainer>
-                <Box gap="small">
+            <Box gap="medium">
+                <>
                     <Heading level="4">Cancel Arbitration</Heading>
-                    <Text size="small">
-                        Cancel this dispute and put the Solver back to the state
-                        before an arbitration request has been raised
+                    <Text size="small" color="dark-4">
+                        Void this dispute and put the Solver back to the state
+                        before arbitration has been requested.
                     </Text>
-                </Box>
+                </>
                 <LoaderButton
                     label="Void this dispute"
                     secondary
+                    icon={<ProhibitInset />}
                     onClick={onArbitrateNull}
                     isLoading={isArbitrating}
                 />
-            </BaseFormContainer>
+            </Box>
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}
@@ -116,4 +86,4 @@ const ArbitrateNullSection = ({
     )
 }
 
-export default ArbitrateNullSection
+export default ArbitrateNullWidget
