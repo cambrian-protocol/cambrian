@@ -10,7 +10,6 @@ import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
 import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
@@ -22,12 +21,14 @@ import { MetadataModel } from '../../models/MetadataModel'
 import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import OutcomeNotification from '../notifications/OutcomeNotification'
 import PageLayout from '../layout/PageLayout'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import SolverActionbar from '@cambrian/app/ui/solvers/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import SolverHeader from '../nav/SolverHeader'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import SolverSidebar from '../sidebar/SolverSidebar'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
@@ -262,9 +263,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             }
         }
     }
-
     const proposalMetadata = metadata?.stages?.proposal as ProposalModel
-
     return (
         <>
             {solverData &&
@@ -272,56 +271,43 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             solverMethods &&
             currentUser.chainId ? (
                 <InteractionLayout
+                    header={
+                        <SolverHeader
+                            metadata={metadata}
+                            solverData={solverData}
+                            currentCondition={currentCondition}
+                        />
+                    }
                     contextTitle={proposalMetadata?.title || 'Solver'}
                     actionBar={
-                        <DefaultSolverActionbar
+                        <SolverActionbar
                             solverAddress={address}
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
                             solverMethods={solverMethods}
-                            metadata={metadata}
                         />
                     }
-                    notification={
-                        proposedOutcome && (
-                            <OutcomeNotification
-                                solverMethods={solverMethods}
-                                token={solverData.collateralToken}
-                                outcomeCollection={proposedOutcome}
-                                condition={currentCondition}
-                                currentUser={currentUser}
-                                solverAddress={address}
-                                solverData={solverData}
-                            />
-                        )
+                    sidebar={
+                        <SolverSidebar
+                            currentCondition={currentCondition}
+                            solverAddress={address}
+                            solverData={solverData}
+                            solverMethods={solverMethods}
+                            currentUser={currentUser}
+                            proposedOutcome={proposedOutcome}
+                        />
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
                         <InitiatedSolverContent metadata={metadata} />
                     ) : (
-                        <>
-                            <HeaderTextSection
-                                title={
-                                    proposalMetadata
-                                        ? proposalMetadata.title
-                                        : solverData.solverTag?.title ||
-                                          'Solver'
-                                }
-                                subTitle="Most recent state of"
-                                paragraph={
-                                    proposalMetadata
-                                        ? proposalMetadata.description
-                                        : solverData.solverTag?.description
-                                }
-                            />
-                            <ModuleUIManager
-                                solverData={solverData}
-                                chainId={currentUser.chainId}
-                                solverAddress={address}
-                                currentCondition={currentCondition}
-                            />
-                        </>
+                        <ModuleUIManager
+                            solverData={solverData}
+                            chainId={currentUser.chainId}
+                            solverAddress={address}
+                            currentCondition={currentCondition}
+                        />
                     )}
                 </InteractionLayout>
             ) : solverData && solverMethods ? (

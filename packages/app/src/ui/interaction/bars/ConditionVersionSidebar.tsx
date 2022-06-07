@@ -6,15 +6,9 @@ import {
     RepeatOnce,
 } from 'phosphor-react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
-import { CONDITION_STATUS_DETAILS } from '@cambrian/app/constants/ConditionStatus'
-import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SetStateAction } from 'react'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
-import SidebarCardBody from '@cambrian/app/components/cards/SidebarCardBody'
-import SidebarCardHeader from '@cambrian/app/components/cards/SidebarCardHeader'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import usePermission from '@cambrian/app/hooks/usePermission'
@@ -50,7 +44,7 @@ const ConditionVersionSidebar = ({
 
     return (
         <SidebarCard>
-            <SidebarCardHeader
+            {/*  <SidebarCardHeader
                 title={`Solver ${solverTag?.title}`}
                 info={solverTag?.version}
             />
@@ -148,7 +142,7 @@ const ConditionVersionSidebar = ({
                         </Box>
                     )}
                 </Box>
-            </SidebarCardBody>
+            </SidebarCardBody> */}
         </SidebarCard>
     )
 }

@@ -1,9 +1,9 @@
-import Actionbar, {
-    ActionbarItemType,
-} from '@cambrian/app/ui/interaction/bars/Actionbar'
+import BaseActionbar, {
+    ActionbarInfoType,
+} from '@cambrian/app/components/actionbars/BaseActionbar'
 import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
-import { Coin, Confetti, Info, Question } from 'phosphor-react'
+import { Coin, Confetti, Info } from 'phosphor-react'
 import {
     calculateCollectionId,
     calculatePositionId,
@@ -16,7 +16,6 @@ import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoaderButton from '../../buttons/LoaderButton'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -29,14 +28,12 @@ interface RedeemTokensActionbarProps {
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
-    metadata?: MetadataModel
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
     currentUser,
-    metadata,
 }: RedeemTokensActionbarProps) => {
     // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
     const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
@@ -216,12 +213,12 @@ const RedeemTokensActionbar = ({
         }
     }
 
-    const actionbarItems: ActionbarItemType[] = []
+    let actionbarInfo: ActionbarInfoType
 
     if (redeemedAmount) {
-        actionbarItems.push({
-            icon: <Question />,
-            label: 'Help',
+        actionbarInfo = {
+            title: 'Tokens redeemed',
+            subTitle: 'You have sucessfully redeemed your token.',
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Tokens redeemed"
@@ -238,11 +235,16 @@ const RedeemTokensActionbar = ({
                     ]}
                 />
             ),
-        })
+        }
     } else {
-        actionbarItems.push({
-            icon: <Question />,
-            label: 'Help',
+        actionbarInfo = {
+            title: 'Redeem tokens',
+            subTitle: `You have earned ${payoutAmount} ${
+                solverData.collateralToken
+                    ? solverData.collateralToken.symbol ||
+                      solverData.collateralToken.name
+                    : 'Tokens'
+            }`,
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Redeem tokens"
@@ -260,14 +262,14 @@ const RedeemTokensActionbar = ({
                     ]}
                 />
             ),
-        })
+        }
     }
 
     return (
         <>
             {redeemedAmount ? (
-                <Actionbar
-                    actionbarItems={actionbarItems}
+                <BaseActionbar
+                    info={actionbarInfo}
                     primaryAction={
                         <Box>
                             <Text size="small" color="dark-4">
@@ -281,13 +283,10 @@ const RedeemTokensActionbar = ({
                             }`}</Text>
                         </Box>
                     }
-                    metadata={metadata}
-                    solverData={solverData}
-                    currentCondition={currentCondition}
                 />
             ) : payoutAmount ? (
-                <Actionbar
-                    actionbarItems={actionbarItems}
+                <BaseActionbar
+                    info={actionbarInfo}
                     primaryAction={
                         <LoaderButton
                             primary
@@ -303,9 +302,6 @@ const RedeemTokensActionbar = ({
                             }`}
                         />
                     }
-                    metadata={metadata}
-                    solverData={solverData}
-                    currentCondition={currentCondition}
                 />
             ) : (
                 <></>

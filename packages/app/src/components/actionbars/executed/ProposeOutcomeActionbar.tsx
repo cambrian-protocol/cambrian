@@ -1,11 +1,9 @@
-import { Question, Shield } from 'phosphor-react'
-
-import Actionbar from '@cambrian/app/ui/interaction/bars/Actionbar'
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
+import BaseActionbar from '@cambrian/app/components/actionbars/BaseActionbar'
 import { Button } from 'grommet'
 import { GenericMethods } from '../../solver/Solver'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import ProposeOutcomeModal from '../../modals/ProposeOutcomeModal'
+import { Shield } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { useState } from 'react'
@@ -14,14 +12,12 @@ interface ProposeOutcomeActionbarProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
-    metadata?: MetadataModel
 }
 
 const ProposeOutcomeActionbar = ({
     solverData,
     solverMethods,
     currentCondition,
-    metadata,
 }: ProposeOutcomeActionbarProps) => {
     // To keep track if Keeper is currently in a transaction
     const [proposedIndexSet, setProposedIndexSet] = useState<number>()
@@ -33,7 +29,7 @@ const ProposeOutcomeActionbar = ({
 
     return (
         <>
-            <Actionbar
+            <BaseActionbar
                 primaryAction={
                     <Button
                         primary
@@ -42,27 +38,23 @@ const ProposeOutcomeActionbar = ({
                         onClick={toggleShowProposeOutcomeModal}
                     />
                 }
-                actionbarItems={[
-                    {
-                        icon: <Question />,
-                        dropContent: (
-                            <ActionbarItemDropContainer
-                                title="Propose an outcome"
-                                description='Please hit the "Propose Outcome"-Button at your right, select the outcome when solve conditions are met and confirm the transaction.'
-                                list={[
-                                    {
-                                        icon: <Shield />,
-                                        label: 'This must be done by the Keeper',
-                                    },
-                                ]}
-                            />
-                        ),
-                        label: 'Help',
-                    },
-                ]}
-                metadata={metadata}
-                solverData={solverData}
-                currentCondition={currentCondition}
+                info={{
+                    title: 'Propose an outcome',
+                    subTitle:
+                        'Select the outcome when solve conditions are met',
+                    dropContent: (
+                        <ActionbarItemDropContainer
+                            title="Propose an outcome"
+                            description='Please hit the "Propose Outcome"-Button at your right, select the outcome when solve conditions are met and confirm the transaction.'
+                            list={[
+                                {
+                                    icon: <Shield />,
+                                    label: 'This must be done by the Keeper',
+                                },
+                            ]}
+                        />
+                    ),
+                }}
             />
             {showProposeOutcomeModal && (
                 <ProposeOutcomeModal

@@ -44,11 +44,10 @@ const ModuleUIManager = ({
     })
 
     return (
-        <Box gap="small" height={{ min: 'auto' }}>
+        <Box gap="small">
             {moduleComponents.map((component, idx) => (
                 <Box key={idx}>{component}</Box>
             ))}
-            <Box pad="medium" />
         </Box>
     )
 }

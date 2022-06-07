@@ -43,14 +43,11 @@ const InitiatedActionbar = ({
         <>
             {emptyManualSlots.length === 0 ? (
                 <ExecuteSolveActionbar
-                    solverData={solverData}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
             ) : (
                 <AddDataActionbar
-                    solverData={solverData}
-                    currentCondition={currentCondition}
                     solverMethods={solverMethods}
                     manualSlots={emptyManualSlots}
                 />

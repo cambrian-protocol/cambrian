@@ -1,12 +1,8 @@
-import { BigNumber, ethers } from 'ethers'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import { SetStateAction, useState } from 'react'
 
 import BaseLayerModal from './BaseLayerModal'
 import { Box } from 'grommet'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from './ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
@@ -15,6 +11,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { ethers } from 'ethers'
 
 interface ArbitrationDesireOutcomeModalProps {
     solverAddress: string
@@ -81,10 +78,9 @@ const ArbitrationDesireOutcomeModal = ({
                     paragraph="Please select your desired outcome"
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {filteredOutcomes.map((outcomeCollection, idx) => {
+                    {filteredOutcomes.map((outcomeCollection) => {
                         return (
                             <OutcomeCollectionCard
-                                idx={idx + 1}
                                 token={solverData.collateralToken}
                                 key={outcomeCollection.indexSet}
                                 outcomeCollection={outcomeCollection}
