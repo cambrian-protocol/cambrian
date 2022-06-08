@@ -17,33 +17,23 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface ArbitrateModalProps {
-    arbitratorContract?: ethers.Contract
     solverMethods: GenericMethods
     solverData: SolverModel
     currentCondition: SolverContractCondition
     onBack: () => void
     isArbitrating?: number
     setIsArbitrating: React.Dispatch<SetStateAction<number | undefined>>
-    solverAddress: string
 }
 
 const ArbitrateModal = ({
-    arbitratorContract,
     solverMethods,
     solverData,
     currentCondition,
     onBack,
     isArbitrating,
     setIsArbitrating,
-    solverAddress,
 }: ArbitrateModalProps) => {
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-    const disputeId = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(
-            ['address', 'uint256'],
-            [solverAddress, currentCondition.executions - 1]
-        )
-    )
 
     const onArbitrate = async (indexSet: number) => {
         setIsArbitrating(indexSet)
@@ -52,31 +42,17 @@ const ArbitrateModal = ({
                 indexSet,
                 solverData.config.conditionBase.outcomeSlots
             )
-
-            if (arbitratorContract !== undefined) {
-                const tx: ethers.ContractTransaction = await arbitratorContract[
-                    'arbitrate(bytes32,uint256)'
-                ](disputeId, binaryArray)
-                await tx.wait()
-            } else {
-                console.log(
-                    'currentCondition.payouts:',
-                    currentCondition.payouts
+            const tx: ethers.ContractTransaction =
+                await solverMethods.arbitrate(
+                    currentCondition.executions - 1,
+                    binaryArray
                 )
-                console.log('Binary array to report:', binaryArray)
-                const tx: ethers.ContractTransaction =
-                    await solverMethods.arbitrate(
-                        currentCondition.executions - 1,
-                        binaryArray
-                    )
-                const rc = await tx.wait()
-                if (
-                    !rc.events?.find((event) => event.event === 'ChangedStatus')
-                )
-                    throw GENERAL_ERROR['ARBITRATION_ERROR']
-            }
+            const rc = await tx.wait()
+            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
+                throw GENERAL_ERROR['ARBITRATION_ERROR']
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
+            setIsArbitrating(undefined)
         }
     }
 
@@ -85,7 +61,8 @@ const ArbitrateModal = ({
             <BaseLayerModal onBack={onBack}>
                 <HeaderTextSection
                     subTitle="Arbitration"
-                    title={'Report arbitration Outcome'}
+                    title={'Report the arbitrated outcome'}
+                    paragraph="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[

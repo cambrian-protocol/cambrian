@@ -4,6 +4,7 @@ import BaseActionbar, {
 import { Lock, Scales, Timer } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
+import ArbitrateDesiredOutcomeModal from '../../modals/ArbitrateDesiredOutcomeModel'
 import ArbitrateModal from '../../modals/ArbitrateModal'
 import { GenericMethods } from '../../solver/Solver'
 import LoaderButton from '../../buttons/LoaderButton'
@@ -39,7 +40,7 @@ const ArbitrateActionbar = ({
         currentUser: currentUser,
     })
 
-    const { arbitratorContract } = useArbitratorContract({
+    const { arbitratorContract, dispute, disputeId } = useArbitratorContract({
         currentUser: currentUser,
         solverData: solverData,
         currentCondition: currentCondition,
@@ -106,6 +107,29 @@ const ArbitrateActionbar = ({
             ),
         }
     }
+
+    const Modal: JSX.Element =
+        arbitratorContract && dispute && disputeId ? (
+            <ArbitrateDesiredOutcomeModal
+                isArbitrating={isArbitrating}
+                setIsArbitrating={setIsArbitrating}
+                solverData={solverData}
+                onBack={toggleShowArbitrateModal}
+                arbitratorContract={arbitratorContract}
+                currentCondition={currentCondition}
+                dispute={dispute}
+                disputeId={disputeId}
+            />
+        ) : (
+            <ArbitrateModal
+                isArbitrating={isArbitrating}
+                setIsArbitrating={setIsArbitrating}
+                onBack={toggleShowArbitrateModal}
+                currentCondition={currentCondition}
+                solverData={solverData}
+                solverMethods={solverMethods}
+            />
+        )
     return (
         <>
             <BaseActionbar
@@ -125,18 +149,7 @@ const ArbitrateActionbar = ({
                 }
                 info={info}
             />
-            {showArbitrateModal && (
-                <ArbitrateModal
-                    solverAddress={solverAddress}
-                    arbitratorContract={arbitratorContract}
-                    isArbitrating={isArbitrating}
-                    setIsArbitrating={setIsArbitrating}
-                    onBack={toggleShowArbitrateModal}
-                    currentCondition={currentCondition}
-                    solverData={solverData}
-                    solverMethods={solverMethods}
-                />
-            )}
+            {showArbitrateModal && Modal}
         </>
     )
 }

@@ -289,14 +289,16 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                         />
                     }
                     sidebar={
-                        <SolverSidebar
-                            currentCondition={currentCondition}
-                            solverAddress={address}
-                            solverData={solverData}
-                            solverMethods={solverMethods}
-                            currentUser={currentUser}
-                            proposedOutcome={proposedOutcome}
-                        />
+                        proposedOutcome && (
+                            <SolverSidebar
+                                currentCondition={currentCondition}
+                                solverAddress={address}
+                                solverData={solverData}
+                                solverMethods={solverMethods}
+                                currentUser={currentUser}
+                                proposedOutcome={proposedOutcome}
+                            />
+                        )
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (

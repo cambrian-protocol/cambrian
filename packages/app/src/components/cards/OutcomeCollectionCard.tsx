@@ -10,6 +10,7 @@ import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionCardProps = {
+    border?: boolean // To higlight report
     outcomeCollection: OutcomeCollectionModel
     token: TokenModel
     proposedIndexSet?: number
@@ -20,6 +21,7 @@ type OutcomeCollectionCardProps = {
 )
 
 const OutcomeCollectionCard = ({
+    border,
     outcomeCollection,
     token,
     onPropose,
@@ -34,7 +36,7 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-contrast-hover">
+            <Card background="background-contrast-hover" border={border}>
                 {cardHeader && cardHeader}
                 <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (
