@@ -2,11 +2,9 @@ import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../nav/Appbar'
 import { Box } from 'grommet'
-import { DotsThreeOutlineVertical } from 'phosphor-react'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
-import { ResponsiveContext } from 'grommet'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
 
@@ -34,51 +32,43 @@ const InteractionLayout = ({
                 <meta name="og:title" content={siteTitle} />
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
-            <ResponsiveContext.Consumer>
-                {(screenSize) => {
-                    return (
-                        <Box height="100vh">
-                            <WarningBanner
-                                message={WARNING_MESSAGE['BETA_WARNING']}
-                            />
-                            <Page
-                                style={{ position: 'relative' }}
-                                overflow={{
-                                    vertical: 'auto',
-                                    horizontal: 'hidden',
-                                }}
-                            >
-                                <Appbar />
-                                <Glow
-                                    height="800px"
-                                    width="1000px"
-                                    left={'5%'}
-                                    top={'-200px'}
-                                />
-                                <Box
-                                    align="center"
-                                    pad="large"
-                                    height={{ min: 'auto' }}
-                                    style={{ position: 'relative' }}
-                                >
-                                    {header}
-                                    <Box
-                                        pad={{ top: 'large' }}
-                                        direction="row"
-                                        width="xlarge"
-                                        gap="large"
-                                        height={{ min: '90vh' }}
-                                    >
-                                        <Box width="medium">{sidebar}</Box>
-                                        <Box flex>{children}</Box>
-                                    </Box>
-                                </Box>
-                            </Page>
-                            {actionBar}
+            <Box height="100vh">
+                <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
+                <Page
+                    style={{ position: 'relative' }}
+                    overflow={{
+                        vertical: 'auto',
+                        horizontal: 'hidden',
+                    }}
+                >
+                    <Appbar />
+                    <Glow
+                        height="800px"
+                        width="1000px"
+                        left={'5%'}
+                        top={'-200px'}
+                    />
+                    <Box
+                        align="center"
+                        pad="large"
+                        height={{ min: 'auto' }}
+                        style={{ position: 'relative' }}
+                    >
+                        {header}
+                        <Box
+                            direction="row"
+                            width="xlarge"
+                            gap="large"
+                            height={{ min: '90vh' }}
+                            pad={{ top: 'large' }}
+                        >
+                            {sidebar && <Box width="medium">{sidebar}</Box>}
+                            <Box flex>{children}</Box>
                         </Box>
-                    )
-                }}
-            </ResponsiveContext.Consumer>
+                    </Box>
+                </Page>
+                {actionBar}
+            </Box>
         </>
     )
 }

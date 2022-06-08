@@ -1,6 +1,7 @@
 import ArbitrationUIManager from './arbitration/ArbitrationUIManager'
-import BaseFormContainer from '../containers/BaseFormContainer'
 import { Box } from 'grommet'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
+import DeliveredArbitrationInfoComponent from './DeliveredArbitrationInfoComponent'
 import { GenericMethods } from '../solver/Solver'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import PayoutInfoComponent from './PayoutInfoComponent'
@@ -12,7 +13,7 @@ interface SolverSidebarProps {
     currentCondition: SolverContractCondition
     solverMethods: GenericMethods
     solverData: SolverModel
-    proposedOutcome?: OutcomeCollectionModel
+    proposedOutcome: OutcomeCollectionModel
     currentUser: UserType
     solverAddress: string
 }
@@ -26,25 +27,34 @@ const SolverSidebar = ({
     currentUser,
 }: SolverSidebarProps) => {
     return (
-        <BaseFormContainer>
-            {proposedOutcome && (
-                <Box gap="medium">
-                    <PayoutInfoComponent
-                        solverData={solverData}
-                        token={solverData.collateralToken}
-                        outcome={proposedOutcome}
-                        currentCondition={currentCondition}
-                    />
-                    <ArbitrationUIManager
-                        currentCondition={currentCondition}
-                        solverAddress={solverAddress}
-                        solverData={solverData}
-                        solverMethods={solverMethods}
-                        currentUser={currentUser}
-                    />
-                </Box>
+        <Box gap="medium">
+            {currentCondition.status ===
+                ConditionStatus.ArbitrationDelivered && (
+                <DeliveredArbitrationInfoComponent
+                    currentCondition={currentCondition}
+                    currentUser={currentUser}
+                    solverData={solverData}
+                />
             )}
-        </BaseFormContainer>
+            <PayoutInfoComponent
+                title={
+                    currentCondition.status === ConditionStatus.OutcomeReported
+                        ? 'Reported Outcome'
+                        : 'Proposed Outcome'
+                }
+                reporterOrProposer="Keeper"
+                keeperOrArbitratorAddress={solverData.config.keeper}
+                token={solverData.collateralToken}
+                outcome={proposedOutcome}
+            />
+            <ArbitrationUIManager
+                currentCondition={currentCondition}
+                solverAddress={solverAddress}
+                solverData={solverData}
+                solverMethods={solverMethods}
+                currentUser={currentUser}
+            />
+        </Box>
     )
 }
 
