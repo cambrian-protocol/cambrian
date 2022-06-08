@@ -4,7 +4,6 @@ import { Box } from 'grommet'
 import { GenericMethods } from '../solver/Solver'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import PayoutInfoComponent from './PayoutInfoComponent'
-import SolverConditionInfo from './SolverConditionInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -28,7 +27,6 @@ const SolverSidebar = ({
 }: SolverSidebarProps) => {
     return (
         <BaseFormContainer>
-            <SolverConditionInfo currentCondition={currentCondition} />
             {proposedOutcome && (
                 <Box gap="medium">
                     <PayoutInfoComponent

@@ -10,6 +10,7 @@ import {
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
+import { CONDITION_STATUS_INFO } from '@cambrian/app/models/ConditionStatus'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import Link from 'next/link'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
@@ -58,7 +59,16 @@ const SolverHeader = ({
                             }}
                         >
                             <HeaderTextSection
-                                subTitle="Project"
+                                icon={
+                                    CONDITION_STATUS_INFO[
+                                        currentCondition.status
+                                    ].icon
+                                }
+                                subTitle={`Status: ${
+                                    CONDITION_STATUS_INFO[
+                                        currentCondition.status
+                                    ].name
+                                }`}
                                 title={proposalMetadata?.title || 'Unknown'}
                             />
                             {screenSize !== 'small' && (
