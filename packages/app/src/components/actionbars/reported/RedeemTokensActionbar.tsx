@@ -96,7 +96,7 @@ const RedeemTokensActionbar = ({
                     })
                 }
             )
-            const payoutPercentage = getTotalPayoutPct(allocs)
+            const payoutPercentage = await getTotalPayoutPct(allocs)
             if (
                 payoutPercentage &&
                 solverData.numMintedTokensByCondition?.[
@@ -140,58 +140,74 @@ const RedeemTokensActionbar = ({
     /**
      * Mostly mimics calculation from ConditionalToken.sol
      */
-    const getTotalPayoutPct = (allocations: AllocationModel[]) => {
-        const payoutNumerators = currentCondition.payouts
-        const indexSets = solverData.config.conditionBase.partition
-        const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots
+    const getTotalPayoutPct = async (allocations: AllocationModel[]) => {
+        const conditionResolutionLogs = await ctf.contract.queryFilter(
+            ctf.contract.filters.ConditionResolution(
+                currentCondition.conditionId
+            )
+        )
+        const payoutNumerators: number[] =
+            conditionResolutionLogs[0].args?.payoutNumerators
 
-        const indexSet = getIndexSetFromBinaryArray(payoutNumerators)
-        const oc = solverData.outcomeCollections[
-            currentCondition.conditionId
-        ].find((outcomeCollection) => outcomeCollection.indexSet === indexSet)
+        if (payoutNumerators) {
+            const indexSets = solverData.config.conditionBase.partition
+            const outcomeSlotCount =
+                solverData.config.conditionBase.outcomeSlots
 
-        let den = currentCondition.payouts.reduce((total, next) => {
-            return total + next
-        })
+            const indexSet = getIndexSetFromBinaryArray(payoutNumerators)
+            const oc = solverData.outcomeCollections[
+                currentCondition.conditionId
+            ].find(
+                (outcomeCollection) => outcomeCollection.indexSet === indexSet
+            )
 
-        let payout = BigNumber.from(0)
-        if (oc) {
-            for (let i = 0; i < indexSets.length; i++) {
-                const indexSet = indexSets[i]
+            let den = payoutNumerators.reduce((total, next) => {
+                return total + next
+            })
 
-                let payoutNumerator = 0
+            let payout = BigNumber.from(0)
+            if (oc) {
+                for (let i = 0; i < indexSets.length; i++) {
+                    const indexSet = indexSets[i]
 
-                for (let j = 0; j < outcomeSlotCount; j++) {
-                    if ((indexSet & (1 << j)) != 0) {
-                        payoutNumerator = payoutNumerator + payoutNumerators[j]
+                    let payoutNumerator = 0
+
+                    for (let j = 0; j < outcomeSlotCount; j++) {
+                        if ((indexSet & (1 << j)) != 0) {
+                            payoutNumerator =
+                                payoutNumerator + payoutNumerators[j]
+                        }
                     }
-                }
 
-                let payoutStake = '0'
-                const positionId = calculatePositionId(
-                    currentCondition.collateralToken,
-                    calculateCollectionId(
-                        currentCondition.conditionId,
-                        indexSet
+                    let payoutStake = '0'
+                    const positionId = calculatePositionId(
+                        currentCondition.collateralToken,
+                        calculateCollectionId(
+                            currentCondition.conditionId,
+                            indexSet
+                        )
                     )
-                )
-                allocations.forEach((alloc) => {
-                    if (alloc.positionId === positionId) {
-                        payoutStake = (
-                            BigInt(payoutStake) + BigInt(alloc.amountPercentage)
-                        ).toString()
-                    }
-                })
+                    allocations.forEach((alloc) => {
+                        if (alloc.positionId === positionId) {
+                            payoutStake = (
+                                BigInt(payoutStake) +
+                                BigInt(alloc.amountPercentage)
+                            ).toString()
+                        }
+                    })
 
-                if (payoutStake && BigNumber.from(payoutStake).gt(0)) {
-                    payout = payout
-                        .add(BigNumber.from(payoutStake).mul(payoutNumerator))
-                        .div(den)
+                    if (payoutStake && BigNumber.from(payoutStake).gt(0)) {
+                        payout = payout
+                            .add(
+                                BigNumber.from(payoutStake).mul(payoutNumerator)
+                            )
+                            .div(den)
+                    }
                 }
             }
-        }
 
-        return payout
+            return payout
+        }
     }
 
     /**
