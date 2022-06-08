@@ -1,18 +1,17 @@
 import ArbitrateLockComponent from './ArbitrateLockCompopnent'
 import ArbitrateNullComponent from './ArbitrateNullComponent'
-import ArbitrationTimelockInfoComponent from './ArbitrationTimelockInfoComponent'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DispatchArbitrationComponent from './DispatchArbitrationComponent'
 import DisputerListComponent from './DisputerListComponent'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import PlainSectionDivider from '../../sections/PlainSectionDivider'
+import ReimbursementComponent from './ReimbursementComponent'
 import RequestContractArbitrationComponent from './RequestContractArbitrationComponent'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import WithDrawArbitrationFeeComponent from './WithDrawArbitrationFeeComponent'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
 import usePermission from '@cambrian/app/hooks/usePermission'
 import useTimelock from '@cambrian/app/hooks/useTimelock'
@@ -23,7 +22,6 @@ interface ArbitrationUIManagerProps {
     currentUser: UserType
     solverAddress: string
     solverMethods: GenericMethods
-    proposedOutcome: OutcomeCollectionModel
 }
 
 const ArbitrationUIManager = ({
@@ -32,20 +30,20 @@ const ArbitrationUIManager = ({
     currentUser,
     solverAddress,
     solverMethods,
-    proposedOutcome,
 }: ArbitrationUIManagerProps) => {
     const isArbitrator = usePermission('Arbitrator')
-    const { isTimelockActive, timelock } = useTimelock({
-        solverMethods: solverMethods,
-        currentCondition: currentCondition,
-        currentUser: currentUser,
-    })
 
     const { arbitratorContract, disputeId } = useArbitratorContract({
         currentUser: currentUser,
         solverData: solverData,
         solverAddress: solverAddress,
         currentCondition: currentCondition,
+    })
+
+    const { isTimelockActive, timelock } = useTimelock({
+        solverMethods: solverMethods,
+        currentCondition: currentCondition,
+        currentUser: currentUser,
     })
 
     let ArbitrationUI: JSX.Element | null = null
@@ -65,16 +63,13 @@ const ArbitrationUIManager = ({
             )
         } else if (isTimelockActive) {
             ArbitrationUI = (
-                <Box gap="medium">
-                    <ArbitrationTimelockInfoComponent timelock={timelock} />
-                    <RequestContractArbitrationComponent
-                        arbitratorContract={arbitratorContract}
-                        currentCondition={currentCondition}
-                        outcomeCollection={proposedOutcome}
-                        solverAddress={solverAddress}
-                        solverData={solverData}
-                    />
-                </Box>
+                <RequestContractArbitrationComponent
+                    timelock={timelock}
+                    arbitratorContract={arbitratorContract}
+                    currentCondition={currentCondition}
+                    solverAddress={solverAddress}
+                    solverData={solverData}
+                />
             )
         }
     }
@@ -87,13 +82,14 @@ const ArbitrationUIManager = ({
 
     if (canLockSolverForArbitration) {
         ArbitrationUI = (
-            <Box gap="medium">
+            <>
                 {ArbitrationUI}
+                {ArbitrationUI && <PlainSectionDivider />}
                 <ArbitrateLockComponent
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
-            </Box>
+            </>
         )
     }
 
@@ -104,8 +100,9 @@ const ArbitrationUIManager = ({
 
     if (canArbitrateNull) {
         ArbitrationUI = (
-            <Box gap="medium">
+            <>
                 {ArbitrationUI}
+                {ArbitrationUI && <PlainSectionDivider />}
                 <ArbitrateNullComponent
                     arbitratorContract={arbitratorContract}
                     disputeId={disputeId}
@@ -113,7 +110,7 @@ const ArbitrationUIManager = ({
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
-            </Box>
+            </>
         )
     }
 
@@ -123,33 +120,38 @@ const ArbitrationUIManager = ({
         disputeId
     ) {
         ArbitrationUI = (
-            <Box gap="medium">
-                {ArbitrationUI}
+            <>
                 <DisputerListComponent
                     currentCondition={currentCondition}
                     solverData={solverData}
                     arbitratorContract={arbitratorContract}
                     disputeId={disputeId}
                 />
-            </Box>
+                {ArbitrationUI && <PlainSectionDivider />}
+                {ArbitrationUI}
+            </>
         )
     }
 
     return (
-        <>
+        <Box gap="medium">
             {ArbitrationUI && (
-                <BaseFormGroupContainer groupTitle="Arbitration" gap="small">
+                <BaseFormGroupContainer
+                    groupTitle="Arbitration"
+                    gap="small"
+                    pad={{ horizontal: 'medium' }}
+                >
                     {ArbitrationUI}
                 </BaseFormGroupContainer>
             )}
             {arbitratorContract && disputeId && (
-                <WithDrawArbitrationFeeComponent
+                <ReimbursementComponent
                     currentUser={currentUser}
                     arbitratorContract={arbitratorContract}
                     disputeId={disputeId}
                 />
             )}
-        </>
+        </Box>
     )
 }
 

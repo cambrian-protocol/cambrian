@@ -16,7 +16,6 @@ import { ethers } from 'ethers'
 interface ArbitrationDesireOutcomeModalProps {
     solverAddress: string
     arbitratorContract: ethers.Contract
-    proposedOutcomeCollection: OutcomeCollectionModel
     desiredIndexSet?: number
     setDesiredIndexSet: React.Dispatch<SetStateAction<number | undefined>>
     fee: ethers.BigNumber
@@ -27,7 +26,6 @@ interface ArbitrationDesireOutcomeModalProps {
 
 const ArbitrationDesireOutcomeModal = ({
     arbitratorContract,
-    proposedOutcomeCollection,
     setDesiredIndexSet,
     desiredIndexSet,
     solverData,
@@ -63,13 +61,6 @@ const ArbitrationDesireOutcomeModal = ({
         setDesiredIndexSet(undefined)
     }
 
-    const filteredOutcomes = solverData.outcomeCollections[
-        currentCondition.conditionId
-    ].filter(
-        (outcomeCollection) =>
-            outcomeCollection.indexSet !== proposedOutcomeCollection.indexSet
-    )
-
     return (
         <>
             <BaseLayerModal onBack={onBack}>
@@ -78,7 +69,9 @@ const ArbitrationDesireOutcomeModal = ({
                     paragraph="Please select your desired outcome"
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {filteredOutcomes.map((outcomeCollection) => {
+                    {solverData.outcomeCollections[
+                        currentCondition.conditionId
+                    ].map((outcomeCollection) => {
                         return (
                             <OutcomeCollectionCard
                                 token={solverData.collateralToken}
