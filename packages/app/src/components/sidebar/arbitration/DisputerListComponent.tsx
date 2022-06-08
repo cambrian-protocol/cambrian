@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 
-import { Box } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import DisputerListItem from './DisputerListItem'
 import SidebarComponentContainer from '../../containers/SidebarComponentContainer'
@@ -29,10 +28,10 @@ const DisputerListComponent = ({
         currentCondition
     )
 
-    // TODO Integrate Listener for new Disputes, BasicArbitrator contract needs an Event emitted
+    // Reusing the ChangedStatus Event from Solver.tsx which updates solverData. Smart Contract is implemented that every time somebody requests arbitration it emits the ChangedStatus Event.
     useEffect(() => {
         fetchDispute()
-    }, [])
+    }, [solverData])
 
     const fetchDispute = async () => {
         setDispute(await arbitratorContract.getDispute(disputeId))
