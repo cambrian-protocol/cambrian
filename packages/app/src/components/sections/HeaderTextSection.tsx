@@ -23,7 +23,7 @@ const HeaderTextSection = ({
         condition={icon !== undefined}
         wrapper={(children) => (
             <Box
-                fill
+                flex
                 justify="center"
                 align="center"
                 gap="small"
