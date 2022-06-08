@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Box } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import DisputerListItem from './DisputerListItem'
+import SidebarComponentContainer from '../../containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'
@@ -28,7 +29,7 @@ const DisputerListComponent = ({
         currentCondition
     )
 
-    // TODO useEffect dependecy, contract listener setup to get notified of new disputes
+    // TODO Integrate Listener for new Disputes, BasicArbitrator contract needs an Event emitted
     useEffect(() => {
         fetchDispute()
     }, [])
@@ -37,7 +38,7 @@ const DisputerListComponent = ({
         setDispute(await arbitratorContract.getDispute(disputeId))
     }
     return (
-        <Box gap="medium">
+        <SidebarComponentContainer title="Disputer Choices">
             {dispute &&
                 dispute.disputers.map((disputer, idx) => {
                     if (disputer !== solverData.config.keeper) {
@@ -53,7 +54,7 @@ const DisputerListComponent = ({
                         )
                     }
                 })}
-        </Box>
+        </SidebarComponentContainer>
     )
 }
 

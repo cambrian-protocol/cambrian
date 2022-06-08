@@ -5,9 +5,8 @@ import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseForm
 import { Coins } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import { Heading } from 'grommet'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { Text } from 'grommet'
+import SidebarComponentContainer from '../../containers/SidebarComponentContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
@@ -26,11 +25,16 @@ const ReimbursementComponent = ({
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        fetchDispute()
+        fetchBalance()
     }, [currentUser])
 
-    const fetchDispute = async () => {
-        setBalance(await arbitratorContract.balances(currentUser.address))
+    const fetchBalance = async () => {
+        try {
+            const res = await arbitratorContract.balances(currentUser.address)
+            setBalance(res)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+        }
     }
 
     const withDrawBalance = async () => {
@@ -40,6 +44,7 @@ const ReimbursementComponent = ({
                 await arbitratorContract.withdraw()
 
             await transaction.wait()
+            fetchBalance()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
@@ -52,21 +57,21 @@ const ReimbursementComponent = ({
                 <BaseFormGroupContainer
                     groupTitle="Reimbursements"
                     gap="medium"
+                    pad={{ horizontal: 'medium' }}
                 >
-                    <>
-                        <Heading level="4">Reimbursed Fee</Heading>
-                        <Text color="dark-4" size="small">
-                            You have funds to withdraw from a previous
-                            arbitration reimbursement
-                        </Text>
-                    </>
-                    <LoaderButton
-                        icon={<Coins />}
-                        isLoading={isWithdrawing}
-                        label="Withdraw"
-                        primary
-                        onClick={withDrawBalance}
-                    />
+                    <SidebarComponentContainer
+                        title="Reimbursed Fee"
+                        description=" You have funds to withdraw from a previous
+                            arbitration reimbursement"
+                    >
+                        <LoaderButton
+                            icon={<Coins />}
+                            isLoading={isWithdrawing}
+                            label="Withdraw"
+                            primary
+                            onClick={withDrawBalance}
+                        />
+                    </SidebarComponentContainer>
                 </BaseFormGroupContainer>
             )}
             {errorMessage && (

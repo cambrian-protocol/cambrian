@@ -27,16 +27,15 @@ const useTimelock = ({
     }, [currentCondition])
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout
-        if (timelock) {
-            if (isTimelockActive || isUnlockingTimelock) {
-                intervalId = setInterval(() => {
-                    updateTimeLock(timelock)
-                }, 1500)
-            }
+        currentUser.web3Provider.on('block', blockListener)
+        return () => {
+            currentUser.web3Provider.removeListener('block', blockListener)
         }
-        return () => clearInterval(intervalId)
-    }, [timelock, isTimelockActive, isUnlockingTimelock])
+    }, [])
+
+    const blockListener = (blocknumber: number) => {
+        updateTimeLock(timelock)
+    }
 
     const initTimelock = async () => {
         try {
@@ -44,8 +43,10 @@ const useTimelock = ({
                 currentCondition.executions - 1
             )
             const timeLockSeconds = fetchedTimeLock.toNumber()
-            setTimelock(timeLockSeconds)
-            await updateTimeLock(timeLockSeconds)
+            if (timeLockSeconds > 0) {
+                setTimelock(timeLockSeconds)
+                await updateTimeLock(timeLockSeconds)
+            }
         } catch (e) {
             await cpLogger.push(e)
         }

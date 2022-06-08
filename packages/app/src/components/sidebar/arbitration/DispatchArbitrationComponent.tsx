@@ -1,16 +1,14 @@
-import { CheckCircle, Repeat, Scales } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
+import { Repeat, Scales } from 'phosphor-react'
 
 import ArbitrationDispatch from '@cambrian/app/contracts/ArbitrationDispatch'
-import { Box } from 'grommet'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import { Heading } from 'grommet'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import SidebarComponentContainer from '../../containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -66,14 +64,10 @@ const DispatchArbitrationComponent = ({
 
     return (
         <>
-            <Box gap="medium">
-                <>
-                    <Heading level="4">Request Arbitration</Heading>
-                    <Text size="small" color={'dark-4'}>
-                        You may request arbitration if you believe this proposed
-                        outcome is incorrect.
-                    </Text>
-                </>
+            <SidebarComponentContainer
+                title="Request Arbitration"
+                description="You may request arbitration if you believe this proposed outcome is incorrect."
+            >
                 <LoaderButton
                     secondary
                     isLoading={isRequestingArbitration}
@@ -85,7 +79,7 @@ const DispatchArbitrationComponent = ({
                     icon={hasArbitrationRequested ? <Repeat /> : <Scales />}
                     onClick={onRequestArbitration}
                 />
-            </Box>
+            </SidebarComponentContainer>
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}

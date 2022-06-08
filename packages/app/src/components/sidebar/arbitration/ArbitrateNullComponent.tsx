@@ -9,6 +9,7 @@ import { GenericMethods } from '../../solver/Solver'
 import { Heading } from 'grommet'
 import LoaderButton from '../../buttons/LoaderButton'
 import { ProhibitInset } from 'phosphor-react'
+import SidebarComponentContainer from '../../containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -60,14 +61,10 @@ const ArbitrateNullComponent = ({
 
     return (
         <>
-            <Box gap="medium">
-                <>
-                    <Heading level="4">Cancel Arbitration</Heading>
-                    <Text size="small" color="dark-4">
-                        Void this dispute and put the Solver back to the state
-                        before arbitration has been requested.
-                    </Text>
-                </>
+            <SidebarComponentContainer
+                title="Cancel Arbitration"
+                description="Void this dispute, put the Solver back to the state before arbitration has been requested and reimburse the disputers."
+            >
                 <LoaderButton
                     label="Void this dispute"
                     secondary
@@ -75,7 +72,7 @@ const ArbitrateNullComponent = ({
                     onClick={onArbitrateNull}
                     isLoading={isArbitrating}
                 />
-            </Box>
+            </SidebarComponentContainer>
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}

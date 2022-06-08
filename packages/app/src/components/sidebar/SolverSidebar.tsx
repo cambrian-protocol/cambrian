@@ -38,7 +38,6 @@ const SolverSidebar = ({
                         currentCondition={currentCondition}
                     />
                     <ArbitrationUIManager
-                        proposedOutcome={proposedOutcome}
                         currentCondition={currentCondition}
                         solverAddress={solverAddress}
                         solverData={solverData}
