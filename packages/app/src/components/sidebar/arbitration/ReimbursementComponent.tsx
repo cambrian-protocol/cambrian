@@ -2,6 +2,7 @@ import { BigNumber, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Coins } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { Heading } from 'grommet'
@@ -10,16 +11,16 @@ import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
-interface WithDrawArbitrationFeeComponentProps {
+interface ReimbursementComponentProps {
     arbitratorContract: ethers.Contract
     disputeId: string
     currentUser: UserType
 }
 
-const WithDrawArbitrationFeeComponent = ({
+const ReimbursementComponent = ({
     arbitratorContract,
     currentUser,
-}: WithDrawArbitrationFeeComponentProps) => {
+}: ReimbursementComponentProps) => {
     const [isWithdrawing, setIsWithdrawing] = useState(false)
     const [balance, setBalance] = useState<BigNumber>(BigNumber.from(0))
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -48,13 +49,19 @@ const WithDrawArbitrationFeeComponent = ({
     return (
         <>
             {!balance.isZero() && (
-                <BaseFormGroupContainer groupTitle="Imbursments" gap="small">
-                    <Heading level="4">Withdraw Fee</Heading>
-                    <Text color="dark-4" size="small">
-                        You have funds to withdraw from a previous arbitration
-                        imbursment
-                    </Text>
+                <BaseFormGroupContainer
+                    groupTitle="Reimbursements"
+                    gap="medium"
+                >
+                    <>
+                        <Heading level="4">Reimbursed Fee</Heading>
+                        <Text color="dark-4" size="small">
+                            You have funds to withdraw from a previous
+                            arbitration reimbursement
+                        </Text>
+                    </>
                     <LoaderButton
+                        icon={<Coins />}
                         isLoading={isWithdrawing}
                         label="Withdraw"
                         primary
@@ -72,4 +79,4 @@ const WithDrawArbitrationFeeComponent = ({
     )
 }
 
-export default WithDrawArbitrationFeeComponent
+export default ReimbursementComponent
