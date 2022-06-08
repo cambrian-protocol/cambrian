@@ -145,7 +145,7 @@ const FundProposalForm = ({
 
     const initProposalsHubListeners = async () => {
         proposalsHub.contract.on(
-            proposalsHub.contract.filters.FundProposal(null, null, null),
+            proposalsHub.contract.filters.FundProposal(proposal.id, null, null),
             async (proposalId) => {
                 await updateFunding(proposalId)
                 setIsInPrimaryTransaction(false)
@@ -153,7 +153,11 @@ const FundProposalForm = ({
         )
 
         proposalsHub.contract.on(
-            proposalsHub.contract.filters.DefundProposal(null, null, null),
+            proposalsHub.contract.filters.DefundProposal(
+                proposal.id,
+                null,
+                null
+            ),
             async (proposalId) => {
                 await updateFunding(proposalId)
                 setIsInSecondaryTransaction(false)
@@ -161,7 +165,7 @@ const FundProposalForm = ({
         )
 
         proposalsHub.contract.on(
-            proposalsHub.contract.filters.ExecuteProposal(null),
+            proposalsHub.contract.filters.ExecuteProposal(proposal.id),
             async (proposalId) => {
                 const updatedProposal = await proposalsHub.getProposal(
                     proposalId
