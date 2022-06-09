@@ -1,11 +1,11 @@
 import { Box, Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
-import BaseMenuListItem from '../buttons/BaseMenuListItem'
+import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Coins } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import OutcomeListItem from '../buttons/OutcomeListItem'
+import OutcomeListItem from '../list/OutcomeListItem'
 import RecipientAllocationModal from '../modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
@@ -42,7 +42,7 @@ const OutcomeCollectionCard = ({
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         hideDivider
                         title="Allocation"
                         icon={<Coins />}

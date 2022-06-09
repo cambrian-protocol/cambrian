@@ -2,7 +2,7 @@ import { Cursor, UserPlus } from 'phosphor-react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseListItemButton from '@cambrian/app/components/buttons/BaseListItemButton'
 import CreateRecipientModal from './CreateRecipientModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SelectRecipientModal from './SelectRecipientModal'
@@ -31,12 +31,12 @@ const AddRecipientModal = ({ onClose }: AddRecipientModalProps) => {
                     paragraph="You can choose between existent recipients and solvers, or create a new ones"
                 />
                 <BaseFormContainer>
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         title="Select recipient"
                         icon={<Cursor size="24" />}
                         onClick={toggleShowSelectRecipient}
                     />
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         title="Create recipient"
                         icon={<UserPlus size="24" />}
                         onClick={toggleShowCreateRecipient}

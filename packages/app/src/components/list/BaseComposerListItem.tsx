@@ -7,10 +7,10 @@ import {
     Trash,
 } from 'phosphor-react'
 
-import ListItemButton from '../buttons/ItemListButton'
+import BaseComposerListItemButton from '../buttons/BaseComposerListItemButton'
 import StackedIcon from '../icons/StackedIcon'
 
-interface ListItemType {
+interface BaseComposerListItemProps {
     description: string
     title: string | JSX.Element
     icon: JSX.Element
@@ -23,7 +23,7 @@ interface ListItemType {
     onAllocate?: () => void
 }
 
-const ListItem = ({
+const BaseComposerListItem = ({
     description,
     title,
     icon,
@@ -34,7 +34,7 @@ const ListItem = ({
     onEdit,
     onSelect,
     onAllocate,
-}: ListItemType) => (
+}: BaseComposerListItemProps) => (
     <IconContext.Provider value={{ size: '24' }}>
         <Box
             pad={{ horizontal: 'medium', top: 'medium', bottom: 'small' }}
@@ -84,7 +84,7 @@ const ListItem = ({
             </Box>
             <Box direction="row" justify="around">
                 {onRemove && (
-                    <ListItemButton
+                    <BaseComposerListItemButton
                         onClick={onRemove}
                         label="Remove"
                         icon={
@@ -93,21 +93,21 @@ const ListItem = ({
                     />
                 )}
                 {onEdit && (
-                    <ListItemButton
+                    <BaseComposerListItemButton
                         onClick={onEdit}
                         label="Edit"
                         icon={<StackedIcon icon={icon} />}
                     />
                 )}
                 {onSelect && (
-                    <ListItemButton
+                    <BaseComposerListItemButton
                         onClick={onSelect}
                         label={isActive ? 'Deselect' : 'Select'}
                         icon={isActive ? <CheckSquare /> : <Square />}
                     />
                 )}
                 {onAllocate && (
-                    <ListItemButton
+                    <BaseComposerListItemButton
                         onClick={onAllocate}
                         label={'Edit BPs'}
                         icon={<StackedIcon icon={<ChartPieSlice />} />}
@@ -118,4 +118,4 @@ const ListItem = ({
     </IconContext.Provider>
 )
 
-export default ListItem
+export default BaseComposerListItem

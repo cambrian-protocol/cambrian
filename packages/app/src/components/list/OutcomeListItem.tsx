@@ -1,6 +1,6 @@
 import { TreeStructure, Warning } from 'phosphor-react'
 
-import BaseMenuListItem from './BaseMenuListItem'
+import BaseListItemButton from '../buttons/BaseListItemButton'
 import OutcomeDetailModal from '../modals/OutcomeDetailModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { useState } from 'react'
@@ -18,13 +18,13 @@ const OutcomeListItem = ({ outcome }: OutcomeListItemProps) => {
     return (
         <>
             {outcome ? (
-                <BaseMenuListItem
+                <BaseListItemButton
                     onClick={toggleShowOutcomeDetail}
                     title={outcome.title}
                     icon={<TreeStructure />}
                 />
             ) : (
-                <BaseMenuListItem
+                <BaseListItemButton
                     title={'No outcome details available'}
                     icon={<Warning />}
                 />

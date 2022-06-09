@@ -1,12 +1,16 @@
 import { Box, Text } from 'grommet'
 
-type ListItemButtonProps = {
+type BaseComposerListItemButtonProps = {
     onClick: () => void
     label: string
     icon: JSX.Element
 }
 
-const ListItemButton = ({ onClick, label, icon }: ListItemButtonProps) => (
+const BaseComposerListItemButton = ({
+    onClick,
+    label,
+    icon,
+}: BaseComposerListItemButtonProps) => (
     <Box
         onClick={onClick}
         round="small"
@@ -24,4 +28,4 @@ const ListItemButton = ({ onClick, label, icon }: ListItemButtonProps) => (
     </Box>
 )
 
-export default ListItemButton
+export default BaseComposerListItemButton

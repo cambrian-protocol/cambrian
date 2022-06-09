@@ -11,7 +11,6 @@ export type LoaderButtonProps = ButtonExtendedProps & {
     isLoading: boolean
 }
 
-// TODO Spinner is not centered
 const LoaderButton = ({
     children,
     isLoading,

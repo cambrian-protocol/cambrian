@@ -1,7 +1,7 @@
 import { ListPlus, UsersThree } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseListItemButton from '@cambrian/app/components/buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
 import HeaderTextSection from '@cambrian/app/src/components/sections/HeaderTextSection'
@@ -64,14 +64,14 @@ const ComposerOutcomeCollectionControl = () => {
                             paragraph="Define the outcomes and token allocations for this collection."
                         />
                         <Box gap="small">
-                            <BaseMenuListItem
+                            <BaseListItemButton
                                 icon={<ListPlus />}
                                 title={'Outcome selection'}
                                 onClick={() =>
                                     setController('OutcomeSelectionControl')
                                 }
                             />
-                            <BaseMenuListItem
+                            <BaseListItemButton
                                 icon={<UsersThree />}
                                 title={'Allocation'}
                                 onClick={() =>

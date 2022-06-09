@@ -8,7 +8,7 @@ import {
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseListItemButton from '@cambrian/app/components/buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
 import ComposerModuleList from './moduleList/ComposerModuleList'
@@ -94,19 +94,19 @@ export const ComposerSolverControl = () => {
                                     paragraph="Directly edit settings and data. Or, add flags for later editing in templates and proposals."
                                 />
                                 <Box gap="small">
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<Gear />}
                                         title="Settings"
                                         onClick={toggleShowSolverSettingsModal}
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<TreeStructure />}
                                         title="Outcome list"
                                         onClick={() =>
                                             setController('OutcomeListControl')
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<UserList />}
                                         title={'Recipient list'}
                                         onClick={() =>
@@ -115,14 +115,14 @@ export const ComposerSolverControl = () => {
                                             )
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<ArrowSquareIn />}
                                         title={'Slot list'}
                                         onClick={() =>
                                             setController('SlotControl')
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<Cube />}
                                         title={'Modules'}
                                         onClick={() => setController('Modules')}

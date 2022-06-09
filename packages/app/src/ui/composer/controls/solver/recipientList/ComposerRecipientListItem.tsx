@@ -1,8 +1,8 @@
 import { ArrowArcLeft, PuzzlePiece, User } from 'phosphor-react'
 import React, { useState } from 'react'
 
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
-import ListItem from '@cambrian/app/components/list/ListItem'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
 import UpdateRecipientModal from './modals/UpdateRecipientModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -58,7 +58,7 @@ const ComposerRecipientListItem = ({
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 description="Recipient"
                 icon={currentIcon}
                 title={currentTitle}
