@@ -1,9 +1,9 @@
 import IPFSTextSubmitterUI, {
     IPFS_TEXT_SUBMITTER_MODULE_KEY,
-} from '@cambrian/app/ui/solvers/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
+} from '@cambrian/app/ui/customUIs/IPFSTextSubmitter/IPFSTextSubmitterUI'
 import UnanimityUI, {
     UNANIMITY_MODULE_KEY,
-} from '@cambrian/app/ui/solvers/customUIs/Unanimity/UnanimityUI'
+} from '@cambrian/app/ui/customUIs/Unanimity/UnanimityUI'
 
 import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import LOCAL_IPFSTextSubmitter from '@cambrian/core/deployments/localhost/IPFSTextSubmitter.json'

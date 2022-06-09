@@ -12,12 +12,12 @@ import {
     getSolverRecipientSlots,
 } from '@cambrian/app/components/solver/SolverHelpers'
 
-import BaseMenuListItem from '../../../components/buttons/BaseMenuListItem'
+import BaseMenuListItem from '../buttons/BaseMenuListItem'
 import { Box } from 'grommet'
-import HeaderTextSection from '../../../components/sections/HeaderTextSection'
-import KeeperInputsModal from '../../../components/modals/KeeperInputsModal'
-import OutcomeCollectionModal from '../../../components/modals/OutcomeCollectionModal'
-import RecipientsModal from '../../../components/modals/RecipientsModal'
+import HeaderTextSection from '../sections/HeaderTextSection'
+import KeeperInputsModal from '../modals/KeeperInputsModal'
+import OutcomeCollectionModal from '../modals/OutcomeCollectionModal'
+import RecipientsModal from '../modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
