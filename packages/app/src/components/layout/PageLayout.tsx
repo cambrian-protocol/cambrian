@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useContext } from 'react'
 
-import Appbar from '../nav/Appbar'
+import Appbar from '../bars/Appbar'
 import BaseFooter from './footer/BaseFooter'
 import { Box } from 'grommet'
 import Glow from '../branding/Glow'

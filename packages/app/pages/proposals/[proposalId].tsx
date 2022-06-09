@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
+import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
