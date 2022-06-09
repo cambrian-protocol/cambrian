@@ -21,8 +21,11 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -55,6 +58,8 @@ export async function parseComposerSolvers(
         return undefined
     }
 
+    const { chainId } = await provider.getNetwork()
+
     return sortedSolvers.map((solver, index) => {
         return {
             collateralToken: collateralToken,
@@ -68,7 +73,8 @@ export async function parseComposerSolvers(
             config: parseComposerSolverConfig(
                 solver.config,
                 index,
-                sortedSolvers
+                sortedSolvers,
+                chainId
             ),
         }
     })
@@ -77,8 +83,13 @@ export async function parseComposerSolvers(
 export function parseComposerSolverConfig(
     composerSolverConfig: ComposerSolverConfigModel,
     currentSolverIndex: number,
-    sortedSolvers: ComposerSolverModel[]
+    sortedSolvers: ComposerSolverModel[],
+    chainId: number
 ): SolverConfigModel {
+    const chainData = SUPPORTED_CHAINS[chainId]
+    if (!chainData || !chainData.contracts['basicSolverV1'])
+        throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
+
     const ingests = Object.keys(composerSolverConfig.slots).map((slotId) =>
         parseComposerSlot(composerSolverConfig.slots[slotId], sortedSolvers)
     )
@@ -90,9 +101,7 @@ export function parseComposerSolverConfig(
     )
 
     return {
-        implementation: composerSolverConfig.implementation
-            ? composerSolverConfig.implementation
-            : '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707', // IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
+        implementation: chainData.contracts['basicSolverV1'],
         keeper: composerSolverConfig.keeperAddress,
         arbitrator: composerSolverConfig.arbitratorAddress
             ? composerSolverConfig.arbitratorAddress
@@ -100,30 +109,51 @@ export function parseComposerSolverConfig(
         timelockSeconds: composerSolverConfig.timelockSeconds
             ? composerSolverConfig.timelockSeconds
             : 0,
-        data:
-            composerSolverConfig.data && composerSolverConfig.data.length
-                ? parseCoreDataInput(composerSolverConfig.data)
-                : ethers.constants.HashZero,
+        moduleLoaders:
+            composerSolverConfig.modules && composerSolverConfig.modules.length
+                ? parseModuleLoaders(composerSolverConfig.modules, chainId)
+                : [],
         ingests: ingests,
         conditionBase: conditionBase,
     }
 }
 
-export function parseCoreDataInput(datas: SolverCoreDataInputType[]) {
-    const types = datas.map((x) => x.type)
-    const values = datas.map((x, i) => {
-        if (types[i] === SolidityDataTypes.Bytes32) {
-            return ethers.utils.formatBytes32String(x.data)
-        } else {
-            return x.data
-        }
-    })
-
+export function parseModuleLoaders(
+    modules: ComposerModuleModel[],
+    chainId: number
+) {
     try {
-        return ethers.utils.defaultAbiCoder.encode([...types], [...values])
+        const parsedModuleLoaders = modules.map((module) => {
+            const types = module.dataInputs?.map((x) => x.type) || []
+            const values =
+                module.dataInputs?.map((x, i) => {
+                    if (types[i] === SolidityDataTypes.Bytes32) {
+                        return ethers.utils.formatBytes32String(x.value)
+                    } else {
+                        return x.value
+                    }
+                }) || []
+
+            const moduleDeploymentAddress = ModuleRegistryAPI.module(module.key)
+                .deployments[chainId]
+
+            if (moduleDeploymentAddress) {
+                return {
+                    module: moduleDeploymentAddress,
+                    data: ethers.utils.defaultAbiCoder.encode(
+                        [...types],
+                        [...values]
+                    ),
+                }
+            } else {
+                throw new Error('Module not supported on this chain')
+            }
+        })
+
+        return parsedModuleLoaders
     } catch (e) {
         cpLogger.push(e)
-        return ethers.constants.HashZero
+        return []
     }
 }
 

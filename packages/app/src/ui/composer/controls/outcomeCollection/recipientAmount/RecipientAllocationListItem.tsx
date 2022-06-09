@@ -1,10 +1,10 @@
 import { ArrowArcLeft, PuzzlePiece, User, WarningCircle } from 'phosphor-react'
 import React, { useState } from 'react'
 
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
 import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
-import ListItem from '@cambrian/app/components/list/ListItem'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
 import UpdateRecipientAllocationModal from './modals/UpdateRecipientAllocationModal'
 import UpdateRecipientModal from '../../solver/recipientList/modals/UpdateRecipientModal'
@@ -81,7 +81,7 @@ const RecipientAllocationListItem = ({
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 description="Recipient"
                 icon={currentIcon}
                 title={currentTitle || <WarningCircle />}

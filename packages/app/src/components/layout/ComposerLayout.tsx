@@ -1,4 +1,4 @@
-import Appbar from '../nav/Appbar'
+import Appbar from '../bars/Appbar'
 import { Box } from 'grommet'
 import Head from 'next/head'
 import { PropsWithChildren } from 'react'

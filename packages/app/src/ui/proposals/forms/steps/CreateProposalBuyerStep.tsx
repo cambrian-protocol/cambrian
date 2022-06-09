@@ -66,7 +66,11 @@ const CreateProposalBuyerStep = ({
                     paragraph="Please provide us with some detail about your Identity or leave blank if you want to stay anonymous."
                 />
                 <FormField name="name" label="Your/Organization Name" />
-                <FormField name="pfp" label="Avatar URL" />
+                <FormField
+                    name="pfp"
+                    placeholder="https://your.profile.picture"
+                    label="Avatar URL"
+                />
             </MultiStepFormLayout>
         </Form>
     )

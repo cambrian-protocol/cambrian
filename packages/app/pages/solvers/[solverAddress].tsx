@@ -1,10 +1,7 @@
-import {
-    BASE_SOLVER_IFACE,
-    WRITER_IFACE,
-} from 'packages/app/config/ContractInterfaces'
 import React, { useEffect, useState } from 'react'
 
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWallet'
+import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -40,14 +37,13 @@ export default function SolverPage() {
         }
     }, [currentUser, router])
 
-    const USE_WRITER = true // TODO TEMP
     return (
         <>
             {currentUser.signer ? (
                 solverContractAddress ? (
                     <Solver
                         address={solverContractAddress}
-                        iface={USE_WRITER ? WRITER_IFACE : BASE_SOLVER_IFACE}
+                        iface={BASE_SOLVER_IFACE}
                         currentUser={currentUser}
                     />
                 ) : showInvalidQueryComponent ? (

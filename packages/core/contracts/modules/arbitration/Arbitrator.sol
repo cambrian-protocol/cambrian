@@ -3,12 +3,12 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-import "../../modules/Module.sol";
 import "../../interfaces/ISolver.sol";
 
 abstract contract Arbitrator {
     function requestArbitration(ISolver solver, uint256 conditionIndex)
         external
+        payable
         virtual
     {
         _requestArbitration(solver, conditionIndex);
@@ -24,9 +24,9 @@ abstract contract Arbitrator {
     function arbitrate(
         ISolver solver,
         uint256 conditionIndex,
-        uint256[] memory payouts
+        uint256[] memory outcomes
     ) external virtual {
-        _arbitrate(solver, conditionIndex, payouts);
+        _arbitrate(solver, conditionIndex, outcomes);
     }
 
     function _requestArbitration(ISolver solver, uint256 conditionIndex)
@@ -42,8 +42,8 @@ abstract contract Arbitrator {
     function _arbitrate(
         ISolver solver,
         uint256 conditionIndex,
-        uint256[] memory payouts
+        uint256[] memory outcomes
     ) internal {
-        solver.arbitrate(conditionIndex, payouts);
+        solver.arbitrate(conditionIndex, outcomes);
     }
 }

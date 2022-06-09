@@ -1,6 +1,7 @@
 import { Box, Layer, LayerProps, Text } from 'grommet'
 import { CaretLeft, IconContext, X } from 'phosphor-react'
 
+import Glow from '../branding/Glow'
 import { PropsWithChildren } from 'react'
 
 export type BaseLayerModalProps = PropsWithChildren<{}> &
@@ -27,7 +28,8 @@ const BaseLayerModal = ({
         margin={{ top: 'small' }}
         background="background-back"
     >
-        <Box align="center" flex width="large">
+        <Box align="center" flex width="large" style={{ position: 'relative' }}>
+            <Glow height="800px" width="1000px" left={'5%'} top={'-200px'} />
             <Box
                 width="100%"
                 direction="row"
@@ -36,6 +38,7 @@ const BaseLayerModal = ({
                 pad="medium"
                 elevation="small"
                 height={{ max: 'xxsmall' }}
+                style={{ position: 'relative' }}
             >
                 <IconContext.Provider value={{ size: '24' }}>
                     <Box onClick={onBack || onClose} focusIndicator={false}>
@@ -47,15 +50,15 @@ const BaseLayerModal = ({
                 </Text>
             </Box>
             <Box
-                pad="medium"
+                style={{ position: 'relative' }}
                 fill
                 align="center"
                 height={{ min: 'auto' }}
                 overflow={{ vertical: 'auto' }}
+                pad={{ vertical: 'large', horizontal: 'medium' }}
             >
                 {children}
             </Box>
-            <Box pad={'small'} />
         </Box>
     </Layer>
 )

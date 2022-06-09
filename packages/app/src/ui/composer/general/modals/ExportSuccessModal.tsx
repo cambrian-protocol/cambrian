@@ -9,7 +9,7 @@ import { loadIdsFromLocalStorage } from '@cambrian/app/utils/helpers/localStorag
 
 interface ExportCompositionModalProps {
     description: string
-    link: string
+    link?: string
     onClose: () => void
     title: string
     prefix: string
@@ -45,10 +45,9 @@ const ExportSuccessModal = ({
                 pad={{ bottom: 'medium' }}
                 fill="horizontal"
             >
-                <Paragraph
+                <Text
                     style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}
-                    fill
-                    color="dark-6"
+                    color="dark-4"
                 >
                     <Anchor
                         color="brand"
@@ -60,7 +59,7 @@ const ExportSuccessModal = ({
                     and use the "/watch{' '}
                     {storedExports.length > 0 ? storedExports[0].cid : '<word>'}
                     " command to receive notification DMs.
-                </Paragraph>
+                </Text>
             </Box>
 
             {storedExports.length > 0 ? (

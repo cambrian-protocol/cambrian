@@ -8,6 +8,7 @@ import "./Module.sol";
 
 contract IPFSTextSubmitter is Module {
     event SubmittedWork(
+        address indexed solver,
         string cid,
         address submitter,
         bytes32 indexed conditionId
@@ -36,6 +37,11 @@ contract IPFSTextSubmitter is Module {
         SolverLib.Condition memory condition = solver.condition(conditionIndex);
 
         require(condition.status == SolverLib.Status.Executed, "Disabled");
-        emit SubmittedWork(cid, msg.sender, condition.conditionId);
+        emit SubmittedWork(
+            address(solver),
+            cid,
+            msg.sender,
+            condition.conditionId
+        );
     }
 }

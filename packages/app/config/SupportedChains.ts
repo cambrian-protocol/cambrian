@@ -8,7 +8,14 @@ import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHu
 import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
 import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
 import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
-import LOCAL_WriterSolverV1 from '@cambrian/core/deployments/localhost/WriterSolverV1.json'
+import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
+import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
+import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
+import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
+import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHub.json'
+import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
+import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
+import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
 
 interface ChainInfo {
     name: string
@@ -29,19 +36,8 @@ interface NativeCurrencyType {
     balance?: string
 }
 
-type ContractAddresses = {
-    arbitratorFactory?: string // Only hardhat
-    arbitrationDispatch: string
-    basicArbitrator?: string // Only hardhat
-    basicSolverV1: string
-    conditionalTokens: string
-    ipfsSolutionsHub: string
-    proposalsHub: string
-    solverFactory: string
-    solverLib: string
-    toyToken: string
-    writerSolverV1: string
-    defaultDenominationToken: string
+export type ContractAddresses = {
+    [key: string]: string
 }
 
 export type ChainDataHashMapType = {
@@ -80,7 +76,6 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverFactory: LOCAL_SolverFactory.address,
             solverLib: LOCAL_SolverLib.address,
             toyToken: LOCAL_ToyToken.address,
-            writerSolverV1: LOCAL_WriterSolverV1.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
@@ -103,15 +98,14 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             },
         },
         contracts: {
-            arbitrationDispatch: '0xc2F13443363872D99c547F625c3aDa538365dCe7',
-            basicSolverV1: '0x65ac197455032b0A94E428b018562Ea279F171ea',
-            conditionalTokens: '0x73B7504BD7cBfed499dA21804a4Dc13935f3be4F',
-            ipfsSolutionsHub: '0xD919c530225588b59BE7379B1a95dC314d47b9B2',
-            proposalsHub: '0x9E8764A8131f6b361f6039082a18aa920EdF20a2',
-            solverFactory: '0x7886965945c7ECcd9C57EdF6b5119EFB7c272A79',
-            solverLib: '0x8E9c2816D50079732669ad32E15be20fE3D9b1Dc',
-            toyToken: '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79',
-            writerSolverV1: '0xfdF811AD6ab1cF19314Da81CE3D21d7D1DFf7089',
+            arbitrationDispatch: ROPSTEN_ArbitrationDispatch.address,
+            basicSolverV1: ROPSTEN_BasicSolverV1.address,
+            conditionalTokens: ROPSTEN_ConditionalTokens.address,
+            ipfsSolutionsHub: ROPSTEN_IPFSSolutionsHub.address,
+            proposalsHub: ROPSTEN_ProposalsHub.address,
+            solverFactory: ROPSTEN_SolverFactory.address,
+            solverLib: ROPSTEN_SolverLib.address,
+            toyToken: ROPSTEN_ToyToken.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },

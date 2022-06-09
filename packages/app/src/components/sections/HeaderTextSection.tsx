@@ -1,6 +1,6 @@
 import { Box, Heading } from 'grommet'
 
-import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
+import { ConditionalWrapper } from '@cambrian/app/components/utils/ConditionalWrapper'
 import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
 
@@ -23,7 +23,7 @@ const HeaderTextSection = ({
         condition={icon !== undefined}
         wrapper={(children) => (
             <Box
-                fill
+                flex
                 justify="center"
                 align="center"
                 gap="small"

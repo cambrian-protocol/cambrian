@@ -8,24 +8,27 @@ import {
 } from './SolverGetters'
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
 
+import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import ContentMarketingCustomUI from '@cambrian/app/ui/solvers/customUIs/ContentMarketing/ContentMarketingCustomUI'
-import DefaultSolverActionbar from '@cambrian/app/ui/solvers/DefaultSolverActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
-import InitiatedSolverContent from '@cambrian/app/ui/solvers/InitiatedSolverContent'
+import InitiatedSolverContent from '@cambrian/app/components/info/InitiatedSolverContent'
 import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import { MetadataModel } from '../../models/MetadataModel'
+import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import OutcomeNotification from '../notifications/OutcomeNotification'
 import PageLayout from '../layout/PageLayout'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
+import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import SolverHeader from '../layout/header/SolverHeader'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import SolverSidebar from '../bars/sidebar/SolverSidebar'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
@@ -97,12 +100,11 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     }, [outcomes])
 
     useEffect(() => {
-        if (solverData && currentUser) {
+        if (solverData && currentUser.address) {
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 
-            if (currentUser.address === solverData.config.arbitrator)
-                addPermission('Arbitrator')
+            initArbitratorPermission()
 
             if (currentCondition) {
                 const recipients = getSolverRecipientSlots(
@@ -125,6 +127,8 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     useEffect(() => {
         if (
             currentCondition?.status === ConditionStatus.OutcomeProposed ||
+            currentCondition?.status === ConditionStatus.ArbitrationRequested ||
+            currentCondition?.status === ConditionStatus.ArbitrationDelivered ||
             currentCondition?.status === ConditionStatus.OutcomeReported
         ) {
             initProposedOutcome()
@@ -151,6 +155,27 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             }
         }
     }, [currentUser, currentCondition])
+
+    const initArbitratorPermission = async () => {
+        if (solverData) {
+            const arbitratorCode = await currentUser.signer?.provider?.getCode(
+                solverData.config.arbitrator
+            )
+            const isContract = arbitratorCode !== '0x'
+
+            if (isContract) {
+                const arbitratorContract = new ethers.Contract(
+                    solverData.config.arbitrator,
+                    BASIC_ARBITRATOR_IFACE,
+                    currentUser.signer
+                )
+                const owner = await arbitratorContract.owner()
+                if (owner && currentUser.address === owner)
+                    addPermission('Arbitrator')
+            } else if (currentUser.address === solverData.config.arbitrator)
+                addPermission('Arbitrator')
+        }
+    }
 
     const updateSolverDataListener = async () => {
         await updateSolverData()
@@ -238,55 +263,57 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             }
         }
     }
-
-    // TODO Intergrate Custom UI Loading. Pass props via Provider?
-    const loadWriter = true
-    const customUI = {
-        sidebar: undefined,
-        sideNav: undefined,
-    }
-
+    const proposalMetadata = metadata?.stages?.proposal as ProposalModel
     return (
         <>
-            {solverData && currentCondition && solverMethods ? (
+            {solverData &&
+            currentCondition &&
+            solverMethods &&
+            currentUser.chainId ? (
                 <InteractionLayout
-                    contextTitle="Solver"
+                    header={
+                        <SolverHeader
+                            metadata={metadata}
+                            solverData={solverData}
+                            currentCondition={currentCondition}
+                        />
+                    }
+                    contextTitle={proposalMetadata?.title || 'Solver'}
                     actionBar={
-                        <DefaultSolverActionbar
+                        <SolverActionbar
+                            solverAddress={address}
                             currentUser={currentUser}
                             solverData={solverData}
                             currentCondition={currentCondition}
                             solverMethods={solverMethods}
-                            metadata={metadata}
                         />
                     }
-                    notification={
+                    sidebar={
                         proposedOutcome && (
-                            <OutcomeNotification
-                                token={solverData.collateralToken}
-                                outcomeCollection={proposedOutcome}
-                                status={currentCondition.status}
+                            <SolverSidebar
+                                currentCondition={currentCondition}
+                                solverAddress={address}
+                                solverData={solverData}
+                                solverMethods={solverMethods}
+                                currentUser={currentUser}
+                                proposedOutcome={proposedOutcome}
                             />
                         )
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
                         <InitiatedSolverContent metadata={metadata} />
-                    ) : loadWriter ? (
-                        <ContentMarketingCustomUI
-                            solverMethods={solverMethods}
-                            solverContract={solverContract}
-                            currentUser={currentUser}
-                            solverData={solverData}
-                            currentCondition={currentCondition}
-                            metadata={metadata}
-                        />
                     ) : (
-                        <>No Solver UI found</>
+                        <ModuleUIManager
+                            solverData={solverData}
+                            chainId={currentUser.chainId}
+                            solverAddress={address}
+                            currentCondition={currentCondition}
+                        />
                     )}
                 </InteractionLayout>
             ) : solverData && solverMethods ? (
-                <PageLayout contextTitle="Uninitialzed Solve">
+                <PageLayout contextTitle="Uninitialized Solve">
                     {/* TODO, integrate Interaction Layout */}
                     <HeaderTextSection
                         subTitle="Uninitialized Solver"

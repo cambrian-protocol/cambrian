@@ -9,6 +9,7 @@ import {
 } from './ConditionModel'
 import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 
+import { ModuleLoaderModel } from './ModuleModel'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
 import { SlotTagsHashMapType } from './SlotTagModel'
 import { SolverTagModel } from './SolverTagModel'
@@ -36,7 +37,7 @@ export type SolverResponseModel = {
     keeper: string
     arbitrator: string
     timelockSeconds: number
-    data: string
+    moduleLoaders: ModuleLoaderModel[]
     ingests: SlotResponseType[]
     conditionBase: ConditionResponseType
 }

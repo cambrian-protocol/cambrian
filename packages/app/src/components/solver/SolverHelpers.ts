@@ -6,6 +6,7 @@ import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { ethers } from 'ethers'
 
 export const calculatePositionId = (
@@ -77,6 +78,27 @@ export const getSolverRecipientSlots = (
                 solverData.slotTags
             )
     )
+}
+
+export const getSolverRecipientAddressHashmap = (
+    solverData: SolverModel,
+    condition: SolverContractCondition
+) => {
+    const recipientSlotArray = getSolverRecipientSlots(solverData, condition)
+
+    const recipientAddressHashmap: {
+        [recipientAddress: string]: RichSlotModel
+    } = {}
+
+    recipientSlotArray.forEach((recipientSlot) => {
+        const decodedAddress = decodeData(
+            [SolidityDataTypes.Address],
+            recipientSlot.slot.data
+        )
+        recipientAddressHashmap[decodedAddress] = recipientSlot
+    })
+
+    return recipientAddressHashmap
 }
 
 export const getManualInputs = (

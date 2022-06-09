@@ -24,8 +24,8 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
-import { SolverCoreDataInputType } from '../ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { ComposerModuleModel } from '../models/ModuleModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -84,12 +84,7 @@ export default class ComposerSolver {
     /*************************** Title & Keeper & Arbitrator & Timelock & "Core" Data ***************************/
 
     updateMainConfig(mainConfig: SolverMainConfigType) {
-        const {
-            keeperAddress,
-            arbitratorAddress,
-            timelockSeconds,
-            implementation,
-        } = mainConfig
+        const { keeperAddress, arbitratorAddress, timelockSeconds } = mainConfig
 
         if (keeperAddress !== this.config.keeperAddress) {
             this.updateKeeper(keeperAddress)
@@ -101,10 +96,6 @@ export default class ComposerSolver {
 
         if (timelockSeconds !== this.config.timelockSeconds) {
             this.updateTimelock(timelockSeconds)
-        }
-
-        if (implementation !== this.config.implementation) {
-            this.updateImplementation(implementation)
         }
     }
 
@@ -128,8 +119,33 @@ export default class ComposerSolver {
         this.config.implementation = implementation
     }
 
-    updateData(data: SolverCoreDataInputType[]) {
-        this.config.data = data
+    /*********************************** Modules *************************************/
+
+    addModule(moduleToAdd: ComposerModuleModel) {
+        if (!this.config.modules) this.config.modules = []
+        this.config.modules.push(moduleToAdd)
+    }
+
+    updateModule(updatedModule: ComposerModuleModel) {
+        if (this.config.modules) {
+            const updatedModules = [...this.config.modules]
+            const idx = updatedModules.findIndex(
+                (module) => module.key === updatedModule.key
+            )
+            updatedModules[idx] = updatedModule
+
+            this.config.modules = updatedModules
+        }
+    }
+
+    deleteModule(moduleKeyToDelete: string) {
+        if (this.config.modules) {
+            const updatedModules = [...this.config.modules]
+            const filteredModules = updatedModules.filter(
+                (module) => module.key !== moduleKeyToDelete
+            )
+            this.config.modules = filteredModules
+        }
     }
 
     /*********************************** Tags *************************************/
@@ -531,13 +547,12 @@ export default class ComposerSolver {
     /*************************** Initialization ***************************/
 
     getDefaultConfig(): ComposerSolverConfigModel {
-        // TODO IMPORTANT WARNING: REPLACE THIS BEFORE PROD // hardhat BasicSolverV1 deployment address
         const config = {
-            implementation: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+            implementation: '', // will be set at Proposal creation
             keeperAddress: '',
             arbitratorAddress: '',
             timelockSeconds: 0,
-            data: [],
+            modules: [],
             slots: this.getDefaultSlots(),
             condition: this.getDefaultCondition(),
         }

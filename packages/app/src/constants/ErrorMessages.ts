@@ -78,6 +78,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Error while arbitration progress',
         logLevel: 1,
     },
+    CREATE_ARBITRATOR_ERROR: {
+        message: 'Error while creating arbitrator',
+        logLevel: 1,
+    },
     ADD_DATA_ERROR: {
         message: 'Error while adding data to the solver',
         logLevel: 1,
@@ -92,6 +96,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     PREPARE_SOLVE_ERROR: {
         message: 'Error while preparing solve',
+        logLevel: 1,
+    },
+    MODULE_ERROR: {
+        message: 'Error initializing module',
         logLevel: 1,
     },
 }

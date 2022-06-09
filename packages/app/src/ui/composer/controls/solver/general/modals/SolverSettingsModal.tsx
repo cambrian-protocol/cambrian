@@ -1,5 +1,5 @@
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseListItemButton from '@cambrian/app/components/buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
@@ -27,7 +27,7 @@ const SolverSettingsModal = ({ onClose, solver }: UpdateSlotFormModalProps) => {
                     paragraph="Define the Solver implementation, Keeper, Arbitrator, Timelock, and metadata."
                 />
                 <Box fill gap="medium">
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         title="Solver Tag"
                         icon={<Tag />}
                         onClick={toggleShowSolverTagModal}

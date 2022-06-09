@@ -9,8 +9,8 @@ const colors: any = {
     active: '#799AB850',
     'background-back': { dark: '#040f11', light: '#ecfcff' },
     'background-front': {
-        dark: '#2f2f2f',
-        light: '#FFFFFF',
+        dark: '#012b39',
+        light: '#76d3e6',
     },
     'background-contrast': {
         dark: '#00202b',
@@ -28,6 +28,7 @@ const colors: any = {
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
+    'dark-4': '#999999',
 }
 
 export const cpTheme = deepMerge(grommet, {
@@ -91,6 +92,7 @@ export const cpTheme = deepMerge(grommet, {
             extend: `
             color: white;
             box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            white-space: nowrap;
             `,
         },
         secondary: {
@@ -102,6 +104,7 @@ export const cpTheme = deepMerge(grommet, {
             extend: `
             color: white;
             box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            white-space: nowrap;
             `,
         },
         size: {

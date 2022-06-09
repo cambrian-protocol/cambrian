@@ -73,17 +73,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("BasicArbitrator", {
-    from: deployer,
-    log: true,
-  });
-
   await deploy("IPFSTextSubmitter", {
     from: deployer,
     log: true,
   });
 
   await deploy("Unanimity", {
+    from: deployer,
+    log: true,
+  });
+
+  await deploy("BasicArbitrator", {
     from: deployer,
     log: true,
   });
@@ -101,7 +101,7 @@ module.exports.tags = [
   "IPFSSolutionsHub",
   "pWRK",
   "ArbitratorFactory",
-  "BasicArbitrator",
   "IPFSTextSubmitter",
   "Unanimity",
+  "BasicArbitrator",
 ];

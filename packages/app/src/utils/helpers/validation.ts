@@ -43,3 +43,14 @@ export const validateAddress = [
         return isAddress(value)
     },
 ]
+
+export const isRequired = (value: string) => {
+    if (
+        value == null ||
+        value === undefined ||
+        value.length === 0 ||
+        value.trim() === ''
+    ) {
+        return 'required'
+    }
+}
