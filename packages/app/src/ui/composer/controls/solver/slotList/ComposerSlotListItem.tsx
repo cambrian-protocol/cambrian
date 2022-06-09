@@ -1,6 +1,6 @@
 import { ArrowSquareIn } from 'phosphor-react'
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
-import ListItem from '@cambrian/app/components/list/ListItem'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import UpdateSlotModal from './modals/UpdateSlotModal'
 import { getSlotTitle } from '@cambrian/app/utils/helpers/slotHelpers'
@@ -45,7 +45,7 @@ const ComposerSlotListItem = ({ slotModel }: ComposerSlotListItemProps) => {
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 icon={<ArrowSquareIn size={'24'} />}
                 description={currentSlotTypeLabel}
                 title={currentTitle}

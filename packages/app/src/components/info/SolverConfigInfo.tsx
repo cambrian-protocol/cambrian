@@ -12,7 +12,7 @@ import {
     getSolverRecipientSlots,
 } from '@cambrian/app/components/solver/SolverHelpers'
 
-import BaseMenuListItem from '../buttons/BaseMenuListItem'
+import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import KeeperInputsModal from '../modals/KeeperInputsModal'
@@ -54,22 +54,22 @@ const SolverConfigInfo = ({
                 }
             />
             <Box gap="small" fill="horizontal">
-                <BaseMenuListItem
+                <BaseListItemButton
                     icon={<UsersThree />}
                     title="Recipients"
                     onClick={toggleShowRecipientModal}
                 />
-                <BaseMenuListItem
+                <BaseListItemButton
                     icon={<TreeStructure />}
                     title="Outcomes"
                     onClick={toggleShowOutcomeModal}
                 />
-                <BaseMenuListItem
+                <BaseListItemButton
                     icon={<ArrowSquareIn />}
                     title="Keeper Inputs"
                     onClick={toggleShowKeeperInputModal}
                 />
-                <BaseMenuListItem
+                <BaseListItemButton
                     info={
                         solverData.slotTags
                             ? solverData.slotTags['timelockSeconds']
@@ -82,7 +82,7 @@ const SolverConfigInfo = ({
                         solverData.config.timelockSeconds
                     )}
                 />
-                <BaseMenuListItem
+                <BaseListItemButton
                     title="Escrow Balance"
                     icon={<Vault />}
                     subTitle={
@@ -100,7 +100,7 @@ const SolverConfigInfo = ({
                             : '0'
                     }
                 />
-                <BaseMenuListItem
+                <BaseListItemButton
                     info={
                         solverData.slotTags
                             ? solverData.slotTags['collateralToken']
@@ -112,7 +112,7 @@ const SolverConfigInfo = ({
                     subTitle={solverData.collateralToken.address}
                 />
                 {solverData.config.arbitrator !== '' && (
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         info={
                             solverData.slotTags
                                 ? solverData.slotTags['arbitrator']?.description

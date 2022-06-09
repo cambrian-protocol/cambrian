@@ -4,7 +4,7 @@ import { CaretRight, IconContext } from 'phosphor-react'
 import InfoDropButton from './InfoDropButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 
-export interface BaseMenuListItemProps {
+export interface BaseListItemButtonProps {
     title: string
     subTitle?: string
     icon: JSX.Element
@@ -14,7 +14,7 @@ export interface BaseMenuListItemProps {
     hideDivider?: boolean
 }
 
-const BaseMenuListItem = ({
+const BaseListItemButton = ({
     title,
     subTitle,
     icon,
@@ -22,7 +22,7 @@ const BaseMenuListItem = ({
     isActive,
     info,
     hideDivider,
-}: BaseMenuListItemProps) => {
+}: BaseListItemButtonProps) => {
     return (
         <IconContext.Provider value={{ size: '24' }}>
             <Box
@@ -64,4 +64,4 @@ const BaseMenuListItem = ({
     )
 }
 
-export default BaseMenuListItem
+export default BaseListItemButton

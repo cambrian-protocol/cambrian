@@ -6,7 +6,7 @@ import {
 import { SetStateAction, useState } from 'react'
 
 import { ChatMessageType } from './ChatMessage'
-import ErrorPopupModal from '../modals/ErrorPopupModal'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { PaperPlaneRight } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'

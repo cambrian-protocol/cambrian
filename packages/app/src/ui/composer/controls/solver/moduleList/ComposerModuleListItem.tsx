@@ -1,5 +1,5 @@
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
-import ListItem from '@cambrian/app/components/list/ListItem'
 import { Plug } from 'phosphor-react'
 import UpdateModuleModal from './modals/UpdateModuleModal'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
@@ -22,7 +22,7 @@ const ComposerModuleListItem = ({ module }: ComposerModuleListItemProps) => {
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 title={module.name}
                 description="Module"
                 icon={<Plug />}
