@@ -5,4 +5,4 @@ node_modules
 cache
 typechain-types
 .vscode
-/packages/bin
+packages/bin
