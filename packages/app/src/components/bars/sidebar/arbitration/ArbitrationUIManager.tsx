@@ -32,6 +32,7 @@ const ArbitrationUIManager = ({
     solverMethods,
 }: ArbitrationUIManagerProps) => {
     const isArbitrator = usePermission('Arbitrator')
+    const isRecipient = usePermission('Recipient')
 
     const { arbitratorContract, disputeId } = useArbitratorContract({
         currentUser: currentUser,
@@ -50,8 +51,9 @@ const ArbitrationUIManager = ({
 
     // Requesting/Locking
     if (
-        currentCondition.status === ConditionStatus.OutcomeProposed ||
-        currentCondition.status === ConditionStatus.ArbitrationRequested
+        (currentCondition.status === ConditionStatus.OutcomeProposed ||
+            currentCondition.status === ConditionStatus.ArbitrationRequested) &&
+        isRecipient
     ) {
         if (!arbitratorContract) {
             ArbitrationUI = (
