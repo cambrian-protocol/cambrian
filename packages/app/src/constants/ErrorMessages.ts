@@ -102,6 +102,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Error initializing module',
         logLevel: 1,
     },
+    TEST_ERROR: {
+        message: 'Log Test',
+        logLevel: 1,
+    },
 }
 
 export const CONTRACT_ERROR: ErrorMessagesType = {

@@ -1,10 +1,11 @@
-import { ArrowSquareRight, CloudArrowDown, Gear } from 'phosphor-react'
+import { ArrowSquareRight, Bug, CloudArrowDown, Gear } from 'phosphor-react'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
 import BasePopupModal from '../modals/BasePopupModal'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import Stagehand from '@cambrian/app/classes/Stagehand'
@@ -50,6 +51,10 @@ const ComposerToolbar = () => {
         }
     }
 
+    const onTestLog = async () => {
+        await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
+    }
+
     return (
         <>
             <Box
@@ -62,6 +67,11 @@ const ComposerToolbar = () => {
                 justify="end"
                 elevation="small"
             >
+                <ComposerToolbarButton
+                    onClick={onTestLog}
+                    label="Test Log"
+                    icon={<Bug />}
+                />
                 <ComposerToolbarButton
                     onClick={toggleShowConfig}
                     label="Solution"
