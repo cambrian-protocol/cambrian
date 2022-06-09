@@ -9,6 +9,8 @@ import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFact
 import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
 import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
 import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
+import ROPSTEN_ArbitratorFactory from '@cambrian/core/deployments/ropsten/ArbitratorFactory.json'
+import ROPSTEN_BasicArbitrator from '@cambrian/core/deployments/ropsten/BasicArbitrator.json'
 import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
 import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
 import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
@@ -98,7 +100,9 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             },
         },
         contracts: {
+            arbitratorFactory: ROPSTEN_ArbitratorFactory.address,
             arbitrationDispatch: ROPSTEN_ArbitrationDispatch.address,
+            basicArbitrator: ROPSTEN_BasicArbitrator.address,
             basicSolverV1: ROPSTEN_BasicSolverV1.address,
             conditionalTokens: ROPSTEN_ConditionalTokens.address,
             ipfsSolutionsHub: ROPSTEN_IPFSSolutionsHub.address,
