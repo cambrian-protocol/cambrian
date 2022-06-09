@@ -1,7 +1,7 @@
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
-import ProposalContextHeader from '../proposals/ProposalContextHeader'
+import ProposalContextHeader from '../../ui/proposals/ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
