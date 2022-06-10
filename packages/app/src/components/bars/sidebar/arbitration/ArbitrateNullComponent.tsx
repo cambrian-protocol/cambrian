@@ -3,15 +3,12 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import { Box } from 'grommet'
 import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../../solver/Solver'
-import { Heading } from 'grommet'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { ProhibitInset } from 'phosphor-react'
 import SidebarComponentContainer from '../../../containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'

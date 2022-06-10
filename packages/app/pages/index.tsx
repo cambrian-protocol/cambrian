@@ -11,7 +11,6 @@ import RecommendedReadingsSection from '@cambrian/app/components/sections/Recomm
 import { Text } from 'grommet'
 import USPListSection from '@cambrian/app/components/sections/USPListSection'
 import USPSection from '@cambrian/app/components/sections/USPSection'
-import { javascript } from '@codemirror/lang-javascript'
 import { useRef } from 'react'
 import { useTheme } from '@cambrian/app/hooks/useTheme'
 
@@ -126,7 +125,6 @@ export default function Home() {
                                     <CodeMirror
                                         theme={themeMode}
                                         value={solverCode}
-                                        extensions={[javascript()]}
                                     />
                                 </Box>
                             }
