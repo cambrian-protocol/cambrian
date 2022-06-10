@@ -7,11 +7,7 @@ type MultiStepFormLayoutProps = PropsWithChildren<{}> & {
 
 const MultiStepFormLayout = ({ nav, children }: MultiStepFormLayoutProps) => {
     return (
-        <Box
-            height={{ min: '60vh' }}
-            width="xlarge"
-            pad={{ horizontal: 'large' }}
-        >
+        <Box height={{ min: '60vh' }} width="xlarge" pad="large">
             <Box flex animation={'fadeIn'} justify="start">
                 {children}
             </Box>
