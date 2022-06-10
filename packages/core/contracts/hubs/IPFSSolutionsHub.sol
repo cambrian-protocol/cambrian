@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/ISolverFactory.sol";
@@ -187,6 +187,10 @@ contract IPFSSolutionsHub {
         }
         // Prepare first Solver
         ISolver(instances[solutionId].solverAddresses[0]).prepareSolve(0);
+
+        try
+            ISolver(instances[solutionId].solverAddresses[0]).executeSolve(0)
+        {} catch {}
 
         emit ExecuteSolution(solutionId);
     }

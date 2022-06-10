@@ -1,4 +1,4 @@
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../conditionalTokens/ConditionalTokens.sol";
@@ -184,6 +184,8 @@ interface ISolver {
         @param _trackingId bytes32
     */
     function setTrackingId(bytes32 _trackingId) external;
+
+    function trackingId() external returns (bytes32 trackingId);
 
     /**
         @notice Get balance of collateral token on Solver

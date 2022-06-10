@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
@@ -90,7 +90,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
                 msg.sender == config.keeper ||
                     msg.sender == chainParent ||
                     isPermittedModule(this.prepareSolve.selector),
-                "Only keeper/parent"
+                "Not permitted"
             );
         }
 
@@ -148,7 +148,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
     // ********************************************************************************** //
 
     /**
-        @notice Mints conditional tokens, allocates them to recipients specified by ingested data, runs arbitrary `postroll()` function and tries to do the same for child Solver
+        @notice Mints conditional tokens, allocates them to recipients specified by ingested data and tries to do the same for child Solver
         @dev require(ingestsValid())
         @param _index Index of condition to execute on
      */

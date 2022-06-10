@@ -1,21 +1,10 @@
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../hubs/IPFSSolutionsHub.sol";
 import "../solvers/SolverLib.sol";
 
 interface IIPFSSolutionsHub {
-    struct Solution {
-        bool executed;
-        IERC20 collateralToken;
-        address proposalHub;
-        bytes32 proposalId;
-        bytes32 id;
-        bytes32 solverConfigsHash;
-        SolverLib.Multihash solverConfigsCID;
-        address[] solverAddresses;
-    }
-
     function createBase(
         bytes32 baseId,
         IERC20 collateralToken,
