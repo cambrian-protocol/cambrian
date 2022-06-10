@@ -61,11 +61,11 @@ const CreateTemplateStartStep = ({
                 }
             >
                 <HeaderTextSection
-                    title="Let's do something!"
-                    subTitle={`Configure a shareable template in ${
+                    title="Create a Listing"
+                    subTitle={`${
                         input.flexInputs.length > 0 ? 5 : 4
-                    } steps`}
-                    paragraph="The blueprint you're using may require some inputs be completed. Inputs you do not complete will be completed by the customer."
+                    } steps to create and list your service`}
+                    paragraph="Describe your service, customize your listing, and configure the Solver that will manage your jobs."
                 />
             </MultiStepFormLayout>
             {showRecentTemplatesModal && (

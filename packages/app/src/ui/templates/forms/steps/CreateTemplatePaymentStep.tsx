@@ -159,7 +159,8 @@ const CreateTemplatePaymentStep = ({
             >
                 <HeaderTextSection
                     subTitle={`${3}/${input.flexInputs.length > 0 ? 5 : 4}`}
-                    title="Interesting.. and how much will that cost?"
+                    title="How much does it cost?"
+                    paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                 />
                 <Box gap="medium">
                     <>

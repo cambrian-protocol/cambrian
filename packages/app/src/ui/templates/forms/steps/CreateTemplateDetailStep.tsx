@@ -64,23 +64,19 @@ const CreateTemplateDetailStep = ({
             >
                 <HeaderTextSection
                     subTitle={`${2}/${input.flexInputs.length > 0 ? 5 : 4}`}
-                    title={`Alright, ${input.name}${
-                        input.name?.trim() !== '' ? '.' : ''
-                    } ${
-                        input.name?.trim() !== '' ? 'W' : 'w'
-                    }hat do you want to solve?`}
-                    paragraph="Tell us what problem you will solve or describe the service your offering."
+                    title={`What service are you offering?`}
+                    paragraph="Let the world know how you can help."
                 />
                 <FormField
                     name="title"
                     label="Title"
                     required
-                    placeholder="I will change the world..."
+                    placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
                 />
                 <FormField name="description" label="Description" required>
                     <TextArea
                         name="description"
-                        placeholder="Nothing will be like it was before..."
+                        placeholder="Describe your service at length. Communicate your unique value, details of your service, and the format and content of information you need from customers. Customers will send proposals in response to this description."
                         rows={9}
                         resize={false}
                     />
