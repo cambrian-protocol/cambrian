@@ -5,6 +5,7 @@ import { Grommet } from 'grommet'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
 import { useTheme } from '@cambrian/app/hooks/useTheme'
+import { Provider } from '@self.id/framework'
 
 // @ts-ignore
 declare global {
@@ -19,9 +20,11 @@ declare global {
 
 export default function App({ ...props }: AppProps) {
     return (
-        <Store>
-            <Core {...props} />
-        </Store>
+        <Provider client={{ ceramic: 'testnet-clay' }}>
+            <Store>
+                <Core {...props} />
+            </Store>
+        </Provider>
     )
 }
 

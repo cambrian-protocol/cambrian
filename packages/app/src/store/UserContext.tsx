@@ -14,6 +14,12 @@ import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
+import {
+    useViewerConnection,
+    useViewerRecord,
+    EthereumAuthProvider,
+} from '@self.id/framework'
+
 export type PermissionType = string
 
 export type UserContextType = {
@@ -135,6 +141,9 @@ export const UserContext = React.createContext<UserContextType>({
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
+    const record = useViewerRecord('basicProfile')
+    const [ceramicConnection, ceramicConnect, ceramicDisconnect] =
+        useViewerConnection()
     const [user, dispatch] = useReducer(userReducer, initialUser)
     const { provider, web3Provider } = user
 
@@ -181,6 +190,16 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             connectWallet()
         }
     }, [connectWallet])
+
+    useEffect(() => {
+        if (provider && web3Provider) {
+            ceramicLogin()
+        }
+    }, [provider, web3Provider])
+
+    useEffect(() => {
+        console.log('Record: ', record)
+    }, [record])
 
     // EIP-1193 Event Listener
     useEffect(() => {
@@ -230,6 +249,16 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             }
         }
     }, [provider, disconnectWallet])
+
+    const ceramicLogin = async () => {
+        try {
+            const signer = web3Provider.getSigner()
+            const address = await signer.getAddress()
+            await ceramicConnect(new EthereumAuthProvider(provider, address))
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     const addPermission = (newPermission: PermissionType) => {
         if (user.signer && !user.permissions.includes(newPermission)) {
