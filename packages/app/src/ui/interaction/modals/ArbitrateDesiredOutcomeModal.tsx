@@ -84,7 +84,7 @@ const ArbitrateDesiredOutcomeModal = ({
                                     token={solverData.collateralToken}
                                     key={idx}
                                     outcomeCollection={outcomeCollection}
-                                    onArbitrate={onArbitrate}
+                                    onArbitrate={(indexSet) => onArbitrate(idx)} // Use index of this choice rather than the indexSet
                                     proposedIndexSet={isArbitrating}
                                     cardHeader={
                                         <CardHeader
