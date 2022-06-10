@@ -6,7 +6,7 @@ const ERC20_ABI =
   require("@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json").abi;
 
 const PROPOSALSHUB_ABI =
-  require("@cambrian/core/artifacts/contracts/ProposalsHub.sol/ProposalsHub.json").abi;
+  require("@cambrian/core/artifacts/contracts/hubs/ProposalsHub.sol/ProposalsHub.json").abi;
 
 const ULID = require("ulid");
 
@@ -32,7 +32,7 @@ async function main() {
       keeper: "0x676d41fedD0f24f282a4579C6d0C8E3B2099f0EF",
       arbitrator: "0x676d41fedD0f24f282a4579C6d0C8E3B2099f0EF",
       timelockSeconds: 0,
-      data: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      moduleLoaders: [],
       ingests: [
         {
           executions: 0,
@@ -179,43 +179,43 @@ async function main() {
   const tx = await ProposalsHub.connect(user1).createIPFSSolutionAndProposal(
     solutionId,
     ToyToken.address,
-    ethers.utils.getAddress("0xD919c530225588b59BE7379B1a95dC314d47b9B2"),
+    ethers.utils.getAddress("0x94AAd1Ac832e2859CDe86FCD5b34F632f6C09F37"),
     "1000000000000000000000",
     solverConfigs,
     getBytes32FromMultihash(cid),
     getBytes32FromMultihash(blankObjCID)
   );
   const res = await tx.wait();
-  const proposalId = res.events[1].args.id;
+  // const proposalId = res.events[1].args.id;
 
-  //Fund Proposal
-  const tx2 = await ToyToken.connect(user1).approve(
-    ProposalsHub.address,
-    "1000000000000000000000"
-  );
+  // //Fund Proposal
+  // const tx2 = await ToyToken.connect(user1).approve(
+  //   ProposalsHub.address,
+  //   "1000000000000000000000"
+  // );
 
-  const res2 = await tx2.wait();
-  console.log(res2);
+  // const res2 = await tx2.wait();
+  // console.log(res2);
 
-  const tx3 = await ProposalsHub.connect(user1).fundProposal(
-    proposalId,
-    ToyToken.address,
-    "1000000000000000000000"
-  );
-  const res3 = await tx3.wait();
-  console.log(res3);
+  // const tx3 = await ProposalsHub.connect(user1).fundProposal(
+  //   proposalId,
+  //   ToyToken.address,
+  //   "1000000000000000000000"
+  // );
+  // const res3 = await tx3.wait();
+  // console.log(res3);
 
-  const tx4 = await ProposalsHub.connect(user1).executeIPFSProposal(
-    proposalId,
-    solverConfigs,
-    { gasLimit: "4000000" }
-  );
+  // const tx4 = await ProposalsHub.connect(user1).executeIPFSProposal(
+  //   proposalId,
+  //   solverConfigs,
+  //   { gasLimit: "4000000" }
+  // );
 
-  const res4 = await tx4.wait();
+  // const res4 = await tx4.wait();
 
-  console.log(res4);
+  // console.log(res4);
 
-  console.log("Executed Proposal: ", proposalId);
+  // console.log("Executed Proposal: ", proposalId);
 }
 
 main()
