@@ -12,10 +12,7 @@ import {
 import { ConditionModel } from '@cambrian/app/models/ConditionModel'
 import { AllocationPathsType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
-import {
-    OutcomeCollectionModel,
-    OutcomeModel,
-} from '@cambrian/app/models/OutcomeModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
@@ -26,6 +23,7 @@ import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
 import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolverModel[],
@@ -413,7 +411,7 @@ export function parseComposerCondition(
 
 // Filter out existant outcomes which are not in an outcomeCollection
 export function filterOutcomes(
-    outcomeCollections: OutcomeCollectionModel[]
+    outcomeCollections: ComposerOutcomeCollectionModel[]
 ): OutcomeModel[] {
     let outcomes = [] as OutcomeModel[]
     outcomeCollections.forEach((oc) => {
@@ -430,7 +428,7 @@ export function filterOutcomes(
 // Get indexSet partition from outcomeCollections
 // eg. [ ['a'],['b'],['c'] ] => [ [1,0,0],[0,1,0],[0,0,1] ] => [4,2,1]
 export function parsePartition(
-    outcomeCollections: OutcomeCollectionModel[]
+    outcomeCollections: ComposerOutcomeCollectionModel[]
 ): number[] {
     if (outcomeCollections.length < 2) {
         throw 'empty or singleton partition'
@@ -451,8 +449,8 @@ export function parsePartition(
 }
 
 export function getBinaryArrayFromOC(
-    OC: OutcomeCollectionModel,
-    outcomeCollections: OutcomeCollectionModel[]
+    OC: ComposerOutcomeCollectionModel,
+    outcomeCollections: ComposerOutcomeCollectionModel[]
 ) {
     const outcomes = filterOutcomes(outcomeCollections)
     const binaryArray = new Array(outcomes.length).fill(0) // eg. [0,0,0]

@@ -11,10 +11,7 @@ import {
 } from '@cambrian/app/models/SlotModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { ComposerConditionModel } from '@cambrian/app/models/ConditionModel'
-import {
-    OutcomeCollectionModel,
-    OutcomeModel,
-} from '@cambrian/app/models/OutcomeModel'
+import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverMainConfigType } from '@cambrian/app/store/composer/actions/solverActions/updateSolverMainConfig.action'
@@ -26,6 +23,7 @@ import {
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ComposerModuleModel } from '../models/ModuleModel'
+import { ComposerOutcomeCollectionModel } from '../models/OutcomeCollectionModel'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -255,7 +253,10 @@ export default class ComposerSolver {
     }
 
     addOutcomeCollection() {
-        const newOC = <OutcomeCollectionModel>{ id: ulid(), outcomes: [] }
+        const newOC = <ComposerOutcomeCollectionModel>{
+            id: ulid(),
+            outcomes: [],
+        }
         this.config.condition.partition.push(newOC)
         this.addNewOutcomeCollectionAmountSlots(newOC.id)
         return newOC
@@ -601,7 +602,7 @@ export default class ComposerSolver {
         const defaultOC = { id: ulid(), outcomes: [] }
         const defaultCondition = {
             outcomes: [],
-            partition: [defaultOC] as OutcomeCollectionModel[],
+            partition: [defaultOC] as ComposerOutcomeCollectionModel[],
             recipients: [],
             recipientAmountSlots: <ComposerAllocationsHashMapType>{},
             amountSlot: '',
