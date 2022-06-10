@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import ArbitrateLockComponent from './ArbitrateLockCompopnent'
 import ArbitrateNullComponent from './ArbitrateNullComponent'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
@@ -35,7 +33,6 @@ const ArbitrationUIManager = ({
 }: ArbitrationUIManagerProps) => {
     const isArbitrator = usePermission('Arbitrator')
     const isRecipient = usePermission('Recipient')
-    const [arbitrationUI, setArbitrationUI] = useState<JSX.Element | null>(null)
 
     const { arbitratorContract, disputeId } = useArbitratorContract({
         currentUser: currentUser,
@@ -50,113 +47,103 @@ const ArbitrationUIManager = ({
         currentUser: currentUser,
     })
 
-    useEffect(() => {
-        initArbitrationUI()
-    }, [])
+    let ArbitrationUI: JSX.Element | null = null
 
-    const initArbitrationUI = () => {
-        let additiveUI: JSX.Element | null = null
-
-        // Requesting/Locking
-        if (
-            (currentCondition.status === ConditionStatus.OutcomeProposed ||
-                currentCondition.status ===
-                    ConditionStatus.ArbitrationRequested) &&
-            isRecipient
-        ) {
-            if (!arbitratorContract) {
-                additiveUI = (
-                    <DispatchArbitrationComponent
-                        currentCondition={currentCondition}
-                        currentUser={currentUser}
-                        solverAddress={solverAddress}
-                    />
-                )
-            } else if (isTimelockActive) {
-                additiveUI = (
-                    <RequestContractArbitrationComponent
-                        timelock={timelock}
-                        arbitratorContract={arbitratorContract}
-                        currentCondition={currentCondition}
-                        solverAddress={solverAddress}
-                        solverData={solverData}
-                    />
-                )
-            }
-        }
-
-        const canLockSolverForArbitration =
-            (currentCondition.status === ConditionStatus.OutcomeProposed ||
-                currentCondition.status ===
-                    ConditionStatus.ArbitrationRequested) &&
-            !arbitratorContract &&
-            isArbitrator
-
-        if (canLockSolverForArbitration) {
-            additiveUI = (
-                <>
-                    {additiveUI}
-                    {additiveUI && <PlainSectionDivider />}
-                    <ArbitrateLockComponent
-                        solverMethods={solverMethods}
-                        currentCondition={currentCondition}
-                    />
-                </>
+    // Requesting/Locking
+    if (
+        (currentCondition.status === ConditionStatus.OutcomeProposed ||
+            currentCondition.status === ConditionStatus.ArbitrationRequested) &&
+        isRecipient
+    ) {
+        if (!arbitratorContract) {
+            ArbitrationUI = (
+                <DispatchArbitrationComponent
+                    currentCondition={currentCondition}
+                    currentUser={currentUser}
+                    solverAddress={solverAddress}
+                />
+            )
+        } else if (isTimelockActive) {
+            ArbitrationUI = (
+                <RequestContractArbitrationComponent
+                    timelock={timelock}
+                    arbitratorContract={arbitratorContract}
+                    currentCondition={currentCondition}
+                    solverAddress={solverAddress}
+                    solverData={solverData}
+                />
             )
         }
+    }
 
-        // Arbitrating
-        const canArbitrateNull =
-            isArbitrator &&
-            currentCondition.status === ConditionStatus.ArbitrationRequested
+    const canLockSolverForArbitration =
+        (currentCondition.status === ConditionStatus.OutcomeProposed ||
+            currentCondition.status === ConditionStatus.ArbitrationRequested) &&
+        !arbitratorContract &&
+        isArbitrator
 
-        if (canArbitrateNull) {
-            additiveUI = (
-                <>
-                    {additiveUI}
-                    {additiveUI && <PlainSectionDivider />}
-                    <ArbitrateNullComponent
-                        arbitratorContract={arbitratorContract}
-                        disputeId={disputeId}
-                        currentUser={currentUser}
-                        solverMethods={solverMethods}
-                        currentCondition={currentCondition}
-                    />
-                </>
-            )
-        }
+    if (canLockSolverForArbitration) {
+        ArbitrationUI = (
+            <>
+                {ArbitrationUI}
+                {ArbitrationUI && <PlainSectionDivider />}
+                <ArbitrateLockComponent
+                    solverMethods={solverMethods}
+                    currentCondition={currentCondition}
+                />
+            </>
+        )
+    }
 
-        if (
-            currentCondition.status === ConditionStatus.ArbitrationRequested &&
-            arbitratorContract &&
-            disputeId
-        ) {
-            additiveUI = (
-                <>
-                    <DisputerListComponent
-                        currentCondition={currentCondition}
-                        solverData={solverData}
-                        arbitratorContract={arbitratorContract}
-                        disputeId={disputeId}
-                    />
-                    {additiveUI && <PlainSectionDivider />}
-                    {additiveUI}
-                </>
-            )
-        }
+    // Arbitrating
+    const canArbitrateNull =
+        isArbitrator &&
+        currentCondition.status === ConditionStatus.ArbitrationRequested
 
-        setArbitrationUI(additiveUI)
+    if (canArbitrateNull) {
+        ArbitrationUI = (
+            <>
+                {ArbitrationUI}
+                {ArbitrationUI && <PlainSectionDivider />}
+                <ArbitrateNullComponent
+                    arbitratorContract={arbitratorContract}
+                    disputeId={disputeId}
+                    currentUser={currentUser}
+                    solverMethods={solverMethods}
+                    currentCondition={currentCondition}
+                />
+            </>
+        )
+    }
+
+    if (
+        currentCondition.status === ConditionStatus.ArbitrationRequested &&
+        arbitratorContract &&
+        disputeId
+    ) {
+        ArbitrationUI = (
+            <>
+                <DisputerListComponent
+                    currentCondition={currentCondition}
+                    solverData={solverData}
+                    arbitratorContract={arbitratorContract}
+                    disputeId={disputeId}
+                />
+                {ArbitrationUI && <PlainSectionDivider />}
+                {ArbitrationUI}
+            </>
+        )
     }
 
     return (
         <Box gap="medium">
-            {arbitrationUI && (
+            {ArbitrationUI && (
                 <BaseFormGroupContainer
                     groupTitle="Arbitration"
                     gap="small"
                     pad={{ horizontal: 'medium' }}
                 >
-                    {arbitrationUI}
+                    {ArbitrationUI}
                 </BaseFormGroupContainer>
             )}
             {arbitratorContract && disputeId && (
