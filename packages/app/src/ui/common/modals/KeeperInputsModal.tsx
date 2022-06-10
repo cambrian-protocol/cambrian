@@ -1,8 +1,10 @@
-import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
+import BaseLayerModal, {
+    BaseLayerModalProps,
+} from '../../../components/modals/BaseLayerModal'
 
-import BaseSlotInputItem from '../list/BaseSlotInputItem'
+import BaseSlotInputItem from '../../../components/list/BaseSlotInputItem'
 import { Box } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'

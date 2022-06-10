@@ -2,7 +2,7 @@ import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropCon
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
 import { Button } from 'grommet'
 import { GenericMethods } from '../../../solver/Solver'
-import ProposeOutcomeModal from '../../../modals/ProposeOutcomeModal'
+import ProposeOutcomeModal from '../../../../ui/interaction/modals/ProposeOutcomeModal'
 import { Shield } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'

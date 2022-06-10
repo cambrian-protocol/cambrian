@@ -1,5 +1,5 @@
-import BaseLayerModal from './BaseLayerModal'
-import HeaderTextSection from '../sections/HeaderTextSection'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
 interface OutcomeDetailModalProps {

@@ -6,7 +6,7 @@ import { Coins } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeListItem from '../list/OutcomeListItem'
-import RecipientAllocationModal from '../modals/RecipientAllocationModal'
+import RecipientAllocationModal from '@cambrian/app/ui/common/modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionCardProps = {

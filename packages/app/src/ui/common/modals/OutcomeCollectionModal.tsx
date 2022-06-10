@@ -1,8 +1,10 @@
-import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
+import BaseLayerModal, {
+    BaseLayerModalProps,
+} from '../../../components/modals/BaseLayerModal'
 
 import { Box } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 

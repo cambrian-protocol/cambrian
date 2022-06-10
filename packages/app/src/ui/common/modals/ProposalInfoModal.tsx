@@ -1,6 +1,6 @@
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import ProposalContextHeader from '@cambrian/app/ui/proposals/ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'

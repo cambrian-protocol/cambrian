@@ -4,8 +4,8 @@ import BaseActionbar, {
 import { Lock, Scales, Timer } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
-import ArbitrateDesiredOutcomeModal from '../../../modals/ArbitrateDesiredOutcomeModal'
-import ArbitrateModal from '../../../modals/ArbitrateModal'
+import ArbitrateDesiredOutcomeModal from '../../../../ui/interaction/modals/ArbitrateDesiredOutcomeModal'
+import ArbitrateModal from '../../../../ui/interaction/modals/ArbitrateModal'
 import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'

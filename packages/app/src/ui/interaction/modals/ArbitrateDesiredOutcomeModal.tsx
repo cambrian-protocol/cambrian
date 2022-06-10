@@ -1,21 +1,21 @@
 import { SetStateAction, useState } from 'react'
 
-import BaseAvatar from '../avatars/BaseAvatar'
-import BaseLayerModal from './BaseLayerModal'
+import BaseAvatar from '../../../components/avatars/BaseAvatar'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { CardHeader } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from './ErrorPopupModal'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getSolverRecipientAddressHashmap } from '../solver/SolverHelpers'
+import { getSolverRecipientAddressHashmap } from '../../../components/solver/SolverHelpers'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void

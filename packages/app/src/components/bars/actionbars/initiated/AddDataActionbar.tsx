@@ -1,5 +1,5 @@
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
-import AddDataModal from '../../../modals/AddDataModal'
+import AddDataModal from '../../../../ui/interaction/modals/AddDataModal'
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
 import { Button } from 'grommet'
 import { GenericMethods } from '../../../solver/Solver'

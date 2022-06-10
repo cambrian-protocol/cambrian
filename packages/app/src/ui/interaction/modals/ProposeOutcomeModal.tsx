@@ -1,73 +1,65 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { SetStateAction, useState } from 'react'
 
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from './ErrorPopupModal'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import { GenericMethods } from '../../../components/solver/Solver'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
-interface ArbitrationDesireOutcomeModalProps {
-    solverAddress: string
-    arbitratorContract: ethers.Contract
-    desiredIndexSet?: number
-    setDesiredIndexSet: React.Dispatch<SetStateAction<number | undefined>>
-    fee: ethers.BigNumber
+interface ProposeOutcomeModalProps {
+    proposedIndexSet?: number
+    setProposedIndexSet: React.Dispatch<SetStateAction<number | undefined>>
+    solverMethods: GenericMethods
     solverData: SolverModel
     currentCondition: SolverContractCondition
     onBack: () => void
 }
 
-const ArbitrationDesireOutcomeModal = ({
-    arbitratorContract,
-    setDesiredIndexSet,
-    desiredIndexSet,
+const ProposeOutcomeModal = ({
+    setProposedIndexSet,
+    proposedIndexSet,
+    solverMethods,
     solverData,
     currentCondition,
     onBack,
-    solverAddress,
-    fee,
-}: ArbitrationDesireOutcomeModalProps) => {
+}: ProposeOutcomeModalProps) => {
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
-    const onDesireOutcome = async (indexSet: number) => {
-        setDesiredIndexSet(indexSet)
+    const onProposeOutcome = async (indexSet: number) => {
+        setProposedIndexSet(indexSet)
         try {
-            const desiredOutcomeArray = binaryArrayFromIndexSet(
+            const binaryArray = binaryArrayFromIndexSet(
                 indexSet,
                 solverData.config.conditionBase.outcomeSlots
-            ).map((x) => ethers.BigNumber.from(x))
-
-            const tx: ethers.ContractTransaction = await arbitratorContract[
-                'requestArbitration(address,uint256,uint256[])'
-            ](
-                solverAddress,
-                currentCondition.executions - 1,
-                desiredOutcomeArray,
-                { value: fee }
             )
-
-            await tx.wait()
-            onBack()
+            const transaction: ethers.ContractTransaction =
+                await solverMethods.proposePayouts(
+                    currentCondition.executions - 1,
+                    binaryArray
+                )
+            const rc = await transaction.wait()
+            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
+                throw GENERAL_ERROR['PROPOSE_OUTCOME_ERROR']
         } catch (e) {
             setErrMsg(await cpLogger.push(e))
+            setProposedIndexSet(undefined)
         }
-        setDesiredIndexSet(undefined)
     }
 
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection
-                    title={'Arbitration'}
-                    paragraph="Please select your desired outcome"
-                />
+                <HeaderTextSection title={'Propose an outcome'} />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[
                         currentCondition.conditionId
@@ -77,8 +69,8 @@ const ArbitrationDesireOutcomeModal = ({
                                 token={solverData.collateralToken}
                                 key={outcomeCollection.indexSet}
                                 outcomeCollection={outcomeCollection}
-                                onPropose={onDesireOutcome}
-                                proposedIndexSet={desiredIndexSet}
+                                onPropose={onProposeOutcome}
+                                proposedIndexSet={proposedIndexSet}
                             />
                         )
                     })}
@@ -94,4 +86,4 @@ const ArbitrationDesireOutcomeModal = ({
     )
 }
 
-export default ArbitrationDesireOutcomeModal
+export default ProposeOutcomeModal

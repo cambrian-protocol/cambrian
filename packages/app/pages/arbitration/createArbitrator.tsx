@@ -1,5 +1,5 @@
 import { Box } from 'grommet'
-import CreateArbitratorMultiStepForm from '@cambrian/app/ui/arbitration/forms/CreateArbitratorMultiStepForm'
+import CreateArbitratorMultiStepForm from '@cambrian/app/ui/arbitrator/create/CreateArbitratorMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '@cambrian/app/ui/composer/general/modals/ExportSuccessModal'

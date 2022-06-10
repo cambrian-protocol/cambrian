@@ -8,7 +8,7 @@ import { Box } from 'grommet'
 import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import MultiStepFormLayout from '@cambrian/app/components/layout/MultiStepFormLayout'
-import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
+import RecentExportsModal from '@cambrian/app/ui/common/modals/RecentExportsModal'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { useState } from 'react'
 
