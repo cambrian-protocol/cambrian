@@ -133,13 +133,13 @@ const CreateProposalMultiStepForm = ({
             })
 
             const stagehand = new Stagehand()
-            const response = await stagehand.publishProposal(
+            const publishedProposal = await stagehand.publishProposal(
                 input,
                 templateCID,
                 currentUser.web3Provider
             )
 
-            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+            if (!publishedProposal) throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
             const proposalsHub = new ProposalsHub(
                 currentUser.signer,
@@ -147,10 +147,11 @@ const CreateProposalMultiStepForm = ({
             )
 
             const transaction = await proposalsHub.createSolutionAndProposal(
-                response.parsedSolvers[0].collateralToken,
+                publishedProposal.parsedSolvers[0].collateralToken,
                 input.price,
-                response.parsedSolvers.map((solver) => solver.config),
-                response.cid
+                publishedProposal.parsedSolvers.map((solver) => solver.config),
+                publishedProposal.proposal.solverConfigsCID,
+                publishedProposal.cid
             )
             let rc = await transaction.wait()
             const event = rc.events?.find(

@@ -106,6 +106,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Log Test',
         logLevel: 1,
     },
+    SOLUTION_FETCH_ERROR: {
+        message: 'Error while fetching Solution',
+        logLevel: 1,
+    },
 }
 
 export const CONTRACT_ERROR: ErrorMessagesType = {

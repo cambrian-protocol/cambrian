@@ -1,49 +1,43 @@
 import { Box, Heading } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import React, { useEffect, useState } from 'react'
-import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from './forms/FundProposalForm'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalContextHeader from './ProposalContextHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { Stages } from '@cambrian/app/classes/Stagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { useRouter } from 'next/router'
 
 interface ProposalUIProps {
     proposal: ethers.Contract
     proposalsHub: ProposalsHub
     currentUser: UserType
+    metaStages?: Stages
 }
 
 const ProposalUI = ({
     proposalsHub,
     proposal,
     currentUser,
+    metaStages,
 }: ProposalUIProps) => {
-    const [metaStages, setMetaStages] = useState<Stages>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(false)
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
     const router = useRouter()
 
     useEffect(() => {
         initProposalStatus()
-        initMetaData()
     }, [])
 
     useEffect(() => {
@@ -78,39 +72,17 @@ const ProposalUI = ({
         }
     }
 
-    const initMetaData = async () => {
-        try {
-            if (!proposal.metadataCID) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const metadataCIDString = getMultihashFromBytes32(
-                proposal.metadataCID
-            )
-
-            if (!metadataCIDString) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const stagehand = new Stagehand()
-            const stages = await stagehand.loadStages(
-                metadataCIDString,
-                StageNames.proposal
-            )
-
-            if (!stages) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
-
-            setMetaStages(stages)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-    }
-
     return (
         <Box align="center">
             {metaStages ? (
                 <Box gap="medium" pad="medium" width={'large'}>
                     <Heading level="2">Proposal Funding</Heading>
-                    <ProposalContextHeader
-                        proposal={metaStages.proposal as ProposalModel}
-                        template={metaStages.template as TemplateModel}
-                    />
+                    {metaStages && (
+                        <ProposalContextHeader
+                            proposal={metaStages.proposal as ProposalModel}
+                            template={metaStages.template as TemplateModel}
+                        />
+                    )}
                     {firstSolverAddress ? (
                         <BaseFormContainer>
                             <Text color="dark-4">
@@ -132,7 +104,6 @@ const ProposalUI = ({
                     ) : (
                         <FundProposalForm
                             currentUser={currentUser}
-                            metaStages={metaStages}
                             proposalsHub={proposalsHub}
                             proposal={proposal}
                             setIsProposalExecuted={setIsProposalExecuted}
@@ -140,11 +111,6 @@ const ProposalUI = ({
                     )}
                     <Box pad="medium" />
                 </Box>
-            ) : errorMessage ? (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['METADATA']} />
             )}

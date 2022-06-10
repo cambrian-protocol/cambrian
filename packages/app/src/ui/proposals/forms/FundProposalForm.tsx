@@ -1,32 +1,34 @@
 import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, FormField, Text } from 'grommet'
-import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import {
-    Stages,
-    getSolverConfigsFromMetaStages,
-} from '@cambrian/app/classes/Stagehand'
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
+import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
 import { ArrowLineUp } from 'phosphor-react'
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
+import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
     proposalsHub: ProposalsHub
-    metaStages: Stages
     currentUser: UserType
     setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
 }
@@ -42,7 +44,6 @@ const initialInput = {
 const FundProposalForm = ({
     proposal,
     proposalsHub,
-    metaStages,
     currentUser,
     setIsProposalExecuted,
 }: FundProposalFormProps) => {
@@ -234,11 +235,36 @@ const FundProposalForm = ({
 
     const onExecuteProposal = async () => {
         safeTransactionCall(async () => {
-            const solverConfigs = await getSolverConfigsFromMetaStages(
-                metaStages,
-                currentUser.web3Provider
-            )
-            await proposalsHub.executeProposal(proposal.id, solverConfigs)
+            if (currentUser.signer && currentUser.chainId) {
+                // Retrieving SolverConfigs from Solution
+                const solutionsHub = new IPFSSolutionsHub(
+                    currentUser.signer,
+                    currentUser.chainId
+                )
+                const solution = await solutionsHub.getSolution(
+                    proposal.solutionId
+                )
+
+                if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
+
+                const solverConfigsCID = getMultihashFromBytes32(
+                    solution.solverConfigsCID
+                )
+
+                if (solverConfigsCID) {
+                    const ipfs = new IPFSAPI()
+                    const solverConfigs = (await ipfs.getFromCID(
+                        solverConfigsCID
+                    )) as SolverConfigModel[]
+
+                    if (!solverConfigs) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
+
+                    await proposalsHub.executeProposal(
+                        proposal.id,
+                        solverConfigs
+                    )
+                }
+            }
         }, setIsInPrimaryTransaction)
     }
 
