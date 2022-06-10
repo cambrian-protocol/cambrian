@@ -8,6 +8,8 @@ import UnanimityUI, {
 import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import LOCAL_IPFSTextSubmitter from '@cambrian/core/deployments/localhost/IPFSTextSubmitter.json'
 import LOCAL_Unanimity from '@cambrian/core/deployments/localhost/Unanimity.json'
+import ROPSTEN_IPFSTextSubmitter from '@cambrian/core/deployments/ropsten/IPFSTextSubmitter.json'
+import ROPSTEN_Unanimity from '@cambrian/core/deployments/ropsten/Unanimity.json'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 type ModuleRegistryType = {
@@ -31,7 +33,7 @@ moduleRegistry[IPFS_TEXT_SUBMITTER_MODULE_KEY] = {
     ],
     deployments: {
         31337: LOCAL_IPFSTextSubmitter.address,
-        // 3: ROPSTEN_IPFSTextSubmitter.address
+        3: ROPSTEN_IPFSTextSubmitter.address,
     },
     component: IPFSTextSubmitterUI,
 }
@@ -43,7 +45,7 @@ moduleRegistry[UNANIMITY_MODULE_KEY] = {
         'Immediately confirm an outcome report, regardless of remaining timelock, if all recipients agree.',
     deployments: {
         31337: LOCAL_Unanimity.address,
-        // 3: ROPSTEN_Unanimity.address
+        3: ROPSTEN_Unanimity.address,
     },
     component: UnanimityUI,
 }
