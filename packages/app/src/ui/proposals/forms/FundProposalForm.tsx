@@ -7,8 +7,6 @@ import {
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
 import { ArrowLineUp } from 'phosphor-react'
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -294,14 +292,12 @@ const FundProposalForm = ({
     return (
         <>
             {collateralToken ? (
-                <BaseFormContainer>
-                    <BaseFormGroupContainer groupTitle="Funding progress">
-                        <FundingProgressMeter
-                            token={collateralToken}
-                            funding={funding}
-                            fundingGoal={proposal.fundingGoal}
-                        />
-                    </BaseFormGroupContainer>
+                <Box gap="medium">
+                    <FundingProgressMeter
+                        token={collateralToken}
+                        funding={funding}
+                        fundingGoal={proposal.fundingGoal}
+                    />
                     <Form<FundProposalFormType>
                         onChange={(nextValue: FundProposalFormType) => {
                             setInput(nextValue)
@@ -321,47 +317,41 @@ const FundProposalForm = ({
                                 : onApproveFunding
                         }
                     >
-                        <Box gap="medium">
-                            <BaseFormGroupContainer
+                        <Box gap="medium" pad={{ top: 'medium' }}>
+                            <Box
                                 direction="row"
-                                gap="small"
-                                justify="center"
+                                justify="between"
+                                align="end"
+                                pad={{ bottom: 'small' }}
                             >
-                                <Box>
-                                    <FormField
-                                        name="amount"
-                                        label="Amount"
-                                        type="number"
-                                        required={
-                                            !funding.eq(proposal.fundingGoal)
-                                        }
-                                        disabled={disableButtons}
-                                    />
-                                    {currentAllowance !== undefined &&
-                                        !currentAllowance.isZero() && (
-                                            <Text size="small" color="dark-4">
-                                                You have approved access to{' '}
-                                                {Number(
-                                                    ethers.utils.formatUnits(
-                                                        currentAllowance,
-                                                        collateralToken.decimals
-                                                    )
-                                                )}{' '}
-                                                {collateralToken.symbol}
-                                            </Text>
-                                        )}
-                                </Box>
+                                <Button
+                                    disabled={disableButtons}
+                                    icon={<ArrowLineUp />}
+                                    onClick={inputMaxAmount}
+                                />
+                                <FormField
+                                    margin={{ bottom: 'none' }}
+                                    name="amount"
+                                    label="Amount"
+                                    type="number"
+                                    required={!funding.eq(proposal.fundingGoal)}
+                                    disabled={disableButtons}
+                                />
+                                {currentAllowance !== undefined &&
+                                    !currentAllowance.isZero() && (
+                                        <Text size="small" color="dark-4">
+                                            You have approved access to{' '}
+                                            {Number(
+                                                ethers.utils.formatUnits(
+                                                    currentAllowance,
+                                                    collateralToken.decimals
+                                                )
+                                            )}{' '}
+                                            {collateralToken.symbol}
+                                        </Text>
+                                    )}
                                 <TokenAvatar token={collateralToken} />
-                                <Box alignSelf="center">
-                                    <Button
-                                        disabled={disableButtons}
-                                        secondary
-                                        label="Max"
-                                        icon={<ArrowLineUp />}
-                                        onClick={inputMaxAmount}
-                                    />
-                                </Box>
-                            </BaseFormGroupContainer>
+                            </Box>
                             <Box direction="row" justify="between">
                                 <LoaderButton
                                     isLoading={isInSecondaryTransaction}
@@ -408,7 +398,7 @@ const FundProposalForm = ({
                             </Box>
                         </Box>
                     </Form>
-                </BaseFormContainer>
+                </Box>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['TOKEN']} />
             )}

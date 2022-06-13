@@ -1,48 +1,39 @@
 import {
-    ArrowClockwise,
     BookOpen,
-    Faders,
+    ClipboardText,
+    Coins,
     Handshake,
     IconContext,
     TreeStructure,
 } from 'phosphor-react'
 
-import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
-import { CONDITION_STATUS_INFO } from '@cambrian/app/models/ConditionStatus'
 import HeaderTextSection from '../../sections/HeaderTextSection'
 import Link from 'next/link'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ResponsiveContext } from 'grommet'
-import SolverConfigInfo from '@cambrian/app/components/info/SolverConfigInfo'
-import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
-interface SolverHeaderProps {
-    metadata?: MetadataModel
-    solverData: SolverModel
-    currentCondition: SolverContractCondition
+interface ProposalHeaderProps {
+    isProposalExecuted: boolean
+    proposalTitle: string
+    proposalMetadata?: ProposalModel
+    templateMetadata?: TemplateModel
 }
 
-const SolverHeader = ({
-    metadata,
-    solverData,
-    currentCondition,
-}: SolverHeaderProps) => {
-    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
-        useState(false)
+const ProposalHeader = ({
+    isProposalExecuted,
+    proposalTitle,
+    proposalMetadata,
+    templateMetadata,
+}: ProposalHeaderProps) => {
     const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
     const toggleShowProposalInfoModal = () =>
         setShowProposalInfoModal(!showProposalInfoModal)
-    const toggleShowSolverConfigInfoModal = () =>
-        setSolverConfigInfoModal(!showSolverConfigInfoModal)
-
-    const proposalMetadata = metadata?.stages?.proposal as ProposalModel
 
     return (
         <>
@@ -60,16 +51,18 @@ const SolverHeader = ({
                         >
                             <HeaderTextSection
                                 icon={
-                                    CONDITION_STATUS_INFO[
-                                        currentCondition.status
-                                    ].icon
+                                    isProposalExecuted ? (
+                                        <ClipboardText />
+                                    ) : (
+                                        <Coins />
+                                    )
                                 }
-                                subTitle={`Status: ${
-                                    CONDITION_STATUS_INFO[
-                                        currentCondition.status
-                                    ].name
-                                }`}
-                                title={proposalMetadata?.title || 'Unknown'}
+                                subTitle={
+                                    isProposalExecuted
+                                        ? 'Project'
+                                        : 'Proposal Funding'
+                                }
+                                title={proposalTitle}
                             />
                             {screenSize !== 'small' && (
                                 <Box
@@ -82,40 +75,27 @@ const SolverHeader = ({
                                     <IconContext.Provider
                                         value={{ size: '18' }}
                                     >
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowProposalInfoModal
-                                            }
-                                            label={'Agreement Details'}
-                                            icon={
-                                                <Handshake
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
+                                        {proposalMetadata &&
+                                            templateMetadata && (
+                                                <Button
+                                                    color="dark-4"
+                                                    size="small"
+                                                    onClick={
+                                                        toggleShowProposalInfoModal
+                                                    }
+                                                    label={'Agreement Details'}
+                                                    icon={
+                                                        <Handshake
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'dark-4'
+                                                                ]
+                                                            }
+                                                        />
                                                     }
                                                 />
-                                            }
-                                        />
-                                        <Button
-                                            size="small"
-                                            color="dark-4"
-                                            onClick={
-                                                toggleShowSolverConfigInfoModal
-                                            }
-                                            label={'Solver Configuration'}
-                                            icon={
-                                                <Faders
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
+                                            )}
                                         <Button
                                             color="dark-4"
                                             size="small"
@@ -123,21 +103,6 @@ const SolverHeader = ({
                                             label={'Solution Overview'}
                                             icon={
                                                 <TreeStructure
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            disabled
-                                            label={'Conditions Overview'}
-                                            icon={
-                                                <ArrowClockwise
                                                     color={
                                                         cpTheme.global.colors[
                                                             'dark-4'
@@ -178,23 +143,15 @@ const SolverHeader = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-
-            {showProposalInfoModal && metadata?.stages && (
+            {showProposalInfoModal && (
                 <ProposalInfoModal
                     onClose={toggleShowProposalInfoModal}
-                    metadata={metadata}
+                    proposalMetadata={proposalMetadata}
+                    templateMetadata={templateMetadata}
                 />
-            )}
-            {showSolverConfigInfoModal && currentCondition && (
-                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
-                    <SolverConfigInfo
-                        solverData={solverData}
-                        currentCondition={currentCondition}
-                    />
-                </BaseLayerModal>
             )}
         </>
     )
 }
 
-export default SolverHeader
+export default ProposalHeader

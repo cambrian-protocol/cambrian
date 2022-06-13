@@ -9,7 +9,7 @@ import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
 
 type InteractionLayoutProps = PageLayoutProps & {
-    actionBar: JSX.Element
+    actionBar?: JSX.Element
     sidebar?: JSX.Element
     header: JSX.Element
 }
@@ -67,7 +67,7 @@ const InteractionLayout = ({
                         </Box>
                     </Box>
                 </Page>
-                {actionBar}
+                {actionBar && actionBar}
             </Box>
         </>
     )

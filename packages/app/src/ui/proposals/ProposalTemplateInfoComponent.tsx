@@ -6,18 +6,18 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
-interface ProposalContextHeaderProps {
-    proposal: ProposalModel
-    template: TemplateModel
+interface ProposalTemplateInfoComponentProps {
+    proposalMetadata?: ProposalModel
+    templateMetadata?: TemplateModel
 }
 
-const ProposalContextHeader = ({
-    proposal,
-    template,
-}: ProposalContextHeaderProps) => {
-    return (
-        <Box gap="medium" height={{ min: 'auto' }}>
-            <BaseFormGroupContainer border groupTitle="Agreement between">
+const ProposalTemplateInfoComponent = ({
+    proposalMetadata,
+    templateMetadata,
+}: ProposalTemplateInfoComponentProps) => (
+    <Box gap="medium" height={{ min: 'auto' }}>
+        {proposalMetadata && templateMetadata && (
+            <BaseFormGroupContainer groupTitle="Agreement between">
                 <Box
                     direction="row"
                     height={{ min: 'auto' }}
@@ -25,32 +25,36 @@ const ProposalContextHeader = ({
                     align="center"
                 >
                     <AvatarWithLabel
-                        label={template.name}
-                        pfpPath={template.pfp}
+                        label={templateMetadata.name}
+                        pfpPath={templateMetadata.pfp}
                         role="Seller"
                     />
                     <Handshake size="24" />
                     <AvatarWithLabel
-                        label={proposal.name}
-                        pfpPath={proposal.pfp}
+                        label={proposalMetadata.name}
+                        pfpPath={proposalMetadata.pfp}
                         role="Buyer"
                     />
                 </Box>
             </BaseFormGroupContainer>
+        )}
+        {proposalMetadata && (
             <BaseFormGroupContainer groupTitle="Proposal details">
                 <HeaderTextSection
-                    title={proposal.title}
-                    paragraph={proposal.description}
+                    title={proposalMetadata.title}
+                    paragraph={proposalMetadata.description}
                 />
             </BaseFormGroupContainer>
+        )}
+        {templateMetadata && (
             <BaseFormGroupContainer groupTitle="Template details">
                 <HeaderTextSection
-                    title={template.title}
-                    paragraph={template.description}
+                    title={templateMetadata.title}
+                    paragraph={templateMetadata.description}
                 />
             </BaseFormGroupContainer>
-        </Box>
-    )
-}
+        )}
+    </Box>
+)
 
-export default ProposalContextHeader
+export default ProposalTemplateInfoComponent
