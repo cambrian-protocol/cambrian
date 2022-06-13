@@ -27,7 +27,10 @@ const FundingProgressMeter = ({
 
     return (
         <Box fill>
-            <Box align="center" pad="large">
+            <Box
+                align="center"
+                pad={{ vertical: 'medium', horizontal: 'large' }}
+            >
                 <Stack anchor="center">
                     <Meter
                         type="circle"

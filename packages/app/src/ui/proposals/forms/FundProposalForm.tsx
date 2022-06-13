@@ -1,3 +1,4 @@
+import { ArrowLineUp, CheckCircle, Info } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, FormField, Text } from 'grommet'
 import {
@@ -6,7 +7,6 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
-import { ArrowLineUp } from 'phosphor-react'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -318,39 +318,82 @@ const FundProposalForm = ({
                         }
                     >
                         <Box gap="medium" pad={{ top: 'medium' }}>
+                            <>
+                                <Box
+                                    direction="row"
+                                    justify="between"
+                                    align="end"
+                                    pad={{ bottom: 'small' }}
+                                >
+                                    <Button
+                                        disabled={disableButtons}
+                                        icon={<ArrowLineUp />}
+                                        onClick={inputMaxAmount}
+                                    />
+                                    <FormField
+                                        margin={{ bottom: 'none' }}
+                                        name="amount"
+                                        label="Amount"
+                                        type="number"
+                                        required={
+                                            !funding.eq(proposal.fundingGoal)
+                                        }
+                                        disabled={disableButtons}
+                                    />
+                                    <TokenAvatar token={collateralToken} />
+                                </Box>
+                            </>
                             <Box
-                                direction="row"
-                                justify="between"
-                                align="end"
-                                pad={{ bottom: 'small' }}
+                                height="3em"
+                                justify="center"
+                                align="center"
+                                round="xsmall"
+                                border
+                                elevation="small"
                             >
-                                <Button
-                                    disabled={disableButtons}
-                                    icon={<ArrowLineUp />}
-                                    onClick={inputMaxAmount}
-                                />
-                                <FormField
-                                    margin={{ bottom: 'none' }}
-                                    name="amount"
-                                    label="Amount"
-                                    type="number"
-                                    required={!funding.eq(proposal.fundingGoal)}
-                                    disabled={disableButtons}
-                                />
                                 {currentAllowance !== undefined &&
-                                    !currentAllowance.isZero() && (
-                                        <Text size="small" color="dark-4">
-                                            You have approved access to{' '}
+                                !currentAllowance.isZero() ? (
+                                    <Box
+                                        direction="row"
+                                        gap="small"
+                                        align="center"
+                                    >
+                                        <CheckCircle size="18" />
+                                        <Text size="small">
+                                            You have approved access to ~{' '}
                                             {Number(
                                                 ethers.utils.formatUnits(
                                                     currentAllowance,
                                                     collateralToken.decimals
                                                 )
-                                            )}{' '}
+                                            ).toFixed(2)}{' '}
                                             {collateralToken.symbol}
                                         </Text>
-                                    )}
-                                <TokenAvatar token={collateralToken} />
+                                    </Box>
+                                ) : funding.eq(proposal.fundingGoal) ? (
+                                    <Box
+                                        direction="row"
+                                        gap="small"
+                                        align="center"
+                                    >
+                                        <Info size="18" />
+                                        <Text size="small">
+                                            Proposal is fully funded
+                                        </Text>
+                                    </Box>
+                                ) : (
+                                    <Box
+                                        direction="row"
+                                        gap="small"
+                                        align="center"
+                                    >
+                                        <Info size="18" />
+                                        <Text size="small">
+                                            Please approve transfer before
+                                            funding
+                                        </Text>
+                                    </Box>
+                                )}
                             </Box>
                             <Box direction="row" justify="between">
                                 <LoaderButton

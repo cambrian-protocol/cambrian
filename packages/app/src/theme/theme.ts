@@ -28,6 +28,7 @@ const colors: any = {
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
+    'status-ok': '#338233',
     'dark-4': '#999999',
 }
 
