@@ -28,7 +28,13 @@ const BaseLayerModal = ({
         margin={{ top: 'small' }}
         background="background-back"
     >
-        <Box align="center" flex width="large" style={{ position: 'relative' }}>
+        <Box
+            align="center"
+            flex
+            width="large"
+            style={{ position: 'relative' }}
+            overflow="hidden"
+        >
             <Glow height="800px" width="1000px" left={'5%'} top={'-200px'} />
             <Box
                 width="100%"
