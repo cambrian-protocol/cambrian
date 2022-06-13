@@ -13,6 +13,7 @@ const Appbar = () => {
             fill="horizontal"
         >
             <Box
+                style={{ position: 'relative' }}
                 border={{ side: 'bottom' }}
                 direction="row"
                 flex

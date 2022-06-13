@@ -41,13 +41,13 @@ const InteractionLayout = ({
                         horizontal: 'hidden',
                     }}
                 >
-                    <Appbar />
                     <Glow
                         height="800px"
                         width="1000px"
                         left={'5%'}
                         top={'-200px'}
                     />
+                    <Appbar />
                     <Box
                         align="center"
                         pad="large"
