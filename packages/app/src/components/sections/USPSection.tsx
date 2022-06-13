@@ -1,9 +1,4 @@
-import {
-    ArrowCircleRight,
-    PuzzlePiece,
-    ShareNetwork,
-    UsersFour,
-} from 'phosphor-react'
+import { UsersFour, Coins, MagnifyingGlass } from 'phosphor-react'
 
 import { Anchor } from 'grommet'
 import { Box } from 'grommet'
@@ -23,14 +18,15 @@ const USPSection = () => {
         >
             <Glow height="800px" width="2000px" left={'40%'} top={'10%'} />
             <Box gap="medium" align="center" style={{ position: 'relative' }}>
-                <Heading textAlign="center">Turn-Key, Web 3</Heading>
+                <Heading textAlign="center">Start Earning Now</Heading>
                 <Box width={'large'} gap="medium">
                     <Text color="dark-4" textAlign="center">
-                        We're building a community to replace Big Tech's work
-                        platforms and SaaS applications with blockchain
-                        alternatives.
+                        Publish a smart template to field proposals from
+                        customers and bounty hunters. Administer contracts using
+                        powerful "Solver" dapps with secure escrow and
+                        centralized or decentralized management and arbitration.
                     </Text>
-                    <Anchor
+                    {/* <Anchor
                         color="brand"
                         href="https://www.notion.so/cambrianprotocol/Project-Description-97ba57659ed2421386065588ee052600"
                     >
@@ -38,25 +34,25 @@ const USPSection = () => {
                             <Text>Check out our Notion</Text>
                             <ArrowCircleRight size="24" />
                         </Box>
-                    </Anchor>
+                    </Anchor> */}
                 </Box>
                 <Box direction="row" justify="around" wrap>
                     <USPCard
-                        icon={<PuzzlePiece />}
-                        title="Service Puzzle pieces"
-                        description="New forms of work by eliminating costs of trust, transfer and triangulation"
+                        icon={<Coins />}
+                        title="Sell Services"
+                        description="Publish your smart template in 5 minutes and sell your services or freelance skills"
                         href="https://cambrianprotocol.notion.site/What-are-Solvers-Cambrian-Dapps-7f0733edf51c4deab97118f475082c88"
                     />
                     <USPCard
                         icon={<UsersFour />}
-                        title="Community Ownership"
-                        description="Open source software, decentralized ownership, and CambrianDAO"
+                        title="Post Bounties"
+                        description="Tap into a global community of talent with trust-minimized, secure bounties"
                         href="https://cambrianprotocol.notion.site/Community-Ownership-85c3c3b76ffb40c5b099c23eb68e23c3"
                     />
                     <USPCard
-                        icon={<ShareNetwork />}
-                        title="Shared Incentives"
-                        description="Three ways to earn aligning developers, entrepreneurs and crypto-enthusiasts"
+                        icon={<MagnifyingGlass />}
+                        title="Explore Listings"
+                        description="Discover services and job opportunities exclusive to Web3"
                         href="https://cambrianprotocol.notion.site/Incentive-Driven-Development-c7d8cb53f0ca42a9b21b8286477b9e0b"
                     />
                 </Box>
