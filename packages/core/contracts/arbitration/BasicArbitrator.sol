@@ -153,6 +153,11 @@ contract BasicArbitrator is
 
         require(_arbitrator == address(this), "Wrong arbitrator");
 
+        require(
+            solver.isRecipient(msg.sender, conditionIndex),
+            "Only recipients"
+        );
+
         SolverLib.Status status = solver.getStatus(conditionIndex);
 
         require(
