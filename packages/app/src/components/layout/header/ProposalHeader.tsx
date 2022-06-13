@@ -4,8 +4,13 @@ import {
     Coins,
     Handshake,
     IconContext,
+    Question,
     TreeStructure,
 } from 'phosphor-react'
+import {
+    SUPPORT_DISCORD_LINK,
+    WIKI_NOTION_LINK,
+} from 'packages/app/config/ExternalLinks'
 
 import { Box } from 'grommet'
 import { Button } from 'grommet'
@@ -20,7 +25,7 @@ import { useState } from 'react'
 
 interface ProposalHeaderProps {
     isProposalExecuted: boolean
-    proposalTitle: string
+    proposalTitle?: string
     proposalMetadata?: ProposalModel
     templateMetadata?: TemplateModel
 }
@@ -62,7 +67,11 @@ const ProposalHeader = ({
                                         ? 'Project'
                                         : 'Proposal Funding'
                                 }
-                                title={proposalTitle}
+                                title={
+                                    proposalTitle ||
+                                    proposalMetadata?.title ||
+                                    'Proposal'
+                                }
                             />
                             {screenSize !== 'small' && (
                                 <Box
@@ -111,10 +120,7 @@ const ProposalHeader = ({
                                                 />
                                             }
                                         />
-                                        <Link
-                                            href="https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70"
-                                            passHref
-                                        >
+                                        <Link href={WIKI_NOTION_LINK} passHref>
                                             <a
                                                 target="_blank"
                                                 rel="noopener noreferrer"
@@ -125,6 +131,31 @@ const ProposalHeader = ({
                                                     label={'Wiki'}
                                                     icon={
                                                         <BookOpen
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'dark-4'
+                                                                ]
+                                                            }
+                                                        />
+                                                    }
+                                                />
+                                            </a>
+                                        </Link>
+                                        <Link
+                                            href={SUPPORT_DISCORD_LINK}
+                                            passHref
+                                        >
+                                            <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                <Button
+                                                    color="dark-4"
+                                                    size="small"
+                                                    label={'Support'}
+                                                    icon={
+                                                        <Question
                                                             color={
                                                                 cpTheme.global
                                                                     .colors[

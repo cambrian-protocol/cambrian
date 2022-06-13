@@ -30,7 +30,7 @@ export default function ProposalPage() {
     const { currentUser } = useCurrentUser()
 
     const [metaStages, setMetaStages] = useState<Stages>()
-    const [proposalTitle, setProposalTitle] = useState('Proposal')
+    const [proposalTitle, setProposalTitle] = useState<string>()
     const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
     const [currentProposal, setCurrentProposal] = useState<ethers.Contract>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
@@ -107,7 +107,7 @@ export default function ProposalPage() {
                     </PageLayout>
                 ) : proposalsHub && currentProposal ? (
                     <InteractionLayout
-                        contextTitle={proposalTitle}
+                        contextTitle={proposalTitle || 'Proposal'}
                         header={
                             <ProposalHeader
                                 isProposalExecuted={isProposalExecuted}
