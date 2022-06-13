@@ -33,7 +33,7 @@ const ProposalUI = ({
         if (isProposalExecuted) {
             initSolver()
         }
-    }, [])
+    }, [isProposalExecuted])
 
     const initSolver = async () => {
         if (currentUser.chainId && currentUser.signer) {
