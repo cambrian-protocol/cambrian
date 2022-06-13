@@ -18,8 +18,9 @@ export enum ConditionStatus {
 type ConditionStatusDetailsType = {
     [statusCode: number]: {
         name: string
-        desciption: string
+        description: string
         icon: JSX.Element
+        color: string
     }
 }
 
@@ -27,32 +28,38 @@ export const CONDITION_STATUS_INFO: ConditionStatusDetailsType = {}
 
 CONDITION_STATUS_INFO[ConditionStatus.Initiated] = {
     name: 'Initiated',
-    desciption:
+    description:
         'This Solver has just been initiated, if the Keeper has input all required data it can be progressed and the work can begin.',
     icon: <AsteriskSimple />,
+    color: 'status-initiated',
 }
 CONDITION_STATUS_INFO[ConditionStatus.Executed] = {
     name: 'Executed',
-    desciption: 'Work in progress',
+    description: 'Work in progress',
     icon: <RocketLaunch />,
+    color: 'status-executed',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeProposed] = {
     name: 'Outcome Proposed',
-    desciption: 'An outcome has been proposed.',
+    description: 'An outcome has been proposed.',
     icon: <EnvelopeSimple />,
+    color: 'status-proposed',
 }
 CONDITION_STATUS_INFO[ConditionStatus.ArbitrationRequested] = {
     name: 'Arbitration Requested',
-    desciption: 'Arbitration has been requested',
+    description: 'Arbitration has been requested',
     icon: <Scales />,
+    color: 'status-arbitration',
 }
 CONDITION_STATUS_INFO[ConditionStatus.ArbitrationDelivered] = {
     name: 'Arbitration Delivered',
-    desciption: 'Arbitration has been deliviered',
+    description: 'Arbitration has been deliviered',
     icon: <Scales />,
+    color: 'status-reported',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeReported] = {
     name: 'Outcome Reported',
-    desciption: 'An Outcome has been reported',
+    description: 'An Outcome has been reported',
     icon: <Handshake />,
+    color: 'status-reported',
 }

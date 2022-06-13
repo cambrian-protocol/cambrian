@@ -22,6 +22,7 @@ import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
+import ProposalHeader from '../layout/header/ProposalHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
@@ -29,6 +30,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SolverSidebar from '../bars/sidebar/SolverSidebar'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
@@ -264,6 +266,8 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
         }
     }
     const proposalMetadata = metadata?.stages?.proposal as ProposalModel
+    const templateMetadata = metadata?.stages?.template as TemplateModel
+
     return (
         <>
             {solverData &&
@@ -271,11 +275,11 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             solverMethods &&
             currentUser.chainId ? (
                 <InteractionLayout
-                    header={
-                        <SolverHeader
-                            metadata={metadata}
-                            solverData={solverData}
-                            currentCondition={currentCondition}
+                    proposalHeader={
+                        <ProposalHeader
+                            isProposalExecuted
+                            templateMetadata={templateMetadata}
+                            proposalMetadata={proposalMetadata}
                         />
                     }
                     contextTitle={proposalMetadata?.title || 'Solver'}
@@ -300,9 +304,16 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             />
                         )
                     }
+                    solverHeader={
+                        <SolverHeader
+                            currentCondition={currentCondition}
+                            solverData={solverData}
+                            metadata={metadata}
+                        />
+                    }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
-                        <InitiatedSolverContent metadata={metadata} />
+                        <InitiatedSolverContent />
                     ) : (
                         <ModuleUIManager
                             solverData={solverData}

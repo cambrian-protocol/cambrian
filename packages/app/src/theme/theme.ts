@@ -30,6 +30,11 @@ const colors: any = {
     'status-warning': '#ffdc4d',
     'status-ok': '#338233',
     'dark-4': '#999999',
+    'status-initiated': '#cac63d',
+    'status-reported': '#2ec090',
+    'status-arbitration': '#be8b32',
+    'status-executed': '#59b846',
+    'status-proposed': '#aca0d6',
 }
 
 export const cpTheme = deepMerge(grommet, {

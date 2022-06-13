@@ -11,7 +11,8 @@ import WarningBanner from '../containers/WarningBanner'
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar?: JSX.Element
     sidebar?: JSX.Element
-    header: JSX.Element
+    proposalHeader: JSX.Element
+    solverHeader?: JSX.Element
 }
 
 // TODO Mobile responsive toggle Sidebar
@@ -20,7 +21,8 @@ const InteractionLayout = ({
     children,
     actionBar,
     sidebar,
-    header,
+    proposalHeader,
+    solverHeader,
 }: InteractionLayoutProps) => {
     return (
         <>
@@ -53,13 +55,15 @@ const InteractionLayout = ({
                         pad="large"
                         height={{ min: 'auto' }}
                         style={{ position: 'relative' }}
+                        gap="small"
                     >
-                        {header}
+                        {proposalHeader}
+                        {solverHeader}
                         <Box
                             direction="row"
                             width="xlarge"
                             gap="large"
-                            height={{ min: '90vh' }}
+                            height={{ min: '70vh' }}
                             pad={{ top: 'large' }}
                         >
                             {sidebar && <Box width="medium">{sidebar}</Box>}

@@ -108,7 +108,7 @@ export default function ProposalPage() {
                 ) : proposalsHub && currentProposal ? (
                     <InteractionLayout
                         contextTitle={proposalTitle || 'Proposal'}
-                        header={
+                        proposalHeader={
                             <ProposalHeader
                                 isProposalExecuted={isProposalExecuted}
                                 proposalTitle={proposalTitle}
