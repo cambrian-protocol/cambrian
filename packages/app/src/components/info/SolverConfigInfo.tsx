@@ -6,7 +6,8 @@ import {
     UsersThree,
     Vault,
 } from 'phosphor-react'
-import React, { useState } from 'react'
+import { BigNumber, ethers } from 'ethers'
+import React, { useEffect, useState } from 'react'
 import {
     getManualInputs,
     getSolverRecipientSlots,
@@ -14,6 +15,8 @@ import {
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Box } from 'grommet'
+import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import KeeperInputsModal from '@cambrian/app/ui/common/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '@cambrian/app/ui/common/modals/OutcomeCollectionModal'
@@ -21,8 +24,8 @@ import RecipientsModal from '../../ui/common/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
-import { ethers } from 'ethers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -33,15 +36,78 @@ const SolverConfigInfo = ({
     solverData,
     currentCondition,
 }: SolverConfigInfoProps) => {
+    const { currentUser } = useCurrentUser()
     const [showRecipientModal, setShowRecipientModal] = useState(false)
     const [showOutcomeModal, setShowOutcomeModal] = useState(false)
     const [showKeeperInputModal, setShowKeeperInputModal] = useState(false)
+    const [currentEscrow, setCurrentEscrow] = useState<string>()
 
     const toggleShowOutcomeModal = () => setShowOutcomeModal(!showOutcomeModal)
     const toggleShowKeeperInputModal = () =>
         setShowKeeperInputModal(!showKeeperInputModal)
     const toggleShowRecipientModal = () =>
         setShowRecipientModal(!showRecipientModal)
+
+    useEffect(() => {
+        initEscrow()
+    }, [])
+
+    const initEscrow = async () => {
+        if (solverData.numMintedTokensByCondition) {
+            const numMintedTokens =
+                solverData.numMintedTokensByCondition[
+                    currentCondition.conditionId
+                ]
+            let alreadyRedeemed = BigNumber.from(0)
+
+            if (
+                currentCondition.status ===
+                    ConditionStatus.ArbitrationDelivered ||
+                currentCondition.status === ConditionStatus.OutcomeReported
+            ) {
+                if (currentUser.signer && currentUser.chainId) {
+                    const ctf = new CTFContract(
+                        currentUser.signer,
+                        currentUser.chainId
+                    )
+
+                    const payoutRedemptionFilter =
+                        ctf.contract.filters.PayoutRedemption(
+                            null,
+                            solverData.config.conditionBase.collateralToken,
+                            currentCondition.parentCollectionId,
+                            null,
+                            null,
+                            null
+                        )
+
+                    const logs = await ctf.contract.queryFilter(
+                        payoutRedemptionFilter
+                    )
+                    const conditionLogs = logs.filter(
+                        (l) =>
+                            l.args?.conditionId == currentCondition.conditionId
+                    )
+
+                    alreadyRedeemed = conditionLogs
+                        .map((l) => l.args?.payout)
+                        .filter(Boolean)
+                        .reduce((x, y) => {
+                            return BigNumber.from(x).add(BigNumber.from(y))
+                        }, BigNumber.from(0))
+                }
+            }
+
+            const totalEscrow = numMintedTokens.sub(alreadyRedeemed)
+
+            setCurrentEscrow(
+                ethers.utils.formatUnits(
+                    totalEscrow,
+                    solverData.collateralToken.decimals
+                )
+            )
+        }
+    }
 
     return (
         <>
@@ -86,13 +152,8 @@ const SolverConfigInfo = ({
                     title="Escrow Balance"
                     icon={<Vault />}
                     subTitle={
-                        solverData.numMintedTokensByCondition
-                            ? `${ethers.utils.formatUnits(
-                                  solverData.numMintedTokensByCondition[
-                                      currentCondition.conditionId
-                                  ],
-                                  solverData.collateralToken.decimals
-                              )}  ${
+                        currentEscrow
+                            ? `${currentEscrow}  ${
                                   solverData.collateralToken.symbol ||
                                   solverData.collateralToken.name ||
                                   ''
