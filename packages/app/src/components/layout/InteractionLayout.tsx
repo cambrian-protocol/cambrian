@@ -1,7 +1,7 @@
+import { Box, WorldMap } from 'grommet'
 import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../bars/Appbar'
-import { Box } from 'grommet'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
@@ -43,6 +43,16 @@ const InteractionLayout = ({
                         horizontal: 'hidden',
                     }}
                 >
+                    <WorldMap
+                        color="brand"
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '20%',
+                            opacity: 0.03,
+                            height: '70vh',
+                        }}
+                    />
                     <Glow
                         height="800px"
                         width="1000px"
