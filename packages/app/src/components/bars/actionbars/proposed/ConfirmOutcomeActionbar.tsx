@@ -9,30 +9,24 @@ import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { Spinner } from 'grommet'
-import { UserType } from '@cambrian/app/store/UserContext'
+import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { useState } from 'react'
-import useTimelock from '@cambrian/app/hooks/useTimelock'
 
 interface ConfirmOutcomeActionbarProps {
-    currentUser: UserType
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
+    solverTimelock: TimelockModel
 }
 
 const ConfirmOutcomeActionbar = ({
-    currentUser,
     solverMethods,
     currentCondition,
+    solverTimelock,
 }: ConfirmOutcomeActionbarProps) => {
     const [isConfirming, setIsConfirming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-    const { isTimelockActive, isUnlockingTimelock, timelock } = useTimelock({
-        solverMethods: solverMethods,
-        currentCondition: currentCondition,
-        currentUser: currentUser,
-    })
+    const { isTimelockActive, timelockSeconds } = solverTimelock
 
     const onConfirmOutcome = async () => {
         await invokeContractFunction(
@@ -46,7 +40,7 @@ const ConfirmOutcomeActionbar = ({
 
     let actionbarInfo: ActionbarInfoType
 
-    if (isUnlockingTimelock || isTimelockActive) {
+    if (isTimelockActive) {
         actionbarInfo = {
             title: 'Active Timelock',
             subTitle: 'Please wait until the timelock has been released.',
@@ -54,33 +48,18 @@ const ConfirmOutcomeActionbar = ({
                 <ActionbarItemDropContainer
                     title="Active Timelock"
                     description="Please wait until the timelock has been released. The timelock makes it possible to the participants to disagree with the proposed outcome before it gets confirmed."
-                    list={
-                        isUnlockingTimelock
-                            ? [
-                                  {
-                                      icon: <Spinner />,
-                                      label: 'Releasing timelock... ( Waiting for the next available block )',
-                                  },
-                                  {
-                                      icon: <Timer />,
-                                      label: `Locked until: ${new Date(
-                                          timelock * 1000
-                                      ).toLocaleString()}`,
-                                  },
-                              ]
-                            : [
-                                  {
-                                      icon: <Lock />,
-                                      label: 'Timelock still active',
-                                  },
-                                  {
-                                      icon: <Timer />,
-                                      label: `Locked until: ${new Date(
-                                          timelock * 1000
-                                      ).toLocaleString()}`,
-                                  },
-                              ]
-                    }
+                    list={[
+                        {
+                            icon: <Lock />,
+                            label: 'Timelock still active',
+                        },
+                        {
+                            icon: <Timer />,
+                            label: `Locked until: ${new Date(
+                                timelockSeconds * 1000
+                            ).toLocaleString()}`,
+                        },
+                    ]}
                 />
             ),
         }
@@ -115,15 +94,11 @@ const ConfirmOutcomeActionbar = ({
                 info={actionbarInfo}
                 primaryAction={
                     <LoaderButton
-                        disabled={isUnlockingTimelock || isTimelockActive}
+                        disabled={isTimelockActive}
                         primary
                         onClick={onConfirmOutcome}
                         label="Confirm Outcome"
-                        icon={
-                            isUnlockingTimelock || isTimelockActive ? (
-                                <Lock />
-                            ) : undefined
-                        }
+                        icon={isTimelockActive ? <Lock /> : undefined}
                         isLoading={isConfirming}
                     />
                 }

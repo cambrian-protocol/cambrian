@@ -9,6 +9,7 @@ import ProposeOutcomeActionbar from '@cambrian/app/components/bars/actionbars/ex
 import RedeemTokensActionbar from '@cambrian/app/components/bars/actionbars/reported/RedeemTokensActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import usePermission from '@cambrian/app/hooks/usePermission'
 
@@ -18,6 +19,7 @@ interface DefaultSolverActionbarProps {
     solverMethods: GenericMethods
     currentCondition?: SolverContractCondition
     solverAddress: string
+    solverTimelock: TimelockModel
 }
 
 const SolverActionbar = ({
@@ -26,6 +28,7 @@ const SolverActionbar = ({
     solverMethods,
     currentCondition,
     solverAddress,
+    solverTimelock,
 }: DefaultSolverActionbarProps) => {
     const allowedForKeeper = usePermission('Keeper')
     const allowedForRecipients = usePermission('Recipient')
@@ -57,7 +60,7 @@ const SolverActionbar = ({
         case ConditionStatus.OutcomeProposed:
             return (
                 <ConfirmOutcomeActionbar
-                    currentUser={currentUser}
+                    solverTimelock={solverTimelock}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
@@ -66,6 +69,7 @@ const SolverActionbar = ({
             if (allowedForArbitrator) {
                 return (
                     <ArbitrateActionbar
+                        solverTimelock={solverTimelock}
                         solverAddress={solverAddress}
                         solverData={solverData}
                         solverMethods={solverMethods}
