@@ -21,7 +21,7 @@ const Appbar = () => {
             >
                 <CambrianLogo />
                 <Box flex />
-                <ThemeToogleButton />
+                {/*      <ThemeToogleButton /> */}
                 <UserMenu />
             </Box>
         </Header>

@@ -10,6 +10,7 @@ export const ThemeContext = React.createContext<ThemeContextType>({
     toggleThemeMode: () => {},
 })
 
+// TODO Lightmode color scheme, theme mode localStorage saving, mode transition
 export const ThemeContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark')
 

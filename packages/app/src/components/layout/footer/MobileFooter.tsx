@@ -30,7 +30,7 @@ const MobileFooter = () => (
         >
             <FooterDisclamerSection />
             <Box align="center" gap="medium">
-                <ThemeToogleButton size="small" />
+                {/*  <ThemeToogleButton size="small" /> */}
                 <FooterTermsSection />
                 <FooterPrivacyPolicySection />
                 <FooterCopyrightSection />
