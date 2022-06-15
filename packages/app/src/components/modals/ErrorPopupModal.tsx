@@ -20,7 +20,7 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
                 width={{ min: 'auto', max: 'large' }}
                 pad="small"
                 border
-                round="small"
+                round="xsmall"
             >
                 <Box direction="row">
                     <Box onClick={onClose} pad="small" focusIndicator={false}>

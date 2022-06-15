@@ -48,7 +48,7 @@ const ProposalHeader = ({
                         <Box
                             height={{ min: 'auto' }}
                             width="xlarge"
-                            round="small"
+                            round="xsmall"
                             pad={{
                                 top: 'medium',
                                 bottom: 'xsmall',

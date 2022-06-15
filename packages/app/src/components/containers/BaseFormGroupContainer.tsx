@@ -23,7 +23,7 @@ const BaseFormGroupContainer = ({
             pad="medium"
             elevation="small"
             background={'background-contrast'}
-            round="small"
+            round="xsmall"
             {...props}
         >
             {children}

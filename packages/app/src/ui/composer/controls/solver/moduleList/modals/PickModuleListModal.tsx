@@ -63,7 +63,7 @@ const PickModuleListModal = ({ onClose }: PickModuleListModalProps) => {
                                 border
                                 fill="horizontal"
                                 background={'background-contrast'}
-                                round="small"
+                                round="xsmall"
                                 justify="between"
                                 elevation="small"
                                 gap="medium"

@@ -89,7 +89,7 @@ const CreateProposalPaymentStep = ({
                     />
                     <Box
                         pad="small"
-                        round="small"
+                        round="xsmall"
                         background="background-contrast"
                         border
                         elevation="small"

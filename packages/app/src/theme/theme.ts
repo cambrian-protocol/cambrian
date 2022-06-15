@@ -75,6 +75,11 @@ export const cpTheme = deepMerge(grommet, {
             maxWidth: '336px',
         },
     },
+    card: {
+        container: {
+            round: 'xsmall',
+        },
+    },
     button: {
         hover: {
             background: '#315e79',

@@ -45,7 +45,7 @@ const SolverHeader = ({
                                                 horizontal: 'medium',
                                             }}
                                             border
-                                            round="small"
+                                            round="xsmall"
                                         >
                                             <Box>
                                                 <Text

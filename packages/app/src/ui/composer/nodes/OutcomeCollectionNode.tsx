@@ -31,7 +31,7 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
                 background="secondary-gradient"
                 pad="small"
                 width={{ min: 'small', max: 'small' }}
-                round="small"
+                round="xsmall"
                 gap="small"
             >
                 <Box align="center" gap="small">
@@ -52,7 +52,7 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
                             }}
                             margin={'xsmall'}
                             align="center"
-                            round="small"
+                            round="xsmall"
                             background="background-contrast"
                         >
                             <TreeStructure color="white" size="18" />

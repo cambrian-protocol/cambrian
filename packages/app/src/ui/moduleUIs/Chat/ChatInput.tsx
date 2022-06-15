@@ -84,7 +84,7 @@ const ChatInput = ({
                     direction="row"
                     elevation="small"
                     pad="small"
-                    round="small"
+                    round="xsmall"
                     background="background-contrast"
                     gap="small"
                 >

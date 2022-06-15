@@ -30,7 +30,7 @@ export const SolverNode = memo((props: FlowElement) => {
             <Box
                 background="primary-gradient"
                 pad="medium"
-                round="small"
+                round="xsmall"
                 width={{ min: 'small' }}
                 gap="small"
             >
