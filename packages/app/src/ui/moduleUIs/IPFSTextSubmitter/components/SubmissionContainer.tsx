@@ -83,11 +83,11 @@ const SubmissionContainer = ({
                 <Box pad="small">
                     <Text size="small" color="brand">
                         Latest submission:{' '}
-                        {latestSubmission.timestamp === undefined
-                            ? 'Nothing submitted yet'
-                            : `${new Date(
+                        {latestSubmission && latestSubmission.timestamp
+                            ? `${new Date(
                                   latestSubmission.timestamp
-                              ).toLocaleString()}`}
+                              ).toLocaleString()}`
+                            : 'Nothing submitted yet'}
                     </Text>
                 </Box>
                 <Box pad="small">
