@@ -1,9 +1,9 @@
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
-import { Box } from 'grommet'
-import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalTemplateInfoComponent from '@cambrian/app/ui/proposals/ProposalTemplateInfoComponent'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { Handshake } from 'phosphor-react'
 
 interface ProposalInfoModalProps {
     onClose: () => void
@@ -18,17 +18,15 @@ const ProposalInfoModal = ({
 }: ProposalInfoModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
-            <Box fill>
-                <HeaderTextSection
-                    subTitle="Information"
-                    title="About this Gig"
-                />
-                <ProposalTemplateInfoComponent
-                    proposalMetadata={proposalMetadata}
-                    templateMetadata={templateMetadata}
-                />
-                <Box pad="medium" />
-            </Box>
+            <ModalHeader
+                title="Agreement Details"
+                description="The following proposal and temlate has been agreed on."
+                icon={<Handshake />}
+            />
+            <ProposalTemplateInfoComponent
+                proposalMetadata={proposalMetadata}
+                templateMetadata={templateMetadata}
+            />
         </BaseLayerModal>
     )
 }

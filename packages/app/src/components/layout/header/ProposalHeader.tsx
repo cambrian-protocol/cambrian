@@ -55,13 +55,6 @@ const ProposalHeader = ({
                             }}
                         >
                             <HeaderTextSection
-                                icon={
-                                    isProposalExecuted ? (
-                                        <ClipboardText />
-                                    ) : (
-                                        <Coins />
-                                    )
-                                }
                                 subTitle={
                                     isProposalExecuted
                                         ? 'Project'

@@ -1,23 +1,20 @@
 import {
-    ArrowSquareIn,
+    ShieldCheck,
     Scales,
     Timer,
     TreeStructure,
     UsersThree,
     Vault,
+    Faders,
 } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
-import {
-    getManualInputs,
-    getSolverRecipientSlots,
-} from '@cambrian/app/components/solver/SolverHelpers'
+import { getSolverRecipientSlots } from '@cambrian/app/components/solver/SolverHelpers'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import HeaderTextSection from '../sections/HeaderTextSection'
 import KeeperInputsModal from '@cambrian/app/ui/common/modals/KeeperInputsModal'
 import OutcomeCollectionModal from '@cambrian/app/ui/common/modals/OutcomeCollectionModal'
 import RecipientsModal from '../../ui/common/modals/RecipientsModal'
@@ -26,6 +23,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import ModalHeader from '../layout/header/ModalHeader'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -111,27 +109,28 @@ const SolverConfigInfo = ({
 
     return (
         <>
-            <HeaderTextSection
-                title={solverData.solverTag?.title || 'No Solver title set'}
-                subTitle="Solver configuration"
-                paragraph={
-                    solverData.solverTag?.description ||
-                    'No Solver description set'
-                }
+            <ModalHeader
+                title="Solver Configuration"
+                icon={<Faders />}
+                metaInfo={solverData.solverTag?.title}
+                description={solverData.solverTag?.description}
             />
-            <Box gap="small" fill="horizontal">
+            <Box gap="small" fill="horizontal" height={{ min: 'auto' }}>
                 <BaseListItemButton
+                    hideDivider
                     icon={<UsersThree />}
                     title="Recipients"
                     onClick={toggleShowRecipientModal}
                 />
                 <BaseListItemButton
+                    hideDivider
                     icon={<TreeStructure />}
                     title="Outcomes"
                     onClick={toggleShowOutcomeModal}
                 />
                 <BaseListItemButton
-                    icon={<ArrowSquareIn />}
+                    hideDivider
+                    icon={<ShieldCheck />}
                     title="Keeper Inputs"
                     onClick={toggleShowKeeperInputModal}
                 />
@@ -197,7 +196,8 @@ const SolverConfigInfo = ({
             {showKeeperInputModal && (
                 <KeeperInputsModal
                     onBack={toggleShowKeeperInputModal}
-                    manualInputs={getManualInputs(solverData, currentCondition)}
+                    solverData={solverData}
+                    currentCondition={currentCondition}
                 />
             )}
             {showOutcomeModal && (

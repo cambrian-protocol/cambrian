@@ -4,38 +4,60 @@ import BaseLayerModal, {
 
 import BaseSlotInputItem from '../../../components/list/BaseSlotInputItem'
 import { Box } from 'grommet'
-import HeaderTextSection from '../../../components/sections/HeaderTextSection'
-import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { ShieldCheck } from 'phosphor-react'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { getManualInputs } from '@cambrian/app/components/solver/SolverHelpers'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
-    manualInputs: RichSlotModel[]
+    solverData: SolverModel
+    currentCondition: SolverContractCondition
 }
 
+// TODO Input can be something else than an address
 const KeeperInputsModal = ({
-    manualInputs,
+    solverData,
+    currentCondition,
     ...rest
 }: KeeperInputsModalProps) => {
     return (
         <BaseLayerModal {...rest}>
-            <HeaderTextSection
+            <ModalHeader
+                icon={<ShieldCheck />}
                 title="Keeper Inputs"
-                paragraph="We think of Keepers as the entrepreneurs or even the decentralized middle managers of the community. This Solver allows Keepers to be assigned to reward creating the opportunity and/or managing the project."
+                description="This Solver has received or needs to receive the following inputs before execution."
             />
             <Box gap="medium" fill>
-                {manualInputs.map((manualSlot) => {
-                    if (manualSlot !== undefined) {
+                {getManualInputs(solverData).map((manualSlot) => {
+                    const slots =
+                        solverData.slotsHistory[currentCondition.conditionId]
+
+                    const address = slots[manualSlot.slot.slot]
+                        ? decodeData(
+                              [SolidityDataTypes.Address],
+                              slots[manualSlot.slot.slot].slot.data
+                          )
+                        : undefined
+
+                    if (address) {
                         return (
-                            // TODO dynamic datatype parsing
                             <BaseSlotInputItem
                                 key={manualSlot.slot.slot}
                                 info={manualSlot.tag.description}
                                 title={manualSlot.tag.label}
-                                address={decodeData(
-                                    [SolidityDataTypes.Address],
-                                    manualSlot.slot.data
-                                )}
+                                address={address}
+                            />
+                        )
+                    } else {
+                        return (
+                            <BaseSlotInputItem
+                                key={manualSlot.slot.slot}
+                                info={manualSlot.tag.description}
+                                title={manualSlot.tag.label}
+                                subTitle={'To be defined'}
                             />
                         )
                     }

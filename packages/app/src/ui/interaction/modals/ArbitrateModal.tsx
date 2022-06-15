@@ -8,13 +8,14 @@ import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
-import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { Scales } from 'phosphor-react'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 
 interface ArbitrateModalProps {
     solverMethods: GenericMethods
@@ -59,10 +60,11 @@ const ArbitrateModal = ({
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection
-                    subTitle="Arbitration"
-                    title={'Report the arbitrated outcome'}
-                    paragraph="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
+                <ModalHeader
+                    icon={<Scales />}
+                    metaInfo="Arbitration"
+                    title="Report an outcome"
+                    description="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[

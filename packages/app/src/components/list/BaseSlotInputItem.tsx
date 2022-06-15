@@ -36,7 +36,7 @@ const BaseSlotInputItem = ({
                 justify="between"
             >
                 <Box gap="medium" direction="row">
-                    <Box width={{ min: 'xxsmall' }}>
+                    <Box width={{ min: 'xxsmall' }} justify="center">
                         <BaseAvatar address={address} />
                     </Box>
                     <Box justify="center">

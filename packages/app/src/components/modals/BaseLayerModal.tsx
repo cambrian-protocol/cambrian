@@ -25,15 +25,13 @@ const BaseLayerModal = ({
         onEsc={onBack || onClose}
         full="vertical"
         position="bottom"
-        margin={{ top: 'small' }}
         background="background-back"
     >
         <Box
-            align="center"
-            flex
             width="large"
             style={{ position: 'relative' }}
             overflow="hidden"
+            height={{ min: '100vh' }}
         >
             <Glow height="800px" width="1000px" left={'5%'} top={'-200px'} />
             <Box
@@ -43,7 +41,7 @@ const BaseLayerModal = ({
                 align="center"
                 pad="medium"
                 elevation="small"
-                height={{ max: 'xxsmall' }}
+                height={{ max: 'xxsmall', min: 'xxsmall' }}
                 style={{ position: 'relative' }}
             >
                 <IconContext.Provider value={{ size: '24' }}>
@@ -57,8 +55,6 @@ const BaseLayerModal = ({
             </Box>
             <Box
                 style={{ position: 'relative' }}
-                fill
-                align="center"
                 height={{ min: 'auto' }}
                 overflow={{ vertical: 'auto' }}
                 pad={{ vertical: 'large', horizontal: 'medium' }}

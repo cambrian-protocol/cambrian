@@ -69,7 +69,7 @@ const SolverHeader = ({
                                                     size="small"
                                                     label={
                                                         screenSize !== 'small'
-                                                            ? 'Configurations'
+                                                            ? 'Configuration'
                                                             : undefined
                                                     }
                                                     icon={

@@ -360,7 +360,7 @@ const FundProposalForm = ({
                                     >
                                         <CheckCircle size="18" />
                                         <Text size="small">
-                                            You have approved access to ~{' '}
+                                            You have approved access to{' '}
                                             {Number(
                                                 ethers.utils.formatUnits(
                                                     currentAllowance,
