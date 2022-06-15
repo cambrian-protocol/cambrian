@@ -32,7 +32,6 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                     </Text>
                 )}
             </Box>
-            <Box pad="small" />
         </Box>
     </>
 )

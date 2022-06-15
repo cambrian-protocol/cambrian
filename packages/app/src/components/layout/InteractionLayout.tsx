@@ -1,4 +1,4 @@
-import { Box, WorldMap } from 'grommet'
+import { Box, ResponsiveContext, WorldMap } from 'grommet'
 import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../bars/Appbar'
@@ -67,18 +67,43 @@ const InteractionLayout = ({
                         style={{ position: 'relative' }}
                         gap="small"
                     >
-                        {proposalHeader}
-                        {solverHeader}
-                        <Box
-                            direction="row"
-                            width="xlarge"
-                            gap="large"
-                            height={{ min: '70vh' }}
-                            pad={{ top: 'large' }}
-                        >
-                            {sidebar && <Box width="medium">{sidebar}</Box>}
-                            <Box flex>{children}</Box>
-                        </Box>
+                        <ResponsiveContext.Consumer>
+                            {(screenSize) => {
+                                return (
+                                    <>
+                                        {screenSize === 'small' ? (
+                                            <Box gap="medium">
+                                                {proposalHeader}
+                                                {solverHeader}
+                                                {sidebar}
+                                                <Box height={{ min: '70vh' }}>
+                                                    {children}
+                                                </Box>
+                                            </Box>
+                                        ) : (
+                                            <>
+                                                {proposalHeader}
+                                                {solverHeader}
+                                                <Box
+                                                    direction="row"
+                                                    width="xlarge"
+                                                    gap="large"
+                                                    height={{ min: '70vh' }}
+                                                    pad={{ top: 'large' }}
+                                                >
+                                                    {sidebar && (
+                                                        <Box width="medium">
+                                                            {sidebar}
+                                                        </Box>
+                                                    )}
+                                                    <Box flex>{children}</Box>
+                                                </Box>
+                                            </>
+                                        )}
+                                    </>
+                                )
+                            }}
+                        </ResponsiveContext.Consumer>
                     </Box>
                 </Page>
                 {actionBar && actionBar}

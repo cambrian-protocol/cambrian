@@ -400,7 +400,7 @@ const FundProposalForm = ({
                                     isLoading={isInSecondaryTransaction}
                                     disabled={!isValidInput || disableButtons}
                                     secondary
-                                    label="Defund Proposal"
+                                    label="Defund"
                                     onClick={onDefundProposal}
                                 />
                                 {funding.eq(proposal.fundingGoal) ? (
@@ -409,7 +409,7 @@ const FundProposalForm = ({
                                         disabled={disableButtons}
                                         primary
                                         type="submit"
-                                        label="Execute Proposal"
+                                        label="Execute"
                                     />
                                 ) : input.amount &&
                                   currentAllowance?.gte(
@@ -425,7 +425,7 @@ const FundProposalForm = ({
                                         }
                                         primary
                                         type="submit"
-                                        label="Fund Proposal"
+                                        label="Fund"
                                     />
                                 ) : (
                                     <LoaderButton
@@ -435,7 +435,7 @@ const FundProposalForm = ({
                                         }
                                         primary
                                         type="submit"
-                                        label="Approve Transfer"
+                                        label="Approve"
                                     />
                                 )}
                             </Box>

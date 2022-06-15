@@ -73,45 +73,28 @@ const ProposalHeader = ({
                                     'Proposal'
                                 }
                             />
-                            {screenSize !== 'small' && (
-                                <Box
-                                    direction="row"
-                                    justify="end"
-                                    wrap
-                                    border={{ side: 'bottom' }}
-                                    pad={{ bottom: 'xsmall' }}
-                                >
-                                    <IconContext.Provider
-                                        value={{ size: '18' }}
-                                    >
-                                        {proposalMetadata &&
-                                            templateMetadata && (
-                                                <Button
-                                                    color="dark-4"
-                                                    size="small"
-                                                    onClick={
-                                                        toggleShowProposalInfoModal
-                                                    }
-                                                    label={'Agreement Details'}
-                                                    icon={
-                                                        <Handshake
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                            )}
+                            <Box
+                                direction="row"
+                                justify="end"
+                                wrap
+                                border={{ side: 'bottom' }}
+                                pad={{ bottom: 'xsmall' }}
+                            >
+                                <IconContext.Provider value={{ size: '18' }}>
+                                    {proposalMetadata && templateMetadata && (
                                         <Button
                                             color="dark-4"
                                             size="small"
-                                            disabled
-                                            label={'Solution Overview'}
+                                            onClick={
+                                                toggleShowProposalInfoModal
+                                            }
+                                            label={
+                                                screenSize !== 'small'
+                                                    ? 'Agreement Details'
+                                                    : undefined
+                                            }
                                             icon={
-                                                <TreeStructure
+                                                <Handshake
                                                     color={
                                                         cpTheme.global.colors[
                                                             'dark-4'
@@ -120,56 +103,80 @@ const ProposalHeader = ({
                                                 />
                                             }
                                         />
-                                        <Link href={WIKI_NOTION_LINK} passHref>
-                                            <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <Button
-                                                    color="dark-4"
-                                                    size="small"
-                                                    label={'Wiki'}
-                                                    icon={
-                                                        <BookOpen
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                            </a>
-                                        </Link>
-                                        <Link
-                                            href={SUPPORT_DISCORD_LINK}
-                                            passHref
+                                    )}
+                                    <Button
+                                        color="dark-4"
+                                        size="small"
+                                        disabled
+                                        label={
+                                            screenSize !== 'small'
+                                                ? 'Solution Overview'
+                                                : undefined
+                                        }
+                                        icon={
+                                            <TreeStructure
+                                                color={
+                                                    cpTheme.global.colors[
+                                                        'dark-4'
+                                                    ]
+                                                }
+                                            />
+                                        }
+                                    />
+                                    <Link href={WIKI_NOTION_LINK} passHref>
+                                        <a
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                         >
-                                            <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <Button
-                                                    color="dark-4"
-                                                    size="small"
-                                                    label={'Support'}
-                                                    icon={
-                                                        <Question
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                            </a>
-                                        </Link>
-                                    </IconContext.Provider>
-                                </Box>
-                            )}
+                                            <Button
+                                                color="dark-4"
+                                                size="small"
+                                                label={
+                                                    screenSize !== 'small'
+                                                        ? 'Wiki'
+                                                        : undefined
+                                                }
+                                                icon={
+                                                    <BookOpen
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'dark-4'
+                                                            ]
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                        </a>
+                                    </Link>
+                                    <Link href={SUPPORT_DISCORD_LINK} passHref>
+                                        <a
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <Button
+                                                color="dark-4"
+                                                size="small"
+                                                label={
+                                                    screenSize !== 'small'
+                                                        ? 'Support'
+                                                        : undefined
+                                                }
+                                                icon={
+                                                    <Question
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'dark-4'
+                                                            ]
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                        </a>
+                                    </Link>
+                                </IconContext.Provider>
+                            </Box>
                         </Box>
                     )
                 }}
