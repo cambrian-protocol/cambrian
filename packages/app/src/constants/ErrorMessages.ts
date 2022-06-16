@@ -12,7 +12,7 @@ export type ErrorMessageType = {
 export const GENERAL_ERROR: ErrorMessagesType = {
     CHAIN_NOT_SUPPORTED: {
         title: 'Unsupported Blockchain',
-        message: 'Please connect to the a supported Blockchain',
+        message: 'Please connect to the a supported Blockchain.',
         logLevel: 0,
     },
     IPFS_PIN_ERROR: {
@@ -22,7 +22,7 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     NO_WALLET_CONNECTION: {
         title: 'No connected Wallet found',
-        message: 'Please connect your wallet to use this function',
+        message: 'Please connect your wallet to use this function.',
         logLevel: 1,
     },
     FAILED_PROPOSAL_DEPLOYMENT: {
@@ -118,7 +118,7 @@ export const GENERAL_ERROR: ErrorMessagesType = {
 export const CONTRACT_ERROR: ErrorMessagesType = {
     INVALID_ARGUMENT: {
         title: 'Invalid Contract Input',
-        message: 'Please check your inputs and try again',
+        message: 'Please check your inputs and try again.',
         logLevel: 0,
     },
 }
@@ -126,7 +126,7 @@ export const CONTRACT_ERROR: ErrorMessagesType = {
 export const METAMASK_ERROR: ErrorMessagesType = {
     '-32700': {
         title: 'Invalid JSON was received by the server',
-        message: 'An error occurred on the server while parsing the JSON text',
+        message: 'An error occurred on the server while parsing the JSON text.',
         logLevel: 1,
     },
     '-32600': {
