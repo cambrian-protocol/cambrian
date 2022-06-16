@@ -9,6 +9,8 @@ import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
+import { UserType } from '../store/UserContext'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 export enum StageNames {
     composition = 'composition',
@@ -43,7 +45,7 @@ export default class Stagehand {
         return this.stages.proposal as ProposalModel | undefined
     }
 
-    publishStage = async (stageType: StageNames) => {
+    publishStage = async (stageType: StageNames, currentUser: UserType) => {
         try {
             const res = await this.ipfs.pin(this.stages[stageType])
             if (res && res.IpfsHash) {
@@ -105,15 +107,20 @@ export default class Stagehand {
      */
     publishComposition = async (
         composition: CompositionModel,
-        provider: ethers.providers.Provider
+        currentUser: UserType
     ) => {
         if (!this.isStageSchema(composition, StageNames.composition)) {
             throw GENERAL_ERROR['WRONG_COMPOSITION_SCHEMA']
         }
 
-        if (await parseComposerSolvers(composition.solvers, provider)) {
+        if (
+            await parseComposerSolvers(
+                composition.solvers,
+                currentUser.provider
+            )
+        ) {
             this.stages['composition'] = composition
-            return this.publishStage(StageNames.composition)
+            return this.publishStage(StageNames.composition, currentUser)
         }
     }
 
@@ -123,7 +130,7 @@ export default class Stagehand {
     publishTemplate = async (
         createTemplateInput: CreateTemplateMultiStepFormType,
         compositionCID: string,
-        provider: ethers.providers.Provider
+        currentUser: UserType
     ) => {
         if (!this.composition) {
             await this.loadStage(compositionCID, StageNames.composition)
@@ -133,7 +140,7 @@ export default class Stagehand {
             this.composition!,
             createTemplateInput.flexInputs
         )
-        await parseComposerSolvers(newComposition.solvers, provider)
+        await parseComposerSolvers(newComposition.solvers, currentUser.provider)
 
         const template: TemplateModel = {
             pfp: createTemplateInput.pfp,
@@ -155,13 +162,13 @@ export default class Stagehand {
             throw GENERAL_ERROR['WRONG_TEMPLATE_SCHEMA']
         }
         this.stages['template'] = template
-        return this.publishStage(StageNames.template)
+        return this.publishStage(StageNames.template, currentUser)
     }
 
     publishProposal = async (
         createProposalInput: CreateProposalMultiStepFormType,
         templateCID: string,
-        provider: ethers.providers.Provider
+        currentUser: UserType
     ) => {
         if (!this.template) {
             await this.loadStage(templateCID, StageNames.template)
@@ -183,7 +190,7 @@ export default class Stagehand {
         )
         const parsedSolvers = await parseComposerSolvers(
             newComposition.solvers,
-            provider
+            currentUser.provider
         )
         if (parsedSolvers) {
             const proposal: ProposalModel = {
@@ -196,7 +203,10 @@ export default class Stagehand {
             }
 
             this.stages[StageNames.proposal] = proposal
-            const proposalCID = await this.publishStage(StageNames.proposal)
+            const proposalCID = await this.publishStage(
+                StageNames.proposal,
+                currentUser
+            )
             if (proposalCID) {
                 return {
                     parsedSolvers: parsedSolvers,
@@ -209,7 +219,7 @@ export default class Stagehand {
 
 export const getSolverConfigsFromMetaStages = async (
     metaStages: Stages,
-    provider: ethers.providers.Provider
+    currentUser: UserType
 ) => {
     const metaTemplate = metaStages.template as TemplateModel
     const metaProposal = metaStages.proposal as ProposalModel
@@ -222,7 +232,7 @@ export const getSolverConfigsFromMetaStages = async (
     )
     const parsedSolvers = await parseComposerSolvers(
         finalComposition.solvers,
-        provider
+        currentUser.provider
     )
     if (!parsedSolvers) throw GENERAL_ERROR['PARSE_SOLVER_ERROR']
     return parsedSolvers.map((solver) => solver.config)

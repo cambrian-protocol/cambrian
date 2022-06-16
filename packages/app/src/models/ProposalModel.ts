@@ -8,3 +8,13 @@ export type ProposalModel = {
     flexInputs: FlexInputFormType[]
     templateCID: string
 }
+
+export type CeramicProposalModel = {
+    title: string
+    description: string
+    flexInputs: FlexInputFormType[]
+    template: {
+        streamID: string
+        commitID: string
+    }
+}

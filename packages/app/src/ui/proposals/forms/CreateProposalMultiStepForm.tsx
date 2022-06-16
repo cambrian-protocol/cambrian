@@ -16,7 +16,7 @@ import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFle
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import Stagehand from '@cambrian/app/classes/Stagehand'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
@@ -25,6 +25,8 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+//@ts-ignore
+import randimals from 'randimals'
 
 export type CreateProposalMultiStepFormType = {
     name: string
@@ -132,43 +134,46 @@ const CreateProposalMultiStepForm = ({
                 }
             })
 
-            const stagehand = new Stagehand()
-            const response = await stagehand.publishProposal(
+            const stagehand = new CeramicStagehand()
+            const proposalStreamID = await stagehand.createProposal(
+                randimals(),
                 input,
                 templateCID,
-                currentUser.web3Provider
+                currentUser
             )
 
-            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+            if (!proposalStreamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 
-            const proposalsHub = new ProposalsHub(
-                currentUser.signer,
-                currentUser.chainId
-            )
+            //  DON'T GO ON-CHAIN RIGHT AWAY ANYMORE. WE MUST NOTIFY THE TEMPLATE GUY
 
-            const transaction = await proposalsHub.createSolutionAndProposal(
-                response.parsedSolvers[0].collateralToken,
-                input.price,
-                response.parsedSolvers.map((solver) => solver.config),
-                response.cid
-            )
-            let rc = await transaction.wait()
-            const event = rc.events?.find(
-                (event) => event.event === 'CreateProposal'
-            ) // Less fragile to event param changes.
-            const proposalId = event?.args && event.args.id
+            // const proposalsHub = new ProposalsHub(
+            //     currentUser.signer,
+            //     currentUser.chainId
+            // )
 
-            if (!proposalId) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
+            // const transaction = await proposalsHub.createSolutionAndProposal(
+            //     response.parsedSolvers[0].collateralToken,
+            //     input.price,
+            //     response.parsedSolvers.map((solver) => solver.config),
+            //     response.cid
+            // )
+            // let rc = await transaction.wait()
+            // const event = rc.events?.find(
+            //     (event) => event.event === 'CreateProposal'
+            // ) // Less fragile to event param changes.
+            // const proposalId = event?.args && event.args.id
 
-            if (input.discordWebhook !== '') {
-                await WebhookAPI.postWebhook(input.discordWebhook, proposalId)
-            }
+            // if (!proposalId) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
+
+            // if (input.discordWebhook !== '') {
+            //     await WebhookAPI.postWebhook(input.discordWebhook, proposalId)
+            // }
 
             storeIdInLocalStorage(
                 'proposals',
                 templateCID,
                 input.title,
-                proposalId
+                proposalStreamID
             )
 
             initInput()

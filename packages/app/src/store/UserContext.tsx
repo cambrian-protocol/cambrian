@@ -18,6 +18,7 @@ import {
     useViewerConnection,
     useViewerRecord,
     EthereumAuthProvider,
+    SelfID,
 } from '@self.id/framework'
 
 export type PermissionType = string
@@ -38,6 +39,7 @@ export type UserType = {
     address?: string
     chainId?: number
     permissions: PermissionType[]
+    selfID?: SelfID
 }
 
 type UserActionType =
@@ -65,6 +67,7 @@ type UserActionType =
           type: 'ADD_PERMISSION'
           permission: PermissionType
       }
+    | { type: 'SET_SELF_ID'; selfID?: SelfID }
 
 const initialUser: UserType = {
     provider: undefined,
@@ -73,6 +76,7 @@ const initialUser: UserType = {
     address: undefined,
     chainId: undefined,
     permissions: [],
+    selfID: undefined,
 }
 
 const providerOptions = {
@@ -128,6 +132,11 @@ function userReducer(state: UserType, action: UserActionType): UserType {
                 ...state,
                 permissions: [...state.permissions, action.permission],
             }
+        case 'SET_SELF_ID':
+            return {
+                ...state,
+                selfID: action.selfID,
+            }
         default:
             throw new Error()
     }
@@ -141,7 +150,6 @@ export const UserContext = React.createContext<UserContextType>({
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
-    const record = useViewerRecord('basicProfile')
     const [ceramicConnection, ceramicConnect, ceramicDisconnect] =
         useViewerConnection()
     const [user, dispatch] = useReducer(userReducer, initialUser)
@@ -167,6 +175,24 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             cpLogger.push(e)
         }
     }, [])
+
+    useEffect(() => {
+        if (
+            ceramicConnection.status === 'connected' &&
+            ceramicConnection.selfID
+        ) {
+            console.log(ceramicConnection.selfID)
+            dispatch({
+                type: 'SET_SELF_ID',
+                selfID: ceramicConnection.selfID,
+            })
+        } else {
+            dispatch({
+                type: 'SET_SELF_ID',
+                selfID: undefined,
+            })
+        }
+    }, [ceramicConnection])
 
     const disconnectWallet = useCallback(
         async function () {
@@ -196,10 +222,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             ceramicLogin()
         }
     }, [provider, web3Provider])
-
-    useEffect(() => {
-        console.log('Record: ', record)
-    }, [record])
 
     // EIP-1193 Event Listener
     useEffect(() => {

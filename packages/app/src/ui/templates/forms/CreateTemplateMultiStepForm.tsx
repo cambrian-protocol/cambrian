@@ -15,7 +15,7 @@ import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
 import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
 import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
-import Stagehand from '@cambrian/app/classes/Stagehand'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
@@ -23,6 +23,8 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+//@ts-ignore
+import randimals from 'randimals'
 
 interface CreateTemplateMultiStepFormProps {
     composition: CompositionModel
@@ -164,13 +166,14 @@ export const CreateTemplateMultiStepForm = ({
                 flexInput.isFlex = stayFlex
             })
 
-            const stagehand = new Stagehand()
-            const templateCID = await stagehand.publishTemplate(
+            const stagehand = new CeramicStagehand()
+            const templateCID = await stagehand.createTemplate(
+                randimals(),
                 updatedInput,
                 compositionCID,
-                currentUser.web3Provider
+                currentUser
             )
-            if (!templateCID) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+            if (!templateCID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 
             if (input.discordWebhook !== '') {
                 await WebhookAPI.postWebhook(input.discordWebhook, templateCID)

@@ -21,6 +21,16 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         info: 'Please try again later...',
         logLevel: 1,
     },
+    CERAMIC_UPDATE_ERROR: {
+        message: 'Error while updating your data to Ceramic',
+        info: 'Please try again later...',
+        logLevel: 1,
+    },
+    CERAMIC_LOAD_ERROR: {
+        message: 'Error while loading data from Ceramic',
+        info: 'Please try again later...',
+        logLevel: 1,
+    },
     NO_WALLET_CONNECTION: {
         message: 'No connected Wallet found',
         info: 'Please connect your wallet to use this function',

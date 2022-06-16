@@ -1,4 +1,6 @@
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
@@ -12,8 +14,10 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useRouter } from 'next/dist/client/router'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export default function CreateTemplatePage() {
+    const currentUser = useCurrentUser().currentUser
     const router = useRouter()
     const { compositionCID } = router.query
     const [currentComposition, setCurrentComposition] =
@@ -32,10 +36,10 @@ export default function CreateTemplatePage() {
             typeof compositionCID === 'string'
         ) {
             try {
-                const stagehand = new Stagehand()
-                const composition = (await stagehand.loadStage(
+                const ceramicStagehand = new CeramicStagehand()
+                const composition = (await ceramicStagehand.loadComposition(
                     compositionCID,
-                    StageNames.composition
+                    currentUser
                 )) as CompositionModel
 
                 if (composition) return setCurrentComposition(composition)

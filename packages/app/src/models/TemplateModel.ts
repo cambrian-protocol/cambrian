@@ -15,3 +15,20 @@ export type TemplateModel = {
     compositionCID: string
     flexInputs: FlexInputFormType[]
 }
+
+export type CeramicTemplateModel = {
+    title: string
+    description: string
+    rfp: string // Request For Proposal (desc of info wanted from customers)
+    price?: {
+        amount: number
+        denominationTokenAddress: string
+        preferredTokens?: TokenModel[]
+        allowAnyPaymentToken: boolean
+    }
+    composition: {
+        streamID: string
+        commitID: string
+    }
+    flexInputs: FlexInputFormType[]
+}
