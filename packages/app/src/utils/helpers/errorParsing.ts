@@ -17,7 +17,7 @@ export function getErrorMessage(error: any): ErrorMessageType {
         return { ...CONTRACT_ERROR[error.code], error: error }
     } else {
         return {
-            title: 'Oh Snap! Something went wrong, please try again.',
+            title: 'Oh Snap!',
             message: 'Something went wrong, please try again.',
             error: error,
             logLevel: 1,

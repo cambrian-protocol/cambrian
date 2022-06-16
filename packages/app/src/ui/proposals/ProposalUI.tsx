@@ -59,17 +59,15 @@ const ProposalUI = ({
             border
             pad={{ horizontal: 'medium' }}
         >
-            {isProposalExecuted ? (
+            {isProposalExecuted && firstSolverAddress ? (
                 <SidebarComponentContainer
                     title="Interaction"
                     description="This Proposal has been funded and executed. To start
                     working with this Solution visit the first Solver"
                 >
-                    {firstSolverAddress && (
-                        <Link href={`/solvers/${firstSolverAddress}`} passHref>
-                            <Button primary size="small" label="Go to Solver" />
-                        </Link>
-                    )}
+                    <Link href={`/solvers/${firstSolverAddress}`} passHref>
+                        <Button primary size="small" label="Go to Solver" />
+                    </Link>
                 </SidebarComponentContainer>
             ) : (
                 <SidebarComponentContainer
