@@ -38,7 +38,7 @@ const OutcomeCollectionCard = ({
         <>
             <Card background="background-contrast-hover" border={border}>
                 {cardHeader && cardHeader}
-                <CardBody>
+                <CardBody pad={{ vertical: 'small', horizontal: 'medium' }}>
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
@@ -65,7 +65,7 @@ const OutcomeCollectionCard = ({
                         </Box>
                     )}
                     {onArbitrate && (
-                        <Box pad="small" gap="small">
+                        <Box gap="small" pad={{ top: 'small' }}>
                             <LoaderButton
                                 primary
                                 disabled={proposedIndexSet !== undefined}
