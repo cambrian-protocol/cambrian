@@ -17,33 +17,47 @@ export default function SolverPage() {
     const router = useRouter()
     const { solverAddress } = router.query
 
-    const [solverContractAddress, setSolverContractAddress] = useState<string>()
+    const [solverContract, setSolverContract] = useState<ethers.Contract>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
         useState(false)
 
     useEffect(() => {
         if (!router.isReady) return
 
-        if (solverAddress !== undefined && typeof solverAddress === 'string') {
-            if (
-                currentUser.chainId &&
-                SUPPORTED_CHAINS[currentUser.chainId] &&
-                ethers.utils.isAddress(solverAddress)
-            ) {
-                setSolverContractAddress(solverAddress)
-            } else {
-                setShowInvalidQueryComponent(true)
-            }
-        }
+        initSolverContract()
     }, [currentUser, router])
+
+    const initSolverContract = async () => {
+        try {
+            if (
+                !solverAddress ||
+                typeof solverAddress !== 'string' ||
+                !currentUser.chainId ||
+                !SUPPORTED_CHAINS[currentUser.chainId] ||
+                !ethers.utils.isAddress(solverAddress)
+            )
+                throw new Error()
+
+            const contract = new ethers.Contract(
+                solverAddress,
+                BASE_SOLVER_IFACE,
+                currentUser.signer
+            )
+
+            // Check if we actually received a Solver
+            await contract.trackingId()
+            setSolverContract(contract)
+        } catch (e) {
+            setShowInvalidQueryComponent(true)
+        }
+    }
 
     return (
         <>
             {currentUser.signer ? (
-                solverContractAddress ? (
+                solverContract ? (
                     <Solver
-                        address={solverContractAddress}
-                        iface={BASE_SOLVER_IFACE}
+                        solverContract={solverContract}
                         currentUser={currentUser}
                     />
                 ) : showInvalidQueryComponent ? (

@@ -45,12 +45,11 @@ export type GenericMethod<T> = {
 export type GenericMethods = { [name: string]: GenericMethod<any> }
 
 interface SolverProps {
-    address: string
-    iface: ethers.utils.Interface
+    solverContract: ethers.Contract
     currentUser: UserType
 }
 
-const Solver = ({ address, iface, currentUser }: SolverProps) => {
+const Solver = ({ currentUser, solverContract }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
     const [solverTimelock, setSolverTimelock] = useState<TimelockModel>({
         isTimelockActive: false,
@@ -72,12 +71,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
 
     const { addPermission } = useCurrentUser()
 
-    const solverContract = new ethers.Contract(
-        address,
-        iface,
-        currentUser.signer
-    )
-
     const changedStatusFilter = {
         address: currentUser.address,
         topics: [ethers.utils.id('ChangedStatus(bytes32)'), null],
@@ -92,7 +85,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
 
     // TODO Contract typescript. TypeChain??
     const solverMethods = getSolverMethods(
-        iface,
+        solverContract.interface,
         async (method: string, ...args: any[]) =>
             await solverContract[method](...args)
     )
@@ -326,7 +319,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                         <SolverActionbar
                             solverData={solverData}
                             solverTimelock={solverTimelock}
-                            solverAddress={address}
+                            solverAddress={solverContract.address}
                             solverMethods={solverMethods}
                             currentUser={currentUser}
                             currentCondition={currentCondition}
@@ -337,7 +330,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                             <SolverSidebar
                                 solverData={solverData}
                                 solverTimelock={solverTimelock}
-                                solverAddress={address}
+                                solverAddress={solverContract.address}
                                 solverMethods={solverMethods}
                                 currentCondition={currentCondition}
                                 currentUser={currentUser}
@@ -359,7 +352,7 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                         <ModuleUIManager
                             solverData={solverData}
                             chainId={currentUser.chainId}
-                            solverAddress={address}
+                            solverAddress={solverContract.address}
                             currentCondition={currentCondition}
                         />
                     )}
