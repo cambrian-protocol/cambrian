@@ -1,25 +1,13 @@
-import {
-    ArrowClockwise,
-    BookOpen,
-    Faders,
-    Handshake,
-    IconContext,
-    TreeStructure,
-} from 'phosphor-react'
+import { ArrowsClockwise, Faders, IconContext } from 'phosphor-react'
+import { Box, Button, Heading, ResponsiveContext, Stack, Text } from 'grommet'
 
-import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { Box } from 'grommet'
-import { Button } from 'grommet'
+import BaseLayerModal from '../../modals/BaseLayerModal'
 import { CONDITION_STATUS_INFO } from '@cambrian/app/models/ConditionStatus'
-import HeaderTextSection from '../../sections/HeaderTextSection'
-import Link from 'next/link'
 import { MetadataModel } from '@cambrian/app/models/MetadataModel'
-import ProposalInfoModal from '@cambrian/app/components/modals/ProposalInfoModal'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import { ResponsiveContext } from 'grommet'
-import SolverConfigInfo from '@cambrian/app/components/info/SolverConfigInfo'
+import SolverConfigInfo from '../../info/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import StatusBadge from '../../badges/StatusBadge'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
@@ -34,132 +22,81 @@ const SolverHeader = ({
     solverData,
     currentCondition,
 }: SolverHeaderProps) => {
-    const [showSolverConfigInfoModal, setSolverConfigInfoModal] =
-        useState(false)
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
-    const toggleShowSolverConfigInfoModal = () =>
-        setSolverConfigInfoModal(!showSolverConfigInfoModal)
+    const [showSolverConfigModal, setShowSolverConfigModal] = useState(false)
 
-    const proposalMetadata = metadata?.stages?.proposal as ProposalModel
+    const toggleShowSolverConfigModal = () =>
+        setShowSolverConfigModal(!showSolverConfigModal)
 
     return (
         <>
-            <ResponsiveContext.Consumer>
-                {(screenSize) => {
-                    return (
-                        <Box
-                            height={{ min: 'auto' }}
-                            width="xlarge"
-                            round="small"
-                            pad={{
-                                top: 'medium',
-                                bottom: 'xsmall',
-                            }}
-                        >
-                            <HeaderTextSection
-                                icon={
-                                    CONDITION_STATUS_INFO[
-                                        currentCondition.status
-                                    ].icon
-                                }
-                                subTitle={`Status: ${
-                                    CONDITION_STATUS_INFO[
-                                        currentCondition.status
-                                    ].name
-                                }`}
-                                title={proposalMetadata?.title || 'Unknown'}
-                            />
-                            {screenSize !== 'small' && (
-                                <Box
-                                    direction="row"
-                                    justify="end"
-                                    wrap
-                                    border={{ side: 'bottom' }}
-                                    pad={{ bottom: 'xsmall' }}
-                                >
-                                    <IconContext.Provider
-                                        value={{ size: '18' }}
-                                    >
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowProposalInfoModal
-                                            }
-                                            label={'Agreement Details'}
-                                            icon={
-                                                <Handshake
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Button
-                                            size="small"
-                                            color="dark-4"
-                                            onClick={
-                                                toggleShowSolverConfigInfoModal
-                                            }
-                                            label={'Solver Configuration'}
-                                            icon={
-                                                <Faders
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            disabled
-                                            label={'Solution Overview'}
-                                            icon={
-                                                <TreeStructure
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            disabled
-                                            label={'Conditions Overview'}
-                                            icon={
-                                                <ArrowClockwise
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                        <Link
-                                            href="https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70"
-                                            passHref
+            <IconContext.Provider value={{ size: '24' }}>
+                <ResponsiveContext.Consumer>
+                    {(screenSize) => {
+                        return (
+                            <Box width="xlarge">
+                                <Stack anchor="top-right">
+                                    <Box pad={{ top: 'medium' }}>
+                                        <Box
+                                            direction="row"
+                                            justify="between"
+                                            align="center"
+                                            pad={{
+                                                vertical: 'small',
+                                                horizontal: 'medium',
+                                            }}
+                                            border
+                                            round="xsmall"
                                         >
-                                            <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <Box>
+                                                <Text
+                                                    size="small"
+                                                    color="dark-4"
+                                                >
+                                                    Solver
+                                                </Text>
+                                                <Heading level="3">
+                                                    {metadata?.solverTag.title}
+                                                </Heading>
+                                            </Box>
+                                            <Box
+                                                direction="row"
+                                                gap="small"
+                                                alignSelf="end"
+                                                pad={{ top: 'large' }}
                                             >
                                                 <Button
                                                     color="dark-4"
                                                     size="small"
-                                                    label={'Wiki'}
+                                                    label={
+                                                        screenSize !== 'small'
+                                                            ? 'Configuration'
+                                                            : undefined
+                                                    }
                                                     icon={
-                                                        <BookOpen
+                                                        <Faders
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'dark-4'
+                                                                ]
+                                                            }
+                                                        />
+                                                    }
+                                                    onClick={
+                                                        toggleShowSolverConfigModal
+                                                    }
+                                                />
+                                                <Button
+                                                    disabled
+                                                    color="dark-4"
+                                                    size="small"
+                                                    label={
+                                                        screenSize !== 'small'
+                                                            ? ' Conditions'
+                                                            : undefined
+                                                    }
+                                                    icon={
+                                                        <ArrowsClockwise
                                                             color={
                                                                 cpTheme.global
                                                                     .colors[
@@ -169,24 +106,34 @@ const SolverHeader = ({
                                                         />
                                                     }
                                                 />
-                                            </a>
-                                        </Link>
-                                    </IconContext.Provider>
-                                </Box>
-                            )}
-                        </Box>
-                    )
-                }}
-            </ResponsiveContext.Consumer>
-
-            {showProposalInfoModal && metadata?.stages && (
-                <ProposalInfoModal
-                    onClose={toggleShowProposalInfoModal}
-                    metadata={metadata}
-                />
-            )}
-            {showSolverConfigInfoModal && currentCondition && (
-                <BaseLayerModal onClose={toggleShowSolverConfigInfoModal}>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                    <StatusBadge
+                                        status={
+                                            CONDITION_STATUS_INFO[
+                                                currentCondition.status
+                                            ]?.name || 'Unknown Status'
+                                        }
+                                        background={
+                                            CONDITION_STATUS_INFO[
+                                                currentCondition.status
+                                            ]?.color || 'status-error'
+                                        }
+                                        tipContent={
+                                            CONDITION_STATUS_INFO[
+                                                currentCondition.status
+                                            ]?.description || undefined
+                                        }
+                                    />
+                                </Stack>
+                            </Box>
+                        )
+                    }}
+                </ResponsiveContext.Consumer>
+            </IconContext.Provider>
+            {showSolverConfigModal && (
+                <BaseLayerModal onClose={toggleShowSolverConfigModal}>
                     <SolverConfigInfo
                         solverData={solverData}
                         currentCondition={currentCondition}

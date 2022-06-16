@@ -4,17 +4,18 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import { SetStateAction, useState } from 'react'
 
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import ErrorPopupModal from './ErrorPopupModal'
-import { GenericMethods } from '../solver/Solver'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import { GenericMethods } from '../../../components/solver/Solver'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { TreeStructure } from 'phosphor-react'
 
 interface ProposeOutcomeModalProps {
     proposedIndexSet?: number
@@ -59,7 +60,11 @@ const ProposeOutcomeModal = ({
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection title={'Propose an outcome'} />
+                <ModalHeader
+                    icon={<TreeStructure />}
+                    title="Propose an outcome"
+                    description="Select the outcome when solve conditions are met."
+                />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[
                         currentCondition.conditionId

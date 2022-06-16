@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import ArbitrationDesireOutcomeModal from '@cambrian/app/components/modals/ArbitrationDesireOutcomeModal'
+import ArbitrationDesireOutcomeModal from '@cambrian/app/ui/interaction/modals/ArbitrationDesireOutcomeModal'
 import ArbitrationTimelockInfoComponent from './ArbitrationTimelockInfoComponent'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '../../../sections/PlainSectionDivider'

@@ -22,6 +22,7 @@ import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
+import ProposalHeader from '../layout/header/ProposalHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
@@ -29,7 +30,10 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SolverSidebar from '../bars/sidebar/SolverSidebar'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
@@ -48,6 +52,10 @@ interface SolverProps {
 
 const Solver = ({ address, iface, currentUser }: SolverProps) => {
     const [solverData, setSolverData] = useState<SolverModel>()
+    const [solverTimelock, setSolverTimelock] = useState<TimelockModel>({
+        isTimelockActive: false,
+        timelockSeconds: 0,
+    })
 
     // Prevents event Listeners to update solver data before the outcome state is set and therefor loose metadata
     const [isInitialized, setIsInitialized] = useState(false)
@@ -136,25 +144,30 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
     }, [currentCondition, solverData])
 
     useEffect(() => {
-        solverContract.on(changedStatusFilter, updateSolverDataListener)
+        solverContract.on(changedStatusFilter, updateSolverData)
 
         if (currentCondition?.status === ConditionStatus.Initiated) {
-            solverContract.on(ingestedDataFilter, updateSolverDataListener)
+            solverContract.on(ingestedDataFilter, updateSolverData)
         }
 
         return () => {
-            solverContract.removeListener(
-                changedStatusFilter,
-                updateSolverDataListener
-            )
-            if (currentCondition?.status === ConditionStatus.Initiated) {
-                solverContract.removeListener(
-                    ingestedDataFilter,
-                    updateSolverDataListener
-                )
-            }
+            solverContract.removeListener(changedStatusFilter, updateSolverData)
+            solverContract.removeListener(ingestedDataFilter, updateSolverData)
         }
     }, [currentUser, currentCondition])
+
+    useEffect(() => {
+        if (solverTimelock.isTimelockActive) {
+            currentUser.web3Provider.on('block', timelockListener)
+        }
+        return () => {
+            currentUser.web3Provider.removeListener('block', timelockListener)
+        }
+    }, [solverTimelock, currentCondition, currentUser])
+
+    const timelockListener = async () => {
+        updateTimelock(solverTimelock.timelockSeconds)
+    }
 
     const initArbitratorPermission = async () => {
         if (solverData) {
@@ -175,10 +188,6 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             } else if (currentUser.address === solverData.config.arbitrator)
                 addPermission('Arbitrator')
         }
-    }
-
-    const updateSolverDataListener = async () => {
-        await updateSolverData()
     }
 
     /* 
@@ -205,9 +214,16 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             )
 
             if (fetchedSolverData.conditions.length) {
-                setCurrentCondition(
+                const latestCondition =
                     fetchedSolverData.conditions[
                         fetchedSolverData.conditions.length - 1
+                    ]
+                setCurrentCondition(latestCondition)
+
+                // Initialize SolverTimelock
+                updateTimelock(
+                    fetchedSolverData.timelocksHistory[
+                        latestCondition.conditionId
                     ]
                 )
             }
@@ -219,6 +235,26 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             setOutcomes(fetchedOutcomes)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
+        }
+    }
+
+    const updateTimelock = async (currentTimelock: number) => {
+        if (currentTimelock) {
+            const latestBlockTimestamp = (
+                await currentUser.web3Provider.getBlock('latest')
+            ).timestamp
+
+            const updatedTimelock = {
+                timelockSeconds: currentTimelock,
+                isTimelockActive: latestBlockTimestamp < currentTimelock,
+            }
+
+            if (!_.isEqual(updatedTimelock, solverTimelock)) {
+                setSolverTimelock({
+                    timelockSeconds: currentTimelock,
+                    isTimelockActive: latestBlockTimestamp < currentTimelock,
+                })
+            }
         }
     }
 
@@ -260,10 +296,17 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
                 setCurrentCondition(
                     updatedSolverData.conditions[currentConditionIdx]
                 )
+                updateTimelock(
+                    updatedSolverData.timelocksHistory[
+                        currentCondition.conditionId
+                    ]
+                )
             }
         }
     }
     const proposalMetadata = metadata?.stages?.proposal as ProposalModel
+    const templateMetadata = metadata?.stages?.template as TemplateModel
+
     return (
         <>
             {solverData &&
@@ -271,38 +314,47 @@ const Solver = ({ address, iface, currentUser }: SolverProps) => {
             solverMethods &&
             currentUser.chainId ? (
                 <InteractionLayout
-                    header={
-                        <SolverHeader
-                            metadata={metadata}
-                            solverData={solverData}
-                            currentCondition={currentCondition}
+                    proposalHeader={
+                        <ProposalHeader
+                            isProposalExecuted
+                            templateMetadata={templateMetadata}
+                            proposalMetadata={proposalMetadata}
                         />
                     }
                     contextTitle={proposalMetadata?.title || 'Solver'}
                     actionBar={
                         <SolverActionbar
-                            solverAddress={address}
-                            currentUser={currentUser}
                             solverData={solverData}
-                            currentCondition={currentCondition}
+                            solverTimelock={solverTimelock}
+                            solverAddress={address}
                             solverMethods={solverMethods}
+                            currentUser={currentUser}
+                            currentCondition={currentCondition}
                         />
                     }
                     sidebar={
                         proposedOutcome && (
                             <SolverSidebar
-                                currentCondition={currentCondition}
-                                solverAddress={address}
                                 solverData={solverData}
+                                solverTimelock={solverTimelock}
+                                solverAddress={address}
                                 solverMethods={solverMethods}
+                                currentCondition={currentCondition}
                                 currentUser={currentUser}
                                 proposedOutcome={proposedOutcome}
                             />
                         )
                     }
+                    solverHeader={
+                        <SolverHeader
+                            currentCondition={currentCondition}
+                            solverData={solverData}
+                            metadata={metadata}
+                        />
+                    }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (
-                        <InitiatedSolverContent metadata={metadata} />
+                        <InitiatedSolverContent />
                     ) : (
                         <ModuleUIManager
                             solverData={solverData}

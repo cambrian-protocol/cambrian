@@ -193,6 +193,11 @@ export default class Stagehand {
             currentUser.provider
         )
         if (parsedSolvers) {
+            // Pin solverConfigs separately to have access without metaData from Solution
+            const solverConfigs = parsedSolvers.map((solver) => solver.config)
+            const res = await this.ipfs.pin(solverConfigs)
+            if (!res || !res.IpfsHash) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+
             const proposal: ProposalModel = {
                 title: createProposalInput.title,
                 name: createProposalInput.name,
@@ -200,6 +205,7 @@ export default class Stagehand {
                 description: createProposalInput.description,
                 templateCID: templateCID,
                 flexInputs: createProposalInput.flexInputs,
+                solverConfigsCID: res.IpfsHash,
             }
 
             this.stages[StageNames.proposal] = proposal
@@ -209,6 +215,7 @@ export default class Stagehand {
             )
             if (proposalCID) {
                 return {
+                    proposal: proposal,
                     parsedSolvers: parsedSolvers,
                     cid: proposalCID,
                 }

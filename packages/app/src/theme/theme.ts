@@ -28,7 +28,13 @@ const colors: any = {
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
+    'status-ok': '#338233',
     'dark-4': '#999999',
+    'status-initiated': '#cac63d',
+    'status-reported': '#2ec090',
+    'status-arbitration': '#be8b32',
+    'status-executed': '#59b846',
+    'status-proposed': '#aca0d6',
 }
 
 export const cpTheme = deepMerge(grommet, {
@@ -67,6 +73,11 @@ export const cpTheme = deepMerge(grommet, {
             size: '14px',
             height: '20px',
             maxWidth: '336px',
+        },
+    },
+    card: {
+        container: {
+            round: 'xsmall',
         },
     },
     button: {

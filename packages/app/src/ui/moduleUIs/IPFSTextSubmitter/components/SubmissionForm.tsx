@@ -95,16 +95,11 @@ const SubmissionForm = ({
                 />
                 <LoaderButton
                     isLoading={isSubmitting}
-                    disabled={
-                        input.submission === latestSubmission.submission ||
-                        input.submission.trim() === '' ||
-                        isSubmitting
-                    }
+                    disabled={isSubmitting}
                     primary
                     label={'Submit work'}
                     onClick={onSubmit}
                 />
-                <Box pad="small" />
             </Box>
             {errorMsg && (
                 <ErrorPopupModal

@@ -79,7 +79,7 @@ const ComposerToolbar = () => {
             <Box
                 pad="small"
                 fill
-                round="small"
+                round="xsmall"
                 background={'background-contrast'}
                 align="center"
                 gap="medium"

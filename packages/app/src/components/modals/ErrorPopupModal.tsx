@@ -1,8 +1,7 @@
-import { Box, Layer } from 'grommet'
+import { Box, Heading, Layer, Text } from 'grommet'
 import { Warning, X } from 'phosphor-react'
 
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import HeaderTextSection from '../sections/HeaderTextSection'
 
 interface ErrorPopupModalProps {
     onClose: () => void
@@ -16,29 +15,28 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
             background={'background-contrast'}
             responsive={false}
         >
-            <Box
-                width={{ min: 'auto', max: 'large' }}
-                pad="small"
-                border
-                round="small"
-            >
-                <Box direction="row">
+            <Box width="medium" border round="xsmall">
+                <Box direction="row" elevation="small">
                     <Box onClick={onClose} pad="small" focusIndicator={false}>
                         <X size={'24'} />
                     </Box>
                     <Box flex />
                 </Box>
-                <HeaderTextSection
-                    size="small"
-                    icon={<Warning />}
-                    subTitle={
-                        errorMessage.code
-                            ? `Code: ${errorMessage.code}`
-                            : undefined
-                    }
-                    title={errorMessage.message}
-                    paragraph={errorMessage.info}
-                />
+                <Box
+                    pad="medium"
+                    gap="small"
+                    align="center"
+                    height="small"
+                    justify="center"
+                >
+                    <Warning size="48" />
+                    <Heading level="3" textAlign="center">
+                        {errorMessage.title}
+                    </Heading>
+                    <Text size="small" color="dark-4">
+                        {errorMessage.message}
+                    </Text>
+                </Box>
             </Box>
         </Layer>
     )

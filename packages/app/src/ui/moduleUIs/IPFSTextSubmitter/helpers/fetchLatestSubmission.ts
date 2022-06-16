@@ -4,10 +4,10 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { ethers } from 'ethers'
 
-export const fetchLatestSubmission = async (
+export const fetchSubmissions = async (
     logs: ethers.Event[],
     currentCondition: SolverContractCondition
-): Promise<SubmissionModel | undefined> => {
+): Promise<SubmissionModel[] | undefined> => {
     const cids = logs.map((l) => l.args?.cid).filter(Boolean)
     const ipfs = new IPFSAPI()
     const allSubmissions = (await ipfs.getManyFromCID(
@@ -20,5 +20,5 @@ export const fetchLatestSubmission = async (
         (x) => x.conditionId === currentCondition.conditionId
     )
 
-    return currentConditionSubmissions[currentConditionSubmissions.length - 1]
+    return currentConditionSubmissions
 }

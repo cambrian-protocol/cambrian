@@ -24,7 +24,7 @@
         "cids": "^1.1.9",
         "cross-env": "5.0.5",
         "dotenv": "^16.0.0",
-        "ethers": "^5.5.4",
+        "ethers": "5.6.1",
         "graphql": "^16.2.0",
         "grommet": "^2.22.0",
         "ipfs-only-hash": "^4.0.0",

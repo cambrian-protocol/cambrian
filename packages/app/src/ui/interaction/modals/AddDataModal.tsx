@@ -1,16 +1,17 @@
 import { Box, Form } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 
-import AddManualSlotDataInput from '../inputs/AddManualSlotDataInput'
-import BaseLayerModal from './BaseLayerModal'
+import AddManualSlotDataInput from '../../../components/inputs/AddManualSlotDataInput'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from './ErrorPopupModal'
-import { GenericMethods } from '../solver/Solver'
-import HeaderTextSection from '../sections/HeaderTextSection'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import { GenericMethods } from '../../../components/solver/Solver'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { ethers } from 'ethers'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { validateAddress } from '@cambrian/app/utils/helpers/validation'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { ShieldCheck } from 'phosphor-react'
 
 interface ExecuteSolverModalProps {
     isAddingData: boolean
@@ -98,10 +99,10 @@ const AddDataModal = ({
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection
-                    title="Data Required"
-                    subTitle="Add solve data"
-                    paragraph='This Solver requires the following data. Fields marked "*" must be added before execution.'
+                <ModalHeader
+                    icon={<ShieldCheck />}
+                    title="Add solve data"
+                    description='This Solver requires the following data. Fields marked "*" must be added before execution.'
                 />
                 <Box gap="medium" fill>
                     {ManualInputGroup}

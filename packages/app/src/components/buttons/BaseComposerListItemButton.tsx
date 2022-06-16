@@ -13,7 +13,7 @@ const BaseComposerListItemButton = ({
 }: BaseComposerListItemButtonProps) => (
     <Box
         onClick={onClick}
-        round="small"
+        round="xsmall"
         align="center"
         pad="xsmall"
         width={{ min: 'xsmall' }}

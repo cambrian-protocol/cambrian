@@ -1,3 +1,13 @@
+import {
+    CONTACT_EMAIL_LINK,
+    GITHUB_LINK,
+    INVITE_DISCORD_LINK,
+    NOTION_ENTRY_LINK,
+    SUPPORT_DISCORD_LINK,
+    TWITTER_PROFILE_LINK,
+    WIKI_NOTION_LINK,
+} from 'packages/app/config/ExternalLinks'
+
 import { Anchor } from 'grommet'
 import { Box } from 'grommet'
 import { ResponsiveContext } from 'grommet'
@@ -20,15 +30,15 @@ const FooterLinksSection = () => (
                         items={[
                             {
                                 label: 'Support',
-                                href: 'https://discord.com/channels/856113492348108882/968295116576026625',
+                                href: SUPPORT_DISCORD_LINK,
                             },
                             {
                                 label: 'Learn',
-                                href: 'https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70',
+                                href: WIKI_NOTION_LINK,
                             },
                             {
                                 label: 'Notion',
-                                href: 'https://www.notion.so/cambrianprotocol/Project-Description-97ba57659ed2421386065588ee052600',
+                                href: NOTION_ENTRY_LINK,
                             },
                         ]}
                     />
@@ -37,7 +47,7 @@ const FooterLinksSection = () => (
                         items={[
                             {
                                 label: 'Contact us',
-                                href: 'mailto:paul@cambrianprotocol.com',
+                                href: CONTACT_EMAIL_LINK,
                             },
                         ]}
                     />
@@ -46,15 +56,15 @@ const FooterLinksSection = () => (
                         items={[
                             {
                                 label: 'Twitter',
-                                href: 'https://twitter.com/cambrian_eth',
+                                href: TWITTER_PROFILE_LINK,
                             },
                             {
                                 label: 'Github',
-                                href: 'https://github.com/cambrian-protocol/cambrian',
+                                href: GITHUB_LINK,
                             },
                             {
                                 label: 'Discord',
-                                href: 'https://discord.gg/pZP4HNYrZs',
+                                href: INVITE_DISCORD_LINK,
                             },
                         ]}
                     />

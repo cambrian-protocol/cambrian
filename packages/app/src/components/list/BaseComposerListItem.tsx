@@ -38,7 +38,7 @@ const BaseComposerListItem = ({
     <IconContext.Provider value={{ size: '24' }}>
         <Box
             pad={{ horizontal: 'medium', top: 'medium', bottom: 'small' }}
-            round="small"
+            round="xsmall"
             gap="small"
             height={{ min: 'auto' }}
             background={isActive ? 'brand' : 'background-front'}
@@ -51,7 +51,7 @@ const BaseComposerListItem = ({
                         width={{ min: 'xxsmall' }}
                         pad="small"
                         background={'accent-1'}
-                        round="small"
+                        round="xsmall"
                         elevation="small"
                     >
                         {icon}

@@ -134,18 +134,28 @@ const CreateProposalMultiStepForm = ({
                 }
             })
 
+<<<<<<< HEAD
             const stagehand = new CeramicStagehand()
             const proposalStreamID = await stagehand.createProposal(
                 randimals(),
+=======
+            const stagehand = new Stagehand()
+            const publishedProposal = await stagehand.publishProposal(
+>>>>>>> dev
                 input,
                 templateCID,
                 currentUser
             )
 
+<<<<<<< HEAD
             if (!proposalStreamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+=======
+            if (!publishedProposal) throw GENERAL_ERROR['IPFS_PIN_ERROR']
+>>>>>>> dev
 
             //  DON'T GO ON-CHAIN RIGHT AWAY ANYMORE. WE MUST NOTIFY THE TEMPLATE GUY
 
+<<<<<<< HEAD
             // const proposalsHub = new ProposalsHub(
             //     currentUser.signer,
             //     currentUser.chainId
@@ -162,6 +172,20 @@ const CreateProposalMultiStepForm = ({
             //     (event) => event.event === 'CreateProposal'
             // ) // Less fragile to event param changes.
             // const proposalId = event?.args && event.args.id
+=======
+            const transaction = await proposalsHub.createSolutionAndProposal(
+                publishedProposal.parsedSolvers[0].collateralToken,
+                input.price,
+                publishedProposal.parsedSolvers.map((solver) => solver.config),
+                publishedProposal.proposal.solverConfigsCID,
+                publishedProposal.cid
+            )
+            let rc = await transaction.wait()
+            const event = rc.events?.find(
+                (event) => event.event === 'CreateProposal'
+            ) // Less fragile to event param changes.
+            const proposalId = event?.args && event.args.id
+>>>>>>> dev
 
             // if (!proposalId) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
 

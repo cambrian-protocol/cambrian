@@ -71,7 +71,7 @@ export default function Home() {
                             paragraph="Discover how you can bring your talents to web3 network for yourself or within a decentralized cooperative*"
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     height={'large'}
                                     width={'large'}
                                     border={{ size: 'medium', color: 'black' }}
@@ -116,7 +116,7 @@ export default function Home() {
                             paragraph="Learn how to build your own Solver, contribute to an Open Source Project in TypeScript and Solidity and create new opportunity for millions of people at a time. "
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     width={'large'}
                                     height={'large'}
                                     elevation="large"
@@ -140,7 +140,7 @@ export default function Home() {
                             paragraph="Create outcomes, load and connect Solvers, define allocations and compose complete business solutions powered by smart contracts with our intuitive no-code editor*"
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     elevation="large"
                                     border
                                     overflow="hidden"

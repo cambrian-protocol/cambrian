@@ -1,12 +1,15 @@
-import BaseLayerModal, { BaseLayerModalProps } from './BaseLayerModal'
+import BaseLayerModal, {
+    BaseLayerModalProps,
+} from '../../../components/modals/BaseLayerModal'
 
-import BaseSlotInputItem from '../list/BaseSlotInputItem'
+import BaseSlotInputItem from '../../../components/list/BaseSlotInputItem'
 import { Box } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { constants } from 'ethers'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { UsersThree } from 'phosphor-react'
 
 type RecipientsModalProps = BaseLayerModalProps & {
     recipientAddresses: RichSlotModel[]
@@ -18,11 +21,12 @@ const RecipientsModal = ({
 }: RecipientsModalProps) => {
     return (
         <BaseLayerModal {...rest}>
-            <HeaderTextSection
+            <ModalHeader
+                icon={<UsersThree />}
                 title="Recipients"
-                paragraph="The following addresses are eligible to collect tokens based on outcomes."
+                description="The following addresses are eligible to collect tokens based on outcomes."
             />
-            <Box gap="medium" fill>
+            <Box gap="medium">
                 {recipientAddresses.map((recipientAddress, idx) => {
                     const decodedAddress = decodeData(
                         [SolidityDataTypes.Address],

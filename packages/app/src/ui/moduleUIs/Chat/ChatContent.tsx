@@ -22,7 +22,7 @@ const ChatContent = ({ messages, currentUser }: ChatContentProps) => {
             flex
             elevation="small"
             background="background-contrast"
-            round="small"
+            round="xsmall"
             overflow={{ vertical: 'auto' }}
         >
             {messages.length === 0 ? (

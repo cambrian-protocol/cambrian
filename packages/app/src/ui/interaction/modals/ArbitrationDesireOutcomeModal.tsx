@@ -1,17 +1,17 @@
 import { SetStateAction, useState } from 'react'
 
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from './ErrorPopupModal'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { TreeStructure } from 'phosphor-react'
 
 interface ArbitrationDesireOutcomeModalProps {
     solverAddress: string
@@ -64,9 +64,11 @@ const ArbitrationDesireOutcomeModal = ({
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection
-                    title={'Arbitration'}
-                    paragraph="Please select your desired outcome"
+                <ModalHeader
+                    icon={<TreeStructure />}
+                    metaInfo="Arbitration"
+                    title="Propose an outcome"
+                    description="Please select your desired outcome."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {solverData.outcomeCollections[

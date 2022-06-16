@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { CircleDashed } from 'phosphor-react'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import StoredIdItem from '../list/StoredIdItem'
+import HeaderTextSection from '../../../components/sections/HeaderTextSection'
+import StoredIdItem from '../../../components/list/StoredIdItem'
 import { Text } from 'grommet'
 import { loadIdsFromLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 

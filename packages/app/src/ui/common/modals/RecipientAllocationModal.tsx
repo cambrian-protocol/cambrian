@@ -1,11 +1,12 @@
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
-import BaseLayerModal from './BaseLayerModal'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import RecipientAllocationItem from '../list/RecipientAllocationItem'
+import RecipientAllocationItem from '../../../components/list/RecipientAllocationItem'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { Coins } from 'phosphor-react'
 
 interface RecipientAllocationModalProps {
     onClose: () => void
@@ -20,12 +21,12 @@ const RecipientAllocationModal = ({
 }: RecipientAllocationModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
-            <HeaderTextSection
-                title={'Token Distribution'}
-                subTitle={'Who gets what?'}
-                paragraph={'Payouts when the selected outcome is confirmed.'}
+            <ModalHeader
+                icon={<Coins />}
+                title="Token Allocation"
+                description="Payouts when the selected outcome is confirmed."
             />
-            <Box gap="medium" fill>
+            <Box gap="medium" height={{ min: 'auto' }}>
                 {allocations.map((allocation, idx) => {
                     const decodedAddress = decodeData(
                         [SolidityDataTypes.Address],

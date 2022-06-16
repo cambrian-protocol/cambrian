@@ -1,21 +1,22 @@
 import { SetStateAction, useState } from 'react'
 
-import BaseAvatar from '../avatars/BaseAvatar'
-import BaseLayerModal from './BaseLayerModal'
+import BaseAvatar from '../../../components/avatars/BaseAvatar'
+import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { CardHeader } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from './ErrorPopupModal'
-import HeaderTextSection from '../sections/HeaderTextSection'
-import OutcomeCollectionCard from '../cards/OutcomeCollectionCard'
+import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getSolverRecipientAddressHashmap } from '../solver/SolverHelpers'
+import { getSolverRecipientAddressHashmap } from '../../../components/solver/SolverHelpers'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import { Scales } from 'phosphor-react'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void
@@ -61,10 +62,11 @@ const ArbitrateDesiredOutcomeModal = ({
     return (
         <>
             <BaseLayerModal onBack={onBack}>
-                <HeaderTextSection
-                    subTitle="Arbitration"
-                    title={'Pick the arbitrated outcome'}
-                    paragraph="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
+                <ModalHeader
+                    icon={<Scales />}
+                    metaInfo="Arbitration"
+                    title="Report an outcome"
+                    description="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     {dispute.disputers.map((disputer, idx) => {
@@ -84,7 +86,7 @@ const ArbitrateDesiredOutcomeModal = ({
                                     token={solverData.collateralToken}
                                     key={idx}
                                     outcomeCollection={outcomeCollection}
-                                    onArbitrate={onArbitrate}
+                                    onArbitrate={(indexSet) => onArbitrate(idx)} // Use index of this choice rather than the indexSet
                                     proposedIndexSet={isArbitrating}
                                     cardHeader={
                                         <CardHeader

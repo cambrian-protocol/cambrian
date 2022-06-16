@@ -1,7 +1,7 @@
 import { TreeStructure, Warning } from 'phosphor-react'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
-import OutcomeDetailModal from '../modals/OutcomeDetailModal'
+import OutcomeDetailModal from '@cambrian/app/ui/common/modals/OutcomeDetailModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { useState } from 'react'
 
