@@ -1,4 +1,4 @@
-import { Box, Card, CardBody } from 'grommet'
+import { Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
@@ -14,6 +14,7 @@ type OutcomeCollectionCardProps = {
     outcomeCollection: OutcomeCollectionModel
     token: TokenModel
     proposedIndexSet?: number
+    itemKey?: number // Necessary for arbitrating choice index instead of indexSet
     cardHeader?: JSX.Element
 } & (
     | { onPropose?: (indexSet: number) => Promise<void>; onArbitrate?: never }
@@ -28,6 +29,7 @@ const OutcomeCollectionCard = ({
     onArbitrate,
     proposedIndexSet,
     cardHeader,
+    itemKey,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -38,7 +40,10 @@ const OutcomeCollectionCard = ({
         <>
             <Card background="background-contrast-hover" border={border}>
                 {cardHeader && cardHeader}
-                <CardBody pad={{ vertical: 'small', horizontal: 'medium' }}>
+                <CardBody
+                    pad={{ vertical: 'small', horizontal: 'medium' }}
+                    gap="small"
+                >
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
@@ -49,36 +54,36 @@ const OutcomeCollectionCard = ({
                         onClick={toggleShowAllocationModal}
                     />
                     {onPropose && (
-                        <Box pad="small" gap="small">
-                            <LoaderButton
-                                primary
-                                disabled={proposedIndexSet !== undefined}
-                                isLoading={
-                                    proposedIndexSet ===
-                                    outcomeCollection.indexSet
-                                }
-                                onClick={() =>
-                                    onPropose(outcomeCollection.indexSet)
-                                }
-                                label="Propose Outcome"
-                            />
-                        </Box>
+                        <LoaderButton
+                            primary
+                            disabled={proposedIndexSet !== undefined}
+                            isLoading={
+                                itemKey !== undefined
+                                    ? itemKey === proposedIndexSet
+                                    : proposedIndexSet ===
+                                      outcomeCollection.indexSet
+                            }
+                            onClick={() =>
+                                onPropose(outcomeCollection.indexSet)
+                            }
+                            label="Propose Outcome"
+                        />
                     )}
                     {onArbitrate && (
-                        <Box gap="small" pad={{ top: 'small' }}>
-                            <LoaderButton
-                                primary
-                                disabled={proposedIndexSet !== undefined}
-                                isLoading={
-                                    proposedIndexSet ===
-                                    outcomeCollection.indexSet
-                                }
-                                onClick={() =>
-                                    onArbitrate(outcomeCollection.indexSet)
-                                }
-                                label="Report Outcome"
-                            />
-                        </Box>
+                        <LoaderButton
+                            primary
+                            disabled={proposedIndexSet !== undefined}
+                            isLoading={
+                                itemKey !== undefined
+                                    ? itemKey === proposedIndexSet
+                                    : proposedIndexSet ===
+                                      outcomeCollection.indexSet
+                            }
+                            onClick={() =>
+                                onArbitrate(outcomeCollection.indexSet)
+                            }
+                            label="Report Outcome"
+                        />
                     )}
                 </CardBody>
             </Card>

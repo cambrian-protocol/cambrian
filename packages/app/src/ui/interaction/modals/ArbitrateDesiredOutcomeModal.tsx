@@ -7,7 +7,9 @@ import { CardHeader } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
+import { Scales } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
@@ -15,8 +17,6 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { getSolverRecipientAddressHashmap } from '../../../components/solver/SolverHelpers'
-import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { Scales } from 'phosphor-react'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void
@@ -86,6 +86,7 @@ const ArbitrateDesiredOutcomeModal = ({
                                     token={solverData.collateralToken}
                                     key={idx}
                                     outcomeCollection={outcomeCollection}
+                                    itemKey={idx} // Index needs to be passed separately to set the right Loader
                                     onArbitrate={(indexSet) => onArbitrate(idx)} // Use index of this choice rather than the indexSet
                                     proposedIndexSet={isArbitrating}
                                     cardHeader={
