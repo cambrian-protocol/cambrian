@@ -10,3 +10,10 @@ export type OutcomeCollectionModel = {
 export type OutcomeCollectionsHashMapType = {
     [conditionId: string]: OutcomeCollectionModel[]
 }
+
+/* Composer explicit Types */
+
+export type ComposerOutcomeCollectionModel = {
+    id: string
+    outcomes: OutcomeModel[]
+}

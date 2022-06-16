@@ -1,27 +1,20 @@
-import { Box, Heading } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import React, { useEffect, useState } from 'react'
-import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
+import React, { SetStateAction, useEffect, useState } from 'react'
 
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Button } from 'grommet'
 import FundProposalForm from './forms/FundProposalForm'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
-import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import ProposalContextHeader from './ProposalContextHeader'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import Link from 'next/link'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import SidebarComponentContainer from '@cambrian/app/components/containers/SidebarComponentContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { useRouter } from 'next/router'
 
 interface ProposalUIProps {
+    isProposalExecuted?: boolean
+    setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
     proposal: ethers.Contract
     proposalsHub: ProposalsHub
     currentUser: UserType
@@ -31,24 +24,18 @@ const ProposalUI = ({
     proposalsHub,
     proposal,
     currentUser,
+    isProposalExecuted,
+    setIsProposalExecuted,
 }: ProposalUIProps) => {
-    const [metaStages, setMetaStages] = useState<Stages>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
-    const router = useRouter()
-
-    useEffect(() => {
-        initProposalStatus()
-        initMetaData()
-    }, [])
+    const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
 
     useEffect(() => {
         if (isProposalExecuted) {
-            pushToSolver()
+            initSolver()
         }
     }, [isProposalExecuted])
 
-    const pushToSolver = async () => {
+    const initSolver = async () => {
         if (currentUser.chainId && currentUser.signer) {
             try {
                 const ipfsSolutionsHub = new IPFSSolutionsHub(
@@ -59,72 +46,45 @@ const ProposalUI = ({
                     proposal.solutionId
                 )
                 if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
-                router.push(`/solvers/${solvers[0]}`)
+                setFirstSolverAddress(solvers[0])
             } catch (e) {
                 cpLogger.push(e)
             }
         }
     }
 
-    const initProposalStatus = async () => {
-        try {
-            setIsProposalExecuted(await proposal.isExecuted)
-        } catch (e) {
-            cpLogger.push(e)
-        }
-    }
-
-    const initMetaData = async () => {
-        try {
-            if (!proposal.metadataCID) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const metadataCIDString = getMultihashFromBytes32(
-                proposal.metadataCID
-            )
-
-            if (!metadataCIDString) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const stagehand = new Stagehand()
-            const stages = await stagehand.loadStages(
-                metadataCIDString,
-                StageNames.proposal
-            )
-
-            if (!stages) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
-
-            setMetaStages(stages)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-    }
-
     return (
-        <Box align="center">
-            {metaStages ? (
-                <Box gap="medium" pad="medium" width={{ max: 'large' }}>
-                    <Heading level="2">Proposal Funding</Heading>
-                    <ProposalContextHeader
-                        proposal={metaStages.proposal as ProposalModel}
-                        template={metaStages.template as TemplateModel}
-                    />
+        <BaseFormGroupContainer
+            groupTitle="Status"
+            border
+            pad={{ horizontal: 'medium' }}
+        >
+            {isProposalExecuted ? (
+                <SidebarComponentContainer
+                    title="Interaction"
+                    description="This Proposal has been funded and executed. To start
+                    working with this Solution visit the first Solver"
+                >
+                    {firstSolverAddress && (
+                        <Link href={`/solvers/${firstSolverAddress}`} passHref>
+                            <Button primary size="small" label="Go to Solver" />
+                        </Link>
+                    )}
+                </SidebarComponentContainer>
+            ) : (
+                <SidebarComponentContainer
+                    title="Fund this Proposal"
+                    description="If you agree to the conditions, you can approve access to the agreed token and fund this proposal. You can withdraw your invested funds anytime before the proposal has been executed."
+                >
                     <FundProposalForm
                         currentUser={currentUser}
-                        metaStages={metaStages}
                         proposalsHub={proposalsHub}
                         proposal={proposal}
                         setIsProposalExecuted={setIsProposalExecuted}
                     />
-                    <Box pad="medium" />
-                </Box>
-            ) : errorMessage ? (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
-            ) : (
-                <LoadingScreen context={LOADING_MESSAGE['METADATA']} />
+                </SidebarComponentContainer>
             )}
-        </Box>
+        </BaseFormGroupContainer>
     )
 }
 

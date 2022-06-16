@@ -11,7 +11,12 @@ interface MultiStepFormNavProps {
 
 const MultiStepFormNav = ({ backward, submitForm }: MultiStepFormNavProps) => {
     return (
-        <Box direction="row" justify="between" pad="xsmall">
+        <Box
+            direction="row"
+            justify="between"
+            gap="small"
+            pad={{ top: 'large' }}
+        >
             {backward ? (
                 <Button
                     disabled={submitForm && submitForm.isLoading}

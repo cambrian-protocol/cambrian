@@ -1,33 +1,45 @@
 import { Anchor, Box, Button, Heading, Paragraph } from 'grommet'
 
 import { ERC20_IFACE } from '../config/ContractInterfaces'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { SUPPORTED_CHAINS } from '../config/SupportedChains'
 import { ethers } from 'ethers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import { SUPPORTED_CHAINS } from '../config/SupportedChains'
+import { useState } from 'react'
 
 export default function MintToy() {
     const { currentUser } = useCurrentUser()
+    const [isMinting, setIsMinting] = useState(false)
 
     const onMintTOY = async () => {
-        if (!currentUser.signer || !currentUser.chainId)
-            throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
+        setIsMinting(true)
+        try {
+            if (!currentUser.signer || !currentUser.chainId)
+                throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
 
-        const chainData = SUPPORTED_CHAINS[currentUser.chainId]
-        if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
+            const chainData = SUPPORTED_CHAINS[currentUser.chainId]
+            if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
 
-        const ToyToken = new ethers.Contract(
-            chainData.contracts.toyToken,
-            ERC20_IFACE,
-            currentUser.signer
-        )
-        await ToyToken.mint(currentUser.address, '1000000000000000000000')
+            const ToyToken = new ethers.Contract(
+                chainData.contracts.toyToken,
+                ERC20_IFACE,
+                currentUser.signer
+            )
+            await ToyToken.mint(currentUser.address, '1000000000000000000000')
+        } catch (e) {}
+        setIsMinting(false)
     }
 
     return (
         <PageLayout contextTitle="Mint Toy">
-            <section id="mintToy">
+            <Box
+                height={{ min: '90vh' }}
+                justify="center"
+                align="center"
+                id="mintToy"
+            >
                 <Box width="large" align="center">
                     <Heading
                         level="3"
@@ -40,7 +52,6 @@ export default function MintToy() {
                         purposes that anybody can mint. Get yours now!
                     </Paragraph>
                 </Box>
-
                 <Box
                     width="large"
                     align="center"
@@ -49,6 +60,7 @@ export default function MintToy() {
                     margin={{ top: 'large' }}
                 >
                     <Anchor
+                        color="brand"
                         size="large"
                         target="_blank"
                         href="https://ropsten.etherscan.io/address/0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79"
@@ -56,6 +68,7 @@ export default function MintToy() {
                         Etherscan
                     </Anchor>
                     <Anchor
+                        color="brand"
                         size="large"
                         target="_blank"
                         href="https://github.com/cambrian-protocol/cambrian/blob/main/packages/core/contracts/ToyToken.sol"
@@ -65,9 +78,14 @@ export default function MintToy() {
                 </Box>
 
                 <Box width="large" align="center" margin={{ top: 'large' }}>
-                    <Button primary label="Mint" onClick={() => onMintTOY()} />
+                    <LoaderButton
+                        isLoading={isMinting}
+                        primary
+                        label="Mint"
+                        onClick={() => onMintTOY()}
+                    />
                 </Box>
-            </section>
+            </Box>
         </PageLayout>
     )
 }

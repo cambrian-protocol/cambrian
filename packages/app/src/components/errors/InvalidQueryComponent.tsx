@@ -7,11 +7,11 @@ interface InvalidQueryComponentProps {
 }
 
 const InvalidQueryComponent = ({ context }: InvalidQueryComponentProps) => (
-    <Box width="large">
+    <Box width="large" height={{ min: '90vh' }} pad="large" alignSelf="center">
         <HeaderTextSection
             subTitle={`Nothing found at provided identifier`}
             title="Looks empty here"
-            paragraph={`Please double check the ${context} identifier, try again, or check with the ${context} creator if the ${context} was successfully exported.`}
+            paragraph={`Please double check the ${context} identifier and the chain you're connected with, try again, or check with the ${context} creator if the ${context} was successfully exported.`}
             icon={<CircleDashed />}
         />
     </Box>

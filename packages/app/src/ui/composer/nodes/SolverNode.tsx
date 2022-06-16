@@ -1,5 +1,6 @@
 import {
     ArrowSquareIn,
+    Plug,
     PuzzlePiece,
     TreeStructure,
     UsersThree,
@@ -29,7 +30,7 @@ export const SolverNode = memo((props: FlowElement) => {
             <Box
                 background="primary-gradient"
                 pad="medium"
-                round="small"
+                round="xsmall"
                 width={{ min: 'small' }}
                 gap="small"
             >
@@ -73,6 +74,15 @@ export const SolverNode = memo((props: FlowElement) => {
                             {currentSolverNode &&
                                 Object.keys(currentSolverNode.config.slots)
                                     .length}
+                        </Text>
+                    </Box>
+                    <Box direction="row" gap="small">
+                        <Plug color="white" size="18" />
+                        <Text color="white" size="small">
+                            Modules
+                        </Text>
+                        <Text color="white" size="small">
+                            {currentSolverNode?.config.modules?.length || 0}
                         </Text>
                     </Box>
                 </Box>

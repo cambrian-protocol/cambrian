@@ -7,7 +7,12 @@ import { SmileyXEyes } from 'phosphor-react'
 const Custom404Page = () => {
     return (
         <PageLayout contextTitle="404 Page not found">
-            <Box justify="center" align="center" gap="small">
+            <Box
+                justify="center"
+                align="center"
+                gap="small"
+                height={{ min: '90vh' }}
+            >
                 <SmileyXEyes size="32" />
                 <Text>404 - Page not found</Text>
                 <Link href="/">

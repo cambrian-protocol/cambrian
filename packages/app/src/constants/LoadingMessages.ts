@@ -6,4 +6,5 @@ export const LOADING_MESSAGE = {
     COMPOSITION: 'Loading Composition',
     TEMPLATE: 'Loading Template',
     PROPOSAL: 'Loading Proposal',
+    MODULE: 'Loading Module',
 }

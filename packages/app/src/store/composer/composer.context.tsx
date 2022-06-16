@@ -1,7 +1,3 @@
-import {
-    ComposerIdPathType,
-    ComposerSolverModel,
-} from '@cambrian/app/models/SolverModel'
 import React, {
     PropsWithChildren,
     useEffect,
@@ -10,9 +6,10 @@ import React, {
 } from 'react'
 
 import { ComposerAction } from './composer.types'
+import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
+import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeModel'
 import { composerReducer } from './composer.reducer'
 import initialComposer from './composer.init'
 
@@ -21,7 +18,7 @@ type ComposerContextOptions = {
     dispatch: React.Dispatch<ComposerAction>
     currentIdPath?: ComposerIdPathType
     currentSolver?: ComposerSolver
-    currentOutcomeCollection?: OutcomeCollectionModel
+    currentOutcomeCollection?: ComposerOutcomeCollectionModel
 }
 
 const ComposerContext = React.createContext<ComposerContextOptions>({
@@ -38,7 +35,7 @@ const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
     const [currentIdPath, setCurrentIdPath] = useState<ComposerIdPathType>()
     const [currentSolver, setCurrentSolver] = useState<ComposerSolver>()
     const [currentOutcomeCollection, setCurrentOutcomeCollection] =
-        useState<OutcomeCollectionModel>()
+        useState<ComposerOutcomeCollectionModel>()
 
     useEffect(() => {
         // Keeps track which Solver and OutcomeSelection is selected
@@ -58,7 +55,7 @@ const ComposerContextProvider = (props: PropsWithChildren<{}>) => {
             ) {
                 setCurrentOutcomeCollection(
                     currentSolver?.config.condition.partition.find(
-                        (oc: OutcomeCollectionModel) =>
+                        (oc: ComposerOutcomeCollectionModel) =>
                             oc.id === composer.currentIdPath?.ocId
                     )
                 )

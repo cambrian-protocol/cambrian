@@ -125,7 +125,13 @@ const CreateTemplatePaymentStep = ({
     ) => {
         e.preventDefault()
         setInput({ ...input, ...paymentInput })
-        if (input.flexInputs.length > 0) {
+
+        // Filter out Collateral Token - as this FlexInput is handled by its own
+        const filteredFlexInputs = input.flexInputs.filter(
+            (flexInput) => flexInput.id !== 'collateralToken'
+        )
+
+        if (filteredFlexInputs.length > 0) {
             stepperCallback(CREATE_TEMPLATE_STEPS.FLEX_INPUTS)
         } else {
             stepperCallback(CREATE_TEMPLATE_STEPS.NOTIFICATION)
@@ -153,7 +159,8 @@ const CreateTemplatePaymentStep = ({
             >
                 <HeaderTextSection
                     subTitle={`${3}/${input.flexInputs.length > 0 ? 5 : 4}`}
-                    title="Interesting.. and how much will that cost?"
+                    title="How much does it cost?"
+                    paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                 />
                 <Box gap="medium">
                     <>

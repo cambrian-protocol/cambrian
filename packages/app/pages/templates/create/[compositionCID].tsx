@@ -48,25 +48,23 @@ export default function CreateTemplatePage() {
 
     return (
         <>
-            <PageLayout contextTitle="Create Template">
-                <Box alignSelf="center">
-                    {currentComposition ? (
+            {currentComposition ? (
+                <PageLayout contextTitle="Create Template">
+                    <Box alignSelf="center">
                         <CreateTemplateUI
                             composition={currentComposition}
                             compositionCID={compositionCID as string}
                             setErrorMessage={setErrorMessage}
                         />
-                    ) : showInvalidQueryComponent ? (
-                        <InvalidQueryComponent
-                            context={StageNames.composition}
-                        />
-                    ) : (
-                        <LoadingScreen
-                            context={LOADING_MESSAGE['COMPOSITION']}
-                        />
-                    )}
-                </Box>
-            </PageLayout>
+                    </Box>
+                </PageLayout>
+            ) : showInvalidQueryComponent ? (
+                <PageLayout contextTitle="Create Template">
+                    <InvalidQueryComponent context={StageNames.composition} />
+                </PageLayout>
+            ) : (
+                <LoadingScreen context={LOADING_MESSAGE['COMPOSITION']} />
+            )}
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}

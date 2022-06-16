@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Solver.sol";
 import "../interfaces/ISolver.sol";
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolverFactory.sol";
+import "../interfaces/IModule.sol";
+import "../modules/Modulated.sol";
 import "../FullMath.sol";
 
 library SolverLib {
@@ -59,7 +61,7 @@ library SolverLib {
         address keeper; // Keeper address
         address arbitrator; // Arbitrator address
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
-        bytes data; // Arbitrary data
+        Modulated.Loader[] moduleLoaders; // Arbitrary data
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
         ConditionBase conditionBase; // Base to create conditions from
     }
@@ -282,7 +284,7 @@ library SolverLib {
         reportPayouts(ctfAddress, condition);
     }
 
-    function arbitrationRequested(Condition storage condition) public {
+    function requestArbitration(Condition storage condition) public {
         condition.status = Status.ArbitrationRequested;
         emit ChangedStatus(condition.conditionId);
     }

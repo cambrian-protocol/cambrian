@@ -6,7 +6,9 @@ import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { ethers } from 'ethers'
+import { parseBytes32String } from 'ethers/lib/utils'
 
 export const calculatePositionId = (
     collateralTokenAddress: string,
@@ -79,13 +81,40 @@ export const getSolverRecipientSlots = (
     )
 }
 
-export const getManualInputs = (
+export const getSolverRecipientAddressHashmap = (
     solverData: SolverModel,
     condition: SolverContractCondition
-): RichSlotModel[] =>
-    Object.values(solverData.slotsHistory[condition.conditionId]).filter(
-        (slot) => slot.slot.ingestType === SlotType.Manual
-    )
+) => {
+    const recipientSlotArray = getSolverRecipientSlots(solverData, condition)
+
+    const recipientAddressHashmap: {
+        [recipientAddress: string]: RichSlotModel
+    } = {}
+
+    recipientSlotArray.forEach((recipientSlot) => {
+        const decodedAddress = decodeData(
+            [SolidityDataTypes.Address],
+            recipientSlot.slot.data
+        )
+        recipientAddressHashmap[decodedAddress] = recipientSlot
+    })
+
+    return recipientAddressHashmap
+}
+
+export const getManualInputs = (solverData: SolverModel): RichSlotModel[] => {
+    if (!solverData.slotTags) return []
+
+    return solverData.config.ingests
+        .filter((ingest) => ingest.ingestType === SlotType.Manual)
+        .map((ingest) => {
+            const slotId = parseBytes32String(ingest.slot)
+            return {
+                slot: ingest,
+                tag: solverData.slotTags![slotId],
+            }
+        })
+}
 
 export const getManualSlots = (solverData: SolverModel): RichSlotModel[] => {
     return solverData.config.ingests.reduce(

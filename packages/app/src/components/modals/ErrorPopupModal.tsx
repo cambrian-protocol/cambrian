@@ -13,14 +13,14 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
     return (
         <Layer
             onEsc={onClose}
-            background={'background-popup'}
+            background={'background-contrast'}
             responsive={false}
         >
             <Box
                 width={{ min: 'auto', max: 'large' }}
                 pad="small"
                 border
-                round="small"
+                round="xsmall"
             >
                 <Box direction="row">
                     <Box onClick={onClose} pad="small" focusIndicator={false}>

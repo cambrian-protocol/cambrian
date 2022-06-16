@@ -9,7 +9,7 @@ import { Box } from 'grommet'
 import { Button } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import MultiStepFormLayout from '@cambrian/app/components/layout/MultiStepFormLayout'
-import RecentExportsModal from '@cambrian/app/components/modals/RecentExportsModal'
+import RecentExportsModal from '@cambrian/app/ui/common/modals/RecentExportsModal'
 import { useState } from 'react'
 
 interface CreateTemplateStartStepProps {
@@ -61,17 +61,17 @@ const CreateTemplateStartStep = ({
                 }
             >
                 <HeaderTextSection
-                    title="Let's do something!"
-                    subTitle={`Configure a shareable template in ${
+                    title="Create a Listing"
+                    subTitle={`${
                         input.flexInputs.length > 0 ? 5 : 4
-                    } steps`}
-                    paragraph="The blueprint you're using may require some inputs be completed. Inputs you do not complete will be completed by the customer."
+                    } steps to create and list your service`}
+                    paragraph="Describe your service, customize your listing, and configure the Solver that will manage your jobs."
                 />
             </MultiStepFormLayout>
             {showRecentTemplatesModal && (
                 <RecentExportsModal
                     prefix="templates"
-                    route="/templates/"
+                    route={`${window.location.origin}/templates/`}
                     keyCID={compositionCID as string}
                     title="Recent templates"
                     subTitle="Distribute on of your"

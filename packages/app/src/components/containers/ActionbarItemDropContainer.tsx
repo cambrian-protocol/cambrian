@@ -1,6 +1,5 @@
-import { IconContext, UsersThree } from 'phosphor-react'
-
 import { Box } from 'grommet'
+import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
 
 interface ActionbarItemDropContainerProps {

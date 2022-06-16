@@ -1,31 +1,33 @@
-import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
+import { Box, Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
-import BaseMenuListItem from '../buttons/BaseMenuListItem'
+import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Coins } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import OutcomeListItem from '../buttons/OutcomeListItem'
-import RecipientAllocationModal from '../modals/RecipientAllocationModal'
+import OutcomeListItem from '../list/OutcomeListItem'
+import RecipientAllocationModal from '@cambrian/app/ui/common/modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionCardProps = {
-    idx?: number
+    border?: boolean // To higlight report
     outcomeCollection: OutcomeCollectionModel
     token: TokenModel
     proposedIndexSet?: number
+    cardHeader?: JSX.Element
 } & (
     | { onPropose?: (indexSet: number) => Promise<void>; onArbitrate?: never }
     | { onArbitrate?: (indexSet: number) => Promise<void>; onPropose?: never }
 )
 
 const OutcomeCollectionCard = ({
-    idx,
+    border,
     outcomeCollection,
     token,
     onPropose,
     onArbitrate,
     proposedIndexSet,
+    cardHeader,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -34,19 +36,13 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-contrast">
-                <CardHeader
-                    pad="medium"
-                    elevation="small"
-                    background="background-contrast"
-                >
-                    <Text truncate>Outcome {idx && `#${idx}`}</Text>
-                </CardHeader>
+            <Card background="background-contrast-hover" border={border}>
+                {cardHeader && cardHeader}
                 <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         hideDivider
                         title="Allocation"
                         icon={<Coins />}

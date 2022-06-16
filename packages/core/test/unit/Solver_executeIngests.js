@@ -83,7 +83,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests,
         conditionBase: this.conditionBase,
       },
@@ -135,7 +135,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests,
         conditionBase: this.conditionBase,
       },
@@ -144,7 +144,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests,
         conditionBase: this.conditionBase,
       },
@@ -193,7 +193,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests,
         conditionBase: this.conditionBase,
       },
@@ -202,7 +202,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests,
         conditionBase: this.conditionBase,
       },
@@ -225,50 +225,6 @@ describe("Solver.sol | executeIngests", function () {
     );
   });
 
-  it("Creates callbacks for callback ingests", async function () {
-    const solverConfigs = [
-      {
-        implementation: this.Solver.address,
-        keeper: this.keeper.address,
-        arbitrator: this.arbitrator.address,
-        timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
-        ingests: [],
-        conditionBase: this.conditionBase,
-      },
-      {
-        implementation: this.Solver.address,
-        keeper: this.keeper.address,
-        arbitrator: this.arbitrator.address,
-        timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
-        ingests: [
-          {
-            executions: 0,
-            ingestType: 0,
-            slot: ethers.utils.formatBytes32String("0"),
-            solverIndex: 0,
-            data: ethers.utils.formatBytes32String("0"),
-          },
-        ],
-        conditionBase: this.conditionBase,
-      },
-    ];
-
-    const solvers = await testHelpers.deploySolverChain(
-      solverConfigs,
-      this.SolverFactory,
-      this.keeper
-    );
-
-    await solvers[0].connect(this.keeper).prepareSolve(0); // calls executeIngests
-    expect(
-      await solvers[0]
-        .connect(this.user1)
-        .getOutgoingCallbacks(ethers.utils.formatBytes32String("0"))
-    ).to.eql([solvers[1].address]);
-  });
-
   it("Ingests callback ingests", async function () {
     const solverConfigs = [
       {
@@ -276,7 +232,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -293,7 +249,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,
@@ -336,7 +292,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [],
         conditionBase: this.conditionBase,
       },
@@ -345,7 +301,7 @@ describe("Solver.sol | executeIngests", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: [
           {
             executions: 0,

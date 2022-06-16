@@ -45,9 +45,9 @@ export default function CreateProposalPage() {
 
     return (
         <>
-            <PageLayout contextTitle="Create Proposal">
-                <Box alignSelf="center">
-                    {metaStages ? (
+            {metaStages ? (
+                <PageLayout contextTitle="Create Proposal">
+                    <Box alignSelf="center">
                         <CreateProposalUI
                             composition={
                                 metaStages.composition as CompositionModel
@@ -56,13 +56,17 @@ export default function CreateProposalPage() {
                             templateCID={templateCID as string}
                             setErrorMessage={setErrorMessage}
                         />
-                    ) : showInvalidQueryComponent ? (
-                        <InvalidQueryComponent context={StageNames.template} />
-                    ) : (
-                        <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
-                    )}
-                </Box>
-            </PageLayout>
+                    </Box>
+                </PageLayout>
+            ) : showInvalidQueryComponent ? (
+                <PageLayout contextTitle="Create Proposal">
+                    <Box alignSelf="center">
+                        <InvalidQueryComponent context={StageNames.template} />{' '}
+                    </Box>
+                </PageLayout>
+            ) : (
+                <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
+            )}
             {errorMessage && (
                 <ErrorPopupModal
                     onClose={() => setErrorMessage(undefined)}

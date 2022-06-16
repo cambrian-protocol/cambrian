@@ -1,5 +1,6 @@
 import { FlowElement, Node } from 'react-flow-renderer'
 
+import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '../../models/CompositionModel'
 import { CreateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/CreateRecipientForm'
@@ -9,14 +10,12 @@ import { SelectRecipientType } from '@cambrian/app/components/selects/SelectReci
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
 import { SlotTagFormFieldsType } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
-import { SolverCoreDataInputType } from '@cambrian/app/ui/composer/controls/solver/general/ComposerSolverCoreDataInputControl'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { UpdateRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/UpdateRecipientForm'
 
 export type ComposerAction =
     | UpdateSelectionActionType
-    | UpdateSolverDataActionType
     | UpdateSolverMainConfigActionType
     | AttachNewOutcomeCollectionActionType
     | OutcomeCollectionActionType
@@ -37,6 +36,9 @@ export type ComposerAction =
     | UpdateSolutionSettingsActionType
     | UpdateSolverTagActionType
     | UpdateSlotTagActionType
+    | AddModuleActionType
+    | UpdateModuleActionType
+    | DeleteModuleActionType
 
 type UpdateSolverTagActionType = {
     type: 'UPDATE_SOLVER_TAG'
@@ -56,9 +58,19 @@ type LoadComposerAction = {
     payload: CompositionModel
 }
 
-type UpdateSolverDataActionType = {
-    type: 'UPDATE_SOLVER_DATA'
-    payload: SolverCoreDataInputType[]
+type AddModuleActionType = {
+    type: 'ADD_MODULE'
+    payload: ComposerModuleModel
+}
+
+type UpdateModuleActionType = {
+    type: 'UPDATE_MODULE'
+    payload: ComposerModuleModel
+}
+
+type DeleteModuleActionType = {
+    type: 'DELETE_MODULE'
+    payload: { key: string }
 }
 
 type UpdateSolverMainConfigActionType = {

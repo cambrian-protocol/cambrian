@@ -1,6 +1,7 @@
 import { GENERAL_ERROR } from '../constants/ErrorMessages'
 import { IPFS_SOLUTIONS_HUB_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { SolutionModel } from '../models/SolutionModel'
 import { ethers } from 'ethers'
 
 export default class IPFSSolutionsHub {
@@ -22,5 +23,11 @@ export default class IPFSSolutionsHub {
 
     getSolvers = async (solutionId: string): Promise<string[] | undefined> => {
         return await this.contract.getSolvers(solutionId)
+    }
+
+    getSolution = async (
+        solutionId: string
+    ): Promise<SolutionModel | undefined> => {
+        return await this.contract.getSolution(solutionId)
     }
 }

@@ -37,7 +37,7 @@ const CreateProposalUI = ({
                 <ExportSuccessModal
                     keyId={templateCID}
                     prefix="proposals"
-                    link="/proposals/"
+                    link={`${window.location.origin}/proposals/`}
                     description="This is your Proposal ID. Share it with your community and fund the proposal."
                     title="Proposal created"
                     onClose={toggleShowSuccessModal}

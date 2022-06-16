@@ -130,7 +130,7 @@ describe("IPFSSolutionsHub", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests,
         conditionBase,
       ],
@@ -194,7 +194,6 @@ describe("IPFSSolutionsHub", function () {
       ethers.provider
     );
 
-    await solver.connect(this.keeper).executeSolve(0);
     await solver.connect(this.keeper).proposePayouts(0, [1, 0]);
     await solver.connect(this.keeper).confirmPayouts(0);
 

@@ -71,8 +71,8 @@ const CreateTemplateFlexInputStep = ({
             >
                 <HeaderTextSection
                     subTitle={`${4}/${5}`}
-                    title="Fair price. Anything here we know already?"
-                    paragraph="Leave empty if something here will be defined by your client or partner."
+                    title="Solver Config"
+                    paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
                 />
                 {renderFlexInputs(input.flexInputs, composition.solvers)}
             </MultiStepFormLayout>

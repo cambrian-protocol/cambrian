@@ -14,8 +14,6 @@ import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
 import { ulid } from 'ulid'
 
-const Hash = require('ipfs-only-hash')
-
 export default class ProposalsHub {
     contract: ethers.Contract
     signerOrProvider: ethers.Signer
@@ -38,6 +36,7 @@ export default class ProposalsHub {
         collateralToken: TokenModel,
         price: number,
         solverConfigs: SolverConfigModel[],
+        solverConfigsCID: string,
         proposalCID: string
     ) => {
         const weiPrice = ethers.utils.parseUnits(
@@ -45,7 +44,6 @@ export default class ProposalsHub {
             collateralToken.decimals
         )
 
-        const solverConfigsHash = await Hash.of(JSON.stringify(solverConfigs))
         const tx: ethers.ContractTransaction =
             await this.contract.createIPFSSolutionAndProposal(
                 ethers.utils.formatBytes32String(ulid()),
@@ -53,7 +51,7 @@ export default class ProposalsHub {
                 SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
-                getBytes32FromMultihash(solverConfigsHash),
+                getBytes32FromMultihash(solverConfigsCID),
                 getBytes32FromMultihash(proposalCID)
             )
 

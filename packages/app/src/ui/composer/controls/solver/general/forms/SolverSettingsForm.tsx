@@ -23,7 +23,6 @@ interface SolverSettingsFormProps {
 }
 
 type SolverSettingsFormType = {
-    implementation: string
     keeperAddress: string
     arbitratorAddress: string
     timelockDays: number
@@ -32,7 +31,6 @@ type SolverSettingsFormType = {
 }
 
 const initialSolverSettingsInput: SolverSettingsFormType = {
-    implementation: '',
     keeperAddress: '',
     arbitratorAddress: '',
     timelockDays: 0,
@@ -59,7 +57,6 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
             ? parseSecondsToForm(solver.config.timelockSeconds)
             : { weeks: 0, days: 0, hours: 0, minutes: 0 }
         setInput({
-            implementation: solver.config.implementation || '',
             keeperAddress: solver.config.keeperAddress,
             arbitratorAddress: solver.config.arbitratorAddress,
             timelockDays: parsedSeconds.days,
@@ -75,7 +72,6 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
         dispatch({
             type: 'UPDATE_SOLVER_MAIN_CONFIG',
             payload: {
-                implementation: input.implementation,
                 arbitratorAddress: input.arbitratorAddress,
                 keeperAddress: input.keeperAddress,
                 timelockSeconds: parseInputToSeconds({
@@ -87,7 +83,6 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
         })
 
         setInput({
-            implementation: input.implementation,
             keeperAddress: input.keeperAddress,
             arbitratorAddress: input.arbitratorAddress,
             timelockDays: input.timelockDays,
@@ -146,12 +141,6 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
                                 </FormField>
                             </Box>
                         }
-                    />
-                </BaseFormGroupContainer>
-                <BaseFormGroupContainer>
-                    <FormField
-                        name="implementation"
-                        label="Implementation Contract Address"
                     />
                 </BaseFormGroupContainer>
                 <Button primary type="submit" label={'Save settings'} />
