@@ -50,7 +50,11 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     PARSE_SOLVER_ERROR: { title: 'Error while parsing Solvers', logLevel: 1 },
     INVALID_METADATA: { title: 'Error while loading metadata', logLevel: 1 },
-    INSUFFICIENT_FUNDS: { title: 'Insufficient funds', logLevel: 1 },
+    INSUFFICIENT_FUNDS: {
+        title: 'Insufficient funds',
+        message: 'Please make sure you have enough tokens.',
+        logLevel: 0,
+    },
     MISSING_COLLATERAL_TOKEN: {
         title: 'No collateral token defined',
         logLevel: 1,
@@ -177,7 +181,7 @@ export const METAMASK_ERROR: ErrorMessagesType = {
 
     '4001': {
         title: 'User rejected the request',
-        message: 'Please try again and make sure to confirm the transaction',
+        message: 'Please try again and make sure to confirm the transaction.',
         logLevel: 0,
     },
 

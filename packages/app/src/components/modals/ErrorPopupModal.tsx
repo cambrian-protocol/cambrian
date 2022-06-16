@@ -33,7 +33,7 @@ const ErrorPopupModal = ({ onClose, errorMessage }: ErrorPopupModalProps) => {
                     <Heading level="3" textAlign="center">
                         {errorMessage.title}
                     </Heading>
-                    <Text size="small" color="dark-4">
+                    <Text size="small" color="dark-4" textAlign="center">
                         {errorMessage.message}
                     </Text>
                 </Box>
