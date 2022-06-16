@@ -34,7 +34,7 @@ const DisputerListItem = ({
             {outcomeCollection && (
                 <Box
                     background={'background-contrast-hover'}
-                    round="small"
+                    round="xsmall"
                     elevation="small"
                 >
                     <OutcomeCollectionCard

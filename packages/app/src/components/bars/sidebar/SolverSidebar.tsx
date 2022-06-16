@@ -7,6 +7,7 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import PayoutInfoComponent from './PayoutInfoComponent'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface SolverSidebarProps {
@@ -16,6 +17,7 @@ interface SolverSidebarProps {
     proposedOutcome: OutcomeCollectionModel
     currentUser: UserType
     solverAddress: string
+    solverTimelock: TimelockModel
 }
 
 const SolverSidebar = ({
@@ -25,6 +27,7 @@ const SolverSidebar = ({
     solverMethods,
     proposedOutcome,
     currentUser,
+    solverTimelock,
 }: SolverSidebarProps) => {
     return (
         <Box gap="medium">
@@ -48,6 +51,7 @@ const SolverSidebar = ({
                 outcome={proposedOutcome}
             />
             <ArbitrationUIManager
+                solverTimelock={solverTimelock}
                 currentCondition={currentCondition}
                 solverAddress={solverAddress}
                 solverData={solverData}

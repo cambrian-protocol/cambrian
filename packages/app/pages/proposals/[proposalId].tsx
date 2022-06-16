@@ -7,13 +7,17 @@ import { useEffect, useState } from 'react'
 
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import ProposalTemplateInfoComponent from '@cambrian/app/ui/proposals/ProposalTemplateInfoComponent'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
@@ -26,12 +30,13 @@ export default function ProposalPage() {
     const { currentUser } = useCurrentUser()
 
     const [metaStages, setMetaStages] = useState<Stages>()
-    const [proposalTitle, setProposalTitle] = useState('Proposal')
+    const [proposalTitle, setProposalTitle] = useState<string>()
     const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
     const [currentProposal, setCurrentProposal] = useState<ethers.Contract>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
 
     useEffect(() => {
         if (router.isReady && currentUser.signer !== undefined) fetchProposal()
@@ -55,6 +60,7 @@ export default function ProposalPage() {
                     proposalId as string
                 )
                 initMetaStages(proposal)
+                setIsProposalExecuted(await proposal.isExecuted)
                 return setCurrentProposal(proposal)
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))
@@ -100,14 +106,33 @@ export default function ProposalPage() {
                         <InvalidQueryComponent context={StageNames.proposal} />
                     </PageLayout>
                 ) : proposalsHub && currentProposal ? (
-                    <PageLayout contextTitle={proposalTitle}>
-                        <ProposalUI
-                            currentUser={currentUser}
-                            proposal={currentProposal}
-                            proposalsHub={proposalsHub}
-                            metaStages={metaStages}
+                    <InteractionLayout
+                        contextTitle={proposalTitle || 'Proposal'}
+                        proposalHeader={
+                            <ProposalHeader
+                                isProposalExecuted={isProposalExecuted}
+                                proposalTitle={proposalTitle}
+                            />
+                        }
+                        sidebar={
+                            <ProposalUI
+                                isProposalExecuted={isProposalExecuted}
+                                setIsProposalExecuted={setIsProposalExecuted}
+                                currentUser={currentUser}
+                                proposal={currentProposal}
+                                proposalsHub={proposalsHub}
+                            />
+                        }
+                    >
+                        <ProposalTemplateInfoComponent
+                            proposalMetadata={
+                                metaStages?.proposal as ProposalModel
+                            }
+                            templateMetadata={
+                                metaStages?.template as TemplateModel
+                            }
                         />
-                    </PageLayout>
+                    </InteractionLayout>
                 ) : (
                     <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
                 )

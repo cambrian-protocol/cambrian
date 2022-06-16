@@ -65,7 +65,9 @@ const BaseActionbar = ({ primaryAction, info }: ActionbarProps) => {
                         </Box>
                     </Box>
                     {primaryAction && (
-                        <Box width={{ min: 'auto' }}>{primaryAction}</Box>
+                        <Box width={{ min: 'auto' }} pad={{ left: 'small' }}>
+                            {primaryAction}
+                        </Box>
                     )}
                 </Box>
             </Box>

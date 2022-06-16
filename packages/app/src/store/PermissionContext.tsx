@@ -4,7 +4,7 @@ import React from 'react'
 type PermissionContextType = {
     isAllowedTo: (permission: PermissionType) => boolean
 }
-type PermissionProvicerProps = {
+type PermissionProviderProps = {
     permissions: PermissionType[]
 }
 
@@ -15,7 +15,7 @@ const defaultBehaviour: PermissionContextType = {
 export const PermissionContext =
     React.createContext<PermissionContextType>(defaultBehaviour)
 
-const PermissionProvider: React.FunctionComponent<PermissionProvicerProps> = ({
+const PermissionProvider: React.FunctionComponent<PermissionProviderProps> = ({
     permissions,
     children,
 }) => {

@@ -24,7 +24,7 @@ const BaseSlotInputItem = ({
     return (
         <Box gap="xsmall" height={{ min: 'auto' }}>
             <Box
-                round="small"
+                round="xsmall"
                 background="background-contrast"
                 pad="medium"
                 direction="row"
@@ -36,7 +36,7 @@ const BaseSlotInputItem = ({
                 justify="between"
             >
                 <Box gap="medium" direction="row">
-                    <Box width={{ min: 'xxsmall' }}>
+                    <Box width={{ min: 'xxsmall' }} justify="center">
                         <BaseAvatar address={address} />
                     </Box>
                     <Box justify="center">

@@ -10,17 +10,17 @@ import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { Spinner } from 'grommet'
+import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
-import useTimelock from '@cambrian/app/hooks/useTimelock'
 
 interface ArbitrateActionbarProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
     solverAddress: string
+    solverTimelock: TimelockModel
 }
 
 const ArbitrateActionbar = ({
@@ -28,17 +28,14 @@ const ArbitrateActionbar = ({
     solverMethods,
     currentCondition,
     solverAddress,
+    solverTimelock,
 }: ArbitrateActionbarProps) => {
     const { currentUser } = useCurrentUser()
     const [isArbitrating, setIsArbitrating] = useState<number>()
     const [showArbitrateModal, setShowArbitrateModal] = useState(false)
     const toggleShowArbitrateModal = () =>
         setShowArbitrateModal(!showArbitrateModal)
-    const { isTimelockActive, isUnlockingTimelock, timelock } = useTimelock({
-        solverMethods: solverMethods,
-        currentCondition: currentCondition,
-        currentUser: currentUser,
-    })
+    const { isTimelockActive, timelockSeconds } = solverTimelock
 
     const { arbitratorContract, dispute, disputeId } = useArbitratorContract({
         currentUser: currentUser,
@@ -49,7 +46,7 @@ const ArbitrateActionbar = ({
 
     let info: ActionbarInfoType
 
-    if (isUnlockingTimelock || isTimelockActive) {
+    if (isTimelockActive) {
         info = {
             title: 'Active Timelock',
             subTitle: 'Please wait until the timelock has been released.',
@@ -57,33 +54,18 @@ const ArbitrateActionbar = ({
                 <ActionbarItemDropContainer
                     title="Active Timelock"
                     description="Please wait until the timelock has been released."
-                    list={
-                        isUnlockingTimelock
-                            ? [
-                                  {
-                                      icon: <Spinner />,
-                                      label: 'Releasing timelock... ( Waiting for the next available block )',
-                                  },
-                                  {
-                                      icon: <Timer />,
-                                      label: `Locked until: ${new Date(
-                                          timelock * 1000
-                                      ).toLocaleString()}`,
-                                  },
-                              ]
-                            : [
-                                  {
-                                      icon: <Lock />,
-                                      label: 'Timelock still active',
-                                  },
-                                  {
-                                      icon: <Timer />,
-                                      label: `Locked until: ${new Date(
-                                          timelock * 1000
-                                      ).toLocaleString()}`,
-                                  },
-                              ]
-                    }
+                    list={[
+                        {
+                            icon: <Lock />,
+                            label: 'Timelock still active',
+                        },
+                        {
+                            icon: <Timer />,
+                            label: `Locked until: ${new Date(
+                                timelockSeconds * 1000
+                            ).toLocaleString()}`,
+                        },
+                    ]}
                 />
             ),
         }
@@ -135,12 +117,8 @@ const ArbitrateActionbar = ({
             <BaseActionbar
                 primaryAction={
                     <LoaderButton
-                        disabled={isUnlockingTimelock || isTimelockActive}
-                        icon={
-                            isUnlockingTimelock || isTimelockActive ? (
-                                <Lock />
-                            ) : undefined
-                        }
+                        disabled={isTimelockActive}
+                        icon={isTimelockActive ? <Lock /> : undefined}
                         isLoading={false}
                         label="Report Outcome"
                         onClick={toggleShowArbitrateModal}

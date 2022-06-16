@@ -1,4 +1,8 @@
 import { Books, Question, SignIn, SignOut, Wallet } from 'phosphor-react'
+import {
+    SUPPORT_DISCORD_LINK,
+    WIKI_NOTION_LINK,
+} from 'packages/app/config/ExternalLinks'
 
 import BaseAvatar from '../avatars/BaseAvatar'
 import { Menu } from 'grommet'
@@ -22,12 +26,12 @@ export default function UserMenu() {
         {
             label: <UserMenuItemLabel label="Learn" />,
             icon: <UserMenuItemIcon icon={<Books />} />,
-            href: 'https://www.notion.so/cambrianprotocol/Cambrian-Protocol-Wiki-24613f0f7cdb4b32b3f7900915740a70',
+            href: WIKI_NOTION_LINK,
         },
         {
             label: <UserMenuItemLabel label="Support" />,
             icon: <UserMenuItemIcon icon={<Question />} />,
-            href: 'https://discord.com/channels/856113492348108882/968295116576026625',
+            href: SUPPORT_DISCORD_LINK,
         },
     ]
 

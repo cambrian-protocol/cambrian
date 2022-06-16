@@ -27,7 +27,7 @@ const PreferredTokenItem = ({
             pad="small"
             background={'background-front'}
             align="start"
-            round="small"
+            round="xsmall"
             elevation="small"
         >
             <Box alignSelf="center">

@@ -14,7 +14,7 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                 fill
                 background={'background-contrast'}
                 pad="medium"
-                round="small"
+                round="xsmall"
                 elevation="small"
                 border
                 height={{ min: 'medium' }}
@@ -32,7 +32,6 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                     </Text>
                 )}
             </Box>
-            <Box pad="small" />
         </Box>
     </>
 )

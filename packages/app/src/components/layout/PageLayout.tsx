@@ -43,13 +43,13 @@ const PageLayout = ({
                     overflow={{ horizontal: 'hidden', vertical: 'auto' }}
                 >
                     <div ref={topRef} />
-                    <Appbar />
                     <Glow
                         height="800px"
                         width="1000px"
                         left={'5%'}
                         top={'-200px'}
                     />
+                    <Appbar />
                     <Box
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}

@@ -13,6 +13,7 @@ const Appbar = () => {
             fill="horizontal"
         >
             <Box
+                style={{ position: 'relative' }}
                 border={{ side: 'bottom' }}
                 direction="row"
                 flex
@@ -20,7 +21,7 @@ const Appbar = () => {
             >
                 <CambrianLogo />
                 <Box flex />
-                <ThemeToogleButton />
+                {/*      <ThemeToogleButton /> */}
                 <UserMenu />
             </Box>
         </Header>

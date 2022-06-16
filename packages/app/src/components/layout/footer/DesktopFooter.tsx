@@ -41,7 +41,7 @@ const DesktopFooter = ({}: DesktopFooterProps) => {
                     <FooterTermsSection />
                     <FooterPrivacyPolicySection />
                     <Box flex />
-                    <ThemeToogleButton size="small" showLabel />
+                    {/* <ThemeToogleButton size="small" showLabel /> */}
                 </Box>
             </Box>
         </Box>

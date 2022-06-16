@@ -17,12 +17,10 @@ export default function CreateArbitrator() {
         <>
             <PageLayout contextTitle="Create Arbitrator">
                 <Box height={{ min: '90vh' }} justify="center" align="center">
-                    <Box width={'large'}>
-                        <CreateArbitratorMultiStepForm
-                            onFailure={(errMsg) => setErrorMessage(errMsg)}
-                            onSuccess={toggleShowSuccessModal}
-                        />
-                    </Box>
+                    <CreateArbitratorMultiStepForm
+                        onFailure={(errMsg) => setErrorMessage(errMsg)}
+                        onSuccess={toggleShowSuccessModal}
+                    />
                 </Box>
             </PageLayout>
             {showSuccessModal && currentUser.chainId && currentUser.address && (

@@ -11,7 +11,7 @@ const UnanimityUI = ({}: ModuleComponentProps) => {
             background="background-contrast"
             width="fill"
             border
-            round="small"
+            round="xsmall"
             pad="small"
             justify="center"
             align="center"
