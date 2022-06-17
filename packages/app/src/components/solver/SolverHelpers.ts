@@ -102,17 +102,22 @@ export const getSolverRecipientAddressHashmap = (
     return recipientAddressHashmap
 }
 
-export const getManualInputs = (solverData: SolverModel): RichSlotModel[] => {
+export const getManualInputs = (
+    solverData: SolverModel,
+    currentCondition: SolverContractCondition
+): RichSlotModel[] => {
     if (!solverData.slotTags) return []
-
+    const existantSlots = solverData.slotsHistory[currentCondition.conditionId]
     return solverData.config.ingests
         .filter((ingest) => ingest.ingestType === SlotType.Manual)
         .map((ingest) => {
-            const slotId = parseBytes32String(ingest.slot)
-            return {
-                slot: ingest,
-                tag: solverData.slotTags![slotId],
-            }
+            // If there is already an existant slot, grab this one with the contained data
+            return (
+                existantSlots[ingest.slot] || {
+                    slot: ingest,
+                    tag: solverData.slotTags![parseBytes32String(ingest.slot)],
+                }
+            )
         })
 }
 

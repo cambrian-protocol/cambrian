@@ -55,7 +55,8 @@ const SubmissionContainer = ({
             .then((submissions) => {
                 if (submissions !== undefined) {
                     setSubmissions(submissions)
-                    setLatestSubmission(submissions[submissions.length - 1])
+                    if (submissions[submissions.length - 1])
+                        setLatestSubmission(submissions[submissions.length - 1])
                 }
             })
             .catch((e) => cpLogger.push(e))
