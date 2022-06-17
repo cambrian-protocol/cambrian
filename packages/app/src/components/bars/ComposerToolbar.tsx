@@ -4,18 +4,16 @@ import BaseLayerModal from '../modals/BaseLayerModal'
 import BasePopupModal from '../modals/BasePopupModal'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
-import Stagehand from '@cambrian/app/classes/Stagehand'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import randimals from 'randimals'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
-//@ts-ignore
-import randimals from 'randimals'
 
 const ComposerToolbar = () => {
     const { currentUser } = useCurrentUser()
@@ -39,27 +37,14 @@ const ComposerToolbar = () => {
     const toggleShowLoadCompositionModal = () =>
         setShowLoadCompositionModal(!showLoadCompositionModal)
 
-    // const onExportComposition = async () => {
-    //     try {
-    //         const ipfsHash = await stageHand.publishComposition(
-    //             composer,
-    //             currentUser.web3Provider
-    //         )
-    //         if (ipfsHash) {
-    //             setExportedCompositionCID(ipfsHash)
-    //             toggleShowExportCompositionModal()
-    //         }
-    //     } catch (e) {
-    //         cpLogger.push(e)
-    //     }
-    // }
-
     const onExportComposition = async () => {
         try {
+            if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
+
             const streamID = await ceramicStagehand.createComposition(
                 randimals(),
                 composer,
-                currentUser
+                currentUser.selfID
             )
             if (streamID) {
                 setExportedCompositionCID(streamID)
