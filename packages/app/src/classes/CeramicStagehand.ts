@@ -30,7 +30,7 @@ export default class CeramicStagehand {
     }
 
     createComposition = async (
-        id: string, // User-provided ID
+        compositionStreamID: string, // User-provided ID
         composition: CompositionModel,
         selfId: SelfID
     ) => {
@@ -44,7 +44,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [selfId.id],
                     family: 'cambrian-composition',
-                    tags: [id],
+                    tags: [compositionStreamID],
                 }
             )
 
@@ -66,10 +66,12 @@ export default class CeramicStagehand {
             ) {
                 await compositionLib.update({
                     ...compositionLib.content,
-                    [id]: doc.id.toString(),
+                    [compositionStreamID]: doc.id.toString(),
                 })
             } else {
-                await compositionLib.update({ [id]: doc.id.toString() })
+                await compositionLib.update({
+                    [compositionStreamID]: doc.id.toString(),
+                })
             }
 
             return doc.id.toString()
@@ -80,7 +82,7 @@ export default class CeramicStagehand {
     }
 
     createTemplate = async (
-        id: string,
+        templateStreamID: string,
         createTemplateInput: CreateTemplateMultiStepFormType,
         compositionStreamID: string,
         selfID: SelfID
@@ -119,7 +121,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [selfID.id],
                     family: 'cambrian-template',
-                    tags: [id],
+                    tags: [templateStreamID],
                 }
             )
 
@@ -141,10 +143,12 @@ export default class CeramicStagehand {
             ) {
                 await templateLib.update({
                     ...templateLib.content,
-                    [id]: doc.id.toString(),
+                    [templateStreamID]: doc.id.toString(),
                 })
             } else {
-                await templateLib.update({ [id]: doc.id.toString() })
+                await templateLib.update({
+                    [templateStreamID]: doc.id.toString(),
+                })
             }
 
             return doc.id.toString()
@@ -155,7 +159,7 @@ export default class CeramicStagehand {
     }
 
     createProposal = async (
-        id: string,
+        proposalStreamID: string,
         createProposalInput: CreateProposalMultiStepFormType,
         templateStreamID: string,
         selfID: SelfID,
@@ -199,12 +203,14 @@ export default class CeramicStagehand {
                     throw GENERAL_ERROR['WRONG_PROPOSAL_SCHEMA']
                 }
 
+                // TODO put proposal to cambrian controlled stream
+
                 const doc = await TileDocument.deterministic(
                     selfID.client.ceramic,
                     {
                         controllers: [selfID.id],
                         family: 'cambrian-proposal',
-                        tags: [id],
+                        tags: [proposalStreamID],
                     }
                 )
 
@@ -226,10 +232,12 @@ export default class CeramicStagehand {
                 ) {
                     await proposalLib.update({
                         ...proposalLib.content,
-                        [id]: doc.id.toString(),
+                        [proposalStreamID]: doc.id.toString(),
                     })
                 } else {
-                    await proposalLib.update({ [id]: doc.id.toString() })
+                    await proposalLib.update({
+                        [proposalStreamID]: doc.id.toString(),
+                    })
                 }
 
                 return doc.id.toString()
@@ -277,18 +285,18 @@ export default class CeramicStagehand {
     }
 
     loadCompositionLib = async (selfID: SelfID) => {
-        this.loadTag(selfID, 'compositions')
+        this.loadCollection(selfID, 'compositions')
     }
     loadTemplateLib = async (selfID: SelfID) => {
-        this.loadTag(selfID, 'templates')
+        this.loadCollection(selfID, 'templates')
     }
     loadProposalLib = async (selfID: SelfID) => {
-        this.loadTag(selfID, 'proposals')
+        this.loadCollection(selfID, 'proposals')
     }
 
-    loadTag = async (
+    loadCollection = async (
         selfID: SelfID,
-        tag: 'compositions' | 'templates' | 'proposals'
+        collection: 'compositions' | 'templates' | 'proposals'
     ) => {
         try {
             const compositionLib = await TileDocument.deterministic(
@@ -296,7 +304,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [selfID.id],
                     family: 'cambrian-lib',
-                    tags: [tag],
+                    tags: [collection],
                 },
                 { pin: true }
             )
