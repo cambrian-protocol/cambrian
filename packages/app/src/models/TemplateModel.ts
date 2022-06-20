@@ -19,7 +19,7 @@ export type TemplateModel = {
 export type CeramicTemplateModel = {
     title: string
     description: string
-    rfp: string // Request For Proposal (desc of info wanted from customers)
+    proposalRequest: string
     price?: {
         amount: number
         denominationTokenAddress: string
@@ -31,4 +31,5 @@ export type CeramicTemplateModel = {
         commitID: string
     }
     flexInputs: FlexInputFormType[]
+    author: string // DID
 }

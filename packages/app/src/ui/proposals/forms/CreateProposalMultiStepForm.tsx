@@ -5,6 +5,7 @@ import {
 import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalBuyerStep from './steps/CreateProposalBuyerStep'
 import CreateProposalDetailStep from './steps/CreateProposalDetailStep'
@@ -15,18 +16,14 @@ import CreateProposalStartStep from './steps/CreateProposalStartStep'
 import { FlexInputFormType } from '../../templates/forms/steps/CreateTemplateFlexInputStep'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import randimals from 'randimals'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-//@ts-ignore
-import randimals from 'randimals'
 
 export type CreateProposalMultiStepFormType = {
     name: string
@@ -126,6 +123,8 @@ const CreateProposalMultiStepForm = ({
             if (!currentUser.signer || !currentUser.chainId)
                 throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
+            if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
+
             const updatedInput = { ...input }
             updatedInput.flexInputs.forEach((flexInput) => {
                 if (flexInput.tagId === 'collateralToken') {
@@ -134,28 +133,19 @@ const CreateProposalMultiStepForm = ({
                 }
             })
 
-<<<<<<< HEAD
             const stagehand = new CeramicStagehand()
             const proposalStreamID = await stagehand.createProposal(
                 randimals(),
-=======
-            const stagehand = new Stagehand()
-            const publishedProposal = await stagehand.publishProposal(
->>>>>>> dev
                 input,
                 templateCID,
-                currentUser
+                currentUser.selfID,
+                currentUser.provider
             )
 
-<<<<<<< HEAD
             if (!proposalStreamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-=======
-            if (!publishedProposal) throw GENERAL_ERROR['IPFS_PIN_ERROR']
->>>>>>> dev
 
             //  DON'T GO ON-CHAIN RIGHT AWAY ANYMORE. WE MUST NOTIFY THE TEMPLATE GUY
 
-<<<<<<< HEAD
             // const proposalsHub = new ProposalsHub(
             //     currentUser.signer,
             //     currentUser.chainId
@@ -172,20 +162,6 @@ const CreateProposalMultiStepForm = ({
             //     (event) => event.event === 'CreateProposal'
             // ) // Less fragile to event param changes.
             // const proposalId = event?.args && event.args.id
-=======
-            const transaction = await proposalsHub.createSolutionAndProposal(
-                publishedProposal.parsedSolvers[0].collateralToken,
-                input.price,
-                publishedProposal.parsedSolvers.map((solver) => solver.config),
-                publishedProposal.proposal.solverConfigsCID,
-                publishedProposal.cid
-            )
-            let rc = await transaction.wait()
-            const event = rc.events?.find(
-                (event) => event.event === 'CreateProposal'
-            ) // Less fragile to event param changes.
-            const proposalId = event?.args && event.args.id
->>>>>>> dev
 
             // if (!proposalId) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
 

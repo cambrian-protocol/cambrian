@@ -1,20 +1,22 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useRouter } from 'next/dist/client/router'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useRouter } from 'next/dist/client/router'
 
 export default function CreateTemplatePage() {
     const currentUser = useCurrentUser().currentUser
@@ -36,10 +38,12 @@ export default function CreateTemplatePage() {
             typeof compositionCID === 'string'
         ) {
             try {
+                if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
+
                 const ceramicStagehand = new CeramicStagehand()
-                const composition = (await ceramicStagehand.loadComposition(
+                const composition = (await ceramicStagehand.loadStream(
                     compositionCID,
-                    currentUser
+                    currentUser.selfID
                 )) as CompositionModel
 
                 if (composition) return setCurrentComposition(composition)

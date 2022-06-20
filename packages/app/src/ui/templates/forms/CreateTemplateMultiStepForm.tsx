@@ -8,6 +8,7 @@ import {
 import React, { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateTemplateDetailStep from './steps/CreateTemplateDetailStep'
 import CreateTemplateNotificationStep from './steps/CreateTemplateNotificationStep'
@@ -15,16 +16,14 @@ import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
 import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
 import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import randimals from 'randimals'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-//@ts-ignore
-import randimals from 'randimals'
 
 interface CreateTemplateMultiStepFormProps {
     composition: CompositionModel
@@ -36,6 +35,7 @@ interface CreateTemplateMultiStepFormProps {
 export type CreateTemplateMultiStepFormType = {
     pfp?: string
     name?: string
+    proposalRequest: string
     title: string
     description: string
     askingAmount: number
@@ -49,6 +49,7 @@ export type CreateTemplateMultiStepFormType = {
 const initialInput = {
     pfp: '',
     name: '',
+    proposalRequest: '',
     title: '',
     description: '',
     askingAmount: 0,
@@ -151,6 +152,8 @@ export const CreateTemplateMultiStepForm = ({
 
     const onCreateTemplate = async () => {
         try {
+            if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
+
             const updatedInput = { ...input }
             updatedInput.flexInputs.forEach((flexInput) => {
                 let stayFlex = flexInput.value === ''
@@ -171,7 +174,7 @@ export const CreateTemplateMultiStepForm = ({
                 randimals(),
                 updatedInput,
                 compositionCID,
-                currentUser
+                currentUser.selfID
             )
             if (!templateCID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 

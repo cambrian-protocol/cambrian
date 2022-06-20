@@ -61,6 +61,9 @@ const FundProposalForm = ({
     const [isInSecondaryTransaction, setIsInSecondaryTransaction] =
         useState(false)
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
+    const [currentUserFunding, setCurrentUserFunding] = useState<BigNumber>(
+        BigNumber.from(0)
+    )
 
     const erc20TokenContract = new ethers.Contract(
         proposal.collateralToken,
@@ -79,6 +82,7 @@ const FundProposalForm = ({
 
     useEffect(() => {
         initAllowance()
+        updateUserFunding(proposal.id)
         erc20TokenContract.on(approvalFilter, approvalListener)
         return () => {
             erc20TokenContract.removeListener(approvalFilter, approvalListener)
@@ -140,6 +144,7 @@ const FundProposalForm = ({
 
         const funding = await proposalsHub.getProposalFunding(proposal.id)
         if (funding) setFunding(funding)
+        await updateUserFunding(proposal.id)
     }
 
     const initProposalsHubListeners = async () => {
@@ -185,6 +190,14 @@ const FundProposalForm = ({
             await initAllowance()
             setFunding(proposalFunding)
         }
+    }
+
+    const updateUserFunding = async (proposalId: string) => {
+        const userFunding = await proposalsHub.contract.funderAmountMap(
+            proposal.id,
+            currentUser.address
+        )
+        if (userFunding) setCurrentUserFunding(userFunding)
     }
 
     const safeTransactionCall = async (
@@ -297,6 +310,7 @@ const FundProposalForm = ({
                         token={collateralToken}
                         funding={funding}
                         fundingGoal={proposal.fundingGoal}
+                        userFunding={currentUserFunding}
                     />
                     <Form<FundProposalFormType>
                         onChange={(nextValue: FundProposalFormType) => {
