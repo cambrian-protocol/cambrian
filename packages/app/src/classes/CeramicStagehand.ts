@@ -270,6 +270,25 @@ export default class CeramicStagehand {
         }
     }
 
+    sendProposal = async (proposalStreamID: string) => {
+        try {
+            // Hit mailbox server
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_WICKBOX}/propose`,
+                {
+                    method: 'POST',
+                    body: proposalStreamID,
+                }
+            )
+
+            if (res.status === 200) {
+                return true
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     receiveProposal = async (
         proposalStreamID: string,
         currentUser: UserType
