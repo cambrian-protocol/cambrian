@@ -12,10 +12,18 @@ import ComposerLayout from '@cambrian/app/components/layout/ComposerLayout'
 import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
 import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
 import ComposerToolbar from '@cambrian/app/components/bars/ComposerToolbar'
+import CompositionHeader from '@cambrian/app/components/layout/header/CompositionHeader'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { MouseEvent } from 'react'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
+
+interface ComposerUIProps {
+    currentUser: UserType
+    composition: CompositionModel
+}
 
 const nodeTypes = {
     solver: SolverNode,
@@ -31,8 +39,8 @@ TODO
 - Manual connection of Nodes
 
 */
-export const ComposerUI = () => {
-    const { composer, dispatch } = useComposerContext()
+export const ComposerUI = ({ currentUser, composition }: ComposerUIProps) => {
+    const { dispatch } = useComposerContext()
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
         // TODO Ask if sure
@@ -57,10 +65,10 @@ export const ComposerUI = () => {
 
     function renderControl() {
         if (
-            composer.currentElement !== undefined &&
-            isNode(composer.currentElement)
+            composition.currentElement !== undefined &&
+            isNode(composition.currentElement)
         ) {
-            switch (composer.currentElement?.type) {
+            switch (composition.currentElement?.type) {
                 case 'solver':
                     return <ComposerSolverControl />
                 case 'oc':
@@ -74,14 +82,23 @@ export const ComposerUI = () => {
         <>
             <ComposerLayout
                 contextTitle="Composer"
-                sidebar={<>{renderControl()}</>}
-                toolbar={<ComposerToolbar />}
+                sidebar={
+                    <Box gap="small" fill>
+                        <CompositionHeader
+                            compositionID={composition.compositionID}
+                            streamID={composition.streamID}
+                        />
+                        {renderControl()}
+                    </Box>
+                }
+                toolbar={<ComposerToolbar currentUser={currentUser} />}
             >
                 <Box direction="row" justify="between" fill>
                     <ReactFlow
                         elementsSelectable
-                        elements={composer.flowElements}
+                        elements={composition.flowElements}
                         deleteKeyCode={46}
+                        //@ts-ignore
                         nodeTypes={nodeTypes}
                         /*    onConnect={onConnect}
                          */

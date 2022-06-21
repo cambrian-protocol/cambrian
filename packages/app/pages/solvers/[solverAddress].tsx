@@ -13,12 +13,12 @@ import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
 
 export default function SolverPage() {
-    const { currentUser } = useCurrentUser()
+    const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
     const { solverAddress } = router.query
 
     const [solverContract, setSolverContract] = useState<ethers.Contract>()
-    const [isLoaded, setIsLoaded] = useState(false)
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
         if (!router.isReady) return
@@ -27,7 +27,7 @@ export default function SolverPage() {
     }, [currentUser, router])
 
     const initSolverContract = async () => {
-        if (currentUser.signer && currentUser.chainId) {
+        if (currentUser) {
             try {
                 if (
                     !solverAddress ||
@@ -46,32 +46,38 @@ export default function SolverPage() {
                 // Check if we actually received a Solver
                 await contract.trackingId()
                 setSolverContract(contract)
-            } catch (e) {}
-            setIsLoaded(true)
+            } catch (e) {
+                console.warn(e)
+            }
+            setIsInitialized(true)
         }
     }
 
     return (
         <>
-            {currentUser.signer ? (
-                isLoaded ? (
-                    solverContract ? (
-                        <Solver
-                            solverContract={solverContract}
-                            currentUser={currentUser}
-                        />
+            {isUserLoaded ? (
+                currentUser ? (
+                    isInitialized ? (
+                        solverContract ? (
+                            <Solver
+                                currentUser={currentUser}
+                                solverContract={solverContract}
+                            />
+                        ) : (
+                            <PageLayout contextTitle="No Solver found">
+                                <InvalidQueryComponent context="Solver" />
+                            </PageLayout>
+                        )
                     ) : (
-                        <PageLayout contextTitle="Solver">
-                            <InvalidQueryComponent context="Solver" />
-                        </PageLayout>
+                        <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
                     )
                 ) : (
-                    <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
+                    <PageLayout contextTitle="Connect your Wallet">
+                        <ConnectWalletSection />
+                    </PageLayout>
                 )
             ) : (
-                <PageLayout contextTitle="Connect your Wallet">
-                    <ConnectWalletSection />
-                </PageLayout>
+                <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
             )}
         </>
     )

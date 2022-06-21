@@ -10,12 +10,13 @@ import CreateArbitratorFeeStep from './steps/CreateArbitratorFeeStep'
 import CreateArbitratorStartStep from './steps/CreateArbitratorStartStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface CreateArbitratorMultiStepFormProps {
+    currentUser: UserType
     onFailure: (error?: ErrorMessageType) => void
     onSuccess: () => void
 }
@@ -38,10 +39,10 @@ export type CreateArbitratorMultiStepStepsType =
     | CREATE_ARBITRATOR_STEPS.FEE
 
 const CreateArbitratorMultiStepForm = ({
+    currentUser,
     onSuccess,
     onFailure,
 }: CreateArbitratorMultiStepFormProps) => {
-    const { currentUser } = useCurrentUser()
     const [input, setInput] =
         useState<CreateArbitratorMultiStepFormType>(initialInput)
     const [currentStep, setCurrentStep] =
@@ -58,13 +59,6 @@ const CreateArbitratorMultiStepForm = ({
 
     const onCreateArbitrator = async () => {
         try {
-            if (
-                !currentUser.signer ||
-                !currentUser.chainId ||
-                !currentUser.address
-            )
-                throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
-
             const chainData = SUPPORTED_CHAINS[currentUser.chainId]
 
             if (!chainData || !chainData.contracts.arbitratorFactory)

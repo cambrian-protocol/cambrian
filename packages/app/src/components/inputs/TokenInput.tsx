@@ -29,15 +29,20 @@ const TokenInput = ({
     )
 
     const onChangeTokenAddress = async (address: string) => {
-        const token = await fetchTokenInfo(address, currentUser.web3Provider)
-        if (token) {
-            const includesToken = options.find(
-                (option) => option.address === address
+        if (currentUser) {
+            const token = await fetchTokenInfo(
+                address,
+                currentUser.web3Provider
             )
-            if (!includesToken) {
-                const updatedOptions = [...options]
-                updatedOptions.push(token)
-                setOptions(updatedOptions)
+            if (token) {
+                const includesToken = options.find(
+                    (option) => option.address === address
+                )
+                if (!includesToken) {
+                    const updatedOptions = [...options]
+                    updatedOptions.push(token)
+                    setOptions(updatedOptions)
+                }
             }
         }
     }

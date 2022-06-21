@@ -4,8 +4,10 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateTemplateMultiStepForm } from './forms/CreateTemplateMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 interface CreateTemplateUIProps {
+    currentUser: UserType
     composition: CompositionModel
     compositionCID: string
     setErrorMessage: React.Dispatch<
@@ -17,6 +19,7 @@ const CreateTemplateUI = ({
     composition,
     compositionCID,
     setErrorMessage,
+    currentUser,
 }: CreateTemplateUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
@@ -28,6 +31,7 @@ const CreateTemplateUI = ({
                 compositionCID={compositionCID}
                 onFailure={(errMsg) => setErrorMessage(errMsg)}
                 onSuccess={toggleShowSuccessModal}
+                currentUser={currentUser}
             />
             {showSuccessModal && (
                 <ExportSuccessModal

@@ -11,11 +11,12 @@ import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
+import { UserType } from '@cambrian/app/store/UserContext'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
 interface ArbitrateActionbarProps {
+    currentUser: UserType
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
@@ -24,13 +25,13 @@ interface ArbitrateActionbarProps {
 }
 
 const ArbitrateActionbar = ({
+    currentUser,
     solverData,
     solverMethods,
     currentCondition,
     solverAddress,
     solverTimelock,
 }: ArbitrateActionbarProps) => {
-    const { currentUser } = useCurrentUser()
     const [isArbitrating, setIsArbitrating] = useState<number>()
     const [showArbitrateModal, setShowArbitrateModal] = useState(false)
     const toggleShowArbitrateModal = () =>

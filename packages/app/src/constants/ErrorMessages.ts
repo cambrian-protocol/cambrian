@@ -50,8 +50,8 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Please try again later...',
         logLevel: 1,
     },
-    WRONG_TEMPLATE_SCHEMA: {
-        title: 'Generated template does not satisfy template schema',
+    WRONG_SCHEMA: {
+        title: 'Generated data does not satisfy schema',
         logLevel: 1,
     },
     WRONG_COMPOSITION_SCHEMA: {

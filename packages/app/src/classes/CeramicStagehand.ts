@@ -23,58 +23,131 @@ export type Stages = {
     [key in StageNames]: StageModel
 }
 
+const CAMBRIAN_LIB_NAME = 'cambrian-lib'
+
 export default class CeramicStagehand {
+    selfID: SelfID
+
+    constructor(selfID: SelfID) {
+        this.selfID = selfID
+    }
+
     // TODO
     isStageSchema = (data: StageModel, stage: StageNames) => {
         return true
     }
 
-    createComposition = async (
-        compositionStreamID: string, // User-provided ID
-        composition: CompositionModel,
-        selfId: SelfID
-    ) => {
-        if (!this.isStageSchema(composition, StageNames.composition)) {
-            throw GENERAL_ERROR['WRONG_COMPOSITION_SCHEMA']
+    createStream = async (streamID: string, data: any, stage: StageNames) => {
+        if (!this.isStageSchema(data, stage)) {
+            throw GENERAL_ERROR['WRONG_SCHEMA']
         }
 
         try {
-            const doc = await TileDocument.deterministic(
-                selfId.client.ceramic,
+            const currentDoc = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
                 {
-                    controllers: [selfId.id],
-                    family: 'cambrian-composition',
-                    tags: [compositionStreamID],
+                    controllers: [this.selfID.id],
+                    family: `cambrian-${stage}`,
+                    tags: [streamID],
                 }
             )
 
-            await doc.update(composition)
+            await currentDoc.update(data)
 
-            const compositionLib = await TileDocument.deterministic(
-                selfId.client.ceramic,
+            const currentStage = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
                 {
-                    controllers: [selfId.id],
-                    family: 'cambrian-lib',
-                    tags: ['composition'],
+                    controllers: [this.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: [stage],
                 },
                 { pin: true }
             )
 
             if (
-                typeof compositionLib.content === 'object' &&
-                compositionLib.content !== null
+                currentStage.content !== null &&
+                typeof currentStage.content === 'object'
             ) {
-                await compositionLib.update({
-                    ...compositionLib.content,
-                    [compositionStreamID]: doc.id.toString(),
+                await currentStage.update({
+                    ...currentStage.content,
+                    [streamID]: currentDoc.id.toString(),
                 })
             } else {
-                await compositionLib.update({
-                    [compositionStreamID]: doc.id.toString(),
+                await currentStage.update({
+                    [streamID]: currentDoc.id.toString(),
                 })
             }
 
-            return doc.id.toString()
+            return currentDoc.id.toString()
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    loadStream = async (streamID: string) => {
+        try {
+            const doc = await TileDocument.load(
+                this.selfID.client.ceramic,
+                streamID
+            )
+            return doc.content
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    loadStages = async (stage: StageNames) => {
+        try {
+            const stageLib = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: [stage],
+                },
+                { pin: true }
+            )
+
+            return stageLib.content
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    updateStream = async (streamID: string, data: any, stage: StageNames) => {
+        this.createStream(streamID, data, stage)
+    }
+
+    deleteStream = async (streamID: string, stage: StageNames) => {
+        try {
+            const compositionCollection = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: [stage],
+                },
+                { pin: true }
+            )
+
+            if (
+                compositionCollection.content !== null &&
+                typeof compositionCollection.content === 'object'
+            ) {
+                const updatedCompositionCollection: { [key: string]: string } =
+                    {
+                        ...compositionCollection.content,
+                    }
+
+                delete updatedCompositionCollection[streamID]
+
+                compositionCollection.update({
+                    ...updatedCompositionCollection,
+                })
+            }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -84,12 +157,11 @@ export default class CeramicStagehand {
     createTemplate = async (
         templateStreamID: string,
         createTemplateInput: CreateTemplateMultiStepFormType,
-        compositionStreamID: string,
-        selfID: SelfID
+        compositionStreamID: string
     ) => {
         try {
             const composition = await TileDocument.load(
-                selfID.client.ceramic,
+                this.selfID.client.ceramic,
                 compositionStreamID
             )
 
@@ -110,7 +182,7 @@ export default class CeramicStagehand {
                     streamID: compositionStreamID,
                     commitID: composition.commitId.toString(),
                 },
-                author: selfID.did.toString(),
+                author: this.selfID.did.toString(),
             }
 
             if (!this.isStageSchema(template, StageNames.template)) {
@@ -118,9 +190,9 @@ export default class CeramicStagehand {
             }
 
             const doc = await TileDocument.deterministic(
-                selfID.client.ceramic,
+                this.selfID.client.ceramic,
                 {
-                    controllers: [selfID.id],
+                    controllers: [this.selfID.id],
                     family: 'cambrian-template',
                     tags: [templateStreamID],
                 }
@@ -129,9 +201,9 @@ export default class CeramicStagehand {
             await doc.update(template)
 
             const templateLib = await TileDocument.deterministic(
-                selfID.client.ceramic,
+                this.selfID.client.ceramic,
                 {
-                    controllers: [selfID.id],
+                    controllers: [this.selfID.id],
                     family: 'cambrian-lib',
                     tags: ['template'],
                 },
@@ -163,16 +235,18 @@ export default class CeramicStagehand {
         proposalStreamID: string,
         createProposalInput: CreateProposalMultiStepFormType,
         templateStreamID: string,
-        selfID: SelfID,
         provider: ethers.providers.Provider
     ) => {
         try {
             const template: TileDocument<CeramicTemplateModel> =
-                await TileDocument.load(selfID.client.ceramic, templateStreamID)
+                await TileDocument.load(
+                    this.selfID.client.ceramic,
+                    templateStreamID
+                )
 
             const composition: TileDocument<CompositionModel> =
                 await TileDocument.load(
-                    selfID.client.ceramic,
+                    this.selfID.client.ceramic,
                     template.content.composition.commitID
                 )
 
@@ -198,7 +272,10 @@ export default class CeramicStagehand {
                         commitID: template.commitId.toString(),
                     },
                     flexInputs: createProposalInput.flexInputs,
-                    authors: [template.content.author, selfID.did.toString()],
+                    authors: [
+                        template.content.author,
+                        this.selfID.did.toString(),
+                    ],
                 }
 
                 if (!this.isStageSchema(proposal, StageNames.proposal)) {
@@ -208,9 +285,9 @@ export default class CeramicStagehand {
                 // TODO put proposal to cambrian controlled stream
 
                 const doc = await TileDocument.deterministic(
-                    selfID.client.ceramic,
+                    this.selfID.client.ceramic,
                     {
-                        controllers: [selfID.id],
+                        controllers: [this.selfID.id],
                         family: 'cambrian-proposal',
                         tags: [proposalStreamID],
                     }
@@ -219,9 +296,9 @@ export default class CeramicStagehand {
                 await doc.update(proposal)
 
                 const proposalLib = await TileDocument.deterministic(
-                    selfID.client.ceramic,
+                    this.selfID.client.ceramic,
                     {
-                        controllers: [selfID.id],
+                        controllers: [this.selfID.id],
                         family: 'cambrian-lib',
                         tags: ['proposal'],
                     },
@@ -286,54 +363,11 @@ export default class CeramicStagehand {
                     }
                 )
 
-                openProposal.update(proposal.content)
+                await openProposal.update(proposal.content)
             }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    loadStream = async (streamID: string, selfID: SelfID) => {
-        try {
-            const doc = await TileDocument.load(selfID.client.ceramic, streamID)
-
-            return doc.content
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    loadCompositionLib = async (selfID: SelfID) => {
-        this.loadCollection(selfID, 'compositions')
-    }
-    loadTemplateLib = async (selfID: SelfID) => {
-        this.loadCollection(selfID, 'templates')
-    }
-    loadProposalLib = async (selfID: SelfID) => {
-        this.loadCollection(selfID, 'proposals')
-    }
-
-    loadCollection = async (
-        selfID: SelfID,
-        collection: 'compositions' | 'templates' | 'proposals'
-    ) => {
-        try {
-            const compositionLib = await TileDocument.deterministic(
-                selfID.client.ceramic,
-                {
-                    controllers: [selfID.id],
-                    family: 'cambrian-lib',
-                    tags: [collection],
-                },
-                { pin: true }
-            )
-
-            return compositionLib.content
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
     }
 }

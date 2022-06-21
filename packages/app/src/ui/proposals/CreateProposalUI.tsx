@@ -1,12 +1,14 @@
-import React, { MutableRefObject, SetStateAction, useState } from 'react'
+import React, { SetStateAction, useState } from 'react'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalMultiStepForm from './forms/CreateProposalMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ExportSuccessModal from '../composer/general/modals/ExportSuccessModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 interface CreateProposalUIProps {
+    currentUser: UserType
     composition: CompositionModel
     template: TemplateModel
     templateCID: string
@@ -20,6 +22,7 @@ const CreateProposalUI = ({
     template,
     templateCID,
     setErrorMessage,
+    currentUser,
 }: CreateProposalUIProps) => {
     const [showSuccessModal, setShowSuccessModal] = useState(false)
     const toggleShowSuccessModal = () => setShowSuccessModal(!showSuccessModal)
@@ -32,6 +35,7 @@ const CreateProposalUI = ({
                 templateCID={templateCID}
                 onFailure={(errMsg) => setErrorMessage(errMsg)}
                 onSuccess={toggleShowSuccessModal}
+                currentUser={currentUser}
             />
             {showSuccessModal && (
                 <ExportSuccessModal

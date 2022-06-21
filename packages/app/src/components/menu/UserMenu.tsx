@@ -1,4 +1,11 @@
-import { Books, Question, SignIn, SignOut, Wallet } from 'phosphor-react'
+import {
+    Books,
+    HouseLine,
+    Question,
+    SignIn,
+    SignOut,
+    Wallet,
+} from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -18,7 +25,7 @@ export default function UserMenu() {
 
     let chainName = 'Chain not supported'
 
-    if (currentUser.chainId && SUPPORTED_CHAINS[currentUser.chainId]) {
+    if (currentUser && SUPPORTED_CHAINS[currentUser.chainId]) {
         chainName = SUPPORTED_CHAINS[currentUser.chainId].chainData.name
     }
 
@@ -35,7 +42,7 @@ export default function UserMenu() {
         },
     ]
 
-    if (currentUser.address && currentUser.chainId) {
+    if (currentUser) {
         menuItems.unshift({
             label: (
                 <UserMenuItemLabel
@@ -44,6 +51,11 @@ export default function UserMenu() {
                 />
             ),
             icon: <UserMenuItemIcon icon={<Wallet />} />,
+        })
+        menuItems.unshift({
+            label: <UserMenuItemLabel label="Dashboard" />,
+            icon: <UserMenuItemIcon icon={<HouseLine />} />,
+            href: WIKI_NOTION_LINK,
         })
         menuItems.push({
             label: (
@@ -58,11 +70,7 @@ export default function UserMenu() {
         })
     } else {
         menuItems.unshift({
-            label: (
-                <UserMenuItemLabel
-                    label={currentUser?.address || 'Connect Wallet'}
-                />
-            ),
+            label: <UserMenuItemLabel label={'Connect Wallet'} />,
             onClick: connectWallet,
             icon: <UserMenuItemIcon icon={<Wallet />} />,
         })
@@ -80,7 +88,10 @@ export default function UserMenu() {
             dropBackground="background-popup"
             items={menuItems}
         >
-            <BaseAvatar icon={<Wallet />} address={currentUser.address} />
+            <BaseAvatar
+                icon={<Wallet />}
+                address={currentUser ? currentUser.address : undefined}
+            />
         </Menu>
     )
 }
