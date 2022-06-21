@@ -55,7 +55,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [selfId.id],
                     family: 'cambrian-lib',
-                    tags: ['compositions'],
+                    tags: ['composition'],
                 },
                 { pin: true }
             )
@@ -133,7 +133,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [selfID.id],
                     family: 'cambrian-lib',
-                    tags: ['templates'],
+                    tags: ['template'],
                 },
                 { pin: true }
             )
@@ -223,7 +223,7 @@ export default class CeramicStagehand {
                     {
                         controllers: [selfID.id],
                         family: 'cambrian-lib',
-                        tags: ['proposals'],
+                        tags: ['proposal'],
                     },
                     { pin: true }
                 )
