@@ -84,6 +84,7 @@ export default function Home() {
                                             <CreateTemplateDetailStep
                                                 input={{
                                                     pfp: '',
+                                                    proposalRequest: '',
                                                     name: 'Chris',
                                                     title: 'Writing an article as a professional journalist',
                                                     description:

@@ -29,7 +29,7 @@ class ErrorBoundary extends Component<Props, State> {
             return <ErrorScreen />
         }
 
-        return this.props.children
+        return <>{this.props.children}</>
     }
 }
 

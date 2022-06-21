@@ -2,10 +2,10 @@ import { AppProps } from 'next/app'
 import ErrorBoundary from '@cambrian/app/components/errors/ErrorBoundary'
 import { GlobalStyle } from '@cambrian/app/src/theme/globalStyle'
 import { Grommet } from 'grommet'
+import { Provider } from '@self.id/framework'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
 import { useTheme } from '@cambrian/app/hooks/useTheme'
-import { Provider } from '@self.id/framework'
 
 // @ts-ignore
 declare global {

@@ -91,7 +91,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     )
 
     useEffect(() => {
-        if (currentUser.signer) init()
+        init()
     }, [currentUser])
 
     useEffect(() => {
@@ -101,7 +101,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     }, [outcomes])
 
     useEffect(() => {
-        if (solverData && currentUser.address) {
+        if (solverData) {
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 
@@ -164,7 +164,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     const initArbitratorPermission = async () => {
         if (solverData) {
-            const arbitratorCode = await currentUser.signer?.provider?.getCode(
+            const arbitratorCode = await currentUser.signer.provider?.getCode(
                 solverData.config.arbitrator
             )
             const isContract = arbitratorCode !== '0x'
@@ -350,8 +350,8 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         <InitiatedSolverContent />
                     ) : (
                         <ModuleUIManager
+                            currentUser={currentUser}
                             solverData={solverData}
-                            chainId={currentUser.chainId}
                             solverAddress={solverContract.address}
                             currentCondition={currentCondition}
                         />

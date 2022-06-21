@@ -69,6 +69,7 @@ const SolverActionbar = ({
             if (allowedForArbitrator) {
                 return (
                     <ArbitrateActionbar
+                        currentUser={currentUser}
                         solverTimelock={solverTimelock}
                         solverAddress={solverAddress}
                         solverData={solverData}

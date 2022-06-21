@@ -19,11 +19,11 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import randimals from 'randimals'
 import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export type CreateProposalMultiStepFormType = {
     name: string
@@ -70,6 +70,7 @@ interface CreateProposalMultiStepFormProps {
     template: TemplateModel
     onFailure: (error?: ErrorMessageType) => void
     onSuccess: () => void
+    currentUser: UserType
 }
 
 const CreateProposalMultiStepForm = ({
@@ -78,8 +79,8 @@ const CreateProposalMultiStepForm = ({
     template,
     onFailure,
     onSuccess,
+    currentUser,
 }: CreateProposalMultiStepFormProps) => {
-    const { currentUser } = useCurrentUser()
     const [input, setInput] =
         useState<CreateProposalMultiStepFormType>(initialInput)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
@@ -120,9 +121,6 @@ const CreateProposalMultiStepForm = ({
 
     const onCreateProposal = async () => {
         try {
-            if (!currentUser.signer || !currentUser.chainId)
-                throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-
             if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
 
             const updatedInput = { ...input }
@@ -133,12 +131,11 @@ const CreateProposalMultiStepForm = ({
                 }
             })
 
-            const stagehand = new CeramicStagehand()
+            const stagehand = new CeramicStagehand(currentUser.selfID)
             const proposalStreamID = await stagehand.createProposal(
                 randimals(),
                 input,
                 templateCID,
-                currentUser.selfID,
                 currentUser.provider
             )
 

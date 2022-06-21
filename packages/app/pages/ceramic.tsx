@@ -1,12 +1,12 @@
 import {
-    SelfID,
-    useViewerRecord,
     usePublicRecord,
     useViewerConnection,
+    useViewerRecord,
 } from '@self.id/framework'
+
+import { Button } from 'grommet'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { useEffect } from 'react'
-import { Button } from 'grommet'
 
 export default function Ceramic() {
     const [connection, connect, disconnect] = useViewerConnection()

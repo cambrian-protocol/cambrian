@@ -5,6 +5,8 @@ import ComposerSolver from '../classes/ComposerSolver'
 
 // TODO Composition Title and description
 export type CompositionModel = {
+    compositionID?: string
+    streamID?: string
     flowElements: Elements
     currentElement?: FlowElement
     currentIdPath?: ComposerIdPathType

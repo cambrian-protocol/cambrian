@@ -1,26 +1,22 @@
-import { ArrowSquareRight, Bug, CloudArrowDown, Gear } from 'phosphor-react'
+import { Bug, FloppyDisk, FolderOpen, Gear, PencilSimple } from 'phosphor-react'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
-import BasePopupModal from '../modals/BasePopupModal'
 import { Box } from 'grommet'
-import { Button } from 'grommet'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
+import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
+import StackedIcon from '../icons/StackedIcon'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import randimals from 'randimals'
-import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
-const ComposerToolbar = () => {
-    const { currentUser } = useCurrentUser()
-    const ceramicStagehand = new CeramicStagehand()
-    const { composer } = useComposerContext()
-    const [exportedCompositionCID, setExportedCompositionCID] =
-        useState<string>('')
+interface ComposerToolbarProps {
+    currentUser: UserType
+}
+
+const ComposerToolbar = ({ currentUser }: ComposerToolbarProps) => {
     const [showConfig, setShowConfig] = useState(false)
 
     const toggleShowConfig = () => setShowConfig(!showConfig)
@@ -37,23 +33,7 @@ const ComposerToolbar = () => {
     const toggleShowLoadCompositionModal = () =>
         setShowLoadCompositionModal(!showLoadCompositionModal)
 
-    const onExportComposition = async () => {
-        try {
-            if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
-
-            const streamID = await ceramicStagehand.createComposition(
-                randimals(),
-                composer,
-                currentUser.selfID
-            )
-            if (streamID) {
-                setExportedCompositionCID(streamID)
-                toggleShowExportCompositionModal()
-            }
-        } catch (e) {
-            cpLogger.push(e)
-        }
-    }
+    const onSaveComposition = async () => {}
 
     const onTestLog = async () => {
         await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
@@ -83,32 +63,36 @@ const ComposerToolbar = () => {
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowLoadCompositionModal}
-                    label="Load"
-                    icon={<CloudArrowDown />}
+                    label="Open"
+                    icon={<FolderOpen />}
                 />
                 <ComposerToolbarButton
-                    onClick={onExportComposition}
-                    label="Export"
-                    icon={<ArrowSquareRight />}
+                    onClick={toggleShowExportCompositionModal}
+                    label="Save As..."
+                    icon={
+                        <StackedIcon
+                            icon={<FloppyDisk />}
+                            stackedIcon={<PencilSimple />}
+                        />
+                    }
+                />
+                <ComposerToolbarButton
+                    onClick={onSaveComposition}
+                    label="Save"
+                    icon={<FloppyDisk />}
                 />
             </Box>
-            {showLoadCompositionModal && (
+            {showLoadCompositionModal && currentUser.selfID && (
                 <LoadCompositionModal
+                    selfID={currentUser.selfID}
                     onClose={toggleShowLoadCompositionModal}
                 />
             )}
-            {showExportCompositionModal && (
-                <BasePopupModal
-                    title="Composition exported"
-                    description={exportedCompositionCID}
-                    onClose={toggleShowExportCompositionModal}
-                >
-                    <Button
-                        primary
-                        href={`/templates/create/${exportedCompositionCID}`}
-                        label="Create template"
-                    />
-                </BasePopupModal>
+            {showExportCompositionModal && currentUser.selfID && (
+                <ExportCompositionModal
+                    selfID={currentUser.selfID}
+                    onBack={toggleShowExportCompositionModal}
+                />
             )}
             {showConfig && (
                 <BaseLayerModal onBack={toggleShowConfig}>

@@ -18,6 +18,7 @@ import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -30,6 +31,7 @@ interface CreateTemplateMultiStepFormProps {
     compositionCID: string
     onFailure: (error?: ErrorMessageType) => void
     onSuccess: () => void
+    currentUser: UserType
 }
 
 export type CreateTemplateMultiStepFormType = {
@@ -82,8 +84,8 @@ export const CreateTemplateMultiStepForm = ({
     compositionCID,
     onSuccess,
     onFailure,
+    currentUser,
 }: CreateTemplateMultiStepFormProps) => {
-    const { currentUser } = useCurrentUser()
     const [input, setInput] =
         useState<CreateTemplateMultiStepFormType>(initialInput)
     const [isCollateralFlex, setIsCollateralFlex] = useState<boolean>(false)
@@ -108,10 +110,7 @@ export const CreateTemplateMultiStepForm = ({
         let ctAddress = ''
         if (composition.solvers[0].config.collateralToken) {
             ctAddress = composition.solvers[0].config.collateralToken
-        } else if (
-            currentUser.chainId &&
-            SUPPORTED_CHAINS[currentUser.chainId]
-        ) {
+        } else if (SUPPORTED_CHAINS[currentUser.chainId]) {
             ctAddress =
                 SUPPORTED_CHAINS[currentUser.chainId].contracts
                     .defaultDenominationToken
@@ -169,12 +168,11 @@ export const CreateTemplateMultiStepForm = ({
                 flexInput.isFlex = stayFlex
             })
 
-            const stagehand = new CeramicStagehand()
+            const stagehand = new CeramicStagehand(currentUser.selfID)
             const templateCID = await stagehand.createTemplate(
                 randimals(),
                 updatedInput,
-                compositionCID,
-                currentUser.selfID
+                compositionCID
             )
             if (!templateCID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 
