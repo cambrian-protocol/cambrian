@@ -2,17 +2,17 @@ import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalle
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import SettingsDashboardUI from '@cambrian/app/ui/dashboard/SettingsDashboardUI'
+import ProfileDashboardUI from '@cambrian/app/ui/dashboard/ProfileDashboardUI'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-export default function SettingsDashboardPage() {
+export default function ProfileDashboardPage() {
     const { currentUser, isUserLoaded } = useCurrentUser()
 
     return (
         <>
             {isUserLoaded ? (
                 currentUser && currentUser.selfID ? (
-                    <SettingsDashboardUI />
+                    <ProfileDashboardUI currentUser={currentUser} />
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">
                         <ConnectWalletSection />

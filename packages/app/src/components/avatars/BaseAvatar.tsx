@@ -10,45 +10,68 @@ interface BaseAvatarProps {
     onClick?: () => void
     address?: string
     icon?: JSX.Element
+    size?: 'large'
 }
 
-const BaseAvatar = ({ address, pfpPath, icon, onClick }: BaseAvatarProps) => (
-    <Box
-        onClick={onClick}
-        justify="center"
-        align="center"
-        focusIndicator={false}
-        height={{ min: 'auto' }}
-    >
+const BaseAvatar = ({
+    address,
+    pfpPath,
+    icon,
+    onClick,
+    size,
+}: BaseAvatarProps) => {
+    const iconSize = size === 'large' ? '64' : '24'
+
+    return (
         <Box
-            elevation="small"
-            width={{ min: '3em', max: '3em' }}
-            height={{ min: '3em', max: '3em' }}
-            background="brand"
+            onClick={onClick}
             justify="center"
             align="center"
-            round="xsmall"
-            overflow="hidden"
+            focusIndicator={false}
+            height={{ min: 'auto' }}
         >
-            <IconContext.Provider value={{ color: 'white', size: '24' }}>
-                {(pfpPath !== undefined && pfpPath !== '') ||
-                address !== undefined ? (
-                    <Image
-                        fit="cover"
-                        src={
-                            pfpPath !== undefined && pfpPath !== ''
-                                ? pfpPath
-                                : blockies.create({ seed: address }).toDataURL()
-                        }
-                    />
-                ) : icon ? (
-                    icon
-                ) : (
-                    <User />
-                )}
-            </IconContext.Provider>
+            <Box
+                elevation="small"
+                width={
+                    size === 'large'
+                        ? { min: 'small', max: 'small' }
+                        : { min: '3em', max: '3em' }
+                }
+                height={
+                    size === 'large'
+                        ? { min: 'small', max: 'small' }
+                        : { min: '3em', max: '3em' }
+                }
+                background="brand"
+                justify="center"
+                align="center"
+                round="xsmall"
+                overflow="hidden"
+            >
+                <IconContext.Provider
+                    value={{ color: 'white', size: iconSize }}
+                >
+                    {(pfpPath !== undefined && pfpPath !== '') ||
+                    address !== undefined ? (
+                        <Image
+                            fit="cover"
+                            src={
+                                pfpPath !== undefined && pfpPath !== ''
+                                    ? pfpPath
+                                    : blockies
+                                          .create({ seed: address })
+                                          .toDataURL()
+                            }
+                        />
+                    ) : icon ? (
+                        icon
+                    ) : (
+                        <User />
+                    )}
+                </IconContext.Provider>
+            </Box>
         </Box>
-    </Box>
-)
+    )
+}
 
 export default BaseAvatar

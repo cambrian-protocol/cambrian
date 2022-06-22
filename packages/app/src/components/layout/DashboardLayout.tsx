@@ -48,16 +48,17 @@ const DashboardLayout = ({ contextTitle, children }: DashboardLayoutProps) => {
                         top={'-200px'}
                     />
                     <Appbar />
-                    <Box
-                        fill
-                        direction="row"
-                        pad="large"
-                        style={{ position: 'relative' }}
-                    >
-                        <Box width={{ min: 'auto' }} border={{ side: 'right' }}>
+                    <Box fill direction="row" style={{ position: 'relative' }}>
+                        <Box width={{ min: 'auto' }}>
                             <DashboardSidebar />
                         </Box>
-                        <Box fill>{children}</Box>
+                        <Box
+                            fill
+                            overflow={{ vertical: 'auto' }}
+                            pad={{ left: 'large' }}
+                        >
+                            {children}
+                        </Box>
                     </Box>
                 </Page>
             </Box>

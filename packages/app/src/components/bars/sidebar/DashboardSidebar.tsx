@@ -2,10 +2,10 @@ import {
     Bell,
     ClipboardText,
     File,
-    Gear,
     House,
     PuzzlePiece,
     TreeStructure,
+    UserCircleGear,
 } from 'phosphor-react'
 
 import BaseListItemButton from '../../buttons/BaseListItemButton'
@@ -45,9 +45,9 @@ const dashboardRoutes = [
         label: 'Compositions',
     },
     {
-        slug: '/dashboard/settings',
-        icon: <Gear />,
-        label: 'Settings',
+        slug: '/dashboard/profile',
+        icon: <UserCircleGear />,
+        label: 'Profile',
     },
 ]
 
@@ -55,8 +55,13 @@ const DashboardSidebar = () => {
     const router = useRouter()
 
     return (
-        <Box fill width={{ min: 'medium' }} justify="between">
-            <Box>
+        <Box
+            fill
+            width={{ min: 'medium' }}
+            justify="between"
+            pad={{ left: 'large', vertical: 'large' }}
+        >
+            <Box border={{ side: 'right' }} fill>
                 {dashboardRoutes.map((dashboardRoute) => (
                     <BaseListItemButton
                         hideDivider
