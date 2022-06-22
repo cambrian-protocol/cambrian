@@ -12,7 +12,10 @@ export default function ProfileDashboardPage() {
         <>
             {isUserLoaded ? (
                 currentUser && currentUser.selfID ? (
-                    <ProfileDashboardUI currentUser={currentUser} />
+                    <ProfileDashboardUI
+                        currentUser={currentUser}
+                        selfID={currentUser.selfID}
+                    />
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">
                         <ConnectWalletSection />

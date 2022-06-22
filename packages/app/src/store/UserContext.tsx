@@ -1,4 +1,5 @@
 import {
+    BasicProfile,
     EthereumAuthProvider,
     SelfID,
     useViewerConnection,
@@ -27,6 +28,7 @@ export type UserContextType = {
     connectWallet: () => Promise<void>
     addPermission: (permission: PermissionType) => void
     isUserLoaded: boolean
+    initSelfID: (selfID: SelfID) => Promise<void>
 }
 
 export type UserType = {
@@ -39,6 +41,7 @@ export type UserType = {
     chainId: number
     permissions: PermissionType[]
     selfID?: SelfID
+    basicProfile?: BasicProfile
 }
 
 type UserActionType =
@@ -62,6 +65,7 @@ type UserActionType =
     | {
           type: 'SET_SELF_ID'
           selfID: UserType['selfID']
+          basicProfile?: BasicProfile
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -132,6 +136,7 @@ function userReducer(
                 return {
                     ...state,
                     selfID: action.selfID,
+                    basicProfile: action.basicProfile,
                 }
             }
             break
@@ -158,6 +163,7 @@ export const UserContext = React.createContext<UserContextType>({
     disconnectWallet: () => {},
     connectWallet: async () => {},
     isUserLoaded: false,
+    initSelfID: async () => {},
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
@@ -174,6 +180,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             const address = await signer.getAddress()
             const network = await web3Provider.getNetwork()
             await ceramicConnect(new EthereumAuthProvider(provider, address))
+
             dispatch({
                 type: 'SET_USER',
                 provider,
@@ -194,13 +201,19 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             ceramicConnection.status === 'connected' &&
             ceramicConnection.selfID
         ) {
-            dispatch({
-                type: 'SET_SELF_ID',
-                selfID: ceramicConnection.selfID,
-            })
-            setIsUserLoaded(true)
+            initSelfID(ceramicConnection.selfID)
         }
     }, [ceramicConnection])
+
+    const initSelfID = async (ceramicSelfID: SelfID) => {
+        const basicProfile = await ceramicSelfID.get('basicProfile')
+        dispatch({
+            type: 'SET_SELF_ID',
+            selfID: ceramicSelfID,
+            basicProfile: basicProfile || undefined,
+        })
+        setIsUserLoaded(true)
+    }
 
     const disconnectWallet = useCallback(
         async function () {
@@ -301,6 +314,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 connectWallet: connectWallet,
                 disconnectWallet: disconnectWallet,
                 isUserLoaded: isUserLoaded,
+                initSelfID: initSelfID,
             }}
         >
             <PermissionProvider permissions={user ? user.permissions : []}>

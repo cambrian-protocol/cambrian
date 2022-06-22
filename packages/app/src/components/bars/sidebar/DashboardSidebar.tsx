@@ -62,8 +62,9 @@ const DashboardSidebar = () => {
             pad={{ left: 'large', vertical: 'large' }}
         >
             <Box border={{ side: 'right' }} fill>
-                {dashboardRoutes.map((dashboardRoute) => (
+                {dashboardRoutes.map((dashboardRoute, idx) => (
                     <BaseListItemButton
+                        key={idx}
                         hideDivider
                         disabled={dashboardRoute.disabled}
                         icon={dashboardRoute.icon}
