@@ -1,5 +1,8 @@
+import { Box, Page, WorldMap } from 'grommet'
+
 import Appbar from '../bars/Appbar'
-import { Box } from 'grommet'
+import DashboardSidebar from '../bars/sidebar/DashboardSidebar'
+import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { PropsWithChildren } from 'react'
 import { siteTitle } from './PageLayout'
@@ -19,9 +22,44 @@ const DashboardLayout = ({ contextTitle, children }: DashboardLayoutProps) => {
                 <meta name="og:title" content={siteTitle} />
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
-            <Box height={'100vh'} width={{ min: '1000px' }}>
-                <Appbar />
-                <Box fill>{children}</Box>
+            <Box height={'100vh'}>
+                <Page
+                    style={{ position: 'relative' }}
+                    overflow={{
+                        vertical: 'auto',
+                        horizontal: 'hidden',
+                    }}
+                    fill
+                >
+                    <WorldMap
+                        color="brand"
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '20%',
+                            opacity: 0.03,
+                            height: '70vh',
+                        }}
+                    />
+                    <Glow
+                        height="800px"
+                        width="1000px"
+                        left={'5%'}
+                        top={'-200px'}
+                    />
+                    <Appbar />
+                    <Box
+                        fill
+                        direction="row"
+                        pad="large"
+                        style={{ position: 'relative' }}
+                    >
+                        <Box width={{ min: 'auto' }} border={{ side: 'right' }}>
+                            <DashboardSidebar />
+                        </Box>
+                        <Box fill>{children}</Box>
+                    </Box>
+                </Page>
             </Box>
         </>
     )

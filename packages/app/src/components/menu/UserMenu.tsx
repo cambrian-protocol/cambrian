@@ -1,4 +1,5 @@
 import {
+    Bell,
     Books,
     HouseLine,
     Question,
@@ -44,6 +45,12 @@ export default function UserMenu() {
 
     if (currentUser) {
         menuItems.unshift({
+            label: <UserMenuItemLabel label="Notification" />,
+            icon: <UserMenuItemIcon icon={<Bell />} />,
+            href: '/dashboard/notification',
+            disabled: true,
+        })
+        menuItems.unshift({
             label: (
                 <UserMenuItemLabel
                     subTitle={chainName}
@@ -55,7 +62,7 @@ export default function UserMenu() {
         menuItems.unshift({
             label: <UserMenuItemLabel label="Dashboard" />,
             icon: <UserMenuItemIcon icon={<HouseLine />} />,
-            href: WIKI_NOTION_LINK,
+            href: '/dashboard',
         })
         menuItems.push({
             label: (
