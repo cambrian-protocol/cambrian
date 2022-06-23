@@ -19,7 +19,7 @@ const updateSelectedElementAction = (
             el.style = {
                 ...el.style,
                 border: 'white 2px solid',
-                borderRadius: '15px',
+                borderRadius: '8px',
             }
         } else {
             el.style = { ...el.style, border: 'none' }
