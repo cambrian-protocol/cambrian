@@ -101,15 +101,20 @@ const CompositionDashboardTile = ({
                                 icon={<DotsThree />}
                             />
                         </CardHeader>
-                        <CardBody
-                            onClick={() =>
-                                router.push(`/composer/composition/${streamID}`)
-                            }
-                            hoverIndicator
-                            justify="center"
-                            align="center"
-                        >
-                            <TreeStructure size="64" />
+                        <CardBody pad="small">
+                            <Box
+                                flex
+                                onClick={() =>
+                                    router.push(
+                                        `/composer/composition/${streamID}`
+                                    )
+                                }
+                                hoverIndicator
+                                justify="center"
+                                align="center"
+                            >
+                                <TreeStructure size="64" />
+                            </Box>
                         </CardBody>
                         <Box pad={{ horizontal: 'small' }}>
                             <PlainSectionDivider />
