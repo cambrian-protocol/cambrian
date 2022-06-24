@@ -1,7 +1,6 @@
 import {
-    Bell,
     Books,
-    HouseLine,
+    ChartBar,
     Question,
     SignIn,
     SignOut,
@@ -39,12 +38,6 @@ export default function UserMenu() {
 
     if (currentUser) {
         menuItems.unshift({
-            label: <UserMenuItemLabel label="Notification" />,
-            icon: <UserMenuItemIcon icon={<Bell />} />,
-            href: '/dashboard/notification',
-            disabled: true,
-        })
-        menuItems.unshift({
             label: (
                 <UserMenuItemLabel
                     subTitle={ellipseAddress(currentUser.address, 9)}
@@ -56,7 +49,7 @@ export default function UserMenu() {
         })
         menuItems.unshift({
             label: <UserMenuItemLabel label="Dashboard" />,
-            icon: <UserMenuItemIcon icon={<HouseLine />} />,
+            icon: <UserMenuItemIcon icon={<ChartBar />} />,
             href: '/dashboard',
         })
         menuItems.push({
