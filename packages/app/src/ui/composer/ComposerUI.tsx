@@ -143,10 +143,16 @@ export const ComposerUI = () => {
     return (
         <>
             <ComposerLayout
-                contextTitle={`Composer | ${compositionKey}`}
+                contextTitle={
+                    compositionKey
+                        ? `Composer | ${compositionKey}`
+                        : 'Loading...'
+                }
                 sidebar={
                     <Box gap="small" fill>
-                        <CompositionHeader compositionTitle={compositionKey} />
+                        <CompositionHeader
+                            compositionTitle={compositionKey || 'Loading...'}
+                        />
                         {renderControl()}
                     </Box>
                 }
