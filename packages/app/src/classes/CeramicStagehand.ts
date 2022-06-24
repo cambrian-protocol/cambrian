@@ -250,6 +250,7 @@ export default class CeramicStagehand {
                     streamID: compositionStreamID,
                     commitID: composition.commitId.toString(),
                 },
+                author: this.selfID.did.toString(),
             }
 
             if (!this.isStageSchema(template, StageNames.template)) {
@@ -272,7 +273,7 @@ export default class CeramicStagehand {
                 {
                     controllers: [this.selfID.id],
                     family: 'cambrian-lib',
-                    tags: ['templates'],
+                    tags: ['template'],
                 },
                 { pin: true }
             )
@@ -339,6 +340,10 @@ export default class CeramicStagehand {
                         commitID: template.commitId.toString(),
                     },
                     flexInputs: createProposalInput.flexInputs,
+                    authors: [
+                        template.content.author,
+                        this.selfID.did.toString(),
+                    ],
                 }
 
                 if (!this.isStageSchema(proposal, StageNames.proposal)) {
@@ -363,7 +368,7 @@ export default class CeramicStagehand {
                     {
                         controllers: [this.selfID.id],
                         family: 'cambrian-lib',
-                        tags: ['proposals'],
+                        tags: ['proposal'],
                     },
                     { pin: true }
                 )
@@ -387,6 +392,25 @@ export default class CeramicStagehand {
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    sendProposal = async (proposalStreamID: string) => {
+        try {
+            // Hit mailbox server
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_WICKBOX}/propose`,
+                {
+                    method: 'POST',
+                    body: proposalStreamID,
+                }
+            )
+
+            if (res.status === 200) {
+                return true
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
 

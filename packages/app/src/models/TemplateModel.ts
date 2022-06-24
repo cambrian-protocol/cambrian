@@ -31,4 +31,5 @@ export type CeramicTemplateModel = {
         commitID: string
     }
     flexInputs: FlexInputFormType[]
+    author: string // DID
 }

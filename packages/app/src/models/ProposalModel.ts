@@ -18,4 +18,5 @@ export type CeramicProposalModel = {
         streamID: string
         commitID: string
     }
+    authors: string[] // DIDs
 }
