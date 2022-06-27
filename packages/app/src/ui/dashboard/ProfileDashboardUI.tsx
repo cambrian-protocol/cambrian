@@ -5,13 +5,11 @@ import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import DashboardLayout from '@cambrian/app/components/layout/DashboardLayout'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { SelfID } from '@self.id/framework'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface ProfileDashboardUIProps {
     currentUser: UserType
-    selfID: SelfID
 }
 
 type ProfileFormType = {
@@ -23,6 +21,7 @@ type ProfileFormType = {
     company: string
     website: string
     twitter: string
+    discordWebhook: string
 }
 
 const initalInput = {
@@ -34,12 +33,10 @@ const initalInput = {
     company: '',
     website: '',
     twitter: '',
+    discordWebhook: '',
 }
 
-const ProfileDashboardUI = ({
-    currentUser,
-    selfID,
-}: ProfileDashboardUIProps) => {
+const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     const { initSelfID } = useCurrentUser()
     const [input, setInput] = useState<ProfileFormType>(initalInput)
     const [isSaving, setIsSaving] = useState(false)
@@ -51,8 +48,8 @@ const ProfileDashboardUI = ({
     const onSave = async () => {
         setIsSaving(true)
         try {
-            await selfID.merge('basicProfile', input)
-            initSelfID(selfID)
+            await currentUser.selfID.merge('basicProfile', input)
+            initSelfID(currentUser.selfID)
         } catch (e) {}
         setIsSaving(false)
     }
@@ -101,7 +98,7 @@ const ProfileDashboardUI = ({
                                 <Text color="dark-4" size="small">
                                     Update your Web3 profile. We don’t store
                                     this data, it is saved to your decentralized
-                                    ID and is tied to your wallet.
+                                    ID and tied to your wallet.
                                 </Text>
                             </Box>
                             <Box
@@ -163,6 +160,10 @@ const ProfileDashboardUI = ({
                         <FormField label="Company" name="company" />
                         <FormField label="Website" name="website" />
                         <FormField label="Twitter" name="twitter" />
+                        <FormField
+                            label="Dicord Webhook"
+                            name="discordWebhook"
+                        />
                     </Form>
                 </Box>
                 <Box pad="large" />
