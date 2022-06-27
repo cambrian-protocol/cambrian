@@ -7,7 +7,7 @@ import "@nomiclabs/hardhat-web3";
 import "tsconfig-paths/register";
 import "@nomiclabs/hardhat-etherscan";
 // import 'hardhat-log-remover'
-// import "hardhat-gas-reporter";
+import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/types";
 import dotenv from "dotenv";
 
@@ -51,7 +51,7 @@ export const config = {
   },
   gasReporter: {
     currency: "USD",
-    gasPrice: 32,
+    gasPrice: 2,
     coinmarketcap: "5dc6d6fd-09c5-4c48-8296-9e2b44dde46a",
   },
   typechain: {
