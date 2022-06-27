@@ -1,39 +1,63 @@
-import { Bug, FloppyDisk, FolderOpen, Gear, PencilSimple } from 'phosphor-react'
+import { ArrowSquareRight, Bug, FloppyDisk, Gear } from 'phosphor-react'
+import CeramicStagehand, {
+    StageNames,
+} from '@cambrian/app/classes/CeramicStagehand'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
-import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
-import StackedIcon from '../icons/StackedIcon'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useState } from 'react'
 
 interface ComposerToolbarProps {
-    currentUser: UserType
+    disabled: boolean
+    ceramicStagehand?: CeramicStagehand
+    currentComposition: CompositionModel
+    compositionKey?: string
 }
 
-const ComposerToolbar = ({ currentUser }: ComposerToolbarProps) => {
+const ComposerToolbar = ({
+    disabled,
+    ceramicStagehand,
+    currentComposition,
+    compositionKey,
+}: ComposerToolbarProps) => {
     const [showConfig, setShowConfig] = useState(false)
-
-    const toggleShowConfig = () => setShowConfig(!showConfig)
-
-    const [showLoadCompositionModal, setShowLoadCompositionModal] =
-        useState(false)
-
     const [showExportCompositionModal, setShowExportCompostionModal] =
         useState(false)
+    const [isSaving, setIsSaving] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
+    const toggleShowConfig = () => setShowConfig(!showConfig)
     const toggleShowExportCompositionModal = () =>
         setShowExportCompostionModal(!showExportCompositionModal)
 
-    const toggleShowLoadCompositionModal = () =>
-        setShowLoadCompositionModal(!showLoadCompositionModal)
-
-    const onSaveComposition = async () => {}
+    const onSaveComposition = async () => {
+        if (ceramicStagehand && compositionKey) {
+            setIsSaving(true)
+            try {
+                await ceramicStagehand.updateStream(
+                    compositionKey,
+                    {
+                        solvers: currentComposition.solvers,
+                        flowElements: currentComposition.flowElements,
+                    },
+                    StageNames.composition
+                )
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            }
+            setIsSaving(false)
+        }
+    }
 
     const onTestLog = async () => {
         await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
@@ -42,55 +66,43 @@ const ComposerToolbar = ({ currentUser }: ComposerToolbarProps) => {
     return (
         <>
             <Box
-                pad="small"
                 fill
                 round="xsmall"
                 background={'background-contrast'}
                 align="center"
-                gap="medium"
+                gap="xsmall"
                 justify="end"
                 elevation="small"
+                pad={{ vertical: 'small' }}
             >
                 <ComposerToolbarButton
                     onClick={onTestLog}
                     label="Test Log"
                     icon={<Bug />}
+                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowConfig}
                     label="Solution"
                     icon={<Gear />}
-                />
-                <ComposerToolbarButton
-                    onClick={toggleShowLoadCompositionModal}
-                    label="Open"
-                    icon={<FolderOpen />}
+                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowExportCompositionModal}
-                    label="Save As..."
-                    icon={
-                        <StackedIcon
-                            icon={<FloppyDisk />}
-                            stackedIcon={<PencilSimple />}
-                        />
-                    }
+                    label="Export"
+                    icon={<ArrowSquareRight />}
+                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={onSaveComposition}
                     label="Save"
                     icon={<FloppyDisk />}
+                    disabled={disabled || isSaving}
                 />
             </Box>
-            {showLoadCompositionModal && currentUser.selfID && (
-                <LoadCompositionModal
-                    selfID={currentUser.selfID}
-                    onClose={toggleShowLoadCompositionModal}
-                />
-            )}
-            {showExportCompositionModal && currentUser.selfID && (
+            {showExportCompositionModal && ceramicStagehand && (
                 <ExportCompositionModal
-                    selfID={currentUser.selfID}
+                    ceramicStagehand={ceramicStagehand}
                     onBack={toggleShowExportCompositionModal}
                 />
             )}
@@ -98,6 +110,12 @@ const ComposerToolbar = ({ currentUser }: ComposerToolbarProps) => {
                 <BaseLayerModal onBack={toggleShowConfig}>
                     <SolutionConfig />
                 </BaseLayerModal>
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    errorMessage={errorMessage}
+                    onClose={() => setErrorMessage(undefined)}
+                />
             )}
         </>
     )

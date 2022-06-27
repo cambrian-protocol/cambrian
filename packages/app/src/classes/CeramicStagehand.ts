@@ -5,6 +5,7 @@ import { CreateProposalMultiStepFormType } from '../ui/proposals/forms/CreatePro
 import { CreateTemplateMultiStepFormType } from '../ui/templates/forms/CreateTemplateMultiStepForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { SelfID } from '@self.id/framework'
+import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -37,24 +38,70 @@ export default class CeramicStagehand {
         return true
     }
 
-    createStream = async (streamID: string, data: any, stage: StageNames) => {
+    updateStream = async (streamKey: string, data: any, stage: StageNames) => {
+        if (!this.isStageSchema(data, stage)) {
+            throw GENERAL_ERROR['WRONG_SCHEMA']
+        }
+
+        const currentDoc = await TileDocument.deterministic(
+            this.selfID.client.ceramic,
+            {
+                controllers: [this.selfID.id],
+                family: `cambrian-${stage}`,
+                tags: [streamKey],
+            }
+        )
+        await currentDoc.update(data)
+    }
+
+    updateStreamKey = async (
+        currentStreamKey: string,
+        updatedStreamKey: string,
+        stage: StageNames
+    ) => {
+        const currentStage = await TileDocument.deterministic(
+            this.selfID.client.ceramic,
+            {
+                controllers: [this.selfID.id],
+                family: CAMBRIAN_LIB_NAME,
+                tags: [stage],
+            },
+            { pin: true }
+        )
+
+        if (
+            currentStage.content !== null &&
+            typeof currentStage.content === 'object'
+        ) {
+            const updatedStreams = {
+                ...(currentStage.content as StringHashmap),
+            }
+            const streamID = updatedStreams[currentStreamKey]
+
+            let uniqueUpdatedStreamKey = updatedStreamKey
+            let counter = 1
+            while (updatedStreams[uniqueUpdatedStreamKey]) {
+                uniqueUpdatedStreamKey = updatedStreamKey + ` (${counter++})`
+            }
+
+            updatedStreams[uniqueUpdatedStreamKey] = streamID
+            delete updatedStreams[currentStreamKey]
+
+            await currentStage.update({
+                ...updatedStreams,
+            })
+
+            return uniqueUpdatedStreamKey
+        }
+    }
+
+    createStream = async (streamKey: string, data: any, stage: StageNames) => {
         if (!this.isStageSchema(data, stage)) {
             throw GENERAL_ERROR['WRONG_SCHEMA']
         }
 
         try {
-            const currentDoc = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: `cambrian-${stage}`,
-                    tags: [streamID],
-                }
-            )
-
-            await currentDoc.update(data)
-
-            const currentStage = await TileDocument.deterministic(
+            const stageCollection = await TileDocument.deterministic(
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.id],
@@ -64,21 +111,48 @@ export default class CeramicStagehand {
                 { pin: true }
             )
 
+            let uniqueStreamKey = streamKey
+
             if (
-                currentStage.content !== null &&
-                typeof currentStage.content === 'object'
+                stageCollection.content !== null &&
+                typeof stageCollection.content === 'object'
             ) {
-                await currentStage.update({
-                    ...currentStage.content,
-                    [streamID]: currentDoc.id.toString(),
+                const collection = {
+                    ...(stageCollection.content as StringHashmap),
+                }
+                let counter = 1
+                while (collection[uniqueStreamKey]) {
+                    uniqueStreamKey = streamKey + ` (${counter++})`
+                }
+            }
+
+            const currentDoc = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-${stage}`,
+                    tags: [uniqueStreamKey],
+                }
+            )
+            await currentDoc.update(data)
+
+            const streamID = currentDoc.id.toString()
+
+            if (
+                stageCollection.content !== null &&
+                typeof stageCollection.content === 'object'
+            ) {
+                await stageCollection.update({
+                    ...stageCollection.content,
+                    [uniqueStreamKey]: streamID,
                 })
             } else {
-                await currentStage.update({
-                    [streamID]: currentDoc.id.toString(),
+                await stageCollection.update({
+                    [uniqueStreamKey]: streamID,
                 })
             }
 
-            return currentDoc.id.toString()
+            return streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -117,13 +191,9 @@ export default class CeramicStagehand {
         }
     }
 
-    updateStream = async (streamID: string, data: any, stage: StageNames) => {
-        this.createStream(streamID, data, stage)
-    }
-
-    deleteStream = async (streamID: string, stage: StageNames) => {
+    deleteStream = async (streamKey: string, stage: StageNames) => {
         try {
-            const compositionCollection = await TileDocument.deterministic(
+            const stageCollection = await TileDocument.deterministic(
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.id],
@@ -134,17 +204,15 @@ export default class CeramicStagehand {
             )
 
             if (
-                compositionCollection.content !== null &&
-                typeof compositionCollection.content === 'object'
+                stageCollection.content !== null &&
+                typeof stageCollection.content === 'object'
             ) {
-                const updatedCompositionCollection: { [key: string]: string } =
-                    {
-                        ...compositionCollection.content,
-                    }
+                const updatedCompositionCollection: StringHashmap = {
+                    ...stageCollection.content,
+                }
 
-                delete updatedCompositionCollection[streamID]
-
-                compositionCollection.update({
+                delete updatedCompositionCollection[streamKey]
+                stageCollection.update({
                     ...updatedCompositionCollection,
                 })
             }

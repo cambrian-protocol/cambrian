@@ -1,9 +1,9 @@
 import {
-    Bell,
+    ChartBar,
     ClipboardText,
     File,
-    House,
     PuzzlePiece,
+    Storefront,
     TreeStructure,
     UserCircleGear,
 } from 'phosphor-react'
@@ -15,13 +15,13 @@ import { useRouter } from 'next/router'
 const dashboardRoutes = [
     {
         slug: '/dashboard',
-        icon: <House />,
+        icon: <ChartBar />,
         label: 'Dashboard',
     },
     {
-        slug: '/dashboard/notification',
-        icon: <Bell />,
-        label: 'Notification',
+        slug: '/dashboard/marketplace',
+        icon: <Storefront />,
+        label: 'Marketplace',
         disabled: true,
     },
     {
