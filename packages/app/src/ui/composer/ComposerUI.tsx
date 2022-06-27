@@ -62,8 +62,7 @@ export const ComposerUI = () => {
         if (
             compositionStreamID !== undefined &&
             typeof compositionStreamID === 'string' &&
-            currentUser &&
-            currentUser.selfID
+            currentUser
         ) {
             try {
                 const newCeramicStagehand = new CeramicStagehand(

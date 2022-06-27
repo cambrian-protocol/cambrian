@@ -34,7 +34,7 @@ const CompositionsDashboardUI = () => {
         setShowCreateCompositionModal(!showCreateCompositionModal)
 
     useEffect(() => {
-        if (currentUser && currentUser?.selfID) {
+        if (currentUser) {
             const ceramicStagehandInstance = new CeramicStagehand(
                 currentUser.selfID
             )

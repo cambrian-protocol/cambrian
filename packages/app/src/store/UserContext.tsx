@@ -33,14 +33,12 @@ export type UserContextType = {
 
 export type UserType = {
     provider: any
-    web3Provider:
-        | ethers.providers.Web3Provider
-        | ethers.providers.JsonRpcProvider
+    web3Provider: ethers.providers.Web3Provider
     signer: ethers.Signer
     address: string
     chainId: number
     permissions: PermissionType[]
-    selfID?: SelfID
+    selfID: SelfID
     basicProfile?: BasicProfile
 }
 
@@ -52,6 +50,8 @@ type UserActionType =
           signer: UserType['signer']
           address: UserType['address']
           chainId: UserType['chainId']
+          selfID: UserType['selfID']
+          basicProfile?: BasicProfile
       }
     | {
           type: 'SET_SIGNER'
@@ -61,11 +61,6 @@ type UserActionType =
     | {
           type: 'SET_CHAIN_ID'
           chainId: UserType['chainId']
-      }
-    | {
-          type: 'SET_SELF_ID'
-          selfID: UserType['selfID']
-          basicProfile?: BasicProfile
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -110,6 +105,8 @@ function userReducer(
                 signer: action.signer,
                 address: action.address,
                 chainId: action.chainId,
+                selfID: action.selfID,
+                basicProfile: action.basicProfile,
                 permissions: [],
             }
         case 'SET_SIGNER':
@@ -118,7 +115,6 @@ function userReducer(
                     ...state,
                     address: action.address,
                     signer: action.signer,
-                    selfID: undefined,
                     permissions: [],
                 }
             }
@@ -128,15 +124,6 @@ function userReducer(
                 return {
                     ...state,
                     chainId: action.chainId,
-                }
-            }
-            break
-        case 'SET_SELF_ID':
-            if (state) {
-                return {
-                    ...state,
-                    selfID: action.selfID,
-                    basicProfile: action.basicProfile,
                 }
             }
             break
@@ -170,6 +157,10 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [ceramicConnection, ceramicConnect, ceramicDisconnect] =
         useViewerConnection()
     const [user, dispatch] = useReducer(userReducer, null)
+    const [walletConnection, setWalletConnection] = useState<Omit<
+        UserType,
+        'selfID' | 'basicProfile'
+    > | null>(null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
 
     const connectWallet = useCallback(async function () {
@@ -179,16 +170,15 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             const signer = web3Provider.getSigner()
             const address = await signer.getAddress()
             const network = await web3Provider.getNetwork()
-            await ceramicConnect(new EthereumAuthProvider(provider, address))
-
-            dispatch({
-                type: 'SET_USER',
-                provider,
-                web3Provider,
-                signer,
-                address,
+            setWalletConnection({
+                address: address,
+                signer: signer,
+                web3Provider: web3Provider,
+                provider: provider,
                 chainId: network.chainId,
+                permissions: [],
             })
+            await ceramicConnect(new EthereumAuthProvider(provider, address))
         } catch (e) {
             setIsUserLoaded(true)
             cpLogger.push(e)
@@ -199,20 +189,28 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         console.log(ceramicConnection)
         if (
             ceramicConnection.status === 'connected' &&
-            ceramicConnection.selfID
+            ceramicConnection.selfID &&
+            walletConnection
         ) {
             initSelfID(ceramicConnection.selfID)
         }
     }, [ceramicConnection])
 
     const initSelfID = async (ceramicSelfID: SelfID) => {
-        const basicProfile = await ceramicSelfID.get('basicProfile')
-        dispatch({
-            type: 'SET_SELF_ID',
-            selfID: ceramicSelfID,
-            basicProfile: basicProfile || undefined,
-        })
-        setIsUserLoaded(true)
+        if (walletConnection) {
+            const basicProfile = await ceramicSelfID.get('basicProfile')
+            dispatch({
+                type: 'SET_USER',
+                provider: walletConnection.provider,
+                web3Provider: walletConnection.web3Provider,
+                signer: walletConnection.signer,
+                address: walletConnection.address,
+                chainId: walletConnection.chainId,
+                basicProfile: basicProfile || undefined,
+                selfID: ceramicSelfID,
+            })
+            setIsUserLoaded(true)
+        }
     }
 
     const disconnectWallet = useCallback(
