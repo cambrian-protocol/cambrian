@@ -39,9 +39,9 @@ export default function ViewTemplatePage() {
                     const ceramicStagehand = new CeramicStagehand(
                         currentUser.selfID
                     )
-                    const template = (await ceramicStagehand.loadStream(
-                        templateStreamID
-                    )) as CeramicTemplateModel
+                    const template = (
+                        await ceramicStagehand.loadStream(templateStreamID)
+                    ).content as CeramicTemplateModel
 
                     if (template) return setCurrentTemplate(template)
                 } catch (e) {

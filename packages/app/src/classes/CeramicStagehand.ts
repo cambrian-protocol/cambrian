@@ -269,6 +269,7 @@ export default class CeramicStagehand {
         createTemplateInput: TemplateFormType,
         compositionStreamID: string
     ) => {
+        // TODO Optional call Add Listing on Trilobot
         try {
             const composition = await TileDocument.load(
                 this.selfID.client.ceramic,

@@ -1,7 +1,6 @@
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
 import { Box } from 'grommet'
 import CodeMirror from '@uiw/react-codemirror'
-import CreateTemplateDetailStep from '@cambrian/app/ui/templates/forms/steps/CreateTemplateDetailStep'
 import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import Glow from '@cambrian/app/components/branding/Glow'
 import { Image } from 'grommet'
@@ -65,6 +64,7 @@ export default function Home() {
                     <Box style={{ position: 'relative' }}>
                         <USPSection />
                         <USPListSection />
+                        {/* TODO Add Screenshot
                         <BaseContentSection
                             title={'Quit a Boss'}
                             subTitle={'Everyone'}
@@ -109,7 +109,7 @@ export default function Home() {
                                     🟢 Live on Ropsten Test Network
                                 </Text>
                             }
-                        />
+                        /> */}
                         <BaseContentSection
                             align="right"
                             title={'Build a Solver'}

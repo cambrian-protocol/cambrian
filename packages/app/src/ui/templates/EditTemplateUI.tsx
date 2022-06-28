@@ -62,14 +62,13 @@ const EditTemplateUI = ({ currentUser }: EditTemplateUIProps) => {
                 const cs = new CeramicStagehand(currentUser.selfID)
                 setCeramicStagehand(cs)
 
-                const template = (await cs.loadStream(
-                    templateStreamID
-                )) as CeramicTemplateModel
+                const template = (await cs.loadStream(templateStreamID))
+                    .content as CeramicTemplateModel
 
                 if (template) {
-                    const composition = (await cs.loadStream(
-                        template.composition.commitID
-                    )) as CompositionModel
+                    const composition = (
+                        await cs.loadStream(template.composition.commitID)
+                    ).content as CompositionModel
 
                     if (composition) {
                         setCurrentComposition(composition)

@@ -40,9 +40,9 @@ export default function NewTemplatePage() {
                     const ceramicStagehand = new CeramicStagehand(
                         currentUser.selfID
                     )
-                    const composition = (await ceramicStagehand.loadStream(
-                        compositionStreamID
-                    )) as CompositionModel
+                    const composition = (
+                        await ceramicStagehand.loadStream(compositionStreamID)
+                    ).content as CompositionModel
 
                     if (composition) return setCurrentComposition(composition)
                 } catch (e) {
