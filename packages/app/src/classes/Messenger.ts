@@ -42,6 +42,25 @@ export default class Messenger {
         this.stagehand = new CeramicStagehand(this.selfID)
     }
 
+    sendMessage = async (chatID: string, message: Message) => {
+        try {
+            const messages = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: 'cambrian-chat',
+                    tags: [chatID],
+                },
+                { pin: true }
+            )
+
+            await messages.patch([{ op: 'add', path: '/-', value: message }])
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
     /**
      * @notice Loads an array of message streams from TileDocument<CeramicProposalModel>
      * @param proposalDoc
