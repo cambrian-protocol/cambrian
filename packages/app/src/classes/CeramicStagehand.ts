@@ -165,7 +165,7 @@ export default class CeramicStagehand {
                 this.selfID.client.ceramic,
                 streamID
             )
-            return doc.content
+            return doc
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
@@ -422,7 +422,7 @@ export default class CeramicStagehand {
             )
 
             if (proposal.content !== null) {
-                const openProposal = await TileDocument.deterministic(
+                const draftProposal = await TileDocument.deterministic(
                     selfID.client.ceramic,
                     {
                         controllers: [selfID.id],
@@ -431,7 +431,7 @@ export default class CeramicStagehand {
                     }
                 )
 
-                await openProposal.update(proposal.content)
+                await draftProposal.update(proposal.content)
             }
         } catch (e) {
             cpLogger.push(e)

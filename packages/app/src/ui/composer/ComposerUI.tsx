@@ -69,9 +69,9 @@ export const ComposerUI = () => {
                     currentUser.selfID
                 )
                 setCeramicStagehand(newCeramicStagehand)
-                const composition = (await newCeramicStagehand.loadStream(
-                    compositionStreamID
-                )) as CompositionModel
+                const composition = (
+                    await newCeramicStagehand.loadStream(compositionStreamID)
+                ).content as CompositionModel
 
                 if (composition) {
                     setLoadedComposition(composition)
