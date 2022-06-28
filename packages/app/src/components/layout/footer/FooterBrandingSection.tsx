@@ -28,9 +28,7 @@ const FooterBrandingSection = () => (
                                 screenSize === 'small' ? 'center' : 'start'
                             }
                         >
-                            Just as we should not be surprised that money has
-                            evolved, we should not be surprised that human
-                            coordination will evolve
+                            Work is evolving.
                         </Text>
                     </Box>
                 </Box>
