@@ -1,4 +1,4 @@
-import { FlexInputFormType } from '../ui/templates/forms/steps/CreateTemplateFlexInputStep'
+import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { TokenModel } from './TokenModel'
 
 export type TemplateModel = {
@@ -19,7 +19,7 @@ export type TemplateModel = {
 export type CeramicTemplateModel = {
     title: string
     description: string
-    proposalRequest: string
+    requirements: string
     price?: {
         amount: number
         denominationTokenAddress: string

@@ -11,7 +11,7 @@ export default function TemplatesDashboardPage() {
     return (
         <>
             {isUserLoaded ? (
-                currentUser && currentUser.selfID ? (
+                currentUser ? (
                     <TemplatesDashboardUI />
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">

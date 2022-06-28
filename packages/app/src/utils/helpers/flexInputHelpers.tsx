@@ -1,6 +1,6 @@
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import FlexInput from '@cambrian/app/components/inputs/FlexInput'
-import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/steps/CreateTemplateFlexInputStep'
+import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 

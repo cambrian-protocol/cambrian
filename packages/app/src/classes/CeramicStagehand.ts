@@ -2,10 +2,10 @@ import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { CreateProposalMultiStepFormType } from '../ui/proposals/forms/CreateProposalMultiStepForm'
-import { CreateTemplateMultiStepFormType } from '../ui/templates/forms/CreateTemplateMultiStepForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { SelfID } from '@self.id/framework'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { TemplateFormType } from '../ui/templates/wizard/TemplateWizard'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -86,7 +86,6 @@ export default class CeramicStagehand {
 
             updatedStreams[uniqueUpdatedStreamKey] = streamID
             delete updatedStreams[currentStreamKey]
-
             await currentStage.update({
                 ...updatedStreams,
             })
@@ -222,9 +221,52 @@ export default class CeramicStagehand {
         }
     }
 
+    updateTemplate = async (
+        templateStreamID: string,
+        updatedTemplateInput: TemplateFormType
+    ) => {
+        const currentDoc = await TileDocument.load(
+            this.selfID.client.ceramic,
+            templateStreamID
+        )
+        if (
+            typeof currentDoc.content === 'object' &&
+            currentDoc.content !== null
+        ) {
+            const currentTemplate = currentDoc.content as CeramicTemplateModel
+
+            const updatedTemplate: CeramicTemplateModel = {
+                ...currentTemplate,
+                title: updatedTemplateInput.title,
+                description: updatedTemplateInput.description,
+                requirements: updatedTemplateInput.requirements,
+                price: {
+                    amount: updatedTemplateInput.askingAmount,
+                    denominationTokenAddress:
+                        updatedTemplateInput.denominationTokenAddress,
+                    preferredTokens: updatedTemplateInput.preferredTokens,
+                    allowAnyPaymentToken:
+                        updatedTemplateInput.allowAnyPaymentToken,
+                },
+                flexInputs: updatedTemplateInput.flexInputs,
+            }
+
+            currentDoc.update(updatedTemplate)
+
+            // Update Title Key if it has changed
+            if (currentTemplate.title !== updatedTemplate.title) {
+                this.updateStreamKey(
+                    currentTemplate.title,
+                    updatedTemplateInput.title,
+                    StageNames.template
+                )
+            }
+        }
+    }
+
     createTemplate = async (
         templateStreamID: string,
-        createTemplateInput: CreateTemplateMultiStepFormType,
+        createTemplateInput: TemplateFormType,
         compositionStreamID: string
     ) => {
         try {
@@ -236,7 +278,7 @@ export default class CeramicStagehand {
             const template: CeramicTemplateModel = {
                 title: createTemplateInput.title,
                 description: createTemplateInput.description,
-                proposalRequest: createTemplateInput.proposalRequest,
+                requirements: createTemplateInput.requirements,
                 price: {
                     amount: createTemplateInput.askingAmount,
                     denominationTokenAddress:

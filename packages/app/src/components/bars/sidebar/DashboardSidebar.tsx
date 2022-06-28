@@ -30,14 +30,14 @@ const dashboardRoutes = [
         label: 'Solvers',
     },
     {
-        slug: '/dashboard/templates',
-        icon: <File />,
-        label: 'Templates',
-    },
-    {
         slug: '/dashboard/proposals',
         icon: <ClipboardText />,
         label: 'Proposals',
+    },
+    {
+        slug: '/dashboard/templates',
+        icon: <File />,
+        label: 'Templates',
     },
     {
         slug: '/dashboard/compositions',

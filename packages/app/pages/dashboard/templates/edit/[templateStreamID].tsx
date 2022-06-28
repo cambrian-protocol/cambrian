@@ -1,18 +1,23 @@
+import { Box } from 'grommet'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
+import EditTemplateUI from '@cambrian/app/ui/templates/EditTemplateUI'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import NotificationDashboardUI from '@cambrian/app/ui/dashboard/NotificationDashboardUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-export default function NotificationDashboardPage() {
+export default function EditTemplatePage() {
     const { currentUser, isUserLoaded } = useCurrentUser()
 
     return (
         <>
             {isUserLoaded ? (
-                currentUser && currentUser.selfID ? (
-                    <NotificationDashboardUI />
+                currentUser ? (
+                    <PageLayout contextTitle="Edit Template">
+                        <Box fill height={{ min: '90vh' }} pad="large">
+                            <EditTemplateUI currentUser={currentUser} />
+                        </Box>
+                    </PageLayout>
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">
                         <ConnectWalletSection />

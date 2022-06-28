@@ -54,7 +54,6 @@ const ImportCompositionModal = ({
             const streamID = await ceramicStagehand.createStream(
                 compositionID,
                 {
-                    compositionID: compositionID,
                     flowElements: compositionObject.flowElements,
                     solvers: compositionObject.solvers,
                 },

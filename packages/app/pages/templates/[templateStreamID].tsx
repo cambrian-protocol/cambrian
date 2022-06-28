@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
-import CreateTemplateUI from '@cambrian/app/ui/templates/CreateTemplateUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
@@ -14,72 +13,63 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { StageNames } from '@cambrian/app/classes/Stagehand'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useRouter } from 'next/dist/client/router'
+import { useRouter } from 'next/router'
 
-export default function CreateTemplatePage() {
+export default function ViewTemplatePage() {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
-    const { compositionStreamID } = router.query
-    const [currentComposition, setCurrentComposition] =
-        useState<CompositionModel>()
+    const { templateStreamID } = router.query
+    const [currentTemplate, setCurrentTemplate] =
+        useState<CeramicTemplateModel>()
     const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        if (router.isReady) fetchComposition()
+        if (router.isReady) fetchTemplate()
     }, [router, currentUser])
 
-    const fetchComposition = async () => {
-        if (
-            compositionStreamID !== undefined &&
-            typeof compositionStreamID === 'string' &&
-            currentUser &&
-            currentUser.selfID
-        ) {
-            try {
-                const ceramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
-                )
-                const composition = (await ceramicStagehand.loadStream(
-                    compositionStreamID
-                )) as CompositionModel
+    const fetchTemplate = async () => {
+        if (currentUser) {
+            if (
+                templateStreamID !== undefined &&
+                typeof templateStreamID === 'string'
+            ) {
+                try {
+                    const ceramicStagehand = new CeramicStagehand(
+                        currentUser.selfID
+                    )
+                    const template = (await ceramicStagehand.loadStream(
+                        templateStreamID
+                    )) as CeramicTemplateModel
 
-                if (composition) return setCurrentComposition(composition)
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
+                    if (template) return setCurrentTemplate(template)
+                } catch (e) {
+                    setErrorMessage(await cpLogger.push(e))
+                }
             }
+            setShowInvalidQueryComponent(true)
         }
-        setShowInvalidQueryComponent(true)
     }
 
     return (
         <>
             {isUserLoaded ? (
                 currentUser ? (
-                    currentComposition ? (
-                        <PageLayout contextTitle="Create Template">
+                    currentTemplate ? (
+                        <PageLayout contextTitle={currentTemplate.title}>
                             <Box alignSelf="center">
-                                <CreateTemplateUI
-                                    currentUser={currentUser}
-                                    composition={currentComposition}
-                                    compositionCID={
-                                        compositionStreamID as string
-                                    }
-                                    setErrorMessage={setErrorMessage}
-                                />
+                                Template View with CTA to create Proposal
                             </Box>
                         </PageLayout>
                     ) : showInvalidQueryComponent ? (
-                        <PageLayout contextTitle="Create Template">
+                        <PageLayout contextTitle="Invalid Composition">
                             <InvalidQueryComponent
-                                context={StageNames.composition}
+                                context={StageNames.template}
                             />
                         </PageLayout>
                     ) : (
-                        <LoadingScreen
-                            context={LOADING_MESSAGE['COMPOSITION']}
-                        />
+                        <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
                     )
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">

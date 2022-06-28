@@ -1,4 +1,10 @@
-import { ArrowSquareIn, Plus, TreeStructure } from 'phosphor-react'
+import {
+    ArrowSquareIn,
+    ArrowsClockwise,
+    CircleDashed,
+    Plus,
+    TreeStructure,
+} from 'phosphor-react'
 import { Box, Heading, Spinner, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
@@ -12,12 +18,12 @@ import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUt
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ImportCompositionModal from './modals/ImportCompositionModal'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-// TODO Catch Error on Load and display Retry Button
 const CompositionsDashboardUI = () => {
     const { currentUser } = useCurrentUser()
     const [compositions, setCompositions] = useState<StringHashmap>()
@@ -27,6 +33,7 @@ const CompositionsDashboardUI = () => {
         useState(false)
     const [showCreateCompositionModal, setShowCreateCompositionModal] =
         useState(false)
+    const [isFetching, setIsFetching] = useState(false)
 
     const toggleShowLoadCompositionModal = () =>
         setShowLoadCompositionModal(!showLoadCompositionModal)
@@ -44,6 +51,7 @@ const CompositionsDashboardUI = () => {
     }, [currentUser])
 
     const fetchCompositions = async (cs: CeramicStagehand) => {
+        setIsFetching(true)
         try {
             const compositionStreams = (await cs.loadStages(
                 StageNames.composition
@@ -52,6 +60,7 @@ const CompositionsDashboardUI = () => {
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
+        setIsFetching(false)
     }
 
     const onDeleteComposition = async (compositionID: string) => {
@@ -99,34 +108,64 @@ const CompositionsDashboardUI = () => {
                             }}
                             gap="medium"
                         >
-                            <Heading level="4">Recently viewed</Heading>
+                            <Box
+                                direction="row"
+                                align="center"
+                                justify="between"
+                            >
+                                <Heading level="4">Your Compositions</Heading>
+                                <LoaderButton
+                                    isLoading={isFetching}
+                                    icon={<ArrowsClockwise />}
+                                    onClick={() => {
+                                        ceramicStagehand &&
+                                            fetchCompositions(ceramicStagehand)
+                                    }}
+                                />
+                            </Box>
                             <PlainSectionDivider />
                         </Box>
                     </Box>
-                    {compositions && ceramicStagehand ? (
-                        <Box direction="row" wrap height={{ min: 'auto' }}>
-                            {Object.keys(compositions).map((compositionID) => {
-                                const streamID = compositions[compositionID]
-                                return (
-                                    <CompositionDashboardTile
-                                        ceramicStagehand={ceramicStagehand}
-                                        key={compositionID}
-                                        compositionKey={compositionID}
-                                        streamID={streamID}
-                                        onDelete={() =>
-                                            onDeleteComposition(compositionID)
-                                        }
-                                    />
-                                )
-                            })}
-                        </Box>
+                    {ceramicStagehand && compositions ? (
+                        Object.keys(compositions).length > 0 ? (
+                            <Box direction="row" wrap height={{ min: 'auto' }}>
+                                {Object.keys(compositions).map(
+                                    (compositionID) => {
+                                        const streamID =
+                                            compositions[compositionID]
+                                        return (
+                                            <CompositionDashboardTile
+                                                ceramicStagehand={
+                                                    ceramicStagehand
+                                                }
+                                                key={compositionID}
+                                                compositionKey={compositionID}
+                                                streamID={streamID}
+                                                onDelete={() =>
+                                                    onDeleteComposition(
+                                                        compositionID
+                                                    )
+                                                }
+                                            />
+                                        )
+                                    }
+                                )}
+                            </Box>
+                        ) : (
+                            <Box
+                                fill
+                                justify="center"
+                                align="center"
+                                gap="medium"
+                            >
+                                <CircleDashed size="32" />
+                                <Text size="small" color="dark-4">
+                                    You don't have any compositions yet
+                                </Text>
+                            </Box>
+                        )
                     ) : (
-                        <Box fill justify="center" align="center" gap="medium">
-                            <Spinner size="medium" />
-                            <Text size="small" color="dark-4">
-                                Loading Compositions...
-                            </Text>
-                        </Box>
+                        <></>
                     )}
                     <Box pad="large" />
                 </Box>

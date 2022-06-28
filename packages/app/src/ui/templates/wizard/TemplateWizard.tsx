@@ -1,97 +1,84 @@
-import CreateTemplateFlexInputStep, {
-    FlexInputFormType,
-} from './steps/CreateTemplateFlexInputStep'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import CreateTemplateDetailStep from './steps/CreateTemplateDetailStep'
-import CreateTemplateNotificationStep from './steps/CreateTemplateNotificationStep'
-import CreateTemplatePaymentStep from './steps/CreateTemplatePaymentStep'
-import CreateTemplateSellerStep from './steps/CreateTemplateSellerStep'
-import CreateTemplateStartStep from './steps/CreateTemplateStartStep'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { FlexInputFormType } from '../forms/TemplateFlexInputsForm'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import TemplateDescriptionStep from './steps/TemplateDescriptionStep'
+import TemplateFlexInputsStep from './steps/TemplateFlexInputsStep'
+import TemplatePricingStep from './steps/TemplatePricingStep'
+import TemplatePublishStep from './steps/TemplatePublishStep'
+import TemplateRequirementsStep from './steps/TemplateRequirementsStep'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { WebhookAPI } from '@cambrian/app/services/api/Webhook.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import randimals from 'randimals'
-import { storeIdInLocalStorage } from '@cambrian/app/utils/helpers/localStorageHelpers'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-interface CreateTemplateMultiStepFormProps {
-    composition: CompositionModel
-    compositionCID: string
-    onFailure: (error?: ErrorMessageType) => void
-    onSuccess: () => void
+interface TemplateWizardProps {
     currentUser: UserType
+    composition: CompositionModel
+    compositionStreamID: string
 }
 
-export type CreateTemplateMultiStepFormType = {
-    pfp?: string
-    name?: string
-    proposalRequest: string
+export type TemplateFormType = {
     title: string
     description: string
     askingAmount: number
-    denominationTokenAddress: string // In case of possible alternative tokens - its the token address for which to calculate equivalent value
+    requirements: string
+    denominationTokenAddress: string
     preferredTokens: TokenModel[]
     allowAnyPaymentToken: boolean
     flexInputs: FlexInputFormType[]
-    discordWebhook: string
 }
 
-const initialInput = {
-    pfp: '',
-    name: '',
-    proposalRequest: '',
+export const initialTemplateFormInput = {
     title: '',
     description: '',
+    requirements: '',
     askingAmount: 0,
     denominationTokenAddress: '',
     preferredTokens: [],
     allowAnyPaymentToken: false,
     flexInputs: [] as FlexInputFormType[],
-    discordWebhook: '',
 }
 
-export enum CREATE_TEMPLATE_STEPS {
-    START,
-    SELLER_DETAILS,
-    TEMPLATE_DETAILS,
+export enum TEMPLATE_WIZARD_STEPS {
+    DESCRIPTION,
+    PRICING,
     FLEX_INPUTS,
-    PAYMENT_DETAILS,
-    NOTIFICATION,
+    REQUIREMENTS,
+    PUBLISH,
 }
 
-export type CreateTemplateMultiStepStepsType =
-    | CREATE_TEMPLATE_STEPS.START
-    | CREATE_TEMPLATE_STEPS.SELLER_DETAILS
-    | CREATE_TEMPLATE_STEPS.TEMPLATE_DETAILS
-    | CREATE_TEMPLATE_STEPS.FLEX_INPUTS
-    | CREATE_TEMPLATE_STEPS.PAYMENT_DETAILS
-    | CREATE_TEMPLATE_STEPS.NOTIFICATION
+export type TemplateWizardStepsType =
+    | TEMPLATE_WIZARD_STEPS.DESCRIPTION
+    | TEMPLATE_WIZARD_STEPS.PRICING
+    | TEMPLATE_WIZARD_STEPS.FLEX_INPUTS
+    | TEMPLATE_WIZARD_STEPS.REQUIREMENTS
+    | TEMPLATE_WIZARD_STEPS.PUBLISH
 
-export const CreateTemplateMultiStepForm = ({
+const TemplateWizard = ({
     composition,
-    compositionCID,
-    onSuccess,
-    onFailure,
     currentUser,
-}: CreateTemplateMultiStepFormProps) => {
-    const [input, setInput] =
-        useState<CreateTemplateMultiStepFormType>(initialInput)
+    compositionStreamID,
+}: TemplateWizardProps) => {
+    const [input, setInput] = useState<TemplateFormType>(
+        initialTemplateFormInput
+    )
+    const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
+        TEMPLATE_WIZARD_STEPS.DESCRIPTION
+    )
     const [isCollateralFlex, setIsCollateralFlex] = useState<boolean>(false)
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [currentStep, setCurrentStep] =
-        useState<CreateTemplateMultiStepStepsType>(CREATE_TEMPLATE_STEPS.START)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [templateStreamID, setTemplateStreamID] = useState<string>()
 
     // Scroll up when step changes
     const topRefContext = useContext(TopRefContext)
@@ -118,7 +105,7 @@ export const CreateTemplateMultiStepForm = ({
         initCollateralToken(ctAddress)
 
         setInput({
-            ...initialInput,
+            ...initialTemplateFormInput,
             flexInputs: formFlexInputs,
             denominationTokenAddress: ctAddress,
         })
@@ -149,17 +136,15 @@ export const CreateTemplateMultiStepForm = ({
         return flexInputs
     }
 
-    const onCreateTemplate = async () => {
+    const onCreateTemplate = async (templateInputs: TemplateFormType) => {
         try {
-            if (!currentUser.selfID) throw GENERAL_ERROR['NO_SELF_ID']
-
-            const updatedInput = { ...input }
+            const updatedInput = { ...templateInputs }
             updatedInput.flexInputs.forEach((flexInput) => {
                 let stayFlex = flexInput.value === ''
                 if (flexInput.tagId === 'collateralToken') {
                     stayFlex =
                         input.allowAnyPaymentToken ||
-                        input.preferredTokens.length > 0
+                        input.preferredTokens?.length > 0
 
                     flexInput.value = stayFlex
                         ? ''
@@ -169,92 +154,67 @@ export const CreateTemplateMultiStepForm = ({
             })
 
             const stagehand = new CeramicStagehand(currentUser.selfID)
-            const templateCID = await stagehand.createTemplate(
-                randimals(),
+            const templateStreamID = await stagehand.createTemplate(
+                templateInputs.title,
                 updatedInput,
-                compositionCID
+                compositionStreamID
             )
-            if (!templateCID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            if (!templateStreamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            setTemplateStreamID(templateStreamID)
 
-            if (input.discordWebhook !== '') {
-                await WebhookAPI.postWebhook(input.discordWebhook, templateCID)
-            }
-
-            storeIdInLocalStorage(
-                'templates',
-                compositionCID,
-                input.title,
-                templateCID
-            )
-
-            initInput()
-            setCurrentStep(CREATE_TEMPLATE_STEPS.START)
-
-            onSuccess()
+            setCurrentStep(TEMPLATE_WIZARD_STEPS.PUBLISH)
         } catch (e) {
-            onFailure(await cpLogger.push(e))
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
     const renderCurrentFormStep = () => {
         switch (currentStep) {
-            case CREATE_TEMPLATE_STEPS.START:
+            case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
-                    <CreateTemplateStartStep
-                        compositionCID={compositionCID}
-                        input={input}
-                        stepperCallback={setCurrentStep}
-                    />
-                )
-            case CREATE_TEMPLATE_STEPS.SELLER_DETAILS:
-                return (
-                    <CreateTemplateSellerStep
+                    <TemplateDescriptionStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
                     />
                 )
-            case CREATE_TEMPLATE_STEPS.TEMPLATE_DETAILS:
+            case TEMPLATE_WIZARD_STEPS.PRICING:
                 return (
-                    <CreateTemplateDetailStep
+                    <TemplatePricingStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
-                    />
-                )
-            case CREATE_TEMPLATE_STEPS.PAYMENT_DETAILS:
-                return (
-                    <CreateTemplatePaymentStep
                         collateralToken={collateralToken}
-                        currentUser={currentUser}
                         isCollateralFlex={isCollateralFlex}
                         setCollateralToken={setCollateralToken}
-                        setInput={setInput}
-                        input={input}
-                        stepperCallback={setCurrentStep}
+                        currentUser={currentUser}
                     />
                 )
-            case CREATE_TEMPLATE_STEPS.FLEX_INPUTS:
+            case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
-                    <CreateTemplateFlexInputStep
+                    <TemplateFlexInputsStep
                         composition={composition}
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
                     />
                 )
-            case CREATE_TEMPLATE_STEPS.NOTIFICATION:
+            case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
-                    <CreateTemplateNotificationStep
+                    <TemplateRequirementsStep
                         createTemplate={onCreateTemplate}
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
                     />
                 )
+            case TEMPLATE_WIZARD_STEPS.PUBLISH:
+                return (
+                    <TemplatePublishStep templateStreamID={templateStreamID} />
+                )
             default:
                 return (
-                    <CreateTemplateSellerStep
+                    <TemplateDescriptionStep
                         input={input}
                         setInput={setInput}
                         stepperCallback={setCurrentStep}
@@ -264,8 +224,44 @@ export const CreateTemplateMultiStepForm = ({
     }
 
     return (
-        <Box height={{ min: '90vh' }} justify="center">
-            {renderCurrentFormStep()}
-        </Box>
+        <>
+            <Box
+                height={{ min: '90vh' }}
+                justify="center"
+                width={'xlarge'}
+                pad={{ horizontal: 'large' }}
+            >
+                {/* TODO Wizard Nav <Box direction="row" align="center">
+                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
+                        <Text>Description</Text>
+                    </Box>
+                    <CaretRight size="32" />
+                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
+                        <Text>Pricing</Text>
+                    </Box>
+                    <CaretRight size="32" />
+                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
+                        <Text>Solver Configuration</Text>
+                    </Box>
+                    <CaretRight size="32" />
+                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
+                        <Text>Requirements</Text>
+                    </Box>
+                    <CaretRight size="32" />
+                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
+                        <Text>Publish</Text>
+                    </Box>
+                </Box> */}
+                {renderCurrentFormStep()}
+            </Box>
+            {errorMessage && (
+                <ErrorPopupModal
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
+                />
+            )}
+        </>
     )
 }
+
+export default TemplateWizard
