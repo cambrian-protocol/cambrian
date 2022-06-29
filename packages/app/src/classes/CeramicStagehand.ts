@@ -293,7 +293,7 @@ export default class CeramicStagehand {
                     streamID: compositionStreamID,
                     commitID: composition.commitId.toString(),
                 },
-                author: this.selfID.did.toString(),
+                author: this.selfID.did.id.toString(),
             }
 
             if (!this.isStageSchema(template, StageNames.template)) {

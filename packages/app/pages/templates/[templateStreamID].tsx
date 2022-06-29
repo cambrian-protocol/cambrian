@@ -11,6 +11,7 @@ import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { StageNames } from '@cambrian/app/classes/Stagehand'
+import ViewTemplateUI from '@cambrian/app/ui/templates/ViewTemplateUI'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
@@ -58,9 +59,7 @@ export default function ViewTemplatePage() {
                 currentUser ? (
                     currentTemplate ? (
                         <PageLayout contextTitle={currentTemplate.title}>
-                            <Box alignSelf="center">
-                                Template View with CTA to create Proposal
-                            </Box>
+                            <ViewTemplateUI template={currentTemplate} currentUser={currentUser}/>
                         </PageLayout>
                     ) : showInvalidQueryComponent ? (
                         <PageLayout contextTitle="Invalid Composition">
