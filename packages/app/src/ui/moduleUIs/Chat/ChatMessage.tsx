@@ -9,15 +9,18 @@ interface ChatMessageProps {
 }
 
 export type ChatMessageType = {
-    id?: string
-    sender: ParticipantModel
     text: string
-    conditionId: string
-    timestamp: Date
+    author: {
+        name: string
+        did: string
+        pfp?: string
+    }
+    timestamp: number
+    images?: string[]
 }
 
 const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
-    const isSender = currentUser.address === message.sender.address
+    const isSender = currentUser.address === message.author.did
 
     return (
         <Box
@@ -31,7 +34,7 @@ const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
         >
             {!isSender && (
                 <Text size="xsmall" color="brand" weight={'bold'}>
-                    {message.sender.name || message.sender.address}
+                    {message.author.name || message.author.did}
                 </Text>
             )}
             <Text size="small">{message.text}</Text>
