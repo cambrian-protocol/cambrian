@@ -442,7 +442,7 @@ export default class CeramicStagehand {
         try {
             // Hit mailbox server
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_WICKBOX}/propose`,
+                `${process.env.NEXT_PUBLIC_TRILOBOT}/propose`,
                 {
                     method: 'POST',
                     body: proposalStreamID,
