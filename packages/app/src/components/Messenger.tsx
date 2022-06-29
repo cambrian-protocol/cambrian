@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '../services/api/Logger.api'
 import { GENERAL_ERROR } from '../constants/ErrorMessages'
@@ -24,6 +24,8 @@ import { Button } from 'grommet/components/Button'
  *  On-Chain Proposal => <proposalId>
  */
 
+const socket = io('ws://localhost:4242') // TODO Replace with env var
+
 export default function Messenger({
     currentUser,
     chatID,
@@ -35,19 +37,18 @@ export default function Messenger({
     chatType: 'Draft' | 'Proposal' | 'Solver' | 'Other'
     participants?: string[] // For 'Other'
 }) {
+    // useRef for publishing messages in outbox, otherwise setInterval has stale state
+    const outboxCallback = useRef(async () => {})
+
+    // Queued messages for publishing to Ceramic
+    const [outbox, setOutbox] = useState<ChatMessageType[]>([])
+
     const [messages, setMessages] = useState<ChatMessageType[]>([])
-    const socket = io('ws://localhost:4242')
 
     useEffect(() => {
+        // Update chat upon receiving websocket emit
         socket.on(`cambrian-chat-${chatID}`, (message: ChatMessageType) => {
-            console.log('Received msg')
-            setMessages([...messages, message])
-        })
-        socket.on('connect', () => {
-            console.log(`Connected client`)
-        })
-        socket.on('connect_error', (err) => {
-            console.log(`connect_error due to ${err.message}`)
+            setMessages((oldMessages) => [...oldMessages, message])
         })
 
         return () => {
@@ -59,6 +60,23 @@ export default function Messenger({
         loadChat()
     }, [])
 
+    // Publish to ceramic every n seconds
+    // Because: Multiple publishes in a short time can fail
+    useEffect(() => {
+        const outboxInterval = setInterval(() => outboxCallback.current(), 5000)
+        return () => {
+            clearInterval(outboxInterval)
+            outboxCallback.current()
+        }
+    }, [])
+
+    // Set useRef callback
+    useEffect(() => {
+        outboxCallback.current = publishOutbox
+    })
+
+    // Load chat based on type
+    // Only difference is how we find the participants so we know which streams to load
     const loadChat = async () => {
         let msgs
         switch (chatType) {
@@ -71,15 +89,45 @@ export default function Messenger({
         }
     }
 
+    // Emit message to websocket
+    // && add to outbox
     const sendMessage = async (message: ChatMessageType) => {
         try {
-            setMessages([...messages, message])
-
             socket.emit(`sendMessage`, {
                 chatID: chatID,
                 message: message,
             })
 
+            addToOutbox(message)
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    const addToOutbox = (message: ChatMessageType) => {
+        setOutbox((oldOutbox) => [...oldOutbox, message])
+    }
+
+    // Call publishMessages with outbox
+    // Clear outbox IF it succeeded
+    const publishOutbox = async () => {
+        try {
+            if (outbox.length > 0) {
+                const success = await publishMessages(outbox)
+                if (success) {
+                    setOutbox([])
+                }
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    // Publish an array of messages (append to existing)
+    const publishMessages = async (messages: ChatMessageType[]) => {
+        try {
             const messagesDoc = await TileDocument.deterministic(
                 currentUser.selfID.client.ceramic,
                 {
@@ -91,20 +139,26 @@ export default function Messenger({
             )
 
             if (Array.isArray(messagesDoc.content)) {
-                await messagesDoc.update([...messagesDoc.content, message])
+                await messagesDoc.update(
+                    [...messagesDoc.content, ...messages],
+                    undefined,
+                    { pin: true }
+                )
             } else {
-                await messagesDoc.update([message])
+                await messagesDoc.update([...messages], undefined, {
+                    pin: true,
+                })
             }
 
-            console.log(messagesDoc)
+            return true
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
 
+    // Load "Other" chat with supplied participant DIDs
     const loadChatOther = async () => {
-        console.log('Loading chat other')
         try {
             // Load, then filter out streams that failed to load & streams with no messages
             const messagesDocs: TileDocument<ChatMessageType[]>[] = (
@@ -129,8 +183,6 @@ export default function Messenger({
                     .filter(Boolean) as TileDocument<ChatMessageType[]>[]
             ).filter((doc) => doc.content.length > 0)
 
-            console.log(messagesDocs)
-
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
                 (doc) => doc.content
@@ -138,7 +190,6 @@ export default function Messenger({
 
             return mergeMessages(messages)
         } catch (e) {
-            console.log(e)
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
@@ -147,6 +198,7 @@ export default function Messenger({
     /**
      * @notice Loads an array of message streams from TileDocument<CeramicProposalModel>
      * @dev chatID == proposalID of draft
+     * @dev Gets DIDs from proposal.authors
      */
     const loadChatDraftProposal = async () => {
         try {
@@ -219,8 +271,12 @@ export default function Messenger({
             >
                 Send
             </Button>
-            {messages.map((msg) => (
-                <ChatMessage currentUser={currentUser} message={msg} />
+            {messages.map((msg, index) => (
+                <ChatMessage
+                    key={index}
+                    currentUser={currentUser}
+                    message={msg}
+                />
             ))}
         </>
     )
