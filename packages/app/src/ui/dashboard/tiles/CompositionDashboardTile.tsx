@@ -126,9 +126,7 @@ const CompositionDashboardTile = ({
                                     label="Listing"
                                     icon={<FilePlus />}
                                     onClick={() =>
-                                        router.push(
-                                            `/templates/create/${streamID}`
-                                        )
+                                        router.push(`templates/new/${streamID}`)
                                     }
                                 />
                             </Box>
