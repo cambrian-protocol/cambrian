@@ -1,9 +1,7 @@
 import { Box, Form, FormField } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 import { SetStateAction, useEffect, useState } from 'react'
 
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { Copy } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -37,15 +35,17 @@ const DuplicateCompositionComponent = ({
     const onSubmit = async () => {
         setIsDuplicating(true)
         try {
-            const newStreamID = await ceramicStagehand.createStream(
+            const { streamID } = await ceramicStagehand.createComposition(
                 input,
-                composition,
-                StageNames.composition
+                {
+                    ...composition,
+                    title: input,
+                }
             )
-            if (newStreamID) {
-                router.push(`/composer/composition/${newStreamID}`)
-                setShowDuplicateCompositionCTA(false)
-            }
+            router.push(
+                `${window.location.origin}/composer/composition/${streamID}`
+            )
+            setShowDuplicateCompositionCTA(false)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

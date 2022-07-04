@@ -6,20 +6,20 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TemplateFormType } from '../wizard/TemplateWizard'
 
 interface TemplateRequirementsFormProps {
-    input: TemplateFormType
-    onSubmit: (
-        event: FormExtendedEvent<TemplateRequirementsFormType, Element>
-    ) => Promise<void>
+    templateInput: CeramicTemplateModel
+    setTemplateInput: React.Dispatch<
+        SetStateAction<CeramicTemplateModel | undefined>
+    >
+    onSubmit: () => Promise<void>
+    submitLabel?: string
     onCancel: () => void
-    submitLabel: string
-    cancelLabel: string
+    cancelLabel?: string
 }
 
 export type TemplateRequirementsFormType = {
@@ -27,57 +27,57 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    input,
+    templateInput,
+    setTemplateInput,
     onSubmit,
-    onCancel,
     submitLabel,
+    onCancel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [requirements, setRequirements] = useState('')
 
     useEffect(() => {
-        setRequirements(input.requirements)
-    }, [input])
+        return () => {}
+    }, [])
 
     const handleSubmit = async (
-        e: FormExtendedEvent<TemplateRequirementsFormType, Element>
+        event: FormExtendedEvent<TemplateRequirementsFormType, Element>
     ) => {
+        event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit(e)
+        await onSubmit()
         setIsSubmitting(false)
     }
 
     return (
         <Form<TemplateRequirementsFormType> onSubmit={handleSubmit}>
-            <Box height={{ min: '60vh' }} justify="between">
-                <Box>
-                    <HeaderTextSection
-                        title="Requirements"
-                        paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
+            <Box height="50vh" justify="between">
+                <FormField label="Requirements" name="requirements">
+                    <TextArea
+                        name="requirements"
+                        value={templateInput.requirements}
+                        resize={false}
+                        rows={10}
+                        onChange={(e) =>
+                            setTemplateInput({
+                                ...templateInput,
+                                requirements: e.target.value,
+                            })
+                        }
                     />
-                    <FormField label="Requirements" name="requirements">
-                        <TextArea
-                            name="requirements"
-                            value={requirements}
-                            resize={false}
-                            rows={10}
-                            onChange={(e) => setRequirements(e.target.value)}
-                        />
-                    </FormField>
-                </Box>
+                </FormField>
                 <Box direction="row" justify="between">
                     <Button
                         size="small"
                         secondary
-                        label={cancelLabel}
+                        label={cancelLabel || 'Reset all changes'}
                         onClick={onCancel}
                     />
                     <LoaderButton
                         isLoading={isSubmitting}
                         size="small"
                         primary
-                        label={submitLabel}
+                        label={submitLabel || 'Save'}
                         type="submit"
                     />
                 </Box>

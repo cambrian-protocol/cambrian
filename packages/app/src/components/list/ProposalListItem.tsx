@@ -2,18 +2,18 @@ import { Anchor, Box, Button, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-interface TemplateListItemProps {
-    templateID: string
-    templateStreamID: string
-    onDelete: (templateID: string) => Promise<void>
+interface ProposalListItemProps {
+    proposalID: string
+    proposalStreamID: string
+    onDelete: (proposalID: string) => Promise<void>
 }
 
 // TODO Styling
-const TemplateListItem = ({
-    templateID,
-    templateStreamID,
+const ProposalListItem = ({
+    proposalID,
+    proposalStreamID,
     onDelete,
-}: TemplateListItemProps) => {
+}: ProposalListItemProps) => {
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
     useEffect(() => {
@@ -40,24 +40,20 @@ const TemplateListItem = ({
             align="center"
             round="xsmall"
         >
-            <Text>{templateID}</Text>
+            <Text>{proposalID}</Text>
             <Box direction="row">
-                <Anchor
-                    href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
-                >
+                <Anchor href={`/dashboard/proposals/edit/${proposalStreamID}`}>
                     <Button icon={<Pen />} />
                 </Anchor>
-                <Anchor
-                    href={`${window.location.origin}/templates/${templateStreamID}`}
-                >
+                <Anchor href={`/proposals/${proposalStreamID}`}>
                     <Button icon={<Eye />} />
                 </Anchor>
-                <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
+                <Button icon={<Trash />} onClick={() => onDelete(proposalID)} />
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(
-                            `${window.location.origin}/templates/${templateStreamID}`
+                            `${window.location.origin}/proposals/${proposalStreamID}`
                         )
                         setIsSavedToClipboard(true)
                     }}
@@ -67,4 +63,4 @@ const TemplateListItem = ({
     )
 }
 
-export default TemplateListItem
+export default ProposalListItem

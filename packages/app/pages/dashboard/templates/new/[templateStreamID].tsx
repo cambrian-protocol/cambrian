@@ -8,19 +8,18 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
-import EditTemplateUI from '@cambrian/app/ui/templates/EditTemplateUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
+import TemplateWizard from '@cambrian/app/ui/templates/wizard/TemplateWizard'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
 
-export default function EditTemplatePage() {
+export default function NewTemplatePage() {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
     const { templateStreamID } = router.query
@@ -85,27 +84,17 @@ export default function EditTemplatePage() {
         }
     }
 
-    const onResetTemplate = () => {
-        setTemplateInput(cachedTemplate)
-    }
-
     return (
         <>
             {isUserLoaded ? (
                 currentUser ? (
                     show404NotFound ? (
                         <Custom404Page />
-                    ) : templateInput &&
-                      ceramicStagehand &&
-                      composition &&
-                      cachedTemplate ? (
-                        <PageLayout contextTitle="Edit Template">
+                    ) : templateInput && ceramicStagehand && composition ? (
+                        <PageLayout contextTitle="New Template">
                             <Box align="center" pad="large">
                                 <Box width={'xlarge'} gap="large">
-                                    <TemplateHeader
-                                        title={cachedTemplate.title}
-                                    />
-                                    <EditTemplateUI
+                                    <TemplateWizard
                                         composition={composition}
                                         currentUser={currentUser}
                                         templateInput={templateInput}
@@ -114,7 +103,6 @@ export default function EditTemplatePage() {
                                             templateStreamID as string
                                         }
                                         onSaveTemplate={onSaveTemplate}
-                                        onResetTemplate={onResetTemplate}
                                     />
                                 </Box>
                             </Box>

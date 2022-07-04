@@ -59,7 +59,11 @@ export default function ViewTemplatePage() {
                 currentUser ? (
                     currentTemplate ? (
                         <PageLayout contextTitle={currentTemplate.title}>
-                            <ViewTemplateUI template={currentTemplate} currentUser={currentUser}/>
+                            <ViewTemplateUI
+                                templateStreamID={templateStreamID as string}
+                                template={currentTemplate}
+                                currentUser={currentUser}
+                            />
                         </PageLayout>
                     ) : showInvalidQueryComponent ? (
                         <PageLayout contextTitle="Invalid Composition">

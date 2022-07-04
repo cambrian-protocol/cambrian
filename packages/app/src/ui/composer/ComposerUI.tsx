@@ -49,7 +49,6 @@ export const ComposerUI = () => {
         useState<CompositionModel>()
     const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
     const [isInitialized, setIsInitialized] = useState(false)
-    const [compositionKey, setCompositionKey] = useState<string>()
     const [showDuplicateCompositionCTA, setShowDuplicateCompositionCTA] =
         useState(false)
 
@@ -89,7 +88,6 @@ export const ComposerUI = () => {
                     if (!key) {
                         setShowDuplicateCompositionCTA(true)
                     } else {
-                        setCompositionKey(key)
                         dispatch({
                             type: 'LOAD_COMPOSITION',
                             payload: {
@@ -142,15 +140,11 @@ export const ComposerUI = () => {
     return (
         <>
             <ComposerLayout
-                contextTitle={
-                    compositionKey
-                        ? `Composer | ${compositionKey}`
-                        : 'Loading...'
-                }
+                contextTitle={`Composer | ${composer.title || 'Loading...'}`}
                 sidebar={
                     <Box gap="small" fill>
                         <CompositionHeader
-                            compositionTitle={compositionKey || 'Loading...'}
+                            compositionTitle={composer.title || 'Unknown'}
                         />
                         {renderControl()}
                     </Box>
@@ -160,7 +154,7 @@ export const ComposerUI = () => {
                         ceramicStagehand={ceramicStagehand}
                         disabled={showDuplicateCompositionCTA}
                         currentComposition={composer}
-                        compositionKey={compositionKey}
+                        compositionStreamID={compositionStreamID as string}
                     />
                 }
             >

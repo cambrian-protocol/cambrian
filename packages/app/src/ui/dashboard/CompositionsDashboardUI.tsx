@@ -66,7 +66,7 @@ const CompositionsDashboardUI = () => {
     const onDeleteComposition = async (compositionID: string) => {
         if (ceramicStagehand) {
             try {
-                await ceramicStagehand.deleteStream(
+                await ceramicStagehand.deleteStage(
                     compositionID,
                     StageNames.composition
                 )
@@ -129,27 +129,20 @@ const CompositionsDashboardUI = () => {
                     {ceramicStagehand && compositions ? (
                         Object.keys(compositions).length > 0 ? (
                             <Box direction="row" wrap height={{ min: 'auto' }}>
-                                {Object.keys(compositions).map(
-                                    (compositionID) => {
-                                        const streamID =
-                                            compositions[compositionID]
-                                        return (
-                                            <CompositionDashboardTile
-                                                ceramicStagehand={
-                                                    ceramicStagehand
-                                                }
-                                                key={compositionID}
-                                                compositionKey={compositionID}
-                                                streamID={streamID}
-                                                onDelete={() =>
-                                                    onDeleteComposition(
-                                                        compositionID
-                                                    )
-                                                }
-                                            />
-                                        )
-                                    }
-                                )}
+                                {Object.keys(compositions).map((tag) => {
+                                    const streamID = compositions[tag]
+                                    return (
+                                        <CompositionDashboardTile
+                                            ceramicStagehand={ceramicStagehand}
+                                            key={tag}
+                                            compositionTag={tag}
+                                            compositionStreamID={streamID}
+                                            onDelete={() =>
+                                                onDeleteComposition(tag)
+                                            }
+                                        />
+                                    )
+                                })}
                             </Box>
                         ) : (
                             <Box

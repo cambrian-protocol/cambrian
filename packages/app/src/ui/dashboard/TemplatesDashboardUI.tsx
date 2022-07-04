@@ -56,7 +56,7 @@ const TemplatesDashboardUI = () => {
     const onDeleteTemplate = async (templateID: string) => {
         if (ceramicStagehand) {
             try {
-                await ceramicStagehand.deleteStream(
+                await ceramicStagehand.deleteStage(
                     templateID,
                     StageNames.template
                 )

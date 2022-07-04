@@ -13,10 +13,14 @@ import CeramicStagehand, {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import randimals from 'randimals'
 import router from 'next/router'
 
 interface CreateTemplateModalProps {
@@ -30,7 +34,8 @@ const CreateTemplateModal = ({
     ceramicStagehand,
 }: CreateTemplateModalProps) => {
     const [compositions, setCompositions] = useState<StringHashmap>()
-    const [compositionCIDInput, setCompositionCIDInput] = useState('')
+    const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         fetchCompositions()
@@ -47,82 +52,93 @@ const CreateTemplateModal = ({
         }
     }
 
-    const onImportComposition = () => {
-        router.push(`/dashboard/templates/new/${compositionCIDInput}`)
+    const onSelectComposition = async (compositionStreamID: string) => {
+        setIsCreatingTemplate(true)
+        try {
+            const { streamID } = await ceramicStagehand.createTemplate(
+                randimals(),
+                compositionStreamID
+            )
+            router.push(`templates/new/${streamID}`)
+        } catch (e) {
+            setIsCreatingTemplate(false)
+            setErrorMessage(await cpLogger.push(e))
+        }
     }
 
     return (
-        <BaseLayerModal onClose={onClose}>
-            <ModalHeader
-                icon={<FilePlus />}
-                title="Create a Template"
-                description="Please select or import the Composition on which this template should be based on."
-            />
-            <Box gap="medium">
-                <Box
-                    direction="row"
-                    align="center"
-                    justify="between"
-                    gap="small"
-                >
-                    <Box flex>
-                        <FormField
-                            name="compositionCID"
-                            label="Composition CID"
-                            onChange={(e) =>
-                                setCompositionCIDInput(e.target.value)
-                            }
-                        >
-                            <TextInput name="compositionCID" />
-                        </FormField>
-                    </Box>
-                    <Box>
-                        <Button
-                            disabled={compositionCIDInput === ''}
-                            size="small"
-                            primary
-                            label="Import"
-                            onClick={onImportComposition}
-                        />
-                    </Box>
-                </Box>
-                <Box height={{ min: 'auto' }}>
-                    {compositions ? (
-                        <Box height={{ min: 'auto' }} gap="small">
-                            {Object.keys(compositions).map((compositionID) => {
-                                return (
-                                    <Box key={compositionID} flex>
-                                        <Anchor
-                                            href={`${window.location.pathname}/new/${compositions[compositionID]}`}
-                                            color="white"
-                                        >
-                                            <Box
-                                                pad="small"
-                                                border
-                                                round="xsmall"
-                                                background={
-                                                    'background-contrast'
-                                                }
-                                            >
-                                                <Text>{compositionID}</Text>
+        <>
+            <BaseLayerModal onClose={onClose}>
+                <ModalHeader
+                    icon={<FilePlus />}
+                    title="Create a Template"
+                    description="Please select or import the Composition on which this template should be based on."
+                />
+                <Box gap="medium">
+                    <Box height={{ min: 'auto' }}>
+                        {compositions ? (
+                            <Box height={{ min: 'auto' }} gap="small">
+                                {Object.keys(compositions).map(
+                                    (compositionTag) => {
+                                        return (
+                                            <Box key={compositionTag} flex>
+                                                <Box
+                                                    pad="small"
+                                                    border
+                                                    round="xsmall"
+                                                    background={
+                                                        'background-contrast'
+                                                    }
+                                                    direction="row"
+                                                    align="center"
+                                                    justify="between"
+                                                >
+                                                    <Text>
+                                                        {compositionTag}
+                                                    </Text>
+                                                    <LoaderButton
+                                                        isLoading={
+                                                            isCreatingTemplate
+                                                        }
+                                                        icon={<FilePlus />}
+                                                        onClick={() =>
+                                                            onSelectComposition(
+                                                                compositions[
+                                                                    compositionTag
+                                                                ]
+                                                            )
+                                                        }
+                                                    />
+                                                </Box>
                                             </Box>
-                                        </Anchor>
-                                    </Box>
-                                )
-                            })}
-                        </Box>
-                    ) : (
-                        <Box fill justify="center" align="center" gap="medium">
-                            <Spinner size="medium" />
-                            <Text size="small" color="dark-4">
-                                Loading Compositions...
-                            </Text>
-                        </Box>
-                    )}
-                    <Box pad="large" />
+                                        )
+                                    }
+                                )}
+                            </Box>
+                        ) : (
+                            <Box
+                                fill
+                                justify="center"
+                                align="center"
+                                gap="medium"
+                            >
+                                <Spinner size="medium" />
+                                <Text size="small" color="dark-4">
+                                    Loading Compositions...
+                                </Text>
+                            </Box>
+                        )}
+                        <Box pad="large" />
+                    </Box>
                 </Box>
-            </Box>
-        </BaseLayerModal>
+            </BaseLayerModal>
+            {errorMessage && (
+                <ErrorPopupModal
+                    errorMessage={errorMessage}
+                    onClose={() => setErrorMessage(undefined)}
+                />
+            )}
+        </>
     )
 }
 

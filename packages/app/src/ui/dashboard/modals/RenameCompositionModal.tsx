@@ -3,6 +3,7 @@ import { SetStateAction, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -14,33 +15,38 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 interface RenameCompositionModalProps {
     onClose: () => void
     ceramicStagehand: CeramicStagehand
-    compositionKey: string
-    setCurrentCompositionKey: React.Dispatch<SetStateAction<string>>
+    compositionStreamID: string
+    currentTag: string
+    setCurrentTag: React.Dispatch<SetStateAction<string>>
 }
 
 const RenameCompositionModal = ({
     onClose,
-    compositionKey,
+    compositionStreamID,
     ceramicStagehand,
-    setCurrentCompositionKey,
+    setCurrentTag,
+    currentTag,
 }: RenameCompositionModalProps) => {
-    const [input, setInput] = useState(compositionKey)
+    const [input, setInput] = useState(currentTag)
     const [isSaving, setIsSaving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onSubmit = async () => {
         setIsSaving(true)
         try {
-            const uniqueCompositionKey = await ceramicStagehand.updateStreamKey(
-                compositionKey,
-                input,
+            const composition = (await (
+                await ceramicStagehand.loadStream(compositionStreamID)
+            ).content) as CompositionModel
+
+            const { uniqueTag } = await ceramicStagehand.updateStage(
+                compositionStreamID,
+                { ...composition, title: input },
                 StageNames.composition
             )
 
-            if (!uniqueCompositionKey)
-                throw Error('Error while updating Stream Key')
+            if (!uniqueTag) throw Error('Error while updating Stream Key')
 
-            setCurrentCompositionKey(uniqueCompositionKey)
+            setCurrentTag(uniqueTag)
             onClose()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))

@@ -20,16 +20,19 @@ export type CeramicTemplateModel = {
     title: string
     description: string
     requirements: string
-    price?: {
-        amount: number
-        denominationTokenAddress: string
-        preferredTokens?: TokenModel[]
-        allowAnyPaymentToken: boolean
-    }
+    price: TemplatePriceModel
     composition: {
         streamID: string
         commitID: string
     }
     flexInputs: FlexInputFormType[]
     author: string // DID
+}
+
+export type TemplatePriceModel = {
+    amount: number
+    denominationTokenAddress: string
+    preferredTokens?: TokenModel[]
+    allowAnyPaymentToken: boolean
+    isCollateralFlex: boolean
 }

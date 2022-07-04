@@ -35,14 +35,7 @@ const CreateCompositionModal = ({
     const onSubmit = async () => {
         setIsCreating(true)
         try {
-            const streamID = await ceramicStagehand.createStream(
-                input,
-                {
-                    flowElements: initialComposer.flowElements,
-                    solvers: initialComposer.solvers,
-                },
-                StageNames.composition
-            )
+            const { streamID } = await ceramicStagehand.createComposition(input)
             router.push(`/composer/composition/${streamID}`)
         } catch (e) {
             setIsCreating(false)

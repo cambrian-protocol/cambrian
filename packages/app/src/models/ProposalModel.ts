@@ -1,5 +1,4 @@
-import { FlexInputFormType } from '../ui/templates/forms/steps/CreateTemplateFlexInputStep'
-import { TokenModel } from './TokenModel'
+import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 
 export type ProposalModel = {
     title: string
@@ -19,12 +18,7 @@ export type CeramicProposalModel = {
         streamID: string
         commitID: string
     }
-    price: {
-        amount: number
-        denominationTokenAddress: string
-        preferredTokens?: TokenModel[]
-        allowAnyPaymentToken: boolean
-    }
+    price: { amount: number; tokenAddress: string }
     authors: string[] // DIDs
     approved: boolean // True only for the controller of this stream
 }

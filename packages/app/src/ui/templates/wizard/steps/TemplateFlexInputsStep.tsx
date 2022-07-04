@@ -1,47 +1,51 @@
 import {
     TEMPLATE_WIZARD_STEPS,
-    TemplateFormType,
     TemplateWizardStepsType,
 } from '../TemplateWizard'
-import TemplateFlexInputsForm, {
-    TemplateFlexInputStepFormType,
-} from '../../forms/TemplateFlexInputsForm'
 
+import { Box } from 'grommet'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { FormExtendedEvent } from 'grommet'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { SetStateAction } from 'react'
+import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
 
 interface TemplateFlexInputsStepProps {
+    templateInput: CeramicTemplateModel
+    setTemplateInput: React.Dispatch<
+        SetStateAction<CeramicTemplateModel | undefined>
+    >
     stepperCallback: (step: TemplateWizardStepsType) => void
-    input: TemplateFormType
-    setInput: React.Dispatch<SetStateAction<TemplateFormType>>
     composition: CompositionModel
+    onSaveTemplate: () => Promise<void>
 }
 
 const TemplateFlexInputsStep = ({
-    input,
     stepperCallback,
-    setInput,
+    templateInput,
+    setTemplateInput,
+    onSaveTemplate,
     composition,
 }: TemplateFlexInputsStepProps) => {
-    const onSubmit = async (
-        e: FormExtendedEvent<TemplateFlexInputStepFormType, Element>
-    ) => {
-        e.preventDefault()
-        const updatedInput = { ...input, flexInputs: e.value.flexInputs }
-        setInput(updatedInput)
-        stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
-    }
-
     return (
-        <TemplateFlexInputsForm
-            composition={composition}
-            input={input}
-            onSubmit={onSubmit}
-            submitLabel={'Continue'}
-            cancelLabel={'Back'}
-            onCancel={() => stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)}
-        />
+        <Box height={{ min: '60vh' }}>
+            <HeaderTextSection
+                title="Solver Config"
+                paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
+            />
+            <TemplateFlexInputsForm
+                composition={composition}
+                templateInput={templateInput}
+                setTemplateInput={setTemplateInput}
+                onSubmit={async () => {
+                    await onSaveTemplate()
+                    stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
+                }}
+                submitLabel="Save & Continue"
+                onCancel={() => stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)}
+                cancelLabel="Back"
+            />
+        </Box>
     )
 }
 

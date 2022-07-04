@@ -7,65 +7,57 @@ import {
     FormField,
     Text,
 } from 'grommet'
+import {
+    CeramicTemplateModel,
+    TemplatePriceModel,
+} from '@cambrian/app/models/TemplateModel'
 import { Info, Plus } from 'phosphor-react'
 import { SetStateAction, useEffect, useState } from 'react'
 
 import { BigNumber } from 'ethers'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
-import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PreferredTokenItem from '@cambrian/app/components/list/PreferredTokenItem'
-import { TemplateFormType } from '../wizard/TemplateWizard'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface TemplatePricingFormProps {
-    input: TemplateFormType
-    collateralToken?: TokenModel
-    setCollateralToken: React.Dispatch<SetStateAction<TokenModel | undefined>>
-    isCollateralFlex: boolean
+    templateInput: CeramicTemplateModel
+    setTemplateInput: React.Dispatch<
+        SetStateAction<CeramicTemplateModel | undefined>
+    >
     currentUser: UserType
-    onSubmit: (
-        event: FormExtendedEvent<TemplatePricingFormType, Element>
-    ) => Promise<void>
-    submitLabel: string
+    onSubmit: () => Promise<void>
+    submitLabel?: string
     onCancel: () => void
-    cancelLabel: string
-}
-
-export type TemplatePricingFormType = {
-    askingAmount: number
-    denominationTokenAddress: string
-    allowAnyPaymentToken: boolean
-    preferredTokens: TokenModel[]
+    cancelLabel?: string
 }
 
 const TemplatePricingForm = ({
     onSubmit,
-    input,
-    isCollateralFlex,
+    templateInput,
+    setTemplateInput,
     currentUser,
-    setCollateralToken,
-    collateralToken,
     submitLabel,
     onCancel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
-    const [askingAmount, setAskingAmount] = useState(0)
-    const [denominationTokenAddress, setDenominationTokenAddress] = useState('')
-    const [allowAnyPaymentToken, setAllowAnyPaymentToken] = useState(false)
-    const [preferredTokens, setPreferredTokens] = useState<TokenModel[]>([])
     const [isSubmitting, setIsSubmitting] = useState(false)
 
+    const [collateralToken, setCollateralToken] = useState<TokenModel>()
+
     useEffect(() => {
-        setAskingAmount(input.askingAmount)
-        setDenominationTokenAddress(input.denominationTokenAddress)
-        setAllowAnyPaymentToken(input.allowAnyPaymentToken)
-        setPreferredTokens(input.preferredTokens)
-    }, [input])
+        init()
+        return () => {}
+    }, [])
+
+    const init = async () => {
+        initCollateralToken(templateInput.price.denominationTokenAddress)
+    }
 
     const initCollateralToken = async (ctAddress: string) => {
         const token = await fetchTokenInfo(ctAddress, currentUser.web3Provider)
@@ -78,100 +70,113 @@ const TemplatePricingForm = ({
             decimals: BigNumber.from(18),
             totalSupply: BigNumber.from(0),
         }
-        const newPrefferredTokens = [...preferredTokens, newPreferredToken]
-        setPreferredTokens(newPrefferredTokens)
+        const inputClone = _.cloneDeep(templateInput)
+        inputClone.price.preferredTokens?.push(newPreferredToken)
+        setTemplateInput(inputClone)
     }
 
     const updatePreferredToken = async (address: string, idx: number) => {
         const token = await fetchTokenInfo(address, currentUser.web3Provider)
-        if (token) {
-            const updatedPreferredTokens = [...preferredTokens]
-            updatedPreferredTokens[idx] = token
-            setPreferredTokens(updatedPreferredTokens)
+        if (token && templateInput.price.preferredTokens) {
+            const inputClone = _.cloneDeep(templateInput)
+            inputClone.price.preferredTokens![idx] = token
+            setTemplateInput(inputClone)
         }
     }
 
     const onRemovePreferredToken = (index: number) => {
-        if (preferredTokens && preferredTokens.length > 0) {
-            setPreferredTokens(
-                preferredTokens.filter((v, _idx) => _idx !== index)
-            )
+        if (
+            templateInput.price.preferredTokens &&
+            templateInput.price.preferredTokens.length > 0
+        ) {
+            const inputClone = _.cloneDeep(templateInput)
+            inputClone.price.preferredTokens =
+                inputClone.price.preferredTokens?.filter(
+                    (v, _idx) => _idx !== index
+                )
+            setTemplateInput(inputClone)
         }
     }
 
     let PreferredTokenGroup = null
-    if (preferredTokens !== undefined) {
-        PreferredTokenGroup = preferredTokens.map((preferredToken, idx) => (
-            <PreferredTokenItem
-                key={idx}
-                idx={idx}
-                token={preferredToken}
-                updateToken={updatePreferredToken}
-                onRemove={onRemovePreferredToken}
-            />
-        ))
+    if (templateInput.price.preferredTokens !== undefined) {
+        PreferredTokenGroup = templateInput.price.preferredTokens.map(
+            (preferredToken, idx) => (
+                <PreferredTokenItem
+                    key={idx}
+                    idx={idx}
+                    token={preferredToken}
+                    updateToken={updatePreferredToken}
+                    onRemove={onRemovePreferredToken}
+                />
+            )
+        )
     }
 
     const handleSubmit = async (
-        e: FormExtendedEvent<TemplatePricingFormType, Element>
+        event: FormExtendedEvent<TemplatePriceModel, Element>
     ) => {
+        event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit(e)
+        await onSubmit()
         setIsSubmitting(false)
     }
 
     return (
-        <Form<TemplatePricingFormType> onSubmit={handleSubmit}>
-            <Box height={{ min: '60vh' }} justify="between">
+        <Form<TemplatePriceModel> onSubmit={handleSubmit}>
+            <Box justify="between" height={{ min: '50vh' }}>
                 <Box>
-                    <HeaderTextSection
-                        title="How much does it cost?"
-                        paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
-                    />
-                    <Box gap="medium">
-                        <>
-                            <Box
-                                direction="row"
-                                fill
-                                gap="small"
-                                align="center"
-                            >
-                                <Box basis="1/4">
-                                    <FormField
-                                        value={askingAmount}
-                                        onChange={(e) =>
-                                            setAskingAmount(
-                                                parseInt(e.target.value)
-                                            )
-                                        }
-                                        name="askingAmount"
-                                        label="Amount"
-                                        type="number"
-                                    />
-                                </Box>
-                                <Box fill direction="row" gap="small">
-                                    <Box flex>
-                                        <FormField
-                                            disabled={!isCollateralFlex}
-                                            name="denominationTokenAddress"
-                                            label="Token Address"
-                                            type="string"
-                                            value={denominationTokenAddress}
-                                            onChange={(event) => {
-                                                setDenominationTokenAddress(
-                                                    event.target.value
-                                                )
-                                                initCollateralToken(
-                                                    event.target.value
-                                                )
-                                            }}
-                                            validate={validateAddress}
-                                        />
-                                    </Box>
-                                    <TokenAvatar token={collateralToken} />
-                                </Box>
+                    <Box direction="row" fill gap="small" align="center">
+                        <Box basis="1/4">
+                            <FormField
+                                value={templateInput.price.amount}
+                                onChange={(e) =>
+                                    setTemplateInput({
+                                        ...templateInput,
+                                        price: {
+                                            ...templateInput.price,
+                                            amount: parseInt(e.target.value),
+                                        },
+                                    })
+                                }
+                                name="askingAmount"
+                                label="Amount"
+                                type="number"
+                            />
+                        </Box>
+                        <Box fill direction="row" gap="small">
+                            <Box flex>
+                                <FormField
+                                    disabled={
+                                        !templateInput.price.isCollateralFlex
+                                    }
+                                    name="denominationTokenAddress"
+                                    label="Token Address"
+                                    type="string"
+                                    value={
+                                        templateInput.price
+                                            .denominationTokenAddress
+                                    }
+                                    onChange={(e) => {
+                                        setTemplateInput({
+                                            ...templateInput,
+                                            price: {
+                                                ...templateInput.price,
+                                                denominationTokenAddress:
+                                                    e.target.value,
+                                            },
+                                        })
+                                        initCollateralToken(e.target.value)
+                                    }}
+                                    validate={validateAddress}
+                                />
                             </Box>
-                            {isCollateralFlex && (
+                            <TokenAvatar token={collateralToken} />
+                        </Box>
+                    </Box>
+                    <Box height={{ min: 'auto' }}>
+                        {templateInput.price.isCollateralFlex && (
+                            <>
                                 <Box
                                     direction="row"
                                     align="center"
@@ -183,54 +188,62 @@ const TemplatePricingForm = ({
                                         alternative tokens are allowed.
                                     </Text>
                                 </Box>
-                            )}
-                        </>
-                        {isCollateralFlex && (
-                            <Box gap="small">
-                                <Box pad={{ vertical: 'small' }}>
-                                    <CheckBox
-                                        checked={allowAnyPaymentToken}
-                                        onChange={(e) =>
-                                            setAllowAnyPaymentToken(
-                                                e.target.checked
-                                            )
-                                        }
-                                        name="allowAnyPaymentToken"
-                                        label="Allow any token for payment"
+                                <Box gap="small">
+                                    <Box pad={{ vertical: 'small' }}>
+                                        <CheckBox
+                                            checked={
+                                                templateInput.price
+                                                    .allowAnyPaymentToken
+                                            }
+                                            onChange={(e) => {
+                                                setTemplateInput({
+                                                    ...templateInput,
+                                                    price: {
+                                                        ...templateInput.price,
+                                                        allowAnyPaymentToken:
+                                                            e.target.checked,
+                                                    },
+                                                })
+                                            }}
+                                            name="allowAnyPaymentToken"
+                                            label="Allow any token for payment"
+                                        />
+                                    </Box>
+                                    {templateInput.price.preferredTokens &&
+                                        templateInput.price.preferredTokens
+                                            .length > 0 && (
+                                            <Text size="small">
+                                                Alternative/Preferred token
+                                                {templateInput.price
+                                                    .preferredTokens.length > 1
+                                                    ? 's '
+                                                    : ' '}
+                                                which can be used for payment:
+                                            </Text>
+                                        )}
+                                    {PreferredTokenGroup}
+                                    <FloatingActionButton
+                                        icon={<Plus />}
+                                        label="Add Token"
+                                        onClick={onAddPreferredToken}
                                     />
                                 </Box>
-                                {preferredTokens.length > 0 && (
-                                    <Text size="small">
-                                        Alternative/Preferred token
-                                        {preferredTokens.length > 1
-                                            ? 's '
-                                            : ' '}
-                                        which can be used for payment:
-                                    </Text>
-                                )}
-                                {PreferredTokenGroup}
-                                <FloatingActionButton
-                                    icon={<Plus />}
-                                    label="Add Token"
-                                    onClick={onAddPreferredToken}
-                                />
-                            </Box>
+                            </>
                         )}
                     </Box>
                 </Box>
-                <Box pad="small" />
-                <Box direction="row" justify="between">
+                <Box direction="row" justify="between" pad={{ top: 'medium' }}>
                     <Button
                         size="small"
                         secondary
-                        label={cancelLabel}
+                        label={cancelLabel || 'Reset all changes'}
                         onClick={onCancel}
                     />
                     <LoaderButton
                         isLoading={isSubmitting}
                         size="small"
                         primary
-                        label={submitLabel}
+                        label={submitLabel || 'Save'}
                         type="submit"
                     />
                 </Box>

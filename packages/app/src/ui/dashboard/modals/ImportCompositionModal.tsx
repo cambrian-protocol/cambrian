@@ -50,21 +50,18 @@ const ImportCompositionModal = ({
             if (!compositionObject)
                 throw new Error('No Composition found at provided CID')
 
-            const compositionID = randimals()
-            const streamID = await ceramicStagehand.createStream(
-                compositionID,
-                {
-                    flowElements: compositionObject.flowElements,
-                    solvers: compositionObject.solvers,
-                },
-                StageNames.composition
-            )
+            const tag = randimals()
+            const { streamID } = await ceramicStagehand.createComposition(tag, {
+                ...compositionObject,
+                title: tag,
+                description: '',
+            })
 
             if (streamID) router.push(`/composer/composition/${streamID}`)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
+            setIsLoading(false)
         }
-        setIsLoading(false)
     }
 
     return (

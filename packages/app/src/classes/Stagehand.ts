@@ -1,16 +1,14 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { CreateProposalMultiStepFormType } from './../ui/proposals/forms/CreateProposalMultiStepForm'
-import { CreateTemplateMultiStepFormType } from '../ui/templates/forms/CreateTemplateMultiStepForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { IPFSAPI } from '../services/api/IPFS.api'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { UserType } from '../store/UserContext'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
-import { UserType } from '../store/UserContext'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 export enum StageNames {
     composition = 'composition',
@@ -43,18 +41,6 @@ export default class Stagehand {
 
     get proposal() {
         return this.stages.proposal as ProposalModel | undefined
-    }
-
-    publishStage = async (stageType: StageNames, currentUser: UserType) => {
-        try {
-            const res = await this.ipfs.pin(this.stages[stageType])
-            if (res && res.IpfsHash) {
-                return res.IpfsHash
-            }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['IPFS_PIN_ERROR']
-        }
     }
 
     /**
@@ -93,132 +79,6 @@ export default class Stagehand {
                     )
                 default:
                     return this.stages
-            }
-        }
-    }
-
-    // TODO
-    isStageSchema = (data: StageModel, stage: StageNames) => {
-        return true
-    }
-
-    /**
-     * Creates a Composition and publishes it to IPFS
-     */
-    publishComposition = async (
-        composition: CompositionModel,
-        currentUser: UserType
-    ) => {
-        if (!this.isStageSchema(composition, StageNames.composition)) {
-            throw GENERAL_ERROR['WRONG_COMPOSITION_SCHEMA']
-        }
-
-        if (
-            await parseComposerSolvers(
-                composition.solvers,
-                currentUser.provider
-            )
-        ) {
-            this.stages['composition'] = composition
-            return this.publishStage(StageNames.composition, currentUser)
-        }
-    }
-
-    /**
-     * Creates a template by applying CreateTemplateForm to a loaded composition and publishes it to IPFS
-     */
-    publishTemplate = async (
-        createTemplateInput: CreateTemplateMultiStepFormType,
-        compositionCID: string,
-        currentUser: UserType
-    ) => {
-        if (!this.composition) {
-            await this.loadStage(compositionCID, StageNames.composition)
-        }
-
-        const newComposition = mergeFlexIntoComposition(
-            this.composition!,
-            createTemplateInput.flexInputs
-        )
-        await parseComposerSolvers(newComposition.solvers, currentUser.provider)
-
-        const template: TemplateModel = {
-            pfp: createTemplateInput.pfp,
-            name: createTemplateInput.name,
-            title: createTemplateInput.title,
-            description: createTemplateInput.description,
-            price: {
-                amount: createTemplateInput.askingAmount,
-                denominationTokenAddress:
-                    createTemplateInput.denominationTokenAddress,
-                preferredTokens: createTemplateInput.preferredTokens,
-                allowAnyPaymentToken: createTemplateInput.allowAnyPaymentToken,
-            },
-            flexInputs: createTemplateInput.flexInputs,
-            compositionCID: compositionCID,
-        }
-
-        if (!this.isStageSchema(template, StageNames.template)) {
-            throw GENERAL_ERROR['WRONG_TEMPLATE_SCHEMA']
-        }
-        this.stages['template'] = template
-        return this.publishStage(StageNames.template, currentUser)
-    }
-
-    publishProposal = async (
-        createProposalInput: CreateProposalMultiStepFormType,
-        templateCID: string,
-        currentUser: UserType
-    ) => {
-        if (!this.template) {
-            await this.loadStage(templateCID, StageNames.template)
-        }
-
-        if (this.template && !this.composition) {
-            await this.loadStage(
-                this.template.compositionCID,
-                StageNames.composition
-            )
-        }
-
-        const newComposition = mergeFlexIntoComposition(
-            mergeFlexIntoComposition(
-                this.composition!,
-                this.template!.flexInputs
-            ),
-            createProposalInput.flexInputs
-        )
-        const parsedSolvers = await parseComposerSolvers(
-            newComposition.solvers,
-            currentUser.provider
-        )
-        if (parsedSolvers) {
-            // Pin solverConfigs separately to have access without metaData from Solution
-            const solverConfigs = parsedSolvers.map((solver) => solver.config)
-            const res = await this.ipfs.pin(solverConfigs)
-            if (!res || !res.IpfsHash) throw GENERAL_ERROR['IPFS_PIN_ERROR']
-
-            const proposal: ProposalModel = {
-                title: createProposalInput.title,
-                name: createProposalInput.name,
-                pfp: createProposalInput.pfp,
-                description: createProposalInput.description,
-                templateCID: templateCID,
-                flexInputs: createProposalInput.flexInputs,
-                solverConfigsCID: res.IpfsHash,
-            }
-
-            this.stages[StageNames.proposal] = proposal
-            const proposalCID = await this.publishStage(
-                StageNames.proposal,
-                currentUser
-            )
-            if (proposalCID) {
-                return {
-                    proposal: proposal,
-                    parsedSolvers: parsedSolvers,
-                    cid: proposalCID,
-                }
             }
         }
     }

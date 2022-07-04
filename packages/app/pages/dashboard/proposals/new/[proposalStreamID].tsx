@@ -4,59 +4,68 @@ import CeramicStagehand, {
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
-import EditTemplateUI from '@cambrian/app/ui/templates/EditTemplateUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
+import ProposalWizard from '@cambrian/app/ui/proposals/wizard/ProposalWizard'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
 
-export default function EditTemplatePage() {
+export default function NewProposalPage() {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
-    const { templateStreamID } = router.query
-    const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
-    const [templateInput, setTemplateInput] = useState<CeramicTemplateModel>()
+    const { proposalStreamID } = router.query
+    const [cachedProposal, setCachedProposal] = useState<CeramicProposalModel>()
+    const [proposalInput, setProposalInput] = useState<CeramicProposalModel>()
     const [composition, setComposition] = useState<CompositionModel>()
+    const [template, setTemplate] = useState<CeramicTemplateModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
 
     useEffect(() => {
-        if (router.isReady) fetchTemplate()
+        if (router.isReady) fetchProposal()
     }, [router, currentUser])
 
-    const fetchTemplate = async () => {
+    const fetchProposal = async () => {
         if (currentUser) {
             if (
-                templateStreamID !== undefined &&
-                typeof templateStreamID === 'string'
+                proposalStreamID !== undefined &&
+                typeof proposalStreamID === 'string'
             ) {
                 try {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     setCeramicStagehand(cs)
-                    const template = (await (
-                        await cs.loadStream(templateStreamID)
-                    ).content) as CeramicTemplateModel
+                    const proposal = (await (
+                        await cs.loadStream(proposalStreamID)
+                    ).content) as CeramicProposalModel
 
-                    if (template) {
-                        const comp = (await (
-                            await cs.loadStream(template.composition.commitID)
-                        ).content) as CompositionModel
+                    if (proposal) {
+                        const template = (await (
+                            await cs.loadStream(proposal.template.commitID)
+                        ).content) as CeramicTemplateModel
+                        if (template) {
+                            const comp = (await (
+                                await cs.loadStream(
+                                    template.composition.commitID
+                                )
+                            ).content) as CompositionModel
 
-                        if (comp) {
-                            setComposition(comp)
-                            setCachedTemplate(_.cloneDeep(template))
-                            return setTemplateInput(template)
+                            if (comp) {
+                                setComposition(comp)
+                                setTemplate(template)
+                                setCachedProposal(_.cloneDeep(proposal))
+                                return setProposalInput(proposal)
+                            }
                         }
                     }
                 } catch (e) {
@@ -67,26 +76,22 @@ export default function EditTemplatePage() {
         }
     }
 
-    const onSaveTemplate = async () => {
-        if (templateInput && ceramicStagehand) {
-            if (!_.isEqual(templateInput, cachedTemplate)) {
+    const onSaveProposal = async () => {
+        if (proposalInput && ceramicStagehand) {
+            if (!_.isEqual(proposalInput, cachedProposal)) {
                 const { uniqueTag } = await ceramicStagehand.updateStage(
-                    templateStreamID as string,
-                    templateInput,
-                    StageNames.template
+                    proposalStreamID as string,
+                    proposalInput,
+                    StageNames.proposal
                 )
-                const templateWithUniqueTitle = {
-                    ...templateInput,
+                const proposalWithUniqueTitle = {
+                    ...proposalInput,
                     title: uniqueTag,
                 }
-                setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
-                setTemplateInput(templateWithUniqueTitle)
+                setCachedProposal(_.cloneDeep(proposalWithUniqueTitle))
+                setProposalInput(proposalWithUniqueTitle)
             }
         }
-    }
-
-    const onResetTemplate = () => {
-        setTemplateInput(cachedTemplate)
     }
 
     return (
@@ -95,34 +100,29 @@ export default function EditTemplatePage() {
                 currentUser ? (
                     show404NotFound ? (
                         <Custom404Page />
-                    ) : templateInput &&
+                    ) : proposalInput &&
                       ceramicStagehand &&
-                      composition &&
-                      cachedTemplate ? (
-                        <PageLayout contextTitle="Edit Template">
+                      template &&
+                      composition ? (
+                        <PageLayout contextTitle="New Proposal">
                             <Box align="center" pad="large">
                                 <Box width={'xlarge'} gap="large">
-                                    <TemplateHeader
-                                        title={cachedTemplate.title}
-                                    />
-                                    <EditTemplateUI
+                                    <ProposalWizard
+                                        template={template}
                                         composition={composition}
                                         currentUser={currentUser}
-                                        templateInput={templateInput}
-                                        setTemplateInput={setTemplateInput}
-                                        templateStreamID={
-                                            templateStreamID as string
+                                        proposalInput={proposalInput}
+                                        setProposalInput={setProposalInput}
+                                        onSaveProposal={onSaveProposal}
+                                        proposalStreamID={
+                                            proposalStreamID as string
                                         }
-                                        onSaveTemplate={onSaveTemplate}
-                                        onResetTemplate={onResetTemplate}
                                     />
                                 </Box>
                             </Box>
                         </PageLayout>
                     ) : (
-                        <LoadingScreen
-                            context={LOADING_MESSAGE['COMPOSITION']}
-                        />
+                        <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
                     )
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">

@@ -21,14 +21,14 @@ interface ComposerToolbarProps {
     disabled: boolean
     ceramicStagehand?: CeramicStagehand
     currentComposition: CompositionModel
-    compositionKey?: string
+    compositionStreamID: string
 }
 
 const ComposerToolbar = ({
     disabled,
     ceramicStagehand,
     currentComposition,
-    compositionKey,
+    compositionStreamID,
 }: ComposerToolbarProps) => {
     const [showConfig, setShowConfig] = useState(false)
     const [showExportCompositionModal, setShowExportCompostionModal] =
@@ -41,12 +41,14 @@ const ComposerToolbar = ({
         setShowExportCompostionModal(!showExportCompositionModal)
 
     const onSaveComposition = async () => {
-        if (ceramicStagehand && compositionKey) {
+        if (ceramicStagehand) {
             setIsSaving(true)
             try {
-                await ceramicStagehand.updateStream(
-                    compositionKey,
+                await ceramicStagehand.updateStage(
+                    compositionStreamID,
                     {
+                        title: currentComposition.title,
+                        description: '',
                         solvers: currentComposition.solvers,
                         flowElements: currentComposition.flowElements,
                     },

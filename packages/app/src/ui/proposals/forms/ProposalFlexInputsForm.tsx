@@ -1,50 +1,42 @@
-import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { Box, Button, Form, FormField, Text } from 'grommet'
+import React, { SetStateAction, useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress } from '@cambrian/app/utils/helpers/validation'
 
-interface TemplateFlexInputsFormProps {
-    composition: CompositionModel
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
+interface ProposalFlexInputsFormProps {
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
     >
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel: () => void
     cancelLabel?: string
+    composition: CompositionModel
 }
 
-export type FlexInputFormType = TaggedInput & {
-    solverId: string
-    tagId: string
-}
-
-const TemplateFlexInputsForm = ({
-    composition,
+const ProposalFlexInputsForm = ({
+    proposalInput,
+    setProposalInput,
     onSubmit,
-    templateInput,
-    setTemplateInput,
     submitLabel,
     onCancel,
     cancelLabel,
-}: TemplateFlexInputsFormProps) => {
+    composition,
+}: ProposalFlexInputsFormProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         return () => {}
     }, [])
 
-    const handleSubmit = async (
-        event: FormExtendedEvent<FlexInputFormType[], Element>
-    ) => {
-        event.preventDefault()
+    const handleSubmit = async () => {
         setIsSubmitting(true)
         await onSubmit()
         setIsSubmitting(false)
@@ -54,8 +46,7 @@ const TemplateFlexInputsForm = ({
         <Form<FlexInputFormType[]> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
                 <Box>
-                    {templateInput.flexInputs.map((flexInput, idx) => {
-                        // Keeping collateralToken out as it is handled previously on its own
+                    {proposalInput.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
@@ -78,15 +69,16 @@ const TemplateFlexInputsForm = ({
                                             }
                                         },
                                     ]}
-                                    value={templateInput.flexInputs[idx].value}
+                                    required
+                                    value={flexInput.value}
                                     onChange={(e) => {
                                         const inputsClone =
-                                            _.cloneDeep(templateInput)
+                                            _.cloneDeep(proposalInput)
 
                                         inputsClone.flexInputs[idx].value =
                                             e.target.value
 
-                                        setTemplateInput(inputsClone)
+                                        setProposalInput(inputsClone)
                                     }}
                                 />
                                 {flexInput.description !== '' && (
@@ -118,4 +110,4 @@ const TemplateFlexInputsForm = ({
     )
 }
 
-export default TemplateFlexInputsForm
+export default ProposalFlexInputsForm

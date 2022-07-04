@@ -1,73 +1,59 @@
 import {
     TEMPLATE_WIZARD_STEPS,
-    TemplateFormType,
     TemplateWizardStepsType,
 } from '../TemplateWizard'
-import TemplatePricingForm, {
-    TemplatePricingFormType,
-} from '../../forms/TemplatePricingForm'
 
-import { FormExtendedEvent } from 'grommet'
+import { Box } from 'grommet'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { SetStateAction } from 'react'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
+import TemplatePricingForm from '../../forms/TemplatePricingForm'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface TemplatePricingStepProps {
-    stepperCallback: (step: TemplateWizardStepsType) => void
-    input: TemplateFormType
-    setInput: React.Dispatch<SetStateAction<TemplateFormType>>
-    collateralToken?: TokenModel
-    setCollateralToken: React.Dispatch<SetStateAction<TokenModel | undefined>>
-    isCollateralFlex: boolean
     currentUser: UserType
+    stepperCallback: (step: TemplateWizardStepsType) => void
+    templateInput: CeramicTemplateModel
+    setTemplateInput: React.Dispatch<
+        SetStateAction<CeramicTemplateModel | undefined>
+    >
+    onSaveTemplate: () => Promise<void>
 }
 
 const TemplatePricingStep = ({
-    input,
     stepperCallback,
-    isCollateralFlex,
-    setInput,
     currentUser,
-    setCollateralToken,
-    collateralToken,
+    templateInput,
+    setTemplateInput,
+    onSaveTemplate,
 }: TemplatePricingStepProps) => {
-    const onSubmit = async (
-        e: FormExtendedEvent<TemplatePricingFormType, Element>
-    ) => {
-        e.preventDefault()
-
-        setInput({
-            ...input,
-            askingAmount: e.value.askingAmount,
-            denominationTokenAddress: e.value.denominationTokenAddress,
-            allowAnyPaymentToken: e.value.allowAnyPaymentToken,
-            preferredTokens: e.value.preferredTokens,
-        })
-
-        // Filter out Collateral Token - as this FlexInput is handled by its own
-        const filteredFlexInputs = input.flexInputs.filter(
-            (flexInput) => flexInput.id !== 'collateralToken'
-        )
-
-        if (filteredFlexInputs.length > 0) {
-            stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
-        } else {
-            stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
-        }
-    }
-
     return (
-        <TemplatePricingForm
-            submitLabel="Continue"
-            onCancel={() => stepperCallback(TEMPLATE_WIZARD_STEPS.DESCRIPTION)}
-            onSubmit={onSubmit}
-            input={input}
-            cancelLabel={'Back'}
-            collateralToken={collateralToken}
-            isCollateralFlex={isCollateralFlex}
-            setCollateralToken={setCollateralToken}
-            currentUser={currentUser}
-        />
+        <Box height={{ min: '60vh' }}>
+            <HeaderTextSection
+                title="How much does it cost?"
+                paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
+            />
+            <TemplatePricingForm
+                templateInput={templateInput}
+                setTemplateInput={setTemplateInput}
+                onSubmit={async () => {
+                    await onSaveTemplate()
+
+                    if (templateInput.flexInputs.length > 0) {
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
+                    } else {
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
+                    }
+                }}
+                submitLabel="Save & Continue"
+                onCancel={() =>
+                    stepperCallback(TEMPLATE_WIZARD_STEPS.DESCRIPTION)
+                }
+                cancelLabel="Back"
+                currentUser={currentUser}
+            />
+        </Box>
     )
 }
 

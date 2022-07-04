@@ -27,31 +27,31 @@ const ExportCompositionModal = ({
         useState<{ compositionKey: string; streamID: string }>()
     const [isExporting, setIsExporting] = useState(false)
 
-    const [compositionKeyInput, setCompositionKeyInput] = useState<string>('')
+    const [compositionTitleInput, setCompositionTitleInput] =
+        useState<string>('')
 
     useEffect(() => {
-        setCompositionKeyInput(randimals())
+        setCompositionTitleInput(randimals())
     }, [])
 
     const onExport = async (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
         setIsExporting(true)
         try {
-            const streamID = await ceramicStagehand.createStream(
-                compositionKeyInput,
-                {
-                    flowElements: composer.flowElements,
-                    solvers: composer.solvers,
-                },
-                StageNames.composition
-            )
+            const { uniqueTag, streamID } =
+                await ceramicStagehand.createComposition(
+                    compositionTitleInput,
+                    {
+                        ...composer,
+                        title: compositionTitleInput,
+                        description: '',
+                    }
+                )
 
-            if (streamID) {
-                setExportedCompositionCID({
-                    compositionKey: compositionKeyInput,
-                    streamID: streamID,
-                })
-            }
+            setExportedCompositionCID({
+                compositionKey: uniqueTag,
+                streamID: streamID,
+            })
         } catch (e) {
             cpLogger.push(e)
         }
@@ -77,7 +77,7 @@ const ExportCompositionModal = ({
             />
             {exportedCompositionCID ? (
                 <StoredIdItem
-                    route={`${window.location.host}/composer/composition/`}
+                    route={`${window.location.origin}/composer/composition/`}
                     cid={exportedCompositionCID.streamID}
                     title={exportedCompositionCID.compositionKey}
                 />
@@ -85,11 +85,11 @@ const ExportCompositionModal = ({
                 <Form onSubmit={onExport}>
                     <FormField
                         required
-                        value={compositionKeyInput}
-                        label="Composition Name"
-                        name="compositionKey"
+                        value={compositionTitleInput}
+                        label="Composition Title"
+                        name="compositionTitleInput"
                         onChange={(event) =>
-                            setCompositionKeyInput(event.target.value)
+                            setCompositionTitleInput(event.target.value)
                         }
                     />
                     <Box>

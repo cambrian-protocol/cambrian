@@ -1,20 +1,13 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextArea,
-} from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { Box, Button, Form, FormField, TextArea } from 'grommet'
+import React, { SetStateAction, useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 
-interface TemplateDescriptionFormProps {
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
+interface ProposalDescriptionFormProps {
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
     >
     onSubmit: () => Promise<void>
     submitLabel?: string
@@ -22,47 +15,44 @@ interface TemplateDescriptionFormProps {
     cancelLabel?: string
 }
 
-export type TemplateDescriptionFormType = {
+type ProposalDescriptionFormType = {
     title: string
     description: string
 }
 
-const TemplateDescriptionForm = ({
-    templateInput,
-    setTemplateInput,
+const ProposalDescriptionForm = ({
+    proposalInput,
+    setProposalInput,
     onSubmit,
     submitLabel,
     onCancel,
     cancelLabel,
-}: TemplateDescriptionFormProps) => {
+}: ProposalDescriptionFormProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         return () => {}
     }, [])
 
-    const handleSubmit = async (
-        event: FormExtendedEvent<TemplateDescriptionFormType, Element>
-    ) => {
-        event.preventDefault()
+    const handleSubmit = async () => {
         setIsSubmitting(true)
         await onSubmit()
         setIsSubmitting(false)
     }
 
     return (
-        <Form<TemplateDescriptionFormType> onSubmit={handleSubmit}>
+        <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
                 <Box>
                     <FormField
                         name="title"
                         label="Title"
                         required
-                        placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
-                        value={templateInput.title}
+                        placeholder={'Type your proposal title here...'}
+                        value={proposalInput.title}
                         onChange={(e) =>
-                            setTemplateInput({
-                                ...templateInput,
+                            setProposalInput({
+                                ...proposalInput,
                                 title: e.target.value,
                             })
                         }
@@ -70,20 +60,22 @@ const TemplateDescriptionForm = ({
                     <FormField name="description" label="Description" required>
                         <TextArea
                             name="description"
-                            placeholder="Describe your service at length. Communicate your unique value, details of your service, and the format and content of information you need from customers. Customers will send proposals in response to this description."
-                            rows={15}
+                            placeholder={
+                                'Type your proposal desciption here...'
+                            }
+                            rows={9}
                             resize={false}
-                            value={templateInput.description}
+                            value={proposalInput.description}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setProposalInput({
+                                    ...proposalInput,
                                     description: e.target.value,
                                 })
                             }
                         />
                     </FormField>
                 </Box>
-                <Box direction="row" justify="between">
+                <Box direction="row" justify="between" pad={{ top: 'medium' }}>
                     <Button
                         size="small"
                         secondary
@@ -103,4 +95,4 @@ const TemplateDescriptionForm = ({
     )
 }
 
-export default TemplateDescriptionForm
+export default ProposalDescriptionForm
