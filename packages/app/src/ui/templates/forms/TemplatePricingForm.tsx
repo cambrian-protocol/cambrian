@@ -23,7 +23,6 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { validateAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface TemplatePricingFormProps {
     templateInput: CeramicTemplateModel
@@ -37,6 +36,7 @@ interface TemplatePricingFormProps {
     cancelLabel?: string
 }
 
+// TODO Validation, Preferred Token Input cursor jump bug
 const TemplatePricingForm = ({
     onSubmit,
     templateInput,
@@ -71,15 +71,25 @@ const TemplatePricingForm = ({
             totalSupply: BigNumber.from(0),
         }
         const inputClone = _.cloneDeep(templateInput)
-        inputClone.price.preferredTokens?.push(newPreferredToken)
+        if (!inputClone.price.preferredTokens) {
+            inputClone.price.preferredTokens = [newPreferredToken]
+        } else {
+            inputClone.price.preferredTokens.push(newPreferredToken)
+        }
         setTemplateInput(inputClone)
     }
 
     const updatePreferredToken = async (address: string, idx: number) => {
-        const token = await fetchTokenInfo(address, currentUser.web3Provider)
-        if (token && templateInput.price.preferredTokens) {
-            const inputClone = _.cloneDeep(templateInput)
-            inputClone.price.preferredTokens![idx] = token
+        const inputClone = _.cloneDeep(templateInput)
+        if (
+            inputClone.price.preferredTokens &&
+            inputClone.price.preferredTokens[idx]
+        ) {
+            const token = await fetchTokenInfo(
+                address,
+                currentUser.web3Provider
+            )
+            inputClone.price.preferredTokens[idx] = token
             setTemplateInput(inputClone)
         }
     }
@@ -129,19 +139,22 @@ const TemplatePricingForm = ({
                     <Box direction="row" fill gap="small" align="center">
                         <Box basis="1/4">
                             <FormField
+                                label="Amount"
+                                type="number"
+                                min={0}
                                 value={templateInput.price.amount}
                                 onChange={(e) =>
                                     setTemplateInput({
                                         ...templateInput,
                                         price: {
                                             ...templateInput.price,
-                                            amount: parseInt(e.target.value),
+                                            amount:
+                                                e.target.value === ''
+                                                    ? 0
+                                                    : parseInt(e.target.value),
                                         },
                                     })
                                 }
-                                name="askingAmount"
-                                label="Amount"
-                                type="number"
                             />
                         </Box>
                         <Box fill direction="row" gap="small">
@@ -150,9 +163,7 @@ const TemplatePricingForm = ({
                                     disabled={
                                         !templateInput.price.isCollateralFlex
                                     }
-                                    name="denominationTokenAddress"
                                     label="Token Address"
-                                    type="string"
                                     value={
                                         templateInput.price
                                             .denominationTokenAddress
@@ -168,7 +179,6 @@ const TemplatePricingForm = ({
                                         })
                                         initCollateralToken(e.target.value)
                                     }}
-                                    validate={validateAddress}
                                 />
                             </Box>
                             <TokenAvatar token={collateralToken} />
@@ -205,7 +215,6 @@ const TemplatePricingForm = ({
                                                     },
                                                 })
                                             }}
-                                            name="allowAnyPaymentToken"
                                             label="Allow any token for payment"
                                         />
                                     </Box>

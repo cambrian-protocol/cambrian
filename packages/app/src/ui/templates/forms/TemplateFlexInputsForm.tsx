@@ -26,6 +26,7 @@ export type FlexInputFormType = TaggedInput & {
     tagId: string
 }
 
+// TODO Validation
 const TemplateFlexInputsForm = ({
     composition,
     onSubmit,
@@ -65,19 +66,6 @@ const TemplateFlexInputsForm = ({
                                 <FormField
                                     label={flexInput.label}
                                     type={type}
-                                    name={`flexInputs[${idx}].value`}
-                                    validate={[
-                                        (userInput: string | number) => {
-                                            if (
-                                                type === 'address' &&
-                                                typeof userInput === 'string'
-                                            ) {
-                                                if (userInput.length > 0) {
-                                                    return isAddress(userInput)
-                                                }
-                                            }
-                                        },
-                                    ]}
                                     value={templateInput.flexInputs[idx].value}
                                     onChange={(e) => {
                                         const inputsClone =

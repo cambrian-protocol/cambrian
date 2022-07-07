@@ -54,7 +54,6 @@ const TemplateRequirementsForm = ({
             <Box height="50vh" justify="between">
                 <FormField label="Requirements" name="requirements">
                     <TextArea
-                        name="requirements"
                         value={templateInput.requirements}
                         resize={false}
                         rows={10}
