@@ -27,6 +27,7 @@ type ProposalPricingFormType = {
     price: number
 }
 
+// TODO Validation
 const ProposalPricingForm = ({
     onSubmit,
     setProposalInput,
@@ -108,10 +109,9 @@ const ProposalPricingForm = ({
                             <Box direction="row" gap="small">
                                 <Box width={{ max: 'medium' }}>
                                     <FormField
-                                        name="price"
                                         label="Amount"
                                         type="number"
-                                        required
+                                        min={0}
                                         value={proposalInput.price.amount}
                                         onChange={(e) =>
                                             setProposalInput({
