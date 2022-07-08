@@ -20,6 +20,7 @@ type ProposalDescriptionFormType = {
     description: string
 }
 
+// TODO Validation
 const ProposalDescriptionForm = ({
     proposalInput,
     setProposalInput,
@@ -43,27 +44,24 @@ const ProposalDescriptionForm = ({
     return (
         <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
-                <Box>
+                <Box height={{ min: 'auto' }}>
                     <FormField
-                        name="title"
                         label="Title"
-                        required
                         placeholder={'Type your proposal title here...'}
                         value={proposalInput.title}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setProposalInput({
                                 ...proposalInput,
                                 title: e.target.value,
                             })
-                        }
+                        }}
                     />
-                    <FormField name="description" label="Description" required>
+                    <FormField label="Description">
                         <TextArea
-                            name="description"
                             placeholder={
                                 'Type your proposal desciption here...'
                             }
-                            rows={9}
+                            rows={15}
                             resize={false}
                             value={proposalInput.description}
                             onChange={(e) =>
@@ -75,7 +73,12 @@ const ProposalDescriptionForm = ({
                         />
                     </FormField>
                 </Box>
-                <Box direction="row" justify="between" pad={{ top: 'medium' }}>
+                <Box
+                    direction="row"
+                    justify="between"
+                    pad={{ top: 'medium' }}
+                    height={{ min: 'auto' }}
+                >
                     <Button
                         size="small"
                         secondary

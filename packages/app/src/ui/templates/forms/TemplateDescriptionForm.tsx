@@ -10,6 +10,7 @@ import { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface TemplateDescriptionFormProps {
     templateInput: CeramicTemplateModel
@@ -53,13 +54,12 @@ const TemplateDescriptionForm = ({
     return (
         <Form<TemplateDescriptionFormType> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
-                <Box>
+                <Box height={{ min: 'auto' }}>
                     <FormField
-                        name="title"
                         label="Title"
-                        required
                         placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
                         value={templateInput.title}
+                        validate={[() => isRequired(templateInput.title)]}
                         onChange={(e) =>
                             setTemplateInput({
                                 ...templateInput,
@@ -67,9 +67,12 @@ const TemplateDescriptionForm = ({
                             })
                         }
                     />
-                    <FormField name="description" label="Description" required>
+                    <FormField
+                        name="description"
+                        label="Description"
+                        validate={[() => isRequired(templateInput.description)]}
+                    >
                         <TextArea
-                            name="description"
                             placeholder="Describe your service at length. Communicate your unique value, details of your service, and the format and content of information you need from customers. Customers will send proposals in response to this description."
                             rows={15}
                             resize={false}
@@ -83,7 +86,7 @@ const TemplateDescriptionForm = ({
                         />
                     </FormField>
                 </Box>
-                <Box direction="row" justify="between">
+                <Box direction="row" justify="between" height={{ min: 'auto' }}>
                     <Button
                         size="small"
                         secondary

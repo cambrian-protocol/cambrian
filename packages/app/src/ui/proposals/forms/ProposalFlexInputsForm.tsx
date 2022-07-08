@@ -7,7 +7,6 @@ import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
-import { isAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface ProposalFlexInputsFormProps {
     proposalInput: CeramicProposalModel
@@ -21,6 +20,7 @@ interface ProposalFlexInputsFormProps {
     composition: CompositionModel
 }
 
+// TODO Validation
 const ProposalFlexInputsForm = ({
     proposalInput,
     setProposalInput,
@@ -45,7 +45,7 @@ const ProposalFlexInputsForm = ({
     return (
         <Form<FlexInputFormType[]> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
-                <Box>
+                <Box height={{ min: 'auto' }}>
                     {proposalInput.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
@@ -56,20 +56,6 @@ const ProposalFlexInputsForm = ({
                                 <FormField
                                     label={flexInput.label}
                                     type={type}
-                                    name={`flexInputs[${idx}].value`}
-                                    validate={[
-                                        (userInput: string | number) => {
-                                            if (
-                                                type === 'address' &&
-                                                typeof userInput === 'string'
-                                            ) {
-                                                if (userInput.length > 0) {
-                                                    return isAddress(userInput)
-                                                }
-                                            }
-                                        },
-                                    ]}
-                                    required
                                     value={flexInput.value}
                                     onChange={(e) => {
                                         const inputsClone =
@@ -90,7 +76,7 @@ const ProposalFlexInputsForm = ({
                         )
                     })}
                 </Box>
-                <Box direction="row" justify="between">
+                <Box direction="row" justify="between" height={{ min: 'auto' }}>
                     <Button
                         size="small"
                         secondary
