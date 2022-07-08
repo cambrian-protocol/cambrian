@@ -22,7 +22,7 @@ export default function App({ ...props }: AppProps) {
     return (
         <Provider
             client={{
-                ceramic: 'http://35.224.77.11:7007',
+                ceramic: 'http://ceramic.cambrianprotocol.com:7007',
                 connectNetwork: 'testnet-clay',
             }}
         >
