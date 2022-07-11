@@ -328,25 +328,25 @@ export default class CeramicStagehand {
     submitProposal = async (proposalStreamID: string) => {
         try {
             // Hit mailbox server
-            /*  const res = await fetch(
-                `${process.env.NEXT_PUBLIC_TRILOBOT}/propose`,
+            const res = await fetch(
+                `http://trilobot.cambrianprotocol.com/proposeDraft`,
                 {
                     method: 'POST',
                     body: proposalStreamID,
                 }
             )
 
-            if (res.status === 200) { */
-            const proposalDoc = await TileDocument.load(
-                this.selfID.client.ceramic,
-                proposalStreamID
-            )
-            await proposalDoc.update({
-                ...(proposalDoc.content as CeramicProposalModel),
-                submitted: true,
-            })
-            return true
-            //}
+            if (res.status === 200) {
+                const proposalDoc = await TileDocument.load(
+                    this.selfID.client.ceramic,
+                    proposalStreamID
+                )
+                await proposalDoc.update({
+                    ...(proposalDoc.content as CeramicProposalModel),
+                    submitted: true,
+                })
+                return true
+            }
         } catch (e) {
             console.log(e)
         }
@@ -475,21 +475,20 @@ export default class CeramicStagehand {
     requestProposalChange = async (proposalStreamID: string) => {
         try {
             // Hit mailbox server
-            /*  const res = await fetch(
-                `${process.env.NEXT_PUBLIC_TRILOBOT}/requestChange`,
+            const res = await fetch(
+                `http://trilobot.cambrianprotocol.com/requestChange`,
                 {
                     method: 'POST',
                     body: proposalStreamID,
                 }
-            ) */
+            )
 
-            // if (res.status === 200) {
-            await this.updateProposalEntry(proposalStreamID, {
-                approved: false,
-                requestChange: true,
-            })
-            return true
-            // }
+            if (res.status === 200) {
+                await this.updateProposalEntry(proposalStreamID, {
+                    requestChange: true,
+                })
+                return true
+            }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -506,20 +505,19 @@ export default class CeramicStagehand {
     approveProposal = async (proposalStreamID: string) => {
         try {
             // Hit mailbox server
-            /*  const res = await fetch(
-                `${process.env.NEXT_PUBLIC_TRILOBOT}/approveProposal`,
+            const res = await fetch(
+                `http://trilobot.cambrianprotocol.com/approveProposal`,
                 {
                     method: 'POST',
                     body: proposalStreamID,
                 }
-            ) */
-            // if (res.status === 200) {
-            await this.updateProposalEntry(proposalStreamID, {
-                approved: true,
-                requestChange: false,
-            })
-            return true
-            // }
+            )
+            if (res.status === 200) {
+                await this.updateProposalEntry(proposalStreamID, {
+                    approved: true,
+                })
+                return true
+            }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
