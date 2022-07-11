@@ -20,7 +20,12 @@ declare global {
 
 export default function App({ ...props }: AppProps) {
     return (
-        <Provider client={{ ceramic: 'testnet-clay' }}>
+        <Provider
+            client={{
+                ceramic: 'http://ceramic.cambrianprotocol.com:7007',
+                connectNetwork: 'testnet-clay',
+            }}
+        >
             <Store>
                 <Core {...props} />
             </Store>
