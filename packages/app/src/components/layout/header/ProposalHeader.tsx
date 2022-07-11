@@ -1,44 +1,46 @@
 import {
     BookOpen,
     ClipboardText,
-    Coins,
-    Handshake,
+    File,
     IconContext,
     Question,
     TreeStructure,
 } from 'phosphor-react'
+import { Box, Heading, Text } from 'grommet'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
 } from 'packages/app/config/ExternalLinks'
 
-import { Box } from 'grommet'
 import { Button } from 'grommet'
-import HeaderTextSection from '../../sections/HeaderTextSection'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Link from 'next/link'
-import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
 interface ProposalHeaderProps {
-    isProposalExecuted: boolean
     proposalTitle?: string
-    proposalMetadata?: ProposalModel
-    templateMetadata?: TemplateModel
+    ceramicProposal?: CeramicProposalModel
+    ceramicTemplate?: CeramicTemplateModel
+    proposalStatus: ProposalStatus
 }
 
+// TODO Proposal Status Badge Styling
 const ProposalHeader = ({
-    isProposalExecuted,
     proposalTitle,
-    proposalMetadata,
-    templateMetadata,
+    ceramicProposal,
+    ceramicTemplate,
+    proposalStatus,
 }: ProposalHeaderProps) => {
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
+    const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
+
+    const toggleShowTemplateInfoModal = () =>
+        setShowTemplateInfoModal(!showTemplateInfoModal)
 
     return (
         <>
@@ -53,19 +55,21 @@ const ProposalHeader = ({
                                 top: 'medium',
                                 bottom: 'xsmall',
                             }}
+                            gap="medium"
                         >
-                            <HeaderTextSection
-                                subTitle={
-                                    isProposalExecuted
-                                        ? 'Project'
-                                        : 'Proposal Funding'
-                                }
-                                title={
-                                    proposalTitle ||
-                                    proposalMetadata?.title ||
-                                    'Proposal'
-                                }
-                            />
+                            <Box gap="small">
+                                <Box direction="row" gap="medium">
+                                    <Text color={'brand'}>Proposal</Text>
+                                    <ProposalStatusBadge
+                                        status={proposalStatus}
+                                    />
+                                </Box>
+                                <Heading>
+                                    {proposalTitle ||
+                                        ceramicProposal?.title ||
+                                        'Untitled Proposal'}
+                                </Heading>
+                            </Box>
                             <Box
                                 direction="row"
                                 justify="end"
@@ -74,20 +78,43 @@ const ProposalHeader = ({
                                 pad={{ bottom: 'xsmall' }}
                             >
                                 <IconContext.Provider value={{ size: '18' }}>
-                                    {proposalMetadata && templateMetadata && (
+                                    {ceramicProposal && (
                                         <Button
                                             color="dark-4"
                                             size="small"
                                             onClick={
-                                                toggleShowProposalInfoModal
+                                                toggleShowTemplateInfoModal
                                             }
                                             label={
                                                 screenSize !== 'small'
-                                                    ? 'Agreement Details'
+                                                    ? 'Proposal Details'
                                                     : undefined
                                             }
                                             icon={
-                                                <Handshake
+                                                <ClipboardText
+                                                    color={
+                                                        cpTheme.global.colors[
+                                                            'dark-4'
+                                                        ]
+                                                    }
+                                                />
+                                            }
+                                        />
+                                    )}
+                                    {ceramicTemplate && (
+                                        <Button
+                                            color="dark-4"
+                                            size="small"
+                                            onClick={
+                                                toggleShowTemplateInfoModal
+                                            }
+                                            label={
+                                                screenSize !== 'small'
+                                                    ? 'Template Details'
+                                                    : undefined
+                                            }
+                                            icon={
+                                                <File
                                                     color={
                                                         cpTheme.global.colors[
                                                             'dark-4'
@@ -103,7 +130,7 @@ const ProposalHeader = ({
                                         disabled
                                         label={
                                             screenSize !== 'small'
-                                                ? 'Solution Overview'
+                                                ? 'Solver Overview'
                                                 : undefined
                                         }
                                         icon={
@@ -174,11 +201,10 @@ const ProposalHeader = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-            {showProposalInfoModal && (
-                <ProposalInfoModal
-                    onClose={toggleShowProposalInfoModal}
-                    proposalMetadata={proposalMetadata}
-                    templateMetadata={templateMetadata}
+            {showTemplateInfoModal && ceramicTemplate && (
+                <TemplateInfoModal
+                    template={ceramicTemplate}
+                    onClose={toggleShowTemplateInfoModal}
                 />
             )}
         </>

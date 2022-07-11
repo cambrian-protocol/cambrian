@@ -89,7 +89,10 @@ const ProposalWizard = ({
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
                 return (
-                    <ProposalPublishStep proposalStreamID={proposalStreamID} />
+                    <ProposalPublishStep
+                        currentUser={currentUser}
+                        proposalStreamID={proposalStreamID}
+                    />
                 )
             default:
                 return (

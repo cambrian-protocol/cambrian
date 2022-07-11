@@ -19,6 +19,6 @@ export type CeramicProposalModel = {
         commitID: string
     }
     price: { amount: number; tokenAddress: string }
-    authors: string[] // DIDs
-    approved: boolean // True only for the controller of this stream
+    author: string // DID
+    submitted: boolean
 }

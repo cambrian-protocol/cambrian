@@ -7,7 +7,7 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalWizard from '@cambrian/app/ui/proposals/wizard/ProposalWizard'
 import _ from 'lodash'
-import useProposal from '@cambrian/app/hooks/useProposal'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function NewProposalPage() {
     const {
@@ -22,13 +22,13 @@ export default function NewProposalPage() {
         proposalStreamID,
         errorMessage,
         setErrorMessage,
-    } = useProposal()
+    } = useEditProposal()
 
     return (
         <>
             {isUserLoaded ? (
                 currentUser ? (
-                    show404NotFound ? (
+                    show404NotFound || proposalInput?.submitted ? (
                         <Custom404Page />
                     ) : proposalInput && template && composition ? (
                         <PageLayout contextTitle="New Proposal">

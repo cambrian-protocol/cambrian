@@ -1,16 +1,18 @@
 import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '../models/ProposalModel'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import _ from 'lodash'
-import { cpLogger } from './../services/api/Logger.api'
+import { initProposalStatus } from '../utils/helpers/proposalStatusHelper'
 import { useCurrentUser } from './useCurrentUser'
 import { useRouter } from 'next/router'
 
-const useProposal = () => {
+const useEditProposal = () => {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
     const { proposalStreamID } = router.query
@@ -21,47 +23,83 @@ const useProposal = () => {
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
+    const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
+        ProposalStatus.Unknown
+    )
+
+    /*     const [proposalContract, setProposalContract] = useState<ethers.Contract>()
+    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
+    const [proposalsHub, setProposalsHub] = useState<ProposalsHub>() */
 
     useEffect(() => {
         if (router.isReady) fetchProposal()
     }, [router, currentUser])
 
+    /* 
+        Tries to fetch Ceramic and on-chain Proposal. At least one of it must exist, otherwise 404 will be set to true.
+    */
     const fetchProposal = async () => {
         if (currentUser) {
             if (
                 proposalStreamID !== undefined &&
                 typeof proposalStreamID === 'string'
             ) {
+                let _proposal: CeramicProposalModel | undefined = undefined
+                // Init Ceramic Data
                 try {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     setCeramicStagehand(cs)
-                    const proposal = (await (
-                        await cs.loadStream(proposalStreamID)
-                    ).content) as CeramicProposalModel
+                    const proposalDoc = (await cs.loadStream(
+                        proposalStreamID
+                    )) as TileDocument<CeramicProposalModel>
 
-                    if (proposal) {
-                        const template = (await (
-                            await cs.loadStream(proposal.template.commitID)
-                        ).content) as CeramicTemplateModel
-                        if (template) {
+                    const proposal = proposalDoc.content as CeramicProposalModel
+                    // Just the author of the proposal can edit
+                    if (
+                        proposal &&
+                        proposal.author === currentUser.selfID.did.id
+                    ) {
+                        // Note: Fetching the template stream to initialize status
+                        const templateStreamDoc = (await cs.loadStream(
+                            proposal.template.streamID
+                        )) as TileDocument<CeramicTemplateModel>
+
+                        const templateStreamContent =
+                            templateStreamDoc.content as CeramicTemplateModel
+
+                        if (templateStreamContent) {
+                            initProposalStatus(
+                                templateStreamContent.receivedProposals[
+                                    proposalStreamID
+                                ],
+                                proposalDoc.commitId.toString(),
+                                proposal.submitted,
+                                setProposalStatus
+                            )
+
+                            // Note: Fetching the actual Template Commit
+                            const templateCommitIDContent = (await (
+                                await cs.loadStream(proposal.template.commitID)
+                            ).content) as CeramicTemplateModel
+
                             const comp = (await (
                                 await cs.loadStream(
-                                    template.composition.commitID
+                                    templateCommitIDContent.composition.commitID
                                 )
                             ).content) as CompositionModel
 
                             if (comp) {
+                                _proposal = proposal
                                 setComposition(comp)
-                                setTemplate(template)
+                                setTemplate(templateCommitIDContent)
                                 setCachedProposal(_.cloneDeep(proposal))
                                 return setProposalInput(proposal)
                             }
                         }
                     }
-                } catch (e) {
-                    setErrorMessage(await cpLogger.push(e))
-                }
+                } catch (e) {}
             }
+
             setShow404NotFound(true)
         }
     }
@@ -71,15 +109,20 @@ const useProposal = () => {
             if (!_.isEqual(proposalInput, cachedProposal)) {
                 const { uniqueTag } = await ceramicStagehand.updateStage(
                     proposalStreamID as string,
-                    proposalInput,
+                    { ...proposalInput, submitted: false },
                     StageNames.proposal
                 )
                 const proposalWithUniqueTitle = {
                     ...proposalInput,
                     title: uniqueTag,
+                    submitted: false,
                 }
                 setCachedProposal(_.cloneDeep(proposalWithUniqueTitle))
                 setProposalInput(proposalWithUniqueTitle)
+
+                if (proposalStatus === ProposalStatus.ChangeRequested) {
+                    fetchProposal()
+                }
             }
         }
     }
@@ -102,7 +145,9 @@ const useProposal = () => {
         onSaveProposal: onSaveProposal,
         onResetProposal: onResetProposal,
         proposalStreamID: proposalStreamID as string,
+        proposalStatus: proposalStatus,
+        updateProposal: fetchProposal,
     }
 }
 
-export default useProposal
+export default useEditProposal

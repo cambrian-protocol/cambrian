@@ -84,15 +84,17 @@ const ViewTemplateUI = ({
                         {sellerBasicProfile.content?.description}
                     </Text>
                 </Box>
-                <Box pad={{ left: 'medium' }}>
-                    <Box border round="xsmall" pad="medium">
-                        <CreateProposalCTA
-                            currentUser={currentUser}
-                            template={template}
-                            templateStreamID={templateStreamID}
-                        />
+                {currentUser.selfID.did.id !== template.author && (
+                    <Box pad={{ left: 'medium' }}>
+                        <Box border round="xsmall" pad="medium">
+                            <CreateProposalCTA
+                                currentUser={currentUser}
+                                template={template}
+                                templateStreamID={templateStreamID}
+                            />
+                        </Box>
                     </Box>
-                </Box>
+                )}
             </Box>
         </>
     )

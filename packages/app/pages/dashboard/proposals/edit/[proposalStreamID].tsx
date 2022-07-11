@@ -3,12 +3,15 @@ import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalle
 import Custom404Page from 'packages/app/pages/404'
 import EditProposalUI from '@cambrian/app/ui/proposals/EditProposalUI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import ProposalDraftHeader from '@cambrian/app/components/layout/header/ProposalDraftHeader'
+import ProposalEditSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalEditSidebar'
+import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import _ from 'lodash'
-import useProposal from '@cambrian/app/hooks/useProposal'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function EditProposalPage() {
     const {
@@ -24,8 +27,10 @@ export default function EditProposalPage() {
         setErrorMessage,
         cachedProposal,
         onResetProposal,
-    } = useProposal()
-
+        proposalStatus,
+        proposalStreamID,
+        updateProposal,
+    } = useEditProposal()
     return (
         <>
             {isUserLoaded ? (
@@ -36,24 +41,37 @@ export default function EditProposalPage() {
                       composition &&
                       cachedProposal &&
                       template ? (
-                        <PageLayout contextTitle="Edit Proposal">
-                            <Box align="center" pad="large">
-                                <Box width={'xlarge'} gap="large">
-                                    <ProposalDraftHeader
-                                        title={cachedProposal.title}
-                                    />
-                                    <EditProposalUI
-                                        template={template}
-                                        composition={composition}
-                                        currentUser={currentUser}
-                                        proposalInput={proposalInput}
-                                        setProposalInput={setProposalInput}
-                                        onSaveProposal={onSaveProposal}
-                                        onResetProposal={onResetProposal}
-                                    />
-                                </Box>
+                        <InteractionLayout
+                            contextTitle={'Edit Proposal'}
+                            proposalHeader={
+                                <ProposalHeader
+                                    proposalTitle={cachedProposal.title}
+                                    proposalStatus={proposalStatus}
+                                    ceramicTemplate={template}
+                                />
+                            }
+                            sidebar={
+                                <ProposalEditSidebar
+                                    proposalStatus={proposalStatus}
+                                    updateProposal={updateProposal}
+                                    currentUser={currentUser}
+                                    proposalStreamID={proposalStreamID}
+                                />
+                            }
+                        >
+                            <Box gap="medium">
+                                <EditProposalUI
+                                    proposalStatus={proposalStatus}
+                                    template={template}
+                                    composition={composition}
+                                    currentUser={currentUser}
+                                    proposalInput={proposalInput}
+                                    setProposalInput={setProposalInput}
+                                    onSaveProposal={onSaveProposal}
+                                    onResetProposal={onResetProposal}
+                                />
                             </Box>
-                        </PageLayout>
+                        </InteractionLayout>
                     ) : (
                         <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
                     )

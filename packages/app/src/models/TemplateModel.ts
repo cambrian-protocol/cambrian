@@ -27,6 +27,18 @@ export type CeramicTemplateModel = {
     }
     flexInputs: FlexInputFormType[]
     author: string // DID
+    receivedProposals: ReceivedProposalsHashmapType
+}
+
+export type ReceivedProposalsHashmapType = {
+    [proposalStreamID: string]: ({
+        proposalCommitID: string
+    } & ReceivedProposalPropsType)[]
+}
+
+export type ReceivedProposalPropsType = {
+    approved?: boolean
+    requestChange?: boolean
 }
 
 export type TemplatePriceModel = {
