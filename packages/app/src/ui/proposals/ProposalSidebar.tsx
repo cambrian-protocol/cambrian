@@ -109,7 +109,18 @@ const ProposalSidebar = ({
                     </>
                 )
             case ProposalStatus.Approved:
-                return <ProposalStartFundingComponent />
+                return (
+                    <>
+                        {ceramicProposal && ceramicTemplate && (
+                            <ProposalStartFundingComponent
+                                proposalStreamID={proposalStreamID}
+                                currentUser={currentUser}
+                                ceramicProposal={ceramicProposal}
+                                ceramicTemplate={ceramicTemplate}
+                            />
+                        )}
+                    </>
+                )
             default:
                 return <></>
         }

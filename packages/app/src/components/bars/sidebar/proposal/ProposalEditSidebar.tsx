@@ -1,6 +1,8 @@
 import { Box, Text } from 'grommet'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import ProposalStartFundingComponent from './ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalSubmitComponent from './ProposalSubmitComponent'
@@ -11,6 +13,8 @@ interface ProposalEditSidebarProps {
     proposalStreamID: string
     updateProposal: () => Promise<void>
     proposalStatus: ProposalStatus
+    ceramicProposal: CeramicProposalModel
+    ceramicTemplate: CeramicTemplateModel
 }
 
 const ProposalEditSidebar = ({
@@ -18,6 +22,8 @@ const ProposalEditSidebar = ({
     proposalStreamID,
     updateProposal,
     proposalStatus,
+    ceramicProposal,
+    ceramicTemplate,
 }: ProposalEditSidebarProps) => {
     return (
         <Box gap="medium">
@@ -28,9 +34,16 @@ const ProposalEditSidebar = ({
                     proposalStreamID={proposalStreamID}
                 />
             )}
-            {proposalStatus === ProposalStatus.Approved && (
-                <ProposalStartFundingComponent />
-            )}
+            {proposalStatus === ProposalStatus.Approved &&
+                ceramicProposal &&
+                ceramicTemplate && (
+                    <ProposalStartFundingComponent
+                        proposalStreamID={proposalStreamID}
+                        currentUser={currentUser}
+                        ceramicProposal={ceramicProposal}
+                        ceramicTemplate={ceramicTemplate}
+                    />
+                )}
             <BaseFormGroupContainer border pad="medium" gap="medium">
                 <Text>Messenger Placeholder</Text>
             </BaseFormGroupContainer>

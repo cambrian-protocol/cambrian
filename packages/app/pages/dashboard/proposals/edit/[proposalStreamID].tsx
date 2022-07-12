@@ -9,7 +9,6 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalEditSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalEditSidebar'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import _ from 'lodash'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
@@ -52,7 +51,9 @@ export default function EditProposalPage() {
                             }
                             sidebar={
                                 <ProposalEditSidebar
+                                    ceramicProposal={cachedProposal}
                                     proposalStatus={proposalStatus}
+                                    ceramicTemplate={template}
                                     updateProposal={updateProposal}
                                     currentUser={currentUser}
                                     proposalStreamID={proposalStreamID}

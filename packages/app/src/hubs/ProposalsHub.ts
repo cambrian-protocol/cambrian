@@ -4,6 +4,7 @@ import {
     PROPOSALS_HUB_IFACE,
 } from '@cambrian/app/config/ContractInterfaces'
 import {
+    MultihashType,
     getBytes32FromMultihash,
     getMultihashFromBytes32,
 } from '../utils/helpers/multihash'
@@ -43,6 +44,14 @@ export default class ProposalsHub {
             price.toString(),
             collateralToken.decimals
         )
+        console.log('solverConfigsCID: ', solverConfigsCID)
+        const _solverConfigsMultihash =
+            getBytes32FromMultihash(solverConfigsCID)
+        console.log('_solverConfigsMultihash:', _solverConfigsMultihash)
+
+        console.log('proposalCID', proposalCID)
+        const _proposalMultihash = getBytes32FromMultihash(proposalCID)
+        console.log('_proposalMultihash:', _proposalMultihash)
 
         const tx: ethers.ContractTransaction =
             await this.contract.createIPFSSolutionAndProposal(
@@ -51,8 +60,8 @@ export default class ProposalsHub {
                 SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
-                getBytes32FromMultihash(solverConfigsCID),
-                getBytes32FromMultihash(proposalCID)
+                _solverConfigsMultihash,
+                _proposalMultihash
             )
 
         return tx
