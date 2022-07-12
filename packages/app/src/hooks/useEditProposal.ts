@@ -68,13 +68,14 @@ const useEditProposal = () => {
                             templateStreamDoc.content as CeramicTemplateModel
 
                         if (templateStreamContent) {
-                            initProposalStatus(
-                                templateStreamContent.receivedProposals[
-                                    proposalStreamID
-                                ],
-                                proposalDoc.commitId.toString(),
-                                proposal.submitted,
-                                setProposalStatus
+                            setProposalStatus(
+                                initProposalStatus(
+                                    templateStreamContent.receivedProposals[
+                                        proposalStreamID
+                                    ],
+                                    proposalDoc.commitId.toString(),
+                                    proposal.submitted
+                                )
                             )
 
                             // Note: Fetching the actual Template Commit

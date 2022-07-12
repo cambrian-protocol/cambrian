@@ -2,18 +2,23 @@ import { Anchor, Box, Button, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import Link from 'next/link'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import ProposalStatusBadge from '../badges/ProposalStatusBadge'
+
 interface ProposalListItemProps {
-    proposalID: string
-    proposalStreamID: string
+    proposal: ProposalListItemType
     onDelete: (proposalID: string) => Promise<void>
 }
 
-// TODO Styling
-const ProposalListItem = ({
-    proposalID,
-    proposalStreamID,
-    onDelete,
-}: ProposalListItemProps) => {
+export type ProposalListItemType = {
+    streamID: string
+    status: ProposalStatus
+    title: string
+    isAuthor: boolean
+}
+
+const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
     useEffect(() => {
@@ -32,28 +37,46 @@ const ProposalListItem = ({
             flex
             height={{ min: 'auto' }}
             pad={{
-                horizontal: 'medium',
+                horizontal: 'small',
                 vertical: 'small',
             }}
             direction="row"
             justify="between"
             align="center"
             round="xsmall"
+            wrap
         >
-            <Text>{proposalID}</Text>
-            <Box direction="row">
-                <Anchor href={`/dashboard/proposals/edit/${proposalStreamID}`}>
-                    <Button icon={<Pen />} />
-                </Anchor>
-                <Anchor href={`/proposals/${proposalStreamID}`}>
+            <Box direction="row" wrap="reverse" align="center">
+                <Box pad="xsmall">
+                    <Text>{proposal.title}</Text>
+                </Box>
+                <Box pad="xsmall">
+                    <ProposalStatusBadge status={proposal.status} />
+                </Box>
+            </Box>
+            <Box direction="row" flex width={{ min: 'auto' }} justify="end">
+                {(proposal.status === ProposalStatus.Draft ||
+                    proposal.status === ProposalStatus.ChangeRequested) &&
+                    proposal.isAuthor && (
+                        <Link
+                            href={`/dashboard/proposals/edit/${proposal.streamID}`}
+                            passHref
+                        >
+                            <Button icon={<Pen />} />
+                        </Link>
+                    )}
+                <Anchor href={`/proposals/${proposal.streamID}`}>
                     <Button icon={<Eye />} />
                 </Anchor>
-                <Button icon={<Trash />} onClick={() => onDelete(proposalID)} />
+                <Button
+                    icon={<Trash />}
+                    onClick={() => onDelete(proposal.title)}
+                />
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(
-                            `${window.location.origin}/proposals/${proposalStreamID}`
+                            `${window.location.origin}/proposals/${proposal.streamID}`
                         )
                         setIsSavedToClipboard(true)
                     }}

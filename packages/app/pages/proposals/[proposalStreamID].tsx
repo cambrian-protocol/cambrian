@@ -68,13 +68,14 @@ export default function ViewProposalPage() {
                                 )
                             ).content) as CeramicTemplateModel
 
-                            initProposalStatus(
-                                _templateStream.receivedProposals[
-                                    proposalStreamID
-                                ],
-                                res.proposalCommitID,
-                                res.proposalContent.submitted,
-                                setProposalStatus
+                            setProposalStatus(
+                                initProposalStatus(
+                                    _templateStream.receivedProposals[
+                                        proposalStreamID
+                                    ],
+                                    res.proposalCommitID,
+                                    res.proposalContent.submitted
+                                )
                             )
 
                             hasCeramicData = true

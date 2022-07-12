@@ -1,15 +1,13 @@
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { ReceivedProposalPropsType } from '@cambrian/app/models/TemplateModel'
-import { SetStateAction } from 'react'
 
 export const initProposalStatus = (
     proposalStreamEntries: ({
         proposalCommitID: string
     } & ReceivedProposalPropsType)[],
     proposalCommitID: string,
-    isSubmitted: boolean,
-    setProposalStatus: React.Dispatch<SetStateAction<ProposalStatus>>
-) => {
+    isSubmitted: boolean
+): ProposalStatus => {
     if (
         proposalStreamEntries &&
         proposalStreamEntries[proposalStreamEntries.length - 1]
@@ -19,17 +17,17 @@ export const initProposalStatus = (
             proposalStreamEntries[proposalStreamEntries.length - 1]
 
         if (proposalEntry.approved) {
-            setProposalStatus(ProposalStatus.Approved)
+            return ProposalStatus.Approved
         } else if (proposalEntry.requestChange) {
-            setProposalStatus(ProposalStatus.ChangeRequested)
+            return ProposalStatus.ChangeRequested
         } else {
-            setProposalStatus(ProposalStatus.OnReview)
+            return ProposalStatus.OnReview
         }
     } else {
         if (isSubmitted) {
-            setProposalStatus(ProposalStatus.OnReview)
+            return ProposalStatus.OnReview
         } else {
-            setProposalStatus(ProposalStatus.Draft)
+            return ProposalStatus.Draft
         }
     }
 }

@@ -58,7 +58,7 @@ PROPOSAL_STATUS_INFO[ProposalStatus.Approved] = {
     name: 'APPROVED',
     icon: <CheckCircle />,
     description: 'Proposal has been accepted by the Seller.',
-    color: 'status-executed',
+    color: 'brand',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Funding] = {
     name: 'FUNDING',
