@@ -83,7 +83,7 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                         _proposalDoc.commitId.toString(),
                                         _proposalContent.submitted
                                     ),
-                                    streamID: streamID,
+                                    streamID: proposalStreamID,
                                     title: _proposalContent.title,
                                     isAuthor:
                                         _proposalContent.author ===
