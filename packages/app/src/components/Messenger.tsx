@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { cpLogger } from '../services/api/Logger.api'
-import { GENERAL_ERROR } from '../constants/ErrorMessages'
-import { CeramicProposalModel } from '../models/ProposalModel'
-import { UserType } from '../store/UserContext'
-import io from 'socket.io-client'
+import { Box, Button, Form, FormField, TextInput } from 'grommet'
 import ChatMessage, { ChatMessageType } from '../ui/moduleUIs/Chat/ChatMessage'
-import { Button } from 'grommet/components/Button'
+import { useEffect, useRef, useState } from 'react'
+
+import { CeramicProposalModel } from '../models/ProposalModel'
+import { CeramicTemplateModel } from '../models/TemplateModel'
+import { GENERAL_ERROR } from '../constants/ErrorMessages'
+import { PaperPlaneRight } from 'phosphor-react'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { UserType } from '../store/UserContext'
+import { cpLogger } from '../services/api/Logger.api'
+import io from 'socket.io-client'
 
 /**
  * Messages are stored for a user in:
@@ -20,7 +23,7 @@ import { Button } from 'grommet/components/Button'
  * Where <chatID> is:
  *
  *  Active Solver => <solverAddress>
- *  Draft Proposal => <proposalStreamID>  (ID of PROPOSER'S stream, not recipient's copy)
+ *  Draft Proposal => <proposalStreamID>  (ID of PROPOSER'S stream)
  *  On-Chain Proposal => <proposalId>
  */
 
@@ -44,6 +47,7 @@ export default function Messenger({
     const [outbox, setOutbox] = useState<ChatMessageType[]>([])
 
     const [messages, setMessages] = useState<ChatMessageType[]>([])
+    const [messageInput, setMessageInput] = useState('')
 
     useEffect(() => {
         // Update chat upon receiving websocket emit
@@ -99,6 +103,7 @@ export default function Messenger({
             })
 
             addToOutbox(message)
+            setMessageInput('')
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -203,20 +208,27 @@ export default function Messenger({
     const loadChatDraftProposal = async () => {
         try {
             const proposalDoc: TileDocument<CeramicProposalModel> =
-                await TileDocument.deterministic(
+                await TileDocument.load(
                     currentUser.selfID.client.ceramic,
-                    {
-                        controllers: [currentUser.selfID.id],
-                        family: 'cambrian-proposal',
-                        tags: [chatID],
-                    }
+                    chatID
                 )
+
+            const templateDoc: TileDocument<CeramicTemplateModel> =
+                await TileDocument.load(
+                    currentUser.selfID.client.ceramic,
+                    proposalDoc.content.template.streamID
+                )
+
+            const authors = [
+                templateDoc.content.author,
+                proposalDoc.content.author,
+            ]
 
             // Load, then filter out streams that failed to load & streams with no messages
             const messagesDocs: TileDocument<ChatMessageType[]>[] = (
                 (
                     await Promise.allSettled(
-                        proposalDoc.content.authors.map((DID) =>
+                        authors.map((DID) =>
                             TileDocument.deterministic(
                                 currentUser.selfID.client.ceramic,
                                 {
@@ -247,7 +259,7 @@ export default function Messenger({
     /**
      * @notice Merge separate arrays of messages into one sorted list
      */
-    const mergeMessages = async (messages: ChatMessageType[][]) => {
+    const mergeMessages = (messages: ChatMessageType[][]) => {
         const mergedMessages = messages
             .reduce((prev, next) => prev.concat(next), []) // Array arrays together...
             .sort((a, b) => a.timestamp - b.timestamp) /// ...and sort by timestamp
@@ -256,11 +268,27 @@ export default function Messenger({
     }
 
     return (
-        <>
-            <Button
-                onClick={() =>
+        <Box gap="small">
+            <Box
+                height={'medium'}
+                border
+                round="xsmall"
+                pad="small"
+                overflow={{ vertical: 'auto' }}
+                gap="small"
+            >
+                {messages.map((msg, index) => (
+                    <ChatMessage
+                        key={index}
+                        currentUser={currentUser}
+                        message={msg}
+                    />
+                ))}
+            </Box>
+            <Form
+                onSubmit={() =>
                     sendMessage({
-                        text: 'Hello, World!',
+                        text: messageInput,
                         author: {
                             name: currentUser.basicProfile?.name || 'Anon',
                             did: currentUser.selfID.id,
@@ -269,15 +297,16 @@ export default function Messenger({
                     })
                 }
             >
-                Send
-            </Button>
-            {messages.map((msg, index) => (
-                <ChatMessage
-                    key={index}
-                    currentUser={currentUser}
-                    message={msg}
-                />
-            ))}
-        </>
+                <Box direction="row" align="center" gap="small">
+                    <Box flex>
+                        <TextInput
+                            value={messageInput}
+                            onChange={(e) => setMessageInput(e.target.value)}
+                        />
+                    </Box>
+                    <Button icon={<PaperPlaneRight />} type="submit" />
+                </Box>
+            </Form>
+        </Box>
     )
 }

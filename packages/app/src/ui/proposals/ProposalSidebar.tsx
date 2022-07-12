@@ -1,10 +1,12 @@
 import { Box, Button, Text } from 'grommet'
 import React, { useState } from 'react'
 
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Link from 'next/link'
+import Messenger from '@cambrian/app/components/Messenger'
 import ProposalDraftSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalDraftSidebar'
 import ProposalReviewSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewSidebar'
 import ProposalStartFundingComponent from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingComponent'
@@ -129,9 +131,13 @@ const ProposalSidebar = ({
     return (
         <Box gap="medium">
             {renderControlls()}
-            <BaseFormGroupContainer border pad="medium" gap="medium">
-                <Text>Messenger Placeholder</Text>
-            </BaseFormGroupContainer>
+            <BaseFormContainer pad="medium" gap="medium">
+                <Messenger
+                    currentUser={currentUser}
+                    chatID={proposalStreamID}
+                    chatType={'Draft'}
+                />
+            </BaseFormContainer>
         </Box>
     )
 }

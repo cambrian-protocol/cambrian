@@ -1,8 +1,8 @@
-import { Box, Text } from 'grommet'
-
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import { Box } from 'grommet'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import Messenger from '@cambrian/app/components/Messenger'
 import ProposalStartFundingComponent from './ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalSubmitComponent from './ProposalSubmitComponent'
@@ -44,9 +44,13 @@ const ProposalEditSidebar = ({
                         ceramicTemplate={ceramicTemplate}
                     />
                 )}
-            <BaseFormGroupContainer border pad="medium" gap="medium">
-                <Text>Messenger Placeholder</Text>
-            </BaseFormGroupContainer>
+            <BaseFormContainer pad="medium" gap="medium">
+                <Messenger
+                    currentUser={currentUser}
+                    chatID={proposalStreamID}
+                    chatType={'Draft'}
+                />
+            </BaseFormContainer>
         </Box>
     )
 }
