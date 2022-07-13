@@ -7,13 +7,20 @@ import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import { IPFSAPI } from '../services/api/IPFS.api'
+import ProposalsHub from '../hubs/ProposalsHub'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
 import { SelfID } from '@self.id/framework'
+import { SolverConfigModel } from '../models/SolverConfigModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import initialComposer from '../store/composer/composer.init'
+import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
+import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
 
 export enum StageNames {
     composition = 'composition',
@@ -263,6 +270,100 @@ export default class CeramicStagehand {
         return await this.createStage(tag, proposal, StageNames.proposal)
     }
 
+    deployProposal = async (
+        proposalStreamID: string,
+        ceramicTemplate: CeramicTemplateModel,
+        ceramicProposal: CeramicProposalModel,
+        currentUser: UserType
+    ) => {
+        try {
+            const ceramicComposition = (await (
+                await this.loadStream(ceramicTemplate.composition.commitID)
+            ).content) as CompositionModel
+
+            const compositionWithFlexInputs = mergeFlexIntoComposition(
+                mergeFlexIntoComposition(
+                    ceramicComposition,
+                    ceramicTemplate.flexInputs
+                ),
+                ceramicProposal.flexInputs
+            )
+
+            // Add final collateralToken address if it was flex
+            if (ceramicTemplate.price.isCollateralFlex) {
+                compositionWithFlexInputs.solvers.forEach((solver) => {
+                    solver.config.collateralToken =
+                        ceramicProposal.price.tokenAddress
+                })
+            }
+
+            const parsedSolvers = await parseComposerSolvers(
+                compositionWithFlexInputs.solvers,
+                currentUser.web3Provider
+            )
+
+            if (parsedSolvers) {
+                // Pin solverConfigs separately to have access without metaData from Solution
+                const solverConfigsDoc = await TileDocument.deterministic(
+                    this.selfID.client.ceramic,
+                    {
+                        controllers: [this.selfID.id],
+                        family: `cambrian-solverConfigs`,
+                        tags: [proposalStreamID],
+                    }
+                )
+                await solverConfigsDoc.update(
+                    parsedSolvers.map((solver) => solver.config)
+                )
+
+                const proposalsHub = new ProposalsHub(
+                    currentUser.signer,
+                    currentUser.chainId
+                )
+
+                const transaction =
+                    await proposalsHub.createSolutionAndProposal(
+                        parsedSolvers[0].collateralToken,
+                        ceramicProposal.price.amount,
+                        parsedSolvers.map((solver) => solver.config),
+                        solverConfigsDoc.commitId.toString(),
+                        proposalStreamID
+                    )
+                let rc = await transaction.wait()
+                const event = rc.events?.find(
+                    (event) => event.event === 'CreateProposal'
+                )
+                const proposalId = event?.args && event.args.id
+
+                console.log('proposalId', proposalId)
+
+                // Attach proposalID either to the template or the proposal
+                if (this.selfID.did.id === ceramicTemplate.author) {
+                    // Deployed by template author, proposalID will be attached to the template at receivedProposals
+                    await this.updateProposalEntry(proposalStreamID, {
+                        proposalID: proposalId,
+                    })
+                } else if (this.selfID.did.id === ceramicProposal.author) {
+                    // Deloyed by proposal author, proposalID will be attached to proposal
+                    await this.updateStage(
+                        proposalStreamID,
+                        { ...ceramicProposal, proposalID: proposalId },
+                        StageNames.proposal
+                    )
+                } else {
+                    // Just in case
+                    console.warn(
+                        'Proposal was not deployed by the template or proposal creator. Created Proposal ID can not be stored!',
+                        proposalId
+                    )
+                }
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
     loadStream = async (streamID: string) => {
         try {
             const doc = await TileDocument.load(
@@ -362,25 +463,32 @@ export default class CeramicStagehand {
     > => {
         try {
             const proposalDoc = await this.loadStream(proposalStreamID)
-
-            if (!proposalDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
             const proposalContent = proposalDoc.content as CeramicProposalModel
 
+            // Load the template stream to check if the proposal is already registered
             const templateDoc = await this.loadStream(
                 proposalContent.template.streamID
             )
-
             if (!templateDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
             const templateContent = templateDoc.content as CeramicTemplateModel
-            const proposalSubmissions =
+            const proposalCommits =
                 templateContent.receivedProposals[proposalStreamID]
-            if (proposalSubmissions) {
-                // We have an entry
-                const latestRegisteredSubmission =
-                    proposalSubmissions[proposalSubmissions.length - 1]
 
-                if (proposalContent.submitted) {
+            if (proposalCommits) {
+                // We have at registered proposal commits
+                const latestRegisteredSubmission =
+                    proposalCommits[proposalCommits.length - 1]
+
+                if (
+                    proposalContent.proposalID !== undefined ||
+                    latestRegisteredSubmission.proposalID !== undefined
+                ) {
+                    // Proposal has been deployed
+                    return {
+                        proposalCommitID: proposalDoc.commitId.toString(),
+                        proposalContent: proposalContent,
+                    }
+                } else if (proposalContent.submitted) {
                     if (
                         latestRegisteredSubmission.proposalCommitID !==
                         proposalDoc.commitId.toString()
@@ -393,12 +501,12 @@ export default class CeramicStagehand {
                                 templateContent.receivedProposals
                             )
                         }
-                        proposalSubmissions.push({
+                        proposalCommits.push({
                             proposalCommitID: proposalDoc.commitId.toString(),
                         })
 
                         updatedReceivedProposals[proposalStreamID] =
-                            proposalSubmissions
+                            proposalCommits
 
                         await templateDoc.update({
                             ...templateContent,
@@ -524,6 +632,14 @@ export default class CeramicStagehand {
         }
     }
 
+    /**
+     * Updates the templates receivedProposals[proposalStreamID] commit-entry.
+     *
+     * @param proposalStreamID StreamID
+     * @param updatedProposalEntry
+     * @auth Must be done by the template author
+     *
+     */
     updateProposalEntry = async (
         proposalStreamID: string,
         updatedProposalEntry: ReceivedProposalPropsType

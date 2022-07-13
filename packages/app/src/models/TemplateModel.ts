@@ -39,6 +39,7 @@ export type ReceivedProposalsHashmapType = {
 export type ReceivedProposalPropsType = {
     approved?: boolean
     requestChange?: boolean
+    proposalID?: string // Stores the onChain ProposalsHub proposalID if it was deployed by the template creator
 }
 
 export type TemplatePriceModel = {

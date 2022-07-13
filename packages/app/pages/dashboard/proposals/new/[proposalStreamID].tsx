@@ -1,7 +1,6 @@
 import { Box } from 'grommet'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
@@ -20,8 +19,6 @@ export default function NewProposalPage() {
         composition,
         onSaveProposal,
         proposalStreamID,
-        errorMessage,
-        setErrorMessage,
     } = useEditProposal()
 
     return (
@@ -58,12 +55,6 @@ export default function NewProposalPage() {
                 )
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             )}
         </>
     )

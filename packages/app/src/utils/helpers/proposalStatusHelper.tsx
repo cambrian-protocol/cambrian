@@ -1,3 +1,4 @@
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { ReceivedProposalPropsType } from '@cambrian/app/models/TemplateModel'
 
@@ -6,7 +7,7 @@ export const initProposalStatus = (
         proposalCommitID: string
     } & ReceivedProposalPropsType)[],
     proposalCommitID: string,
-    isSubmitted: boolean
+    ceramicProposal: CeramicProposalModel
 ): ProposalStatus => {
     if (
         proposalStreamEntries &&
@@ -16,7 +17,13 @@ export const initProposalStatus = (
         const proposalEntry =
             proposalStreamEntries[proposalStreamEntries.length - 1]
 
-        if (proposalEntry.approved) {
+        if (
+            proposalEntry.proposalID !== undefined ||
+            ceramicProposal.proposalID !== undefined
+        ) {
+            // TODO determine if onchain proposal is executed, consider adding third onchain status: ProposalStatus.Funded
+            return ProposalStatus.Funding
+        } else if (proposalEntry.approved) {
             return ProposalStatus.Approved
         } else if (proposalEntry.requestChange) {
             return ProposalStatus.ChangeRequested
@@ -24,7 +31,7 @@ export const initProposalStatus = (
             return ProposalStatus.OnReview
         }
     } else {
-        if (isSubmitted) {
+        if (ceramicProposal.submitted) {
             return ProposalStatus.OnReview
         } else {
             return ProposalStatus.Draft

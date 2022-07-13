@@ -74,7 +74,7 @@ export default function ViewProposalPage() {
                                         proposalStreamID
                                     ],
                                     res.proposalCommitID,
-                                    res.proposalContent.submitted
+                                    res.proposalContent
                                 )
                             )
 

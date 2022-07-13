@@ -1,25 +1,14 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
-import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useState } from 'react'
-
-const CID = require('cids')
 
 interface ProposalStartFundingComponentProps {
     currentUser: UserType
@@ -41,73 +30,16 @@ const ProposalStartFundingComponent = ({
         setIsInTransaction(true)
         try {
             const cs = new CeramicStagehand(currentUser.selfID)
-
-            const ceramicComposition = (await (
-                await cs.loadStream(ceramicTemplate.composition.commitID)
-            ).content) as CompositionModel
-
-            const compositionWithFlexInputs = mergeFlexIntoComposition(
-                mergeFlexIntoComposition(
-                    ceramicComposition,
-                    ceramicTemplate.flexInputs
-                ),
-                ceramicProposal.flexInputs
+            await cs.deployProposal(
+                proposalStreamID,
+                ceramicTemplate,
+                ceramicProposal,
+                currentUser
             )
-
-            if (ceramicTemplate.price.isCollateralFlex) {
-                compositionWithFlexInputs.solvers.forEach((solver) => {
-                    solver.config.collateralToken =
-                        ceramicProposal.price.tokenAddress
-                })
-            }
-
-            const parsedSolvers = await parseComposerSolvers(
-                compositionWithFlexInputs.solvers,
-                currentUser.web3Provider
-            )
-            if (parsedSolvers) {
-                const proposalsHub = new ProposalsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-
-                // Pin solverConfigs separately to have access without metaData from Solution
-                const ipfs = new IPFSAPI()
-                const ipfsSolverConfigs = await ipfs.pin(
-                    parsedSolvers.map((solver) => solver.config)
-                )
-
-                if (!ipfsSolverConfigs || !ipfsSolverConfigs.IpfsHash)
-                    throw GENERAL_ERROR['IPFS_PIN_ERROR']
-
-                // TODO Temp - can be passed as prop if works
-                const proposalDoc = await cs.loadStream(proposalStreamID)
-
-                const transaction =
-                    await proposalsHub.createSolutionAndProposal(
-                        parsedSolvers[0].collateralToken,
-                        ceramicProposal.price.amount,
-                        parsedSolvers.map((solver) => solver.config),
-                        ipfsSolverConfigs.IpfsHash,
-                        proposalDoc.id.toString()
-                    )
-                let rc = await transaction.wait()
-                const event = rc.events?.find(
-                    (event) => event.event === 'CreateProposal'
-                ) // Less fragile to event param changes.
-                const proposalId = event?.args && event.args.id
-                console.log(proposalId)
-            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsInTransaction(false)
-    }
-
-    function toHexString(byteArray: Uint8Array) {
-        return Array.from(byteArray, function (byte) {
-            return ('0' + (byte & 0xff).toString(16)).slice(-2)
-        }).join('')
     }
 
     return (

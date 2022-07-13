@@ -37,6 +37,12 @@ const ProposalSidebar = ({
 }: ProposalSidebarProps) => {
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
 
+    const isProposalAuthor =
+        currentUser.selfID.did.id === ceramicProposal?.author
+
+    const isTemplateAuthor =
+        currentUser.selfID.did.id === ceramicTemplate?.author
+
     /* useEffect(() => {
         if (isProposalExecuted) {
             initSolver()
@@ -66,17 +72,20 @@ const ProposalSidebar = ({
         switch (proposalStatus) {
             case ProposalStatus.Draft:
                 return (
-                    <ProposalDraftSidebar
-                        updateProposal={updateProposal}
-                        currentUser={currentUser}
-                        proposalStreamID={proposalStreamID}
-                    />
+                    <>
+                        {isProposalAuthor && (
+                            <ProposalDraftSidebar
+                                updateProposal={updateProposal}
+                                currentUser={currentUser}
+                                proposalStreamID={proposalStreamID}
+                            />
+                        )}
+                    </>
                 )
             case ProposalStatus.OnReview:
                 return (
                     <>
-                        {currentUser.selfID.did.id ===
-                            ceramicTemplate?.author && (
+                        {isTemplateAuthor && (
                             <ProposalReviewSidebar
                                 currentUser={currentUser}
                                 proposalStreamID={proposalStreamID}
@@ -88,8 +97,7 @@ const ProposalSidebar = ({
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {currentUser.selfID.did.id ===
-                            ceramicProposal?.author && (
+                        {isProposalAuthor && (
                             <BaseFormGroupContainer
                                 border
                                 pad="medium"
@@ -113,14 +121,16 @@ const ProposalSidebar = ({
             case ProposalStatus.Approved:
                 return (
                     <>
-                        {ceramicProposal && ceramicTemplate && (
-                            <ProposalStartFundingComponent
-                                proposalStreamID={proposalStreamID}
-                                currentUser={currentUser}
-                                ceramicProposal={ceramicProposal}
-                                ceramicTemplate={ceramicTemplate}
-                            />
-                        )}
+                        {(isProposalAuthor || isTemplateAuthor) &&
+                            ceramicProposal &&
+                            ceramicTemplate && (
+                                <ProposalStartFundingComponent
+                                    proposalStreamID={proposalStreamID}
+                                    currentUser={currentUser}
+                                    ceramicProposal={ceramicProposal}
+                                    ceramicTemplate={ceramicTemplate}
+                                />
+                            )}
                     </>
                 )
             default:
@@ -135,7 +145,12 @@ const ProposalSidebar = ({
                 <Messenger
                     currentUser={currentUser}
                     chatID={proposalStreamID}
-                    chatType="Draft"
+                    chatType={
+                        proposalStatus === ProposalStatus.Funding ||
+                        proposalStatus === ProposalStatus.Executed
+                            ? 'Proposal'
+                            : 'Draft'
+                    }
                 />
             </BaseFormContainer>
         </Box>

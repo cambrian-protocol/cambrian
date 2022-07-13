@@ -81,7 +81,7 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                             proposalStreamID
                                         ],
                                         _proposalDoc.commitId.toString(),
-                                        _proposalContent.submitted
+                                        _proposalContent
                                     ),
                                     streamID: proposalStreamID,
                                     title: _proposalContent.title,
@@ -125,7 +125,7 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                         streamID
                                     ],
                                     _proposalDoc.commitId.toString(),
-                                    _proposal.submitted
+                                    _proposal
                                 ),
                                 streamID: streamID,
                                 title: _proposal.title,
