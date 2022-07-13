@@ -135,7 +135,7 @@ const ProposalSidebar = ({
                 <Messenger
                     currentUser={currentUser}
                     chatID={proposalStreamID}
-                    chatType={'Draft'}
+                    chatType="Draft"
                 />
             </BaseFormContainer>
         </Box>

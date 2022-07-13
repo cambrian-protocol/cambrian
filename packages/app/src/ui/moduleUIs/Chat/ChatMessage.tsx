@@ -18,7 +18,7 @@ export type ChatMessageType = {
 }
 
 const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
-    const isSender = currentUser.selfID.did.id === message.author.did
+    const isSender = currentUser.selfID.did.id === message.author?.did
 
     return (
         <Box
@@ -35,7 +35,7 @@ const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
             >
                 {!isSender && (
                     <Text size="xsmall" color="brand" weight={'bold'}>
-                        {message.author.name || message.author.did}
+                        {message.author?.name || message.author?.did}
                     </Text>
                 )}
                 <Text size="small">{message.text}</Text>

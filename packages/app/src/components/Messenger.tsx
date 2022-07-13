@@ -27,7 +27,7 @@ import io from 'socket.io-client'
  *  On-Chain Proposal => <proposalId>
  */
 
-const socket = io('ws://localhost:4242') // TODO Replace with env var
+const socket = io('ws://trilobot.cambrianprotocol.com:4242') // TODO Replace with env var
 
 export default function Messenger({
     currentUser,
@@ -67,7 +67,7 @@ export default function Messenger({
     // Publish to ceramic every n seconds
     // Because: Multiple publishes in a short time can fail
     useEffect(() => {
-        const outboxInterval = setInterval(() => outboxCallback.current(), 5000)
+        const outboxInterval = setInterval(() => outboxCallback.current(), 3000)
         return () => {
             clearInterval(outboxInterval)
             outboxCallback.current()
@@ -87,9 +87,11 @@ export default function Messenger({
             case 'Draft':
                 msgs = await loadChatDraftProposal()
                 setMessages(msgs)
+                break
             case 'Other':
                 msgs = await loadChatOther()
                 setMessages(msgs)
+                break
         }
     }
 
@@ -133,26 +135,36 @@ export default function Messenger({
     // Publish an array of messages (append to existing)
     const publishMessages = async (messages: ChatMessageType[]) => {
         try {
-            const messagesDoc = await TileDocument.deterministic(
-                currentUser.selfID.client.ceramic,
-                {
-                    controllers: [currentUser.selfID.id],
-                    family: 'cambrian-chat',
-                    tags: [chatID],
-                },
-                { pin: true }
-            )
+            const messagesDoc: TileDocument<{ messages: ChatMessageType[] }> =
+                await TileDocument.deterministic(
+                    currentUser.selfID.client.ceramic,
+                    {
+                        controllers: [currentUser.selfID.id],
+                        family: 'cambrian-chat',
+                        tags: [chatID],
+                    },
+                    { pin: true }
+                )
 
-            if (Array.isArray(messagesDoc.content)) {
+            if (Array.isArray(messagesDoc.content?.messages)) {
                 await messagesDoc.update(
-                    [...messagesDoc.content, ...messages],
+                    {
+                        messages: [
+                            ...messagesDoc.content.messages,
+                            ...messages,
+                        ],
+                    },
                     undefined,
                     { pin: true }
                 )
             } else {
-                await messagesDoc.update([...messages], undefined, {
-                    pin: true,
-                })
+                await messagesDoc.update(
+                    { messages: [...messages] },
+                    undefined,
+                    {
+                        pin: true,
+                    }
+                )
             }
 
             return true
@@ -166,7 +178,9 @@ export default function Messenger({
     const loadChatOther = async () => {
         try {
             // Load, then filter out streams that failed to load & streams with no messages
-            const messagesDocs: TileDocument<ChatMessageType[]>[] = (
+            const messagesDocs: TileDocument<{
+                messages: ChatMessageType[]
+            }>[] = (
                 (
                     await Promise.allSettled(
                         participants!.map((DID) =>
@@ -182,15 +196,16 @@ export default function Messenger({
                     )
                 )
                     .map((res) => {
-                        console.log(res)
                         return res.status === 'fulfilled' && res.value
                     })
-                    .filter(Boolean) as TileDocument<ChatMessageType[]>[]
-            ).filter((doc) => doc.content.length > 0)
+                    .filter(Boolean) as TileDocument<{
+                    messages: ChatMessageType[]
+                }>[]
+            ).filter((doc) => doc.content?.messages?.length > 0)
 
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
-                (doc) => doc.content
+                (doc) => doc.content.messages
             )
 
             return mergeMessages(messages)
@@ -225,7 +240,9 @@ export default function Messenger({
             ]
 
             // Load, then filter out streams that failed to load & streams with no messages
-            const messagesDocs: TileDocument<ChatMessageType[]>[] = (
+            const messagesDocs: TileDocument<{
+                messages: ChatMessageType[]
+            }>[] = (
                 (
                     await Promise.allSettled(
                         authors.map((DID) =>
@@ -241,12 +258,14 @@ export default function Messenger({
                     )
                 )
                     .map((res) => res.status === 'fulfilled' && res.value)
-                    .filter(Boolean) as TileDocument<ChatMessageType[]>[]
-            ).filter((doc) => doc.content.length > 0)
+                    .filter(Boolean) as TileDocument<{
+                    messages: ChatMessageType[]
+                }>[]
+            ).filter((doc) => doc.content?.messages?.length > 1)
 
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
-                (doc) => doc.content
+                (doc) => doc.content.messages
             )
 
             return mergeMessages(messages)
