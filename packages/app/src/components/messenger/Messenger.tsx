@@ -1,14 +1,14 @@
-import { Box, Button, Form, FormField, TextInput } from 'grommet'
-import ChatMessage, { ChatMessageType } from '../ui/moduleUIs/Chat/ChatMessage'
+import { Box, Button, Form, TextInput } from 'grommet'
+import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
-import { CeramicProposalModel } from '../models/ProposalModel'
-import { CeramicTemplateModel } from '../models/TemplateModel'
-import { GENERAL_ERROR } from '../constants/ErrorMessages'
+import { CeramicProposalModel } from '../../models/ProposalModel'
+import { CeramicTemplateModel } from '../../models/TemplateModel'
+import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { UserType } from '../store/UserContext'
-import { cpLogger } from '../services/api/Logger.api'
+import { UserType } from '../../store/UserContext'
+import { cpLogger } from '../../services/api/Logger.api'
 import io from 'socket.io-client'
 
 /**
@@ -23,7 +23,7 @@ import io from 'socket.io-client'
  * Where <chatID> is:
  *
  *  Active Solver => <solverAddress>
- *  Draft Proposal => <proposalStreamID>  (ID of PROPOSER'S stream)
+ *  Draft Proposal => <proposalStreamID>
  *  On-Chain Proposal => <proposalId>
  */
 
@@ -63,6 +63,12 @@ export default function Messenger({
     useEffect(() => {
         loadChat()
     }, [])
+
+    useEffect(() => {
+        document
+            .getElementById('chat-end')
+            ?.scrollIntoView({ behavior: 'smooth' })
+    }, [messages])
 
     // Publish to ceramic every n seconds
     // Because: Multiple publishes in a short time can fail
@@ -303,6 +309,7 @@ export default function Messenger({
                         message={msg}
                     />
                 ))}
+                <div id="chat-end" />
             </Box>
             <Form
                 onSubmit={() =>
@@ -319,6 +326,7 @@ export default function Messenger({
                 <Box direction="row" align="center" gap="small">
                     <Box flex>
                         <TextInput
+                            placeholder="Write a message here"
                             value={messageInput}
                             onChange={(e) => setMessageInput(e.target.value)}
                         />

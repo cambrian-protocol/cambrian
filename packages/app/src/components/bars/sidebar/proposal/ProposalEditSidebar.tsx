@@ -2,7 +2,7 @@ import BaseFormContainer from '@cambrian/app/components/containers/BaseFormConta
 import { Box } from 'grommet'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
-import Messenger from '@cambrian/app/components/Messenger'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalStartFundingComponent from './ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalSubmitComponent from './ProposalSubmitComponent'
