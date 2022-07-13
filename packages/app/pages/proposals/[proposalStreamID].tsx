@@ -9,8 +9,8 @@ import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import ViewProposalUI from '@cambrian/app/ui/proposals/ViewProposalUI'
 import { ethers } from 'ethers'
 import { initProposalStatus } from '@cambrian/app/utils/helpers/proposalStatusHelper'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
@@ -121,7 +121,7 @@ export default function ViewProposalPage() {
                     show404NotFound ? (
                         <Custom404Page />
                     ) : ceramicProposal || proposalContract ? (
-                        <ViewProposalUI
+                        <ProposalUI
                             updateProposal={fetchProposal}
                             proposalStreamID={proposalStreamID as string}
                             proposalStatus={proposalStatus}

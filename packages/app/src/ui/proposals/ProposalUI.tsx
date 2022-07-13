@@ -1,49 +1,39 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import Stagehand, { Stages } from '@cambrian/app/classes/Stagehand'
-import { useEffect, useState } from 'react'
+import { Heading, Text } from 'grommet'
 
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
-import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalSidebar from './ProposalSidebar'
-import ProposalTemplateInfoComponent from './ProposalTemplateInfoComponent'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { StageNames } from '@cambrian/app/classes/CeramicStagehand'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { useRouter } from 'next/router'
 
 interface ProposalUIProps {
     currentUser: UserType
+    proposalStreamID: string
+    ceramicProposal?: CeramicProposalModel
+    proposalContract?: ethers.Contract
+    ceramicTemplate?: CeramicTemplateModel
+    proposalsHub?: ProposalsHub
+    proposalStatus: ProposalStatus
+    updateProposal: () => Promise<void>
 }
 
-const ProposalUI = ({ currentUser }: ProposalUIProps) => {
-    const router = useRouter()
-    const { proposalID } = router.query
-
-    const [metaStages, setMetaStages] = useState<Stages>()
-    const [proposalTitle, setProposalTitle] = useState<string>()
-    const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
-    const [currentProposal, setCurrentProposal] = useState<ethers.Contract>()
-    const [showInvalidQueryComponent, setShowInvalidQueryComponent] =
-        useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
-
-    useEffect(() => {
-        if (router.isReady) fetchProposal()
-    }, [router])
-
+const ProposalUI = ({
+    currentUser,
+    ceramicProposal,
+    proposalContract,
+    ceramicTemplate,
+    proposalsHub,
+    proposalStatus,
+    proposalStreamID,
+    updateProposal,
+}: ProposalUIProps) => {
+    /* 
     const fetchProposal = async () => {
         // Fetch proposal from proposalsHub via proposalId and try to init metaStages
         if (proposalID !== undefined && typeof proposalID === 'string') {
@@ -92,45 +82,38 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
             }
         }
     }
+*/
 
     return (
         <>
-            {proposalsHub && currentProposal ? (
+            {proposalStatus !== undefined ? (
                 <InteractionLayout
-                    contextTitle={proposalTitle || 'Proposal'}
+                    contextTitle={ceramicProposal?.title || 'Proposal'}
                     proposalHeader={
                         <ProposalHeader
-                            isProposalExecuted={isProposalExecuted}
-                            proposalTitle={proposalTitle}
+                            proposalTitle={ceramicProposal?.title}
+                            proposalStatus={proposalStatus}
+                            ceramicTemplate={ceramicTemplate}
                         />
                     }
                     sidebar={
                         <ProposalSidebar
-                            isProposalExecuted={isProposalExecuted}
-                            setIsProposalExecuted={setIsProposalExecuted}
+                            ceramicTemplate={ceramicTemplate}
+                            ceramicProposal={ceramicProposal}
+                            updateProposal={updateProposal}
+                            proposalStreamID={proposalStreamID}
                             currentUser={currentUser}
-                            proposal={currentProposal}
+                            proposalStatus={proposalStatus}
+                            proposalContract={proposalContract}
                             proposalsHub={proposalsHub}
                         />
                     }
                 >
-                    <ProposalTemplateInfoComponent
-                        proposalMetadata={metaStages?.proposal as ProposalModel}
-                        templateMetadata={metaStages?.template as TemplateModel}
-                    />
+                    <Heading>TODO Proposal Plain readonly view</Heading>
+                    <Text>{ceramicProposal?.description}</Text>
                 </InteractionLayout>
-            ) : showInvalidQueryComponent ? (
-                <PageLayout contextTitle="Invalid Identifier">
-                    <InvalidQueryComponent context={StageNames.proposal} />
-                </PageLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             )}
         </>
     )
