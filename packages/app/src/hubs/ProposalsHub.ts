@@ -3,11 +3,6 @@ import {
     ERC20_IFACE,
     PROPOSALS_HUB_IFACE,
 } from '@cambrian/app/config/ContractInterfaces'
-import {
-    MultihashType,
-    getBytes32FromMultihash,
-    getMultihashFromBytes32,
-} from '../utils/helpers/multihash'
 
 import { GENERAL_ERROR } from './../constants/ErrorMessages'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
@@ -37,21 +32,13 @@ export default class ProposalsHub {
         collateralToken: TokenModel,
         price: number,
         solverConfigs: SolverConfigModel[],
-        solverConfigsCID: string,
+        solverConfigsURI: string,
         proposalCID: string
     ) => {
         const weiPrice = ethers.utils.parseUnits(
             price.toString(),
             collateralToken.decimals
         )
-        console.log('solverConfigsCID: ', solverConfigsCID)
-        const _solverConfigsMultihash =
-            getBytes32FromMultihash(solverConfigsCID)
-        console.log('_solverConfigsMultihash:', _solverConfigsMultihash)
-
-        console.log('proposalCID', proposalCID)
-        const _proposalMultihash = getBytes32FromMultihash(proposalCID)
-        console.log('_proposalMultihash:', _proposalMultihash)
 
         const tx: ethers.ContractTransaction =
             await this.contract.createIPFSSolutionAndProposal(
@@ -60,8 +47,8 @@ export default class ProposalsHub {
                 SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
-                _solverConfigsMultihash,
-                _proposalMultihash
+                solverConfigsURI,
+                proposalCID
             )
 
         return tx
@@ -137,8 +124,6 @@ export default class ProposalsHub {
     }
 
     getMetadataCID = async (proposalId: string) => {
-        return getMultihashFromBytes32(
-            await this.contract.getMetadataCID(proposalId)
-        )
+        return this.contract.getMetadataCID(proposalId)
     }
 }

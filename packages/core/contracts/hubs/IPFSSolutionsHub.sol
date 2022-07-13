@@ -16,7 +16,7 @@ contract IPFSSolutionsHub {
         IERC20 collateralToken;
         bytes32 id;
         bytes32 solverConfigsHash;
-        SolverLib.Multihash solverConfigsCID;
+        string solverConfigsURI;
     }
 
     struct Instance {
@@ -33,7 +33,7 @@ contract IPFSSolutionsHub {
         bytes32 proposalId;
         bytes32 id;
         bytes32 solverConfigsHash;
-        SolverLib.Multihash solverConfigsCID;
+        string solverConfigsURI;
         address[] solverAddresses;
     }
 
@@ -103,14 +103,14 @@ contract IPFSSolutionsHub {
         bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
+        string calldata solverConfigsURI
     ) public {
         require(bases[baseId].id != baseId, "Base ID already exists");
         Base storage base = bases[baseId];
         base.id = baseId;
         base.collateralToken = collateralToken;
         base.solverConfigsHash = keccak256(abi.encode(solverConfigs));
-        base.solverConfigsCID = solverConfigsCID;
+        base.solverConfigsURI = solverConfigsURI;
         emit CreateBase(baseId);
     }
 
@@ -136,14 +136,14 @@ contract IPFSSolutionsHub {
         bytes32 instanceId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
+        string calldata solverConfigsURI
     ) public returns (bytes32 baseId, bytes32 solutionId) {
         require(
             instances[instanceId].id != instanceId,
             "SolutionsHub::Instance ID already exists"
         );
         baseId = keccak256(abi.encodePacked(instanceId, instanceId));
-        createBase(baseId, collateralToken, solverConfigs, solverConfigsCID);
+        createBase(baseId, collateralToken, solverConfigs, solverConfigsURI);
         createInstance(baseId, instanceId);
 
         emit CreateSolution(instanceId);
@@ -237,6 +237,6 @@ contract IPFSSolutionsHub {
         solution.collateralToken = base.collateralToken;
         solution.proposalId = instanceId_to_ProposalId[instanceId];
         solution.solverConfigsHash = base.solverConfigsHash;
-        solution.solverConfigsCID = base.solverConfigsCID;
+        solution.solverConfigsURI = base.solverConfigsURI;
     }
 }

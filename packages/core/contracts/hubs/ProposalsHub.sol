@@ -26,7 +26,7 @@ contract ProposalsHub is ERC1155Receiver {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
-        SolverLib.Multihash metadataCID;
+        string metadataCID;
     }
 
     mapping(bytes32 => Proposal) public proposals;
@@ -116,7 +116,7 @@ contract ProposalsHub is ERC1155Receiver {
         address solutionsHub,
         uint256 fundingGoal,
         bytes32 baseId,
-        SolverLib.Multihash calldata metadataCID
+        string calldata metadataCID
     ) public returns (bytes32 solutionId, bytes32 proposalId) {
         nonce++;
 
@@ -156,14 +156,14 @@ contract ProposalsHub is ERC1155Receiver {
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID,
-        SolverLib.Multihash calldata metadataCID
+        string calldata solverConfigsURI,
+        string calldata metadataCID
     ) external returns (bytes32 solutionId, bytes32 proposalId) {
         ipfsSolutionsHub.createBase(
             baseId,
             collateralToken,
             solverConfigs,
-            solverConfigsCID
+            solverConfigsURI
         );
 
         (solutionId, proposalId) = createProposal(
@@ -266,11 +266,7 @@ contract ProposalsHub is ERC1155Receiver {
         return proposals[id];
     }
 
-    function getMetadataCID(bytes32 id)
-        external
-        view
-        returns (SolverLib.Multihash memory)
-    {
+    function getMetadataCID(bytes32 id) external view returns (string memory) {
         return proposals[id].metadataCID;
     }
 

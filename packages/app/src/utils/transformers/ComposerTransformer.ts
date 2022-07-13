@@ -15,7 +15,6 @@ import { ComposerSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
-import { getBytes32FromMultihash } from '@cambrian/app/utils/helpers/multihash'
 import { getSolverHierarchy } from '../helpers/solverHelpers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -403,7 +402,7 @@ export function parseComposerCondition(
     }
 
     outCondition.outcomeURIs = filterOutcomes(config.condition.partition).map(
-        (o) => getBytes32FromMultihash(o.uri)
+        (o) => o.uri
     )
 
     return outCondition

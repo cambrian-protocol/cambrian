@@ -30,12 +30,6 @@ library SolverLib {
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
     }
 
-    struct Multihash {
-        bytes32 digest;
-        uint8 hashFunction;
-        uint8 size;
-    }
-
     // Expected sources of data being ingested into the Solver
     struct Ingest {
         uint256 executions; // Number of times this Ingest has been executed
@@ -86,7 +80,7 @@ library SolverLib {
         bytes32 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
         Allocation[] allocations; // Allocations for each partition
-        Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
+        string[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
     }
 
     struct Allocation {

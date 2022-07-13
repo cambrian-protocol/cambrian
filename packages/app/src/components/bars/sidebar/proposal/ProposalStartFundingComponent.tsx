@@ -80,12 +80,8 @@ const ProposalStartFundingComponent = ({
                 if (!ipfsSolverConfigs || !ipfsSolverConfigs.IpfsHash)
                     throw GENERAL_ERROR['IPFS_PIN_ERROR']
 
-                console.log('SolverConfigs CID', ipfsSolverConfigs.IpfsHash)
-
                 // TODO Temp - can be passed as prop if works
                 const proposalDoc = await cs.loadStream(proposalStreamID)
-
-                console.log('proposaldoc ID: ', proposalDoc.id)
 
                 const transaction =
                     await proposalsHub.createSolutionAndProposal(
@@ -93,7 +89,7 @@ const ProposalStartFundingComponent = ({
                         ceramicProposal.price.amount,
                         parsedSolvers.map((solver) => solver.config),
                         ipfsSolverConfigs.IpfsHash,
-                        proposalDoc.id.cid.toString()
+                        proposalDoc.id.toString()
                     )
                 let rc = await transaction.wait()
                 const event = rc.events?.find(

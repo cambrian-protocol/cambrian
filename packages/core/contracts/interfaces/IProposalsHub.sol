@@ -28,8 +28,8 @@ interface IProposalsHub {
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID,
-        SolverLib.Multihash calldata metadataCID
+        string calldata solverConfigsURI,
+        string calldata metadataCID
     ) external returns (bytes32 solutionID, bytes32 proposalID);
 
     function fundProposal(
@@ -44,10 +44,7 @@ interface IProposalsHub {
         uint256 amount
     ) external;
 
-    function getMetadataCID(bytes32 id)
-        external
-        view
-        returns (SolverLib.Multihash memory);
+    function getMetadataCID(bytes32 id) external view returns (string memory);
 
     function isProposal(bytes32 id) external view returns (bool);
 

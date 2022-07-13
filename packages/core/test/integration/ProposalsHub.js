@@ -122,12 +122,8 @@ describe("ProposalsHub", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -157,8 +153,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
@@ -217,8 +213,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
@@ -284,8 +280,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
@@ -320,8 +316,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt = await tx.wait();
     let iface = new ethers.utils.Interface([
@@ -390,8 +386,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt = await tx.wait();
     let iface = new ethers.utils.Interface([
@@ -482,8 +478,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt = await tx.wait();
     let iface = new ethers.utils.Interface([
@@ -601,8 +597,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
@@ -644,8 +640,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt2 = await tx2.wait();
     let iface2 = new ethers.utils.Interface([
@@ -687,8 +683,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt = await tx.wait();
     let iface = new ethers.utils.Interface([
@@ -793,8 +789,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
     let receipt = await tx.wait();
     let iface = new ethers.utils.Interface([
@@ -924,8 +920,8 @@ describe("ProposalsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       this.solverConfigs,
-      getBytes32FromMultihash(this.cid),
-      getBytes32FromMultihash(this.emptyCid)
+      this.cid,
+      this.emptyCid
     );
 
     const res = await tx.wait();

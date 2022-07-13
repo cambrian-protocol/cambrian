@@ -21,7 +21,6 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 import { useRouter } from 'next/router'
 
 interface ProposalUIProps {
@@ -70,16 +69,13 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     const initMetaStages = async (proposal: ethers.Contract) => {
         if (proposal.metadataCID) {
             try {
-                const metadataCIDString = getMultihashFromBytes32(
-                    proposal.metadataCID
-                )
-
-                if (!metadataCIDString) throw GENERAL_ERROR['INVALID_METADATA']
+                if (!proposal.metadataCID)
+                    throw GENERAL_ERROR['INVALID_METADATA']
 
                 // TODO Ceramic integration
                 const stagehand = new Stagehand()
                 const stages = await stagehand.loadStages(
-                    metadataCIDString,
+                    proposal.metadataCID,
                     StageNames.proposal
                 )
 

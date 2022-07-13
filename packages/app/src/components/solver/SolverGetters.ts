@@ -23,10 +23,8 @@ import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { MetadataModel } from '../../models/MetadataModel'
-import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -38,7 +36,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 export const getSolverConfig = async (
     contract: ethers.Contract
@@ -107,15 +104,13 @@ export const getSolverTimelocks = async (
 }
 
 export const getSolverOutcomes = async (solverConfig: SolverConfigModel) => {
-    const outcomeURIs = solverConfig.conditionBase.outcomeURIs.map(
-        (multiHash: MultihashType) => getMultihashFromBytes32(multiHash)
-    )
-
     const outcomes = (await Promise.all(
-        outcomeURIs.map((outcomeURI: string | null) => {
-            const ipfs = new IPFSAPI()
-            if (outcomeURI) return ipfs.getFromCID(outcomeURI)
-        })
+        solverConfig.conditionBase.outcomeURIs.map(
+            (outcomeURI: string | null) => {
+                const ipfs = new IPFSAPI()
+                if (outcomeURI) return ipfs.getFromCID(outcomeURI)
+            }
+        )
     )) as OutcomeModel[]
 
     return outcomes

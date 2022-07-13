@@ -9,7 +9,7 @@ interface IIPFSSolutionsHub {
         bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
+        string calldata solverConfigsURI
     ) external;
 
     function createInstance(bytes32 baseId, bytes32 instanceId)
@@ -20,7 +20,7 @@ interface IIPFSSolutionsHub {
         bytes32 _id,
         IERC20 _collateralToken,
         SolverLib.Config[] calldata _solverConfigs,
-        SolverLib.Multihash calldata _solverConfigsCID
+        string calldata _solverConfigsURI
     ) external returns (bytes32 _solutionId);
 
     function linkToProposal(

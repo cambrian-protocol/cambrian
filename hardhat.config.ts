@@ -7,7 +7,7 @@ import "@nomiclabs/hardhat-web3";
 import "tsconfig-paths/register";
 import "@nomiclabs/hardhat-etherscan";
 // import 'hardhat-log-remover'
-import "hardhat-gas-reporter";
+// import "hardhat-gas-reporter";
 import { HardhatUserConfig } from "hardhat/types";
 import dotenv from "dotenv";
 

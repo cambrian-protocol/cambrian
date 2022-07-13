@@ -7,7 +7,7 @@ export type ProposalModel = {
     description: string
     flexInputs: FlexInputFormType[]
     templateCID: string
-    solverConfigsCID: string
+    solverConfigsURI: string
 }
 
 export type CeramicProposalModel = {

@@ -22,7 +22,6 @@ import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
@@ -258,14 +257,10 @@ const FundProposalForm = ({
 
                 if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
 
-                const solverConfigsCID = getMultihashFromBytes32(
-                    solution.solverConfigsCID
-                )
-
-                if (solverConfigsCID) {
+                if (solution.solverConfigsURI) {
                     const ipfs = new IPFSAPI()
                     const solverConfigs = (await ipfs.getFromCID(
-                        solverConfigsCID
+                        solution.solverConfigsURI
                     )) as SolverConfigModel[]
 
                     if (!solverConfigs) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
