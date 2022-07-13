@@ -13,14 +13,14 @@ import { useState } from 'react'
 
 interface CreateProposalCTAProps {
     templateStreamID: string
-    template: CeramicTemplateModel
+    ceramicTemplate: CeramicTemplateModel
     currentUser: UserType
 }
 
 // TODO Styling
 const CreateProposalCTA = ({
     templateStreamID,
-    template,
+    ceramicTemplate,
     currentUser,
 }: CreateProposalCTAProps) => {
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
@@ -45,10 +45,7 @@ const CreateProposalCTA = ({
     return (
         <>
             <Box gap="medium">
-                <TemplatePricingInfo
-                    template={template}
-                    currentUser={currentUser}
-                />
+                <TemplatePricingInfo template={ceramicTemplate} />
                 <LoaderButton
                     onClick={onCreateProposal}
                     isLoading={isCreatingProposal}

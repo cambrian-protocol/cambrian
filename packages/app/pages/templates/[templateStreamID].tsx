@@ -4,7 +4,7 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import ViewTemplateUI from '@cambrian/app/ui/templates/ViewTemplateUI'
+import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
 import useTemplate from '@cambrian/app/hooks/useTemplate'
 
 export default function ViewTemplatePage() {
@@ -26,10 +26,10 @@ export default function ViewTemplatePage() {
                         <Custom404Page />
                     ) : templateInput ? (
                         <PageLayout contextTitle={templateInput.title}>
-                            <ViewTemplateUI
-                                templateStreamID={templateStreamID as string}
-                                template={templateInput}
+                            <TemplateUI
+                                ceramicTemplate={templateInput}
                                 currentUser={currentUser}
+                                templateStreamID={templateStreamID}
                             />
                         </PageLayout>
                     ) : (

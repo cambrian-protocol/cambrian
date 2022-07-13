@@ -30,7 +30,6 @@ interface ProposalHeaderProps {
     proposalStatus: ProposalStatus
 }
 
-// TODO Proposal Status Badge Styling
 const ProposalHeader = ({
     proposalTitle,
     ceramicProposal,
@@ -203,7 +202,7 @@ const ProposalHeader = ({
             </ResponsiveContext.Consumer>
             {showTemplateInfoModal && ceramicTemplate && (
                 <TemplateInfoModal
-                    template={ceramicTemplate}
+                    ceramicTemplate={ceramicTemplate}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
