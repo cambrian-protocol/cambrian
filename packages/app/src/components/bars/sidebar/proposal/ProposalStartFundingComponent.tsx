@@ -46,8 +46,8 @@ const ProposalStartFundingComponent = ({
         <>
             <BaseFormGroupContainer pad="medium" gap="medium">
                 <Text>
-                    Proposal has been approved. This action deployes the
-                    Proposal on chain
+                    Proposal approved! It can now be published on-chain and
+                    funded.
                 </Text>
                 <LoaderButton
                     isLoading={isInTransaction}
