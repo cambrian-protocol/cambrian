@@ -28,6 +28,7 @@ export default function ViewProposalPage() {
     const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
         ProposalStatus.Unknown
     )
+    const [proposalCommitID, setProposalCommitID] = useState<string>()
 
     const [proposalContract, setProposalContract] = useState<ethers.Contract>()
     const [isProposalExecuted, setIsProposalExecuted] = useState(false)
@@ -50,7 +51,8 @@ export default function ViewProposalPage() {
                 try {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     const res = await cs.loadAndReceiveProposal(
-                        proposalStreamID
+                        proposalStreamID,
+                        currentUser
                     )
 
                     if (res?.proposalContent) {
@@ -79,7 +81,7 @@ export default function ViewProposalPage() {
                             )
 
                             hasCeramicData = true
-
+                            setProposalCommitID(res.proposalCommitID)
                             setCeramicProposal(res.proposalContent)
                             setCeramicTemplate(_templateCommit)
                         }
@@ -129,6 +131,7 @@ export default function ViewProposalPage() {
                             ceramicProposal={ceramicProposal}
                             proposalContract={proposalContract}
                             ceramicTemplate={ceramicTemplate}
+                            proposalCommitID={proposalCommitID}
                         />
                     ) : (
                         <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />

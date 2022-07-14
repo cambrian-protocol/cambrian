@@ -48,6 +48,21 @@ export default class CeramicStagehand {
         return true
     }
 
+    // Warning: Just for dev purposes to clean DID from all stages
+    clearStages = async (stage: StageNames) => {
+        const stageLib = await TileDocument.deterministic(
+            this.selfID.client.ceramic,
+            {
+                controllers: [this.selfID.id],
+                family: CAMBRIAN_LIB_NAME,
+                tags: [stage],
+            },
+            { pin: true }
+        )
+
+        stageLib.update({})
+    }
+
     updateStage = async (
         streamID: string,
         data: StageModel,
@@ -272,34 +287,34 @@ export default class CeramicStagehand {
 
     deployProposal = async (
         proposalStreamID: string,
+        proposalCommitID: string,
         ceramicTemplate: CeramicTemplateModel,
         ceramicProposal: CeramicProposalModel,
         currentUser: UserType
     ) => {
-        try {
-            const ceramicComposition = (await (
-                await this.loadStream(ceramicTemplate.composition.commitID)
-            ).content) as CompositionModel
-
-            const compositionWithFlexInputs = mergeFlexIntoComposition(
-                mergeFlexIntoComposition(
-                    ceramicComposition,
-                    ceramicTemplate.flexInputs
-                ),
-                ceramicProposal.flexInputs
+        // Sanity check - Just let deploy if the proposalCommitID is actually flaggeed as approved at the template and the proposalCommitID is right
+        const _templateStreamContent = (await (
+            await this.loadStream(ceramicProposal.template.streamID)
+        ).content) as CeramicTemplateModel
+        const _proposalStreamEntry =
+            _templateStreamContent.receivedProposals[proposalStreamID]
+        if (
+            !_proposalStreamEntry ||
+            !_proposalStreamEntry[_proposalStreamEntry.length - 1].approved ||
+            _proposalStreamEntry[_proposalStreamEntry.length - 1].approved ===
+                undefined ||
+            _proposalStreamEntry[_proposalStreamEntry.length - 1]
+                .proposalCommitID !== proposalCommitID
+        ) {
+            throw Error(
+                'Error, commit ID of Proposal is not approved or does not match!'
             )
+        }
 
-            // Add final collateralToken address if it was flex
-            if (ceramicTemplate.price.isCollateralFlex) {
-                compositionWithFlexInputs.solvers.forEach((solver) => {
-                    solver.config.collateralToken =
-                        ceramicProposal.price.tokenAddress
-                })
-            }
-
-            const parsedSolvers = await parseComposerSolvers(
-                compositionWithFlexInputs.solvers,
-                currentUser.web3Provider
+        try {
+            const parsedSolvers = await this.getParsedSolvers(
+                proposalCommitID,
+                currentUser
             )
 
             if (parsedSolvers) {
@@ -309,11 +324,8 @@ export default class CeramicStagehand {
                     {
                         controllers: [this.selfID.id],
                         family: `cambrian-solverConfigs`,
-                        tags: [proposalStreamID],
+                        tags: [proposalCommitID],
                     }
-                )
-                await solverConfigsDoc.update(
-                    parsedSolvers.map((solver) => solver.config)
                 )
 
                 const proposalsHub = new ProposalsHub(
@@ -327,7 +339,7 @@ export default class CeramicStagehand {
                         ceramicProposal.price.amount,
                         parsedSolvers.map((solver) => solver.config),
                         solverConfigsDoc.commitId.toString(),
-                        proposalStreamID
+                        proposalCommitID
                     )
                 let rc = await transaction.wait()
                 const event = rc.events?.find(
@@ -335,13 +347,12 @@ export default class CeramicStagehand {
                 )
                 const proposalId = event?.args && event.args.id
 
-                console.log('proposalId', proposalId)
-
                 // Attach proposalID either to the template or the proposal
                 if (this.selfID.did.id === ceramicTemplate.author) {
                     // Deployed by template author, proposalID will be attached to the template at receivedProposals
                     await this.updateProposalEntry(proposalStreamID, {
                         proposalID: proposalId,
+                        approved: true,
                     })
                 } else if (this.selfID.did.id === ceramicProposal.author) {
                     // Deloyed by proposal author, proposalID will be attached to proposal
@@ -453,70 +464,175 @@ export default class CeramicStagehand {
         }
     }
 
+    getParsedSolvers = async (proposalCID: string, currentUser: UserType) => {
+        const _proposalContent = (await (
+            await this.loadStream(proposalCID)
+        ).content) as CeramicProposalModel
+
+        const _templateContent = (await (
+            await this.loadStream(_proposalContent.template.commitID)
+        ).content) as CeramicTemplateModel
+
+        const _compositionContent = (await (
+            await this.loadStream(_templateContent.composition.commitID)
+        ).content) as CompositionModel
+
+        const _compositionWithFlexInputs = mergeFlexIntoComposition(
+            mergeFlexIntoComposition(
+                _compositionContent,
+                _templateContent.flexInputs
+            ),
+            _proposalContent.flexInputs
+        )
+
+        if (_templateContent.price.isCollateralFlex) {
+            _compositionWithFlexInputs.solvers.forEach((solver) => {
+                solver.config.collateralToken =
+                    _proposalContent.price.tokenAddress
+            })
+        }
+        return await parseComposerSolvers(
+            _compositionWithFlexInputs.solvers,
+            currentUser.web3Provider
+        )
+    }
+
     /**
     Returns the most recent submitted version of the proposal, returns undefined if a proposal is opened without being submitted */
     loadAndReceiveProposal = async (
-        proposalStreamID: string
+        proposalStreamID: string,
+        currentUser: UserType
     ): Promise<
         | { proposalCommitID: string; proposalContent: CeramicProposalModel }
         | undefined
     > => {
         try {
-            const proposalDoc = await this.loadStream(proposalStreamID)
-            const proposalContent = proposalDoc.content as CeramicProposalModel
+            const proposalStreamDoc = await this.loadStream(proposalStreamID)
+            const proposalStreamContent =
+                proposalStreamDoc.content as CeramicProposalModel
 
             // Load the template stream to check if the proposal is already registered
-            const templateDoc = await this.loadStream(
-                proposalContent.template.streamID
+            const templateStreamDoc = await this.loadStream(
+                proposalStreamContent.template.streamID
             )
-            if (!templateDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-            const templateContent = templateDoc.content as CeramicTemplateModel
+            if (!templateStreamDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            const templateStreamContent =
+                templateStreamDoc.content as CeramicTemplateModel
             const proposalCommits =
-                templateContent.receivedProposals[proposalStreamID]
+                templateStreamContent.receivedProposals[proposalStreamID]
 
             if (proposalCommits) {
                 // We have at registered proposal commits
                 const latestRegisteredSubmission =
                     proposalCommits[proposalCommits.length - 1]
 
-                if (
-                    proposalContent.proposalID !== undefined ||
-                    latestRegisteredSubmission.proposalID !== undefined
-                ) {
-                    // Proposal has been deployed
-                    return {
-                        proposalCommitID: proposalDoc.commitId.toString(),
-                        proposalContent: proposalContent,
+                if (latestRegisteredSubmission.approved) {
+                    // TODO Extract to function -----------
+                    // Check if a proposalID is existent
+                    const templateProposalID =
+                        latestRegisteredSubmission.proposalID
+                    const proposalProposalID = proposalStreamContent.proposalID
+
+                    // Both proposalID's are defined, something is odd
+                    if (
+                        templateProposalID !== undefined &&
+                        proposalProposalID !== undefined &&
+                        proposalProposalID !== templateProposalID
+                    ) {
+                        throw Error(
+                            "Critical error! ProposalID's are not matching!"
+                        )
                     }
-                } else if (proposalContent.submitted) {
+
+                    if (templateProposalID || proposalProposalID) {
+                        const proposalsHub = new ProposalsHub(
+                            currentUser.signer,
+                            currentUser.chainId
+                        )
+                        let metadataCID = ''
+                        if (templateProposalID) {
+                            metadataCID = await proposalsHub.getMetadataCID(
+                                templateProposalID
+                            )
+                        } else if (proposalProposalID) {
+                            metadataCID = await proposalsHub.getMetadataCID(
+                                proposalProposalID
+                            )
+                        }
+
+                        if (metadataCID.length > 0) {
+                            if (
+                                metadataCID !==
+                                latestRegisteredSubmission.proposalCommitID
+                            ) {
+                                throw Error(
+                                    'Critical error! Provided proposalCommitID does not match with onChain ProposalCommitID!'
+                                )
+                            }
+
+                            const _onChainMetadataParsedSolvers =
+                                await this.getParsedSolvers(
+                                    metadataCID,
+                                    currentUser
+                                )
+
+                            const _queryProposalStreamParsedSolvers =
+                                await this.getParsedSolvers(
+                                    proposalStreamID,
+                                    currentUser
+                                )
+
+                            if (
+                                !_.isEqual(
+                                    _onChainMetadataParsedSolvers,
+                                    _queryProposalStreamParsedSolvers
+                                )
+                            ) {
+                                // Hacker incoming
+                                throw Error(
+                                    'Critical error! Provided proposalCommitID does not match with onChain ProposalCommitID!'
+                                )
+                            }
+
+                            // TODO Check if these two are also matching the solutionshub
+                        }
+                    }
+                    // TODO --------------
+
+                    return {
+                        proposalCommitID: proposalStreamDoc.commitId.toString(),
+                        proposalContent: proposalStreamContent,
+                    }
+                } else if (proposalStreamContent.submitted) {
                     if (
                         latestRegisteredSubmission.proposalCommitID !==
-                        proposalDoc.commitId.toString()
+                        proposalStreamDoc.commitId.toString()
                     ) {
                         // Register the new commit inside of the template
                         let updatedReceivedProposals: ReceivedProposalsHashmapType =
                             {}
-                        if (templateContent.receivedProposals) {
+                        if (templateStreamContent.receivedProposals) {
                             updatedReceivedProposals = _.cloneDeep(
-                                templateContent.receivedProposals
+                                templateStreamContent.receivedProposals
                             )
                         }
                         proposalCommits.push({
-                            proposalCommitID: proposalDoc.commitId.toString(),
+                            proposalCommitID:
+                                proposalStreamDoc.commitId.toString(),
                         })
 
                         updatedReceivedProposals[proposalStreamID] =
                             proposalCommits
 
-                        await templateDoc.update({
-                            ...templateContent,
+                        await templateStreamDoc.update({
+                            ...templateStreamContent,
                             receivedProposals: updatedReceivedProposals,
                         })
                     }
                     // The most actual streamID version is flagged as submitted, so we return that one
                     return {
-                        proposalCommitID: proposalDoc.commitId.toString(),
-                        proposalContent: proposalContent,
+                        proposalCommitID: proposalStreamDoc.commitId.toString(),
+                        proposalContent: proposalStreamContent,
                     }
                 } else {
                     // The most recent StreamID version is not flagged as submitted, so we return the last received version
@@ -533,36 +649,41 @@ export default class CeramicStagehand {
             } else {
                 // A new unregistered proposal was received
                 if (
-                    proposalContent.submitted &&
-                    this.selfID.did.id === templateContent.author
+                    proposalStreamContent.submitted &&
+                    this.selfID.did.id === templateStreamContent.author
                 ) {
                     // It is flagged as submitted, so we register it and return it
                     let updatedReceivedProposals: ReceivedProposalsHashmapType =
                         {}
-                    if (templateContent.receivedProposals) {
+                    if (templateStreamContent.receivedProposals) {
                         updatedReceivedProposals = _.cloneDeep(
-                            templateContent.receivedProposals
+                            templateStreamContent.receivedProposals
                         )
                     }
 
                     updatedReceivedProposals[proposalStreamID] = [
-                        { proposalCommitID: proposalDoc.commitId.toString() },
+                        {
+                            proposalCommitID:
+                                proposalStreamDoc.commitId.toString(),
+                        },
                     ]
 
-                    await templateDoc.update({
-                        ...templateContent,
+                    await templateStreamDoc.update({
+                        ...templateStreamContent,
                         receivedProposals: updatedReceivedProposals,
                     })
 
                     return {
-                        proposalContent: proposalContent,
-                        proposalCommitID: proposalDoc.commitId.toString(),
+                        proposalContent: proposalStreamContent,
+                        proposalCommitID: proposalStreamDoc.commitId.toString(),
                     }
-                } else if (this.selfID.did.id === proposalContent.author) {
+                } else if (
+                    this.selfID.did.id === proposalStreamContent.author
+                ) {
                     // For the author a preview is allowed
                     return {
-                        proposalContent: proposalContent,
-                        proposalCommitID: proposalDoc.commitId.toString(),
+                        proposalContent: proposalStreamContent,
+                        proposalCommitID: proposalStreamDoc.commitId.toString(),
                     }
                 }
                 // It has not been submitted yet and the user is not the author, we return nothing/undefined

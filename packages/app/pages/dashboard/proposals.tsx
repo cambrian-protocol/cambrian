@@ -12,7 +12,7 @@ export default function ProposalsDashboardPage() {
         <>
             {isUserLoaded ? (
                 currentUser && currentUser.selfID ? (
-                    <ProposalsDashboardUI />
+                    <ProposalsDashboardUI currentUser={currentUser} />
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">
                         <ConnectWalletSection />

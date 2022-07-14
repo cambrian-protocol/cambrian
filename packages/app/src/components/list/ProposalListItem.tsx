@@ -8,7 +8,7 @@ import ProposalStatusBadge from '../badges/ProposalStatusBadge'
 
 interface ProposalListItemProps {
     proposal: ProposalListItemType
-    onDelete: (proposalID: string) => Promise<void>
+    onDelete?: (proposalID: string) => Promise<void>
 }
 
 export type ProposalListItemType = {
@@ -68,10 +68,12 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
                 <Anchor href={`/proposals/${proposal.streamID}`}>
                     <Button icon={<Eye />} />
                 </Anchor>
-                <Button
-                    icon={<Trash />}
-                    onClick={() => onDelete(proposal.title)}
-                />
+                {onDelete && proposal.status === ProposalStatus.Draft && (
+                    <Button
+                        icon={<Trash />}
+                        onClick={() => onDelete(proposal.title)}
+                    />
+                )}
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {

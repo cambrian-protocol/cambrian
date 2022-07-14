@@ -22,6 +22,7 @@ interface ProposalSidebarProps {
     proposalStatus: ProposalStatus
     currentUser: UserType
     proposalStreamID: string
+    proposalCommitID?: string
     proposalContract?: ethers.Contract
     proposalsHub?: ProposalsHub
     updateProposal: () => Promise<void>
@@ -33,6 +34,7 @@ const ProposalSidebar = ({
     proposalStatus,
     currentUser,
     proposalStreamID,
+    proposalCommitID,
     updateProposal,
 }: ProposalSidebarProps) => {
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
@@ -123,8 +125,10 @@ const ProposalSidebar = ({
                     <>
                         {(isProposalAuthor || isTemplateAuthor) &&
                             ceramicProposal &&
-                            ceramicTemplate && (
+                            ceramicTemplate &&
+                            proposalCommitID && (
                                 <ProposalStartFundingComponent
+                                    proposalCommitID={proposalCommitID}
                                     proposalStreamID={proposalStreamID}
                                     currentUser={currentUser}
                                     ceramicProposal={ceramicProposal}

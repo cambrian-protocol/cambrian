@@ -14,6 +14,7 @@ interface ProposalStartFundingComponentProps {
     currentUser: UserType
     ceramicProposal: CeramicProposalModel
     ceramicTemplate: CeramicTemplateModel
+    proposalCommitID: string
     proposalStreamID: string
 }
 
@@ -22,6 +23,7 @@ const ProposalStartFundingComponent = ({
     ceramicTemplate,
     ceramicProposal,
     proposalStreamID,
+    proposalCommitID,
 }: ProposalStartFundingComponentProps) => {
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -32,6 +34,7 @@ const ProposalStartFundingComponent = ({
             const cs = new CeramicStagehand(currentUser.selfID)
             await cs.deployProposal(
                 proposalStreamID,
+                proposalCommitID,
                 ceramicTemplate,
                 ceramicProposal,
                 currentUser

@@ -1,11 +1,10 @@
-import { Heading, Text } from 'grommet'
-
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import ProposalInfo from './ProposalInfo'
 import ProposalSidebar from './ProposalSidebar'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
@@ -15,6 +14,7 @@ import { ethers } from 'ethers'
 interface ProposalUIProps {
     currentUser: UserType
     proposalStreamID: string
+    proposalCommitID?: string
     ceramicProposal?: CeramicProposalModel
     proposalContract?: ethers.Contract
     ceramicTemplate?: CeramicTemplateModel
@@ -27,6 +27,7 @@ const ProposalUI = ({
     currentUser,
     ceramicProposal,
     proposalContract,
+    proposalCommitID,
     ceramicTemplate,
     proposalsHub,
     proposalStatus,
@@ -98,6 +99,7 @@ const ProposalUI = ({
                     }
                     sidebar={
                         <ProposalSidebar
+                            proposalCommitID={proposalCommitID}
                             ceramicTemplate={ceramicTemplate}
                             ceramicProposal={ceramicProposal}
                             updateProposal={updateProposal}
@@ -109,8 +111,12 @@ const ProposalUI = ({
                         />
                     }
                 >
-                    <Heading>TODO Proposal Plain readonly view</Heading>
-                    <Text>{ceramicProposal?.description}</Text>
+                    {ceramicProposal && (
+                        <ProposalInfo
+                            ceramicProposal={ceramicProposal}
+                            hideTitle
+                        />
+                    )}
                 </InteractionLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />

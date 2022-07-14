@@ -15,15 +15,15 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { initProposalStatus } from '@cambrian/app/utils/helpers/proposalStatusHelper'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-interface ProposalsDashboardUIProps {}
+interface ProposalsDashboardUIProps {
+    currentUser: UserType
+}
 
-const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
-    const { currentUser } = useCurrentUser()
-
+const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]
@@ -34,15 +34,13 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
     const [isFetching, setIsFetching] = useState(false)
 
     useEffect(() => {
-        if (currentUser) {
-            const ceramicStagehandInstance = new CeramicStagehand(
-                currentUser.selfID
-            )
-            setCeramicStagehand(ceramicStagehandInstance)
-            fetchMyProposals(ceramicStagehandInstance)
-            fetchReceivedProposals(ceramicStagehandInstance)
-        }
-    }, [currentUser])
+        const ceramicStagehandInstance = new CeramicStagehand(
+            currentUser.selfID
+        )
+        setCeramicStagehand(ceramicStagehandInstance)
+        fetchMyProposals(ceramicStagehandInstance)
+        fetchReceivedProposals(ceramicStagehandInstance)
+    }, [])
 
     const fetchReceivedProposals = async (cs: CeramicStagehand) => {
         const templateStreams = (await cs.loadStages(
@@ -87,7 +85,7 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                     title: _proposalContent.title,
                                     isAuthor:
                                         _proposalContent.author ===
-                                        currentUser?.selfID.did.id,
+                                        currentUser.selfID.did.id,
                                 })
                             }
                         })
@@ -131,7 +129,7 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                 title: _proposal.title,
                                 isAuthor:
                                     _proposal.author ===
-                                    currentUser?.selfID.did.id,
+                                    currentUser.selfID.did.id,
                             })
                         }
                     }
@@ -144,24 +142,21 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
         setIsFetching(false)
     }
 
-    const onDeleteProposal = async (proposalStreamKey: string) => {
-        /*  if (ceramicStagehand) {
+    const onDeleteProposal = async (proposalTag: string) => {
+        if (ceramicStagehand) {
             try {
                 await ceramicStagehand.deleteStage(
-                    proposalStreamKey,
+                    proposalTag,
                     StageNames.proposal
                 )
-                const updatedProposals = { ...proposals }
-                delete updatedProposals[proposalStreamKey]
-                setProposals(updatedProposals)
+                const updatedProposals = myProposals.filter(
+                    (proposal) => proposal.title !== proposalTag
+                )
+                setMyProposals(updatedProposals)
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))
             }
-        } */
-    }
-
-    const onDeleteReceivedProposal = async () => {
-        // TODO Remove proposal entry from template
+        }
     }
 
     return (
@@ -231,9 +226,6 @@ const ProposalsDashboardUI = ({}: ProposalsDashboardUIProps) => {
                                                         key={idx}
                                                         proposal={
                                                             receivedProposal
-                                                        }
-                                                        onDelete={
-                                                            onDeleteProposal
                                                         }
                                                     />
                                                 )
