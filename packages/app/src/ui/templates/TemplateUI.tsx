@@ -28,11 +28,7 @@ const TemplateUI = ({
             justify="center"
             direction="row"
         >
-            <TemplateInfo
-                sellerBasicProfile={sellerBasicProfile}
-                template={ceramicTemplate}
-            />
-
+            <TemplateInfo template={ceramicTemplate} />
             <Box pad={{ left: 'medium' }}>
                 <Box border round="xsmall" pad="medium">
                     <CreateProposalCTA
