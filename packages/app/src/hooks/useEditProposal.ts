@@ -7,7 +7,7 @@ import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import _ from 'lodash'
-import { initProposalStatus } from '../utils/helpers/proposalStatusHelper'
+import { initProposalStatus } from '../utils/helpers/proposalHelper'
 import { useCurrentUser } from './useCurrentUser'
 import { useRouter } from 'next/router'
 
@@ -83,9 +83,8 @@ const useEditProposal = () => {
 
                             setProposalStatus(
                                 initProposalStatus(
-                                    receivedProposalCommits,
-                                    proposalDoc.commitId.toString(),
-                                    proposal
+                                    templateStreamDoc,
+                                    proposalDoc
                                 )
                             )
 
@@ -121,7 +120,7 @@ const useEditProposal = () => {
             if (!_.isEqual(proposalInput, cachedProposal)) {
                 const { uniqueTag } = await ceramicStagehand.updateStage(
                     proposalStreamID as string,
-                    { ...proposalInput, submitted: false },
+                    { ...proposalInput, isSubmitted: false },
                     StageNames.proposal
                 )
                 const proposalWithUniqueTitle = {

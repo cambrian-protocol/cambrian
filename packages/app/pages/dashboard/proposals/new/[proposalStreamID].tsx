@@ -25,7 +25,7 @@ export default function NewProposalPage() {
         <>
             {isUserLoaded ? (
                 currentUser ? (
-                    show404NotFound || proposalInput?.submitted ? (
+                    show404NotFound || proposalInput?.isSubmitted ? (
                         <Custom404Page />
                     ) : proposalInput && template && composition ? (
                         <PageLayout contextTitle="New Proposal">
