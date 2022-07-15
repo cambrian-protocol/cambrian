@@ -9,6 +9,8 @@ import "../solvers/Solver.sol";
 import "../solvers/SolverLib.sol";
 
 contract IPFSSolutionsHub {
+    uint256 nonce;
+
     ISolverFactory immutable solverFactory;
     IProposalsHub immutable proposalsHub;
 
@@ -99,6 +101,7 @@ contract IPFSSolutionsHub {
         }
     }
 
+    // Ceramic Interop: baseId == keccak256(abi.encodePacked(templateCommitID, proposalCommitID))
     function createBase(
         bytes32 baseId,
         IERC20 collateralToken,
@@ -114,10 +117,15 @@ contract IPFSSolutionsHub {
         emit CreateBase(baseId);
     }
 
-    function createInstance(bytes32 baseId, bytes32 instanceId)
+    function createInstance(bytes32 baseId)
         public
         returns (bytes32 solutionId)
     {
+        nonce++;
+
+        bytes32 instanceId = keccak256(
+            abi.encodePacked(baseId, nonce, blockhash(block.number - 1))
+        );
         require(
             instances[instanceId].id != instanceId,
             "Instance ID already exists"
@@ -133,21 +141,19 @@ contract IPFSSolutionsHub {
     }
 
     function createSolution(
-        bytes32 instanceId,
+        bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
         string calldata solverConfigsURI
-    ) public returns (bytes32 baseId, bytes32 solutionId) {
+    ) public returns (bytes32 instanceId) {
         require(
             instances[instanceId].id != instanceId,
             "SolutionsHub::Instance ID already exists"
         );
-        baseId = keccak256(abi.encodePacked(instanceId, instanceId));
         createBase(baseId, collateralToken, solverConfigs, solverConfigsURI);
-        createInstance(baseId, instanceId);
+        instanceId = createInstance(baseId);
 
         emit CreateSolution(instanceId);
-        return (baseId, instanceId);
     }
 
     function executeSolution(
@@ -156,7 +162,7 @@ contract IPFSSolutionsHub {
         SolverLib.Config[] calldata solverConfigs
     ) external {
         require(
-            verifyHash(solutionId, solverConfigs),
+            verifyHash(instances[solutionId].baseId, solverConfigs),
             "Incorrect SolverConfig content"
         );
         require(
@@ -195,12 +201,13 @@ contract IPFSSolutionsHub {
         emit ExecuteSolution(solutionId);
     }
 
-    function verifyHash(
-        bytes32 solutionId,
-        SolverLib.Config[] memory solverConfigs
-    ) public view returns (bool) {
+    function verifyHash(bytes32 baseId, SolverLib.Config[] memory solverConfigs)
+        public
+        view
+        returns (bool)
+    {
         return
-            bases[instances[solutionId].baseId].solverConfigsHash ==
+            bases[baseId].solverConfigsHash ==
             keccak256(abi.encode(solverConfigs));
     }
 

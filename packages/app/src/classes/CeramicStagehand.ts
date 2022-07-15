@@ -21,6 +21,7 @@ import { cpLogger } from '../services/api/Logger.api'
 import initialComposer from '../store/composer/composer.init'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
+import CID from 'cids'
 
 export enum StageNames {
     composition = 'composition',
@@ -508,6 +509,7 @@ export default class CeramicStagehand {
     > => {
         try {
             const proposalStreamDoc = await this.loadStream(proposalStreamID)
+
             const proposalStreamContent =
                 proposalStreamDoc.content as CeramicProposalModel
 
@@ -549,20 +551,20 @@ export default class CeramicStagehand {
                             currentUser.signer,
                             currentUser.chainId
                         )
-                        let metadataCID = ''
+                        let metadataURI = ''
                         if (templateProposalID) {
-                            metadataCID = await proposalsHub.getMetadataCID(
+                            metadataURI = await proposalsHub.getMetadataCID(
                                 templateProposalID
                             )
                         } else if (proposalProposalID) {
-                            metadataCID = await proposalsHub.getMetadataCID(
+                            metadataURI = await proposalsHub.getMetadataCID(
                                 proposalProposalID
                             )
                         }
 
-                        if (metadataCID.length > 0) {
+                        if (metadataURI.length > 0) {
                             if (
-                                metadataCID !==
+                                metadataURI !==
                                 latestRegisteredSubmission.proposalCommitID
                             ) {
                                 throw Error(
@@ -572,7 +574,7 @@ export default class CeramicStagehand {
 
                             const _onChainMetadataParsedSolvers =
                                 await this.getParsedSolvers(
-                                    metadataCID,
+                                    metadataURI,
                                     currentUser
                                 )
 

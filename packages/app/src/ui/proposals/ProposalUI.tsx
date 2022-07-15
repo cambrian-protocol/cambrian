@@ -58,15 +58,15 @@ const ProposalUI = ({
     }
 
     const initMetaStages = async (proposal: ethers.Contract) => {
-        if (proposal.metadataCID) {
+        if (proposal.metadataURI) {
             try {
-                if (!proposal.metadataCID)
+                if (!proposal.metadataURI)
                     throw GENERAL_ERROR['INVALID_METADATA']
 
                 // TODO Ceramic integration
                 const stagehand = new Stagehand()
                 const stages = await stagehand.loadStages(
-                    proposal.metadataCID,
+                    proposal.metadataURI,
                     StageNames.proposal
                 )
 

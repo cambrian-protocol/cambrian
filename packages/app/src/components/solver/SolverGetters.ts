@@ -440,11 +440,11 @@ export const getMetadataFromProposal = async (
             currentUser.chainId
         )
 
-        const metadataCID = await proposalsHub.getMetadataCID(proposalId)
-        if (metadataCID) {
+        const metadataURI = await proposalsHub.getMetadataCID(proposalId)
+        if (metadataURI) {
             const stagehand = new Stagehand()
             const stages = await stagehand.loadStages(
-                metadataCID,
+                metadataURI,
                 StageNames.proposal
             )
             if (stages) {

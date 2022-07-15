@@ -12,7 +12,7 @@ interface IIPFSSolutionsHub {
         string calldata solverConfigsURI
     ) external;
 
-    function createInstance(bytes32 baseId, bytes32 instanceId)
+    function createInstance(bytes32 baseId)
         external
         returns (bytes32 solutionId);
 

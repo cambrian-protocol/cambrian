@@ -15,7 +15,7 @@ contract ProposalsHub is ERC1155Receiver {
     IConditionalTokens public immutable conditionalTokens;
 
     // Increment for unique proposal IDs
-    uint256 nonce;
+    mapping(bytes32 => uint256) public nonces;
 
     struct Proposal {
         bool isExecuted;
@@ -26,7 +26,7 @@ contract ProposalsHub is ERC1155Receiver {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
-        string metadataCID;
+        string metadataURI;
     }
 
     mapping(bytes32 => Proposal) public proposals;
@@ -110,24 +110,29 @@ contract ProposalsHub is ERC1155Receiver {
         @param solutionsHub Address of the SolutionsHub contract managing the Solution
         @param fundingGoal Amount of ERC20 collateral requested for the Proposal
         @param baseId ID of the Solution.Base for which a new instance and proposal is created
+        @notice Ceramic Interop: baseId == keccak256(abi.encodePacked(templateCommitID, proposalCommitID))
     */
     function createProposal(
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
         bytes32 baseId,
-        string calldata metadataCID
+        SolverLib.Config[] memory solverConfigs,
+        string calldata metadataURI
     ) public returns (bytes32 solutionId, bytes32 proposalId) {
-        nonce++;
-
-        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(
-            baseId,
-            keccak256(
-                abi.encodePacked(baseId, blockhash(block.number - 1), nonce)
-            )
+        require(
+            IIPFSSolutionsHub(solutionsHub).verifyHash(baseId, solverConfigs),
+            "Incorrect Solver Configs"
         );
 
-        proposalId = keccak256(abi.encodePacked(solutionId, nonce));
+        bytes32 nonceId = keccak256(abi.encodePacked(baseId, metadataURI));
+        nonces[nonceId]++; // Prevents DOS by frontrunning baseId
+
+        proposalId = keccak256(
+            abi.encodePacked(baseId, metadataURI, nonces[nonceId])
+        );
+
+        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(baseId);
 
         Proposal storage proposal = proposals[proposalId];
         proposal.id = proposalId;
@@ -143,7 +148,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposal.solutionsHub = solutionsHub;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
-        proposal.metadataCID = metadataCID;
+        proposal.metadataURI = metadataURI;
 
         emit CreateProposal(proposalId);
 
@@ -157,7 +162,7 @@ contract ProposalsHub is ERC1155Receiver {
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
         string calldata solverConfigsURI,
-        string calldata metadataCID
+        string calldata metadataURI
     ) external returns (bytes32 solutionId, bytes32 proposalId) {
         ipfsSolutionsHub.createBase(
             baseId,
@@ -171,7 +176,8 @@ contract ProposalsHub is ERC1155Receiver {
             address(ipfsSolutionsHub),
             fundingGoal,
             baseId,
-            metadataCID
+            solverConfigs,
+            metadataURI
         );
     }
 
@@ -267,7 +273,7 @@ contract ProposalsHub is ERC1155Receiver {
     }
 
     function getMetadataCID(bytes32 id) external view returns (string memory) {
-        return proposals[id].metadataCID;
+        return proposals[id].metadataURI;
     }
 
     function isProposal(bytes32 id) external view returns (bool) {

@@ -147,6 +147,7 @@ describe("IPFSSolutionsHub", function () {
       this.IPFSSolutionsHub.address,
       this.amount,
       solutionBaseId,
+      solverConfigs,
       nullCid
     );
     let rc = await tx.wait();

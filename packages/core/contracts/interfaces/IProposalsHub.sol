@@ -29,7 +29,7 @@ interface IProposalsHub {
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
         string calldata solverConfigsURI,
-        string calldata metadataCID
+        string calldata metadataURI
     ) external returns (bytes32 solutionID, bytes32 proposalID);
 
     function fundProposal(
