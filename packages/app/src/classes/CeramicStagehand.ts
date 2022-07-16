@@ -20,6 +20,8 @@ import initialComposer from '../store/composer/composer.init'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
 import { ethers } from 'ethers'
+import IPFSSolutionsHub from '../hubs/IPFSSolutionsHub'
+import { SolverModel } from '../models/SolverModel'
 
 export enum StageNames {
     composition = 'composition',
@@ -289,23 +291,17 @@ export default class CeramicStagehand {
         return await this.createStage(tag, proposal, StageNames.proposal)
     }
 
-    deploySolutionBase = async (
-        currentUser: UserType,
-        proposalStack: ProposalStackType
+    saveSolverConfigs = async (
+        parsedSolvers: SolverModel[],
+        proposalCommitId: string
     ) => {
-        const parsedSolvers = await this.getParsedSolvers(
-            proposalStack,
-            currentUser
-        )
-
-        if (parsedSolvers) {
-            // Pin solverConfigs separately to have access without metaData from Solution
+        try {
             const solverConfigsDoc = await TileDocument.deterministic(
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.id],
                     family: `cambrian-solverConfigs`,
-                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                    tags: [proposalCommitId],
                 },
                 { pin: true }
             )
@@ -317,27 +313,51 @@ export default class CeramicStagehand {
                 {
                     controllers: [this.selfID.id],
                     family: `cambrian-solverConfigs`,
-                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                    tags: [proposalCommitId],
                 },
                 { pin: true }
             )
 
-            const proposalsHub = new ProposalsHub(
+            return solverConfigsDoc
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    deploySolutionBase = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
+    ) => {
+        const parsedSolvers = await this.getParsedSolvers(
+            proposalStack,
+            currentUser
+        )
+
+        if (parsedSolvers) {
+            // Pin solverConfigs separately to have access without metaData from Solution
+            const solverConfigsDoc = await this.saveSolverConfigs(
+                parsedSolvers,
+                proposalStack.proposalDoc.commitId.toString()
+            )
+
+            if (!solverConfigsDoc) {
+                throw new Error('AHH')
+            }
+
+            const solutionsHub = new IPFSSolutionsHub(
                 currentUser.signer,
                 currentUser.chainId
             )
 
-            const solutionSafeBaseId: string = await this.getSolutionSafeBaseId(
-                currentUser,
+            const solutionBaseId: string = await this.getSolutionBaseId(
                 proposalStack
             )
 
-            const transaction = await proposalsHub.createProposal(
-                parsedSolvers[0].collateralToken,
-                proposalStack.proposalDoc.content.price.amount,
-                solutionSafeBaseId,
+            const transaction = await solutionsHub.createBase(
+                solutionBaseId,
+                parsedSolvers[0].collateralToken.address,
                 parsedSolvers.map((solver) => solver.config),
-                proposalStack.proposalDoc.commitId.toString()
+                solverConfigsDoc.commitId.toString()
             )
             let rc = await transaction.wait()
             const event = rc.events?.find(
@@ -351,6 +371,8 @@ export default class CeramicStagehand {
         currentUser: UserType,
         proposalStack: ProposalStackType
     ) => {
+        // TODO Sanity check function that this is approved
+
         const parsedSolvers = await this.getParsedSolvers(
             proposalStack,
             currentUser
@@ -358,27 +380,15 @@ export default class CeramicStagehand {
 
         if (parsedSolvers) {
             // Pin solverConfigs separately to have access without metaData from Solution
-            const solverConfigsDoc = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: `cambrian-solverConfigs`,
-                    tags: [proposalStack.proposalDoc.commitId.toString()],
-                },
-                { pin: true }
+            // URI will differ from that on the Solution Base, but it should refer to identical data
+            const solverConfigsDoc = await this.saveSolverConfigs(
+                parsedSolvers,
+                proposalStack.proposalDoc.commitId.toString()
             )
 
-            await solverConfigsDoc.update(
-                {
-                    solverConfigs: parsedSolvers.map((x) => x.config),
-                },
-                {
-                    controllers: [this.selfID.id],
-                    family: `cambrian-solverConfigs`,
-                    tags: [proposalStack.proposalDoc.commitId.toString()],
-                },
-                { pin: true }
-            )
+            if (!solverConfigsDoc) {
+                throw new Error('AHH')
+            }
 
             const proposalsHub = new ProposalsHub(
                 currentUser.signer,
@@ -402,6 +412,10 @@ export default class CeramicStagehand {
                 (event) => event.event === 'CreateProposal'
             )
             const proposalId = event?.args && event.args.id
+
+            // Note, we should be able to determine the ProposalID now (no need to save it somewhere)
+            // If for some reason some POS wants to DOS we can save the correct id nonce
+            // on ceramic to save time for subsequent loads
         }
     }
 
@@ -442,6 +456,32 @@ export default class CeramicStagehand {
             ethers.utils.defaultAbiCoder.encode(
                 ['bytes32', 'uint256'],
                 [baseId, nonce]
+            )
+        )
+    }
+
+    getOnChainProposalId = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
+    ) => {
+        const solutionSafeBaseId = await this.getSolutionSafeBaseId(
+            currentUser,
+            proposalStack
+        )
+        let nonce = 1
+        // TODO Same idea as above. Somebody may have front-ran the proposalId we expected
+        // We can fetch a proposal starting at nonce = 1, check if its what we expect..
+        // If it's not, increment nonce until it is
+        // We're not worrying about this right now
+
+        return ethers.utils.keccak256(
+            ethers.utils.defaultAbiCoder.encode(
+                ['bytes32', 'uint256'],
+                [
+                    solutionSafeBaseId,
+                    proposalStack.proposalDoc.commitId.toString(),
+                    nonce,
+                ]
             )
         )
     }
