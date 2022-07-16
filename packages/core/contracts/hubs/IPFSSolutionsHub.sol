@@ -9,7 +9,7 @@ import "../solvers/Solver.sol";
 import "../solvers/SolverLib.sol";
 
 contract IPFSSolutionsHub {
-    uint256 nonce;
+    mapping(bytes32 => uint256) public nonces;
 
     ISolverFactory immutable solverFactory;
     IProposalsHub immutable proposalsHub;
@@ -42,7 +42,7 @@ contract IPFSSolutionsHub {
     mapping(bytes32 => Base) public bases;
     mapping(bytes32 => Instance) public instances;
 
-    mapping(bytes32 => bytes32) instanceId_to_ProposalId;
+    mapping(bytes32 => bytes32) public instanceId_to_ProposalId;
 
     event CreateBase(bytes32 id);
     event CreateSolution(bytes32 id);
@@ -101,30 +101,34 @@ contract IPFSSolutionsHub {
         }
     }
 
-    // Ceramic Interop: baseId == keccak256(abi.encodePacked(templateCommitID, proposalCommitID))
+    // Ceramic Interop: baseId == keccak256(abi.encode(templateCommitID, proposalCommitID))
     function createBase(
         bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
         string calldata solverConfigsURI
-    ) public {
-        require(bases[baseId].id != baseId, "Base ID already exists");
-        Base storage base = bases[baseId];
-        base.id = baseId;
+    ) public returns (bytes32 safeBaseId) {
+        nonces[baseId]++;
+        safeBaseId = keccak256(abi.encode(baseId, nonces[baseId]));
+
+        require(bases[safeBaseId].id != safeBaseId, "Base ID already exists");
+
+        Base storage base = bases[safeBaseId];
+        base.id = safeBaseId;
         base.collateralToken = collateralToken;
         base.solverConfigsHash = keccak256(abi.encode(solverConfigs));
         base.solverConfigsURI = solverConfigsURI;
-        emit CreateBase(baseId);
+        emit CreateBase(safeBaseId);
     }
 
     function createInstance(bytes32 baseId)
         public
         returns (bytes32 solutionId)
     {
-        nonce++;
+        nonces[baseId]++;
 
         bytes32 instanceId = keccak256(
-            abi.encodePacked(baseId, nonce, blockhash(block.number - 1))
+            abi.encode(baseId, nonces[baseId], blockhash(block.number - 1))
         );
         require(
             instances[instanceId].id != instanceId,

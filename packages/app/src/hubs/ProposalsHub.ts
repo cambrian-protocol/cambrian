@@ -28,6 +28,34 @@ export default class ProposalsHub {
         )
     }
 
+    /**
+     * @notice Creates a Proposal from an existing Solution Base
+     */
+    createProposal = async (
+        collateralToken: TokenModel,
+        price: number,
+        solutionBaseId: string,
+        solverConfigs: SolverConfigModel[],
+        proposalURI: string // commitID
+    ) => {
+        const weiPrice = ethers.utils.parseUnits(
+            price.toString(),
+            collateralToken.decimals
+        )
+
+        const tx: ethers.ContractTransaction =
+            await this.contract.createProposal(
+                collateralToken.address,
+                SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
+                weiPrice,
+                solutionBaseId,
+                solverConfigs,
+                proposalURI
+            )
+
+        return tx
+    }
+
     createSolutionAndProposal = async (
         collateralToken: TokenModel,
         price: number,

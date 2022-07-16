@@ -19,6 +19,7 @@ import { cpLogger } from '../services/api/Logger.api'
 import initialComposer from '../store/composer/composer.init'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
+import { ethers } from 'ethers'
 
 export enum StageNames {
     composition = 'composition',
@@ -108,14 +109,19 @@ export default class CeramicStagehand {
             updatedStageLib[uniqueTag] = streamID
             delete updatedStageLib[currentTag]
 
-            await stageLib.update(updatedStageLib)
+            await stageLib.update(updatedStageLib, undefined, { pin: true })
             await currentData.update(
                 { ...data, title: uniqueTag },
-                { ...currentData.metadata, tags: [uniqueTag] }
+                { ...currentData.metadata, tags: [uniqueTag] },
+                { pin: true }
             )
             return { uniqueTag: uniqueTag }
         } else {
-            await currentData.update({ ...data, title: cleanedUserTitle })
+            await currentData.update(
+                { ...data, title: cleanedUserTitle },
+                undefined,
+                { pin: true }
+            )
             return { uniqueTag: cleanedUserTitle }
         }
     }
@@ -283,95 +289,161 @@ export default class CeramicStagehand {
         return await this.createStage(tag, proposal, StageNames.proposal)
     }
 
-    // TODO WIP
-    deployProposal = async (
-        proposalStreamID: string,
-        proposalCommitID: string,
-        ceramicTemplate: CeramicTemplateModel,
-        ceramicProposal: CeramicProposalModel,
-        currentUser: UserType
+    deploySolutionBase = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
     ) => {
-        /*  // Sanity check - Just let deploy if the proposalCommitID is actually flaggeed as approved at the template and the proposalCommitID is right
-        const _templateStreamContent = (await (
-            await this.loadStream(ceramicProposal.template.streamID)
-        ).content) as CeramicTemplateModel
-        const _proposalStreamEntry =
-            _templateStreamContent.receivedProposals[proposalStreamID]
-        if (
-            !_proposalStreamEntry ||
-            !_proposalStreamEntry[_proposalStreamEntry.length - 1].approved ||
-            _proposalStreamEntry[_proposalStreamEntry.length - 1].approved ===
-                undefined ||
-            _proposalStreamEntry[_proposalStreamEntry.length - 1]
-                .proposalCommitID !== proposalCommitID
-        ) {
-            throw Error(
-                'Error, commit ID of Proposal is not approved or does not match!'
+        const parsedSolvers = await this.getParsedSolvers(
+            proposalStack,
+            currentUser
+        )
+
+        if (parsedSolvers) {
+            // Pin solverConfigs separately to have access without metaData from Solution
+            const solverConfigsDoc = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-solverConfigs`,
+                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                },
+                { pin: true }
             )
+
+            await solverConfigsDoc.update(
+                {
+                    solverConfigs: parsedSolvers.map((x) => x.config),
+                },
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-solverConfigs`,
+                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                },
+                { pin: true }
+            )
+
+            const proposalsHub = new ProposalsHub(
+                currentUser.signer,
+                currentUser.chainId
+            )
+
+            const solutionSafeBaseId: string = await this.getSolutionSafeBaseId(
+                currentUser,
+                proposalStack
+            )
+
+            const transaction = await proposalsHub.createProposal(
+                parsedSolvers[0].collateralToken,
+                proposalStack.proposalDoc.content.price.amount,
+                solutionSafeBaseId,
+                parsedSolvers.map((solver) => solver.config),
+                proposalStack.proposalDoc.commitId.toString()
+            )
+            let rc = await transaction.wait()
+            const event = rc.events?.find(
+                (event) => event.event === 'CreateProposal'
+            )
+            const proposalId = event?.args && event.args.id
         }
+    }
 
-        try {
-            const parsedSolvers = await this.getParsedSolvers(
-                proposalCommitID,
-                currentUser
+    deployProposal = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
+    ) => {
+        const parsedSolvers = await this.getParsedSolvers(
+            proposalStack,
+            currentUser
+        )
+
+        if (parsedSolvers) {
+            // Pin solverConfigs separately to have access without metaData from Solution
+            const solverConfigsDoc = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-solverConfigs`,
+                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                },
+                { pin: true }
             )
 
-            if (parsedSolvers) {
-                // Pin solverConfigs separately to have access without metaData from Solution
-                const solverConfigsDoc = await TileDocument.deterministic(
-                    this.selfID.client.ceramic,
-                    {
-                        controllers: [this.selfID.id],
-                        family: `cambrian-solverConfigs`,
-                        tags: [proposalCommitID],
-                    }
-                )
+            await solverConfigsDoc.update(
+                {
+                    solverConfigs: parsedSolvers.map((x) => x.config),
+                },
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-solverConfigs`,
+                    tags: [proposalStack.proposalDoc.commitId.toString()],
+                },
+                { pin: true }
+            )
 
-                const proposalsHub = new ProposalsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
+            const proposalsHub = new ProposalsHub(
+                currentUser.signer,
+                currentUser.chainId
+            )
 
-                const transaction =
-                    await proposalsHub.createSolutionAndProposal(
-                        parsedSolvers[0].collateralToken,
-                        ceramicProposal.price.amount,
-                        parsedSolvers.map((solver) => solver.config),
-                        solverConfigsDoc.commitId.toString(),
-                        proposalCommitID
-                    )
-                let rc = await transaction.wait()
-                const event = rc.events?.find(
-                    (event) => event.event === 'CreateProposal'
-                )
-                const proposalId = event?.args && event.args.id
+            const solutionSafeBaseId: string = await this.getSolutionSafeBaseId(
+                currentUser,
+                proposalStack
+            )
 
-                // Attach proposalID either to the template or the proposal
-                if (this.selfID.did.id === ceramicTemplate.author) {
-                    // Deployed by template author, proposalID will be attached to the template at receivedProposals
-                    await this.updateProposalEntry(proposalStreamID, {
-                        proposalID: proposalId,
-                        approved: true,
-                    })
-                } else if (this.selfID.did.id === ceramicProposal.author) {
-                    // Deloyed by proposal author, proposalID will be attached to proposal
-                    await this.updateStage(
-                        proposalStreamID,
-                        { ...ceramicProposal, proposalID: proposalId },
-                        StageNames.proposal
-                    )
-                } else {
-                    // Just in case
-                    console.warn(
-                        'Proposal was not deployed by the template or proposal creator. Created Proposal ID can not be stored!',
-                        proposalId
-                    )
-                }
-            }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        } */
+            const transaction = await proposalsHub.createProposal(
+                parsedSolvers[0].collateralToken,
+                proposalStack.proposalDoc.content.price.amount,
+                solutionSafeBaseId,
+                parsedSolvers.map((solver) => solver.config),
+                proposalStack.proposalDoc.commitId.toString()
+            )
+            let rc = await transaction.wait()
+            const event = rc.events?.find(
+                (event) => event.event === 'CreateProposal'
+            )
+            const proposalId = event?.args && event.args.id
+        }
+    }
+
+    getSolutionBaseId = (proposalStack: ProposalStackType) => {
+        return ethers.utils.keccak256(
+            ethers.utils.defaultAbiCoder.encode(
+                ['string', 'string'],
+                [
+                    proposalStack.templateDoc.commitId.toString(),
+                    proposalStack.proposalDoc.commitId.toString(),
+                ]
+            )
+        )
+    }
+
+    getSolutionSafeBaseId = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
+    ) => {
+        const baseId = this.getSolutionBaseId(proposalStack)
+
+        let nonce = 1 // Default nonce is 1
+
+        /**
+         * TODO
+         * To protect against DOS caused by a proposal being created ahead of our real users,
+         * a nonce is incremented on-chain.
+         *
+         * This is where we would fetch the IPFSSolutionsHub.bases[baseId] and check if it's contents are
+         * what we expect. If they aren't, we can increment the nonce until we find the Base made by a
+         * legitimate user.
+         *
+         * We can do a similar procedure later when fetching proposals from on-chain.
+         *
+         */
+
+        return ethers.utils.keccak256(
+            ethers.utils.defaultAbiCoder.encode(
+                ['bytes32', 'uint256'],
+                [baseId, nonce]
+            )
+        )
     }
 
     loadStream = async (streamID: string) => {
@@ -463,7 +535,7 @@ export default class CeramicStagehand {
         }
     }
 
-    getSolverConfigs = async (
+    getParsedSolvers = async (
         proposalStack: ProposalStackType,
         currentUser: UserType
     ) => {
@@ -487,7 +559,7 @@ export default class CeramicStagehand {
             currentUser.web3Provider
         )
 
-        return _parsedSolvers?.map((solver) => solver.config)
+        return _parsedSolvers
     }
 
     loadProposalStack = async (proposalStreamOrCommitID: string) => {
@@ -507,40 +579,6 @@ export default class CeramicStagehand {
             proposalDoc: _proposalDoc,
             templateDoc: _templateDoc,
             compositionDoc: _compositionDoc,
-        }
-    }
-
-    /**
-     * Adds a new entry for a submitted proposal at the templates receivedProposals
-     *
-     * @param templateDoc
-     * @param proposalDoc
-     * @auth Must be done by the templater
-     */
-    registerNewProposalSubmission = async (
-        proposalDoc: TileDocument<CeramicProposalModel>,
-        templateDoc: TileDocument<CeramicTemplateModel>
-    ) => {
-        try {
-            let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
-            if (templateDoc.content.receivedProposals) {
-                updatedReceivedProposals = _.cloneDeep(
-                    templateDoc.content.receivedProposals
-                )
-            }
-
-            updatedReceivedProposals[proposalDoc.id.toString()] = [
-                {
-                    proposalCommitID: proposalDoc.commitId.toString(),
-                },
-            ]
-            await templateDoc.update({
-                ...templateDoc.content,
-                receivedProposals: updatedReceivedProposals,
-            })
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
 
@@ -604,6 +642,44 @@ export default class CeramicStagehand {
     }
 
     /**
+     * Adds a new entry for a submitted proposal at the templates receivedProposals
+     *
+     * @param templateDoc
+     * @param proposalDoc
+     * @auth Must be done by the templater
+     */
+    registerNewProposalSubmission = async (
+        proposalDoc: TileDocument<CeramicProposalModel>,
+        templateDoc: TileDocument<CeramicTemplateModel>
+    ) => {
+        try {
+            let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
+            if (templateDoc.content.receivedProposals) {
+                updatedReceivedProposals = _.cloneDeep(
+                    templateDoc.content.receivedProposals
+                )
+            }
+
+            updatedReceivedProposals[proposalDoc.id.toString()] = [
+                {
+                    proposalCommitID: proposalDoc.commitId.toString(),
+                },
+            ]
+            await templateDoc.update(
+                {
+                    ...templateDoc.content,
+                    receivedProposals: updatedReceivedProposals,
+                },
+                undefined,
+                { pin: true }
+            )
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    /**
      * Updates the templates receivedProposals[proposalStreamID] commit-entry.
      *
      * @param proposalStreamID StreamID
@@ -615,18 +691,16 @@ export default class CeramicStagehand {
         proposalStreamID: string,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
+        // Load Proposal
         const proposalDoc = await this.loadStream(proposalStreamID)
-
-        if (!proposalDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
+        if (!proposalDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         const proposalContent = proposalDoc.content as CeramicProposalModel
 
+        // Load Template
         const templateDoc = await this.loadStream(
             proposalContent.template.streamID
         )
-
-        if (!templateDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
+        if (!templateDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         const templateContent = templateDoc.content as CeramicTemplateModel
 
         const updatedReceivedProposals = _.cloneDeep(
@@ -653,9 +727,104 @@ export default class CeramicStagehand {
             ...updatedProposalEntry,
         }
 
-        templateDoc.update({
-            ...templateContent,
-            receivedProposals: updatedReceivedProposals,
-        })
+        templateDoc.update(
+            {
+                ...templateContent,
+                receivedProposals: updatedReceivedProposals,
+            },
+            undefined,
+            { pin: true }
+        )
     }
 }
+
+// TODO WIP
+// deployProposal = async (
+//     proposalStreamID: string,
+//     proposalCommitID: string,
+//     ceramicTemplate: CeramicTemplateModel,
+//     ceramicProposal: CeramicProposalModel,
+//     currentUser: UserType
+// ) => {
+//     // Sanity check - Just let deploy if the proposalCommitID is actually flaggeed as approved at the template and the proposalCommitID is right
+//     const _templateStreamContent = (await (
+//         await this.loadStream(ceramicProposal.template.streamID)
+//     ).content) as CeramicTemplateModel
+//     const _proposalStreamEntry =
+//         _templateStreamContent.receivedProposals[proposalStreamID]
+//     if (
+//         !_proposalStreamEntry ||
+//         !_proposalStreamEntry[_proposalStreamEntry.length - 1].approved ||
+//         _proposalStreamEntry[_proposalStreamEntry.length - 1].approved ===
+//             undefined ||
+//         _proposalStreamEntry[_proposalStreamEntry.length - 1]
+//             .proposalCommitID !== proposalCommitID
+//     ) {
+//         throw Error(
+//             'Error, commit ID of Proposal is not approved or does not match!'
+//         )
+//     }
+
+//     try {
+//         const parsedSolvers = await this.getParsedSolvers(
+//             proposalCommitID,
+//             currentUser
+//         )
+
+//         if (parsedSolvers) {
+//             // Pin solverConfigs separately to have access without metaData from Solution
+//             const solverConfigsDoc = await TileDocument.deterministic(
+//                 this.selfID.client.ceramic,
+//                 {
+//                     controllers: [this.selfID.id],
+//                     family: `cambrian-solverConfigs`,
+//                     tags: [proposalCommitID],
+//                 }
+//             )
+
+//             const proposalsHub = new ProposalsHub(
+//                 currentUser.signer,
+//                 currentUser.chainId
+//             )
+
+//             const transaction =
+//                 await proposalsHub.createSolutionAndProposal(
+//                     parsedSolvers[0].collateralToken,
+//                     ceramicProposal.price.amount,
+//                     parsedSolvers.map((solver) => solver.config),
+//                     solverConfigsDoc.commitId.toString(),
+//                     proposalCommitID
+//                 )
+//             let rc = await transaction.wait()
+//             const event = rc.events?.find(
+//                 (event) => event.event === 'CreateProposal'
+//             )
+//             const proposalId = event?.args && event.args.id
+
+//             // Attach proposalID either to the template or the proposal
+//             if (this.selfID.did.id === ceramicTemplate.author) {
+//                 // Deployed by template author, proposalID will be attached to the template at receivedProposals
+//                 await this.updateProposalEntry(proposalStreamID, {
+//                     proposalID: proposalId,
+//                     approved: true,
+//                 })
+//             } else if (this.selfID.did.id === ceramicProposal.author) {
+//                 // Deloyed by proposal author, proposalID will be attached to proposal
+//                 await this.updateStage(
+//                     proposalStreamID,
+//                     { ...ceramicProposal, proposalID: proposalId },
+//                     StageNames.proposal
+//                 )
+//             } else {
+//                 // Just in case
+//                 console.warn(
+//                     'Proposal was not deployed by the template or proposal creator. Created Proposal ID can not be stored!',
+//                     proposalId
+//                 )
+//             }
+//         }
+//     } catch (e) {
+//         cpLogger.push(e)
+//         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+//     }
+// }

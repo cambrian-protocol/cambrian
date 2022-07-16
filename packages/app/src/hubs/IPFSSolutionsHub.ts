@@ -3,9 +3,11 @@ import { IPFS_SOLUTIONS_HUB_IFACE } from '@cambrian/app/config/ContractInterface
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolutionModel } from '../models/SolutionModel'
 import { ethers } from 'ethers'
+import { SolverConfigModel } from '../models/SolverConfigModel'
 
 export default class IPFSSolutionsHub {
     contract: ethers.Contract
+    chainId: number
 
     constructor(
         signerOrProvider: ethers.Signer | ethers.providers.Provider,
@@ -19,6 +21,28 @@ export default class IPFSSolutionsHub {
             IPFS_SOLUTIONS_HUB_IFACE,
             signerOrProvider
         )
+
+        this.chainId = chainId
+    }
+
+    /**
+     * @notice Creates a Solution Base
+     */
+    createBase = async (
+        baseId: string,
+        collateralToken: string,
+        solverConfigs: SolverConfigModel[],
+        solverConfigsURI: string // commitID
+    ) => {
+        const tx: ethers.ContractTransaction = await this.contract.createBase(
+            baseId,
+            collateralToken,
+            SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
+            solverConfigs,
+            solverConfigsURI
+        )
+
+        return tx
     }
 
     getSolvers = async (solutionId: string): Promise<string[] | undefined> => {

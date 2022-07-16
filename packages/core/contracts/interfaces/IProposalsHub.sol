@@ -19,7 +19,9 @@ interface IProposalsHub {
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 solutionId
+        bytes32 safeBaseId,
+        SolverLib.Config[] memory solverConfigs,
+        string calldata metadataURI
     ) external;
 
     function createIPFSSolutionAndProposal(

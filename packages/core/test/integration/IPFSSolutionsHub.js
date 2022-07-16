@@ -146,7 +146,12 @@ describe("IPFSSolutionsHub", function () {
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
-      solutionBaseId,
+      ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(
+          ["bytes32", "uint256"],
+          [solutionBaseId, 1]
+        )
+      ),
       solverConfigs,
       nullCid
     );

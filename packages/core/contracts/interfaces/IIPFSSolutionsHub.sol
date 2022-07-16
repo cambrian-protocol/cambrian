@@ -10,7 +10,7 @@ interface IIPFSSolutionsHub {
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
         string calldata solverConfigsURI
-    ) external;
+    ) external returns (bytes32 safeBaseId);
 
     function createInstance(bytes32 baseId)
         external

@@ -109,30 +109,32 @@ contract ProposalsHub is ERC1155Receiver {
         @param collateralToken ERC20 token being used as collateral for conditional tokens
         @param solutionsHub Address of the SolutionsHub contract managing the Solution
         @param fundingGoal Amount of ERC20 collateral requested for the Proposal
-        @param baseId ID of the Solution.Base for which a new instance and proposal is created
-        @notice Ceramic Interop: baseId == keccak256(abi.encodePacked(templateCommitID, proposalCommitID))
+        @param safeBaseId ID of the Solution.Base for which a new instance and proposal is created
+        @notice Ceramic Interop: safeBaseId == keccak256(abi.encode(keccak256(abi.encode(templateCommitID, proposalCommitID)), nonce))
     */
     function createProposal(
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 baseId,
+        bytes32 safeBaseId,
         SolverLib.Config[] memory solverConfigs,
         string calldata metadataURI
     ) public returns (bytes32 solutionId, bytes32 proposalId) {
         require(
-            IIPFSSolutionsHub(solutionsHub).verifyHash(baseId, solverConfigs),
+            IIPFSSolutionsHub(solutionsHub).verifyHash(
+                safeBaseId,
+                solverConfigs
+            ),
             "Incorrect Solver Configs"
         );
 
-        bytes32 nonceId = keccak256(abi.encodePacked(baseId, metadataURI));
-        nonces[nonceId]++; // Prevents DOS by frontrunning baseId
+        nonces[safeBaseId]++; // Prevents DOS by frontrunning safeBaseId
 
         proposalId = keccak256(
-            abi.encodePacked(baseId, metadataURI, nonces[nonceId])
+            abi.encode(safeBaseId, metadataURI, nonces[safeBaseId])
         );
 
-        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(baseId);
+        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(safeBaseId);
 
         Proposal storage proposal = proposals[proposalId];
         proposal.id = proposalId;
@@ -164,7 +166,7 @@ contract ProposalsHub is ERC1155Receiver {
         string calldata solverConfigsURI,
         string calldata metadataURI
     ) external returns (bytes32 solutionId, bytes32 proposalId) {
-        ipfsSolutionsHub.createBase(
+        bytes32 safeBaseId = ipfsSolutionsHub.createBase(
             baseId,
             collateralToken,
             solverConfigs,
@@ -175,7 +177,7 @@ contract ProposalsHub is ERC1155Receiver {
             collateralToken,
             address(ipfsSolutionsHub),
             fundingGoal,
-            baseId,
+            safeBaseId,
             solverConfigs,
             metadataURI
         );
