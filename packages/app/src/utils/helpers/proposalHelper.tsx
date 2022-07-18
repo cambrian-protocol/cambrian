@@ -3,20 +3,18 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 
-export const initProposalStatus = (
-    templateDoc: TileDocument<CeramicTemplateModel>,
-    proposalDoc: TileDocument<CeramicProposalModel>
+export const getProposalStatus = (
+    proposalDoc: TileDocument<CeramicProposalModel>,
+    templateDoc: TileDocument<CeramicTemplateModel>
 ): ProposalStatus => {
     const proposalCommits =
         templateDoc.content.receivedProposals[proposalDoc.id.toString()]
-
     if (
         proposalCommits &&
         proposalCommits[proposalCommits.length - 1].proposalCommitID ===
             proposalDoc.commitId.toString()
     ) {
         const proposalCommit = proposalCommits[proposalCommits.length - 1]
-
         if (
             proposalCommit.proposalID !== undefined ||
             proposalDoc.content.proposalID !== undefined

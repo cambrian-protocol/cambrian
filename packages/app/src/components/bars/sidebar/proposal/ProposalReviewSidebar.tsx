@@ -5,45 +5,44 @@ import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 import { useState } from 'react'
 
-interface ProposalReviewSidebarProps {
-    currentUser: UserType
-    proposalStreamID: string
-    updateProposal: () => Promise<void>
-}
+const ProposalReviewSidebar = () => {
+    const { currentUser } = useCurrentUser()
+    const { proposalStack, updateProposal } = useProposal()
 
-const ProposalReviewSidebar = ({
-    currentUser,
-    updateProposal,
-    proposalStreamID,
-}: ProposalReviewSidebarProps) => {
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        try {
-            const cs = new CeramicStagehand(currentUser.selfID)
-            await cs.approveProposal(proposalStreamID)
-            await updateProposal()
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+        if (currentUser && proposalStack) {
+            try {
+                const cs = new CeramicStagehand(currentUser.selfID)
+                await cs.approveProposal(currentUser, proposalStack)
+                await updateProposal()
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            }
         }
+
         setIsApproving(false)
     }
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        try {
-            const cs = new CeramicStagehand(currentUser.selfID)
-            await cs.requestProposalChange(proposalStreamID)
-            await updateProposal()
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+        if (currentUser && proposalStack) {
+            try {
+                const cs = new CeramicStagehand(currentUser.selfID)
+                await cs.requestProposalChange(proposalStack.proposalDoc)
+                await updateProposal()
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            }
         }
         setIsRequestingChange(false)
     }

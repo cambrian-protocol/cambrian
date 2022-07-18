@@ -1,5 +1,5 @@
 import { ArrowsClockwise, CircleDashed } from 'phosphor-react'
-import { Box, Heading, Tab, Tabs, Text } from 'grommet'
+import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
@@ -15,9 +15,10 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { initProposalStatus } from '@cambrian/app/utils/helpers/proposalStatusHelper'
+import { getProposalStatus } from '@cambrian/app/utils/helpers/proposalHelper'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
@@ -51,35 +52,31 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
         await Promise.all(
             Object.values(templateStreams).map(async (streamID) => {
-                const _templateStreamContent = (await (
-                    await cs.loadStream(streamID)
-                ).content) as CeramicTemplateModel
+                const _templateStreamDoc = (await cs.loadStream(
+                    streamID
+                )) as TileDocument<CeramicTemplateModel>
                 if (
-                    _templateStreamContent &&
-                    _templateStreamContent.receivedProposals &&
-                    Object.keys(_templateStreamContent.receivedProposals)
+                    _templateStreamDoc &&
+                    _templateStreamDoc.content.receivedProposals &&
+                    Object.keys(_templateStreamDoc.content.receivedProposals)
                         .length > 0
                 ) {
                     await Promise.all(
                         Object.keys(
-                            _templateStreamContent.receivedProposals
+                            _templateStreamDoc.content.receivedProposals
                         ).map(async (proposalStreamID) => {
-                            const _proposalDoc = await cs.loadStream(
+                            const _proposalDoc = (await cs.loadStream(
                                 proposalStreamID
-                            )
+                            )) as TileDocument<CeramicProposalModel>
 
                             const _proposalContent =
                                 _proposalDoc.content as CeramicProposalModel
 
                             if (_proposalContent) {
                                 _receivedProposals.push({
-                                    status: initProposalStatus(
-                                        _templateStreamContent
-                                            .receivedProposals[
-                                            proposalStreamID
-                                        ],
-                                        _proposalDoc.commitId.toString(),
-                                        _proposalContent
+                                    status: getProposalStatus(
+                                        _proposalDoc,
+                                        _templateStreamDoc
                                     ),
                                     streamID: proposalStreamID,
                                     title: _proposalContent.title,
@@ -107,28 +104,23 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
             await Promise.all(
                 Object.values(proposalStreams).map(async (streamID) => {
-                    const _proposalDoc = await cs.loadStream(streamID)
-
-                    const _proposal =
-                        _proposalDoc.content as CeramicProposalModel
-
-                    if (_proposal) {
-                        const _templateStreamContent = (
-                            await cs.loadStream(_proposal.template.streamID)
-                        ).content as CeramicTemplateModel
-                        if (_templateStreamContent) {
+                    const _proposalDoc = (await cs.loadStream(
+                        streamID
+                    )) as TileDocument<CeramicProposalModel>
+                    if (_proposalDoc) {
+                        const _templateStreamDoc = (await cs.loadStream(
+                            _proposalDoc.content.template.streamID
+                        )) as TileDocument<CeramicTemplateModel>
+                        if (_templateStreamDoc) {
                             _proposals.push({
-                                status: initProposalStatus(
-                                    _templateStreamContent.receivedProposals[
-                                        streamID
-                                    ],
-                                    _proposalDoc.commitId.toString(),
-                                    _proposal
+                                status: getProposalStatus(
+                                    _proposalDoc,
+                                    _templateStreamDoc
                                 ),
                                 streamID: streamID,
-                                title: _proposal.title,
+                                title: _proposalDoc.content.title,
                                 isAuthor:
-                                    _proposal.author ===
+                                    _proposalDoc.content.author ===
                                     currentUser.selfID.did.id,
                             })
                         }
@@ -173,6 +165,16 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         <Box pad="medium">
                             <Heading level="2">Proposals Management</Heading>
                         </Box>
+                        <Button
+                            label="@"
+                            onClickCapture={() => {
+                                if (ceramicStagehand) {
+                                    ceramicStagehand.clearStages(
+                                        StageNames.proposal
+                                    )
+                                }
+                            }}
+                        />
                         <Box>
                             <LoaderButton
                                 isLoading={isFetching}

@@ -1,17 +1,13 @@
 import { Box, Button, Form, FormField, TextArea } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 interface ProposalDescriptionFormProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
-    onSubmit: () => Promise<void>
+    postRollSubmit?: () => void
     submitLabel?: string
-    onCancel: () => void
+    postRollCancel?: () => void
     cancelLabel?: string
 }
 
@@ -22,13 +18,18 @@ type ProposalDescriptionFormType = {
 
 // TODO Validation
 const ProposalDescriptionForm = ({
-    proposalInput,
-    setProposalInput,
-    onSubmit,
+    postRollSubmit,
     submitLabel,
-    onCancel,
+    postRollCancel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
+    const {
+        proposalInput,
+        setProposalInput,
+        onSaveProposal,
+        onResetProposalInput,
+    } = useProposal()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -37,64 +38,72 @@ const ProposalDescriptionForm = ({
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        await onSubmit()
+        onSaveProposal && (await onSaveProposal())
+        postRollSubmit && postRollSubmit()
         setIsSubmitting(false)
     }
-
     return (
-        <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
-            <Box height="50vh" justify="between">
-                <Box height={{ min: 'auto' }}>
-                    <FormField
-                        label="Title"
-                        placeholder={'Type your proposal title here...'}
-                        value={proposalInput.title}
-                        onChange={(e) => {
-                            setProposalInput({
-                                ...proposalInput,
-                                title: e.target.value,
-                            })
-                        }}
-                    />
-                    <FormField label="Description">
-                        <TextArea
-                            placeholder={
-                                'Type your proposal desciption here...'
-                            }
-                            rows={15}
-                            resize={false}
-                            value={proposalInput.description}
-                            onChange={(e) =>
-                                setProposalInput({
-                                    ...proposalInput,
-                                    description: e.target.value,
-                                })
-                            }
-                        />
-                    </FormField>
-                </Box>
-                <Box
-                    direction="row"
-                    justify="between"
-                    pad={{ top: 'medium' }}
-                    height={{ min: 'auto' }}
-                >
-                    <Button
-                        size="small"
-                        secondary
-                        label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
-                    />
-                    <LoaderButton
-                        isLoading={isSubmitting}
-                        size="small"
-                        primary
-                        label={submitLabel || 'Save'}
-                        type="submit"
-                    />
-                </Box>
-            </Box>
-        </Form>
+        <>
+            {proposalInput && (
+                <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
+                    <Box height="50vh" justify="between">
+                        <Box height={{ min: 'auto' }}>
+                            <FormField
+                                label="Title"
+                                placeholder={'Type your proposal title here...'}
+                                value={proposalInput.title}
+                                onChange={(e) => {
+                                    setProposalInput({
+                                        ...proposalInput,
+                                        title: e.target.value,
+                                    })
+                                }}
+                            />
+                            <FormField label="Description">
+                                <TextArea
+                                    placeholder={
+                                        'Type your proposal desciption here...'
+                                    }
+                                    rows={15}
+                                    resize={false}
+                                    value={proposalInput.description}
+                                    onChange={(e) =>
+                                        setProposalInput({
+                                            ...proposalInput,
+                                            description: e.target.value,
+                                        })
+                                    }
+                                />
+                            </FormField>
+                        </Box>
+                        <Box
+                            direction="row"
+                            justify="between"
+                            pad={{ top: 'medium' }}
+                            height={{ min: 'auto' }}
+                        >
+                            <Button
+                                size="small"
+                                secondary
+                                label={cancelLabel || 'Reset all changes'}
+                                onClick={() => {
+                                    onResetProposalInput &&
+                                        onResetProposalInput()
+                                    postRollCancel && postRollCancel()
+                                }}
+                            />
+                            <LoaderButton
+                                isLoading={isSubmitting}
+                                size="small"
+                                primary
+                                label={submitLabel || 'Save'}
+                                type="submit"
+                            />
+                        </Box>
+                    </Box>
+                </Form>
+            )}
+        </>
     )
 }
 

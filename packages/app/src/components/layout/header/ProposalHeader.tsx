@@ -1,6 +1,5 @@
 import {
     BookOpen,
-    ClipboardText,
     File,
     IconContext,
     Question,
@@ -13,29 +12,16 @@ import {
 } from 'packages/app/config/ExternalLinks'
 
 import { Button } from 'grommet'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Link from 'next/link'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 import { useState } from 'react'
 
-interface ProposalHeaderProps {
-    proposalTitle?: string
-    ceramicProposal?: CeramicProposalModel
-    ceramicTemplate?: CeramicTemplateModel
-    proposalStatus: ProposalStatus
-}
-
-const ProposalHeader = ({
-    proposalTitle,
-    ceramicProposal,
-    ceramicTemplate,
-    proposalStatus,
-}: ProposalHeaderProps) => {
+const ProposalHeader = () => {
+    const { proposalStack, proposalStatus } = useProposal()
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
 
     const toggleShowTemplateInfoModal = () =>
@@ -64,8 +50,7 @@ const ProposalHeader = ({
                                     />
                                 </Box>
                                 <Heading>
-                                    {proposalTitle ||
-                                        ceramicProposal?.title ||
+                                    {proposalStack?.proposalDoc.content.title ||
                                         'Untitled Proposal'}
                                 </Heading>
                             </Box>
@@ -77,30 +62,7 @@ const ProposalHeader = ({
                                 pad={{ bottom: 'xsmall' }}
                             >
                                 <IconContext.Provider value={{ size: '18' }}>
-                                    {ceramicProposal && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowTemplateInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Proposal Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <ClipboardText
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {ceramicTemplate && (
+                                    {proposalStack && (
                                         <Button
                                             color="dark-4"
                                             size="small"
@@ -200,9 +162,9 @@ const ProposalHeader = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-            {showTemplateInfoModal && ceramicTemplate && (
+            {showTemplateInfoModal && proposalStack && (
                 <TemplateInfoModal
-                    ceramicTemplate={ceramicTemplate}
+                    ceramicTemplate={proposalStack.templateDoc.content}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}

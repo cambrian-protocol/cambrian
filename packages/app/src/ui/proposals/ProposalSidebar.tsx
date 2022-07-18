@@ -1,105 +1,36 @@
 import { Box, Button, Text } from 'grommet'
-import React, { useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Link from 'next/link'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalDraftSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalDraftSidebar'
 import ProposalReviewSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewSidebar'
-import ProposalStartFundingComponent from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { UserType } from '@cambrian/app/store/UserContext'
+import React from 'react'
 import _ from 'lodash'
-import { ethers } from 'ethers'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-interface ProposalSidebarProps {
-    ceramicTemplate?: CeramicTemplateModel
-    ceramicProposal?: CeramicProposalModel
-    proposalStatus: ProposalStatus
-    currentUser: UserType
-    proposalStreamID: string
-    proposalCommitID?: string
-    proposalContract?: ethers.Contract
-    proposalsHub?: ProposalsHub
-    updateProposal: () => Promise<void>
-}
-
-const ProposalSidebar = ({
-    ceramicTemplate,
-    ceramicProposal,
-    proposalStatus,
-    currentUser,
-    proposalStreamID,
-    proposalCommitID,
-    updateProposal,
-}: ProposalSidebarProps) => {
-    const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
+const ProposalSidebar = () => {
+    const { currentUser } = useCurrentUser()
+    const { proposalStatus, proposalStack } = useProposal()
 
     const isProposalAuthor =
-        currentUser.selfID.did.id === ceramicProposal?.author
-
+        currentUser?.selfID.did.id === proposalStack?.proposalDoc.content.author
     const isTemplateAuthor =
-        currentUser.selfID.did.id === ceramicTemplate?.author
+        currentUser?.selfID.did.id === proposalStack?.templateDoc.content.author
 
-    /* useEffect(() => {
-        if (isProposalExecuted) {
-            initSolver()
-        }
-    }, [isProposalExecuted])
-
-    const initSolver = async () => {
-        if (currentUser.chainId && currentUser.signer) {
-            try {
-                const ipfsSolutionsHub = new IPFSSolutionsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-                const solvers = await ipfsSolutionsHub.getSolvers(
-                    proposal.solutionId
-                )
-                if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
-                setFirstSolverAddress(solvers[0])
-            } catch (e) {
-                cpLogger.push(e)
-            }
-        }
-    } */
-
-    //
-    const renderControlls = () => {
+    const renderControls = () => {
         switch (proposalStatus) {
             case ProposalStatus.Draft:
-                return (
-                    <>
-                        {isProposalAuthor && (
-                            <ProposalDraftSidebar
-                                updateProposal={updateProposal}
-                                currentUser={currentUser}
-                                proposalStreamID={proposalStreamID}
-                            />
-                        )}
-                    </>
-                )
+                return <>{isProposalAuthor && <ProposalDraftSidebar />}</>
             case ProposalStatus.OnReview:
-                return (
-                    <>
-                        {isTemplateAuthor && (
-                            <ProposalReviewSidebar
-                                currentUser={currentUser}
-                                proposalStreamID={proposalStreamID}
-                                updateProposal={updateProposal}
-                            />
-                        )}
-                    </>
-                )
+                return <>{isTemplateAuthor && <ProposalReviewSidebar />}</>
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && (
+                        {isProposalAuthor && proposalStack && (
                             <BaseFormGroupContainer
                                 border
                                 pad="medium"
@@ -107,7 +38,9 @@ const ProposalSidebar = ({
                             >
                                 <Text>Edit your proposal</Text>
                                 <Link
-                                    href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
+                                    href={`${
+                                        window.location.origin
+                                    }/dashboard/proposals/edit/${proposalStack.proposalDoc.id.toString()}`}
                                     passHref
                                 >
                                     <Button
@@ -120,7 +53,7 @@ const ProposalSidebar = ({
                         )}
                     </>
                 )
-            case ProposalStatus.Approved:
+            /*  case ProposalStatus.Approved:
                 return (
                     <>
                         {(isProposalAuthor || isTemplateAuthor) &&
@@ -136,28 +69,34 @@ const ProposalSidebar = ({
                                 />
                             )}
                     </>
-                )
+                ) */
             default:
                 return <></>
         }
     }
 
     return (
-        <Box gap="medium">
-            {renderControlls()}
-            <BaseFormContainer pad="medium" gap="medium">
-                <Messenger
-                    currentUser={currentUser}
-                    chatID={proposalStreamID}
-                    chatType={
-                        proposalStatus === ProposalStatus.Funding ||
-                        proposalStatus === ProposalStatus.Executed
-                            ? 'Proposal'
-                            : 'Draft'
-                    }
-                />
-            </BaseFormContainer>
-        </Box>
+        <>
+            {proposalStack && currentUser && (
+                <Box gap="medium">
+                    {renderControls()}
+                    {(isProposalAuthor || isTemplateAuthor) && (
+                        <BaseFormContainer pad="medium" gap="medium">
+                            <Messenger
+                                currentUser={currentUser}
+                                chatID={proposalStack.proposalDoc.id.toString()}
+                                chatType={
+                                    proposalStatus === ProposalStatus.Funding ||
+                                    proposalStatus === ProposalStatus.Executed
+                                        ? 'Proposal'
+                                        : 'Draft'
+                                }
+                            />
+                        </BaseFormContainer>
+                    )}
+                </Box>
+            )}
+        </>
     )
 }
 

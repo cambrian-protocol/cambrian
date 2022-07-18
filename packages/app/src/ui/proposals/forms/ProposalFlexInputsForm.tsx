@@ -1,35 +1,34 @@
 import { Box, Button, Form, FormField, Text } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 interface ProposalFlexInputsFormProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
-    onSubmit: () => Promise<void>
+    postRollSubmit?: () => void
     submitLabel?: string
-    onCancel: () => void
+    postRollCancel?: () => void
     cancelLabel?: string
-    composition: CompositionModel
 }
 
 // TODO Validation
 const ProposalFlexInputsForm = ({
-    proposalInput,
-    setProposalInput,
-    onSubmit,
+    postRollSubmit,
     submitLabel,
-    onCancel,
+    postRollCancel,
     cancelLabel,
-    composition,
 }: ProposalFlexInputsFormProps) => {
+    const {
+        proposalInput,
+        proposalStack,
+        setProposalInput,
+        onResetProposalInput,
+        onSaveProposal,
+    } = useProposal()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -38,7 +37,8 @@ const ProposalFlexInputsForm = ({
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        await onSubmit()
+        await onSaveProposal()
+        postRollSubmit && postRollSubmit()
         setIsSubmitting(false)
     }
 
@@ -46,42 +46,47 @@ const ProposalFlexInputsForm = ({
         <Form<FlexInputFormType[]> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
                 <Box height={{ min: 'auto' }}>
-                    {proposalInput.flexInputs.map((flexInput, idx) => {
-                        const type = getFlexInputType(
-                            composition.solvers,
-                            flexInput
-                        )
-                        return (
-                            <Box key={idx}>
-                                <FormField
-                                    label={flexInput.label}
-                                    type={type}
-                                    value={flexInput.value}
-                                    onChange={(e) => {
-                                        const inputsClone =
-                                            _.cloneDeep(proposalInput)
+                    {proposalInput &&
+                        proposalStack &&
+                        proposalInput.flexInputs.map((flexInput, idx) => {
+                            const type = getFlexInputType(
+                                proposalStack.compositionDoc.content.solvers,
+                                flexInput
+                            )
+                            return (
+                                <Box key={idx}>
+                                    <FormField
+                                        label={flexInput.label}
+                                        type={type}
+                                        value={flexInput.value}
+                                        onChange={(e) => {
+                                            const inputsClone =
+                                                _.cloneDeep(proposalInput)
 
-                                        inputsClone.flexInputs[idx].value =
-                                            e.target.value
+                                            inputsClone.flexInputs[idx].value =
+                                                e.target.value
 
-                                        setProposalInput(inputsClone)
-                                    }}
-                                />
-                                {flexInput.description !== '' && (
-                                    <Text size="small" color="dark-4">
-                                        {flexInput.description}
-                                    </Text>
-                                )}
-                            </Box>
-                        )
-                    })}
+                                            setProposalInput(inputsClone)
+                                        }}
+                                    />
+                                    {flexInput.description !== '' && (
+                                        <Text size="small" color="dark-4">
+                                            {flexInput.description}
+                                        </Text>
+                                    )}
+                                </Box>
+                            )
+                        })}
                 </Box>
                 <Box direction="row" justify="between" height={{ min: 'auto' }}>
                     <Button
                         size="small"
                         secondary
                         label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
+                        onClick={() => {
+                            onResetProposalInput()
+                            postRollCancel && postRollCancel()
+                        }}
                     />
                     <LoaderButton
                         isLoading={isSubmitting}

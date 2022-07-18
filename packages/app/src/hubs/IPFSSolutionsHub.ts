@@ -2,8 +2,8 @@ import { GENERAL_ERROR } from '../constants/ErrorMessages'
 import { IPFS_SOLUTIONS_HUB_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolutionModel } from '../models/SolutionModel'
-import { ethers } from 'ethers'
 import { SolverConfigModel } from '../models/SolverConfigModel'
+import { ethers } from 'ethers'
 
 export default class IPFSSolutionsHub {
     contract: ethers.Contract

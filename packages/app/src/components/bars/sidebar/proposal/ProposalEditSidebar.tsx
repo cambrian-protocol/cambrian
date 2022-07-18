@@ -1,56 +1,37 @@
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Box } from 'grommet'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalStartFundingComponent from './ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalSubmitComponent from './ProposalSubmitComponent'
-import { UserType } from '@cambrian/app/store/UserContext'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-interface ProposalEditSidebarProps {
-    currentUser: UserType
-    proposalStreamID: string
-    updateProposal: () => Promise<void>
-    proposalStatus: ProposalStatus
-    ceramicProposal: CeramicProposalModel
-    ceramicTemplate: CeramicTemplateModel
-}
+const ProposalEditSidebar = () => {
+    const { currentUser } = useCurrentUser()
+    const { proposalStatus, proposalStack } = useProposal()
 
-const ProposalEditSidebar = ({
-    currentUser,
-    proposalStreamID,
-    updateProposal,
-    proposalStatus,
-    ceramicProposal,
-    ceramicTemplate,
-}: ProposalEditSidebarProps) => {
     return (
         <Box gap="medium">
             {proposalStatus === ProposalStatus.Draft && (
-                <ProposalSubmitComponent
-                    updateProposal={updateProposal}
-                    currentUser={currentUser}
-                    proposalStreamID={proposalStreamID}
-                />
+                <ProposalSubmitComponent />
             )}
-            {proposalStatus === ProposalStatus.Approved &&
-                ceramicProposal &&
-                ceramicTemplate && (
-                    <ProposalStartFundingComponent
-                        proposalStreamID={proposalStreamID}
-                        currentUser={currentUser}
-                        ceramicProposal={ceramicProposal}
-                        ceramicTemplate={ceramicTemplate}
-                    />
+            {proposalStatus === ProposalStatus.Approved && (
+                <ProposalStartFundingComponent />
+            )}
+            {currentUser &&
+                proposalStack &&
+                proposalStack.templateDoc.content.receivedProposals[
+                    proposalStack.proposalDoc.id.toString()
+                ] && (
+                    <BaseFormContainer pad="medium" gap="medium">
+                        <Messenger
+                            currentUser={currentUser}
+                            chatID={proposalStack.proposalDoc.id.toString()}
+                            chatType={'Draft'}
+                        />
+                    </BaseFormContainer>
                 )}
-            <BaseFormContainer pad="medium" gap="medium">
-                <Messenger
-                    currentUser={currentUser}
-                    chatID={proposalStreamID}
-                    chatType={'Draft'}
-                />
-            </BaseFormContainer>
         </Box>
     )
 }

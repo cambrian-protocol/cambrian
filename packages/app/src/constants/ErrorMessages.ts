@@ -128,6 +128,10 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         title: 'Error while fetching Solution',
         logLevel: 1,
     },
+    SOLUTION_BASE_ERROR: {
+        title: 'Error while creating a Solution Base',
+        logLevel: 1,
+    },
 }
 
 export const CONTRACT_ERROR: ErrorMessagesType = {

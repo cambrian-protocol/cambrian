@@ -7,21 +7,21 @@ import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import IPFSSolutionsHub from '../hubs/IPFSSolutionsHub'
 import { ProposalStackType } from './../store/ProposalContext'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
 import { SelfID } from '@self.id/framework'
+import { SolverModel } from '../models/SolverModel'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
+import { ethers } from 'ethers'
 import initialComposer from '../store/composer/composer.init'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
-import { ethers } from 'ethers'
-import IPFSSolutionsHub from '../hubs/IPFSSolutionsHub'
-import { SolverModel } from '../models/SolverModel'
 
 export enum StageNames {
     composition = 'composition',
@@ -324,46 +324,77 @@ export default class CeramicStagehand {
         }
     }
 
+    approveProposal = async (
+        currentUser: UserType,
+        proposalStack: ProposalStackType
+    ) => {
+        try {
+            await this.deploySolutionBase(currentUser, proposalStack)
+
+            const proposalStreamID = proposalStack.proposalDoc.id.toString()
+
+            // Hit mailbox server
+            const res = await fetch(
+                `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
+                {
+                    method: 'POST',
+                    body: proposalStreamID,
+                }
+            )
+            if (res.status === 200) {
+                await this.updateProposalEntry(proposalStack.proposalDoc, {
+                    approved: true,
+                })
+                return true
+            }
+        } catch (e) {
+            cpLogger.push(e)
+        }
+    }
+
     deploySolutionBase = async (
         currentUser: UserType,
         proposalStack: ProposalStackType
     ) => {
-        const parsedSolvers = await this.getParsedSolvers(
-            proposalStack,
-            currentUser
-        )
-
-        if (parsedSolvers) {
-            // Pin solverConfigs separately to have access without metaData from Solution
-            const solverConfigsDoc = await this.saveSolverConfigs(
-                parsedSolvers,
-                proposalStack.proposalDoc.commitId.toString()
+        try {
+            const parsedSolvers = await this.getParsedSolvers(
+                proposalStack,
+                currentUser
             )
 
-            if (!solverConfigsDoc) {
-                throw new Error('AHH')
+            if (parsedSolvers) {
+                // Pin solverConfigs separately to have access without metaData from Solution
+                const solverConfigsDoc = await this.saveSolverConfigs(
+                    parsedSolvers,
+                    proposalStack.proposalDoc.commitId.toString()
+                )
+
+                if (!solverConfigsDoc)
+                    throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+
+                const solutionsHub = new IPFSSolutionsHub(
+                    currentUser.signer,
+                    currentUser.chainId
+                )
+
+                const solutionBaseId: string =
+                    this.getSolutionBaseId(proposalStack)
+
+                const transaction = await solutionsHub.createBase(
+                    solutionBaseId,
+                    parsedSolvers[0].collateralToken.address,
+                    parsedSolvers.map((solver) => solver.config),
+                    solverConfigsDoc.commitId.toString()
+                )
+                let rc = await transaction.wait()
+                const event = rc.events?.find(
+                    (event) => event.event === 'CreateBase'
+                )
+
+                if (!event) throw GENERAL_ERROR['SOLUTION_BASE_ERROR']
             }
-
-            const solutionsHub = new IPFSSolutionsHub(
-                currentUser.signer,
-                currentUser.chainId
-            )
-
-            const solutionBaseId: string = await this.getSolutionBaseId(
-                proposalStack
-            )
-
-            const transaction = await solutionsHub.createBase(
-                solutionBaseId,
-                parsedSolvers[0].collateralToken.address,
-                parsedSolvers.map((solver) => solver.config),
-                solverConfigsDoc.commitId.toString()
-            )
-            let rc = await transaction.wait()
-            const event = rc.events?.find(
-                (event) => event.event === 'CreateProposal'
-            )
-            const proposalId = event?.args && event.args.id
+        } catch (e) {
+            cpLogger.push(e)
         }
     }
 
@@ -548,25 +579,23 @@ export default class CeramicStagehand {
         }
     }
 
-    submitProposal = async (proposalStreamID: string) => {
+    submitProposal = async (
+        proposalDoc: TileDocument<CeramicProposalModel>
+    ) => {
         try {
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/proposeDraft`,
                 {
                     method: 'POST',
-                    body: proposalStreamID,
+                    body: proposalDoc.id.toString(),
                 }
             )
 
             if (res.status === 200) {
-                const proposalDoc = await TileDocument.load(
-                    this.selfID.client.ceramic,
-                    proposalStreamID
-                )
                 await proposalDoc.update({
                     ...(proposalDoc.content as CeramicProposalModel),
-                    submitted: true,
+                    isSubmitted: true,
                 })
                 return true
             }
@@ -622,56 +651,22 @@ export default class CeramicStagehand {
         }
     }
 
-    /**
-     * Sets the flag requestChange at the templates receivedProposals[proposalStreamID] commit-entry to true.
-     *
-     * @param proposalStreamID StreamID
-     * @auth Must be done by the template author
-     *
-     */
-    requestProposalChange = async (proposalStreamID: string) => {
+    requestProposalChange = async (
+        proposalDoc: TileDocument<CeramicProposalModel>
+    ) => {
         try {
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/requestChange`,
                 {
                     method: 'POST',
-                    body: proposalStreamID,
+                    body: proposalDoc.id.toString(),
                 }
             )
 
             if (res.status === 200) {
-                await this.updateProposalEntry(proposalStreamID, {
+                await this.updateProposalEntry(proposalDoc, {
                     requestChange: true,
-                })
-                return true
-            }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    /**
-     * Sets the flag approved at the templates receivedProposals[proposalStreamID] commit-entry to true and hits Trilobots approveProposal endpoint.
-     *
-     * @param proposalStreamID StreamID to flag the Proposal Commit at the template as approved
-     * @auth Must be done by the template author
-     *
-     */
-    approveProposal = async (proposalStreamID: string) => {
-        try {
-            // Hit mailbox server
-            const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
-                {
-                    method: 'POST',
-                    body: proposalStreamID,
-                }
-            )
-            if (res.status === 200) {
-                await this.updateProposalEntry(proposalStreamID, {
-                    approved: true,
                 })
                 return true
             }
@@ -684,30 +679,42 @@ export default class CeramicStagehand {
     /**
      * Adds a new entry for a submitted proposal at the templates receivedProposals
      *
-     * @param templateDoc
      * @param proposalDoc
      * @auth Must be done by the templater
      */
     registerNewProposalSubmission = async (
-        proposalDoc: TileDocument<CeramicProposalModel>,
-        templateDoc: TileDocument<CeramicTemplateModel>
+        proposalDoc: TileDocument<CeramicProposalModel>
     ) => {
         try {
+            const templateStreamDoc = (await this.loadStream(
+                proposalDoc.content.template.streamID
+            )) as TileDocument<CeramicTemplateModel>
+
             let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
-            if (templateDoc.content.receivedProposals) {
+            if (templateStreamDoc.content.receivedProposals) {
                 updatedReceivedProposals = _.cloneDeep(
-                    templateDoc.content.receivedProposals
+                    templateStreamDoc.content.receivedProposals
                 )
             }
 
-            updatedReceivedProposals[proposalDoc.id.toString()] = [
+            const proposalStreamID = proposalDoc.id.toString()
+            const proposalCommmitID = proposalDoc.commitId.toString()
+
+            if (!updatedReceivedProposals[proposalStreamID]) {
+                updatedReceivedProposals[proposalStreamID] = [
+                    {
+                        proposalCommitID: proposalCommmitID,
+                    },
+                ]
+            } else {
+                updatedReceivedProposals[proposalStreamID].push({
+                    proposalCommitID: proposalCommmitID,
+                })
+            }
+
+            await templateStreamDoc.update(
                 {
-                    proposalCommitID: proposalDoc.commitId.toString(),
-                },
-            ]
-            await templateDoc.update(
-                {
-                    ...templateDoc.content,
+                    ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
                 },
                 undefined,
@@ -728,27 +735,20 @@ export default class CeramicStagehand {
      *
      */
     updateProposalEntry = async (
-        proposalStreamID: string,
+        proposalDoc: TileDocument<CeramicProposalModel>,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
-        // Load Proposal
-        const proposalDoc = await this.loadStream(proposalStreamID)
-        if (!proposalDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        const proposalContent = proposalDoc.content as CeramicProposalModel
-
-        // Load Template
-        const templateDoc = await this.loadStream(
-            proposalContent.template.streamID
-        )
-        if (!templateDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        const templateContent = templateDoc.content as CeramicTemplateModel
+        // Load Stream Template
+        const templateDoc = (await this.loadStream(
+            proposalDoc.content.template.streamID
+        )) as TileDocument<CeramicTemplateModel>
 
         const updatedReceivedProposals = _.cloneDeep(
-            templateContent.receivedProposals
+            templateDoc.content.receivedProposals
         )
 
-        const proposalSubmissions = updatedReceivedProposals[proposalStreamID]
-
+        const proposalSubmissions =
+            updatedReceivedProposals[proposalDoc.id.toString()]
         if (!proposalSubmissions || proposalSubmissions.length === 0)
             throw Error('No Submissions found for provided Proposal StreamID.')
 
@@ -766,10 +766,9 @@ export default class CeramicStagehand {
             proposalCommitID: proposalDoc.commitId.toString(),
             ...updatedProposalEntry,
         }
-
         templateDoc.update(
             {
-                ...templateContent,
+                ...templateDoc.content,
                 receivedProposals: updatedReceivedProposals,
             },
             undefined,

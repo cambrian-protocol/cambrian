@@ -1,25 +1,18 @@
 import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 interface ProposalPricingFormProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
-    onSubmit: () => Promise<void>
+    postRollSubmit?: () => Promise<void>
     submitLabel?: string
-    onCancel: () => void
+    postRollCancel?: () => void
     cancelLabel?: string
-    template: CeramicTemplateModel
-    currentUser: UserType
 }
 
 type ProposalPricingFormType = {
@@ -29,15 +22,20 @@ type ProposalPricingFormType = {
 
 // TODO Validation
 const ProposalPricingForm = ({
-    onSubmit,
-    setProposalInput,
-    proposalInput,
-    template,
-    currentUser,
-    onCancel,
-    cancelLabel,
+    postRollSubmit,
     submitLabel,
+    postRollCancel,
+    cancelLabel,
 }: ProposalPricingFormProps) => {
+    const {
+        proposalInput,
+        setProposalInput,
+        proposalStack,
+        onSaveProposal,
+        onResetProposalInput,
+    } = useProposal()
+
+    const { currentUser } = useCurrentUser()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
 
@@ -46,12 +44,21 @@ const ProposalPricingForm = ({
     }, [])
 
     useEffect(() => {
-        initDenominationToken(template.price.denominationTokenAddress)
+        if (proposalStack) {
+            initDenominationToken(
+                proposalStack.templateDoc.content.price.denominationTokenAddress
+            )
+        }
     }, [])
 
     const initDenominationToken = async (address: string) => {
-        const token = await fetchTokenInfo(address, currentUser.web3Provider)
-        setDenominationToken(token)
+        if (currentUser) {
+            const token = await fetchTokenInfo(
+                address,
+                currentUser.web3Provider
+            )
+            setDenominationToken(token)
+        }
     }
 
     const handleSubmit = async (
@@ -59,14 +66,15 @@ const ProposalPricingForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        await onSaveProposal()
+        postRollSubmit && postRollSubmit()
         setIsSubmitting(false)
     }
 
     return (
         <Form<ProposalPricingFormType> onSubmit={handleSubmit}>
             <Box justify="between" height={{ min: '50vh' }}>
-                {denominationToken && (
+                {denominationToken && proposalStack && proposalInput && (
                     <>
                         <Box gap="medium">
                             <Box
@@ -76,14 +84,19 @@ const ProposalPricingForm = ({
                                 border
                                 elevation="small"
                             >
-                                {template.price.allowAnyPaymentToken ||
-                                (template.price.preferredTokens &&
-                                    template.price.preferredTokens.length >
-                                        0) ? (
+                                {proposalStack.templateDoc.content.price
+                                    .allowAnyPaymentToken ||
+                                (proposalStack.templateDoc.content.price
+                                    .preferredTokens &&
+                                    proposalStack.templateDoc.content.price
+                                        .preferredTokens.length > 0) ? (
                                     <>
                                         <Text>
                                             The seller quotes an equivalent of{' '}
-                                            {template.price?.amount}{' '}
+                                            {
+                                                proposalStack.templateDoc
+                                                    .content.price?.amount
+                                            }{' '}
                                             {denominationToken.symbol}
                                         </Text>
                                         <Text color="dark-4" size="small">
@@ -96,7 +109,10 @@ const ProposalPricingForm = ({
                                     <>
                                         <Text>
                                             The seller quotes{' '}
-                                            {template.price?.amount}{' '}
+                                            {
+                                                proposalStack.templateDoc
+                                                    .content.price?.amount
+                                            }{' '}
                                             {denominationToken.symbol}
                                         </Text>
                                         <Text color="dark-4" size="small">
@@ -127,7 +143,7 @@ const ProposalPricingForm = ({
                                     />
                                 </Box>
                                 <TokenInput
-                                    template={template}
+                                    template={proposalStack.templateDoc.content}
                                     denominationToken={denominationToken}
                                     proposalInput={proposalInput}
                                     setProposalInput={setProposalInput}
@@ -143,7 +159,10 @@ const ProposalPricingForm = ({
                                 size="small"
                                 secondary
                                 label={cancelLabel || 'Reset all changes'}
-                                onClick={onCancel}
+                                onClick={() => {
+                                    onResetProposalInput()
+                                    postRollCancel && postRollCancel()
+                                }}
                             />
                             <LoaderButton
                                 isLoading={isSubmitting}
