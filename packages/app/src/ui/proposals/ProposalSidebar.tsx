@@ -2,6 +2,7 @@ import { Box, Button, Text } from 'grommet'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import FundProposalForm from './forms/FundProposalForm'
 import Link from 'next/link'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalDraftSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalDraftSidebar'
@@ -15,7 +16,12 @@ import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const ProposalSidebar = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStatus, proposalStack, proposalStreamDoc } = useProposal()
+    const {
+        proposalStatus,
+        proposalStack,
+        proposalStreamDoc,
+        proposalContract,
+    } = useProposal()
 
     const isProposalAuthor =
         currentUser?.selfID.did.id === proposalStack?.proposal.author
@@ -56,6 +62,23 @@ const ProposalSidebar = () => {
                 )
             case ProposalStatus.Approved:
                 return <ProposalStartFundingComponent />
+            case ProposalStatus.Funding:
+                return (
+                    <>
+                        {currentUser && proposalContract && (
+                            <BaseFormGroupContainer
+                                border
+                                pad="medium"
+                                gap="medium"
+                            >
+                                <FundProposalForm
+                                    currentUser={currentUser}
+                                    proposal={proposalContract}
+                                />
+                            </BaseFormGroupContainer>
+                        )}
+                    </>
+                )
             default:
                 return <></>
         }
@@ -63,23 +86,27 @@ const ProposalSidebar = () => {
 
     return (
         <>
-            {proposalStreamDoc && currentUser && (
+            {currentUser && (
                 <Box gap="medium">
                     {renderControls()}
-                    {(isProposalAuthor || isTemplateAuthor) && proposalStack && (
-                        <BaseFormContainer pad="medium" gap="medium">
-                            <Messenger
-                                currentUser={currentUser}
-                                chatID={proposalStreamDoc.id.toString()}
-                                chatType={
-                                    proposalStatus === ProposalStatus.Funding ||
-                                    proposalStatus === ProposalStatus.Executed
-                                        ? 'Proposal'
-                                        : 'Draft'
-                                }
-                            />
-                        </BaseFormContainer>
-                    )}
+                    {(isProposalAuthor || isTemplateAuthor) &&
+                        proposalStack &&
+                        proposalStreamDoc && (
+                            <BaseFormContainer pad="medium" gap="medium">
+                                <Messenger
+                                    currentUser={currentUser}
+                                    chatID={proposalStreamDoc.id.toString()}
+                                    chatType={
+                                        proposalStatus ===
+                                            ProposalStatus.Funding ||
+                                        proposalStatus ===
+                                            ProposalStatus.Executed
+                                            ? 'Proposal'
+                                            : 'Draft'
+                                    }
+                                />
+                            </BaseFormContainer>
+                        )}
                 </Box>
             )}
         </>

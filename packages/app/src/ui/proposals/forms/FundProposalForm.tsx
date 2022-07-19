@@ -25,9 +25,7 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
-    proposalsHub: ProposalsHub
     currentUser: UserType
-    setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
 }
 
 type FundProposalFormType = {
@@ -38,12 +36,7 @@ const initialInput = {
     amount: 0,
 }
 
-const FundProposalForm = ({
-    proposal,
-    proposalsHub,
-    currentUser,
-    setIsProposalExecuted,
-}: FundProposalFormProps) => {
+const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
 
     // Necessary to access amount state in approvalListener
@@ -53,6 +46,10 @@ const FundProposalForm = ({
         _setInput(newInput)
     }
 
+    const proposalsHub = new ProposalsHub(
+        currentUser.signer,
+        currentUser.chainId
+    )
     const [funding, setFunding] = useState(BigNumber.from(0))
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
@@ -174,7 +171,8 @@ const FundProposalForm = ({
                     proposalId
                 )
                 if (updatedProposal && updatedProposal.isExecuted) {
-                    setIsProposalExecuted(true)
+                    // TODO Update proposal
+                    //setIsProposalExecuted(true)
                     setIsInPrimaryTransaction(false)
                 }
             }
