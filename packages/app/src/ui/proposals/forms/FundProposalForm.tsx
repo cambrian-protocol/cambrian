@@ -7,6 +7,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -17,6 +18,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -256,16 +258,14 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
                 if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
 
                 if (solution.solverConfigsURI) {
-                    const ipfs = new IPFSAPI()
-                    const solverConfigs = (await ipfs.getFromCID(
+                    const cs = new CeramicStagehand(currentUser.selfID)
+                    const ceramicSolverConfigs = (await cs.loadStream(
                         solution.solverConfigsURI
-                    )) as SolverConfigModel[]
-
-                    if (!solverConfigs) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
+                    )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>
 
                     await proposalsHub.executeProposal(
                         proposal.id,
-                        solverConfigs
+                        ceramicSolverConfigs.content.solverConfigs
                     )
                 }
             }

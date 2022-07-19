@@ -15,7 +15,8 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const EditProposalUI = () => {
-    const { proposalStatus, proposalInput, isLoaded } = useProposal()
+    const { proposalStack, proposalStatus, proposalInput, isLoaded } =
+        useProposal()
     const [activeIndex, setActiveIndex] = useState(0)
 
     // Scroll up when step changes
@@ -36,7 +37,12 @@ const EditProposalUI = () => {
             ) : proposalInput && isEditable ? (
                 <InteractionLayout
                     contextTitle={'Edit Proposal'}
-                    proposalHeader={<ProposalHeader />}
+                    proposalHeader={
+                        <ProposalHeader
+                            proposalStatus={proposalStatus}
+                            proposalStack={proposalStack}
+                        />
+                    }
                     sidebar={<ProposalEditSidebar />}
                 >
                     <Tabs

@@ -13,15 +13,23 @@ import {
 
 import { Button } from 'grommet'
 import Link from 'next/link'
+import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
 import { useState } from 'react'
 
-const ProposalHeader = () => {
-    const { proposalStack, proposalStatus } = useProposal()
+interface ProposalHeaderProps {
+    proposalStack?: ProposalStackType
+    proposalStatus: ProposalStatus
+}
+
+const ProposalHeader = ({
+    proposalStack,
+    proposalStatus,
+}: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
 
     const toggleShowTemplateInfoModal = () =>

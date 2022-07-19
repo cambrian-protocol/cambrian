@@ -8,7 +8,7 @@ import ProposalSidebar from './ProposalSidebar'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const ProposalUI = ({}) => {
-    const { isLoaded, proposalStack } = useProposal()
+    const { isLoaded, proposalStack, proposalStatus } = useProposal()
 
     return (
         <>
@@ -17,7 +17,12 @@ const ProposalUI = ({}) => {
             ) : proposalStack ? (
                 <InteractionLayout
                     contextTitle={proposalStack.proposal.title || 'Proposal'}
-                    proposalHeader={<ProposalHeader />}
+                    proposalHeader={
+                        <ProposalHeader
+                            proposalStack={proposalStack}
+                            proposalStatus={proposalStatus}
+                        />
+                    }
                     sidebar={<ProposalSidebar />}
                 >
                     <ProposalInfo

@@ -6,6 +6,7 @@ import FundProposalForm from './forms/FundProposalForm'
 import Link from 'next/link'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalDraftSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalDraftSidebar'
+import ProposalExecutedSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalExecutedSidebar'
 import ProposalReviewSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewSidebar'
 import ProposalStartFundingComponent from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
@@ -79,6 +80,8 @@ const ProposalSidebar = () => {
                         )}
                     </>
                 )
+            case ProposalStatus.Executed:
+                return <ProposalExecutedSidebar />
             default:
                 return <></>
         }
@@ -114,27 +117,3 @@ const ProposalSidebar = () => {
 }
 
 export default ProposalSidebar
-
-/*  {isProposalExecuted && firstSolverAddress ? (
-                <SidebarComponentContainer
-                title="Interaction"
-                    description="This Proposal has been funded and executed. To start
-                    working with this Solution visit the first Solver"
-                    >
-                    <Link href={`/solvers/${firstSolverAddress}`} passHref>
-                    <Button primary size="small" label="Go to Solver" />
-                    </Link>
-                    </SidebarComponentContainer>
-                    ) : (
-                        <SidebarComponentContainer
-                        title="Fund this Proposal"
-                        description="If you agree to the conditions, you can approve access to the agreed token and fund this proposal. You can withdraw your invested funds anytime before the proposal has been executed."
-                        >
-                        <FundProposalForm
-                        currentUser={currentUser}
-                        proposalsHub={proposalsHub}
-                        proposal={proposal}
-                        setIsProposalExecuted={setIsProposalExecuted}
-                        />
-                        </SidebarComponentContainer>
-                    )} */

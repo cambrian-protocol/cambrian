@@ -1,7 +1,10 @@
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export const getProposalStatus = (
     proposalDoc: TileDocument<CeramicProposalModel>,
@@ -40,7 +43,6 @@ export const getProposalStatus = (
 /**
  * Returns the latest registered proposalCommit from the templateStream
  *
- * @param proposalDoc Proposal STREAM TileDocument
  * @param templateDoc Template STREAM TileDocument
  * @returns The latest registered proposal submission from the templates receivedProposals
  */
@@ -58,5 +60,28 @@ export const getLatestProposalSubmission = (
         if (latestProposalCommit) {
             return latestProposalCommit
         }
+    }
+}
+
+export const getOnChainProposal = async (
+    currentUser: UserType,
+    proposalStreamDoc: TileDocument<CeramicProposalModel>,
+    ceramicStagehand: CeramicStagehand
+) => {
+    const proposalsHub = new ProposalsHub(
+        currentUser.signer,
+        currentUser.chainId
+    )
+    const proposalID = await ceramicStagehand.getOnChainProposalId(
+        proposalStreamDoc.commitId.toString(),
+        proposalStreamDoc.content.template.commitID
+    )
+    const res = await proposalsHub.getProposal(proposalID)
+
+    if (
+        res.id !==
+        '0x0000000000000000000000000000000000000000000000000000000000000000'
+    ) {
+        return res
     }
 }
