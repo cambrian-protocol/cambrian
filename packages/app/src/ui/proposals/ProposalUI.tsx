@@ -16,14 +16,12 @@ const ProposalUI = ({}) => {
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
             ) : proposalStack ? (
                 <InteractionLayout
-                    contextTitle={
-                        proposalStack.proposalDoc.content.title || 'Proposal'
-                    }
+                    contextTitle={proposalStack.proposal.title || 'Proposal'}
                     proposalHeader={<ProposalHeader />}
                     sidebar={<ProposalSidebar />}
                 >
                     <ProposalInfo
-                        ceramicProposal={proposalStack.proposalDoc.content}
+                        ceramicProposal={proposalStack.proposal}
                         hideTitle
                     />
                 </InteractionLayout>

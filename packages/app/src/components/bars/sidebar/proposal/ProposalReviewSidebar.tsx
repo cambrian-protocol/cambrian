@@ -12,7 +12,7 @@ import { useState } from 'react'
 
 const ProposalReviewSidebar = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack, updateProposal } = useProposal()
+    const { proposalStack, proposalStreamDoc, updateProposal } = useProposal()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -20,25 +20,28 @@ const ProposalReviewSidebar = () => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (currentUser && proposalStack) {
+        if (currentUser && proposalStack && proposalStreamDoc) {
             try {
                 const cs = new CeramicStagehand(currentUser.selfID)
-                await cs.approveProposal(currentUser, proposalStack)
+                await cs.approveProposal(
+                    currentUser,
+                    proposalStreamDoc,
+                    proposalStack
+                )
                 await updateProposal()
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))
             }
         }
-
         setIsApproving(false)
     }
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (currentUser && proposalStack) {
+        if (currentUser && proposalStreamDoc) {
             try {
                 const cs = new CeramicStagehand(currentUser.selfID)
-                await cs.requestProposalChange(proposalStack.proposalDoc)
+                await cs.requestProposalChange(proposalStreamDoc)
                 await updateProposal()
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))

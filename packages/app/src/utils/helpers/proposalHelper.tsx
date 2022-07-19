@@ -45,11 +45,11 @@ export const getProposalStatus = (
  * @returns The latest registered proposal submission from the templates receivedProposals
  */
 export const getLatestProposalSubmission = (
-    proposalDoc: TileDocument<CeramicProposalModel>,
+    proposalStreamID: string,
     templateDoc: TileDocument<CeramicTemplateModel>
 ) => {
     const registeredProposal =
-        templateDoc.content.receivedProposals[proposalDoc.id.toString()]
+        templateDoc.content.receivedProposals[proposalStreamID]
 
     if (registeredProposal) {
         const latestProposalCommit =

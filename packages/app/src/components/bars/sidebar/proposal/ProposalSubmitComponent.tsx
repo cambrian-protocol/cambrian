@@ -16,7 +16,7 @@ import { useState } from 'react'
 
 const ProposalSubmitComponent = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack } = useProposal()
+    const { proposalStreamDoc } = useProposal()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -26,14 +26,14 @@ const ProposalSubmitComponent = () => {
         setIsSubmitting(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStack) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+            if (!proposalStreamDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStack.proposalDoc)
+            await ceramicStagehand.submitProposal(proposalStreamDoc)
             router.push(
                 `${
                     window.location.origin
-                }/proposals/${proposalStack.proposalDoc.id.toString()}`
+                }/proposals/${proposalStreamDoc?.id.toString()}`
             )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))

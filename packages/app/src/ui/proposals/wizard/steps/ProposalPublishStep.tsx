@@ -17,7 +17,7 @@ import { useState } from 'react'
 
 const ProposalPublishStep = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack } = useProposal()
+    const { proposalStreamDoc } = useProposal()
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -26,14 +26,14 @@ const ProposalPublishStep = () => {
         setIsSubmitting(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStack) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+            if (!proposalStreamDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStack.proposalDoc)
+            await ceramicStagehand.submitProposal(proposalStreamDoc)
             router.push(
                 `${
                     window.location.origin
-                }/proposals/${proposalStack.proposalDoc.id.toString()}`
+                }/proposals/${proposalStreamDoc.id.toString()}`
             )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -44,12 +44,12 @@ const ProposalPublishStep = () => {
         <>
             <Box height={{ min: '60vh' }} justify="between">
                 <HeaderTextSection title="Proposal ready to submit" />
-                {proposalStack && (
+                {proposalStreamDoc && (
                     <Box direction="row" justify="between">
                         <Link
                             href={`${
                                 window.location.origin
-                            }/dashboard/proposals/edit/${proposalStack.proposalDoc.id.toString()}`}
+                            }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
                             passHref
                         >
                             <Button

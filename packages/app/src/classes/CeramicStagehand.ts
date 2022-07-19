@@ -8,7 +8,7 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '../hubs/IPFSSolutionsHub'
-import { ProposalStackType } from './../store/ProposalContext'
+import { ProposalStackType } from '../store/ProposalContext'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
 import { SelfID } from '@self.id/framework'
@@ -326,26 +326,31 @@ export default class CeramicStagehand {
 
     approveProposal = async (
         currentUser: UserType,
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         try {
-            await this.deploySolutionBase(currentUser, proposalStack)
-
-            const proposalStreamID = proposalStack.proposalDoc.id.toString()
-
-            // Hit mailbox server
-            const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
-                {
-                    method: 'POST',
-                    body: proposalStreamID,
-                }
+            const success = await this.deploySolutionBase(
+                currentUser,
+                proposalStreamDoc,
+                proposalStack
             )
-            if (res.status === 200) {
-                await this.updateProposalEntry(proposalStack.proposalDoc, {
-                    approved: true,
-                })
-                return true
+
+            if (success) {
+                // Hit mailbox server
+                const res = await fetch(
+                    `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
+                    {
+                        method: 'POST',
+                        body: proposalStreamDoc.id.toString(),
+                    }
+                )
+                if (res.status === 200) {
+                    await this.updateProposalEntry(proposalStreamDoc, {
+                        approved: true,
+                    })
+                    return true
+                }
             }
         } catch (e) {
             cpLogger.push(e)
@@ -354,6 +359,7 @@ export default class CeramicStagehand {
 
     deploySolutionBase = async (
         currentUser: UserType,
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         try {
@@ -366,7 +372,7 @@ export default class CeramicStagehand {
                 // Pin solverConfigs separately to have access without metaData from Solution
                 const solverConfigsDoc = await this.saveSolverConfigs(
                     parsedSolvers,
-                    proposalStack.proposalDoc.commitId.toString()
+                    proposalStreamDoc.commitId.toString()
                 )
 
                 if (!solverConfigsDoc)
@@ -377,8 +383,10 @@ export default class CeramicStagehand {
                     currentUser.chainId
                 )
 
-                const solutionBaseId: string =
-                    this.getSolutionBaseId(proposalStack)
+                const solutionBaseId: string = this.getSolutionBaseId(
+                    proposalStreamDoc.commitId.toString(),
+                    proposalStack.proposal.template.commitID
+                )
 
                 const transaction = await solutionsHub.createBase(
                     solutionBaseId,
@@ -390,8 +398,7 @@ export default class CeramicStagehand {
                 const event = rc.events?.find(
                     (event) => event.event === 'CreateBase'
                 )
-
-                if (!event) throw GENERAL_ERROR['SOLUTION_BASE_ERROR']
+                if (event) return true
             }
         } catch (e) {
             cpLogger.push(e)
@@ -400,6 +407,7 @@ export default class CeramicStagehand {
 
     deployProposal = async (
         currentUser: UserType,
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         // TODO Sanity check function that this is approved
@@ -414,12 +422,10 @@ export default class CeramicStagehand {
             // URI will differ from that on the Solution Base, but it should refer to identical data
             const solverConfigsDoc = await this.saveSolverConfigs(
                 parsedSolvers,
-                proposalStack.proposalDoc.commitId.toString()
+                proposalStreamDoc.commitId.toString()
             )
 
-            if (!solverConfigsDoc) {
-                throw new Error('AHH')
-            }
+            if (!solverConfigsDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 
             const proposalsHub = new ProposalsHub(
                 currentUser.signer,
@@ -427,22 +433,23 @@ export default class CeramicStagehand {
             )
 
             const solutionSafeBaseId: string = await this.getSolutionSafeBaseId(
-                currentUser,
-                proposalStack
+                proposalStreamDoc.commitId.toString(),
+                proposalStack.proposal.template.commitID
             )
 
             const transaction = await proposalsHub.createProposal(
                 parsedSolvers[0].collateralToken,
-                proposalStack.proposalDoc.content.price.amount,
+                proposalStreamDoc.content.price.amount,
                 solutionSafeBaseId,
                 parsedSolvers.map((solver) => solver.config),
-                proposalStack.proposalDoc.commitId.toString()
+                proposalStreamDoc.commitId.toString()
             )
             let rc = await transaction.wait()
             const event = rc.events?.find(
                 (event) => event.event === 'CreateProposal'
             )
-            const proposalId = event?.args && event.args.id
+            console.log(event)
+            if (!event) throw GENERAL_ERROR['PROPOSAL_DEPLOY_ERROR']
 
             // Note, we should be able to determine the ProposalID now (no need to save it somewhere)
             // If for some reason some POS wants to DOS we can save the correct id nonce
@@ -450,23 +457,26 @@ export default class CeramicStagehand {
         }
     }
 
-    getSolutionBaseId = (proposalStack: ProposalStackType) => {
+    getSolutionBaseId = (
+        proposalCommitID: string,
+        templateCommitID: string
+    ) => {
         return ethers.utils.keccak256(
             ethers.utils.defaultAbiCoder.encode(
                 ['string', 'string'],
-                [
-                    proposalStack.templateDoc.commitId.toString(),
-                    proposalStack.proposalDoc.commitId.toString(),
-                ]
+                [templateCommitID, proposalCommitID]
             )
         )
     }
 
     getSolutionSafeBaseId = async (
-        currentUser: UserType,
-        proposalStack: ProposalStackType
+        proposalCommitID: string,
+        templateCommitID: string
     ) => {
-        const baseId = this.getSolutionBaseId(proposalStack)
+        const baseId = this.getSolutionBaseId(
+            proposalCommitID,
+            templateCommitID
+        )
 
         let nonce = 1 // Default nonce is 1
 
@@ -492,12 +502,12 @@ export default class CeramicStagehand {
     }
 
     getOnChainProposalId = async (
-        currentUser: UserType,
-        proposalStack: ProposalStackType
+        proposalCommitID: string,
+        templateCommitID: string
     ) => {
         const solutionSafeBaseId = await this.getSolutionSafeBaseId(
-            currentUser,
-            proposalStack
+            proposalCommitID,
+            templateCommitID
         )
         let nonce = 1
         // TODO Same idea as above. Somebody may have front-ran the proposalId we expected
@@ -507,12 +517,8 @@ export default class CeramicStagehand {
 
         return ethers.utils.keccak256(
             ethers.utils.defaultAbiCoder.encode(
-                ['bytes32', 'uint256'],
-                [
-                    solutionSafeBaseId,
-                    proposalStack.proposalDoc.commitId.toString(),
-                    nonce,
-                ]
+                ['bytes32', 'string', 'uint256'],
+                [solutionSafeBaseId, proposalCommitID, nonce]
             )
         )
     }
@@ -610,16 +616,16 @@ export default class CeramicStagehand {
     ) => {
         const _compositionWithFlexInputs = mergeFlexIntoComposition(
             mergeFlexIntoComposition(
-                proposalStack.compositionDoc.content,
-                proposalStack.templateDoc.content.flexInputs
+                proposalStack.composition,
+                proposalStack.template.flexInputs
             ),
-            proposalStack.proposalDoc.content.flexInputs
+            proposalStack.proposal.flexInputs
         )
 
-        if (proposalStack.templateDoc.content.price.isCollateralFlex) {
+        if (proposalStack.template.price.isCollateralFlex) {
             _compositionWithFlexInputs.solvers.forEach((solver) => {
                 solver.config.collateralToken =
-                    proposalStack.proposalDoc.content.price.tokenAddress
+                    proposalStack.proposal.price.tokenAddress
             })
         }
 
@@ -631,23 +637,26 @@ export default class CeramicStagehand {
         return _parsedSolvers
     }
 
-    loadProposalStack = async (proposalStreamOrCommitID: string) => {
-        const _proposalDoc = (await this.loadStream(
-            proposalStreamOrCommitID
-        )) as TileDocument<CeramicProposalModel>
+    loadAndCloneProposalStack = async (proposalCommitID: string) => {
+        const _proposalCommitContent = _.cloneDeep(
+            (await this.loadStream(proposalCommitID))
+                .content as CeramicProposalModel
+        )
 
-        const _templateDoc = (await this.loadStream(
-            _proposalDoc.content.template.commitID
-        )) as TileDocument<CeramicTemplateModel>
+        const _templateCommitContent = _.cloneDeep(
+            (await this.loadStream(_proposalCommitContent.template.commitID))
+                .content as CeramicTemplateModel
+        )
 
-        const _compositionDoc = (await this.loadStream(
-            _templateDoc.content.composition.commitID
-        )) as TileDocument<CompositionModel>
+        const _compositionCommitContent = _.cloneDeep(
+            (await this.loadStream(_templateCommitContent.composition.commitID))
+                .content as CompositionModel
+        )
 
         return {
-            proposalDoc: _proposalDoc,
-            templateDoc: _templateDoc,
-            compositionDoc: _compositionDoc,
+            proposal: _proposalCommitContent,
+            template: _templateCommitContent,
+            composition: _compositionCommitContent,
         }
     }
 
@@ -679,17 +688,13 @@ export default class CeramicStagehand {
     /**
      * Adds a new entry for a submitted proposal at the templates receivedProposals
      *
-     * @param proposalDoc
      * @auth Must be done by the templater
      */
     registerNewProposalSubmission = async (
-        proposalDoc: TileDocument<CeramicProposalModel>
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
+        templateStreamDoc: TileDocument<CeramicTemplateModel>
     ) => {
         try {
-            const templateStreamDoc = (await this.loadStream(
-                proposalDoc.content.template.streamID
-            )) as TileDocument<CeramicTemplateModel>
-
             let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
             if (templateStreamDoc.content.receivedProposals) {
                 updatedReceivedProposals = _.cloneDeep(
@@ -697,8 +702,8 @@ export default class CeramicStagehand {
                 )
             }
 
-            const proposalStreamID = proposalDoc.id.toString()
-            const proposalCommmitID = proposalDoc.commitId.toString()
+            const proposalStreamID = proposalStreamDoc.id.toString()
+            const proposalCommmitID = proposalStreamDoc.commitId.toString()
 
             if (!updatedReceivedProposals[proposalStreamID]) {
                 updatedReceivedProposals[proposalStreamID] = [

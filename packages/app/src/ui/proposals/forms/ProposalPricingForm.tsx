@@ -46,7 +46,7 @@ const ProposalPricingForm = ({
     useEffect(() => {
         if (proposalStack) {
             initDenominationToken(
-                proposalStack.templateDoc.content.price.denominationTokenAddress
+                proposalStack.template.price.denominationTokenAddress
             )
         }
     }, [])
@@ -84,18 +84,17 @@ const ProposalPricingForm = ({
                                 border
                                 elevation="small"
                             >
-                                {proposalStack.templateDoc.content.price
+                                {proposalStack.template.price
                                     .allowAnyPaymentToken ||
-                                (proposalStack.templateDoc.content.price
-                                    .preferredTokens &&
-                                    proposalStack.templateDoc.content.price
-                                        .preferredTokens.length > 0) ? (
+                                (proposalStack.template.price.preferredTokens &&
+                                    proposalStack.template.price.preferredTokens
+                                        .length > 0) ? (
                                     <>
                                         <Text>
                                             The seller quotes an equivalent of{' '}
                                             {
-                                                proposalStack.templateDoc
-                                                    .content.price?.amount
+                                                proposalStack.template.price
+                                                    ?.amount
                                             }{' '}
                                             {denominationToken.symbol}
                                         </Text>
@@ -110,8 +109,8 @@ const ProposalPricingForm = ({
                                         <Text>
                                             The seller quotes{' '}
                                             {
-                                                proposalStack.templateDoc
-                                                    .content.price?.amount
+                                                proposalStack.template.price
+                                                    ?.amount
                                             }{' '}
                                             {denominationToken.symbol}
                                         </Text>
@@ -143,7 +142,7 @@ const ProposalPricingForm = ({
                                     />
                                 </Box>
                                 <TokenInput
-                                    template={proposalStack.templateDoc.content}
+                                    template={proposalStack.template}
                                     denominationToken={denominationToken}
                                     proposalInput={proposalInput}
                                     setProposalInput={setProposalInput}

@@ -9,7 +9,8 @@ import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const ProposalEditSidebar = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStatus, proposalStack } = useProposal()
+    const { proposalStatus, templateStreamDoc, proposalStreamDoc } =
+        useProposal()
 
     return (
         <Box gap="medium">
@@ -20,14 +21,14 @@ const ProposalEditSidebar = () => {
                 <ProposalStartFundingComponent />
             )}
             {currentUser &&
-                proposalStack &&
-                proposalStack.templateDoc.content.receivedProposals[
-                    proposalStack.proposalDoc.id.toString()
+                proposalStreamDoc &&
+                templateStreamDoc?.content.receivedProposals[
+                    proposalStreamDoc?.id.toString()
                 ] && (
                     <BaseFormContainer pad="medium" gap="medium">
                         <Messenger
                             currentUser={currentUser}
-                            chatID={proposalStack.proposalDoc.id.toString()}
+                            chatID={proposalStreamDoc.id.toString()}
                             chatType={'Draft'}
                         />
                     </BaseFormContainer>

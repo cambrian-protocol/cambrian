@@ -15,7 +15,6 @@ export default class IPFSSolutionsHub {
     ) {
         const chainData = SUPPORTED_CHAINS[chainId]
         if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
-
         this.contract = new ethers.Contract(
             chainData.contracts.ipfsSolutionsHub,
             IPFS_SOLUTIONS_HUB_IFACE,
@@ -37,7 +36,6 @@ export default class IPFSSolutionsHub {
         const tx: ethers.ContractTransaction = await this.contract.createBase(
             baseId,
             collateralToken,
-            SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
             solverConfigs,
             solverConfigsURI
         )

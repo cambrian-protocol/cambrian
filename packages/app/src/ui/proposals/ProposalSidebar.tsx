@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalDraftSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalDraftSidebar'
 import ProposalReviewSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewSidebar'
+import ProposalStartFundingComponent from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingComponent'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import React from 'react'
 import _ from 'lodash'
@@ -14,12 +15,12 @@ import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const ProposalSidebar = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStatus, proposalStack } = useProposal()
+    const { proposalStatus, proposalStack, proposalStreamDoc } = useProposal()
 
     const isProposalAuthor =
-        currentUser?.selfID.did.id === proposalStack?.proposalDoc.content.author
+        currentUser?.selfID.did.id === proposalStack?.proposal.author
     const isTemplateAuthor =
-        currentUser?.selfID.did.id === proposalStack?.templateDoc.content.author
+        currentUser?.selfID.did.id === proposalStack?.template.author
 
     const renderControls = () => {
         switch (proposalStatus) {
@@ -30,7 +31,7 @@ const ProposalSidebar = () => {
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && proposalStack && (
+                        {isProposalAuthor && proposalStreamDoc && (
                             <BaseFormGroupContainer
                                 border
                                 pad="medium"
@@ -40,7 +41,7 @@ const ProposalSidebar = () => {
                                 <Link
                                     href={`${
                                         window.location.origin
-                                    }/dashboard/proposals/edit/${proposalStack.proposalDoc.id.toString()}`}
+                                    }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
                                     passHref
                                 >
                                     <Button
@@ -53,23 +54,8 @@ const ProposalSidebar = () => {
                         )}
                     </>
                 )
-            /*  case ProposalStatus.Approved:
-                return (
-                    <>
-                        {(isProposalAuthor || isTemplateAuthor) &&
-                            ceramicProposal &&
-                            ceramicTemplate &&
-                            proposalCommitID && (
-                                <ProposalStartFundingComponent
-                                    proposalCommitID={proposalCommitID}
-                                    proposalStreamID={proposalStreamID}
-                                    currentUser={currentUser}
-                                    ceramicProposal={ceramicProposal}
-                                    ceramicTemplate={ceramicTemplate}
-                                />
-                            )}
-                    </>
-                ) */
+            case ProposalStatus.Approved:
+                return <ProposalStartFundingComponent />
             default:
                 return <></>
         }
@@ -77,14 +63,14 @@ const ProposalSidebar = () => {
 
     return (
         <>
-            {proposalStack && currentUser && (
+            {proposalStreamDoc && currentUser && (
                 <Box gap="medium">
                     {renderControls()}
-                    {(isProposalAuthor || isTemplateAuthor) && (
+                    {(isProposalAuthor || isTemplateAuthor) && proposalStack && (
                         <BaseFormContainer pad="medium" gap="medium">
                             <Messenger
                                 currentUser={currentUser}
-                                chatID={proposalStack.proposalDoc.id.toString()}
+                                chatID={proposalStreamDoc.id.toString()}
                                 chatType={
                                     proposalStatus === ProposalStatus.Funding ||
                                     proposalStatus === ProposalStatus.Executed

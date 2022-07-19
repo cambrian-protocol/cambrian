@@ -50,7 +50,7 @@ const ProposalFlexInputsForm = ({
                         proposalStack &&
                         proposalInput.flexInputs.map((flexInput, idx) => {
                             const type = getFlexInputType(
-                                proposalStack.compositionDoc.content.solvers,
+                                proposalStack.composition.solvers,
                                 flexInput
                             )
                             return (

@@ -50,7 +50,7 @@ const ProposalHeader = () => {
                                     />
                                 </Box>
                                 <Heading>
-                                    {proposalStack?.proposalDoc.content.title ||
+                                    {proposalStack?.proposal.title ||
                                         'Untitled Proposal'}
                                 </Heading>
                             </Box>
@@ -164,7 +164,7 @@ const ProposalHeader = () => {
             </ResponsiveContext.Consumer>
             {showTemplateInfoModal && proposalStack && (
                 <TemplateInfoModal
-                    ceramicTemplate={proposalStack.templateDoc.content}
+                    ceramicTemplate={proposalStack.template}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}

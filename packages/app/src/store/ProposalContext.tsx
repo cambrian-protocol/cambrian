@@ -9,6 +9,7 @@ import { CeramicProposalModel } from '../models/ProposalModel'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStatus } from '../models/ProposalStatus'
+import ProposalsHub from '../hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
@@ -17,6 +18,8 @@ import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export type ProposalContextType = {
     proposalStack?: ProposalStackType
+    proposalStreamDoc?: TileDocument<CeramicProposalModel>
+    templateStreamDoc?: TileDocument<CeramicTemplateModel>
     proposalContract?: ethers.Contract
     proposalStatus: ProposalStatus
     updateProposal: () => Promise<void>
@@ -43,9 +46,9 @@ export const ProposalContext = React.createContext<ProposalContextType>({
 })
 
 export type ProposalStackType = {
-    proposalDoc: TileDocument<CeramicProposalModel>
-    templateDoc: TileDocument<CeramicTemplateModel>
-    compositionDoc: TileDocument<CompositionModel>
+    proposal: CeramicProposalModel
+    template: CeramicTemplateModel
+    composition: CompositionModel
 }
 
 export const ProposalContextProvider: React.FunctionComponent<ProposalProviderProps> =
@@ -53,11 +56,16 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const { currentUser } = useCurrentUser()
         const [ceramicStagehand, setCeramicStagehand] =
             useState<CeramicStagehand>()
-        const [proposalStack, setProposalStack] = useState<ProposalStackType>()
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown
         )
+        // Clones of the commit contents
+        const [proposalStack, setProposalStack] = useState<ProposalStackType>()
         const [isLoaded, setIsLoaded] = useState(false)
+        const [proposalStreamDoc, setProposalStreamDoc] =
+            useState<TileDocument<CeramicProposalModel>>()
+        const [templateStreamDoc, setTemplateStreamDoc] =
+            useState<TileDocument<CeramicTemplateModel>>()
 
         // Used for editing the proposal
         const [proposalInput, setProposalInput] =
@@ -79,45 +87,68 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const initProposal = async () => {
             if (currentUser && ceramicStagehand) {
                 try {
-                    const _proposalStack =
-                        await ceramicStagehand.loadProposalStack(
+                    const _proposalStreamDoc =
+                        (await ceramicStagehand.loadStream(
                             proposalStreamID
+                        )) as TileDocument<CeramicProposalModel>
+
+                    const proposalsHub = new ProposalsHub(
+                        currentUser.signer,
+                        currentUser.chainId
+                    )
+                    const proposalID =
+                        await ceramicStagehand.getOnChainProposalId(
+                            _proposalStreamDoc.commitId.toString(),
+                            _proposalStreamDoc.content.template.commitID
+                        )
+                    const res = await proposalsHub.getProposal(proposalID)
+                    console.log('On Chain Proposal', res)
+
+                    const _proposalStackClones =
+                        await ceramicStagehand.loadAndCloneProposalStack(
+                            _proposalStreamDoc.commitId.toString()
                         )
 
                     const _templateStreamDoc =
                         (await ceramicStagehand.loadStream(
-                            _proposalStack.proposalDoc.content.template.streamID
+                            _proposalStreamDoc.content.template.streamID
                         )) as TileDocument<CeramicTemplateModel>
 
-                    const _latestProposalSubmit = getLatestProposalSubmission(
-                        _proposalStack.proposalDoc,
-                        _templateStreamDoc
+                    console.log('Clones', _proposalStackClones)
+                    console.log('template stream', _templateStreamDoc)
+
+                    const _latestProposalSubmission =
+                        getLatestProposalSubmission(
+                            proposalStreamID,
+                            _templateStreamDoc
+                        )
+
+                    console.log(
+                        'Latest Proposal Submission',
+                        _latestProposalSubmission
                     )
 
                     let _proposalStatus: ProposalStatus = ProposalStatus.Unknown
-                    // Init stack - Just the proposal author is allowed to see his unsubmitted proposals
+
                     if (
-                        !_proposalStack.proposalDoc.content.isSubmitted &&
+                        !_proposalStackClones.proposal.isSubmitted &&
                         currentUser.selfID.did.id !==
-                            _proposalStack.proposalDoc.content.author
+                            _proposalStackClones.proposal.author
                     ) {
-                        if (_latestProposalSubmit) {
-                            // A previous submit is existent, we fetch and init that one.
+                        if (_latestProposalSubmission) {
                             _proposalStatus = ProposalStatus.ChangeRequested
                             setProposalStatus(_proposalStatus)
                             setProposalStack(
-                                _.cloneDeep(
-                                    await ceramicStagehand.loadProposalStack(
-                                        _latestProposalSubmit.proposalCommitID
-                                    )
+                                await ceramicStagehand.loadAndCloneProposalStack(
+                                    _latestProposalSubmission.proposalCommitID
                                 )
                             )
                         }
                         // Note: If there are no latest submissions, no stack will be set
                     } else {
-                        setProposalStack(_proposalStack)
+                        setProposalStack(_proposalStackClones)
                         _proposalStatus = getProposalStatus(
-                            _proposalStack.proposalDoc,
+                            _proposalStreamDoc,
                             _templateStreamDoc
                         )
                         setProposalStatus(_proposalStatus)
@@ -125,14 +156,35 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                     // Register new submitted proposal if user is template author
                     if (
-                        _proposalStack.proposalDoc.content.isSubmitted &&
-                        _latestProposalSubmit?.proposalCommitID !==
-                            _proposalStack.proposalDoc.commitId.toString() &&
+                        _proposalStreamDoc.content.isSubmitted &&
+                        _latestProposalSubmission?.proposalCommitID !==
+                            _proposalStreamDoc.commitId.toString() &&
                         currentUser.selfID.did.id ===
-                            _proposalStack.templateDoc.content.author
+                            _proposalStackClones.template.author
                     ) {
+                        console.log('Registered a new submission')
+                        console.log(
+                            'Was submitted',
+                            _proposalStreamDoc.content.isSubmitted
+                        )
+                        console.log(
+                            '_latestProposalSubmission?.proposalCommitID',
+                            _latestProposalSubmission?.proposalCommitID
+                        )
+                        console.log(
+                            '_proposalStreamDoc.commitId.toString()',
+                            _proposalStreamDoc.commitId.toString()
+                        )
+
+                        console.log(
+                            'is author',
+                            currentUser.selfID.did.id ===
+                                _proposalStackClones.template.author
+                        )
+
                         await ceramicStagehand.registerNewProposalSubmission(
-                            _proposalStack.proposalDoc
+                            _proposalStreamDoc,
+                            _templateStreamDoc
                         )
                     }
 
@@ -142,13 +194,16 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             _proposalStatus ===
                                 ProposalStatus.ChangeRequested) &&
                         currentUser?.selfID.did.id ===
-                            _proposalStack?.proposalDoc.content.author &&
-                        _proposalStack
+                            _proposalStreamDoc.content.author &&
+                        _proposalStackClones
                     ) {
                         setProposalInput(
-                            _.cloneDeep(_proposalStack.proposalDoc.content)
+                            _.cloneDeep(_proposalStackClones.proposal)
                         )
                     }
+
+                    setProposalStreamDoc(_proposalStreamDoc)
+                    setTemplateStreamDoc(_templateStreamDoc)
 
                     setIsLoaded(true)
                 } catch (e) {
@@ -159,9 +214,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const saveProposal = async () => {
             if (proposalInput && ceramicStagehand && proposalStack) {
-                if (
-                    !_.isEqual(proposalInput, proposalStack.proposalDoc.content)
-                ) {
+                if (!_.isEqual(proposalInput, proposalStack.proposal)) {
                     const { uniqueTag } = await ceramicStagehand.updateStage(
                         proposalStreamID as string,
                         { ...proposalInput, isSubmitted: false },
@@ -181,13 +234,15 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const resetProposalInput = () => {
             if (proposalStack) {
-                setProposalInput(_.cloneDeep(proposalStack.proposalDoc.content))
+                setProposalInput(_.cloneDeep(proposalStack.proposal))
             }
         }
 
         return (
             <ProposalContext.Provider
                 value={{
+                    proposalStreamDoc: proposalStreamDoc,
+                    templateStreamDoc: templateStreamDoc,
                     proposalStack: proposalStack,
                     proposalStatus: proposalStatus,
                     updateProposal: initProposal,
