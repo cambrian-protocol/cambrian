@@ -48,13 +48,15 @@ const CreateProposalCTA = ({
                 background={'background-contrast'}
             >
                 <Text>Interested in this template?</Text>
-                <LoaderButton
-                    onClick={onCreateProposal}
-                    isLoading={isCreatingProposal}
-                    size="small"
-                    primary
-                    label="Create Proposal"
-                />
+                <Box>
+                    <LoaderButton
+                        onClick={onCreateProposal}
+                        isLoading={isCreatingProposal}
+                        size="small"
+                        primary
+                        label="Create Proposal"
+                    />
+                </Box>
             </Box>
             {errorMessage && (
                 <ErrorPopupModal
