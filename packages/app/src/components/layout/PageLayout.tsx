@@ -1,8 +1,8 @@
+import { Box, WorldMap } from 'grommet'
 import React, { PropsWithChildren, useContext } from 'react'
 
 import Appbar from '../bars/Appbar'
 import BaseFooter from './footer/BaseFooter'
-import { Box } from 'grommet'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
@@ -48,6 +48,16 @@ const PageLayout = ({
                         width="1000px"
                         left={'5%'}
                         top={'-200px'}
+                    />
+                    <WorldMap
+                        color="brand"
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '20%',
+                            opacity: 0.03,
+                            height: '70vh',
+                        }}
                     />
                     <Appbar />
                     <Box

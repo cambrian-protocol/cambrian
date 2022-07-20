@@ -1,6 +1,8 @@
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
-import TemplateInfo from '../../templates/TemplateInfo'
+import TemplateContentInfo from '../../templates/TemplateContentInfo'
+import TemplateFlexInputInfo from '../../templates/TemplateInfo'
+import TemplatePricingInfo from '@cambrian/app/components/info/TemplatePricingInfo'
 
 interface TemplateInfoModalProps {
     ceramicTemplate: CeramicTemplateModel
@@ -13,7 +15,9 @@ const TemplateInfoModal = ({
 }: TemplateInfoModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
-            <TemplateInfo template={ceramicTemplate} showQuote />
+            <TemplateContentInfo template={ceramicTemplate} />
+            <TemplatePricingInfo template={ceramicTemplate} />
+            <TemplateFlexInputInfo template={ceramicTemplate} />
         </BaseLayerModal>
     )
 }

@@ -1,9 +1,12 @@
+import BasicProfileInfo from '../../components/info/BasicProfileInfo'
 import { Box } from 'grommet'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import CreateProposalCTA from './CreateProposalCTA'
-import TemplateInfo from './TemplateInfo'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import TemplateContentInfo from './TemplateContentInfo'
+import TemplateFlexInputInfo from './TemplateInfo'
+import TemplatePricingInfo from '@cambrian/app/components/info/TemplatePricingInfo'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { usePublicRecord } from '@self.id/framework'
 
 interface TemplateUIProps {
     ceramicTemplate: CeramicTemplateModel
@@ -16,27 +19,34 @@ const TemplateUI = ({
     currentUser,
     templateStreamID,
 }: TemplateUIProps) => {
-    const sellerBasicProfile = usePublicRecord(
-        'basicProfile',
-        ceramicTemplate.author
-    )
-
     return (
-        <Box
-            pad="large"
-            height={{ min: '90vh' }}
-            justify="center"
-            direction="row"
-        >
-            <TemplateInfo template={ceramicTemplate} />
-            <Box pad={{ left: 'medium' }}>
-                <Box border round="xsmall" pad="medium">
-                    <CreateProposalCTA
-                        currentUser={currentUser}
-                        ceramicTemplate={ceramicTemplate}
-                        templateStreamID={templateStreamID}
-                    />
+        <Box pad="large" height={{ min: '80vh' }} direction="row" wrap>
+            <Box
+                basis="1/3"
+                pad={'large'}
+                justify="center"
+                height={{ max: '80vh' }}
+                width={{ min: 'medium' }}
+                gap="medium"
+            >
+                <BasicProfileInfo did={ceramicTemplate.author} />
+                <CreateProposalCTA
+                    currentUser={currentUser}
+                    templateStreamID={templateStreamID}
+                />
+            </Box>
+            <Box
+                pad={{ left: 'large' }}
+                basis="2/3"
+                gap="medium"
+                border={{ side: 'left' }}
+            >
+                <Box direction="row" align="start" wrap>
+                    <TemplateContentInfo template={ceramicTemplate} />
                 </Box>
+                <PlainSectionDivider />
+                <TemplatePricingInfo template={ceramicTemplate} />
+                <TemplateFlexInputInfo template={ceramicTemplate} />
             </Box>
         </Box>
     )

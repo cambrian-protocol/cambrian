@@ -1,8 +1,9 @@
-import { Box, Heading, Text } from 'grommet'
+import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
-import { CoinVertical } from 'phosphor-react'
+import { Coins } from 'phosphor-react'
+import PriceInfo from './PriceInfo'
 import TokenAvatar from '../avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -31,40 +32,59 @@ const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
     }
 
     return (
-        <Box width={{ min: 'medium' }} gap="medium">
-            <Text>The seller quotes:</Text>
-            <Box direction="row" gap="small" justify="center">
-                <Heading level="2">{template.price?.amount}</Heading>
-                <TokenAvatar token={collateralToken} />
-            </Box>
-            {template.price.allowAnyPaymentToken && (
-                <Box direction="row" align="center" gap="small">
-                    <CoinVertical size="24" />
-                    <Text size="small">
-                        The seller allows payment with any other token
-                    </Text>
-                </Box>
-            )}
-            {template.price.preferredTokens &&
-                template.price.preferredTokens.length > 0 && (
-                    <Box gap="small">
-                        {template.price.allowAnyPaymentToken ? (
-                            <Text>Preferred tokens for payment:</Text>
-                        ) : (
-                            <Text>Alternative Tokens for payment:</Text>
-                        )}
-                        <Box direction="row" justify="center" gap="small">
-                            {template.price.preferredTokens.map(
-                                (preferredToken, idx) => (
-                                    <TokenAvatar
-                                        key={idx}
-                                        token={preferredToken}
-                                    />
-                                )
-                            )}
+        <Box gap="medium">
+            <PriceInfo
+                amount={template.price.amount}
+                label="Sellers quote"
+                token={collateralToken}
+            />
+            <Box direction="row" wrap>
+                {template.price.allowAnyPaymentToken && (
+                    <Box
+                        basis="1/2"
+                        height={'xsmall'}
+                        gap="xsmall"
+                        width={{ min: 'medium' }}
+                    >
+                        <Text color="dark-4">Flexible Token</Text>
+                        <Box direction="row" gap="medium">
+                            <Coins size="24" />
+                            <Text size="small" color={'dark-4'}>
+                                The seller allows payment with any other token
+                            </Text>
                         </Box>
                     </Box>
                 )}
+                {template.price.preferredTokens &&
+                    template.price.preferredTokens.length > 0 && (
+                        <Box
+                            basis="1/2"
+                            height={'xsmall'}
+                            gap="xsmall"
+                            width={{ min: 'medium' }}
+                        >
+                            {template.price.allowAnyPaymentToken ? (
+                                <Text color={'dark-4'}>
+                                    Preferred tokens for payment:
+                                </Text>
+                            ) : (
+                                <Text color={'dark-4'}>
+                                    Alternative Tokens for payment:
+                                </Text>
+                            )}
+                            <Box direction="row" gap="small">
+                                {template.price.preferredTokens.map(
+                                    (preferredToken, idx) => (
+                                        <TokenAvatar
+                                            key={idx}
+                                            token={preferredToken}
+                                        />
+                                    )
+                                )}
+                            </Box>
+                        </Box>
+                    )}
+            </Box>
         </Box>
     )
 }

@@ -2,8 +2,6 @@ import {
     ChartBar,
     ClipboardText,
     File,
-    PuzzlePiece,
-    Storefront,
     TreeStructure,
     UserCircleGear,
 } from 'phosphor-react'
@@ -17,17 +15,6 @@ const dashboardRoutes = [
         slug: '/dashboard',
         icon: <ChartBar />,
         label: 'Dashboard',
-    },
-    {
-        slug: '/dashboard/marketplace',
-        icon: <Storefront />,
-        label: 'Marketplace',
-        disabled: true,
-    },
-    {
-        slug: '/dashboard/solvers',
-        icon: <PuzzlePiece />,
-        label: 'Solvers',
     },
     {
         slug: '/dashboard/proposals',
@@ -66,7 +53,6 @@ const DashboardSidebar = () => {
                     <BaseListItemButton
                         key={idx}
                         hideDivider
-                        disabled={dashboardRoute.disabled}
                         icon={dashboardRoute.icon}
                         title={dashboardRoute.label}
                         isActive={router.pathname === dashboardRoute.slug}

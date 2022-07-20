@@ -1,10 +1,9 @@
-import { Box } from 'grommet'
+import { Box, Text } from 'grommet'
+
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TemplatePricingInfo from '@cambrian/app/components/info/TemplatePricingInfo'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
@@ -13,14 +12,11 @@ import { useState } from 'react'
 
 interface CreateProposalCTAProps {
     templateStreamID: string
-    ceramicTemplate: CeramicTemplateModel
     currentUser: UserType
 }
 
-// TODO Styling
 const CreateProposalCTA = ({
     templateStreamID,
-    ceramicTemplate,
     currentUser,
 }: CreateProposalCTAProps) => {
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
@@ -44,8 +40,14 @@ const CreateProposalCTA = ({
     }
     return (
         <>
-            <Box gap="medium">
-                <TemplatePricingInfo template={ceramicTemplate} />
+            <Box
+                pad={'small'}
+                border
+                round="xsmall"
+                gap="small"
+                background={'background-contrast'}
+            >
+                <Text>Interested in this template?</Text>
                 <LoaderButton
                     onClick={onCreateProposal}
                     isLoading={isCreatingProposal}
