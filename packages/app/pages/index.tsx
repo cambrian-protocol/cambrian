@@ -64,7 +64,6 @@ export default function Home() {
                     <Box style={{ position: 'relative' }}>
                         <USPSection />
                         <USPListSection />
-                        {/* TODO Add Screenshot
                         <BaseContentSection
                             title={'Quit a Boss'}
                             subTitle={'Everyone'}
@@ -72,36 +71,11 @@ export default function Home() {
                             image={
                                 <Box
                                     round="xsmall"
-                                    height={'large'}
-                                    width={'large'}
-                                    border={{ size: 'medium', color: 'black' }}
                                     elevation="large"
+                                    border
                                     overflow="hidden"
-                                    style={{ pointerEvents: 'none' }}
                                 >
-                                    <PageLayout contextTitle="Index" hideBanner>
-                                        <Box pad={{ top: 'medium' }}>
-                                            <CreateTemplateDetailStep
-                                                input={{
-                                                    pfp: '',
-                                                    proposalRequest: '',
-                                                    name: 'Chris',
-                                                    title: 'Writing an article as a professional journalist',
-                                                    description:
-                                                        "I am a professional journalist and content marketer with over 16-years' expertise and can supply you with top-quality, original blog posts that are tailor-made according to your unique requirements and goals. I have published hundreds of articles in magazines and on news sites, blogs, and social platforms.",
-                                                    askingAmount: 0,
-                                                    denominationTokenAddress:
-                                                        '',
-                                                    preferredTokens: [],
-                                                    allowAnyPaymentToken: false,
-                                                    flexInputs: [],
-                                                    discordWebhook: '',
-                                                }}
-                                                setInput={() => {}}
-                                                stepperCallback={() => {}}
-                                            />
-                                        </Box>
-                                    </PageLayout>
+                                    <Image src="/images/template_example.jpg" />
                                 </Box>
                             }
                             anchor={
@@ -109,7 +83,7 @@ export default function Home() {
                                     🟢 Live on Ropsten Test Network
                                 </Text>
                             }
-                        /> */}
+                        />
                         <BaseContentSection
                             align="right"
                             title={'Build a Solver'}
