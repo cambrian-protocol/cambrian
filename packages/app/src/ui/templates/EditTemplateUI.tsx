@@ -5,12 +5,14 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
+import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface EditTemplateUIProps {
+    cachedTemplateTitle: string
     currentUser: UserType
     templateInput: CeramicTemplateModel
     setTemplateInput: React.Dispatch<
@@ -23,6 +25,7 @@ interface EditTemplateUIProps {
 }
 
 const EditTemplateUI = ({
+    cachedTemplateTitle,
     templateInput,
     setTemplateInput,
     onSaveTemplate,
@@ -40,37 +43,16 @@ const EditTemplateUI = ({
     }, [activeIndex])
 
     return (
-        <Tabs
-            justify="start"
-            activeIndex={activeIndex}
-            onActive={(nextIndex: number) => setActiveIndex(nextIndex)}
-        >
-            <Tab title="Description">
-                <Box pad="small">
-                    <TemplateDescriptionForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
-                        onCancel={onResetTemplate}
-                    />
-                </Box>
-            </Tab>
-            <Tab title="Pricing">
-                <Box pad="small">
-                    <TemplatePricingForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
-                        onCancel={onResetTemplate}
-                        currentUser={currentUser}
-                    />
-                </Box>
-            </Tab>
-            {templateInput.flexInputs.length > 0 && (
-                <Tab title="Solver Config">
+        <Box gap="medium">
+            <TemplateHeader title={cachedTemplateTitle} />
+            <Tabs
+                justify="start"
+                activeIndex={activeIndex}
+                onActive={(nextIndex: number) => setActiveIndex(nextIndex)}
+            >
+                <Tab title="Description">
                     <Box pad="small">
-                        <TemplateFlexInputsForm
-                            composition={composition}
+                        <TemplateDescriptionForm
                             templateInput={templateInput}
                             setTemplateInput={setTemplateInput}
                             onSubmit={onSaveTemplate}
@@ -78,18 +60,42 @@ const EditTemplateUI = ({
                         />
                     </Box>
                 </Tab>
-            )}
-            <Tab title="Requirements">
-                <Box pad="small">
-                    <TemplateRequirementsForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
-                        onCancel={onResetTemplate}
-                    />
-                </Box>
-            </Tab>
-        </Tabs>
+                <Tab title="Pricing">
+                    <Box pad="small">
+                        <TemplatePricingForm
+                            templateInput={templateInput}
+                            setTemplateInput={setTemplateInput}
+                            onSubmit={onSaveTemplate}
+                            onCancel={onResetTemplate}
+                            currentUser={currentUser}
+                        />
+                    </Box>
+                </Tab>
+                {templateInput.flexInputs.length > 0 && (
+                    <Tab title="Solver Config">
+                        <Box pad="small">
+                            <TemplateFlexInputsForm
+                                composition={composition}
+                                templateInput={templateInput}
+                                setTemplateInput={setTemplateInput}
+                                onSubmit={onSaveTemplate}
+                                onCancel={onResetTemplate}
+                            />
+                        </Box>
+                    </Tab>
+                )}
+                <Tab title="Requirements">
+                    <Box pad="small">
+                        <TemplateRequirementsForm
+                            templateInput={templateInput}
+                            setTemplateInput={setTemplateInput}
+                            onSubmit={onSaveTemplate}
+                            onCancel={onResetTemplate}
+                        />
+                    </Box>
+                </Tab>
+            </Tabs>
+        </Box>
     )
 }
 

@@ -34,8 +34,8 @@ export default function EditTemplatePage() {
                         <Custom404Page />
                     ) : templateInput && composition && cachedTemplate ? (
                         <PageLayout contextTitle="Edit Template" kind="narrow">
-                            <TemplateHeader title={cachedTemplate.title} />
                             <EditTemplateUI
+                                cachedTemplateTitle={cachedTemplate.title}
                                 composition={composition}
                                 currentUser={currentUser}
                                 templateInput={templateInput}

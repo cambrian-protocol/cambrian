@@ -1,6 +1,7 @@
 import { Box, Page, WorldMap } from 'grommet'
 
 import Appbar from '../bars/Appbar'
+import BaseFooter from './footer/BaseFooter'
 import DashboardSidebar from '../bars/sidebar/DashboardSidebar'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
@@ -48,7 +49,12 @@ const DashboardLayout = ({ contextTitle, children }: DashboardLayoutProps) => {
                         top={'-200px'}
                     />
                     <Appbar />
-                    <Box fill direction="row" style={{ position: 'relative' }}>
+                    <Box
+                        fill
+                        direction="row"
+                        style={{ position: 'relative' }}
+                        height={{ min: '90vh' }}
+                    >
                         <Box width={{ min: 'auto' }}>
                             <DashboardSidebar />
                         </Box>
@@ -60,6 +66,7 @@ const DashboardLayout = ({ contextTitle, children }: DashboardLayoutProps) => {
                             {children}
                         </Box>
                     </Box>
+                    <BaseFooter />
                 </Page>
             </Box>
         </>

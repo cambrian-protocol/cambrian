@@ -1,4 +1,4 @@
-import { ArrowsClockwise, CircleDashed } from 'phosphor-react'
+import { ArrowsClockwise, CircleDashed, Trash } from 'phosphor-react'
 import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
@@ -154,39 +154,47 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     return (
         <>
             <DashboardLayout contextTitle="Dashboard">
-                <Box fill pad={{ top: 'medium' }}>
+                <Box fill pad="large" gap="large">
                     <Box
                         height={{ min: 'auto' }}
                         direction="row"
                         justify="between"
-                        pad={{ right: 'large' }}
                         align="center"
                     >
-                        <Box pad="medium">
-                            <Heading level="2">Proposals Management</Heading>
-                        </Box>
-                        <Button
-                            label="@"
-                            onClickCapture={() => {
-                                if (ceramicStagehand) {
-                                    ceramicStagehand.clearStages(
-                                        StageNames.proposal
-                                    )
-                                }
-                            }}
-                        />
                         <Box>
-                            <LoaderButton
-                                isLoading={isFetching}
-                                icon={<ArrowsClockwise />}
+                            <Heading level="2">Proposals Management</Heading>
+                            <Text>
+                                Edit, Review, and fund your proposals here
+                            </Text>
+                        </Box>
+                        <Box direction="row" gap="small">
+                            <Button
+                                secondary
+                                size="small"
+                                label="Delete all"
+                                icon={<Trash />}
                                 onClick={() => {
-                                    ceramicStagehand &&
-                                        fetchMyProposals(ceramicStagehand)
+                                    if (ceramicStagehand) {
+                                        ceramicStagehand.clearStages(
+                                            StageNames.proposal
+                                        )
+                                    }
                                 }}
                             />
+                            <Box>
+                                <LoaderButton
+                                    secondary
+                                    isLoading={isFetching}
+                                    icon={<ArrowsClockwise />}
+                                    onClick={() => {
+                                        ceramicStagehand &&
+                                            fetchMyProposals(ceramicStagehand)
+                                    }}
+                                />
+                            </Box>
                         </Box>
                     </Box>
-                    <Box pad="small" fill>
+                    <Box fill>
                         <Tabs alignControls="start">
                             <Tab
                                 title={`Your Proposals (${myProposals.length})`}
@@ -248,12 +256,6 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                         </Text>
                                     </Box>
                                 )}
-                            </Tab>
-                            <Tab title="Funding">
-                                <Text>
-                                    Note: On chain proposals which are currently
-                                    in the funding process
-                                </Text>
                             </Tab>
                         </Tabs>
                     </Box>
