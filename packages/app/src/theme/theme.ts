@@ -168,4 +168,17 @@ export const cpTheme = deepMerge(grommet, {
             size: '20px',
         },
     },
+    tabs: {
+        header: {
+            border: { side: 'all' },
+            extend: `
+            border-radius: 5px;
+            padding: 10px;
+            `,
+        },
+    },
+    tab: {
+        border: false,
+        color: 'dark-4',
+    },
 })

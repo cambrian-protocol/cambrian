@@ -8,7 +8,6 @@ import { ComposerIdPathType } from './SolverModel'
 import { ComposerOutcomeCollectionModel } from './OutcomeCollectionModel'
 import { ComposerSlotPathType } from './SlotModel'
 import { ConditionStatus } from './ConditionStatus'
-import { MultihashType } from './MultihashType'
 import { OutcomeModel } from './OutcomeModel'
 import { SolidityDataTypes } from './SolidityDataTypes'
 
@@ -19,7 +18,7 @@ export type ConditionModel = {
     amountSlot: string
     partition: number[]
     allocations: AllocationPathsType[]
-    outcomeURIs: MultihashType[]
+    outcomeURIs: string[]
 }
 
 // TODO Type merge or renaming if really necessary. Will circle back to it as soon as composer => interaction flow is clear
@@ -41,7 +40,7 @@ export type ConditionResponseType = {
     amountSlot: string
     partition: BigNumber[]
     allocations: AllocationPathsType[]
-    outcomeURIs: MultihashType[]
+    outcomeURIs: string[]
 }
 
 /* 

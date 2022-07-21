@@ -104,12 +104,8 @@ describe("WriterSolverV1_SolverCoopCallbacks", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -183,12 +179,8 @@ describe("WriterSolverV1_SolverCoopCallbacks", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 

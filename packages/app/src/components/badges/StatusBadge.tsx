@@ -1,7 +1,5 @@
 import { Box, Text, Tip } from 'grommet'
 
-import { ConditionalWrapper } from '../utils/ConditionalWrapper'
-
 interface StatusBadgeProps {
     status: string
     background: string
@@ -11,20 +9,13 @@ interface StatusBadgeProps {
 const StatusBadge = ({ status, background, tipContent }: StatusBadgeProps) => {
     return (
         <Box justify="center" pad="xsmall">
-            <ConditionalWrapper
-                condition={tipContent !== undefined}
-                wrapper={(children) => (
-                    <Tip
-                        content={
-                            <Box width={'medium'} pad="small">
-                                <Text size="small">{tipContent}</Text>
-                            </Box>
-                        }
-                        dropProps={{ align: { right: 'right', top: 'bottom' } }}
-                    >
-                        {children}
-                    </Tip>
-                )}
+            <Tip
+                content={
+                    <Box width={'medium'} pad="small">
+                        <Text size="small">{tipContent}</Text>
+                    </Box>
+                }
+                dropProps={{ align: { right: 'right', top: 'bottom' } }}
             >
                 <Box
                     direction="row"
@@ -36,7 +27,7 @@ const StatusBadge = ({ status, background, tipContent }: StatusBadgeProps) => {
                 >
                     <Text weight={'bold'}>{status}</Text>
                 </Box>
-            </ConditionalWrapper>
+            </Tip>
         </Box>
     )
 }

@@ -1,88 +1,155 @@
-import React, { SetStateAction, useEffect, useState } from 'react'
+import { Box, Button, Stack } from 'grommet'
+import { CaretDown, CaretUp } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { Button } from 'grommet'
-import FundProposalForm from './forms/FundProposalForm'
-import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
-import Link from 'next/link'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import SidebarComponentContainer from '@cambrian/app/components/containers/SidebarComponentContainer'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { ethers } from 'ethers'
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'
+import Custom404Page from 'packages/app/pages/404'
+import FlexInputInfo from '../common/FlexInputInfo'
+import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import PriceInfo from '@cambrian/app/components/info/PriceInfo'
+import ProposalContentInfo from './ProposalContentInfo'
+import ProposalControlbar from './ProposalControlbar'
+import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-interface ProposalUIProps {
-    isProposalExecuted?: boolean
-    setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
-    proposal: ethers.Contract
-    proposalsHub: ProposalsHub
-    currentUser: UserType
-}
+const ProposalUI = ({}) => {
+    const { currentUser } = useCurrentUser()
+    const {
+        isLoaded,
+        proposalStack,
+        proposalStatus,
+        proposalStreamDoc,
+        templateStreamDoc,
+    } = useProposal()
+    const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
-const ProposalUI = ({
-    proposalsHub,
-    proposal,
-    currentUser,
-    isProposalExecuted,
-    setIsProposalExecuted,
-}: ProposalUIProps) => {
-    const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
+    const [showMessenger, setShowMessenger] = useState(true)
+    const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     useEffect(() => {
-        if (isProposalExecuted) {
-            initSolver()
-        }
-    }, [isProposalExecuted])
+        init()
+    }, [currentUser])
 
-    const initSolver = async () => {
-        if (currentUser.chainId && currentUser.signer) {
-            try {
-                const ipfsSolutionsHub = new IPFSSolutionsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-                const solvers = await ipfsSolutionsHub.getSolvers(
-                    proposal.solutionId
-                )
-                if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
-                setFirstSolverAddress(solvers[0])
-            } catch (e) {
-                cpLogger.push(e)
-            }
+    const init = async () => {
+        if (proposalStack && currentUser) {
+            const ct = await fetchTokenInfo(
+                proposalStack.proposal.price.tokenAddress,
+                currentUser.web3Provider
+            )
+            if (ct) setCollateralToken(ct)
         }
     }
 
+    const initMessenger =
+        proposalStreamDoc &&
+        !!templateStreamDoc?.content.receivedProposals[
+            proposalStreamDoc.id.toString()
+        ] &&
+        currentUser
+
     return (
-        <BaseFormGroupContainer
-            groupTitle="Status"
-            border
-            pad={{ horizontal: 'medium' }}
-        >
-            {isProposalExecuted && firstSolverAddress ? (
-                <SidebarComponentContainer
-                    title="Interaction"
-                    description="This Proposal has been funded and executed. To start
-                    working with this Solution visit the first Solver"
-                >
-                    <Link href={`/solvers/${firstSolverAddress}`} passHref>
-                        <Button primary size="small" label="Go to Solver" />
-                    </Link>
-                </SidebarComponentContainer>
+        <>
+            {!isLoaded ? (
+                <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
+            ) : proposalStack ? (
+                <Stack anchor="bottom-right">
+                    <PageLayout
+                        contextTitle={proposalStack.proposal.title}
+                        kind="narrow"
+                    >
+                        <Box pad="large">
+                            <ProposalHeader
+                                proposalStack={proposalStack}
+                                proposalStatus={proposalStatus}
+                            />
+                            <Box
+                                height={{ min: 'auto' }}
+                                pad={{ top: 'large' }}
+                                gap="medium"
+                            >
+                                <ProposalContentInfo
+                                    hideTitle
+                                    proposal={proposalStack.proposal}
+                                />
+                                <PlainSectionDivider />
+                                <PriceInfo
+                                    amount={proposalStack.proposal.price.amount}
+                                    label="Proposed Price"
+                                    token={collateralToken}
+                                />
+                                <FlexInputInfo
+                                    flexInputs={
+                                        proposalStack.proposal.flexInputs
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <BasicProfileInfo
+                                    did={proposalStack.proposal.author}
+                                />
+                                <ProposalControlbar />
+                            </Box>
+                        </Box>
+                    </PageLayout>
+                    {initMessenger && (
+                        <Box pad={{ right: 'large' }}>
+                            <BaseFormContainer
+                                pad="small"
+                                width={{ min: 'medium' }}
+                                gap="medium"
+                            >
+                                <Box direction="row" justify="between">
+                                    <BasicProfileInfo
+                                        did={
+                                            currentUser?.selfID.did.id ===
+                                            proposalStack.proposal.author
+                                                ? proposalStack.template.author
+                                                : proposalStack.proposal.author
+                                        }
+                                        hideDetails
+                                        size="small"
+                                    />
+                                    <Button
+                                        icon={
+                                            showMessenger ? (
+                                                <CaretDown />
+                                            ) : (
+                                                <CaretUp />
+                                            )
+                                        }
+                                        onClick={toggleShowMessenger}
+                                    />
+                                </Box>
+                                {showMessenger && (
+                                    <Messenger
+                                        currentUser={currentUser}
+                                        chatID={proposalStreamDoc.id.toString()}
+                                        chatType={
+                                            proposalStatus ===
+                                                ProposalStatus.Funding ||
+                                            proposalStatus ===
+                                                ProposalStatus.Executed
+                                                ? 'Proposal'
+                                                : 'Draft'
+                                        }
+                                    />
+                                )}
+                            </BaseFormContainer>
+                        </Box>
+                    )}
+                </Stack>
             ) : (
-                <SidebarComponentContainer
-                    title="Fund this Proposal"
-                    description="If you agree to the conditions, you can approve access to the agreed token and fund this proposal. You can withdraw your invested funds anytime before the proposal has been executed."
-                >
-                    <FundProposalForm
-                        currentUser={currentUser}
-                        proposalsHub={proposalsHub}
-                        proposal={proposal}
-                        setIsProposalExecuted={setIsProposalExecuted}
-                    />
-                </SidebarComponentContainer>
+                <Custom404Page />
             )}
-        </BaseFormGroupContainer>
+        </>
     )
 }
 

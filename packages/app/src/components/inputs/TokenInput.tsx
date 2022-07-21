@@ -1,43 +1,62 @@
 import { Box, Select } from 'grommet'
+import { SetStateAction, useEffect, useState } from 'react'
 
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { FormField } from 'grommet'
 import { Text } from 'grommet'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import _ from 'lodash'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useState } from 'react'
 
 interface TokenInputProps {
-    name: string
     denominationToken: TokenModel
-    preferredTokens: TokenModel[]
-    disabled?: boolean
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    template: CeramicTemplateModel
 }
 
 const TokenInput = ({
-    name,
-    disabled,
-    preferredTokens,
     denominationToken,
+    proposalInput,
+    template,
+    setProposalInput,
 }: TokenInputProps) => {
     const { currentUser } = useCurrentUser()
     const [options, setOptions] = useState<TokenModel[]>(
-        denominationToken
-            ? preferredTokens.concat(denominationToken)
-            : preferredTokens
+        template.price.preferredTokens
+            ? template.price.preferredTokens.concat(denominationToken)
+            : [denominationToken]
     )
 
-    const onChangeTokenAddress = async (address: string) => {
-        const token = await fetchTokenInfo(address, currentUser.web3Provider)
-        if (token) {
-            const includesToken = options.find(
-                (option) => option.address === address
+    useEffect(() => {
+        if (
+            !options.find(
+                (option) => option.address === proposalInput.price.tokenAddress
             )
-            if (!includesToken) {
-                const updatedOptions = [...options]
-                updatedOptions.push(token)
-                setOptions(updatedOptions)
+        ) {
+            onChangeTokenAddress(proposalInput.price.tokenAddress)
+        }
+    }, [])
+
+    const onChangeTokenAddress = async (address: string) => {
+        if (currentUser) {
+            const token = await fetchTokenInfo(
+                address,
+                currentUser.web3Provider
+            )
+            if (token) {
+                const includesToken = options.find(
+                    (option) => option.address === address
+                )
+                if (!includesToken) {
+                    const updatedOptions = [...options]
+                    updatedOptions.push(token)
+                    setOptions(updatedOptions)
+                }
             }
         }
     }
@@ -47,23 +66,39 @@ const TokenInput = ({
             <Box basis="1/4">
                 <FormField label="Token">
                     <Select
-                        name={name}
                         options={options}
                         labelKey="symbol"
                         valueKey={{ key: 'address', reduce: true }}
+                        value={proposalInput.price.tokenAddress}
+                        onChange={({ option }) => {
+                            setProposalInput({
+                                ...proposalInput,
+                                price: {
+                                    ...proposalInput.price,
+                                    tokenAddress: option.address,
+                                },
+                            })
+                        }}
                     />
                 </FormField>
             </Box>
             <Box flex>
                 <FormField
-                    name={name}
-                    onChange={(event) =>
+                    onChange={(event) => {
                         onChangeTokenAddress(event.target.value)
-                    }
-                    disabled={disabled}
+                        setProposalInput({
+                            ...proposalInput,
+                            price: {
+                                ...proposalInput.price,
+                                tokenAddress: event.target.value,
+                            },
+                        })
+                    }}
+                    disabled={!template.price.allowAnyPaymentToken}
+                    value={proposalInput.price.tokenAddress || ''}
                     label="Token Address"
                 />
-                {!disabled && (
+                {template.price.allowAnyPaymentToken && (
                     <Text size="xsmall" color="dark-4">
                         You can insert any ERC20 token address you want to pay
                         with

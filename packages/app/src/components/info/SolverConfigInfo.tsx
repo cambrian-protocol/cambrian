@@ -1,29 +1,29 @@
+import { BigNumber, ethers } from 'ethers'
 import {
-    ShieldCheck,
+    Faders,
     Scales,
+    ShieldCheck,
     Timer,
     TreeStructure,
     UsersThree,
     Vault,
-    Faders,
 } from 'phosphor-react'
-import { BigNumber, ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
-import { getSolverRecipientSlots } from '@cambrian/app/components/solver/SolverHelpers'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import KeeperInputsModal from '@cambrian/app/ui/common/modals/KeeperInputsModal'
+import ModalHeader from '../layout/header/ModalHeader'
 import OutcomeCollectionModal from '@cambrian/app/ui/common/modals/OutcomeCollectionModal'
 import RecipientsModal from '../../ui/common/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
+import { getSolverRecipientSlots } from '@cambrian/app/components/solver/SolverHelpers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import ModalHeader from '../layout/header/ModalHeader'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -63,7 +63,7 @@ const SolverConfigInfo = ({
                     ConditionStatus.ArbitrationDelivered ||
                 currentCondition.status === ConditionStatus.OutcomeReported
             ) {
-                if (currentUser.signer && currentUser.chainId) {
+                if (currentUser) {
                     const ctf = new CTFContract(
                         currentUser.signer,
                         currentUser.chainId

@@ -24,13 +24,13 @@ import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
 import ProposalHeader from '../layout/header/ProposalHeader'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SolverSidebar from '../bars/sidebar/SolverSidebar'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
@@ -91,7 +91,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     )
 
     useEffect(() => {
-        if (currentUser.signer) init()
+        init()
     }, [currentUser])
 
     useEffect(() => {
@@ -101,7 +101,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     }, [outcomes])
 
     useEffect(() => {
-        if (solverData && currentUser.address) {
+        if (solverData) {
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 
@@ -164,7 +164,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     const initArbitratorPermission = async () => {
         if (solverData) {
-            const arbitratorCode = await currentUser.signer?.provider?.getCode(
+            const arbitratorCode = await currentUser.signer.provider?.getCode(
                 solverData.config.arbitrator
             )
             const isContract = arbitratorCode !== '0x'
@@ -297,8 +297,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             }
         }
     }
-    const proposalMetadata = metadata?.stages?.proposal as ProposalModel
-    const templateMetadata = metadata?.stages?.template as TemplateModel
 
     return (
         <>
@@ -309,12 +307,13 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                 <InteractionLayout
                     proposalHeader={
                         <ProposalHeader
-                            isProposalExecuted
-                            templateMetadata={templateMetadata}
-                            proposalMetadata={proposalMetadata}
+                            proposalStack={metadata?.proposalStack}
+                            proposalStatus={ProposalStatus.Executed}
                         />
                     }
-                    contextTitle={proposalMetadata?.title || 'Solver'}
+                    contextTitle={
+                        metadata?.proposalStack?.proposal?.title || 'Solver'
+                    }
                     actionBar={
                         <SolverActionbar
                             solverData={solverData}
@@ -350,8 +349,8 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         <InitiatedSolverContent />
                     ) : (
                         <ModuleUIManager
+                            currentUser={currentUser}
                             solverData={solverData}
-                            chainId={currentUser.chainId}
                             solverAddress={solverContract.address}
                             currentCondition={currentCondition}
                         />

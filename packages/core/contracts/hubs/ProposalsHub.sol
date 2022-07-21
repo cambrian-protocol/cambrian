@@ -15,7 +15,7 @@ contract ProposalsHub is ERC1155Receiver {
     IConditionalTokens public immutable conditionalTokens;
 
     // Increment for unique proposal IDs
-    uint256 nonce;
+    mapping(bytes32 => uint256) public nonces;
 
     struct Proposal {
         bool isExecuted;
@@ -26,7 +26,7 @@ contract ProposalsHub is ERC1155Receiver {
         bytes32 solutionId;
         uint256 funding;
         uint256 fundingGoal;
-        SolverLib.Multihash metadataCID;
+        string metadataURI;
     }
 
     mapping(bytes32 => Proposal) public proposals;
@@ -109,25 +109,32 @@ contract ProposalsHub is ERC1155Receiver {
         @param collateralToken ERC20 token being used as collateral for conditional tokens
         @param solutionsHub Address of the SolutionsHub contract managing the Solution
         @param fundingGoal Amount of ERC20 collateral requested for the Proposal
-        @param baseId ID of the Solution.Base for which a new instance and proposal is created
+        @param safeBaseId ID of the Solution.Base for which a new instance and proposal is created
+        @notice Ceramic Interop: safeBaseId == keccak256(abi.encode(keccak256(abi.encode(templateCommitID, proposalCommitID)), nonce))
     */
     function createProposal(
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 baseId,
-        SolverLib.Multihash calldata metadataCID
+        bytes32 safeBaseId,
+        SolverLib.Config[] memory solverConfigs,
+        string calldata metadataURI
     ) public returns (bytes32 solutionId, bytes32 proposalId) {
-        nonce++;
-
-        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(
-            baseId,
-            keccak256(
-                abi.encodePacked(baseId, blockhash(block.number - 1), nonce)
-            )
+        require(
+            IIPFSSolutionsHub(solutionsHub).verifyHash(
+                safeBaseId,
+                solverConfigs
+            ),
+            "Incorrect Solver Configs"
         );
 
-        proposalId = keccak256(abi.encodePacked(solutionId, nonce));
+        nonces[safeBaseId]++; // Prevents DOS by frontrunning safeBaseId
+
+        proposalId = keccak256(
+            abi.encode(safeBaseId, metadataURI, nonces[safeBaseId])
+        );
+
+        solutionId = IIPFSSolutionsHub(solutionsHub).createInstance(safeBaseId);
 
         Proposal storage proposal = proposals[proposalId];
         proposal.id = proposalId;
@@ -143,7 +150,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposal.solutionsHub = solutionsHub;
         proposal.solutionId = solutionId;
         proposal.fundingGoal = fundingGoal;
-        proposal.metadataCID = metadataCID;
+        proposal.metadataURI = metadataURI;
 
         emit CreateProposal(proposalId);
 
@@ -156,22 +163,23 @@ contract ProposalsHub is ERC1155Receiver {
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID,
-        SolverLib.Multihash calldata metadataCID
+        string calldata solverConfigsURI,
+        string calldata metadataURI
     ) external returns (bytes32 solutionId, bytes32 proposalId) {
-        ipfsSolutionsHub.createBase(
+        bytes32 safeBaseId = ipfsSolutionsHub.createBase(
             baseId,
             collateralToken,
             solverConfigs,
-            solverConfigsCID
+            solverConfigsURI
         );
 
         (solutionId, proposalId) = createProposal(
             collateralToken,
             address(ipfsSolutionsHub),
             fundingGoal,
-            baseId,
-            metadataCID
+            safeBaseId,
+            solverConfigs,
+            metadataURI
         );
     }
 
@@ -266,12 +274,8 @@ contract ProposalsHub is ERC1155Receiver {
         return proposals[id];
     }
 
-    function getMetadataCID(bytes32 id)
-        external
-        view
-        returns (SolverLib.Multihash memory)
-    {
-        return proposals[id].metadataCID;
+    function getMetadataCID(bytes32 id) external view returns (string memory) {
+        return proposals[id].metadataURI;
     }
 
     function isProposal(bytes32 id) external view returns (bool) {

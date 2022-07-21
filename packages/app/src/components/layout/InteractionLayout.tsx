@@ -86,10 +86,10 @@ const InteractionLayout = ({
                                                 {solverHeader}
                                                 <Box
                                                     direction="row"
-                                                    width="xlarge"
+                                                    fill
                                                     gap="large"
                                                     height={{ min: '70vh' }}
-                                                    pad={{ top: 'large' }}
+                                                    pad={{ top: 'medium' }}
                                                 >
                                                     {sidebar && (
                                                         <Box width="medium">

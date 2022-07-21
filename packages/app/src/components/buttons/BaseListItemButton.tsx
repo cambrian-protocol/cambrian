@@ -3,6 +3,7 @@ import { CaretRight, IconContext } from 'phosphor-react'
 
 import InfoDropButton from './InfoDropButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
+import { cpTheme } from '@cambrian/app/src/theme/theme'
 
 export interface BaseListItemButtonProps {
     title: string
@@ -12,6 +13,7 @@ export interface BaseListItemButtonProps {
     onClick?: () => void
     info?: string
     hideDivider?: boolean
+    disabled?: boolean
 }
 
 const BaseListItemButton = ({
@@ -22,18 +24,21 @@ const BaseListItemButton = ({
     isActive,
     info,
     hideDivider,
+    disabled,
 }: BaseListItemButtonProps) => {
+    const iconColor = disabled ? cpTheme.global.colors['dark-4'] : undefined
+
     return (
-        <IconContext.Provider value={{ size: '24' }}>
+        <IconContext.Provider value={{ size: '24', color: iconColor }}>
             <Box
                 direction="row"
                 justify="between"
                 align="center"
                 pad="medium"
-                round="xsmall"
                 background={isActive ? 'active' : 'none'}
-                onClick={onClick}
+                onClick={disabled ? undefined : onClick}
                 focusIndicator={false}
+                hoverIndicator
                 height={{ min: 'auto' }}
                 width={{ min: 'auto' }}
             >
@@ -42,8 +47,10 @@ const BaseListItemButton = ({
                         {icon}
                     </Box>
                     <Box>
-                        <Text>{title}</Text>
-                        <Text size="small" color="light-4" truncate>
+                        <Text color={disabled ? 'dark-4' : undefined}>
+                            {title}
+                        </Text>
+                        <Text size="small" color="dark-4" truncate>
                             {subTitle}
                         </Text>
                     </Box>

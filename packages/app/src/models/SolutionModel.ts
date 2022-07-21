@@ -1,5 +1,3 @@
-import { MultihashType } from '../utils/helpers/multihash'
-
 export type SolutionModel = {
     id: string
     executed: boolean
@@ -7,6 +5,6 @@ export type SolutionModel = {
     proposalId: string
     proposalsHub: string
     solverConfigsHash: string
-    solverConfigsCID: MultihashType
+    solverConfigsURI: string
     solverAddresses: string[]
 }

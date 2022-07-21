@@ -15,9 +15,10 @@
         "isolatedModules": true,
         "jsx": "preserve",
         "incremental": true,
-        "noEmit": true
+        "noEmit": true,
+        "typeRoots": ["src/@types", "node_modules/@types"]
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.test.ts", "**/*.tsx"],
     "exclude": ["node_modules"],
-    "files":["../../hardhat.config.ts"]
+    "files": ["../../hardhat.config.ts"]
 }

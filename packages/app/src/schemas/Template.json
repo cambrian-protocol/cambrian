@@ -1,0 +1,19 @@
+{
+    "*title": "string",
+    "*description": "string",
+    "*rfp": "string",
+    "price": {
+        "*amount": 0,
+        "*denominationTokenAddress": "string",
+        "preferredTokens": [
+            {
+                "*address": "string",
+                "*decimals": 18,
+                "name": "string",
+                "symbol": "string",
+                "*totalSupply": 42
+            }
+        ],
+        "*allowAnyPaymentToken": false
+    }
+}

@@ -1,8 +1,8 @@
+import { Box, WorldMap } from 'grommet'
 import React, { PropsWithChildren, useContext } from 'react'
 
 import Appbar from '../bars/Appbar'
 import BaseFooter from './footer/BaseFooter'
-import { Box } from 'grommet'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
@@ -13,6 +13,7 @@ import WarningBanner from '../containers/WarningBanner'
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     hideBanner?: boolean
+    kind?: 'narrow'
 }
 
 export const siteTitle = 'Cambrian Protocol'
@@ -21,6 +22,7 @@ const PageLayout = ({
     contextTitle,
     children,
     hideBanner,
+    kind,
 }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
 
@@ -49,12 +51,25 @@ const PageLayout = ({
                         left={'5%'}
                         top={'-200px'}
                     />
+                    <WorldMap
+                        color="brand"
+                        style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '20%',
+                            opacity: 0.03,
+                            height: '70vh',
+                        }}
+                    />
                     <Appbar />
                     <Box
+                        align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        {children}
+                        <Box width={kind === 'narrow' ? 'xlarge' : undefined}>
+                            {children}
+                        </Box>
                         <BaseFooter />
                     </Box>
                 </Page>

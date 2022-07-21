@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Heading, Paragraph } from 'grommet'
+import { Anchor, Box, Heading, Paragraph } from 'grommet'
 
 import { ERC20_IFACE } from '../config/ContractInterfaces'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
@@ -16,8 +16,7 @@ export default function MintToy() {
     const onMintTOY = async () => {
         setIsMinting(true)
         try {
-            if (!currentUser.signer || !currentUser.chainId)
-                throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
+            if (!currentUser) throw GENERAL_ERROR['WALLET_NOT_CONNECTED']
 
             const chainData = SUPPORTED_CHAINS[currentUser.chainId]
             if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']

@@ -7,4 +7,5 @@ export const LOADING_MESSAGE = {
     TEMPLATE: 'Loading Template',
     PROPOSAL: 'Loading Proposal',
     MODULE: 'Loading Module',
+    WALLET: 'Connecting Wallet',
 }
