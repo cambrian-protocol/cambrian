@@ -6,11 +6,11 @@ import CeramicStagehand, {
 import { useEffect, useState } from 'react'
 
 import CreateTemplateModal from './modals/CreateTemplateModal'
-import DashboardLayout from '@cambrian/app/components/layout/DashboardLayout'
 import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
@@ -71,11 +71,14 @@ const TemplatesDashboardUI = () => {
 
     return (
         <>
-            <DashboardLayout contextTitle="Dashboard">
-                <Box fill pad={{ top: 'medium' }}>
+            <PageLayout contextTitle="Templates" kind="narrow">
+                <Box fill pad={{ top: 'large' }}>
                     <Box height={{ min: 'auto' }}>
                         <Box pad="medium">
                             <Heading level="2">Templates Management</Heading>
+                            <Text color="dark-4">
+                                Create, edit or distribute your templates here
+                            </Text>
                         </Box>
                         <Box direction="row" height={{ min: 'auto' }} wrap>
                             <DashboardUtilityButton
@@ -85,14 +88,7 @@ const TemplatesDashboardUI = () => {
                                 onClick={toggleShowCreateTemplateModal}
                             />
                         </Box>
-                        <Box
-                            pad={{
-                                left: 'medium',
-                                right: 'large',
-                                vertical: 'medium',
-                            }}
-                            gap="small"
-                        >
+                        <Box pad={'medium'} gap="small">
                             <Box
                                 direction="row"
                                 align="center"
@@ -137,7 +133,7 @@ const TemplatesDashboardUI = () => {
                     )}
                     <Box pad="large" />
                 </Box>
-            </DashboardLayout>
+            </PageLayout>
             {showCreateTemplateModal && ceramicStagehand && (
                 <CreateTemplateModal
                     onClose={toggleShowCreateTemplateModal}

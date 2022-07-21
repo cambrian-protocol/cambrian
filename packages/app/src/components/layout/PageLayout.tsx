@@ -1,4 +1,4 @@
-import { Box, WorldMap } from 'grommet'
+import { Box, Stack, WorldMap } from 'grommet'
 import React, { PropsWithChildren, useContext } from 'react'
 
 import Appbar from '../bars/Appbar'
@@ -12,18 +12,12 @@ import WarningBanner from '../containers/WarningBanner'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
-    hideBanner?: boolean
     kind?: 'narrow'
 }
 
 export const siteTitle = 'Cambrian Protocol'
 
-const PageLayout = ({
-    contextTitle,
-    children,
-    hideBanner,
-    kind,
-}: PageLayoutProps) => {
+const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
 
     return (
@@ -37,9 +31,7 @@ const PageLayout = ({
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
             <Box height={'100vh'}>
-                {!hideBanner && (
-                    <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
-                )}
+                <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
                 <Page
                     style={{ position: 'relative' }}
                     overflow={{ horizontal: 'hidden', vertical: 'auto' }}
@@ -67,7 +59,10 @@ const PageLayout = ({
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        <Box width={kind === 'narrow' ? 'xlarge' : undefined}>
+                        <Box
+                            width={kind === 'narrow' ? 'xlarge' : undefined}
+                            height={{ min: '90vh' }}
+                        >
                             {children}
                         </Box>
                         <BaseFooter />

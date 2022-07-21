@@ -2,8 +2,8 @@ import { Box, Button, Form, FormField, Heading, Text, TextArea } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
-import DashboardLayout from '@cambrian/app/components/layout/DashboardLayout'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
@@ -55,19 +55,9 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     }
 
     return (
-        <DashboardLayout contextTitle="Dashboard">
-            <Box
-                fill
-                gap="large"
-                pad="large"
-                width={{ max: 'large', min: 'large' }}
-            >
-                <Box
-                    direction="row"
-                    align="center"
-                    height={{ min: 'auto' }}
-                    gap="medium"
-                >
+        <PageLayout kind="narrow" contextTitle="Dashboard">
+            <Box gap="large" pad="large">
+                <Box direction="row" align="center" gap="medium">
                     {currentUser.basicProfile?.avatar ? (
                         <BaseAvatar
                             size="large"
@@ -90,7 +80,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                         <Text color="dark-4">{currentUser.address}</Text>
                     </Box>
                 </Box>
-                <Box gap="large" height={{ min: 'auto' }}>
+                <Box gap="large">
                     <Box gap="small">
                         <Box direction="row" gap="small">
                             <Box gap="xsmall">
@@ -106,7 +96,6 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                                 gap="medium"
                                 justify="end"
                                 alignSelf="end"
-                                height={{ min: 'auto' }}
                                 width={{ min: 'auto' }}
                             >
                                 <Button
@@ -168,7 +157,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 </Box>
                 <Box pad="large" />
             </Box>
-        </DashboardLayout>
+        </PageLayout>
     )
 }
 

@@ -10,10 +10,10 @@ import { useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
-import DashboardLayout from '@cambrian/app/components/layout/DashboardLayout'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -153,17 +153,17 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
     return (
         <>
-            <DashboardLayout contextTitle="Dashboard">
-                <Box fill pad="large" gap="large">
+            <PageLayout contextTitle="Proposals" kind="narrow">
+                <Box fill pad={{ top: 'large' }}>
                     <Box
                         height={{ min: 'auto' }}
                         direction="row"
                         justify="between"
                         align="center"
                     >
-                        <Box>
+                        <Box pad="medium">
                             <Heading level="2">Proposals Management</Heading>
-                            <Text>
+                            <Text color="dark-4">
                                 Edit, Review, and fund your proposals here
                             </Text>
                         </Box>
@@ -194,7 +194,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                             </Box>
                         </Box>
                     </Box>
-                    <Box fill>
+                    <Box fill pad={'medium'}>
                         <Tabs alignControls="start">
                             <Tab
                                 title={`Your Proposals (${myProposals.length})`}
@@ -261,7 +261,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                     </Box>
                     <Box pad="large" />
                 </Box>
-            </DashboardLayout>
+            </PageLayout>
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}
