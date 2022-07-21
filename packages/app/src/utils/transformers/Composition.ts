@@ -1,12 +1,13 @@
 import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/steps/CreateTemplateFlexInputStep'
+import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
+import _ from 'lodash'
 
 export const mergeFlexIntoComposition = (
     oldComposition: CompositionModel,
     flexInputs: FlexInputFormType[]
 ): CompositionModel => {
-    const updatedComposerSolvers = [...oldComposition.solvers]
+    const updatedComposerSolvers = _.cloneDeep(oldComposition.solvers)
 
     // Update our composition with new flexInput values
     if (flexInputs.length > 0) {
@@ -41,10 +42,10 @@ export const mergeFlexIntoComposition = (
                             //         taggedInput.value
                             //     break
 
-                            case 'collateralToken':
+                            /*   case 'collateralToken':
                                 solver.config['collateralToken'] =
                                     filteredFlexInput.value
-                                break
+                                break */
 
                             case 'timelockSeconds':
                                 solver.config['timelockSeconds'] = parseInt(

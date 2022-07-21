@@ -38,7 +38,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                     >
                         <Box
                             pad="large"
-                            width="xlarge"
+                            width="xxlarge"
                             gap={isSmallScreen ? 'large' : 'medium'}
                         >
                             <Heading
@@ -46,16 +46,16 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 style={{ fontWeight: 'bold' }}
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                The Future of Work has arrived
+                                Do Business. On-Chain.
                             </Heading>
                             <Text
                                 color="dark-4"
                                 size="large"
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                Explore a system of composable Ethereum dapps,
-                                which wrap need-specific services in escrow
-                                smart contracts
+                                Buy and sell services, freelance work and
+                                bounties on a trustless, non-custodial Web3
+                                platform.
                             </Text>
                             <Box
                                 direction={isSmallScreen ? 'column' : 'row'}

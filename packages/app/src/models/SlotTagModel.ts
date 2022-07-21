@@ -11,7 +11,7 @@ export type SlotTagModel = {
 }
 
 export type TaggedInput = SlotTagModel & {
-    value: string | undefined
+    value: string
 }
 
 export type FlexInputs = {

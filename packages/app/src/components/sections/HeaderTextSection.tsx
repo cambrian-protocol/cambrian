@@ -1,6 +1,6 @@
-import { Box, Heading } from 'grommet'
+import { Box, Heading, ResponsiveContext } from 'grommet'
 
-import { ConditionalWrapper } from '@cambrian/app/utils/helpers/ConditionalWrapper'
+import { ConditionalWrapper } from '@cambrian/app/components/utils/ConditionalWrapper'
 import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
 
@@ -23,15 +23,19 @@ const HeaderTextSection = ({
         condition={icon !== undefined}
         wrapper={(children) => (
             <Box
-                fill
+                flex
                 justify="center"
                 align="center"
                 gap="small"
                 direction="row"
-                width={{ min: 'medium' }}
+                width="large"
             >
                 <Box pad="medium" align="center">
-                    <IconContext.Provider value={{ size: '48' }}>
+                    <IconContext.Provider
+                        value={
+                            size === 'small' ? { size: '32' } : { size: '48' }
+                        }
+                    >
                         {icon}
                     </IconContext.Provider>
                 </Box>
@@ -49,7 +53,10 @@ const HeaderTextSection = ({
             <Text color="brand">{subTitle}</Text>
             <Heading level={size === 'small' ? '3' : '1'}>{title}</Heading>
             <Text
-                style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}
+                style={{
+                    whiteSpace: 'pre-line',
+                    wordBreak: 'break-word',
+                }}
                 color="dark-4"
             >
                 {paragraph}

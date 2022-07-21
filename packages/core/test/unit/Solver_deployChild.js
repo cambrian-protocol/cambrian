@@ -45,12 +45,8 @@ describe("Solver | deployChild", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -60,7 +56,7 @@ describe("Solver | deployChild", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: this.timelockSeconds,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: this.ingests,
         conditionBase: this.conditionBase,
       },
@@ -111,7 +107,7 @@ describe("Solver | deployChild", function () {
     await solver.connect(this.keeper).deployChild(this.solverConfigs[0]);
     return expectRevert(
       solver.connect(this.keeper).deployChild(this.solverConfigs[0]),
-      "Solver has child"
+      "Has child"
     );
   });
 

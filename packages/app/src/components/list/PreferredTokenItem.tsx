@@ -27,7 +27,7 @@ const PreferredTokenItem = ({
             pad="small"
             background={'background-front'}
             align="start"
-            round="small"
+            round="xsmall"
             elevation="small"
         >
             <Box alignSelf="center">
@@ -40,6 +40,7 @@ const PreferredTokenItem = ({
                     required
                     onChange={(event) => updateToken(event.target.value, idx)}
                     validate={validateAddress}
+                    value={token.address}
                 />
             </Box>
             <Box

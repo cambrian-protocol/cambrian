@@ -1,8 +1,8 @@
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../solvers/SolverLib.sol";
-import "../ProposalsHub.sol";
+import "../hubs/ProposalsHub.sol";
 import "./IIPFSSolutionsHub.sol";
 
 interface IProposalsHub {
@@ -19,7 +19,9 @@ interface IProposalsHub {
         IERC20 collateralToken,
         address solutionsHub,
         uint256 fundingGoal,
-        bytes32 solutionId
+        bytes32 safeBaseId,
+        SolverLib.Config[] memory solverConfigs,
+        string calldata metadataURI
     ) external;
 
     function createIPFSSolutionAndProposal(
@@ -28,8 +30,8 @@ interface IProposalsHub {
         IIPFSSolutionsHub ipfsSolutionsHub,
         uint256 fundingGoal,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID,
-        SolverLib.Multihash calldata metadataCID
+        string calldata solverConfigsURI,
+        string calldata metadataURI
     ) external returns (bytes32 solutionID, bytes32 proposalID);
 
     function fundProposal(
@@ -44,10 +46,7 @@ interface IProposalsHub {
         uint256 amount
     ) external;
 
-    function getMetadataCID(bytes32 id)
-        external
-        view
-        returns (SolverLib.Multihash memory);
+    function getMetadataCID(bytes32 id) external view returns (string memory);
 
     function isProposal(bytes32 id) external view returns (bool);
 

@@ -1,31 +1,35 @@
-import { Box, Card, CardBody, CardHeader, Text } from 'grommet'
+import { Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
-import BaseMenuListItem from '../buttons/BaseMenuListItem'
+import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Coins } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import OutcomeListItem from '../buttons/OutcomeListItem'
-import RecipientAllocationModal from '../modals/RecipientAllocationModal'
+import OutcomeListItem from '../list/OutcomeListItem'
+import RecipientAllocationModal from '@cambrian/app/ui/common/modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type OutcomeCollectionCardProps = {
-    idx?: number
+    border?: boolean // To higlight report
     outcomeCollection: OutcomeCollectionModel
     token: TokenModel
     proposedIndexSet?: number
+    itemKey?: number // Necessary for arbitrating choice index instead of indexSet
+    cardHeader?: JSX.Element
 } & (
     | { onPropose?: (indexSet: number) => Promise<void>; onArbitrate?: never }
     | { onArbitrate?: (indexSet: number) => Promise<void>; onPropose?: never }
 )
 
 const OutcomeCollectionCard = ({
-    idx,
+    border,
     outcomeCollection,
     token,
     onPropose,
     onArbitrate,
     proposedIndexSet,
+    cardHeader,
+    itemKey,
 }: OutcomeCollectionCardProps) => {
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
@@ -34,55 +38,52 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-contrast">
-                <CardHeader
-                    pad="medium"
-                    elevation="small"
-                    background="background-contrast"
+            <Card background="background-contrast-hover" border={border}>
+                {cardHeader && cardHeader}
+                <CardBody
+                    pad={{ vertical: 'small', horizontal: 'medium' }}
+                    gap="small"
                 >
-                    <Text truncate>Outcome {idx && `#${idx}`}</Text>
-                </CardHeader>
-                <CardBody>
                     {outcomeCollection.outcomes.map((outcome, idx) => (
                         <OutcomeListItem key={idx} outcome={outcome} />
                     ))}
-                    <BaseMenuListItem
+                    <BaseListItemButton
                         hideDivider
                         title="Allocation"
                         icon={<Coins />}
                         onClick={toggleShowAllocationModal}
                     />
                     {onPropose && (
-                        <Box pad="small" gap="small">
-                            <LoaderButton
-                                primary
-                                disabled={proposedIndexSet !== undefined}
-                                isLoading={
-                                    proposedIndexSet ===
-                                    outcomeCollection.indexSet
-                                }
-                                onClick={() =>
-                                    onPropose(outcomeCollection.indexSet)
-                                }
-                                label="Propose Outcome"
-                            />
-                        </Box>
+                        <LoaderButton
+                            primary
+                            disabled={proposedIndexSet !== undefined}
+                            isLoading={
+                                itemKey !== undefined
+                                    ? itemKey === proposedIndexSet
+                                    : proposedIndexSet ===
+                                      outcomeCollection.indexSet
+                            }
+                            onClick={() =>
+                                onPropose(outcomeCollection.indexSet)
+                            }
+                            label="Propose Outcome"
+                        />
                     )}
                     {onArbitrate && (
-                        <Box pad="small" gap="small">
-                            <LoaderButton
-                                primary
-                                disabled={proposedIndexSet !== undefined}
-                                isLoading={
-                                    proposedIndexSet ===
-                                    outcomeCollection.indexSet
-                                }
-                                onClick={() =>
-                                    onArbitrate(outcomeCollection.indexSet)
-                                }
-                                label="Report Outcome"
-                            />
-                        </Box>
+                        <LoaderButton
+                            primary
+                            disabled={proposedIndexSet !== undefined}
+                            isLoading={
+                                itemKey !== undefined
+                                    ? itemKey === proposedIndexSet
+                                    : proposedIndexSet ===
+                                      outcomeCollection.indexSet
+                            }
+                            onClick={() =>
+                                onArbitrate(outcomeCollection.indexSet)
+                            }
+                            label="Report Outcome"
+                        />
                     )}
                 </CardBody>
             </Card>

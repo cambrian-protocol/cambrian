@@ -3,18 +3,12 @@ import {
     ERC20_IFACE,
     PROPOSALS_HUB_IFACE,
 } from '@cambrian/app/config/ContractInterfaces'
-import {
-    getBytes32FromMultihash,
-    getMultihashFromBytes32,
-} from '../utils/helpers/multihash'
 
 import { GENERAL_ERROR } from './../constants/ErrorMessages'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
 import { ulid } from 'ulid'
-
-const Hash = require('ipfs-only-hash')
 
 export default class ProposalsHub {
     contract: ethers.Contract
@@ -34,10 +28,39 @@ export default class ProposalsHub {
         )
     }
 
+    /**
+     * @notice Creates a Proposal from an existing Solution Base
+     */
+    createProposal = async (
+        collateralToken: TokenModel,
+        price: number,
+        solutionBaseId: string,
+        solverConfigs: SolverConfigModel[],
+        proposalURI: string // commitID
+    ) => {
+        const weiPrice = ethers.utils.parseUnits(
+            price.toString(),
+            collateralToken.decimals
+        )
+
+        const tx: ethers.ContractTransaction =
+            await this.contract.createProposal(
+                collateralToken.address,
+                SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
+                weiPrice,
+                solutionBaseId,
+                solverConfigs,
+                proposalURI
+            )
+
+        return tx
+    }
+
     createSolutionAndProposal = async (
         collateralToken: TokenModel,
         price: number,
         solverConfigs: SolverConfigModel[],
+        solverConfigsURI: string,
         proposalCID: string
     ) => {
         const weiPrice = ethers.utils.parseUnits(
@@ -45,7 +68,6 @@ export default class ProposalsHub {
             collateralToken.decimals
         )
 
-        const solverConfigsHash = await Hash.of(JSON.stringify(solverConfigs))
         const tx: ethers.ContractTransaction =
             await this.contract.createIPFSSolutionAndProposal(
                 ethers.utils.formatBytes32String(ulid()),
@@ -53,8 +75,8 @@ export default class ProposalsHub {
                 SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
                 weiPrice,
                 solverConfigs,
-                getBytes32FromMultihash(solverConfigsHash),
-                getBytes32FromMultihash(proposalCID)
+                solverConfigsURI,
+                proposalCID
             )
 
         return tx
@@ -130,8 +152,6 @@ export default class ProposalsHub {
     }
 
     getMetadataCID = async (proposalId: string) => {
-        return getMultihashFromBytes32(
-            await this.contract.getMetadataCID(proposalId)
-        )
+        return this.contract.getMetadataCID(proposalId)
     }
 }

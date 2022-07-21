@@ -1,7 +1,6 @@
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
 import { Box } from 'grommet'
 import CodeMirror from '@uiw/react-codemirror'
-import CreateTemplateDetailStep from '@cambrian/app/ui/templates/forms/steps/CreateTemplateDetailStep'
 import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import Glow from '@cambrian/app/components/branding/Glow'
 import { Image } from 'grommet'
@@ -11,7 +10,6 @@ import RecommendedReadingsSection from '@cambrian/app/components/sections/Recomm
 import { Text } from 'grommet'
 import USPListSection from '@cambrian/app/components/sections/USPListSection'
 import USPSection from '@cambrian/app/components/sections/USPSection'
-import { javascript } from '@codemirror/lang-javascript'
 import { useRef } from 'react'
 import { useTheme } from '@cambrian/app/hooks/useTheme'
 
@@ -66,13 +64,14 @@ export default function Home() {
                     <Box style={{ position: 'relative' }}>
                         <USPSection />
                         <USPListSection />
+                        {/* TODO Add Screenshot
                         <BaseContentSection
                             title={'Quit a Boss'}
                             subTitle={'Everyone'}
                             paragraph="Discover how you can bring your talents to web3 network for yourself or within a decentralized cooperative*"
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     height={'large'}
                                     width={'large'}
                                     border={{ size: 'medium', color: 'black' }}
@@ -85,6 +84,7 @@ export default function Home() {
                                             <CreateTemplateDetailStep
                                                 input={{
                                                     pfp: '',
+                                                    proposalRequest: '',
                                                     name: 'Chris',
                                                     title: 'Writing an article as a professional journalist',
                                                     description:
@@ -109,7 +109,7 @@ export default function Home() {
                                     🟢 Live on Ropsten Test Network
                                 </Text>
                             }
-                        />
+                        /> */}
                         <BaseContentSection
                             align="right"
                             title={'Build a Solver'}
@@ -117,7 +117,7 @@ export default function Home() {
                             paragraph="Learn how to build your own Solver, contribute to an Open Source Project in TypeScript and Solidity and create new opportunity for millions of people at a time. "
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     width={'large'}
                                     height={'large'}
                                     elevation="large"
@@ -126,7 +126,6 @@ export default function Home() {
                                     <CodeMirror
                                         theme={themeMode}
                                         value={solverCode}
-                                        extensions={[javascript()]}
                                     />
                                 </Box>
                             }
@@ -142,7 +141,7 @@ export default function Home() {
                             paragraph="Create outcomes, load and connect Solvers, define allocations and compose complete business solutions powered by smart contracts with our intuitive no-code editor*"
                             image={
                                 <Box
-                                    round="small"
+                                    round="xsmall"
                                     elevation="large"
                                     border
                                     overflow="hidden"

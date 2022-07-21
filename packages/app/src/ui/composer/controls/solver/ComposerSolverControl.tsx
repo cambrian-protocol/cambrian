@@ -8,13 +8,13 @@ import {
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import BaseMenuListItem from '@cambrian/app/components/buttons/BaseMenuListItem'
+import BaseListItemButton from '@cambrian/app/components/buttons/BaseListItemButton'
 import { Box } from 'grommet'
 import Breadcrump from '@cambrian/app/components/nav/Breadcrump'
+import ComposerModuleList from './moduleList/ComposerModuleList'
 import ComposerOutcomeList from './outcomeList/ComposerOutcomeList'
 import ComposerRecipientList from './recipientList/ComposerRecipientList'
 import ComposerSlotList from './slotList/ComposerSlotList'
-import ComposerSolverCoreDataInputControl from './general/ComposerSolverCoreDataInputControl'
 import FloatingActionButton from '@cambrian/app/components/buttons/FloatingActionButton'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
@@ -30,7 +30,7 @@ export type SolverControllerType =
     | 'RecipientListControl'
     | 'OutcomeListControl'
     | 'TimingControl'
-    | 'CoreInput'
+    | 'Modules'
 
 export const ComposerSolverControl = () => {
     const { dispatch, currentSolver } = useComposerContext()
@@ -62,8 +62,8 @@ export const ComposerSolverControl = () => {
                 return <ComposerOutcomeList />
             case 'SlotControl':
                 return <ComposerSlotList />
-            case 'CoreInput':
-                return <ComposerSolverCoreDataInputControl />
+            case 'Modules':
+                return <ComposerModuleList />
             default:
                 return <></>
         }
@@ -94,19 +94,19 @@ export const ComposerSolverControl = () => {
                                     paragraph="Directly edit settings and data. Or, add flags for later editing in templates and proposals."
                                 />
                                 <Box gap="small">
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<Gear />}
                                         title="Settings"
                                         onClick={toggleShowSolverSettingsModal}
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<TreeStructure />}
                                         title="Outcome list"
                                         onClick={() =>
                                             setController('OutcomeListControl')
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<UserList />}
                                         title={'Recipient list'}
                                         onClick={() =>
@@ -115,20 +115,19 @@ export const ComposerSolverControl = () => {
                                             )
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<ArrowSquareIn />}
                                         title={'Slot list'}
                                         onClick={() =>
                                             setController('SlotControl')
                                         }
                                     />
-                                    <BaseMenuListItem
+                                    <BaseListItemButton
                                         icon={<Cube />}
-                                        title={'Core Input'}
-                                        onClick={() =>
-                                            setController('CoreInput')
-                                        }
+                                        title={'Modules'}
+                                        onClick={() => setController('Modules')}
                                     />
+                                    <Box pad="medium" />
                                 </Box>
                             </Box>
                             <SidebarCardFooter>

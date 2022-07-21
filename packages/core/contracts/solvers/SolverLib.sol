@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./Solver.sol";
 import "../interfaces/ISolver.sol";
 import "../interfaces/IConditionalTokens.sol";
 import "../interfaces/ISolverFactory.sol";
+import "../interfaces/IModule.sol";
+import "../modules/Modulated.sol";
 import "../FullMath.sol";
 
 library SolverLib {
@@ -26,12 +28,6 @@ library SolverLib {
         ArbitrationRequested, // Arbitration has been requested for this condition
         ArbitrationDelivered, // Arbitration (except 'null' arbitration) has been delivered for this condition
         OutcomeReported // Outcome has been reported to the CTF via reportPayouts()
-    }
-
-    struct Multihash {
-        bytes32 digest;
-        uint8 hashFunction;
-        uint8 size;
     }
 
     // Expected sources of data being ingested into the Solver
@@ -59,7 +55,7 @@ library SolverLib {
         address keeper; // Keeper address
         address arbitrator; // Arbitrator address
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
-        bytes data; // Arbitrary data
+        Modulated.Loader[] moduleLoaders; // Arbitrary data
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
         ConditionBase conditionBase; // Base to create conditions from
     }
@@ -84,7 +80,7 @@ library SolverLib {
         bytes32 amountSlot; // Slot for amount of collateral being used        // TODO maybe make this dynamic also
         uint256[] partition; // Partition of positions for payouts
         Allocation[] allocations; // Allocations for each partition
-        Multihash[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
+        string[] outcomeURIs; // Resource containing human-friendly descriptions of the conditions for this Solver
     }
 
     struct Allocation {
@@ -282,7 +278,7 @@ library SolverLib {
         reportPayouts(ctfAddress, condition);
     }
 
-    function arbitrationRequested(Condition storage condition) public {
+    function requestArbitration(Condition storage condition) public {
         condition.status = Status.ArbitrationRequested;
         emit ChangedStatus(condition.conditionId);
     }

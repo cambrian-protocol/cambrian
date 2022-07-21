@@ -99,12 +99,8 @@ describe("Solver", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -114,7 +110,7 @@ describe("Solver", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         canon0,
       ],
@@ -267,12 +263,8 @@ describe("Solver", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -282,7 +274,7 @@ describe("Solver", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         canon0,
       ],
@@ -431,12 +423,8 @@ describe("Solver", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -446,7 +434,7 @@ describe("Solver", function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         canon0,
       ],
@@ -598,12 +586,8 @@ describe("Solver", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -613,7 +597,7 @@ describe("Solver", function () {
         keeper: this.keeper.address,
         arbitrator: this.arbitrator.address,
         timelockSeconds: 0,
-        data: ethers.utils.formatBytes32String(""),
+        moduleLoaders: [],
         ingests: ingests0,
         conditionBase: canon0,
       },

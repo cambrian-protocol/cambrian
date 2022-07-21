@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "../interfaces/ISolver.sol";
 import "../interfaces/IArbitratorFactory.sol";
 import "../solvers/SolverLib.sol";
-import "./ArbitratorInterface.sol";
+import "../modules/arbitration/Arbitrator.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract BasicArbitrator is
-    ArbitratorInterface,
+    Arbitrator,
     Initializable,
     OwnableUpgradeable,
     ReentrancyGuard
@@ -75,9 +75,15 @@ contract BasicArbitrator is
 
     /**
      * @notice If Dispute already exists, returns the fee from when was created. Else, the current fee
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param solver Solver address
+     * @param conditionIndex Condition index
      */
-    function getFee(bytes32 disputeId) public view returns (uint256) {
+    function getFee(ISolver solver, uint256 conditionIndex)
+        public
+        view
+        returns (uint256)
+    {
+        bytes32 disputeId = keccak256(abi.encode(solver, conditionIndex));
         if (disputes[disputeId].id != bytes32("")) {
             // Dispute exists
             return disputes[disputeId].fee;
@@ -108,7 +114,7 @@ contract BasicArbitrator is
     /**
      * @notice Add additional lapse duration to an active dispute
      * @dev onlyOwner
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      * @param extraTime Additional lapse in seconds
      */
     function extendLapse(bytes32 disputeId, uint256 extraTime)
@@ -121,7 +127,7 @@ contract BasicArbitrator is
 
     /**
      * @notice True when a dispute has lapsed
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function isLapsed(bytes32 disputeId) public view returns (bool) {
         return
@@ -136,16 +142,21 @@ contract BasicArbitrator is
      * @dev Only callable while Solver condition is Status.OutcomeProposed or Status.ArbitrationRequested
      * @param solver Address of solver
      * @param conditionIndex Index of condition for which arbitration is being requested
-     * @param desiredOutcome Outcome report being requested by the disputer
+     * @param outcomes Outcome report being requested by the disputer
      */
     function requestArbitration(
         ISolver solver,
         uint256 conditionIndex,
-        uint256[] calldata desiredOutcome
-    ) external payable override {
+        uint256[] calldata outcomes
+    ) external payable {
         address _arbitrator = solver.arbitrator();
 
         require(_arbitrator == address(this), "Wrong arbitrator");
+
+        require(
+            solver.isRecipient(msg.sender, conditionIndex),
+            "Only recipients"
+        );
 
         SolverLib.Status status = solver.getStatus(conditionIndex);
 
@@ -162,7 +173,10 @@ contract BasicArbitrator is
 
         bytes32 _disputeId = keccak256(abi.encode(solver, conditionIndex));
 
-        require(msg.value >= getFee(_disputeId), "Insufficient fee");
+        require(
+            msg.value >= getFee(solver, conditionIndex),
+            "Insufficient fee"
+        );
         balances[msg.sender] += msg.value - fee; // Refund the difference to msg.sender's balance
 
         Dispute storage dispute = disputes[_disputeId];
@@ -186,8 +200,8 @@ contract BasicArbitrator is
         }
 
         dispute.disputers.push(msg.sender);
-        dispute.choices.push(desiredOutcome);
-        solver.arbitrationRequested(conditionIndex);
+        dispute.choices.push(outcomes);
+        _requestArbitration(solver, conditionIndex);
     }
 
     /**
@@ -195,17 +209,16 @@ contract BasicArbitrator is
      * @dev Callable on any active dispute
      * @dev onlyOwner
      * @dev isRequested
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function arbitrateNull(bytes32 disputeId)
-        external
-        override
+        public
         onlyOwner
         isRequested(disputeId)
     {
         Dispute storage dispute = disputes[disputeId];
 
-        dispute.solver.arbitrateNull(dispute.conditionIndex);
+        _arbitrateNull(dispute.solver, dispute.conditionIndex);
 
         reimburse(disputeId);
 
@@ -219,12 +232,11 @@ contract BasicArbitrator is
      * @dev Callable only when timelock has passed
      * @dev onlyOwner
      * @dev isRequested
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      * @param choice index of the chosen desiredOutcome from dispute.choices
      */
     function arbitrate(bytes32 disputeId, uint256 choice)
-        external
-        override
+        public
         onlyOwner
         isRequested(disputeId)
     {
@@ -236,7 +248,8 @@ contract BasicArbitrator is
             "Timelocked"
         );
 
-        dispute.solver.arbitrate(
+        _arbitrate(
+            dispute.solver,
             dispute.conditionIndex,
             dispute.choices[choice]
         );
@@ -248,7 +261,7 @@ contract BasicArbitrator is
      * @notice Delivers arbitration as the Keeper's proposed report and refunds all disputers who requested arbitration
      * @dev Callable when a dispute has lapsed. Also hides this arbitrator in ArbitratorFactory
      * @dev isRequested
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function claimLapse(bytes32 disputeId) external isRequested(disputeId) {
         Dispute memory dispute = disputes[disputeId];
@@ -259,15 +272,14 @@ contract BasicArbitrator is
             .solver
             .condition(dispute.conditionIndex);
 
-        dispute.solver.arbitrate(dispute.conditionIndex, condition.payouts);
+        _arbitrate(dispute.solver, dispute.conditionIndex, condition.payouts);
         reimburse(disputeId);
-        _hideArbitrator();
     }
 
     /**
      * @notice Adds withdrawal balance to the arbitrator and disputers whose choice matched the arbitrator's ruling
      * @dev Arbitrator must select from disputed choices
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      * @param choice index of the chosen desiredOutcome from dispute.choices
      */
     function imburse(bytes32 disputeId, uint256 choice) private {
@@ -290,7 +302,7 @@ contract BasicArbitrator is
 
     /**
      * @notice Adds withdrawal balance to all disputers
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function reimburse(bytes32 disputeId) private {
         Dispute storage dispute = disputes[disputeId];
@@ -303,7 +315,7 @@ contract BasicArbitrator is
 
     /**
      * @notice Gets timelock of the condition being disputed
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function getTimelock(bytes32 disputeId)
         public
@@ -317,7 +329,7 @@ contract BasicArbitrator is
 
     /**
      * @notice Dispute getter
-     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionId))
+     * @param disputeId keccak256(abi.encode(address solver, uint256 conditionIndex))
      */
     function getDispute(bytes32 disputeId)
         public
@@ -342,33 +354,45 @@ contract BasicArbitrator is
     }
 
     /**
-     * @notice Sets visible=true on ArbitratorFactory's list of arbitrators
-     * @dev onlyOwner
-     */
-    function unhideArbitrator() external onlyOwner {
-        arbitratorFactory.unhideArbitrator();
-    }
-
-    /**
-     * @notice Sets visible=false on ArbitratorFactory's list of arbitrators
-     * @dev onlyOwner
-     */
-    function hideArbitrator() external onlyOwner {
-        _hideArbitrator();
-    }
-
-    /**
-     * @notice Sets visible=false on ArbitratorFactory's list of arbitrators
-     * @dev Called by owner through hideArbitrator() or automatically by claimlapse()
-     */
-    function _hideArbitrator() internal {
-        arbitratorFactory.hideArbitrator();
-    }
-
-    /**
      * @notice Increases current owner's balance
      */
     receive() external payable {
         balances[owner()] += msg.value;
+    }
+
+    // Overrides
+    function requestArbitration(ISolver solver, uint256 conditionIndex)
+        external
+        payable
+        override
+    {
+        solver;
+        conditionIndex;
+        revert(
+            "Call requestArbitration(bytes32 disputeId, uint256 choice) instead"
+        );
+    }
+
+    // Overrides
+    function arbitrate(
+        ISolver solver,
+        uint256 conditionIndex,
+        uint256[] memory outcomes
+    ) external pure override {
+        solver;
+        conditionIndex;
+        outcomes;
+        revert("Call arbitrate(bytes32 disputeId, uint256 choice) instead");
+    }
+
+    // Overrides
+    function arbitrateNull(ISolver solver, uint256 conditionIndex)
+        external
+        pure
+        override
+    {
+        solver;
+        conditionIndex;
+        revert("Call arbitrateNull(bytes32 disputeId) instead");
     }
 }

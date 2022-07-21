@@ -3,12 +3,13 @@ import { FlowElement, Handle, Position } from 'react-flow-renderer'
 import React, { memo, useEffect, useState } from 'react'
 import { StackSimple, TreeStructure } from 'phosphor-react'
 
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeModel'
+import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export const OutcomeCollectionNode = memo((props: FlowElement) => {
     const { composer } = useComposerContext()
-    const [currentOCNode, setCurrentOCNode] = useState<OutcomeCollectionModel>()
+    const [currentOCNode, setCurrentOCNode] =
+        useState<ComposerOutcomeCollectionModel>()
 
     useEffect(() => {
         const idPathArr = props.id.split('/')
@@ -30,7 +31,7 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
                 background="secondary-gradient"
                 pad="small"
                 width={{ min: 'small', max: 'small' }}
-                round="small"
+                round="xsmall"
                 gap="small"
             >
                 <Box align="center" gap="small">
@@ -51,7 +52,7 @@ export const OutcomeCollectionNode = memo((props: FlowElement) => {
                             }}
                             margin={'xsmall'}
                             align="center"
-                            round="small"
+                            round="xsmall"
                             background="background-contrast"
                         >
                             <TreeStructure color="white" size="18" />

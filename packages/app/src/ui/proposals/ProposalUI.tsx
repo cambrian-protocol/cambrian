@@ -1,130 +1,155 @@
-import { Box, Heading } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import React, { useEffect, useState } from 'react'
-import Stagehand, { StageNames, Stages } from '@cambrian/app/classes/Stagehand'
+import { Box, Button, Stack } from 'grommet'
+import { CaretDown, CaretUp } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import FundProposalForm from './forms/FundProposalForm'
-import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
+import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
+import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'
+import Custom404Page from 'packages/app/pages/404'
+import FlexInputInfo from '../common/FlexInputInfo'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import ProposalContextHeader from './ProposalContextHeader'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { ethers } from 'ethers'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
-import { useRouter } from 'next/router'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import PriceInfo from '@cambrian/app/components/info/PriceInfo'
+import ProposalContentInfo from './ProposalContentInfo'
+import ProposalControlbar from './ProposalControlbar'
+import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-interface ProposalUIProps {
-    proposal: ethers.Contract
-    proposalsHub: ProposalsHub
-    currentUser: UserType
-}
+const ProposalUI = ({}) => {
+    const { currentUser } = useCurrentUser()
+    const {
+        isLoaded,
+        proposalStack,
+        proposalStatus,
+        proposalStreamDoc,
+        templateStreamDoc,
+    } = useProposal()
+    const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
-const ProposalUI = ({
-    proposalsHub,
-    proposal,
-    currentUser,
-}: ProposalUIProps) => {
-    const [metaStages, setMetaStages] = useState<Stages>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [isProposalExecuted, setIsProposalExecuted] = useState(false)
-    const router = useRouter()
-
-    useEffect(() => {
-        initProposalStatus()
-        initMetaData()
-    }, [])
+    const [showMessenger, setShowMessenger] = useState(true)
+    const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     useEffect(() => {
-        if (isProposalExecuted) {
-            pushToSolver()
-        }
-    }, [isProposalExecuted])
+        init()
+    }, [currentUser])
 
-    const pushToSolver = async () => {
-        if (currentUser.chainId && currentUser.signer) {
-            try {
-                const ipfsSolutionsHub = new IPFSSolutionsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-                const solvers = await ipfsSolutionsHub.getSolvers(
-                    proposal.solutionId
-                )
-                if (!solvers) throw GENERAL_ERROR['NO_SOLVERS_FOUND']
-                router.push(`/solvers/${solvers[0]}`)
-            } catch (e) {
-                cpLogger.push(e)
-            }
-        }
-    }
-
-    const initProposalStatus = async () => {
-        try {
-            setIsProposalExecuted(await proposal.isExecuted)
-        } catch (e) {
-            cpLogger.push(e)
-        }
-    }
-
-    const initMetaData = async () => {
-        try {
-            if (!proposal.metadataCID) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const metadataCIDString = getMultihashFromBytes32(
-                proposal.metadataCID
+    const init = async () => {
+        if (proposalStack && currentUser) {
+            const ct = await fetchTokenInfo(
+                proposalStack.proposal.price.tokenAddress,
+                currentUser.web3Provider
             )
-
-            if (!metadataCIDString) throw GENERAL_ERROR['INVALID_METADATA']
-
-            const stagehand = new Stagehand()
-            const stages = await stagehand.loadStages(
-                metadataCIDString,
-                StageNames.proposal
-            )
-
-            if (!stages) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
-
-            setMetaStages(stages)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            if (ct) setCollateralToken(ct)
         }
     }
+
+    const initMessenger =
+        proposalStreamDoc &&
+        !!templateStreamDoc?.content.receivedProposals[
+            proposalStreamDoc.id.toString()
+        ] &&
+        currentUser
 
     return (
-        <Box align="center">
-            {metaStages ? (
-                <Box gap="medium" pad="medium" width={{ max: 'large' }}>
-                    <Heading level="2">Proposal Funding</Heading>
-                    <ProposalContextHeader
-                        proposal={metaStages.proposal as ProposalModel}
-                        template={metaStages.template as TemplateModel}
-                    />
-                    <FundProposalForm
-                        currentUser={currentUser}
-                        metaStages={metaStages}
-                        proposalsHub={proposalsHub}
-                        proposal={proposal}
-                        setIsProposalExecuted={setIsProposalExecuted}
-                    />
-                    <Box pad="medium" />
-                </Box>
-            ) : errorMessage ? (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
+        <>
+            {!isLoaded ? (
+                <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
+            ) : proposalStack ? (
+                <Stack anchor="bottom-right">
+                    <PageLayout
+                        contextTitle={proposalStack.proposal.title}
+                        kind="narrow"
+                    >
+                        <Box pad="large">
+                            <ProposalHeader
+                                proposalStack={proposalStack}
+                                proposalStatus={proposalStatus}
+                            />
+                            <Box
+                                height={{ min: 'auto' }}
+                                pad={{ top: 'large' }}
+                                gap="medium"
+                            >
+                                <ProposalContentInfo
+                                    hideTitle
+                                    proposal={proposalStack.proposal}
+                                />
+                                <PlainSectionDivider />
+                                <PriceInfo
+                                    amount={proposalStack.proposal.price.amount}
+                                    label="Proposed Price"
+                                    token={collateralToken}
+                                />
+                                <FlexInputInfo
+                                    flexInputs={
+                                        proposalStack.proposal.flexInputs
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <BasicProfileInfo
+                                    did={proposalStack.proposal.author}
+                                />
+                                <ProposalControlbar />
+                            </Box>
+                        </Box>
+                    </PageLayout>
+                    {initMessenger && (
+                        <Box pad={{ right: 'large' }}>
+                            <BaseFormContainer
+                                pad="small"
+                                width={{ min: 'medium' }}
+                                gap="medium"
+                            >
+                                <Box direction="row" justify="between">
+                                    <BasicProfileInfo
+                                        did={
+                                            currentUser?.selfID.did.id ===
+                                            proposalStack.proposal.author
+                                                ? proposalStack.template.author
+                                                : proposalStack.proposal.author
+                                        }
+                                        hideDetails
+                                        size="small"
+                                    />
+                                    <Button
+                                        icon={
+                                            showMessenger ? (
+                                                <CaretDown />
+                                            ) : (
+                                                <CaretUp />
+                                            )
+                                        }
+                                        onClick={toggleShowMessenger}
+                                    />
+                                </Box>
+                                {showMessenger && (
+                                    <Messenger
+                                        currentUser={currentUser}
+                                        chatID={proposalStreamDoc.id.toString()}
+                                        chatType={
+                                            proposalStatus ===
+                                                ProposalStatus.Funding ||
+                                            proposalStatus ===
+                                                ProposalStatus.Executed
+                                                ? 'Proposal'
+                                                : 'Draft'
+                                        }
+                                    />
+                                )}
+                            </BaseFormContainer>
+                        </Box>
+                    )}
+                </Stack>
             ) : (
-                <LoadingScreen context={LOADING_MESSAGE['METADATA']} />
+                <Custom404Page />
             )}
-        </Box>
+        </>
     )
 }
 

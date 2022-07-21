@@ -1,4 +1,4 @@
-import ListItem from '@cambrian/app/components/list/ListItem'
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TreeStructure } from 'phosphor-react'
 import UpdateOutcomeModal from './modals/UpdateOutcomeModal'
@@ -25,7 +25,7 @@ const ComposerOutcomeListItem = ({ outcome }: ComposerOutcomeListItemPrpos) => {
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 icon={<TreeStructure />}
                 description="Outcome"
                 title={outcome.title}

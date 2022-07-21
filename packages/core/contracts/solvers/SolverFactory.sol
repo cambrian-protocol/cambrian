@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -18,6 +18,12 @@ contract SolverFactory {
         ctfAddress = _ctfAddress;
     }
 
+    /**
+        @notice Deploys Solver clone and calls init function
+        @param chainParent Parent solver, or address(0)
+        @param chainIndex Index of solver in its chain
+        @param solverConfig Solver configuration
+    */
     function createSolver(
         address chainParent,
         uint256 chainIndex,
@@ -30,7 +36,7 @@ contract SolverFactory {
         require(
             (chainParent == address(0) && chainIndex == 0) ||
                 (chainParent != address(0) && chainIndex > 0),
-            "Invalid chain parent/index"
+            "SolverFactory::Invalid chain parent/index"
         );
 
         address clone = Clones.clone(address(solverConfig.implementation));

@@ -20,7 +20,7 @@ const USPCard = ({ icon, title, description, href }: USPCardProps) => {
                     hoverIndicator={{ background: 'background-contrast-hover' }}
                     elevation="small"
                     pad={{ vertical: 'large', horizontal: 'medium' }}
-                    round="small"
+                    round="xsmall"
                     height="medium"
                     width={{ min: '20rem', max: '20rem' }}
                     background="background-contrast"

@@ -35,7 +35,7 @@ export const config = {
   solidity: {
     compilers: [
       {
-        version: "0.8.13",
+        version: "0.8.14",
         settings: {
           optimizer: {
             enabled: true,
@@ -51,7 +51,7 @@ export const config = {
   },
   gasReporter: {
     currency: "USD",
-    gasPrice: 32,
+    gasPrice: 2,
     coinmarketcap: "5dc6d6fd-09c5-4c48-8296-9e2b44dde46a",
   },
   typechain: {

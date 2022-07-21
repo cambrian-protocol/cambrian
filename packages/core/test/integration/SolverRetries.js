@@ -109,12 +109,8 @@ describe("SolverRetries", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -173,12 +169,8 @@ describe("SolverRetries", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -188,7 +180,7 @@ describe("SolverRetries", async function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         conditionBase0,
       ],
@@ -197,7 +189,7 @@ describe("SolverRetries", async function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests1,
         conditionBase1,
       ],
@@ -374,12 +366,8 @@ describe("SolverRetries", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -438,12 +426,8 @@ describe("SolverRetries", async function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -453,7 +437,7 @@ describe("SolverRetries", async function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests0,
         conditionBase0,
       ],
@@ -462,7 +446,7 @@ describe("SolverRetries", async function () {
         this.keeper.address,
         this.arbitrator.address,
         0,
-        ethers.utils.formatBytes32String(""),
+        [],
         ingests1,
         conditionBase1,
       ],

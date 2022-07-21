@@ -1,0 +1,341 @@
+{
+  "address": "0x4e4b0d87FF771C3D7d6e466ce3BBC226B4aBBEb4",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "arbitrator",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "CreatedArbitrator",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "address_to_arbitrator",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "arbitrator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "arbitrators",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "arbitrator",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "initParams",
+          "type": "bytes"
+        }
+      ],
+      "name": "createArbitrator",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "implementations",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x5f12bf6d78dd54bfcc7c5747a2f9752c591e2592b47e6668ade81df36c60c64b",
+  "receipt": {
+    "to": null,
+    "from": "0x676d41fedD0f24f282a4579C6d0C8E3B2099f0EF",
+    "contractAddress": "0x4e4b0d87FF771C3D7d6e466ce3BBC226B4aBBEb4",
+    "transactionIndex": 8,
+    "gasUsed": "502211",
+    "logsBloom": "0x00000000000000000000040000000000000000000000000000800000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000001020000000000000000000400000000000000020000000000000000000800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000040000000000000000000000000000000200000000000000000000000",
+    "blockHash": "0x58eafbde1104674098f2b00d8271146f0778fb1e795449442c70439cacffd94c",
+    "transactionHash": "0x5f12bf6d78dd54bfcc7c5747a2f9752c591e2592b47e6668ade81df36c60c64b",
+    "logs": [
+      {
+        "transactionIndex": 8,
+        "blockNumber": 12364753,
+        "transactionHash": "0x5f12bf6d78dd54bfcc7c5747a2f9752c591e2592b47e6668ade81df36c60c64b",
+        "address": "0x4e4b0d87FF771C3D7d6e466ce3BBC226B4aBBEb4",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x000000000000000000000000676d41fedd0f24f282a4579c6d0c8e3b2099f0ef"
+        ],
+        "data": "0x",
+        "logIndex": 7,
+        "blockHash": "0x58eafbde1104674098f2b00d8271146f0778fb1e795449442c70439cacffd94c"
+      }
+    ],
+    "blockNumber": 12364753,
+    "cumulativeGasUsed": "2256009",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "816e3735d9aca0b2eb7dc28bffe77065",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"arbitrator\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"CreatedArbitrator\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"address_to_arbitrator\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"arbitrator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"arbitrators\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"arbitrator\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"initParams\",\"type\":\"bytes\"}],\"name\":\"createArbitrator\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"implementations\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"createArbitrator(address,bytes)\":{\"params\":{\"implementation\":\"Address of the implementation contract\",\"initParams\":\"Params for the initializer function of the implementation\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"createArbitrator(address,bytes)\":{\"notice\":\"Deploys a clone of an implementation and initializes it\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/arbitration/ArbitratorFactory.sol\":\"ArbitratorFactory\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../utils/Context.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the owner account will be the one that deploys the contract. This\\n * can later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract Ownable is Context {\\n    address private _owner;\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the deployer as the initial owner.\\n     */\\n    constructor() {\\n        _setOwner(_msgSender());\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        require(owner() == _msgSender(), \\\"Ownable: caller is not the owner\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions anymore. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby removing any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _setOwner(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        require(newOwner != address(0), \\\"Ownable: new owner is the zero address\\\");\\n        _setOwner(newOwner);\\n    }\\n\\n    function _setOwner(address newOwner) private {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n}\\n\",\"keccak256\":\"0x6bb804a310218875e89d12c053e94a13a4607cdf7cc2052f3e52bd32a0dc50a1\",\"license\":\"MIT\"},\"@openzeppelin/contracts/proxy/Clones.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev https://eips.ethereum.org/EIPS/eip-1167[EIP 1167] is a standard for\\n * deploying minimal proxy contracts, also known as \\\"clones\\\".\\n *\\n * > To simply and cheaply clone contract functionality in an immutable way, this standard specifies\\n * > a minimal bytecode implementation that delegates all calls to a known, fixed address.\\n *\\n * The library includes functions to deploy a proxy using either `create` (traditional deployment) or `create2`\\n * (salted deterministic deployment). It also includes functions to predict the addresses of clones deployed using the\\n * deterministic method.\\n *\\n * _Available since v3.4._\\n */\\nlibrary Clones {\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create opcode, which should never revert.\\n     */\\n    function clone(address implementation) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create(0, ptr, 0x37)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create failed\\\");\\n    }\\n\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create2 opcode and a `salt` to deterministically deploy\\n     * the clone. Using the same `implementation` and `salt` multiple time will revert, since\\n     * the clones cannot be deployed twice at the same address.\\n     */\\n    function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create2(0, ptr, 0x37, salt)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create2 failed\\\");\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(\\n        address implementation,\\n        bytes32 salt,\\n        address deployer\\n    ) internal pure returns (address predicted) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf3ff00000000000000000000000000000000)\\n            mstore(add(ptr, 0x38), shl(0x60, deployer))\\n            mstore(add(ptr, 0x4c), salt)\\n            mstore(add(ptr, 0x6c), keccak256(ptr, 0x37))\\n            predicted := keccak256(add(ptr, 0x37), 0x55)\\n        }\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(address implementation, bytes32 salt)\\n        internal\\n        view\\n        returns (address predicted)\\n    {\\n        return predictDeterministicAddress(implementation, salt, address(this));\\n    }\\n}\\n\",\"keccak256\":\"0xa3bbab77849522b73d8c6cd3d2ac54bef7580e4354484f35f4cabf55d3d2b3f9\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n}\\n\",\"keccak256\":\"0x90565a39ae45c80f0468dc96c7b20d0afc3055f344c8203a0c9258239f350b9f\",\"license\":\"MIT\"},\"contracts/arbitration/ArbitratorFactory.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\r\\n\\r\\npragma solidity ^0.8.14;\\r\\n\\r\\nimport \\\"@openzeppelin/contracts/proxy/Clones.sol\\\";\\r\\nimport \\\"@openzeppelin/contracts/access/Ownable.sol\\\";\\r\\n\\r\\ncontract ArbitratorFactory is Ownable {\\r\\n    bytes4 private constant CLONE_INIT_SELECTOR =\\r\\n        bytes4(keccak256(\\\"init(bytes)\\\"));\\r\\n\\r\\n    struct Arbitrator {\\r\\n        uint256 index;\\r\\n        address arbitrator;\\r\\n        address implementation;\\r\\n    }\\r\\n\\r\\n    Arbitrator[] public arbitrators; // All available arbitrators\\r\\n    address[] public implementations; // All implementations that have ever been allowed\\r\\n\\r\\n    mapping(address => Arbitrator) public address_to_arbitrator;\\r\\n\\r\\n    event CreatedArbitrator(\\r\\n        address indexed arbitrator,\\r\\n        address indexed implementation\\r\\n    );\\r\\n\\r\\n    /**\\r\\n     * @notice Deploys a clone of an implementation and initializes it\\r\\n     * @param implementation Address of the implementation contract\\r\\n     * @param initParams Params for the initializer function of the implementation\\r\\n     */\\r\\n    function createArbitrator(address implementation, bytes calldata initParams)\\r\\n        external\\r\\n        returns (address)\\r\\n    {\\r\\n        address clone = Clones.clone(implementation);\\r\\n\\r\\n        bytes memory data = abi.encodeWithSelector(\\r\\n            CLONE_INIT_SELECTOR,\\r\\n            initParams\\r\\n        );\\r\\n        (bool success, bytes memory retData) = clone.call{value: 0}(data);\\r\\n\\r\\n        require(success, \\\"Initialization call failed\\\");\\r\\n\\r\\n        Arbitrator memory arbitrator;\\r\\n        arbitrator.arbitrator = clone;\\r\\n        arbitrator.implementation = implementation;\\r\\n        arbitrator.index = arbitrators.length; // Array index for new arbitrator\\r\\n\\r\\n        // Add to arbitrators array and map\\r\\n        arbitrators.push(arbitrator);\\r\\n        address_to_arbitrator[clone] = arbitrator;\\r\\n\\r\\n        emit CreatedArbitrator(clone, implementation);\\r\\n        return clone;\\r\\n    }\\r\\n}\\r\\n\",\"keccak256\":\"0xcfe545c4825aa1393b3e5a9575e32adda4af5e10370715649203a9a397728d53\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061001a3361001f565b61006f565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6107aa8061007e6000396000f3fe608060405234801561001057600080fd5b506004361061006d5760003560e01c80635a67446314610072578063715018a6146100d7578063845affc8146100e15780638da5cb5b1461010c5780639353c18914610114578063a6430cc014610127578063f2fde38b1461013a575b600080fd5b6100ad610080366004610618565b60036020526000908152604090208054600182015460029092015490916001600160a01b03908116911683565b604080519384526001600160a01b0392831660208501529116908201526060015b60405180910390f35b6100df61014d565b005b6100f46100ef36600461063a565b610191565b6040516001600160a01b0390911681526020016100ce565b6100f46101bb565b6100f4610122366004610653565b6101ca565b6100ad61013536600461063a565b610434565b6100df610148366004610618565b610474565b336101566101bb565b6001600160a01b0316146101855760405162461bcd60e51b815260040161017c906106d5565b60405180910390fd5b61018f6000610514565b565b600281815481106101a157600080fd5b6000918252602090912001546001600160a01b0316905081565b6000546001600160a01b031690565b6000806101d685610564565b905060007f4ddf47d42b0805152162d9c7d618efff08ffcd16086dd0bb57ec336c014a9948858560405160240161020e92919061070a565b604051602081830303815290604052906001600160e01b0319166020820180516001600160e01b0383818316178352505050509050600080836001600160a01b03166000846040516102609190610739565b60006040518083038185875af1925050503d806000811461029d576040519150601f19603f3d011682016040523d82523d6000602084013e6102a2565b606091505b5091509150816102f15760405162461bcd60e51b815260206004820152601a602482015279125b9a5d1a585b1a5e985d1a5bdb8818d85b1b0819985a5b195960321b604482015260640161017c565b604080516060810182526001600160a01b0386811660208084018281528d84168587018181526001805480895280820182556000828152895160039283027fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf681019190915586517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf782018054918c166001600160a01b031992831617905585517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf89092018054928c1692821692909217909155888252919096528986208951815594519185018054928916928216929092179091559051600290930180549390961692169190911790935593519293919290917f4f8840854068f3df6fda9ea1b48b84044ff6d8773dc07916aec5d6eb8d16cbf291a35092979650505050505050565b6001818154811061044457600080fd5b60009182526020909120600390910201805460018201546002909201549092506001600160a01b03918216911683565b3361047d6101bb565b6001600160a01b0316146104a35760405162461bcd60e51b815260040161017c906106d5565b6001600160a01b0381166105085760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161017c565b61051181610514565b50565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528260601b60148201526e5af43d82803e903d91602b57fd5bf360881b60288201526037816000f09150506001600160a01b0381166105fc5760405162461bcd60e51b8152602060048201526016602482015275115490cc4c4d8dce8818dc99585d194819985a5b195960521b604482015260640161017c565b919050565b80356001600160a01b03811681146105fc57600080fd5b60006020828403121561062a57600080fd5b61063382610601565b9392505050565b60006020828403121561064c57600080fd5b5035919050565b60008060006040848603121561066857600080fd5b61067184610601565b925060208401356001600160401b038082111561068d57600080fd5b818601915086601f8301126106a157600080fd5b8135818111156106b057600080fd5b8760208285010111156106c257600080fd5b6020830194508093505050509250925092565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b60208152816020820152818360408301376000818301604090810191909152601f909201601f19160101919050565b6000825160005b8181101561075a5760208186018101518583015201610740565b81811115610769576000828501525b50919091019291505056fea26469706673582212209e62d33262674deace94bd435c95a2354a048cac89621bd3e672869992719f7064736f6c634300080e0033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061006d5760003560e01c80635a67446314610072578063715018a6146100d7578063845affc8146100e15780638da5cb5b1461010c5780639353c18914610114578063a6430cc014610127578063f2fde38b1461013a575b600080fd5b6100ad610080366004610618565b60036020526000908152604090208054600182015460029092015490916001600160a01b03908116911683565b604080519384526001600160a01b0392831660208501529116908201526060015b60405180910390f35b6100df61014d565b005b6100f46100ef36600461063a565b610191565b6040516001600160a01b0390911681526020016100ce565b6100f46101bb565b6100f4610122366004610653565b6101ca565b6100ad61013536600461063a565b610434565b6100df610148366004610618565b610474565b336101566101bb565b6001600160a01b0316146101855760405162461bcd60e51b815260040161017c906106d5565b60405180910390fd5b61018f6000610514565b565b600281815481106101a157600080fd5b6000918252602090912001546001600160a01b0316905081565b6000546001600160a01b031690565b6000806101d685610564565b905060007f4ddf47d42b0805152162d9c7d618efff08ffcd16086dd0bb57ec336c014a9948858560405160240161020e92919061070a565b604051602081830303815290604052906001600160e01b0319166020820180516001600160e01b0383818316178352505050509050600080836001600160a01b03166000846040516102609190610739565b60006040518083038185875af1925050503d806000811461029d576040519150601f19603f3d011682016040523d82523d6000602084013e6102a2565b606091505b5091509150816102f15760405162461bcd60e51b815260206004820152601a602482015279125b9a5d1a585b1a5e985d1a5bdb8818d85b1b0819985a5b195960321b604482015260640161017c565b604080516060810182526001600160a01b0386811660208084018281528d84168587018181526001805480895280820182556000828152895160039283027fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf681019190915586517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf782018054918c166001600160a01b031992831617905585517fb10e2d527612073b26eecdfd717e6a320cf44b4afac2b0732d9fcbe2b7fa0cf89092018054928c1692821692909217909155888252919096528986208951815594519185018054928916928216929092179091559051600290930180549390961692169190911790935593519293919290917f4f8840854068f3df6fda9ea1b48b84044ff6d8773dc07916aec5d6eb8d16cbf291a35092979650505050505050565b6001818154811061044457600080fd5b60009182526020909120600390910201805460018201546002909201549092506001600160a01b03918216911683565b3361047d6101bb565b6001600160a01b0316146104a35760405162461bcd60e51b815260040161017c906106d5565b6001600160a01b0381166105085760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161017c565b61051181610514565b50565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528260601b60148201526e5af43d82803e903d91602b57fd5bf360881b60288201526037816000f09150506001600160a01b0381166105fc5760405162461bcd60e51b8152602060048201526016602482015275115490cc4c4d8dce8818dc99585d194819985a5b195960521b604482015260640161017c565b919050565b80356001600160a01b03811681146105fc57600080fd5b60006020828403121561062a57600080fd5b61063382610601565b9392505050565b60006020828403121561064c57600080fd5b5035919050565b60008060006040848603121561066857600080fd5b61067184610601565b925060208401356001600160401b038082111561068d57600080fd5b818601915086601f8301126106a157600080fd5b8135818111156106b057600080fd5b8760208285010111156106c257600080fd5b6020830194508093505050509250925092565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b60208152816020820152818360408301376000818301604090810191909152601f909201601f19160101919050565b6000825160005b8181101561075a5760208186018101518583015201610740565b81811115610769576000828501525b50919091019291505056fea26469706673582212209e62d33262674deace94bd435c95a2354a048cac89621bd3e672869992719f7064736f6c634300080e0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "createArbitrator(address,bytes)": {
+        "params": {
+          "implementation": "Address of the implementation contract",
+          "initParams": "Params for the initializer function of the implementation"
+        }
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "createArbitrator(address,bytes)": {
+        "notice": "Deploys a clone of an implementation and initializes it"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 558,
+        "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 3405,
+        "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+        "label": "arbitrators",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_array(t_struct(Arbitrator)3401_storage)dyn_storage"
+      },
+      {
+        "astId": 3408,
+        "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+        "label": "implementations",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_array(t_address)dyn_storage"
+      },
+      {
+        "astId": 3413,
+        "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+        "label": "address_to_arbitrator",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_mapping(t_address,t_struct(Arbitrator)3401_storage)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_address)dyn_storage": {
+        "base": "t_address",
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(Arbitrator)3401_storage)dyn_storage": {
+        "base": "t_struct(Arbitrator)3401_storage",
+        "encoding": "dynamic_array",
+        "label": "struct ArbitratorFactory.Arbitrator[]",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_struct(Arbitrator)3401_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct ArbitratorFactory.Arbitrator)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Arbitrator)3401_storage"
+      },
+      "t_struct(Arbitrator)3401_storage": {
+        "encoding": "inplace",
+        "label": "struct ArbitratorFactory.Arbitrator",
+        "members": [
+          {
+            "astId": 3396,
+            "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+            "label": "index",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 3398,
+            "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+            "label": "arbitrator",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_address"
+          },
+          {
+            "astId": 3400,
+            "contract": "contracts/arbitration/ArbitratorFactory.sol:ArbitratorFactory",
+            "label": "implementation",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address"
+          }
+        ],
+        "numberOfBytes": "96"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

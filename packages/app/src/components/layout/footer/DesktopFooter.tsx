@@ -4,13 +4,11 @@ import FooterCTASection from './FooterCTASection'
 import FooterCopyrightSection from './FooterCopyrightSection'
 import FooterDisclamerSection from './FooterDisclamerSection'
 import FooterLinksSection from './FooterLinksSection'
+import FooterPartnersSection from './FooterPartnersSection'
 import FooterPrivacyPolicySection from './FooterPrivacyPolicySection'
 import FooterTermsSection from './FooterTermsSection'
-import ThemeToogleButton from '../../buttons/ThemeToogleButton'
 
-interface DesktopFooterProps {}
-
-const DesktopFooter = ({}: DesktopFooterProps) => {
+const DesktopFooter = () => {
     return (
         <Box
             pad={{
@@ -24,6 +22,7 @@ const DesktopFooter = ({}: DesktopFooterProps) => {
                     <FooterLinksSection />
                 </Box>
                 <Box basis="1/2">
+                    <FooterPartnersSection />
                     <FooterCTASection />
                 </Box>
             </Box>
@@ -41,7 +40,7 @@ const DesktopFooter = ({}: DesktopFooterProps) => {
                     <FooterTermsSection />
                     <FooterPrivacyPolicySection />
                     <Box flex />
-                    <ThemeToogleButton size="small" showLabel />
+                    {/* <ThemeToogleButton size="small" showLabel /> */}
                 </Box>
             </Box>
         </Box>

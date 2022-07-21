@@ -1,4 +1,4 @@
-import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
+import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
 import React, { SetStateAction, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
@@ -28,9 +28,9 @@ const OutcomeConfigForm = ({
     const [showLoadCIDModal, setShowLoadCIDModal] = useState(false)
     const [err, setErr] = useState<string>()
     const [isLoading, setIsLoading] = useState(false)
-    
+
     const toggleShowLoadCIDModal = () => setShowLoadCIDModal(!showLoadCIDModal)
-    
+
     const onLoadCID = async () => {
         if (outcomeInput.uri.trim() !== '') {
             setIsLoading(true)
@@ -99,7 +99,7 @@ const OutcomeConfigForm = ({
                             border
                             pad="small"
                             elevation="small"
-                            round="small"
+                            round="xsmall"
                             background="background-contrast"
                         >
                             <Box direction="row" gap="small">

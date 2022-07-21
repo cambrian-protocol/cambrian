@@ -8,16 +8,22 @@ interface FundingProgressMeterProps {
     fundingGoal: BigNumber
     funding: BigNumber
     token: TokenModel
+    userFunding: BigNumber
 }
 
 const FundingProgressMeter = ({
     fundingGoal,
     funding,
     token,
+    userFunding,
 }: FundingProgressMeterProps) => {
     const formattedFunding = ethers.utils.formatUnits(funding, token.decimals)
     const formattedFundingGoal = ethers.utils.formatUnits(
         fundingGoal,
+        token.decimals
+    )
+    const formattedUserFunding = ethers.utils.formatUnits(
+        userFunding,
         token.decimals
     )
     const percentageValue =
@@ -27,7 +33,7 @@ const FundingProgressMeter = ({
 
     return (
         <Box fill>
-            <Box align="center" pad="large">
+            <Box align="center" pad={{ vertical: 'medium' }}>
                 <Stack anchor="center">
                     <Meter
                         type="circle"
@@ -46,12 +52,15 @@ const FundingProgressMeter = ({
                         <Text size="small">%</Text>
                     </Box>
                 </Stack>
-                <Text textAlign="center" size="small" color="dark-4">
+                <Text textAlign="center">
                     {formattedFunding} / {formattedFundingGoal}
                 </Text>
                 <Text textAlign="center" size="small" color="dark-4">
                     Remaining:{' '}
                     {Number(formattedFundingGoal) - Number(formattedFunding)}
+                </Text>
+                <Text textAlign="center" size="small" color="dark-4">
+                    Your funds: {Number(formattedUserFunding)}
                 </Text>
             </Box>
         </Box>

@@ -1,15 +1,10 @@
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { MultihashType } from '../utils/helpers/multihash'
-import { ParticipantModel } from './ParticipantModel'
-import { SolverConfigModel } from './SolverConfigModel'
-import { TokenModel } from './TokenModel'
-
 export type SolutionModel = {
     id: string
-    seller: ParticipantModel
-    collateralToken: TokenModel
-    solverConfigsCID: MultihashType
-    solverConfigs: SolverConfigModel[]
+    executed: boolean
+    collateralToken: string
     proposalId: string
-    finalComposition: CompositionModel
+    proposalsHub: string
+    solverConfigsHash: string
+    solverConfigsURI: string
+    solverAddresses: string[]
 }

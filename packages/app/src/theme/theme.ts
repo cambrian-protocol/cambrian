@@ -9,8 +9,8 @@ const colors: any = {
     active: '#799AB850',
     'background-back': { dark: '#040f11', light: '#ecfcff' },
     'background-front': {
-        dark: '#2f2f2f',
-        light: '#FFFFFF',
+        dark: '#012b39',
+        light: '#76d3e6',
     },
     'background-contrast': {
         dark: '#00202b',
@@ -28,6 +28,13 @@ const colors: any = {
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
+    'status-ok': '#338233',
+    'dark-4': '#999999',
+    'status-initiated': '#cac63d',
+    'status-reported': '#2ec090',
+    'status-arbitration': '#be8b32',
+    'status-executed': '#59b846',
+    'status-proposed': '#aca0d6',
 }
 
 export const cpTheme = deepMerge(grommet, {
@@ -68,6 +75,11 @@ export const cpTheme = deepMerge(grommet, {
             maxWidth: '336px',
         },
     },
+    card: {
+        container: {
+            round: 'xsmall',
+        },
+    },
     button: {
         hover: {
             background: '#315e79',
@@ -91,6 +103,7 @@ export const cpTheme = deepMerge(grommet, {
             extend: `
             color: white;
             box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            white-space: nowrap;
             `,
         },
         secondary: {
@@ -102,6 +115,7 @@ export const cpTheme = deepMerge(grommet, {
             extend: `
             color: white;
             box-shadow: 0px 4px 4px rgb(0 0 0 / 40%);
+            white-space: nowrap;
             `,
         },
         size: {
@@ -153,5 +167,18 @@ export const cpTheme = deepMerge(grommet, {
             pad: 'none',
             size: '20px',
         },
+    },
+    tabs: {
+        header: {
+            border: { side: 'all' },
+            extend: `
+            border-radius: 5px;
+            padding: 10px;
+            `,
+        },
+    },
+    tab: {
+        border: false,
+        color: 'dark-4',
     },
 })

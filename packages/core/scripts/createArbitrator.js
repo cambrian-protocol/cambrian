@@ -19,10 +19,6 @@ async function main() {
     [this.options.address, this.options.fee, this.options.lapse]
   );
 
-  await this.ArbitratorFactory.connect(this.owner).enableImplementation(
-    this.BasicArbitrator.address
-  );
-
   await this.ArbitratorFactory.connect(this.owner).createArbitrator(
     this.BasicArbitrator.address,
     this.initParams

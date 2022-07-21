@@ -20,7 +20,7 @@ const RecipientAllocationItem = ({
     <BaseSlotInputItem title={title} address={address}>
         <Box align="end">
             <Text>{amountPercentage}%</Text>
-            <Text size="small" color="dark-6">
+            <Text size="small" color="dark-4" textAlign="end">
                 {amount &&
                     `Minted: ${
                         Number(

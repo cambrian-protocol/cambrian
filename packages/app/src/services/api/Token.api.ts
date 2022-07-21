@@ -1,9 +1,7 @@
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { BigNumber, ethers } from 'ethers'
+import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { cpLogger } from './Logger.api'
-
-const ERC20_ABI =
-    require('@cambrian/core/artifacts/contracts/tokens/ToyToken.sol/ToyToken.json').abi
 
 export type TokenResponseType = {
     address: string
@@ -20,15 +18,10 @@ export const TokenAPI = {
     ): Promise<TokenResponseType> => {
         let erc20Contract
         try {
-            erc20Contract = new ethers.Contract(
-                address,
-                new ethers.utils.Interface(ERC20_ABI),
-                provider
-            )
+            erc20Contract = new ethers.Contract(address, ERC20_IFACE, provider)
         } catch (e) {
             cpLogger.push(e)
         }
-
         if (erc20Contract) {
             const [name, decimals, symbol, totalSupply] =
                 await Promise.allSettled([

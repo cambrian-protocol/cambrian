@@ -1,4 +1,4 @@
-import ListItem from '@cambrian/app/components/list/ListItem'
+import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { TreeStructure } from 'phosphor-react'
 import UpdateOutcomeModal from '../../solver/outcomeList/modals/UpdateOutcomeModal'
@@ -36,7 +36,7 @@ const OutcomeSelectionListItem = ({
 
     return (
         <>
-            <ListItem
+            <BaseComposerListItem
                 icon={<TreeStructure />}
                 description="Outcome"
                 isActive={isActive}
