@@ -4,9 +4,9 @@ import FooterCTASection from './FooterCTASection'
 import FooterCopyrightSection from './FooterCopyrightSection'
 import FooterDisclamerSection from './FooterDisclamerSection'
 import FooterLinksSection from './FooterLinksSection'
+import FooterPartnersSection from './FooterPartnersSection'
 import FooterPrivacyPolicySection from './FooterPrivacyPolicySection'
 import FooterTermsSection from './FooterTermsSection'
-import ThemeToogleButton from '../../buttons/ThemeToogleButton'
 
 const MobileFooter = () => (
     <Box
@@ -17,6 +17,7 @@ const MobileFooter = () => (
     >
         <Box border={{ side: 'top' }}>
             <FooterBrandingSection />
+            <FooterPartnersSection />
             <FooterCTASection />
             <FooterLinksSection />
         </Box>

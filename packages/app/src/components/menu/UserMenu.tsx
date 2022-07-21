@@ -1,4 +1,12 @@
-import { Books, Question, SignIn, SignOut, Wallet } from 'phosphor-react'
+import {
+    Books,
+    ChartBar,
+    Question,
+    SignIn,
+    SignOut,
+    User,
+    Wallet,
+} from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -7,7 +15,6 @@ import {
 import BaseAvatar from '../avatars/BaseAvatar'
 import { Menu } from 'grommet'
 import React from 'react'
-import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
@@ -15,12 +22,6 @@ import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export default function UserMenu() {
     const { currentUser, disconnectWallet, connectWallet } = useCurrentUser()
-
-    let chainName = 'Chain not supported'
-
-    if (currentUser.chainId && SUPPORTED_CHAINS[currentUser.chainId]) {
-        chainName = SUPPORTED_CHAINS[currentUser.chainId].chainData.name
-    }
 
     const menuItems: {}[] = [
         {
@@ -35,15 +36,21 @@ export default function UserMenu() {
         },
     ]
 
-    if (currentUser.address && currentUser.chainId) {
+    if (currentUser) {
         menuItems.unshift({
             label: (
                 <UserMenuItemLabel
-                    subTitle={chainName}
-                    label={ellipseAddress(currentUser.address, 9)}
+                    subTitle={ellipseAddress(currentUser.address, 9)}
+                    label={currentUser.basicProfile?.name || 'Anonym'}
                 />
             ),
-            icon: <UserMenuItemIcon icon={<Wallet />} />,
+            icon: <UserMenuItemIcon icon={<User />} />,
+            href: '/dashboard/profile',
+        })
+        menuItems.unshift({
+            label: <UserMenuItemLabel label="Dashboard" />,
+            icon: <UserMenuItemIcon icon={<ChartBar />} />,
+            href: '/dashboard',
         })
         menuItems.push({
             label: (
@@ -58,11 +65,7 @@ export default function UserMenu() {
         })
     } else {
         menuItems.unshift({
-            label: (
-                <UserMenuItemLabel
-                    label={currentUser?.address || 'Connect Wallet'}
-                />
-            ),
+            label: <UserMenuItemLabel label={'Connect Wallet'} />,
             onClick: connectWallet,
             icon: <UserMenuItemIcon icon={<Wallet />} />,
         })
@@ -80,7 +83,17 @@ export default function UserMenu() {
             dropBackground="background-popup"
             items={menuItems}
         >
-            <BaseAvatar icon={<Wallet />} address={currentUser.address} />
+            {currentUser ? (
+                currentUser.basicProfile?.avatar ? (
+                    <BaseAvatar
+                        pfpPath={currentUser.basicProfile.avatar as string}
+                    />
+                ) : (
+                    <BaseAvatar address={currentUser.address} />
+                )
+            ) : (
+                <BaseAvatar icon={<Wallet />} />
+            )}
         </Menu>
     )
 }

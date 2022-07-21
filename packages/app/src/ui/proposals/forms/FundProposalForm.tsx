@@ -7,6 +7,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -17,18 +18,16 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 interface FundProposalFormProps {
     proposal: ethers.Contract
-    proposalsHub: ProposalsHub
     currentUser: UserType
-    setIsProposalExecuted: React.Dispatch<SetStateAction<boolean>>
 }
 
 type FundProposalFormType = {
@@ -39,12 +38,7 @@ const initialInput = {
     amount: 0,
 }
 
-const FundProposalForm = ({
-    proposal,
-    proposalsHub,
-    currentUser,
-    setIsProposalExecuted,
-}: FundProposalFormProps) => {
+const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
 
     // Necessary to access amount state in approvalListener
@@ -54,6 +48,10 @@ const FundProposalForm = ({
         _setInput(newInput)
     }
 
+    const proposalsHub = new ProposalsHub(
+        currentUser.signer,
+        currentUser.chainId
+    )
     const [funding, setFunding] = useState(BigNumber.from(0))
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
@@ -61,6 +59,9 @@ const FundProposalForm = ({
     const [isInSecondaryTransaction, setIsInSecondaryTransaction] =
         useState(false)
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
+    const [currentUserFunding, setCurrentUserFunding] = useState<BigNumber>(
+        BigNumber.from(0)
+    )
 
     const erc20TokenContract = new ethers.Contract(
         proposal.collateralToken,
@@ -79,6 +80,7 @@ const FundProposalForm = ({
 
     useEffect(() => {
         initAllowance()
+        updateUserFunding(proposal.id)
         erc20TokenContract.on(approvalFilter, approvalListener)
         return () => {
             erc20TokenContract.removeListener(approvalFilter, approvalListener)
@@ -140,6 +142,7 @@ const FundProposalForm = ({
 
         const funding = await proposalsHub.getProposalFunding(proposal.id)
         if (funding) setFunding(funding)
+        await updateUserFunding(proposal.id)
     }
 
     const initProposalsHubListeners = async () => {
@@ -170,7 +173,8 @@ const FundProposalForm = ({
                     proposalId
                 )
                 if (updatedProposal && updatedProposal.isExecuted) {
-                    setIsProposalExecuted(true)
+                    // TODO Update proposal
+                    //setIsProposalExecuted(true)
                     setIsInPrimaryTransaction(false)
                 }
             }
@@ -185,6 +189,14 @@ const FundProposalForm = ({
             await initAllowance()
             setFunding(proposalFunding)
         }
+    }
+
+    const updateUserFunding = async (proposalId: string) => {
+        const userFunding = await proposalsHub.contract.funderAmountMap(
+            proposal.id,
+            currentUser.address
+        )
+        if (userFunding) setCurrentUserFunding(userFunding)
     }
 
     const safeTransactionCall = async (
@@ -245,21 +257,15 @@ const FundProposalForm = ({
 
                 if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
 
-                const solverConfigsCID = getMultihashFromBytes32(
-                    solution.solverConfigsCID
-                )
-
-                if (solverConfigsCID) {
-                    const ipfs = new IPFSAPI()
-                    const solverConfigs = (await ipfs.getFromCID(
-                        solverConfigsCID
-                    )) as SolverConfigModel[]
-
-                    if (!solverConfigs) throw GENERAL_ERROR['IPFS_FETCH_ERROR']
+                if (solution.solverConfigsURI) {
+                    const cs = new CeramicStagehand(currentUser.selfID)
+                    const ceramicSolverConfigs = (await cs.loadStream(
+                        solution.solverConfigsURI
+                    )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>
 
                     await proposalsHub.executeProposal(
                         proposal.id,
-                        solverConfigs
+                        ceramicSolverConfigs.content.solverConfigs
                     )
                 }
             }
@@ -297,6 +303,7 @@ const FundProposalForm = ({
                         token={collateralToken}
                         funding={funding}
                         fundingGoal={proposal.fundingGoal}
+                        userFunding={currentUserFunding}
                     />
                     <Form<FundProposalFormType>
                         onChange={(nextValue: FundProposalFormType) => {

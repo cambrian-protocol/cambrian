@@ -40,6 +40,7 @@ const PreferredTokenItem = ({
                     required
                     onChange={(event) => updateToken(event.target.value, idx)}
                     validate={validateAddress}
+                    value={token.address}
                 />
             </Box>
             <Box

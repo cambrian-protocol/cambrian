@@ -18,15 +18,14 @@ import {
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { MetadataModel } from '../../models/MetadataModel'
-import { MultihashType } from '@cambrian/app/models/MultihashType'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -38,7 +37,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { getMultihashFromBytes32 } from '@cambrian/app/utils/helpers/multihash'
 
 export const getSolverConfig = async (
     contract: ethers.Contract
@@ -107,15 +105,13 @@ export const getSolverTimelocks = async (
 }
 
 export const getSolverOutcomes = async (solverConfig: SolverConfigModel) => {
-    const outcomeURIs = solverConfig.conditionBase.outcomeURIs.map(
-        (multiHash: MultihashType) => getMultihashFromBytes32(multiHash)
-    )
-
     const outcomes = (await Promise.all(
-        outcomeURIs.map((outcomeURI: string | null) => {
-            const ipfs = new IPFSAPI()
-            if (outcomeURI) return ipfs.getFromCID(outcomeURI)
-        })
+        solverConfig.conditionBase.outcomeURIs.map(
+            (outcomeURI: string | null) => {
+                const ipfs = new IPFSAPI()
+                if (outcomeURI) return ipfs.getFromCID(outcomeURI)
+            }
+        )
     )) as OutcomeModel[]
 
     return outcomes
@@ -445,27 +441,25 @@ export const getMetadataFromProposal = async (
             currentUser.chainId
         )
 
-        const metadataCID = await proposalsHub.getMetadataCID(proposalId)
-        if (metadataCID) {
-            const stagehand = new Stagehand()
-            const stages = await stagehand.loadStages(
-                metadataCID,
-                StageNames.proposal
-            )
-            if (stages) {
-                const metaComposition = stages.composition as CompositionModel
-                if (metaComposition) {
-                    const solverIndex = (await solverMethods.chainIndex()) as
-                        | number
-                        | undefined
-                    if (solverIndex !== undefined) {
-                        return {
-                            slotTags:
-                                metaComposition.solvers[solverIndex].slotTags,
-                            solverTag:
-                                metaComposition.solvers[solverIndex].solverTag,
-                            stages: stages,
-                        }
+        const metadataURI = await proposalsHub.getMetadataCID(proposalId)
+        if (metadataURI) {
+            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+            const proposalStack =
+                await ceramicStagehand.loadAndCloneProposalStack(metadataURI)
+
+            if (proposalStack) {
+                const solverIndex = (await solverMethods.chainIndex()) as
+                    | number
+                    | undefined
+                if (solverIndex !== undefined) {
+                    return {
+                        slotTags:
+                            proposalStack.composition.solvers[solverIndex]
+                                .slotTags,
+                        solverTag:
+                            proposalStack.composition.solvers[solverIndex]
+                                .solverTag,
+                        proposalStack: proposalStack,
                     }
                 }
             }

@@ -20,10 +20,25 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Please try again later...',
         logLevel: 1,
     },
+    CERAMIC_UPDATE_ERROR: {
+        title: 'Error while updating your data to Ceramic',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
+    CERAMIC_LOAD_ERROR: {
+        title: 'Error while loading data from Ceramic',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
+    NO_SELF_ID: {
+        title: 'Ceramic connection necessary',
+        message: 'Please connect your wallet to ceramic.',
+        logLevel: 0,
+    },
     NO_WALLET_CONNECTION: {
         title: 'No connected Wallet found',
         message: 'Please connect your wallet to use this function.',
-        logLevel: 1,
+        logLevel: 0,
     },
     FAILED_PROPOSAL_DEPLOYMENT: {
         title: 'Error while deploying solution and proposal',
@@ -35,8 +50,8 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Please try again later...',
         logLevel: 1,
     },
-    WRONG_TEMPLATE_SCHEMA: {
-        title: 'Generated template does not satisfy template schema',
+    WRONG_SCHEMA: {
+        title: 'Generated data does not satisfy schema',
         logLevel: 1,
     },
     WRONG_COMPOSITION_SCHEMA: {
@@ -111,6 +126,14 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     SOLUTION_FETCH_ERROR: {
         title: 'Error while fetching Solution',
+        logLevel: 1,
+    },
+    SOLUTION_BASE_ERROR: {
+        title: 'Error while creating a Solution Base',
+        logLevel: 1,
+    },
+    PROPOSAL_DEPLOY_ERROR: {
+        title: 'Error while deploying proposal',
         logLevel: 1,
     },
 }

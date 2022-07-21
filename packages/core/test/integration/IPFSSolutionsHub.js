@@ -115,12 +115,8 @@ describe("IPFSSolutionsHub", function () {
         },
       ],
       outcomeURIs: [
-        getBytes32FromMultihash(
-          "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ"
-        ),
-        getBytes32FromMultihash(
-          "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP"
-        ),
+        "QmYZB6LDtGqqfJyhJDEp7rgFgEVSm7H7yyXZjhvCqVkYvZ",
+        "QmPrcQH4akfr7eSn4tQHmmudLdJpKhHskVJ5iqYxCks1FP",
       ],
     };
 
@@ -143,15 +139,21 @@ describe("IPFSSolutionsHub", function () {
       solutionBaseId,
       this.ToyToken.address,
       solverConfigs,
-      getBytes32FromMultihash(cid)
+      cid
     );
 
     let tx = await this.ProposalsHub.connect(this.keeper).createProposal(
       this.ToyToken.address,
       this.IPFSSolutionsHub.address,
       this.amount,
-      solutionBaseId,
-      getBytes32FromMultihash(nullCid)
+      ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(
+          ["bytes32", "uint256"],
+          [solutionBaseId, 1]
+        )
+      ),
+      solverConfigs,
+      nullCid
     );
     let rc = await tx.wait();
     const proposalId = new ethers.utils.Interface([
@@ -180,8 +182,10 @@ describe("IPFSSolutionsHub", function () {
 
     const solution = await this.IPFSSolutionsHub.getSolution(solutionId);
 
+    console.log(solution);
+
     expect(solution.executed).to.equal(true);
-    expect(getMultihashFromBytes32(solution.solverConfigsCID)).to.equal(cid);
+    expect(solution.solverConfigsURI).to.equal(cid);
 
     const solverAddress = await this.IPFSSolutionsHub.solverFromIndex(
       solutionId,

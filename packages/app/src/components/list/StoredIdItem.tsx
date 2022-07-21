@@ -1,9 +1,10 @@
-import { ArrowCircleRight, Check, Link } from 'phosphor-react'
+import { ArrowCircleRight, Check, Link as LinkIcon } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseFormContainer from '../containers/BaseFormContainer'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
+import Link from 'next/link'
 import { Text } from 'grommet'
 
 interface StoredIdItemProps {
@@ -44,7 +45,7 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
                             isSavedToClipboard ? (
                                 <Check size={'24'} />
                             ) : (
-                                <Link size="24" />
+                                <LinkIcon size="24" />
                             )
                         }
                         onClick={() => {
@@ -55,13 +56,14 @@ const StoredIdItem = ({ route, title, cid, border }: StoredIdItemProps) => {
                 </Box>
                 {route && (
                     <Box flex width={{ min: 'small' }} pad="xsmall">
-                        <Button
-                            label="Follow link"
-                            reverse
-                            primary
-                            icon={<ArrowCircleRight size="24" />}
-                            href={link}
-                        />
+                        <Link href={link} passHref>
+                            <Button
+                                label="Follow link"
+                                reverse
+                                primary
+                                icon={<ArrowCircleRight size="24" />}
+                            />
+                        </Link>
                     </Box>
                 )}
             </Box>

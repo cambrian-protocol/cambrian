@@ -46,7 +46,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 style={{ fontWeight: 'bold' }}
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                Do Business. On-Chain.
+                                Work is Evolving
                             </Heading>
                             <Text
                                 color="dark-4"
@@ -86,9 +86,9 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                     <Text>Curious?</Text>
                                     <Anchor
                                         color="brand"
-                                        href="mailto:paul@cambrianprotocol.com"
+                                        href="https://discord.gg/pZP4HNYrZs"
                                     >
-                                        <Text>Get in touch</Text>
+                                        <Text>Join Discord</Text>
                                     </Anchor>
                                 </Box>
                             </Box>

@@ -9,6 +9,8 @@ import "../solvers/Solver.sol";
 import "../solvers/SolverLib.sol";
 
 contract IPFSSolutionsHub {
+    mapping(bytes32 => uint256) public nonces;
+
     ISolverFactory immutable solverFactory;
     IProposalsHub immutable proposalsHub;
 
@@ -16,7 +18,7 @@ contract IPFSSolutionsHub {
         IERC20 collateralToken;
         bytes32 id;
         bytes32 solverConfigsHash;
-        SolverLib.Multihash solverConfigsCID;
+        string solverConfigsURI;
     }
 
     struct Instance {
@@ -33,14 +35,14 @@ contract IPFSSolutionsHub {
         bytes32 proposalId;
         bytes32 id;
         bytes32 solverConfigsHash;
-        SolverLib.Multihash solverConfigsCID;
+        string solverConfigsURI;
         address[] solverAddresses;
     }
 
     mapping(bytes32 => Base) public bases;
     mapping(bytes32 => Instance) public instances;
 
-    mapping(bytes32 => bytes32) instanceId_to_ProposalId;
+    mapping(bytes32 => bytes32) public instanceId_to_ProposalId;
 
     event CreateBase(bytes32 id);
     event CreateSolution(bytes32 id);
@@ -99,25 +101,35 @@ contract IPFSSolutionsHub {
         }
     }
 
+    // Ceramic Interop: baseId == keccak256(abi.encode(templateCommitID, proposalCommitID))
     function createBase(
         bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
-    ) public {
-        require(bases[baseId].id != baseId, "Base ID already exists");
-        Base storage base = bases[baseId];
-        base.id = baseId;
+        string calldata solverConfigsURI
+    ) public returns (bytes32 safeBaseId) {
+        nonces[baseId]++;
+        safeBaseId = keccak256(abi.encode(baseId, nonces[baseId]));
+
+        require(bases[safeBaseId].id != safeBaseId, "Base ID already exists");
+
+        Base storage base = bases[safeBaseId];
+        base.id = safeBaseId;
         base.collateralToken = collateralToken;
         base.solverConfigsHash = keccak256(abi.encode(solverConfigs));
-        base.solverConfigsCID = solverConfigsCID;
-        emit CreateBase(baseId);
+        base.solverConfigsURI = solverConfigsURI;
+        emit CreateBase(safeBaseId);
     }
 
-    function createInstance(bytes32 baseId, bytes32 instanceId)
+    function createInstance(bytes32 baseId)
         public
         returns (bytes32 solutionId)
     {
+        nonces[baseId]++;
+
+        bytes32 instanceId = keccak256(
+            abi.encode(baseId, nonces[baseId], blockhash(block.number - 1))
+        );
         require(
             instances[instanceId].id != instanceId,
             "Instance ID already exists"
@@ -133,21 +145,19 @@ contract IPFSSolutionsHub {
     }
 
     function createSolution(
-        bytes32 instanceId,
+        bytes32 baseId,
         IERC20 collateralToken,
         SolverLib.Config[] calldata solverConfigs,
-        SolverLib.Multihash calldata solverConfigsCID
-    ) public returns (bytes32 baseId, bytes32 solutionId) {
+        string calldata solverConfigsURI
+    ) public returns (bytes32 instanceId) {
         require(
             instances[instanceId].id != instanceId,
             "SolutionsHub::Instance ID already exists"
         );
-        baseId = keccak256(abi.encodePacked(instanceId, instanceId));
-        createBase(baseId, collateralToken, solverConfigs, solverConfigsCID);
-        createInstance(baseId, instanceId);
+        createBase(baseId, collateralToken, solverConfigs, solverConfigsURI);
+        instanceId = createInstance(baseId);
 
         emit CreateSolution(instanceId);
-        return (baseId, instanceId);
     }
 
     function executeSolution(
@@ -156,7 +166,7 @@ contract IPFSSolutionsHub {
         SolverLib.Config[] calldata solverConfigs
     ) external {
         require(
-            verifyHash(solutionId, solverConfigs),
+            verifyHash(instances[solutionId].baseId, solverConfigs),
             "Incorrect SolverConfig content"
         );
         require(
@@ -195,12 +205,13 @@ contract IPFSSolutionsHub {
         emit ExecuteSolution(solutionId);
     }
 
-    function verifyHash(
-        bytes32 solutionId,
-        SolverLib.Config[] memory solverConfigs
-    ) public view returns (bool) {
+    function verifyHash(bytes32 baseId, SolverLib.Config[] memory solverConfigs)
+        public
+        view
+        returns (bool)
+    {
         return
-            bases[instances[solutionId].baseId].solverConfigsHash ==
+            bases[baseId].solverConfigsHash ==
             keccak256(abi.encode(solverConfigs));
     }
 
@@ -237,6 +248,6 @@ contract IPFSSolutionsHub {
         solution.collateralToken = base.collateralToken;
         solution.proposalId = instanceId_to_ProposalId[instanceId];
         solution.solverConfigsHash = base.solverConfigsHash;
-        solution.solverConfigsCID = base.solverConfigsCID;
+        solution.solverConfigsURI = base.solverConfigsURI;
     }
 }

@@ -1,6 +1,7 @@
 import { ContractAddresses } from './../../config/SupportedChains'
 import { SolidityDataTypes } from './SolidityDataTypes'
 import { SolverContractCondition } from './ConditionModel'
+import { UserType } from '../store/UserContext'
 
 export type ModuleLoaderModel = {
     module: string // deployment address
@@ -10,6 +11,7 @@ export type ModuleLoaderModel = {
 export type ModuleComponentProps = {
     solverAddress: string
     currentCondition: SolverContractCondition
+    currentUser: UserType
 }
 
 export type ComposerModuleModel = {

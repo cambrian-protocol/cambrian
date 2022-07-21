@@ -1,53 +1,63 @@
-import { ArrowSquareRight, Bug, CloudArrowDown, Gear } from 'phosphor-react'
+import { ArrowSquareRight, Bug, FloppyDisk, Gear } from 'phosphor-react'
+import CeramicStagehand, {
+    StageNames,
+} from '@cambrian/app/classes/CeramicStagehand'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
-import BasePopupModal from '../modals/BasePopupModal'
 import { Box } from 'grommet'
-import { Button } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
-import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import LoadCompositionModal from '@cambrian/app/ui/composer/general/modals/LoadCompositionModal'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import ErrorPopupModal from '../modals/ErrorPopupModal'
+import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
-import Stagehand from '@cambrian/app/classes/Stagehand'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
 
-const ComposerToolbar = () => {
-    const { currentUser } = useCurrentUser()
-    const stageHand = new Stagehand()
-    const { composer } = useComposerContext()
-    const [exportedCompositionCID, setExportedCompositionCID] =
-        useState<string>('')
+interface ComposerToolbarProps {
+    disabled: boolean
+    ceramicStagehand?: CeramicStagehand
+    currentComposition: CompositionModel
+    compositionStreamID: string
+}
+
+const ComposerToolbar = ({
+    disabled,
+    ceramicStagehand,
+    currentComposition,
+    compositionStreamID,
+}: ComposerToolbarProps) => {
     const [showConfig, setShowConfig] = useState(false)
-
-    const toggleShowConfig = () => setShowConfig(!showConfig)
-
-    const [showLoadCompositionModal, setShowLoadCompositionModal] =
-        useState(false)
-
     const [showExportCompositionModal, setShowExportCompostionModal] =
         useState(false)
+    const [isSaving, setIsSaving] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
+    const toggleShowConfig = () => setShowConfig(!showConfig)
     const toggleShowExportCompositionModal = () =>
         setShowExportCompostionModal(!showExportCompositionModal)
 
-    const toggleShowLoadCompositionModal = () =>
-        setShowLoadCompositionModal(!showLoadCompositionModal)
-
-    const onExportComposition = async () => {
-        try {
-            const ipfsHash = await stageHand.publishComposition(
-                composer,
-                currentUser.web3Provider
-            )
-            if (ipfsHash) {
-                setExportedCompositionCID(ipfsHash)
-                toggleShowExportCompositionModal()
+    const onSaveComposition = async () => {
+        if (ceramicStagehand) {
+            setIsSaving(true)
+            try {
+                await ceramicStagehand.updateStage(
+                    compositionStreamID,
+                    {
+                        title: currentComposition.title,
+                        description: '',
+                        solvers: currentComposition.solvers,
+                        flowElements: currentComposition.flowElements,
+                    },
+                    StageNames.composition
+                )
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
             }
-        } catch (e) {
-            cpLogger.push(e)
+            setIsSaving(false)
         }
     }
 
@@ -58,58 +68,56 @@ const ComposerToolbar = () => {
     return (
         <>
             <Box
-                pad="small"
                 fill
                 round="xsmall"
                 background={'background-contrast'}
                 align="center"
-                gap="medium"
+                gap="xsmall"
                 justify="end"
                 elevation="small"
+                pad={{ vertical: 'small' }}
             >
                 <ComposerToolbarButton
                     onClick={onTestLog}
                     label="Test Log"
                     icon={<Bug />}
+                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowConfig}
                     label="Solution"
                     icon={<Gear />}
+                    disabled={disabled}
                 />
                 <ComposerToolbarButton
-                    onClick={toggleShowLoadCompositionModal}
-                    label="Load"
-                    icon={<CloudArrowDown />}
-                />
-                <ComposerToolbarButton
-                    onClick={onExportComposition}
+                    onClick={toggleShowExportCompositionModal}
                     label="Export"
                     icon={<ArrowSquareRight />}
+                    disabled={disabled}
+                />
+                <ComposerToolbarButton
+                    onClick={onSaveComposition}
+                    label="Save"
+                    icon={<FloppyDisk />}
+                    disabled={disabled || isSaving}
                 />
             </Box>
-            {showLoadCompositionModal && (
-                <LoadCompositionModal
-                    onClose={toggleShowLoadCompositionModal}
+            {showExportCompositionModal && ceramicStagehand && (
+                <ExportCompositionModal
+                    ceramicStagehand={ceramicStagehand}
+                    onBack={toggleShowExportCompositionModal}
                 />
-            )}
-            {showExportCompositionModal && (
-                <BasePopupModal
-                    title="Composition exported"
-                    description={exportedCompositionCID}
-                    onClose={toggleShowExportCompositionModal}
-                >
-                    <Button
-                        primary
-                        href={`/templates/create/${exportedCompositionCID}`}
-                        label="Create template"
-                    />
-                </BasePopupModal>
             )}
             {showConfig && (
                 <BaseLayerModal onBack={toggleShowConfig}>
                     <SolutionConfig />
                 </BaseLayerModal>
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    errorMessage={errorMessage}
+                    onClose={() => setErrorMessage(undefined)}
+                />
             )}
         </>
     )

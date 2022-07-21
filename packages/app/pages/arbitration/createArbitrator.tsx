@@ -1,8 +1,9 @@
-import { Box } from 'grommet'
 import CreateArbitratorMultiStepForm from '@cambrian/app/ui/arbitrator/create/CreateArbitratorMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ExportSuccessModal from '@cambrian/app/ui/composer/general/modals/ExportSuccessModal'
+import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useState } from 'react'
@@ -15,15 +16,18 @@ export default function CreateArbitrator() {
 
     return (
         <>
-            <PageLayout contextTitle="Create Arbitrator">
-                <Box height={{ min: '90vh' }} justify="center" align="center">
+            {currentUser ? (
+                <PageLayout contextTitle="Create Arbitrator" kind="narrow">
                     <CreateArbitratorMultiStepForm
+                        currentUser={currentUser}
                         onFailure={(errMsg) => setErrorMessage(errMsg)}
                         onSuccess={toggleShowSuccessModal}
                     />
-                </Box>
-            </PageLayout>
-            {showSuccessModal && currentUser.chainId && currentUser.address && (
+                </PageLayout>
+            ) : (
+                <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
+            )}
+            {showSuccessModal && currentUser && (
                 <ExportSuccessModal
                     keyId={currentUser.chainId.toString()}
                     prefix={currentUser.address}
