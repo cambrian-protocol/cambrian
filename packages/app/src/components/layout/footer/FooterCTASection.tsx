@@ -36,7 +36,7 @@ const FooterCTASection = () => (
                             primary
                             label="Get in touch"
                             icon={<Envelope color="white" size="24" />}
-                            href="mailto:paul@cambrianprotocol.com?subject=Demo inquiry"
+                            href="mailto:info@cambrianprotocol.com?subject=Demo inquiry"
                         />
                         <Box flex />
                     </Box>
