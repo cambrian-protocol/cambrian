@@ -23,6 +23,8 @@ type ComposerContextOptions = {
 
 const ComposerContext = React.createContext<ComposerContextOptions>({
     composer: {
+        title: '',
+        description: '',
         flowElements: [],
         solvers: [],
     },
