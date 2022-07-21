@@ -1,6 +1,6 @@
-import { Box, Text } from 'grommet'
+import { CheckCircle, PencilLine } from 'phosphor-react'
 
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -10,7 +10,7 @@ import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
 import { useState } from 'react'
 
-const ProposalReviewSidebar = () => {
+const ProposalReviewControl = () => {
     const { currentUser } = useCurrentUser()
     const { proposalStack, proposalStreamDoc, updateProposal } = useProposal()
 
@@ -52,28 +52,21 @@ const ProposalReviewSidebar = () => {
 
     return (
         <>
-            <Box gap="medium">
-                <BaseFormGroupContainer border pad="medium" gap="medium">
-                    <Text>After approval the proposal can get funded</Text>
-                    <LoaderButton
-                        isLoading={isApproving}
-                        label="Approve Proposal"
-                        primary
-                        onClick={onApproveProposal}
-                    />
-                </BaseFormGroupContainer>
-                <BaseFormGroupContainer border pad="medium" gap="medium">
-                    <Text>
-                        After you request a change, the proposer can edit his
-                        proposal again and resubmit his proposal.
-                    </Text>
-                    <LoaderButton
-                        isLoading={isRequestingChange}
-                        label="Request Change"
-                        primary
-                        onClick={onRequestChange}
-                    />
-                </BaseFormGroupContainer>
+            <Box gap="small" direction="row" justify="end">
+                <LoaderButton
+                    isLoading={isRequestingChange}
+                    label="Request Change"
+                    secondary
+                    icon={<PencilLine />}
+                    onClick={onRequestChange}
+                />
+                <LoaderButton
+                    icon={<CheckCircle />}
+                    isLoading={isApproving}
+                    label="Approve Proposal"
+                    primary
+                    onClick={onApproveProposal}
+                />
             </Box>
             {errorMessage && (
                 <ErrorPopupModal
@@ -85,4 +78,4 @@ const ProposalReviewSidebar = () => {
     )
 }
 
-export default ProposalReviewSidebar
+export default ProposalReviewControl

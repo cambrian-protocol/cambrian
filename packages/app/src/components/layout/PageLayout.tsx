@@ -13,6 +13,7 @@ import WarningBanner from '../containers/WarningBanner'
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     hideBanner?: boolean
+    kind?: 'narrow'
 }
 
 export const siteTitle = 'Cambrian Protocol'
@@ -21,6 +22,7 @@ const PageLayout = ({
     contextTitle,
     children,
     hideBanner,
+    kind,
 }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
 
@@ -61,10 +63,13 @@ const PageLayout = ({
                     />
                     <Appbar />
                     <Box
+                        align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        {children}
+                        <Box width={kind === 'narrow' ? 'xlarge' : undefined}>
+                            {children}
+                        </Box>
                         <BaseFooter />
                     </Box>
                 </Page>

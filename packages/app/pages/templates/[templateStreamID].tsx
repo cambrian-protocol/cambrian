@@ -25,7 +25,10 @@ export default function ViewTemplatePage() {
                     show404NotFound ? (
                         <Custom404Page />
                     ) : templateInput ? (
-                        <PageLayout contextTitle={templateInput.title}>
+                        <PageLayout
+                            contextTitle={templateInput.title}
+                            kind="narrow"
+                        >
                             <TemplateUI
                                 ceramicTemplate={templateInput}
                                 currentUser={currentUser}

@@ -1,5 +1,4 @@
-import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     getLatestProposalSubmission,
     getOnChainProposal,
@@ -7,6 +6,7 @@ import {
 } from '../utils/helpers/proposalHelper'
 
 import { CeramicProposalModel } from '../models/ProposalModel'
+import CeramicStagehand from '../classes/CeramicStagehand'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStatus } from '../models/ProposalStatus'
@@ -23,12 +23,6 @@ export type ProposalContextType = {
     proposalContract?: ethers.Contract
     proposalStatus: ProposalStatus
     updateProposal: () => Promise<void>
-    proposalInput?: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
-    onSaveProposal: () => Promise<void>
-    onResetProposalInput: () => void
     isLoaded: boolean
 }
 
@@ -39,9 +33,6 @@ type ProposalProviderProps = {
 export const ProposalContext = React.createContext<ProposalContextType>({
     proposalStatus: ProposalStatus.Unknown,
     updateProposal: async () => {},
-    onSaveProposal: async () => {},
-    onResetProposalInput: () => {},
-    setProposalInput: () => {},
     isLoaded: false,
 })
 
@@ -68,10 +59,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             useState<TileDocument<CeramicProposalModel>>()
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<CeramicTemplateModel>>()
-
-        // Used for editing the proposal
-        const [proposalInput, setProposalInput] =
-            useState<CeramicProposalModel>()
 
         useEffect(() => {
             if (currentUser) {
@@ -128,11 +115,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         let _proposalStatus: ProposalStatus =
                             ProposalStatus.Unknown
 
-                        if (
-                            !_proposalStackClones.proposal.isSubmitted &&
-                            currentUser.selfID.did.id !==
-                                _proposalStackClones.proposal.author
-                        ) {
+                        if (!_proposalStackClones.proposal.isSubmitted) {
                             if (_latestProposalSubmission) {
                                 _proposalStatus = ProposalStatus.ChangeRequested
                                 setProposalStatus(_proposalStatus)
@@ -160,43 +143,9 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             currentUser.selfID.did.id ===
                                 _proposalStackClones.template.author
                         ) {
-                            console.log('Registered a new submission')
-                            console.log(
-                                'Was submitted',
-                                _proposalStreamDoc.content.isSubmitted
-                            )
-                            console.log(
-                                '_latestProposalSubmission?.proposalCommitID',
-                                _latestProposalSubmission?.proposalCommitID
-                            )
-                            console.log(
-                                '_proposalStreamDoc.commitId.toString()',
-                                _proposalStreamDoc.commitId.toString()
-                            )
-
-                            console.log(
-                                'is author',
-                                currentUser.selfID.did.id ===
-                                    _proposalStackClones.template.author
-                            )
-
                             await ceramicStagehand.registerNewProposalSubmission(
                                 _proposalStreamDoc,
                                 _templateStreamDoc
-                            )
-                        }
-
-                        // Init Input if editable
-                        if (
-                            (_proposalStatus === ProposalStatus.Draft ||
-                                _proposalStatus ===
-                                    ProposalStatus.ChangeRequested) &&
-                            currentUser?.selfID.did.id ===
-                                _proposalStreamDoc.content.author &&
-                            _proposalStackClones
-                        ) {
-                            setProposalInput(
-                                _.cloneDeep(_proposalStackClones.proposal)
                             )
                         }
 
@@ -211,32 +160,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             }
         }
 
-        const saveProposal = async () => {
-            if (proposalInput && ceramicStagehand && proposalStack) {
-                if (!_.isEqual(proposalInput, proposalStack.proposal)) {
-                    const { uniqueTag } = await ceramicStagehand.updateStage(
-                        proposalStreamID as string,
-                        { ...proposalInput, isSubmitted: false },
-                        StageNames.proposal
-                    )
-                    const proposalWithUniqueTitle = {
-                        ...proposalInput,
-                        title: uniqueTag,
-                        isSubmitted: false,
-                    }
-
-                    setProposalInput(proposalWithUniqueTitle)
-                    initProposal()
-                }
-            }
-        }
-
-        const resetProposalInput = () => {
-            if (proposalStack) {
-                setProposalInput(_.cloneDeep(proposalStack.proposal))
-            }
-        }
-
         return (
             <ProposalContext.Provider
                 value={{
@@ -246,10 +169,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     proposalStatus: proposalStatus,
                     proposalContract: onChainProposal,
                     updateProposal: initProposal,
-                    proposalInput: proposalInput,
-                    setProposalInput: setProposalInput,
-                    onResetProposalInput: resetProposalInput,
-                    onSaveProposal: saveProposal,
                     isLoaded: isLoaded,
                 }}
             >

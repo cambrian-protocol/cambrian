@@ -3,20 +3,19 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { Text } from 'grommet'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const ProposalSubmitComponent = () => {
+const ProposalSubmitControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStreamDoc } = useProposal()
+    const { proposalStreamDoc } = useEditProposal()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -30,6 +29,7 @@ const ProposalSubmitComponent = () => {
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
             await ceramicStagehand.submitProposal(proposalStreamDoc)
+
             router.push(
                 `${
                     window.location.origin
@@ -41,24 +41,21 @@ const ProposalSubmitComponent = () => {
         }
     }
     return (
-        <>
-            <BaseFormGroupContainer border pad="medium" gap="medium">
-                <Text>Submit your Proposal</Text>
-                <LoaderButton
-                    isLoading={isSubmitting}
-                    label="Submit Proposal"
-                    primary
-                    onClick={onSubmitProposal}
-                />
-            </BaseFormGroupContainer>
+        <Box align="end" pad={{ horizontal: 'small' }}>
+            <LoaderButton
+                isLoading={isSubmitting}
+                label="Submit Proposal"
+                primary
+                onClick={onSubmitProposal}
+            />
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}
                     onClose={() => setErrorMessage(undefined)}
                 />
             )}
-        </>
+        </Box>
     )
 }
 
-export default ProposalSubmitComponent
+export default ProposalSubmitControl

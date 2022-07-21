@@ -4,23 +4,39 @@ import {
 } from '../ProposalWizard'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { SetStateAction } from 'react'
 
 interface ProposalPricingStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSaveProposal: () => Promise<void>
+    template: CeramicTemplateModel
 }
 
-const ProposalPricingStep = ({ stepperCallback }: ProposalPricingStepProps) => {
-    const { proposalInput } = useProposal()
-
+const ProposalPricingStep = ({
+    template,
+    stepperCallback,
+    onSaveProposal,
+    proposalInput,
+    setProposalInput,
+}: ProposalPricingStepProps) => {
     return (
         <Box height={{ min: '60vh' }}>
             <Box gap="medium">
                 <HeaderTextSection title="Great! And how much are you willing to pay?" />
                 <ProposalPricingForm
-                    postRollSubmit={async () => {
+                    template={template}
+                    proposalInput={proposalInput}
+                    setProposalInput={setProposalInput}
+                    onSubmit={async () => {
+                        await onSaveProposal()
                         if (
                             proposalInput &&
                             proposalInput.flexInputs.length > 0
@@ -31,10 +47,10 @@ const ProposalPricingStep = ({ stepperCallback }: ProposalPricingStepProps) => {
                         }
                     }}
                     submitLabel="Save & Continue"
-                    postRollCancel={() =>
+                    onCancel={() =>
                         stepperCallback(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
                     }
-                    cancelLabel="Dismiss & Back"
+                    cancelLabel="Back"
                 />
             </Box>
         </Box>

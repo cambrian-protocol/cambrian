@@ -41,9 +41,6 @@ const ProposalHeader = ({
                 {(screenSize) => {
                     return (
                         <Box
-                            fill
-                            height={{ min: 'auto' }}
-                            round="xsmall"
                             pad={{
                                 top: 'medium',
                                 bottom: 'xsmall',

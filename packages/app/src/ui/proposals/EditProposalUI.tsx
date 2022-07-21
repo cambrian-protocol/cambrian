@@ -1,76 +1,92 @@
 import { Box, Tab, Tabs } from 'grommet'
-import { useContext, useEffect, useState } from 'react'
 
 import Custom404Page from 'packages/app/pages/404'
-import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalDescriptionForm from './forms/ProposalDescriptionForm'
-import ProposalEditSidebar from '@cambrian/app/components/bars/sidebar/proposal/ProposalEditSidebar'
 import ProposalFlexInputsForm from './forms/ProposalFlexInputsForm'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import ProposalPricingForm from './forms/ProposalPricingForm'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import ProposalSubmitControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalSubmitControl'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import { useState } from 'react'
 
 const EditProposalUI = () => {
-    const { proposalStack, proposalStatus, proposalInput, isLoaded } =
-        useProposal()
+    const {
+        proposalStack,
+        proposalStatus,
+        proposalInput,
+        setProposalInput,
+        onSaveProposal,
+        onResetProposalInput,
+    } = useEditProposal()
     const [activeIndex, setActiveIndex] = useState(0)
-
-    // Scroll up when step changes
-    const topRefContext = useContext(TopRefContext)
-    useEffect(() => {
-        if (topRefContext)
-            topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [activeIndex])
 
     const isEditable =
         proposalStatus === ProposalStatus.Draft ||
-        proposalStatus === ProposalStatus.ChangeRequested
+        proposalStatus === ProposalStatus.ChangeRequested ||
+        proposalStatus === ProposalStatus.Modified
 
     return (
         <>
-            {!isLoaded ? (
+            {!proposalStack ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
             ) : proposalInput && isEditable ? (
-                <InteractionLayout
-                    contextTitle={'Edit Proposal'}
-                    proposalHeader={
+                <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
+                    <Box pad="large" gap="medium">
                         <ProposalHeader
                             proposalStatus={proposalStatus}
                             proposalStack={proposalStack}
                         />
-                    }
-                    sidebar={<ProposalEditSidebar />}
-                >
-                    <Tabs
-                        justify="start"
-                        activeIndex={activeIndex}
-                        onActive={(nextIndex: number) =>
-                            setActiveIndex(nextIndex)
-                        }
-                    >
-                        <Tab title="Description">
-                            <Box pad="small">
-                                <ProposalDescriptionForm />
-                            </Box>
-                        </Tab>
-                        <Tab title="Pricing">
-                            <Box pad="small">
-                                <ProposalPricingForm />
-                            </Box>
-                        </Tab>
-                        {proposalInput.flexInputs.length > 0 && (
-                            <Tab title="Solver Config">
+                        <ProposalSubmitControl />
+                        <Tabs
+                            justify="start"
+                            activeIndex={activeIndex}
+                            onActive={(nextIndex: number) =>
+                                setActiveIndex(nextIndex)
+                            }
+                        >
+                            <Tab title="Description">
                                 <Box pad="small">
-                                    <ProposalFlexInputsForm />
+                                    <ProposalDescriptionForm
+                                        proposalInput={proposalInput}
+                                        setProposalInput={setProposalInput}
+                                        onSubmit={onSaveProposal}
+                                        onCancel={onResetProposalInput}
+                                    />
                                 </Box>
                             </Tab>
-                        )}
-                    </Tabs>
-                </InteractionLayout>
+                            <Tab title="Pricing">
+                                <Box pad="small">
+                                    <ProposalPricingForm
+                                        template={proposalStack.template}
+                                        proposalInput={proposalInput}
+                                        setProposalInput={setProposalInput}
+                                        onSubmit={onSaveProposal}
+                                        onCancel={onResetProposalInput}
+                                    />
+                                </Box>
+                            </Tab>
+                            {proposalInput.flexInputs.length > 0 && (
+                                <Tab title="Solver Config">
+                                    <Box pad="small">
+                                        <ProposalFlexInputsForm
+                                            composition={
+                                                proposalStack.composition
+                                            }
+                                            proposalInput={proposalInput}
+                                            setProposalInput={setProposalInput}
+                                            onSubmit={onSaveProposal}
+                                            onCancel={onResetProposalInput}
+                                        />
+                                    </Box>
+                                </Tab>
+                            )}
+                        </Tabs>
+                    </Box>
+                </PageLayout>
             ) : (
                 <Custom404Page />
             )}

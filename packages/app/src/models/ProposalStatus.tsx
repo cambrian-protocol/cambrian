@@ -13,6 +13,7 @@ export enum ProposalStatus {
     Draft,
     OnReview,
     ChangeRequested,
+    Modified,
     Approved,
     Funding,
     Executed,
@@ -53,6 +54,13 @@ PROPOSAL_STATUS_INFO[ProposalStatus.ChangeRequested] = {
     icon: <PencilSimpleLine />,
     description: 'The Seller requested some changes.',
     color: 'status-warning',
+}
+PROPOSAL_STATUS_INFO[ProposalStatus.Modified] = {
+    name: 'MODIFIED',
+    icon: <PencilSimpleLine />,
+    description:
+        'You have modified this proposal. It has not been submitted to the Seller',
+    color: 'accent-3',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Approved] = {
     name: 'APPROVED',

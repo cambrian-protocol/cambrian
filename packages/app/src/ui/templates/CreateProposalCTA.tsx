@@ -1,6 +1,6 @@
-import { Box, Text } from 'grommet'
-
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import { ClipboardText } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -39,32 +39,22 @@ const CreateProposalCTA = ({
         }
     }
     return (
-        <>
-            <Box
-                pad={'small'}
-                border
-                round="xsmall"
-                gap="small"
-                background={'background-contrast'}
-            >
-                <Text>Interested in this template?</Text>
-                <Box>
-                    <LoaderButton
-                        onClick={onCreateProposal}
-                        isLoading={isCreatingProposal}
-                        size="small"
-                        primary
-                        label="Create Proposal"
-                    />
-                </Box>
-            </Box>
+        <Box align="end">
+            <LoaderButton
+                onClick={onCreateProposal}
+                isLoading={isCreatingProposal}
+                size="small"
+                primary
+                label="Create Proposal"
+                icon={<ClipboardText />}
+            />
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}
                     onClose={() => setErrorMessage(undefined)}
                 />
             )}
-        </>
+        </Box>
     )
 }
 

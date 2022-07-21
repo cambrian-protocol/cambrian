@@ -1,11 +1,24 @@
-import { useContext, useEffect, useState } from 'react'
+import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalDescriptionStep from './steps/ProposalDescriptionStep'
 import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
+import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+
+interface ProposalWizardProps {
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSaveProposal: () => Promise<void>
+    proposalStack: ProposalStackType
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
+}
 
 export enum PROPOSAL_WIZARD_STEPS {
     DESCRIPTION,
@@ -20,7 +33,13 @@ export type ProposalWizardStepsType =
     | PROPOSAL_WIZARD_STEPS.FLEX_INPUTS
     | PROPOSAL_WIZARD_STEPS.PUBLISH
 
-const ProposalWizard = () => {
+const ProposalWizard = ({
+    proposalInput,
+    setProposalInput,
+    onSaveProposal,
+    proposalStack,
+    proposalStreamDoc,
+}: ProposalWizardProps) => {
     const [currentStep, setCurrentStep] = useState<ProposalWizardStepsType>(
         PROPOSAL_WIZARD_STEPS.DESCRIPTION
     )
@@ -35,16 +54,39 @@ const ProposalWizard = () => {
         switch (currentStep) {
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
-                    <ProposalDescriptionStep stepperCallback={setCurrentStep} />
+                    <ProposalDescriptionStep
+                        stepperCallback={setCurrentStep}
+                        proposalInput={proposalInput}
+                        setProposalInput={setProposalInput}
+                        onSaveProposal={onSaveProposal}
+                    />
                 )
             case PROPOSAL_WIZARD_STEPS.PRICING:
-                return <ProposalPricingStep stepperCallback={setCurrentStep} />
+                return (
+                    <ProposalPricingStep
+                        stepperCallback={setCurrentStep}
+                        proposalInput={proposalInput}
+                        setProposalInput={setProposalInput}
+                        onSaveProposal={onSaveProposal}
+                        template={proposalStack.template}
+                    />
+                )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
                 return (
-                    <ProposalFlexInputsStep stepperCallback={setCurrentStep} />
+                    <ProposalFlexInputsStep
+                        stepperCallback={setCurrentStep}
+                        proposalInput={proposalInput}
+                        setProposalInput={setProposalInput}
+                        onSaveProposal={onSaveProposal}
+                        composition={proposalStack.composition}
+                    />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
-                return <ProposalPublishStep />
+                return (
+                    <ProposalPublishStep
+                        proposalStreamDoc={proposalStreamDoc}
+                    />
+                )
             default:
                 return <></>
         }

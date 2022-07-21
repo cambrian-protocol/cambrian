@@ -1,4 +1,3 @@
-import { Box } from 'grommet'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -30,21 +29,15 @@ export default function NewTemplatePage() {
                     show404NotFound ? (
                         <Custom404Page />
                     ) : templateInput && composition ? (
-                        <PageLayout contextTitle="New Template">
-                            <Box align="center" pad="large">
-                                <Box width={'xlarge'} gap="large">
-                                    <TemplateWizard
-                                        composition={composition}
-                                        currentUser={currentUser}
-                                        templateInput={templateInput}
-                                        setTemplateInput={setTemplateInput}
-                                        templateStreamID={
-                                            templateStreamID as string
-                                        }
-                                        onSaveTemplate={onSaveTemplate}
-                                    />
-                                </Box>
-                            </Box>
+                        <PageLayout contextTitle="New Template" kind="narrow">
+                            <TemplateWizard
+                                composition={composition}
+                                currentUser={currentUser}
+                                templateInput={templateInput}
+                                setTemplateInput={setTemplateInput}
+                                templateStreamID={templateStreamID as string}
+                                onSaveTemplate={onSaveTemplate}
+                            />
                         </PageLayout>
                     ) : (
                         <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />

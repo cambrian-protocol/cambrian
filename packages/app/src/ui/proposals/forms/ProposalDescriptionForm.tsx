@@ -1,13 +1,17 @@
 import { Box, Button, Form, FormField, TextArea } from 'grommet'
-import React, { useEffect, useState } from 'react'
+import React, { SetStateAction, useEffect, useState } from 'react'
 
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 interface ProposalDescriptionFormProps {
-    postRollSubmit?: () => void
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSubmit: () => Promise<void>
     submitLabel?: string
-    postRollCancel?: () => void
+    onCancel?: () => void
     cancelLabel?: string
 }
 
@@ -18,18 +22,13 @@ type ProposalDescriptionFormType = {
 
 // TODO Validation
 const ProposalDescriptionForm = ({
-    postRollSubmit,
+    proposalInput,
+    setProposalInput,
+    onSubmit,
     submitLabel,
-    postRollCancel,
+    onCancel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
-    const {
-        proposalInput,
-        setProposalInput,
-        onSaveProposal,
-        onResetProposalInput,
-    } = useProposal()
-
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -38,16 +37,15 @@ const ProposalDescriptionForm = ({
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        onSaveProposal && (await onSaveProposal())
-        postRollSubmit && postRollSubmit()
+        await onSubmit()
         setIsSubmitting(false)
     }
     return (
         <>
             {proposalInput && (
                 <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
-                    <Box height="50vh" justify="between">
-                        <Box height={{ min: 'auto' }}>
+                    <Box justify="between" height={{ min: '50vh' }}>
+                        <Box>
                             <FormField
                                 label="Title"
                                 placeholder={'Type your proposal title here...'}
@@ -86,11 +84,7 @@ const ProposalDescriptionForm = ({
                                 size="small"
                                 secondary
                                 label={cancelLabel || 'Reset all changes'}
-                                onClick={() => {
-                                    onResetProposalInput &&
-                                        onResetProposalInput()
-                                    postRollCancel && postRollCancel()
-                                }}
+                                onClick={onCancel}
                             />
                             <LoaderButton
                                 isLoading={isSubmitting}

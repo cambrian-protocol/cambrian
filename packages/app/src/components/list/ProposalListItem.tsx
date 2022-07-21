@@ -1,4 +1,4 @@
-import { Anchor, Box, Button, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
@@ -31,6 +31,11 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
         return () => clearInterval(intervalId)
     }, [isSavedToClipboard])
 
+    const isEditable =
+        proposal.status === ProposalStatus.Draft ||
+        proposal.status === ProposalStatus.ChangeRequested ||
+        proposal.status === ProposalStatus.Modified
+
     return (
         <Box
             border
@@ -55,19 +60,19 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
                 </Box>
             </Box>
             <Box direction="row" flex width={{ min: 'auto' }} justify="end">
-                {(proposal.status === ProposalStatus.Draft ||
-                    proposal.status === ProposalStatus.ChangeRequested) &&
-                    proposal.isAuthor && (
-                        <Link
-                            href={`/dashboard/proposals/edit/${proposal.streamID}`}
-                            passHref
-                        >
-                            <Button icon={<Pen />} />
-                        </Link>
-                    )}
-                <Anchor href={`/proposals/${proposal.streamID}`}>
-                    <Button icon={<Eye />} />
-                </Anchor>
+                {isEditable && proposal.isAuthor && (
+                    <Link
+                        href={`/dashboard/proposals/edit/${proposal.streamID}`}
+                        passHref
+                    >
+                        <Button icon={<Pen />} />
+                    </Link>
+                )}
+                {proposal.status !== ProposalStatus.Draft && (
+                    <Link href={`/proposals/${proposal.streamID}`} passHref>
+                        <Button icon={<Eye />} />
+                    </Link>
+                )}
                 {onDelete && proposal.status === ProposalStatus.Draft && (
                     <Button
                         icon={<Trash />}

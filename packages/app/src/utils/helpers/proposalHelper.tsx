@@ -12,24 +12,25 @@ export const getProposalStatus = (
 ): ProposalStatus => {
     const proposalCommits =
         templateDoc.content.receivedProposals[proposalDoc.id.toString()]
-    if (
-        proposalCommits &&
-        proposalCommits[proposalCommits.length - 1].proposalCommitID ===
-            proposalDoc.commitId.toString()
-    ) {
-        const proposalCommit = proposalCommits[proposalCommits.length - 1]
+    if (proposalCommits) {
         if (
-            proposalCommit.proposalID !== undefined ||
-            proposalDoc.content.proposalID !== undefined
+            proposalCommits[proposalCommits.length - 1].proposalCommitID ===
+            proposalDoc.commitId.toString()
         ) {
-            // TODO determine if onchain proposal is executed, consider adding third onchain status: ProposalStatus.Funded
-            return ProposalStatus.Funding
-        } else if (proposalCommit.approved) {
-            return ProposalStatus.Approved
-        } else if (proposalCommit.requestChange) {
-            return ProposalStatus.ChangeRequested
+            const proposalCommit = proposalCommits[proposalCommits.length - 1]
+            if (proposalCommit.approved) {
+                return ProposalStatus.Approved
+            } else if (proposalCommit.requestChange) {
+                return ProposalStatus.ChangeRequested
+            } else {
+                return ProposalStatus.OnReview
+            }
         } else {
-            return ProposalStatus.OnReview
+            if (proposalDoc.content.isSubmitted) {
+                return ProposalStatus.OnReview
+            } else {
+                return ProposalStatus.Modified
+            }
         }
     } else {
         if (proposalDoc.content.isSubmitted) {

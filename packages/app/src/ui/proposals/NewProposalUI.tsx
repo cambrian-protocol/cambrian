@@ -4,20 +4,33 @@ import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProposalWizard from './wizard/ProposalWizard'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 const NewProposalUI = () => {
-    const { isLoaded, proposalInput } = useProposal()
+    const {
+        isLoaded,
+        proposalInput,
+        setProposalInput,
+        proposalStack,
+        onSaveProposal,
+        proposalStreamDoc,
+    } = useEditProposal()
 
     return (
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput ? (
-                <PageLayout contextTitle="New Proposal">
+            ) : proposalInput && proposalStack && proposalStreamDoc ? (
+                <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center" pad="large">
                         <Box width={'xlarge'} gap="large">
-                            <ProposalWizard />
+                            <ProposalWizard
+                                proposalStreamDoc={proposalStreamDoc}
+                                onSaveProposal={onSaveProposal}
+                                proposalStack={proposalStack}
+                                proposalInput={proposalInput}
+                                setProposalInput={setProposalInput}
+                            />
                         </Box>
                     </Box>
                 </PageLayout>

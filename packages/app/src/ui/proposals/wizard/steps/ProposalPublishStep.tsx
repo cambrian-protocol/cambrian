@@ -4,20 +4,27 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const ProposalPublishStep = () => {
+interface ProposalPublishStepProps {
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
+}
+
+const ProposalPublishStep = ({
+    proposalStreamDoc,
+}: ProposalPublishStepProps) => {
     const { currentUser } = useCurrentUser()
-    const { proposalStreamDoc } = useProposal()
+
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()

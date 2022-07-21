@@ -33,25 +33,17 @@ export default function EditTemplatePage() {
                     show404NotFound ? (
                         <Custom404Page />
                     ) : templateInput && composition && cachedTemplate ? (
-                        <PageLayout contextTitle="Edit Template">
-                            <Box align="center" pad="large">
-                                <Box width={'xlarge'} gap="large">
-                                    <TemplateHeader
-                                        title={cachedTemplate.title}
-                                    />
-                                    <EditTemplateUI
-                                        composition={composition}
-                                        currentUser={currentUser}
-                                        templateInput={templateInput}
-                                        setTemplateInput={setTemplateInput}
-                                        templateStreamID={
-                                            templateStreamID as string
-                                        }
-                                        onSaveTemplate={onSaveTemplate}
-                                        onResetTemplate={onResetTemplate}
-                                    />
-                                </Box>
-                            </Box>
+                        <PageLayout contextTitle="Edit Template" kind="narrow">
+                            <TemplateHeader title={cachedTemplate.title} />
+                            <EditTemplateUI
+                                composition={composition}
+                                currentUser={currentUser}
+                                templateInput={templateInput}
+                                setTemplateInput={setTemplateInput}
+                                templateStreamID={templateStreamID as string}
+                                onSaveTemplate={onSaveTemplate}
+                                onResetTemplate={onResetTemplate}
+                            />
                         </PageLayout>
                     ) : (
                         <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />

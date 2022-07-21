@@ -4,15 +4,28 @@ import {
 } from '../ProposalWizard'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalFlexInputsForm from '../../forms/ProposalFlexInputsForm'
+import { SetStateAction } from 'react'
 
 interface ProposalFlexInputsStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSaveProposal: () => Promise<void>
+    composition: CompositionModel
 }
 
 const ProposalFlexInputsStep = ({
+    composition,
     stepperCallback,
+    onSaveProposal,
+    proposalInput,
+    setProposalInput,
 }: ProposalFlexInputsStepProps) => (
     <Box height={{ min: '60vh' }}>
         <Box gap="medium">
@@ -21,14 +34,16 @@ const ProposalFlexInputsStep = ({
                 paragraph="Please input the following information to set up the Solver correctly."
             />
             <ProposalFlexInputsForm
-                postRollSubmit={() => {
+                composition={composition}
+                proposalInput={proposalInput}
+                setProposalInput={setProposalInput}
+                onSubmit={async () => {
+                    await onSaveProposal()
                     stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
                 }}
                 submitLabel="Save & Continue"
-                postRollCancel={() =>
-                    stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
-                }
-                cancelLabel="Dismiss & Back"
+                onCancel={() => stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)}
+                cancelLabel="Back"
             />
         </Box>
     </Box>

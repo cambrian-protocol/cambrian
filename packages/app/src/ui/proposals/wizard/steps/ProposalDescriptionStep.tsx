@@ -4,15 +4,25 @@ import {
 } from '../ProposalWizard'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalDescriptionForm from '../../forms/ProposalDescriptionForm'
+import { SetStateAction } from 'react'
 import router from 'next/router'
 
 interface ProposalDescriptionStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
+    proposalInput: CeramicProposalModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSaveProposal: () => Promise<void>
 }
 
 const ProposalDescriptionStep = ({
+    proposalInput,
+    setProposalInput,
+    onSaveProposal,
     stepperCallback,
 }: ProposalDescriptionStepProps) => (
     <Box height={{ min: '60vh' }}>
@@ -23,11 +33,14 @@ const ProposalDescriptionStep = ({
             }
         />
         <ProposalDescriptionForm
-            postRollSubmit={() => {
+            proposalInput={proposalInput}
+            setProposalInput={setProposalInput}
+            onSubmit={async () => {
+                await onSaveProposal()
                 stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
             }}
             submitLabel="Save & Continue"
-            postRollCancel={() =>
+            onCancel={() =>
                 router.push(`${window.location.origin}/dashboard/proposals`)
             }
             cancelLabel="Cancel"

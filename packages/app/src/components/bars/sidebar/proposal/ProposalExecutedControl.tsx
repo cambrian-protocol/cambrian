@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-const ProposalExecutedSidebar = () => {
+const ProposalExecutedControl = () => {
     const { currentUser } = useCurrentUser()
     const { proposalContract } = useProposal()
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
@@ -51,4 +51,4 @@ const ProposalExecutedSidebar = () => {
     )
 }
 
-export default ProposalExecutedSidebar
+export default ProposalExecutedControl

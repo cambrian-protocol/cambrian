@@ -15,7 +15,7 @@ const PriceInfo = ({ label, amount, token }: PriceInfoProps) => {
         <Box direction="row" wrap align="center">
             <Box
                 basis="1/2"
-                width={{ min: 'medium' }}
+                width={{ min: 'small' }}
                 height={'xsmall'}
                 align="center"
                 direction="row"
@@ -29,7 +29,7 @@ const PriceInfo = ({ label, amount, token }: PriceInfoProps) => {
             </Box>
             <Box
                 basis="1/2"
-                width={{ min: 'medium' }}
+                width={{ min: 'small' }}
                 height={'xsmall'}
                 justify="center"
             >

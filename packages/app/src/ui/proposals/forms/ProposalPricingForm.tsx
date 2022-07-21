@@ -1,17 +1,23 @@
 import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
-import { useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState } from 'react'
 
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 interface ProposalPricingFormProps {
-    postRollSubmit?: () => Promise<void>
+    proposalInput: CeramicProposalModel
+    template: CeramicTemplateModel
+    setProposalInput: React.Dispatch<
+        SetStateAction<CeramicProposalModel | undefined>
+    >
+    onSubmit: () => Promise<void>
     submitLabel?: string
-    postRollCancel?: () => void
+    onCancel?: () => void
     cancelLabel?: string
 }
 
@@ -22,19 +28,14 @@ type ProposalPricingFormType = {
 
 // TODO Validation
 const ProposalPricingForm = ({
-    postRollSubmit,
+    proposalInput,
+    template,
+    setProposalInput,
+    onSubmit,
     submitLabel,
-    postRollCancel,
+    onCancel,
     cancelLabel,
 }: ProposalPricingFormProps) => {
-    const {
-        proposalInput,
-        setProposalInput,
-        proposalStack,
-        onSaveProposal,
-        onResetProposalInput,
-    } = useProposal()
-
     const { currentUser } = useCurrentUser()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
@@ -44,11 +45,7 @@ const ProposalPricingForm = ({
     }, [])
 
     useEffect(() => {
-        if (proposalStack) {
-            initDenominationToken(
-                proposalStack.template.price.denominationTokenAddress
-            )
-        }
+        initDenominationToken(template.price.denominationTokenAddress)
     }, [])
 
     const initDenominationToken = async (address: string) => {
@@ -66,15 +63,14 @@ const ProposalPricingForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSaveProposal()
-        postRollSubmit && postRollSubmit()
+        await onSubmit()
         setIsSubmitting(false)
     }
 
     return (
         <Form<ProposalPricingFormType> onSubmit={handleSubmit}>
             <Box justify="between" height={{ min: '50vh' }}>
-                {denominationToken && proposalStack && proposalInput && (
+                {denominationToken && proposalInput && (
                     <>
                         <Box gap="medium">
                             <Box
@@ -84,18 +80,14 @@ const ProposalPricingForm = ({
                                 border
                                 elevation="small"
                             >
-                                {proposalStack.template.price
-                                    .allowAnyPaymentToken ||
-                                (proposalStack.template.price.preferredTokens &&
-                                    proposalStack.template.price.preferredTokens
-                                        .length > 0) ? (
+                                {template.price.allowAnyPaymentToken ||
+                                (template.price.preferredTokens &&
+                                    template.price.preferredTokens.length >
+                                        0) ? (
                                     <>
                                         <Text>
                                             The seller quotes an equivalent of{' '}
-                                            {
-                                                proposalStack.template.price
-                                                    ?.amount
-                                            }{' '}
+                                            {template.price?.amount}{' '}
                                             {denominationToken.symbol}
                                         </Text>
                                         <Text color="dark-4" size="small">
@@ -108,10 +100,7 @@ const ProposalPricingForm = ({
                                     <>
                                         <Text>
                                             The seller quotes{' '}
-                                            {
-                                                proposalStack.template.price
-                                                    ?.amount
-                                            }{' '}
+                                            {template.price?.amount}{' '}
                                             {denominationToken.symbol}
                                         </Text>
                                         <Text color="dark-4" size="small">
@@ -142,7 +131,7 @@ const ProposalPricingForm = ({
                                     />
                                 </Box>
                                 <TokenInput
-                                    template={proposalStack.template}
+                                    template={template}
                                     denominationToken={denominationToken}
                                     proposalInput={proposalInput}
                                     setProposalInput={setProposalInput}
@@ -158,10 +147,7 @@ const ProposalPricingForm = ({
                                 size="small"
                                 secondary
                                 label={cancelLabel || 'Reset all changes'}
-                                onClick={() => {
-                                    onResetProposalInput()
-                                    postRollCancel && postRollCancel()
-                                }}
+                                onClick={onCancel}
                             />
                             <LoaderButton
                                 isLoading={isSubmitting}

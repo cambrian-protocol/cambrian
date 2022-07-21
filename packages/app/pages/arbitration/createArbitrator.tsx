@@ -1,4 +1,3 @@
-import { Box } from 'grommet'
 import CreateArbitratorMultiStepForm from '@cambrian/app/ui/arbitrator/create/CreateArbitratorMultiStepForm'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -18,18 +17,12 @@ export default function CreateArbitrator() {
     return (
         <>
             {currentUser ? (
-                <PageLayout contextTitle="Create Arbitrator">
-                    <Box
-                        height={{ min: '90vh' }}
-                        justify="center"
-                        align="center"
-                    >
-                        <CreateArbitratorMultiStepForm
-                            currentUser={currentUser}
-                            onFailure={(errMsg) => setErrorMessage(errMsg)}
-                            onSuccess={toggleShowSuccessModal}
-                        />
-                    </Box>
+                <PageLayout contextTitle="Create Arbitrator" kind="narrow">
+                    <CreateArbitratorMultiStepForm
+                        currentUser={currentUser}
+                        onFailure={(errMsg) => setErrorMessage(errMsg)}
+                        onSuccess={toggleShowSuccessModal}
+                    />
                 </PageLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
