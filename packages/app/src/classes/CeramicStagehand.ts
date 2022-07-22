@@ -326,10 +326,14 @@ export default class CeramicStagehand {
 
     approveProposal = async (
         currentUser: UserType,
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
+        proposalStreamID: string,
         proposalStack: ProposalStackType
     ) => {
         try {
+            const proposalStreamDoc = (await this.loadStream(
+                proposalStreamID
+            )) as TileDocument<CeramicProposalModel>
+
             const success = await this.deploySolutionBase(
                 currentUser,
                 proposalStreamDoc,
@@ -342,7 +346,7 @@ export default class CeramicStagehand {
                     `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
                     {
                         method: 'POST',
-                        body: proposalStreamDoc.id.toString(),
+                        body: proposalStreamID,
                     }
                 )
                 if (res.status === 200) {
@@ -353,7 +357,7 @@ export default class CeramicStagehand {
                 }
             }
         } catch (e) {
-            cpLogger.push(e)
+            throw e
         }
     }
 
@@ -401,16 +405,19 @@ export default class CeramicStagehand {
                 if (event) return true
             }
         } catch (e) {
-            cpLogger.push(e)
+            throw e
         }
     }
 
     deployProposal = async (
         currentUser: UserType,
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
+        proposalStreamID: string,
         proposalStack: ProposalStackType
     ) => {
         // TODO Sanity check function that this is approved
+        const proposalStreamDoc = (await this.loadStream(
+            proposalStreamID
+        )) as TileDocument<CeramicProposalModel>
 
         const parsedSolvers = await this.getParsedSolvers(
             proposalStack,
@@ -660,21 +667,22 @@ export default class CeramicStagehand {
         }
     }
 
-    requestProposalChange = async (
-        proposalDoc: TileDocument<CeramicProposalModel>
-    ) => {
+    requestProposalChange = async (proposalStreamID: string) => {
         try {
+            const proposalStreamDoc = (await this.loadStream(
+                proposalStreamID
+            )) as TileDocument<CeramicProposalModel>
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/requestChange`,
                 {
                     method: 'POST',
-                    body: proposalDoc.id.toString(),
+                    body: proposalStreamID,
                 }
             )
 
             if (res.status === 200) {
-                await this.updateProposalEntry(proposalDoc, {
+                await this.updateProposalEntry(proposalStreamDoc, {
                     requestChange: true,
                 })
                 return true
@@ -781,94 +789,3 @@ export default class CeramicStagehand {
         )
     }
 }
-
-// TODO WIP
-// deployProposal = async (
-//     proposalStreamID: string,
-//     proposalCommitID: string,
-//     ceramicTemplate: CeramicTemplateModel,
-//     ceramicProposal: CeramicProposalModel,
-//     currentUser: UserType
-// ) => {
-//     // Sanity check - Just let deploy if the proposalCommitID is actually flaggeed as approved at the template and the proposalCommitID is right
-//     const _templateStreamContent = (await (
-//         await this.loadStream(ceramicProposal.template.streamID)
-//     ).content) as CeramicTemplateModel
-//     const _proposalStreamEntry =
-//         _templateStreamContent.receivedProposals[proposalStreamID]
-//     if (
-//         !_proposalStreamEntry ||
-//         !_proposalStreamEntry[_proposalStreamEntry.length - 1].approved ||
-//         _proposalStreamEntry[_proposalStreamEntry.length - 1].approved ===
-//             undefined ||
-//         _proposalStreamEntry[_proposalStreamEntry.length - 1]
-//             .proposalCommitID !== proposalCommitID
-//     ) {
-//         throw Error(
-//             'Error, commit ID of Proposal is not approved or does not match!'
-//         )
-//     }
-
-//     try {
-//         const parsedSolvers = await this.getParsedSolvers(
-//             proposalCommitID,
-//             currentUser
-//         )
-
-//         if (parsedSolvers) {
-//             // Pin solverConfigs separately to have access without metaData from Solution
-//             const solverConfigsDoc = await TileDocument.deterministic(
-//                 this.selfID.client.ceramic,
-//                 {
-//                     controllers: [this.selfID.id],
-//                     family: `cambrian-solverConfigs`,
-//                     tags: [proposalCommitID],
-//                 }
-//             )
-
-//             const proposalsHub = new ProposalsHub(
-//                 currentUser.signer,
-//                 currentUser.chainId
-//             )
-
-//             const transaction =
-//                 await proposalsHub.createSolutionAndProposal(
-//                     parsedSolvers[0].collateralToken,
-//                     ceramicProposal.price.amount,
-//                     parsedSolvers.map((solver) => solver.config),
-//                     solverConfigsDoc.commitId.toString(),
-//                     proposalCommitID
-//                 )
-//             let rc = await transaction.wait()
-//             const event = rc.events?.find(
-//                 (event) => event.event === 'CreateProposal'
-//             )
-//             const proposalId = event?.args && event.args.id
-
-//             // Attach proposalID either to the template or the proposal
-//             if (this.selfID.did.id === ceramicTemplate.author) {
-//                 // Deployed by template author, proposalID will be attached to the template at receivedProposals
-//                 await this.updateProposalEntry(proposalStreamID, {
-//                     proposalID: proposalId,
-//                     approved: true,
-//                 })
-//             } else if (this.selfID.did.id === ceramicProposal.author) {
-//                 // Deloyed by proposal author, proposalID will be attached to proposal
-//                 await this.updateStage(
-//                     proposalStreamID,
-//                     { ...ceramicProposal, proposalID: proposalId },
-//                     StageNames.proposal
-//                 )
-//             } else {
-//                 // Just in case
-//                 console.warn(
-//                     'Proposal was not deployed by the template or proposal creator. Created Proposal ID can not be stored!',
-//                     proposalId
-//                 )
-//             }
-//         }
-//     } catch (e) {
-//         cpLogger.push(e)
-//         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-//     }
-// }

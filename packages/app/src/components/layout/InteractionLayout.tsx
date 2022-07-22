@@ -81,7 +81,7 @@ const InteractionLayout = ({
                                                 </Box>
                                             </Box>
                                         ) : (
-                                            <>
+                                            <Box width={'xlarge'}>
                                                 {proposalHeader}
                                                 {solverHeader}
                                                 <Box
@@ -98,7 +98,7 @@ const InteractionLayout = ({
                                                     )}
                                                     <Box flex>{children}</Box>
                                                 </Box>
-                                            </>
+                                            </Box>
                                         )}
                                     </>
                                 )

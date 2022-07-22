@@ -18,8 +18,7 @@ import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export type ProposalContextType = {
     proposalStack?: ProposalStackType
-    proposalStreamDoc?: TileDocument<CeramicProposalModel>
-    templateStreamDoc?: TileDocument<CeramicTemplateModel>
+    proposalStreamID: string
     proposalContract?: ethers.Contract
     proposalStatus: ProposalStatus
     updateProposal: () => Promise<void>
@@ -31,6 +30,7 @@ type ProposalProviderProps = {
 }
 
 export const ProposalContext = React.createContext<ProposalContextType>({
+    proposalStreamID: '',
     proposalStatus: ProposalStatus.Unknown,
     updateProposal: async () => {},
     isLoaded: false,
@@ -55,10 +55,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
         const [isLoaded, setIsLoaded] = useState(false)
-        const [proposalStreamDoc, setProposalStreamDoc] =
-            useState<TileDocument<CeramicProposalModel>>()
-        const [templateStreamDoc, setTemplateStreamDoc] =
-            useState<TileDocument<CeramicTemplateModel>>()
 
         useEffect(() => {
             if (currentUser) {
@@ -148,9 +144,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                                 _templateStreamDoc
                             )
                         }
-
-                        setProposalStreamDoc(_proposalStreamDoc)
-                        setTemplateStreamDoc(_templateStreamDoc)
                     }
 
                     setIsLoaded(true)
@@ -163,8 +156,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         return (
             <ProposalContext.Provider
                 value={{
-                    proposalStreamDoc: proposalStreamDoc,
-                    templateStreamDoc: templateStreamDoc,
+                    proposalStreamID: proposalStreamID,
                     proposalStack: proposalStack,
                     proposalStatus: proposalStatus,
                     proposalContract: onChainProposal,

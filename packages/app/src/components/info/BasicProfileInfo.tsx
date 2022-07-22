@@ -18,12 +18,12 @@ const BasicProfileInfo = ({
 
     return (
         <Box justify="center" gap="medium">
-            <Box direction="row" gap={size ? size : 'medium'} align="center">
+            <Box direction="row" wrap align="center">
                 <BaseAvatar
                     pfpPath={sellerBasicProfile.content?.avatar as string}
                     size={size ? undefined : 'medium'}
                 />
-                <Box>
+                <Box pad="small">
                     <Heading level={size === 'small' ? '4' : '3'}>
                         {sellerBasicProfile.content?.name}
                     </Heading>
