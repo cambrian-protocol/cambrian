@@ -161,6 +161,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         justify="between"
                         align="center"
                         pad="medium"
+                        wrap
                     >
                         <Box>
                             <Heading level="2">Proposals Management</Heading>
@@ -168,7 +169,11 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                 Edit, Review, and fund your proposals here
                             </Text>
                         </Box>
-                        <Box direction="row" gap="small">
+                        <Box
+                            direction="row"
+                            gap="small"
+                            pad={{ vertical: 'small' }}
+                        >
                             <Button
                                 secondary
                                 size="small"

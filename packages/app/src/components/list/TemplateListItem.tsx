@@ -39,9 +39,10 @@ const TemplateListItem = ({
             justify="between"
             align="center"
             round="xsmall"
+            wrap
         >
             <Text>{templateID}</Text>
-            <Box direction="row">
+            <Box direction="row" justify="end" flex width={{ min: 'auto' }}>
                 <Anchor
                     href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
                 >

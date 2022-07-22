@@ -78,6 +78,7 @@ const TemplatesDashboardUI = () => {
                             justify="between"
                             align="center"
                             pad="medium"
+                            wrap
                         >
                             <Box>
                                 <Heading level="2">
@@ -88,7 +89,11 @@ const TemplatesDashboardUI = () => {
                                     here
                                 </Text>
                             </Box>
-                            <Box direction="row" gap="small">
+                            <Box
+                                direction="row"
+                                gap="small"
+                                pad={{ vertical: 'small' }}
+                            >
                                 <Button
                                     secondary
                                     size="small"
