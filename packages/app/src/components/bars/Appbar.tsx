@@ -71,7 +71,11 @@ interface AppbarMenuItemProps {
 }
 
 const AppbarMenuItem = ({ icon, pathname, label }: AppbarMenuItemProps) => {
-    const isActive = window.location.pathname === pathname
+    let isActive = false
+    if (typeof window !== 'undefined') {
+        isActive = window.location.pathname === pathname
+    }
+
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
