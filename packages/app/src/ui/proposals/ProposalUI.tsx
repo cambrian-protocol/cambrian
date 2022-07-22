@@ -21,7 +21,7 @@ import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
 
-const ProposalUI = ({}) => {
+const ProposalUI = () => {
     const { currentUser } = useCurrentUser()
     const {
         isLoaded,
@@ -36,10 +36,10 @@ const ProposalUI = ({}) => {
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     useEffect(() => {
-        init()
-    }, [currentUser])
+        initCollateralToken()
+    }, [currentUser, proposalStack])
 
-    const init = async () => {
+    const initCollateralToken = async () => {
         if (proposalStack && currentUser) {
             const ct = await fetchTokenInfo(
                 proposalStack.proposal.price.tokenAddress,
