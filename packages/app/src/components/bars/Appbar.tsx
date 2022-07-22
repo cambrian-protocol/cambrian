@@ -7,8 +7,10 @@ import { Header } from 'grommet'
 import Link from 'next/link'
 import UserMenu from '../menu/UserMenu'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 const Appbar = () => {
+    const { currentUser } = useCurrentUser()
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
@@ -36,21 +38,25 @@ const Appbar = () => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
-                            <AppbarMenuItem
-                                pathname="/dashboard/templates"
-                                label="Templates"
-                                icon={<File />}
-                            />
-                            <AppbarMenuItem
-                                pathname="/dashboard/proposals"
-                                label="Proposals"
-                                icon={<ClipboardText />}
-                            />
-                            <AppbarMenuItem
-                                pathname="/dashboard/compositions"
-                                label="Compositions"
-                                icon={<TreeStructure />}
-                            />
+                            {currentUser && (
+                                <Box direction="row">
+                                    <AppbarMenuItem
+                                        pathname="/dashboard/templates"
+                                        label="Templates"
+                                        icon={<File />}
+                                    />
+                                    <AppbarMenuItem
+                                        pathname="/dashboard/proposals"
+                                        label="Proposals"
+                                        icon={<ClipboardText />}
+                                    />
+                                    <AppbarMenuItem
+                                        pathname="/dashboard/compositions"
+                                        label="Compositions"
+                                        icon={<TreeStructure />}
+                                    />
+                                </Box>
+                            )}
                             <Box alignSelf="center" pad={{ left: 'large' }}>
                                 <UserMenu />
                             </Box>
