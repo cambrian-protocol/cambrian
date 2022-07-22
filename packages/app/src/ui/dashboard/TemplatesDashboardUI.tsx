@@ -1,17 +1,15 @@
-import { ArrowsClockwise, CircleDashed, File, Plus } from 'phosphor-react'
-import { Box, Heading, Text } from 'grommet'
+import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
+import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
 import CreateTemplateModal from './modals/CreateTemplateModal'
-import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -74,28 +72,32 @@ const TemplatesDashboardUI = () => {
             <PageLayout contextTitle="Templates" kind="narrow">
                 <Box fill pad={{ top: 'large' }}>
                     <Box height={{ min: 'auto' }}>
-                        <Box pad="medium">
-                            <Heading level="2">Templates Management</Heading>
-                            <Text color="dark-4">
-                                Create, edit or distribute your templates here
-                            </Text>
-                        </Box>
-                        <Box direction="row" height={{ min: 'auto' }} wrap>
-                            <DashboardUtilityButton
-                                label="New Template"
-                                primaryIcon={<File />}
-                                secondaryIcon={<Plus />}
-                                onClick={toggleShowCreateTemplateModal}
-                            />
-                        </Box>
-                        <Box pad={'medium'} gap="small">
-                            <Box
-                                direction="row"
-                                align="center"
-                                justify="between"
-                            >
-                                <Heading level="4">Your Templates</Heading>
+                        <Box
+                            height={{ min: 'auto' }}
+                            direction="row"
+                            justify="between"
+                            align="center"
+                            pad="medium"
+                        >
+                            <Box>
+                                <Heading level="2">
+                                    Templates Management
+                                </Heading>
+                                <Text color="dark-4">
+                                    Create, edit or distribute your templates
+                                    here
+                                </Text>
+                            </Box>
+                            <Box direction="row" gap="small">
+                                <Button
+                                    secondary
+                                    size="small"
+                                    label="New Template"
+                                    icon={<FilePlus />}
+                                    onClick={toggleShowCreateTemplateModal}
+                                />
                                 <LoaderButton
+                                    secondary
                                     isLoading={isFetching}
                                     icon={<ArrowsClockwise />}
                                     onClick={() => {
@@ -104,33 +106,62 @@ const TemplatesDashboardUI = () => {
                                     }}
                                 />
                             </Box>
-                            <PlainSectionDivider />
                         </Box>
                     </Box>
-                    {templates && Object.keys(templates).length > 0 ? (
-                        <Box
-                            gap="small"
-                            pad={{ left: 'medium', right: 'large' }}
-                        >
-                            {Object.keys(templates).map((templateID) => {
-                                return (
-                                    <TemplateListItem
-                                        key={templateID}
-                                        templateStreamID={templates[templateID]}
-                                        templateID={templateID}
-                                        onDelete={onDeleteTemplate}
-                                    />
-                                )
-                            })}
-                        </Box>
-                    ) : (
-                        <Box fill justify="center" align="center" gap="medium">
-                            <CircleDashed size="32" />
-                            <Text size="small" color="dark-4">
-                                You don't have any templates yet
-                            </Text>
-                        </Box>
-                    )}
+                    <Box fill pad={'medium'}>
+                        <Tabs alignControls="start">
+                            <Tab
+                                title={`Your Templates (${
+                                    templates
+                                        ? Object.keys(templates).length
+                                        : 0
+                                })`}
+                            >
+                                <Box pad={{ top: 'medium' }}>
+                                    {templates &&
+                                    Object.keys(templates).length > 0 ? (
+                                        <Box gap="small">
+                                            {Object.keys(templates).map(
+                                                (templateID) => {
+                                                    return (
+                                                        <TemplateListItem
+                                                            key={templateID}
+                                                            templateStreamID={
+                                                                templates[
+                                                                    templateID
+                                                                ]
+                                                            }
+                                                            templateID={
+                                                                templateID
+                                                            }
+                                                            onDelete={
+                                                                onDeleteTemplate
+                                                            }
+                                                        />
+                                                    )
+                                                }
+                                            )}
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            border
+                                            fill
+                                            justify="center"
+                                            align="center"
+                                            gap="medium"
+                                            pad="large"
+                                            round="xsmall"
+                                        >
+                                            <CircleDashed size="32" />
+                                            <Text size="small" color="dark-4">
+                                                You don't have any templates yet
+                                            </Text>
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Tab>
+                        </Tabs>
+                    </Box>
                     <Box pad="large" />
                 </Box>
             </PageLayout>

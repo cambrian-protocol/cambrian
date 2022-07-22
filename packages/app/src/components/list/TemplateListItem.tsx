@@ -54,6 +54,10 @@ const TemplateListItem = ({
                 </Anchor>
                 <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
                 <Button
+                    tip={{
+                        content: 'Copy link to clipboard',
+                        dropProps: { align: { left: 'right' } },
+                    }}
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(

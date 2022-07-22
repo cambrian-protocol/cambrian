@@ -160,8 +160,9 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         direction="row"
                         justify="between"
                         align="center"
+                        pad="medium"
                     >
-                        <Box pad="medium">
+                        <Box>
                             <Heading level="2">Proposals Management</Heading>
                             <Text color="dark-4">
                                 Edit, Review, and fund your proposals here
@@ -181,17 +182,15 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     }
                                 }}
                             />
-                            <Box>
-                                <LoaderButton
-                                    secondary
-                                    isLoading={isFetching}
-                                    icon={<ArrowsClockwise />}
-                                    onClick={() => {
-                                        ceramicStagehand &&
-                                            fetchMyProposals(ceramicStagehand)
-                                    }}
-                                />
-                            </Box>
+                            <LoaderButton
+                                secondary
+                                isLoading={isFetching}
+                                icon={<ArrowsClockwise />}
+                                onClick={() => {
+                                    ceramicStagehand &&
+                                        fetchMyProposals(ceramicStagehand)
+                                }}
+                            />
                         </Box>
                     </Box>
                     <Box fill pad={'medium'}>
@@ -199,63 +198,71 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                             <Tab
                                 title={`Your Proposals (${myProposals.length})`}
                             >
-                                {myProposals.length > 0 ? (
-                                    <Box gap="small" pad="small">
-                                        {myProposals.map((proposal) => (
-                                            <ProposalListItem
-                                                key={proposal.title}
-                                                proposal={proposal}
-                                                onDelete={onDeleteProposal}
-                                            />
-                                        ))}
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        fill
-                                        justify="center"
-                                        align="center"
-                                        gap="medium"
-                                        pad="large"
-                                    >
-                                        <CircleDashed size="32" />
-                                        <Text size="small" color="dark-4">
-                                            Proposals created yet
-                                        </Text>
-                                    </Box>
-                                )}
+                                <Box pad={{ top: 'medium' }}>
+                                    {myProposals.length > 0 ? (
+                                        <Box gap="small">
+                                            {myProposals.map((proposal) => (
+                                                <ProposalListItem
+                                                    key={proposal.title}
+                                                    proposal={proposal}
+                                                    onDelete={onDeleteProposal}
+                                                />
+                                            ))}
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            fill
+                                            justify="center"
+                                            align="center"
+                                            gap="medium"
+                                            pad="large"
+                                            round="xsmall"
+                                            border
+                                        >
+                                            <CircleDashed size="32" />
+                                            <Text size="small" color="dark-4">
+                                                No Proposals created yet
+                                            </Text>
+                                        </Box>
+                                    )}
+                                </Box>
                             </Tab>
                             <Tab
                                 title={`Received Proposals (${receivedProposals.length})`}
                             >
-                                {receivedProposals.length > 0 ? (
-                                    <Box gap="small" pad="small">
-                                        {receivedProposals.map(
-                                            (receivedProposal, idx) => {
-                                                return (
-                                                    <ProposalListItem
-                                                        key={idx}
-                                                        proposal={
-                                                            receivedProposal
-                                                        }
-                                                    />
-                                                )
-                                            }
-                                        )}
-                                    </Box>
-                                ) : (
-                                    <Box
-                                        fill
-                                        justify="center"
-                                        align="center"
-                                        gap="medium"
-                                        pad="large"
-                                    >
-                                        <CircleDashed size="32" />
-                                        <Text size="small" color="dark-4">
-                                            No proposals received yet
-                                        </Text>
-                                    </Box>
-                                )}
+                                <Box pad={{ top: 'medium' }}>
+                                    {receivedProposals.length > 0 ? (
+                                        <Box gap="small">
+                                            {receivedProposals.map(
+                                                (receivedProposal, idx) => {
+                                                    return (
+                                                        <ProposalListItem
+                                                            key={idx}
+                                                            proposal={
+                                                                receivedProposal
+                                                            }
+                                                        />
+                                                    )
+                                                }
+                                            )}
+                                        </Box>
+                                    ) : (
+                                        <Box
+                                            fill
+                                            justify="center"
+                                            align="center"
+                                            gap="medium"
+                                            pad="large"
+                                            round="xsmall"
+                                            border
+                                        >
+                                            <CircleDashed size="32" />
+                                            <Text size="small" color="dark-4">
+                                                No proposals received yet
+                                            </Text>
+                                        </Box>
+                                    )}
+                                </Box>
                             </Tab>
                         </Tabs>
                     </Box>
