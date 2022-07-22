@@ -34,11 +34,13 @@ export default function Messenger({
     chatID,
     chatType,
     participants,
+    showMessenger,
 }: {
     currentUser: UserType
     chatID: string
     chatType: 'Draft' | 'Proposal' | 'Solver' | 'Other'
     participants?: string[] // For 'Other'
+    showMessenger?: boolean // to prevent reinit on hide
 }) {
     // useRef for publishing messages in outbox, otherwise setInterval has stale state
     const outboxCallback = useRef(async () => {})
@@ -69,6 +71,10 @@ export default function Messenger({
             .getElementById('chat-end')
             ?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
+
+    useEffect(() => {
+        document.getElementById('chat-end')?.scrollIntoView()
+    }, [showMessenger])
 
     // Publish to ceramic every n seconds
     // Because: Multiple publishes in a short time can fail
@@ -293,47 +299,55 @@ export default function Messenger({
     }
 
     return (
-        <Box gap="small">
-            <Box
-                height={'medium'}
-                border
-                round="xsmall"
-                pad="small"
-                overflow={{ vertical: 'auto' }}
-                gap="small"
-            >
-                {messages.map((msg, index) => (
-                    <ChatMessage
-                        key={index}
-                        currentUser={currentUser}
-                        message={msg}
-                    />
-                ))}
-                <div id="chat-end" />
-            </Box>
-            <Form
-                onSubmit={() =>
-                    sendMessage({
-                        text: messageInput,
-                        author: {
-                            name: currentUser.basicProfile?.name || 'Anon',
-                            did: currentUser.selfID.id,
-                        },
-                        timestamp: new Date().getTime(),
-                    })
-                }
-            >
-                <Box direction="row" align="center" gap="small">
-                    <Box flex>
-                        <TextInput
-                            placeholder="Write a message here"
-                            value={messageInput}
-                            onChange={(e) => setMessageInput(e.target.value)}
-                        />
+        <>
+            {showMessenger && (
+                <Box gap="small" pad={{ horizontal: 'small', bottom: 'small' }}>
+                    <Box
+                        height={'medium'}
+                        border
+                        round="xsmall"
+                        pad="small"
+                        overflow={{ vertical: 'auto' }}
+                        gap="small"
+                    >
+                        {messages.map((msg, index) => (
+                            <ChatMessage
+                                key={index}
+                                currentUser={currentUser}
+                                message={msg}
+                            />
+                        ))}
+                        <div id="chat-end" />
                     </Box>
-                    <Button icon={<PaperPlaneRight />} type="submit" />
+                    <Form
+                        onSubmit={() =>
+                            sendMessage({
+                                text: messageInput,
+                                author: {
+                                    name:
+                                        currentUser.basicProfile?.name ||
+                                        'Anon',
+                                    did: currentUser.selfID.id,
+                                },
+                                timestamp: new Date().getTime(),
+                            })
+                        }
+                    >
+                        <Box direction="row" align="center" gap="small">
+                            <Box flex>
+                                <TextInput
+                                    placeholder="Write a message here"
+                                    value={messageInput}
+                                    onChange={(e) =>
+                                        setMessageInput(e.target.value)
+                                    }
+                                />
+                            </Box>
+                            <Button icon={<PaperPlaneRight />} type="submit" />
+                        </Box>
+                    </Form>
                 </Box>
-            </Form>
-        </Box>
+            )}
+        </>
     )
 }
