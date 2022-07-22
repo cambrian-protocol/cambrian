@@ -80,6 +80,10 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
                     />
                 )}
                 <Button
+                    tip={{
+                        content: 'Copy link to clipboard',
+                        dropProps: { align: { left: 'right' } },
+                    }}
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(

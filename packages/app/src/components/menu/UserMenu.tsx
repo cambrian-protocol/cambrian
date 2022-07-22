@@ -47,11 +47,6 @@ export default function UserMenu() {
             icon: <UserMenuItemIcon icon={<User />} />,
             href: '/dashboard/profile',
         })
-        menuItems.unshift({
-            label: <UserMenuItemLabel label="Dashboard" />,
-            icon: <UserMenuItemIcon icon={<ChartBar />} />,
-            href: '/dashboard',
-        })
         menuItems.push({
             label: (
                 <UserMenuItemLabel label={currentUser ? 'Logout' : 'Login'} />

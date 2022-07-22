@@ -88,7 +88,7 @@ const CompositionDashboardTile = ({
                 <Box pad={{ horizontal: 'medium', vertical: 'small' }}>
                     <Card
                         height={{ min: 'medium', max: 'medium' }}
-                        width={{ min: 'medium', max: '23em' }}
+                        width="medium"
                         background="background-contrast"
                     >
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>

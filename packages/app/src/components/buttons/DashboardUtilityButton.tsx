@@ -19,7 +19,7 @@ const DashboardUtilityButton = ({
         <Box pad="medium">
             <IconContext.Provider value={{ size: '32' }}>
                 <Box
-                    width={{ min: 'medium', max: 'medium' }}
+                    width="medium"
                     height="xsmall"
                     border
                     round="xsmall"

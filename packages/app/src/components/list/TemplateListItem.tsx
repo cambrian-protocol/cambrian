@@ -39,9 +39,10 @@ const TemplateListItem = ({
             justify="between"
             align="center"
             round="xsmall"
+            wrap
         >
             <Text>{templateID}</Text>
-            <Box direction="row">
+            <Box direction="row" justify="end" flex width={{ min: 'auto' }}>
                 <Anchor
                     href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
                 >
@@ -54,6 +55,10 @@ const TemplateListItem = ({
                 </Anchor>
                 <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
                 <Button
+                    tip={{
+                        content: 'Copy link to clipboard',
+                        dropProps: { align: { left: 'right' } },
+                    }}
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(
