@@ -39,7 +39,7 @@ const CreateProposalCTA = ({
         }
     }
     return (
-        <Box align="end">
+        <Box align="end" pad={{ top: 'medium' }}>
             <LoaderButton
                 onClick={onCreateProposal}
                 isLoading={isCreatingProposal}

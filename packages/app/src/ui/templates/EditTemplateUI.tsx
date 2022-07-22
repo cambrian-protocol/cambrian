@@ -43,7 +43,7 @@ const EditTemplateUI = ({
     }, [activeIndex])
 
     return (
-        <Box gap="medium">
+        <Box gap="medium" pad="medium">
             <TemplateHeader title={cachedTemplateTitle} />
             <Tabs
                 justify="start"

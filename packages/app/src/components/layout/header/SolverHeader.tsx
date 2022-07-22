@@ -33,7 +33,7 @@ const SolverHeader = ({
                 <ResponsiveContext.Consumer>
                     {(screenSize) => {
                         return (
-                            <Box width="xlarge">
+                            <Box height={{ min: 'auto' }}>
                                 <Stack anchor="top-right">
                                     <Box pad={{ top: 'medium' }}>
                                         <Box

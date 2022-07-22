@@ -15,7 +15,7 @@ const ProposalControlbar = () => {
     const {
         proposalStack,
         proposalStatus,
-        proposalStreamDoc,
+        proposalStreamID,
         proposalContract,
     } = useProposal()
 
@@ -31,11 +31,9 @@ const ProposalControlbar = () => {
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && proposalStreamDoc && (
+                        {isProposalAuthor && (
                             <Link
-                                href={`${
-                                    window.location.origin
-                                }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
+                                href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
                                 passHref
                             >
                                 <Button

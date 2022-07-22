@@ -1,5 +1,6 @@
+import { Box, Heading } from 'grommet'
+
 import BasicProfileInfo from '../../components/info/BasicProfileInfo'
-import { Box } from 'grommet'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import CreateProposalCTA from './CreateProposalCTA'
 import FlexInputInfo from '../common/FlexInputInfo'
@@ -20,17 +21,31 @@ const TemplateUI = ({
     templateStreamID,
 }: TemplateUIProps) => {
     return (
-        <Box pad="large" height={{ min: '80vh' }} gap="medium">
-            <TemplateContentInfo template={ceramicTemplate} />
-            <PlainSectionDivider />
-            <TemplatePricingInfo template={ceramicTemplate} />
-            <FlexInputInfo flexInputs={ceramicTemplate.flexInputs} />
-            <PlainSectionDivider />
-            <BasicProfileInfo did={ceramicTemplate.author} />
-            <CreateProposalCTA
-                currentUser={currentUser}
-                templateStreamID={templateStreamID}
-            />
+        <Box pad="large">
+            <Box
+                pad="large"
+                height={{ min: '80vh' }}
+                gap="medium"
+                border
+                round="xsmall"
+            >
+                <BasicProfileInfo
+                    did={ceramicTemplate.author}
+                    hideDetails
+                    size="small"
+                />
+                <PlainSectionDivider />
+                <TemplateContentInfo template={ceramicTemplate} />
+                <PlainSectionDivider />
+                <TemplatePricingInfo template={ceramicTemplate} />
+                <FlexInputInfo flexInputs={ceramicTemplate.flexInputs} />
+                <PlainSectionDivider />
+                <BasicProfileInfo did={ceramicTemplate.author} />
+                <CreateProposalCTA
+                    currentUser={currentUser}
+                    templateStreamID={templateStreamID}
+                />
+            </Box>
         </Box>
     )
 }

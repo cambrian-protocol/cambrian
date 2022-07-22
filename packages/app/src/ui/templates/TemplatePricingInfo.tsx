@@ -32,7 +32,7 @@ const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
     }
 
     return (
-        <Box gap="medium">
+        <Box>
             <PriceInfo
                 amount={template.price.amount}
                 label="Sellers quote"
@@ -42,15 +42,16 @@ const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
                 {template.price.allowAnyPaymentToken && (
                     <Box
                         basis="1/2"
-                        height={'xsmall'}
+                        height={'auto'}
                         gap="xsmall"
-                        width={{ min: 'medium' }}
+                        width={{ min: 'small' }}
+                        pad={{ vertical: 'medium' }}
                     >
                         <Text color="dark-4">Flexible Token</Text>
                         <Box direction="row" gap="medium">
                             <Coins size="24" />
                             <Text size="small" color={'dark-4'}>
-                                The seller allows payment with any other token
+                                Any ERC20 token allowed
                             </Text>
                         </Box>
                     </Box>
@@ -59,9 +60,10 @@ const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
                     template.price.preferredTokens.length > 0 && (
                         <Box
                             basis="1/2"
-                            height={'xsmall'}
+                            height={'auto'}
                             gap="xsmall"
-                            width={{ min: 'medium' }}
+                            width={{ min: 'auto' }}
+                            pad={{ vertical: 'medium' }}
                         >
                             {template.price.allowAnyPaymentToken ? (
                                 <Text color={'dark-4'}>
@@ -72,7 +74,7 @@ const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
                                     Alternative Tokens for payment:
                                 </Text>
                             )}
-                            <Box direction="row" gap="small">
+                            <Box direction="row" gap="small" pad="small">
                                 {template.price.preferredTokens.map(
                                     (preferredToken, idx) => (
                                         <TokenAvatar

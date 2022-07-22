@@ -22,17 +22,9 @@ import { useProposal } from '@cambrian/app/hooks/useProposal'
 
 const ProposalUI = () => {
     const { currentUser } = useCurrentUser()
-    const {
-        isLoaded,
-        proposalStack,
-        proposalStatus,
-        proposalStreamDoc,
-        templateStreamDoc,
-    } = useProposal()
+    const { isLoaded, proposalStack, proposalStatus, proposalStreamID } =
+        useProposal()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-
-    const [showMessenger, setShowMessenger] = useState(true)
-    const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     useEffect(() => {
         initCollateralToken()
@@ -49,11 +41,9 @@ const ProposalUI = () => {
     }
 
     const initMessenger =
-        proposalStreamDoc &&
-        !!templateStreamDoc?.content.receivedProposals[
-            proposalStreamDoc.id.toString()
-        ] &&
-        currentUser
+        (currentUser?.selfID.did.id === proposalStack?.template.author ||
+            currentUser?.selfID.did.id === proposalStack?.proposal.author) &&
+        proposalStatus !== ProposalStatus.Draft
 
     return (
         <>
@@ -98,59 +88,23 @@ const ProposalUI = () => {
                             </Box>
                         </Box>
                     </PageLayout>
-                    {initMessenger && (
-                        <Box pad={{ right: 'large' }}>
-                            <Box
-                                width={{ min: 'medium' }}
-                                background="background-contrast"
-                                round={{ corner: 'top', size: 'xsmall' }}
-                            >
-                                <Box
-                                    direction="row"
-                                    justify="between"
-                                    pad="small"
-                                >
-                                    <BasicProfileInfo
-                                        did={
-                                            currentUser?.selfID.did.id ===
-                                            proposalStack.proposal.author
-                                                ? proposalStack.template.author
-                                                : proposalStack.proposal.author
-                                        }
-                                        hideDetails
-                                        size="small"
-                                    />
-                                    <IconContext.Provider
-                                        value={{ size: '18' }}
-                                    >
-                                        <Box
-                                            onClick={toggleShowMessenger}
-                                            focusIndicator={false}
-                                            pad="small"
-                                        >
-                                            {showMessenger ? (
-                                                <CaretDown />
-                                            ) : (
-                                                <CaretUp />
-                                            )}
-                                        </Box>
-                                    </IconContext.Provider>
-                                </Box>
-                                <Messenger
-                                    showMessenger={showMessenger}
-                                    currentUser={currentUser}
-                                    chatID={proposalStreamDoc.id.toString()}
-                                    chatType={
-                                        proposalStatus ===
-                                            ProposalStatus.Funding ||
-                                        proposalStatus ===
-                                            ProposalStatus.Executed
-                                            ? 'Proposal'
-                                            : 'Draft'
-                                    }
-                                />
-                            </Box>
-                        </Box>
+                    {initMessenger && currentUser && (
+                        <Messenger
+                            chatID={proposalStreamID}
+                            currentUser={currentUser}
+                            chatType={
+                                proposalStatus === ProposalStatus.Funding ||
+                                proposalStatus === ProposalStatus.Executed
+                                    ? 'Proposal'
+                                    : 'Draft'
+                            }
+                            participantDIDs={
+                                currentUser?.selfID.did.id ===
+                                proposalStack.proposal.author
+                                    ? [proposalStack.template.author]
+                                    : [proposalStack.proposal.author]
+                            }
+                        />
                     )}
                 </Stack>
             ) : (
