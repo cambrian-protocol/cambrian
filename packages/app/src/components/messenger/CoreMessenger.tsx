@@ -8,6 +8,7 @@ import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
+import _ from 'lodash'
 import { cpLogger } from '../../services/api/Logger.api'
 import io from 'socket.io-client'
 
@@ -276,12 +277,10 @@ export default function CoreMessenger({
                     messages: ChatMessageType[]
                 }>[]
             ).filter((doc) => doc.content?.messages?.length > 1)
-
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
                 (doc) => doc.content.messages
             )
-
             return mergeMessages(messages)
         } catch (e) {
             cpLogger.push(e)
@@ -321,6 +320,10 @@ export default function CoreMessenger({
                                 key={index}
                                 currentUser={currentUser}
                                 message={msg}
+                                pending={
+                                    outbox.findIndex((m) => _.isEqual(m, msg)) >
+                                    -1
+                                }
                             />
                         ))}
                         <div id="chat-end" />
@@ -349,7 +352,11 @@ export default function CoreMessenger({
                                     }
                                 />
                             </Box>
-                            <Button icon={<PaperPlaneRight />} type="submit" />
+                            <Button
+                                icon={<PaperPlaneRight />}
+                                type="submit"
+                                disabled={messageInput.trim() === ''}
+                            />
                         </Box>
                     </Form>
                 </Box>
