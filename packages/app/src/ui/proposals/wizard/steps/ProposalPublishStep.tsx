@@ -4,24 +4,22 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface ProposalPublishStepProps {
-    proposalStreamDoc: TileDocument<CeramicProposalModel>
+    proposalStreamID: string
 }
 
 const ProposalPublishStep = ({
-    proposalStreamDoc,
+    proposalStreamID,
 }: ProposalPublishStepProps) => {
     const { currentUser } = useCurrentUser()
 
@@ -33,14 +31,11 @@ const ProposalPublishStep = ({
         setIsSubmitting(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStreamDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStreamDoc)
+            await ceramicStagehand.submitProposal(proposalStreamID)
             router.push(
-                `${
-                    window.location.origin
-                }/proposals/${proposalStreamDoc.id.toString()}`
+                `${window.location.origin}/proposals/${proposalStreamID}`
             )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -51,12 +46,10 @@ const ProposalPublishStep = ({
         <>
             <Box height={{ min: '60vh' }} justify="between">
                 <HeaderTextSection title="Proposal ready to submit" />
-                {proposalStreamDoc && (
+                {
                     <Box direction="row" justify="between">
                         <Link
-                            href={`${
-                                window.location.origin
-                            }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
+                            href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
                             passHref
                         >
                             <Button
@@ -72,7 +65,7 @@ const ProposalPublishStep = ({
                             onClick={onSubmitProposal}
                         />
                     </Box>
-                )}
+                }
             </Box>
             {errorMessage && (
                 <ErrorPopupModal

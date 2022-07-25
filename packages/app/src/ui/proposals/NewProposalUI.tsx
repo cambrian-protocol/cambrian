@@ -13,19 +13,19 @@ const NewProposalUI = () => {
         setProposalInput,
         proposalStack,
         onSaveProposal,
-        proposalStreamDoc,
+        proposalStreamID,
     } = useEditProposal()
 
     return (
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && proposalStack && proposalStreamDoc ? (
+            ) : proposalInput && proposalStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center" pad="large">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
-                                proposalStreamDoc={proposalStreamDoc}
+                                proposalStreamID={proposalStreamID}
                                 onSaveProposal={onSaveProposal}
                                 proposalStack={proposalStack}
                                 proposalInput={proposalInput}

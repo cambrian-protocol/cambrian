@@ -1,5 +1,4 @@
 import { Box, Stack } from 'grommet'
-import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'

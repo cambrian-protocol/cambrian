@@ -592,10 +592,12 @@ export default class CeramicStagehand {
         }
     }
 
-    submitProposal = async (
-        proposalDoc: TileDocument<CeramicProposalModel>
-    ) => {
+    submitProposal = async (proposalStreamID: string) => {
         try {
+            const proposalDoc = (await this.loadStream(
+                proposalStreamID
+            )) as TileDocument<CeramicProposalModel>
+
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/proposeDraft`,
@@ -644,24 +646,22 @@ export default class CeramicStagehand {
         return _parsedSolvers
     }
 
-    loadAndCloneProposalStack = async (proposalCommitID: string) => {
-        const _proposalCommitContent = _.cloneDeep(
-            (await this.loadStream(proposalCommitID))
-                .content as CeramicProposalModel
-        )
+    loadAndCloneProposalStack = async (
+        proposalDoc: TileDocument<CeramicProposalModel>
+    ) => {
+        const _proposalContent = _.cloneDeep(proposalDoc.content)
 
         const _templateCommitContent = _.cloneDeep(
-            (await this.loadStream(_proposalCommitContent.template.commitID))
+            (await this.loadStream(_proposalContent.template.commitID))
                 .content as CeramicTemplateModel
         )
-
         const _compositionCommitContent = _.cloneDeep(
             (await this.loadStream(_templateCommitContent.composition.commitID))
                 .content as CompositionModel
         )
 
         return {
-            proposal: _proposalCommitContent,
+            proposal: _proposalContent,
             template: _templateCommitContent,
             composition: _compositionCommitContent,
         }

@@ -17,7 +17,7 @@ interface ProposalWizardProps {
     >
     onSaveProposal: () => Promise<void>
     proposalStack: ProposalStackType
-    proposalStreamDoc: TileDocument<CeramicProposalModel>
+    proposalStreamID: string
 }
 
 export enum PROPOSAL_WIZARD_STEPS {
@@ -38,7 +38,7 @@ const ProposalWizard = ({
     setProposalInput,
     onSaveProposal,
     proposalStack,
-    proposalStreamDoc,
+    proposalStreamID,
 }: ProposalWizardProps) => {
     const [currentStep, setCurrentStep] = useState<ProposalWizardStepsType>(
         PROPOSAL_WIZARD_STEPS.DESCRIPTION
@@ -83,9 +83,7 @@ const ProposalWizard = ({
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
                 return (
-                    <ProposalPublishStep
-                        proposalStreamDoc={proposalStreamDoc}
-                    />
+                    <ProposalPublishStep proposalStreamID={proposalStreamID} />
                 )
             default:
                 return <></>

@@ -1,6 +1,10 @@
+import {
+    CeramicTemplateModel,
+    ReceivedProposalsHashmapType,
+} from '@cambrian/app/models/TemplateModel'
+
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -29,7 +33,7 @@ export const getProposalStatus = (
             if (proposalDoc.content.isSubmitted) {
                 return ProposalStatus.OnReview
             } else {
-                return ProposalStatus.Modified
+                return ProposalStatus.ChangeRequested
             }
         }
     } else {
@@ -49,10 +53,9 @@ export const getProposalStatus = (
  */
 export const getLatestProposalSubmission = (
     proposalStreamID: string,
-    templateDoc: TileDocument<CeramicTemplateModel>
+    receivedProposals: ReceivedProposalsHashmapType
 ) => {
-    const registeredProposal =
-        templateDoc.content.receivedProposals[proposalStreamID]
+    const registeredProposal = receivedProposals[proposalStreamID]
 
     if (registeredProposal) {
         const latestProposalCommit =
