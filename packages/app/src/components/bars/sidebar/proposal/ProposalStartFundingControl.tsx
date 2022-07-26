@@ -3,6 +3,7 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { Coins } from 'phosphor-react'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -37,7 +38,7 @@ const ProposalStartFundingControl = () => {
     }
 
     return (
-        <>
+        <Box align="end">
             <LoaderButton
                 isLoading={isInTransaction}
                 label="Start funding"
@@ -52,7 +53,7 @@ const ProposalStartFundingControl = () => {
                     onClose={() => setErrorMessage(undefined)}
                 />
             )}
-        </>
+        </Box>
     )
 }
 

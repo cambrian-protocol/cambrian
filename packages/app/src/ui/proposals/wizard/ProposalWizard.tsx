@@ -7,7 +7,6 @@ import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
 import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 
 interface ProposalWizardProps {
@@ -55,6 +54,7 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
+                        requirements={proposalStack.template.requirements}
                         stepperCallback={setCurrentStep}
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
