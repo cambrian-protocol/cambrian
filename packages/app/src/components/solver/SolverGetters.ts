@@ -8,7 +8,6 @@ import {
     SolverModel,
     SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
-import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 import {
     calculateCollectionId,
     calculatePositionId,
@@ -18,6 +17,7 @@ import {
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
@@ -31,6 +31,7 @@ import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -444,8 +445,14 @@ export const getMetadataFromProposal = async (
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
         if (metadataURI) {
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+            const proposalStreamDoc = (await ceramicStagehand.loadStream(
+                metadataURI
+            )) as TileDocument<CeramicProposalModel>
+
             const proposalStack =
-                await ceramicStagehand.loadAndCloneProposalStack(metadataURI)
+                await ceramicStagehand.loadAndCloneProposalStack(
+                    proposalStreamDoc
+                )
 
             if (proposalStack) {
                 const solverIndex = (await solverMethods.chainIndex()) as

@@ -170,7 +170,8 @@ export default class CeramicStagehand {
                     controllers: [this.selfID.id],
                     family: `cambrian-${stage}`,
                     tags: [uniqueTag],
-                }
+                },
+                { pin: true }
             )
             await currentDoc.update(data)
             const streamID = currentDoc.id.toString()
@@ -179,14 +180,30 @@ export default class CeramicStagehand {
                 stageLib.content !== null &&
                 typeof stageLib.content === 'object'
             ) {
-                await stageLib.update({
-                    ...stageLib.content,
-                    [uniqueTag]: streamID,
-                })
+                await stageLib.update(
+                    {
+                        ...stageLib.content,
+                        [uniqueTag]: streamID,
+                    },
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
             } else {
-                await stageLib.update({
-                    [uniqueTag]: streamID,
-                })
+                await stageLib.update(
+                    {
+                        [uniqueTag]: streamID,
+                    },
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
             }
 
             return { uniqueTag: uniqueTag, streamID: streamID }
