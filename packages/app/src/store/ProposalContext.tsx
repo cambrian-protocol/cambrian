@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {
     getLatestProposalSubmission,
     getOnChainProposal,
+    getOnChainProposalId,
     getProposalStatus,
 } from '../utils/helpers/proposalHelper'
 
@@ -46,6 +47,12 @@ export type ProposalStackType = {
 
 export const ProposalContextProvider: React.FunctionComponent<ProposalProviderProps> =
     ({ proposalStreamID, currentUser, children }) => {
+        const proposalsHub = new ProposalsHub(
+            currentUser.signer,
+            currentUser.chainId
+        )
+        const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown
         )
@@ -60,10 +67,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<CeramicTemplateModel>>()
 
-        const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
-
-        const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-
         useEffect(() => {
             init()
         }, [])
@@ -76,12 +79,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             ) {
                 if (proposalStreamDoc && templateStreamDoc) {
                     const proposalSub = proposalStreamDoc.subscribe((x) => {
-                        console.log('fired proposal sub')
                         refreshProposal()
                     })
                     const templateSub = templateStreamDoc.subscribe(
                         async (x) => {
-                            console.log('fired template sub')
                             setProposalStatus(
                                 await getProposalStatus(
                                     proposalStreamDoc,
@@ -102,19 +103,19 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         // Init Proposalshub listener
         useEffect(() => {
-            if (proposalsHub && proposalStreamDoc && ceramicStagehand) {
+            if (proposalStreamDoc) {
                 initProposalsHubListener(proposalsHub, proposalStreamDoc)
                 return () => {
                     proposalsHub.contract.removeAllListeners()
                 }
             }
-        }, [proposalStatus, proposalsHub, proposalStreamDoc, ceramicStagehand])
+        }, [proposalStatus, proposalStreamDoc])
 
         const initProposalsHubListener = async (
             proposalsHub: ProposalsHub,
             proposalStreamDoc: TileDocument<CeramicProposalModel>
         ) => {
-            const proposalID = await ceramicStagehand.getOnChainProposalId(
+            const proposalID = getOnChainProposalId(
                 proposalStreamDoc.commitId.toString(),
                 proposalStreamDoc.content.template.commitID
             )
@@ -154,9 +155,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 await initProposal(_proposalStreamDoc, _templateStreamDoc)
 
-                setProposalsHub(
-                    new ProposalsHub(currentUser.signer, currentUser.chainId)
-                )
                 setProposalStreamDoc(_proposalStreamDoc)
                 setTemplateStreamDoc(_templateStreamDoc)
                 setIsLoaded(true)
@@ -238,7 +236,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const refreshProposal = async () => {
             if (proposalStreamDoc && templateStreamDoc) {
-                initProposal(proposalStreamDoc, templateStreamDoc)
+                await initProposal(proposalStreamDoc, templateStreamDoc)
             }
         }
 

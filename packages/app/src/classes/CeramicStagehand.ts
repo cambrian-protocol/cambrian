@@ -2,6 +2,10 @@ import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
 } from '@cambrian/app/models/TemplateModel'
+import {
+    getSolutionBaseId,
+    getSolutionSafeBaseId,
+} from '../utils/helpers/proposalHelper'
 
 import { CERAMIC_NODE_ENDPOINT } from './../../config/index'
 import CeramicClient from '@ceramicnetwork/http-client'
@@ -73,6 +77,7 @@ export default class CeramicStagehand {
         data: StageModel,
         stage: StageNames
     ) => {
+        console.log('updated Stage at updateStage')
         if (!this.isStageSchema(data, stage)) {
             throw GENERAL_ERROR['WRONG_SCHEMA']
         }
@@ -409,7 +414,7 @@ export default class CeramicStagehand {
                     currentUser.chainId
                 )
 
-                const solutionBaseId: string = this.getSolutionBaseId(
+                const solutionBaseId: string = getSolutionBaseId(
                     proposalStreamDoc.commitId.toString(),
                     proposalStack.proposal.template.commitID
                 )
@@ -457,7 +462,7 @@ export default class CeramicStagehand {
                 currentUser.chainId
             )
 
-            const solutionSafeBaseId: string = await this.getSolutionSafeBaseId(
+            const solutionSafeBaseId: string = getSolutionSafeBaseId(
                 proposalStreamDoc.commitId.toString(),
                 proposalStack.proposal.template.commitID
             )
@@ -479,72 +484,6 @@ export default class CeramicStagehand {
             // If for some reason some POS wants to DOS we can save the correct id nonce
             // on ceramic to save time for subsequent loads
         }
-    }
-
-    getSolutionBaseId = (
-        proposalCommitID: string,
-        templateCommitID: string
-    ) => {
-        return ethers.utils.keccak256(
-            ethers.utils.defaultAbiCoder.encode(
-                ['string', 'string'],
-                [templateCommitID, proposalCommitID]
-            )
-        )
-    }
-
-    getSolutionSafeBaseId = async (
-        proposalCommitID: string,
-        templateCommitID: string
-    ) => {
-        const baseId = this.getSolutionBaseId(
-            proposalCommitID,
-            templateCommitID
-        )
-
-        let nonce = 1 // Default nonce is 1
-
-        /**
-         * TODO
-         * To protect against DOS caused by a proposal being created ahead of our real users,
-         * a nonce is incremented on-chain.
-         *
-         * This is where we would fetch the IPFSSolutionsHub.bases[baseId] and check if it's contents are
-         * what we expect. If they aren't, we can increment the nonce until we find the Base made by a
-         * legitimate user.
-         *
-         * We can do a similar procedure later when fetching proposals from on-chain.
-         *
-         */
-
-        return ethers.utils.keccak256(
-            ethers.utils.defaultAbiCoder.encode(
-                ['bytes32', 'uint256'],
-                [baseId, nonce]
-            )
-        )
-    }
-
-    getOnChainProposalId = async (
-        proposalCommitID: string,
-        templateCommitID: string
-    ) => {
-        const solutionSafeBaseId = await this.getSolutionSafeBaseId(
-            proposalCommitID,
-            templateCommitID
-        )
-        let nonce = 1
-        // TODO Same idea as above. Somebody may have front-ran the proposalId we expected
-        // We can fetch a proposal starting at nonce = 1, check if its what we expect..
-        // If it's not, increment nonce until it is
-        // We're not worrying about this right now
-
-        return ethers.utils.keccak256(
-            ethers.utils.defaultAbiCoder.encode(
-                ['bytes32', 'string', 'uint256'],
-                [solutionSafeBaseId, proposalCommitID, nonce]
-            )
-        )
     }
 
     multiQuery = async (queries: { streamId: string }[]): Promise<any> => {
