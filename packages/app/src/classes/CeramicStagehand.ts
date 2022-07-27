@@ -547,6 +547,16 @@ export default class CeramicStagehand {
         )
     }
 
+    multiQuery = async (queries: { streamId: string }[]): Promise<any> => {
+        try {
+            const streamMap = await this.ceramicClient.multiQuery(queries)
+            return streamMap
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
     loadTileDocument = async (streamID: string) => {
         try {
             const doc = await TileDocument.load(

@@ -8,6 +8,7 @@ import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { Coins } from 'phosphor-react'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
@@ -40,22 +41,25 @@ const ProposalStartFundingControl = () => {
     }
 
     return (
-        <Box align="end">
-            <LoaderButton
-                isLoading={isInTransaction}
-                label="Start funding"
-                primary
-                icon={<Coins />}
-                size="small"
-                onClick={onDeployProposal}
-            />
+        <>
+            <Box gap="medium">
+                <PlainSectionDivider />
+                <LoaderButton
+                    isLoading={isInTransaction}
+                    label="Start funding"
+                    primary
+                    icon={<Coins />}
+                    size="small"
+                    onClick={onDeployProposal}
+                />
+            </Box>
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}
                     onClose={() => setErrorMessage(undefined)}
                 />
             )}
-        </Box>
+        </>
     )
 }
 

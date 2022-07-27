@@ -1,4 +1,5 @@
-import { Button } from 'grommet'
+import { Box, Button } from 'grommet'
+
 import FundProposalForm from './forms/FundProposalForm'
 import Link from 'next/link'
 import { PencilCircle } from 'phosphor-react'
@@ -32,19 +33,22 @@ const ProposalControlbar = () => {
                 return (
                     <>
                         {isProposalAuthor && proposalStreamDoc && (
-                            <Link
-                                href={`${
-                                    window.location.origin
-                                }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
-                                passHref
-                            >
-                                <Button
-                                    icon={<PencilCircle />}
-                                    label="Edit Proposal"
-                                    primary
-                                    size="small"
-                                />
-                            </Link>
+                            <Box gap="medium">
+                                <PlainSectionDivider />
+                                <Link
+                                    href={`${
+                                        window.location.origin
+                                    }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
+                                    passHref
+                                >
+                                    <Button
+                                        icon={<PencilCircle />}
+                                        label="Edit Proposal"
+                                        primary
+                                        size="small"
+                                    />
+                                </Link>
+                            </Box>
                         )}
                     </>
                 )
@@ -54,13 +58,10 @@ const ProposalControlbar = () => {
                 return (
                     <>
                         {currentUser && proposalContract && (
-                            <>
-                                <PlainSectionDivider />
-                                <FundProposalForm
-                                    currentUser={currentUser}
-                                    proposal={proposalContract}
-                                />
-                            </>
+                            <FundProposalForm
+                                currentUser={currentUser}
+                                proposal={proposalContract}
+                            />
                         )}
                     </>
                 )

@@ -16,12 +16,15 @@ export default function ViewProposalPage() {
                 <PageLayout contextTitle="Connect your Wallet">
                     <ConnectWalletSection />
                 </PageLayout>
-            ) : (
+            ) : currentUser ? (
                 <ProposalContextProvider
+                    currentUser={currentUser}
                     proposalStreamID={proposalStreamID as string}
                 >
                     <ProposalUI />
                 </ProposalContextProvider>
+            ) : (
+                <></>
             )}
         </>
     )

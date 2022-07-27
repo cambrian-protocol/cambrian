@@ -1,9 +1,11 @@
 import { CheckCircle, PencilLine } from 'phosphor-react'
 
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
@@ -60,28 +62,31 @@ const ProposalReviewControl = () => {
 
     return (
         <>
-            <TwoButtonWrapContainer
-                primaryButton={
-                    <LoaderButton
-                        disabled={isRequestingChange}
-                        icon={<CheckCircle />}
-                        isLoading={isApproving}
-                        label="Approve Proposal"
-                        primary
-                        onClick={onApproveProposal}
-                    />
-                }
-                secondaryButton={
-                    <LoaderButton
-                        disabled={isApproving}
-                        isLoading={isRequestingChange}
-                        label="Request Change"
-                        secondary
-                        icon={<PencilLine />}
-                        onClick={onRequestChange}
-                    />
-                }
-            />
+            <Box gap="medium">
+                <PlainSectionDivider />
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            disabled={isRequestingChange}
+                            icon={<CheckCircle />}
+                            isLoading={isApproving}
+                            label="Approve Proposal"
+                            primary
+                            onClick={onApproveProposal}
+                        />
+                    }
+                    secondaryButton={
+                        <LoaderButton
+                            disabled={isApproving}
+                            isLoading={isRequestingChange}
+                            label="Request Change"
+                            secondary
+                            icon={<PencilLine />}
+                            onClick={onRequestChange}
+                        />
+                    }
+                />
+            </Box>
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}

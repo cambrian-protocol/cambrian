@@ -10,12 +10,12 @@ import CeramicStagehand from '../classes/CeramicStagehand'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStatus } from '../models/ProposalStatus'
+import ProposalsHub from '../hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from './UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
-import { useCurrentUser } from '../hooks/useCurrentUser'
 
 export type ProposalContextType = {
     proposalStack?: ProposalStackType
@@ -29,6 +29,7 @@ export type ProposalContextType = {
 
 type ProposalProviderProps = {
     proposalStreamID: string
+    currentUser: UserType
 }
 
 export const ProposalContext = React.createContext<ProposalContextType>({
@@ -44,10 +45,7 @@ export type ProposalStackType = {
 }
 
 export const ProposalContextProvider: React.FunctionComponent<ProposalProviderProps> =
-    ({ proposalStreamID, children }) => {
-        const { currentUser } = useCurrentUser()
-        const [ceramicStagehand, setCeramicStagehand] =
-            useState<CeramicStagehand>()
+    ({ proposalStreamID, currentUser, children }) => {
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown
         )
@@ -62,61 +60,112 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<CeramicTemplateModel>>()
 
-        useEffect(() => {
-            currentUser && init(currentUser)
-        }, [currentUser])
+        const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
 
-        // Init Listeners
+        const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+
         useEffect(() => {
-            if (proposalStreamDoc && templateStreamDoc) {
-                const proposalSub = proposalStreamDoc.subscribe((x) => {
-                    refreshProposal()
-                })
-                const templateSub = templateStreamDoc.subscribe((x) => {
-                    setProposalStatus(
-                        getProposalStatus(proposalStreamDoc, templateStreamDoc)
+            init()
+        }, [])
+
+        // Init offchain Listeners
+        useEffect(() => {
+            if (
+                proposalStatus === ProposalStatus.OnReview ||
+                proposalStatus === ProposalStatus.ChangeRequested
+            ) {
+                if (proposalStreamDoc && templateStreamDoc) {
+                    const proposalSub = proposalStreamDoc.subscribe((x) => {
+                        console.log('fired proposal sub')
+                        refreshProposal()
+                    })
+                    const templateSub = templateStreamDoc.subscribe(
+                        async (x) => {
+                            console.log('fired template sub')
+                            setProposalStatus(
+                                await getProposalStatus(
+                                    proposalStreamDoc,
+                                    templateStreamDoc,
+                                    currentUser,
+                                    ceramicStagehand
+                                )
+                            )
+                        }
                     )
-                })
-                return () => {
-                    proposalSub.unsubscribe()
-                    templateSub.unsubscribe()
+                    return () => {
+                        proposalSub.unsubscribe()
+                        templateSub.unsubscribe()
+                    }
                 }
             }
-        }, [proposalStreamDoc, templateStreamDoc])
+        }, [proposalStreamDoc, templateStreamDoc, proposalStatus])
 
-        const init = async (currentUser: UserType) => {
-            try {
-                const _ceramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
+        // Init Proposalshub listener
+        useEffect(() => {
+            if (proposalsHub && proposalStreamDoc && ceramicStagehand) {
+                initProposalsHubListener(proposalsHub, proposalStreamDoc)
+                return () => {
+                    proposalsHub.contract.removeAllListeners()
+                }
+            }
+        }, [proposalStatus, proposalsHub, proposalStreamDoc, ceramicStagehand])
+
+        const initProposalsHubListener = async (
+            proposalsHub: ProposalsHub,
+            proposalStreamDoc: TileDocument<CeramicProposalModel>
+        ) => {
+            const proposalID = await ceramicStagehand.getOnChainProposalId(
+                proposalStreamDoc.commitId.toString(),
+                proposalStreamDoc.content.template.commitID
+            )
+            if (proposalStatus === ProposalStatus.Approved) {
+                proposalsHub.contract.on(
+                    proposalsHub.contract.filters.CreateProposal(proposalID),
+                    async () => {
+                        console.log('Proposal created!')
+                        setProposalStatus(ProposalStatus.Funding)
+                        setOnChainProposal(
+                            await proposalsHub.getProposal(proposalID)
+                        )
+                    }
                 )
+            } else if (proposalStatus === ProposalStatus.Funding) {
+                proposalsHub.contract.on(
+                    proposalsHub.contract.filters.ExecuteProposal(proposalID),
+                    async () => {
+                        console.log('Proposal executed!')
+                        setProposalStatus(ProposalStatus.Executed)
+                    }
+                )
+            }
+        }
+
+        const init = async () => {
+            try {
                 const _proposalStreamDoc =
-                    (await _ceramicStagehand.loadTileDocument(
+                    (await ceramicStagehand.loadTileDocument(
                         proposalStreamID
                     )) as TileDocument<CeramicProposalModel>
 
                 const _templateStreamDoc =
-                    (await _ceramicStagehand.loadTileDocument(
+                    (await ceramicStagehand.loadTileDocument(
                         _proposalStreamDoc.content.template.streamID
                     )) as TileDocument<CeramicTemplateModel>
 
-                initProposal(
-                    currentUser,
-                    _ceramicStagehand,
-                    _proposalStreamDoc,
-                    _templateStreamDoc
-                )
+                await initProposal(_proposalStreamDoc, _templateStreamDoc)
 
-                setCeramicStagehand(_ceramicStagehand)
+                setProposalsHub(
+                    new ProposalsHub(currentUser.signer, currentUser.chainId)
+                )
                 setProposalStreamDoc(_proposalStreamDoc)
                 setTemplateStreamDoc(_templateStreamDoc)
+                setIsLoaded(true)
             } catch (e) {
                 cpLogger.push(e)
             }
         }
 
         const initProposal = async (
-            currentUser: UserType,
-            ceramicStagehand: CeramicStagehand,
             proposalStreamDoc: TileDocument<CeramicProposalModel>,
             templateStreamDoc: TileDocument<CeramicTemplateModel>
         ) => {
@@ -160,7 +209,12 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 }
 
                 setProposalStatus(
-                    getProposalStatus(proposalStreamDoc, templateStreamDoc)
+                    await getProposalStatus(
+                        proposalStreamDoc,
+                        templateStreamDoc,
+                        currentUser,
+                        ceramicStagehand
+                    )
                 )
                 if (_proposalStackClones.proposal.isSubmitted) {
                     setProposalStack(_proposalStackClones)
@@ -183,18 +237,8 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         }
 
         const refreshProposal = async () => {
-            if (
-                currentUser &&
-                ceramicStagehand &&
-                proposalStreamDoc &&
-                templateStreamDoc
-            ) {
-                initProposal(
-                    currentUser,
-                    ceramicStagehand,
-                    proposalStreamDoc,
-                    templateStreamDoc
-                )
+            if (proposalStreamDoc && templateStreamDoc) {
+                initProposal(proposalStreamDoc, templateStreamDoc)
             }
         }
 

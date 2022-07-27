@@ -10,10 +10,12 @@ import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 
-export const getProposalStatus = (
+export const getProposalStatus = async (
     proposalDoc: TileDocument<CeramicProposalModel>,
-    templateDoc: TileDocument<CeramicTemplateModel>
-): ProposalStatus => {
+    templateDoc: TileDocument<CeramicTemplateModel>,
+    currentUser: UserType,
+    ceramicStagehand: CeramicStagehand
+): Promise<ProposalStatus> => {
     const proposalCommits =
         templateDoc.content.receivedProposals[proposalDoc.id.toString()]
     if (proposalCommits) {
@@ -23,6 +25,15 @@ export const getProposalStatus = (
         ) {
             const proposalCommit = proposalCommits[proposalCommits.length - 1]
             if (proposalCommit.approved) {
+                const onChainProposal = await getOnChainProposal(
+                    currentUser,
+                    proposalDoc,
+                    ceramicStagehand
+                )
+
+                console.log(onChainProposal)
+
+                // Todo Check on chain if funding or active??
                 return ProposalStatus.Approved
             } else if (proposalCommit.requestChange) {
                 return ProposalStatus.ChangeRequested

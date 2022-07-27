@@ -44,14 +44,14 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     }, [])
 
     const fetchReceivedProposals = async (cs: CeramicStagehand) => {
-        const templateStreams = (await cs.loadStages(
+        const templateStreamIDs = (await cs.loadStages(
             StageNames.template
         )) as StringHashmap
 
         const _receivedProposals: ProposalListItemType[] = []
 
         await Promise.all(
-            Object.values(templateStreams).map(async (streamID) => {
+            Object.values(templateStreamIDs).map(async (streamID) => {
                 const _templateStreamDoc = (await cs.loadTileDocument(
                     streamID
                 )) as TileDocument<CeramicTemplateModel>
@@ -74,9 +74,11 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
                             if (_proposalContent) {
                                 _receivedProposals.push({
-                                    status: getProposalStatus(
+                                    status: await getProposalStatus(
                                         _proposalDoc,
-                                        _templateStreamDoc
+                                        _templateStreamDoc,
+                                        currentUser,
+                                        cs
                                     ),
                                     streamID: proposalStreamID,
                                     title: _proposalContent.title,
@@ -96,45 +98,39 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     const fetchMyProposals = async (cs: CeramicStagehand) => {
         setIsFetching(true)
         try {
-            const proposalStreams = (await cs.loadStages(
+            const proposalStreamIDs = (await cs.loadStages(
                 StageNames.proposal
             )) as StringHashmap
 
-            const _proposals: ProposalListItemType[] = []
+            const proposalStreamMap = (await cs.multiQuery(
+                Object.values(proposalStreamIDs).map((s) => {
+                    return { streamId: s }
+                })
+            )) as { [streamId: string]: TileDocument<CeramicProposalModel> }
 
-            await Promise.all(
-                Object.values(proposalStreams).map(async (streamID) => {
-                    const _proposalDoc = (await cs.loadTileDocument(
-                        streamID
-                    )) as TileDocument<CeramicProposalModel>
-                    if (_proposalDoc.state.anchorProof) {
-                        console.log(
-                            new Date(
-                                _proposalDoc.state.anchorProof.blockTimestamp
-                            ).toLocaleTimeString()
-                        )
-                    }
-                    if (_proposalDoc) {
-                        const _templateStreamDoc = (await cs.loadTileDocument(
-                            _proposalDoc.content.template.streamID
-                        )) as TileDocument<CeramicTemplateModel>
-                        if (_templateStreamDoc) {
-                            _proposals.push({
-                                status: getProposalStatus(
-                                    _proposalDoc,
-                                    _templateStreamDoc
-                                ),
-                                streamID: streamID,
-                                title: _proposalDoc.content.title,
-                                isAuthor:
-                                    _proposalDoc.content.author ===
-                                    currentUser.selfID.did.id,
-                            })
-                        }
+            const proposalListItems: ProposalListItemType[] = await Promise.all(
+                Object.keys(proposalStreamMap).map(async (p) => {
+                    const _proposalDoc = proposalStreamMap[p]
+                    const _template = (await cs.loadTileDocument(
+                        _proposalDoc.content.template.streamID
+                    )) as TileDocument<CeramicTemplateModel>
+                    return {
+                        status: await getProposalStatus(
+                            _proposalDoc,
+                            _template,
+                            currentUser,
+                            cs
+                        ),
+                        streamID: p,
+                        title: _proposalDoc.content.title,
+                        isAuthor:
+                            _proposalDoc.content.author ===
+                            currentUser.selfID.did.id,
                     }
                 })
             )
-            setMyProposals(_proposals)
+
+            setMyProposals(proposalListItems)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
@@ -199,8 +195,10 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                 isLoading={isFetching}
                                 icon={<ArrowsClockwise />}
                                 onClick={() => {
-                                    ceramicStagehand &&
+                                    if (ceramicStagehand) {
                                         fetchMyProposals(ceramicStagehand)
+                                        fetchReceivedProposals(ceramicStagehand)
+                                    }
                                 }}
                             />
                         </Box>

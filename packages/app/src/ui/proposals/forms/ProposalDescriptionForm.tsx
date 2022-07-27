@@ -3,6 +3,7 @@ import React, { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 
 interface ProposalDescriptionFormProps {
     proposalInput: CeramicProposalModel
@@ -74,26 +75,25 @@ const ProposalDescriptionForm = ({
                                 />
                             </FormField>
                         </Box>
-                        <Box
-                            direction="row"
-                            justify="between"
-                            pad={{ top: 'medium' }}
-                            height={{ min: 'auto' }}
-                        >
-                            <Button
-                                size="small"
-                                secondary
-                                label={cancelLabel || 'Reset all changes'}
-                                onClick={onCancel}
-                            />
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                size="small"
-                                primary
-                                label={submitLabel || 'Save'}
-                                type="submit"
-                            />
-                        </Box>
+                        <TwoButtonWrapContainer
+                            primaryButton={
+                                <LoaderButton
+                                    isLoading={isSubmitting}
+                                    size="small"
+                                    primary
+                                    label={submitLabel || 'Save'}
+                                    type="submit"
+                                />
+                            }
+                            secondaryButton={
+                                <Button
+                                    size="small"
+                                    secondary
+                                    label={cancelLabel || 'Reset all changes'}
+                                    onClick={onCancel}
+                                />
+                            }
+                        />
                     </Box>
                 </Form>
             )}
