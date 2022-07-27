@@ -302,11 +302,7 @@ export default function CoreMessenger({
     return (
         <>
             {showMessenger && (
-                <Box
-                    gap="small"
-                    pad={{ horizontal: 'small', bottom: 'small' }}
-                    width="medium"
-                >
+                <Box gap="small" pad={{ horizontal: 'small', bottom: 'small' }}>
                     <Box
                         height={'medium'}
                         border

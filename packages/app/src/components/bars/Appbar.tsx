@@ -39,7 +39,7 @@ const Appbar = () => {
                             )}
                             <Box flex />
                             {currentUser && (
-                                <Box direction="row">
+                                <Box direction="row" gap="small">
                                     <AppbarMenuItem
                                         pathname="/dashboard/templates"
                                         label="Templates"
