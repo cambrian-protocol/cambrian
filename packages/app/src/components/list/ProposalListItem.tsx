@@ -1,4 +1,4 @@
-import { Box, Button, Text } from 'grommet'
+import { Box, Button, ResponsiveContext, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
@@ -59,7 +59,13 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
                     <ProposalStatusBadge status={proposal.status} />
                 </Box>
             </Box>
-            <Box direction="row" flex width={{ min: 'auto' }} justify="end">
+            <Box
+                direction="row"
+                flex
+                width={{ min: 'auto' }}
+                justify="end"
+                gap="small"
+            >
                 {isEditable && proposal.isAuthor && (
                     <Link
                         href={`/dashboard/proposals/edit/${proposal.streamID}`}
@@ -80,12 +86,9 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
                     />
                 )}
                 <Button
-                    tip={{
-                        content: 'Copy link to clipboard',
-                        dropProps: { align: { left: 'right' } },
-                    }}
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
+                        console.log('was here')
                         navigator.clipboard.writeText(
                             `${window.location.origin}/proposals/${proposal.streamID}`
                         )
