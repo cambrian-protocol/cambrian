@@ -308,6 +308,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         <ProposalHeader
                             proposalStack={metadata?.proposalStack}
                             proposalStatus={ProposalStatus.Executed}
+                            showProposalDetails
                         />
                     }
                     contextTitle={
