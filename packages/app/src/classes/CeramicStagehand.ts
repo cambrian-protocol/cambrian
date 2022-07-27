@@ -3,6 +3,8 @@ import {
     ReceivedProposalPropsType,
 } from '@cambrian/app/models/TemplateModel'
 
+import { CERAMIC_NODE_ENDPOINT } from './../../config/index'
+import CeramicClient from '@ceramicnetwork/http-client'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
@@ -39,9 +41,11 @@ const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
 export default class CeramicStagehand {
     selfID: SelfID
+    ceramicClient: CeramicClient
 
     constructor(selfID: SelfID) {
         this.selfID = selfID
+        this.ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     }
 
     // TODO
@@ -343,14 +347,11 @@ export default class CeramicStagehand {
 
     approveProposal = async (
         currentUser: UserType,
-        proposalStreamID: string,
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
+        templateStreamDoc: TileDocument<CeramicTemplateModel>,
         proposalStack: ProposalStackType
     ) => {
         try {
-            const proposalStreamDoc = (await this.loadStream(
-                proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
-
             const success = await this.deploySolutionBase(
                 currentUser,
                 proposalStreamDoc,
@@ -363,13 +364,17 @@ export default class CeramicStagehand {
                     `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
                     {
                         method: 'POST',
-                        body: proposalStreamID,
+                        body: proposalStreamDoc.id.toString(),
                     }
                 )
                 if (res.status === 200) {
-                    await this.updateProposalEntry(proposalStreamDoc, {
-                        approved: true,
-                    })
+                    await this.updateProposalEntry(
+                        proposalStreamDoc,
+                        templateStreamDoc,
+                        {
+                            approved: true,
+                        }
+                    )
                     return true
                 }
             }
@@ -428,14 +433,10 @@ export default class CeramicStagehand {
 
     deployProposal = async (
         currentUser: UserType,
-        proposalStreamID: string,
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         // TODO Sanity check function that this is approved
-        const proposalStreamDoc = (await this.loadStream(
-            proposalStreamID
-        )) as TileDocument<CeramicProposalModel>
-
         const parsedSolvers = await this.getParsedSolvers(
             proposalStack,
             currentUser
@@ -475,7 +476,6 @@ export default class CeramicStagehand {
             console.log(event)
             if (!event) throw GENERAL_ERROR['PROPOSAL_DEPLOY_ERROR']
 
-            // Note, we should be able to determine the ProposalID now (no need to save it somewhere)
             // If for some reason some POS wants to DOS we can save the correct id nonce
             // on ceramic to save time for subsequent loads
         }
@@ -547,13 +547,26 @@ export default class CeramicStagehand {
         )
     }
 
-    loadStream = async (streamID: string) => {
+    loadTileDocument = async (streamID: string) => {
         try {
             const doc = await TileDocument.load(
                 this.selfID.client.ceramic,
                 streamID
             )
             return doc
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    loadStreamContent = async (streamOrCommitID: string) => {
+        try {
+            const streamContent = await (
+                await this.ceramicClient.loadStream(streamOrCommitID)
+            ).content
+
+            return streamContent
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
@@ -609,26 +622,28 @@ export default class CeramicStagehand {
         }
     }
 
-    submitProposal = async (proposalStreamID: string) => {
+    submitProposal = async (
+        proposalStreamDoc: TileDocument<CeramicProposalModel>
+    ) => {
         try {
-            const proposalDoc = (await this.loadStream(
-                proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
-
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/proposeDraft`,
                 {
                     method: 'POST',
-                    body: proposalDoc.id.toString(),
+                    body: proposalStreamDoc.id.toString(),
                 }
             )
 
             if (res.status === 200) {
-                await proposalDoc.update({
-                    ...(proposalDoc.content as CeramicProposalModel),
-                    isSubmitted: true,
-                })
+                await proposalStreamDoc.update(
+                    {
+                        ...(proposalStreamDoc.content as CeramicProposalModel),
+                        isSubmitted: true,
+                    },
+                    { ...proposalStreamDoc.metadata },
+                    { pin: true }
+                )
                 return true
             }
         } catch (e) {
@@ -663,45 +678,58 @@ export default class CeramicStagehand {
         return _parsedSolvers
     }
 
-    loadAndCloneProposalStack = async (
-        proposalDoc: TileDocument<CeramicProposalModel>
-    ) => {
-        const _proposalContent = _.cloneDeep(proposalDoc.content)
+    loadProposalStackFromID = async (proposalStreamOrCommitID: string) => {
+        const _proposalContent = (
+            await this.ceramicClient.loadStream(proposalStreamOrCommitID)
+        ).content as CeramicProposalModel
 
-        const _templateCommitContent = _.cloneDeep(
-            (await this.loadStream(_proposalContent.template.commitID))
-                .content as CeramicTemplateModel
-        )
-        const _compositionCommitContent = _.cloneDeep(
-            (await this.loadStream(_templateCommitContent.composition.commitID))
-                .content as CompositionModel
-        )
+        return this.loadProposalStackFromProposal(_proposalContent)
+    }
+
+    loadProposalStackFromProposal = async (
+        proposalContent: CeramicProposalModel
+    ) => {
+        const _templateCommitContent = (
+            await this.ceramicClient.loadStream(
+                proposalContent.template.commitID
+            )
+        ).content as CeramicTemplateModel
+
+        const _compositionCommitContent = (
+            await this.ceramicClient.loadStream(
+                _templateCommitContent.composition.commitID
+            )
+        ).content as CompositionModel
 
         return {
-            proposal: _proposalContent,
+            proposal: proposalContent,
             template: _templateCommitContent,
             composition: _compositionCommitContent,
         }
     }
 
-    requestProposalChange = async (proposalStreamID: string) => {
+    requestProposalChange = async (
+        proposalStreamDoc: TileDocument<CeramicProposalModel>,
+        templateStreamDoc: TileDocument<CeramicTemplateModel>
+    ) => {
         try {
-            const proposalStreamDoc = (await this.loadStream(
-                proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
             // Hit mailbox server
             const res = await fetch(
                 `http://trilobot.cambrianprotocol.com:4242/requestChange`,
                 {
                     method: 'POST',
-                    body: proposalStreamID,
+                    body: proposalStreamDoc.id.toString(),
                 }
             )
 
             if (res.status === 200) {
-                await this.updateProposalEntry(proposalStreamDoc, {
-                    requestChange: true,
-                })
+                await this.updateProposalEntry(
+                    proposalStreamDoc,
+                    templateStreamDoc,
+                    {
+                        requestChange: true,
+                    }
+                )
                 return true
             }
         } catch (e) {
@@ -747,7 +775,7 @@ export default class CeramicStagehand {
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
                 },
-                undefined,
+                { ...templateStreamDoc.metadata },
                 { pin: true }
             )
         } catch (e) {
@@ -766,13 +794,9 @@ export default class CeramicStagehand {
      */
     updateProposalEntry = async (
         proposalDoc: TileDocument<CeramicProposalModel>,
+        templateDoc: TileDocument<CeramicTemplateModel>,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
-        // Load Stream Template
-        const templateDoc = (await this.loadStream(
-            proposalDoc.content.template.streamID
-        )) as TileDocument<CeramicTemplateModel>
-
         const updatedReceivedProposals = _.cloneDeep(
             templateDoc.content.receivedProposals
         )

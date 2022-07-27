@@ -23,7 +23,7 @@ const EditProposalUI = () => {
         setProposalInput,
         onSaveProposal,
         onResetProposalInput,
-        proposalStreamID,
+        proposalStreamDoc,
     } = useEditProposal()
 
     const { currentUser } = useCurrentUser()
@@ -114,14 +114,18 @@ const EditProposalUI = () => {
                             </Tabs>
                         </Box>
                     </PageLayout>
-                    {proposalStatus !== ProposalStatus.Draft && currentUser && (
-                        <Messenger
-                            currentUser={currentUser}
-                            chatID={proposalStreamID}
-                            participantDIDs={[proposalStack.template.author]}
-                            chatType={'Draft'}
-                        />
-                    )}
+                    {proposalStatus !== ProposalStatus.Draft &&
+                        currentUser &&
+                        proposalStreamDoc && (
+                            <Messenger
+                                currentUser={currentUser}
+                                chatID={proposalStreamDoc.id.toString()}
+                                participantDIDs={[
+                                    proposalStack.template.author,
+                                ]}
+                                chatType={'Draft'}
+                            />
+                        )}
                 </Stack>
             ) : (
                 <Custom404Page />

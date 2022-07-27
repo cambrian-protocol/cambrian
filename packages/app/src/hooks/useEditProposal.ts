@@ -21,6 +21,8 @@ const useEditProposal = () => {
     const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
         ProposalStatus.Unknown
     )
+    const [proposalStreamDoc, setProposalStreamDoc] =
+        useState<TileDocument<CeramicProposalModel>>()
     const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
@@ -39,12 +41,14 @@ const useEditProposal = () => {
                 )
                 setCeramicStagehand(ceramicStagehand)
 
-                const _proposalStreamDoc = (await ceramicStagehand.loadStream(
-                    proposalStreamID
-                )) as TileDocument<CeramicProposalModel>
-                const _templateStreamDoc = (await ceramicStagehand.loadStream(
-                    _proposalStreamDoc.content.template.streamID
-                )) as TileDocument<CeramicTemplateModel>
+                const _proposalStreamDoc =
+                    (await ceramicStagehand.loadTileDocument(
+                        proposalStreamID
+                    )) as TileDocument<CeramicProposalModel>
+                const _templateStreamDoc =
+                    (await ceramicStagehand.loadTileDocument(
+                        _proposalStreamDoc.content.template.streamID
+                    )) as TileDocument<CeramicTemplateModel>
 
                 if (_proposalStreamDoc.content.isSubmitted) {
                     setProposalStatus(ProposalStatus.ChangeRequested)
@@ -59,10 +63,11 @@ const useEditProposal = () => {
                 }
 
                 const _proposalStackClones =
-                    await ceramicStagehand.loadAndCloneProposalStack(
-                        _proposalStreamDoc
+                    await ceramicStagehand.loadProposalStackFromID(
+                        proposalStreamID
                     )
 
+                setProposalStreamDoc(_proposalStreamDoc)
                 setProposalStack(_proposalStackClones)
                 setProposalInput(_.cloneDeep(_proposalStackClones.proposal))
                 setIsLoaded(true)
@@ -103,7 +108,7 @@ const useEditProposal = () => {
         }
     }
     return {
-        proposalStreamID: proposalStreamID as string,
+        proposalStreamDoc: proposalStreamDoc,
         proposalStack: proposalStack,
         onResetProposalInput: resetProposalInput,
         onSaveProposal: saveProposal,

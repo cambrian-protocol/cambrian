@@ -34,12 +34,14 @@ const useTemplate = () => {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     setCeramicStagehand(cs)
                     const template = (await (
-                        await cs.loadStream(templateStreamID)
+                        await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
                     if (template) {
                         const comp = (await (
-                            await cs.loadStream(template.composition.commitID)
+                            await cs.loadTileDocument(
+                                template.composition.commitID
+                            )
                         ).content) as CompositionModel
 
                         if (comp) {

@@ -1,10 +1,6 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-
 import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -15,7 +11,7 @@ import { useState } from 'react'
 
 const ProposalSubmitControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStreamID } = useEditProposal()
+    const { proposalStreamDoc } = useEditProposal()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,14 +20,17 @@ const ProposalSubmitControl = () => {
     const onSubmitProposal = async () => {
         setIsSubmitting(true)
         try {
-            if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStreamID)
-
-            router.push(
-                `${window.location.origin}/proposals/${proposalStreamID}`
-            )
+            if (currentUser && proposalStreamDoc) {
+                const ceramicStagehand = new CeramicStagehand(
+                    currentUser.selfID
+                )
+                await ceramicStagehand.submitProposal(proposalStreamDoc)
+                router.push(
+                    `${
+                        window.location.origin
+                    }/proposals/${proposalStreamDoc.id.toString()}`
+                )
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsSubmitting(false)

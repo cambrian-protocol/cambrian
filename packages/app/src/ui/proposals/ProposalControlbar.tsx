@@ -1,8 +1,8 @@
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Button } from 'grommet'
 import FundProposalForm from './forms/FundProposalForm'
 import Link from 'next/link'
 import { PencilCircle } from 'phosphor-react'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import ProposalExecutedControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalExecutedControl'
 import ProposalReviewControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewControl'
 import ProposalStartFundingControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingControl'
@@ -15,7 +15,7 @@ const ProposalControlbar = () => {
     const {
         proposalStack,
         proposalStatus,
-        proposalStreamID,
+        proposalStreamDoc,
         proposalContract,
     } = useProposal()
 
@@ -31,9 +31,11 @@ const ProposalControlbar = () => {
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && (
+                        {isProposalAuthor && proposalStreamDoc && (
                             <Link
-                                href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
+                                href={`${
+                                    window.location.origin
+                                }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
                                 passHref
                             >
                                 <Button
@@ -52,16 +54,13 @@ const ProposalControlbar = () => {
                 return (
                     <>
                         {currentUser && proposalContract && (
-                            <BaseFormGroupContainer
-                                border
-                                pad="medium"
-                                gap="medium"
-                            >
+                            <>
+                                <PlainSectionDivider />
                                 <FundProposalForm
                                     currentUser={currentUser}
                                     proposal={proposalContract}
                                 />
-                            </BaseFormGroupContainer>
+                            </>
                         )}
                     </>
                 )

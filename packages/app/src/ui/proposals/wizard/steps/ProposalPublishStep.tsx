@@ -4,22 +4,24 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface ProposalPublishStepProps {
-    proposalStreamID: string
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
 }
 
 const ProposalPublishStep = ({
-    proposalStreamID,
+    proposalStreamDoc,
 }: ProposalPublishStepProps) => {
     const { currentUser } = useCurrentUser()
 
@@ -33,9 +35,11 @@ const ProposalPublishStep = ({
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStreamID)
+            await ceramicStagehand.submitProposal(proposalStreamDoc)
             router.push(
-                `${window.location.origin}/proposals/${proposalStreamID}`
+                `${
+                    window.location.origin
+                }/proposals/${proposalStreamDoc.id.toString()}`
             )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -49,7 +53,9 @@ const ProposalPublishStep = ({
                 {
                     <Box direction="row" justify="between">
                         <Link
-                            href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
+                            href={`${
+                                window.location.origin
+                            }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
                             passHref
                         >
                             <Button

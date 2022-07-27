@@ -17,9 +17,7 @@ import {
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -31,7 +29,6 @@ import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -445,14 +442,8 @@ export const getMetadataFromProposal = async (
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
         if (metadataURI) {
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            const proposalStreamDoc = (await ceramicStagehand.loadStream(
-                metadataURI
-            )) as TileDocument<CeramicProposalModel>
-
             const proposalStack =
-                await ceramicStagehand.loadAndCloneProposalStack(
-                    proposalStreamDoc
-                )
+                await ceramicStagehand.loadProposalStackFromID(metadataURI)
 
             if (proposalStack) {
                 const solverIndex = (await solverMethods.chainIndex()) as

@@ -19,7 +19,9 @@ export default function ViewTemplatePage() {
     return (
         <>
             {isUserLoaded && !currentUser ? (
-                <ConnectWalletSection />
+                <PageLayout contextTitle="Connect your Wallet">
+                    <ConnectWalletSection />
+                </PageLayout>
             ) : show404NotFound ? (
                 <Custom404Page />
             ) : (

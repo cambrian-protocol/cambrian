@@ -52,7 +52,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
         await Promise.all(
             Object.values(templateStreams).map(async (streamID) => {
-                const _templateStreamDoc = (await cs.loadStream(
+                const _templateStreamDoc = (await cs.loadTileDocument(
                     streamID
                 )) as TileDocument<CeramicTemplateModel>
                 if (
@@ -65,7 +65,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         Object.keys(
                             _templateStreamDoc.content.receivedProposals
                         ).map(async (proposalStreamID) => {
-                            const _proposalDoc = (await cs.loadStream(
+                            const _proposalDoc = (await cs.loadTileDocument(
                                 proposalStreamID
                             )) as TileDocument<CeramicProposalModel>
 
@@ -104,11 +104,18 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
             await Promise.all(
                 Object.values(proposalStreams).map(async (streamID) => {
-                    const _proposalDoc = (await cs.loadStream(
+                    const _proposalDoc = (await cs.loadTileDocument(
                         streamID
                     )) as TileDocument<CeramicProposalModel>
+                    if (_proposalDoc.state.anchorProof) {
+                        console.log(
+                            new Date(
+                                _proposalDoc.state.anchorProof.blockTimestamp
+                            ).toLocaleTimeString()
+                        )
+                    }
                     if (_proposalDoc) {
-                        const _templateStreamDoc = (await cs.loadStream(
+                        const _templateStreamDoc = (await cs.loadTileDocument(
                             _proposalDoc.content.template.streamID
                         )) as TileDocument<CeramicTemplateModel>
                         if (_templateStreamDoc) {

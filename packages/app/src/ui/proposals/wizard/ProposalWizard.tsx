@@ -7,6 +7,7 @@ import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
 import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 
 interface ProposalWizardProps {
@@ -16,7 +17,7 @@ interface ProposalWizardProps {
     >
     onSaveProposal: () => Promise<void>
     proposalStack: ProposalStackType
-    proposalStreamID: string
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
 }
 
 export enum PROPOSAL_WIZARD_STEPS {
@@ -37,7 +38,7 @@ const ProposalWizard = ({
     setProposalInput,
     onSaveProposal,
     proposalStack,
-    proposalStreamID,
+    proposalStreamDoc,
 }: ProposalWizardProps) => {
     const [currentStep, setCurrentStep] = useState<ProposalWizardStepsType>(
         PROPOSAL_WIZARD_STEPS.DESCRIPTION
@@ -83,7 +84,9 @@ const ProposalWizard = ({
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
                 return (
-                    <ProposalPublishStep proposalStreamID={proposalStreamID} />
+                    <ProposalPublishStep
+                        proposalStreamDoc={proposalStreamDoc}
+                    />
                 )
             default:
                 return <></>

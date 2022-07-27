@@ -1,4 +1,5 @@
 import { AppProps } from 'next/app'
+import { CERAMIC_NODE_ENDPOINT } from '../config'
 import ErrorBoundary from '@cambrian/app/components/errors/ErrorBoundary'
 import { GlobalStyle } from '@cambrian/app/src/theme/globalStyle'
 import { Grommet } from 'grommet'
@@ -22,7 +23,7 @@ export default function App({ ...props }: AppProps) {
     return (
         <Provider
             client={{
-                ceramic: 'http://ceramic.cambrianprotocol.com:7007',
+                ceramic: CERAMIC_NODE_ENDPOINT,
                 connectNetwork: 'testnet-clay',
             }}
         >
