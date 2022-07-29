@@ -8,6 +8,7 @@ import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import { isAddress } from 'ethers/lib/utils'
 
 interface TemplateFlexInputsFormProps {
     composition: CompositionModel
@@ -51,7 +52,7 @@ const TemplateFlexInputsForm = ({
     }
 
     return (
-        <Form<FlexInputFormType[]> onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
                     {templateInput.flexInputs.map((flexInput, idx) => {
@@ -63,6 +64,7 @@ const TemplateFlexInputsForm = ({
                         return (
                             <Box key={idx}>
                                 <FormField
+                                    name={`flexInput.[${idx}]`}
                                     label={flexInput.label}
                                     type={type}
                                     value={templateInput.flexInputs[idx].value}
@@ -75,6 +77,26 @@ const TemplateFlexInputsForm = ({
 
                                         setTemplateInput(inputsClone)
                                     }}
+                                    validate={[
+                                        () => {
+                                            if (
+                                                templateInput.flexInputs[
+                                                    idx
+                                                ].value.trim().length === 0
+                                            ) {
+                                                return undefined
+                                            } else if (
+                                                type === 'address' &&
+                                                !isAddress(
+                                                    templateInput.flexInputs[
+                                                        idx
+                                                    ].value
+                                                )
+                                            ) {
+                                                return 'Invalid Address'
+                                            }
+                                        },
+                                    ]}
                                 />
                                 {flexInput.description !== '' && (
                                     <Text size="small" color="dark-4">

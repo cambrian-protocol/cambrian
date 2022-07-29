@@ -1,6 +1,8 @@
-import { Anchor, Box, Button, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
+
+import Link from 'next/link'
 
 interface TemplateListItemProps {
     templateID: string
@@ -48,16 +50,18 @@ const TemplateListItem = ({
                 width={{ min: 'auto' }}
                 gap="small"
             >
-                <Anchor
+                <Link
                     href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
+                    passHref
                 >
                     <Button icon={<Pen />} />
-                </Anchor>
-                <Anchor
+                </Link>
+                <Link
                     href={`${window.location.origin}/templates/${templateStreamID}`}
+                    passHref
                 >
                     <Button icon={<Eye />} />
-                </Anchor>
+                </Link>
                 <Button
                     icon={<Trash />}
                     onClick={() => {

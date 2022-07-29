@@ -54,16 +54,15 @@ const TemplateDescriptionForm = ({
     }
 
     return (
-        <Form<TemplateDescriptionFormType> onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box height={{ min: 'auto' }} pad="xsmall">
                     <FormField
-                        htmlFor="title"
+                        name="title"
                         label="Title"
                         validate={[() => isRequired(templateInput.title)]}
                     >
                         <TextInput
-                            id="title"
                             placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
                             value={templateInput.title}
                             onChange={(e) =>
