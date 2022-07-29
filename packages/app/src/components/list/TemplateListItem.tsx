@@ -8,7 +8,6 @@ interface TemplateListItemProps {
     onDelete: (templateID: string) => Promise<void>
 }
 
-// TODO Styling
 const TemplateListItem = ({
     templateID,
     templateStreamID,
@@ -59,7 +58,17 @@ const TemplateListItem = ({
                 >
                     <Button icon={<Eye />} />
                 </Anchor>
-                <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
+                <Button
+                    icon={<Trash />}
+                    onClick={() => {
+                        if (
+                            window.confirm(
+                                'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
+                            )
+                        )
+                            onDelete(templateID)
+                    }}
+                />
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {

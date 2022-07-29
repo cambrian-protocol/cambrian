@@ -1,54 +1,73 @@
 import { Box } from 'grommet'
-import { FormField } from 'grommet'
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import ClipboardAddress from '../info/ClipboardAddress'
+import { SetStateAction } from 'react'
 import TokenAvatar from '../avatars/TokenAvatar'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { X } from 'phosphor-react'
-import { validateAddress } from '@cambrian/app/utils/helpers/validation'
+import _ from 'lodash'
 
 interface PreferredTokenItemProps {
     idx: number
-    token: TokenModel
-    onRemove: (idx: number) => void
-    updateToken: (value: string, idx: number) => void
+    templateInput: CeramicTemplateModel
+    setTemplateInput: React.Dispatch<
+        SetStateAction<CeramicTemplateModel | undefined>
+    >
 }
-
 const PreferredTokenItem = ({
     idx,
-    token,
-    onRemove,
-    updateToken,
+    templateInput,
+    setTemplateInput,
 }: PreferredTokenItemProps) => {
+    const onRemovePreferredToken = (index: number) => {
+        if (
+            templateInput.price.preferredTokens &&
+            templateInput.price.preferredTokens.length > 0
+        ) {
+            const inputClone = _.cloneDeep(templateInput)
+            inputClone.price.preferredTokens =
+                inputClone.price.preferredTokens?.filter(
+                    (v, _idx) => _idx !== index
+                )
+            setTemplateInput(inputClone)
+        }
+    }
+
     return (
-        <Box
-            animation={'fadeIn'}
-            key={idx}
-            direction="row"
-            gap="small"
-            pad="small"
-            background={'background-front'}
-            align="start"
-            round="xsmall"
-            elevation="small"
-        >
-            <Box alignSelf="center">
-                <TokenAvatar token={token} />
-            </Box>
-            <Box flex>
-                <FormField
-                    label="Token address"
-                    name={`preferredTokens[${idx}].address`}
-                    required
-                    onChange={(event) => updateToken(event.target.value, idx)}
-                    validate={validateAddress}
-                    value={token.address}
-                />
-            </Box>
+        <Box pad="xsmall">
             <Box
-                onClick={() => onRemove(idx)}
-                justify="center"
-                focusIndicator={false}
+                width={'medium'}
+                animation={'fadeIn'}
+                direction="row"
+                height="xsmall"
+                gap="small"
+                pad="small"
+                background={'background-contrast'}
+                align="start"
+                round="xsmall"
+                elevation="small"
+                justify="between"
             >
-                <X size="18" />
+                <Box alignSelf="center">
+                    <TokenAvatar
+                        token={templateInput.price.preferredTokens[idx]}
+                    />
+                </Box>
+                <Box alignSelf="center">
+                    <ClipboardAddress
+                        label="Contract address"
+                        address={
+                            templateInput.price.preferredTokens[idx].address
+                        }
+                    />
+                </Box>
+                <Box
+                    onClick={() => onRemovePreferredToken(idx)}
+                    justify="center"
+                    focusIndicator={false}
+                    pad="xsmall"
+                >
+                    <X size="18" />
+                </Box>
             </Box>
         </Box>
     )

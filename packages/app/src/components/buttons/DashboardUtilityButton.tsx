@@ -16,7 +16,7 @@ const DashboardUtilityButton = ({
     secondaryIcon,
 }: DashboardUtilityButtonProps) => {
     return (
-        <Box pad="medium">
+        <Box pad="xsmall">
             <IconContext.Provider value={{ size: '32' }}>
                 <Box
                     width="medium"

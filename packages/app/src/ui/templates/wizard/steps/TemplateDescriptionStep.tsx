@@ -16,7 +16,7 @@ interface TemplateDescriptionStepProps {
         SetStateAction<CeramicTemplateModel | undefined>
     >
     stepperCallback: (step: TemplateWizardStepsType) => void
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateDescriptionStep = ({
@@ -26,17 +26,19 @@ const TemplateDescriptionStep = ({
     onSaveTemplate,
 }: TemplateDescriptionStepProps) => {
     return (
-        <Box height={{ min: '60vh' }}>
-            <HeaderTextSection
-                title={`What service are you offering?`}
-                paragraph="Let the world know how you can help."
-            />
+        <Box>
+            <Box pad="xsmall">
+                <HeaderTextSection
+                    title={`What service are you offering?`}
+                    paragraph="Let the world know how you can help."
+                />
+            </Box>
             <TemplateDescriptionForm
                 templateInput={templateInput}
                 setTemplateInput={setTemplateInput}
                 onSubmit={async () => {
-                    await onSaveTemplate()
-                    stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
+                    if (await onSaveTemplate())
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
                 }}
                 submitLabel="Save & Continue"
                 onCancel={() =>

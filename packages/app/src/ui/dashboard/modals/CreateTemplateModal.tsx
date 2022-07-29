@@ -1,12 +1,4 @@
-import {
-    Anchor,
-    Box,
-    Button,
-    FormField,
-    Spinner,
-    Text,
-    TextInput,
-} from 'grommet'
+import { Box, Spinner, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
@@ -28,13 +20,12 @@ interface CreateTemplateModalProps {
     ceramicStagehand: CeramicStagehand
 }
 
-// TODO Styling
 const CreateTemplateModal = ({
     onClose,
     ceramicStagehand,
 }: CreateTemplateModalProps) => {
     const [compositions, setCompositions] = useState<StringHashmap>()
-    const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
+    const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
@@ -53,7 +44,7 @@ const CreateTemplateModal = ({
     }
 
     const onSelectComposition = async (compositionStreamID: string) => {
-        setIsCreatingTemplate(true)
+        setIsCreatingTemplate(compositionStreamID)
         try {
             const { streamID } = await ceramicStagehand.createTemplate(
                 randimals(),
@@ -61,7 +52,7 @@ const CreateTemplateModal = ({
             )
             router.push(`templates/new/${streamID}`)
         } catch (e) {
-            setIsCreatingTemplate(false)
+            setIsCreatingTemplate(undefined)
             setErrorMessage(await cpLogger.push(e))
         }
     }
@@ -98,7 +89,14 @@ const CreateTemplateModal = ({
                                                     </Text>
                                                     <LoaderButton
                                                         isLoading={
-                                                            isCreatingTemplate
+                                                            isCreatingTemplate ===
+                                                            compositions[
+                                                                compositionTag
+                                                            ]
+                                                        }
+                                                        disabled={
+                                                            isCreatingTemplate !==
+                                                            undefined
                                                         }
                                                         icon={<FilePlus />}
                                                         onClick={() =>

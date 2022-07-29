@@ -3,6 +3,7 @@ import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
@@ -32,6 +33,7 @@ const EditTemplateUI = ({
     onResetTemplate,
     currentUser,
     composition,
+    templateStreamID,
 }: EditTemplateUIProps) => {
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -44,55 +46,78 @@ const EditTemplateUI = ({
 
     return (
         <Box gap="medium" pad="medium">
-            <TemplateHeader title={cachedTemplateTitle} />
+            <TemplateHeader
+                title={cachedTemplateTitle}
+                link={`${window.location.origin}/templates/${templateStreamID}`}
+            />
             <Tabs
                 justify="start"
                 activeIndex={activeIndex}
                 onActive={(nextIndex: number) => setActiveIndex(nextIndex)}
             >
                 <Tab title="Description">
-                    <Box pad="small">
-                        <TemplateDescriptionForm
-                            templateInput={templateInput}
-                            setTemplateInput={setTemplateInput}
-                            onSubmit={onSaveTemplate}
-                            onCancel={onResetTemplate}
+                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                        <HeaderTextSection
+                            size="small"
+                            title={`What service are you offering?`}
+                            paragraph="Let the world know how you can help."
                         />
                     </Box>
+                    <TemplateDescriptionForm
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        onSubmit={onSaveTemplate}
+                        onCancel={onResetTemplate}
+                    />
                 </Tab>
                 <Tab title="Pricing">
-                    <Box pad="small">
-                        <TemplatePricingForm
-                            templateInput={templateInput}
-                            setTemplateInput={setTemplateInput}
-                            onSubmit={onSaveTemplate}
-                            onCancel={onResetTemplate}
-                            currentUser={currentUser}
+                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                        <HeaderTextSection
+                            size="small"
+                            title="How much does it cost?"
+                            paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                         />
                     </Box>
+                    <TemplatePricingForm
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        onSubmit={onSaveTemplate}
+                        onCancel={onResetTemplate}
+                        currentUser={currentUser}
+                    />
                 </Tab>
                 {templateInput.flexInputs.length > 0 && (
                     <Tab title="Solver Config">
-                        <Box pad="small">
-                            <TemplateFlexInputsForm
-                                composition={composition}
-                                templateInput={templateInput}
-                                setTemplateInput={setTemplateInput}
-                                onSubmit={onSaveTemplate}
-                                onCancel={onResetTemplate}
+                        <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                            <HeaderTextSection
+                                size="small"
+                                title="Solver Config"
+                                paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
                             />
                         </Box>
-                    </Tab>
-                )}
-                <Tab title="Requirements">
-                    <Box pad="small">
-                        <TemplateRequirementsForm
+                        <TemplateFlexInputsForm
+                            composition={composition}
                             templateInput={templateInput}
                             setTemplateInput={setTemplateInput}
                             onSubmit={onSaveTemplate}
                             onCancel={onResetTemplate}
                         />
+                    </Tab>
+                )}
+                <Tab title="Requirements">
+                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                        <HeaderTextSection
+                            size="small"
+                            title="Requirements"
+                            paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
+                        />
                     </Box>
+                    <TemplateRequirementsForm
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        onSubmit={onSaveTemplate}
+                        onCancel={onResetTemplate}
+                    />
                 </Tab>
             </Tabs>
         </Box>

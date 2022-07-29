@@ -135,11 +135,22 @@ export const cpTheme = deepMerge(grommet, {
             requiredIndicator: true,
         },
         error: {
-            size: 'small',
+            size: 'xsmall',
+            background: {
+                color: { light: '#FF404033', dark: '#FF40404D' },
+            },
         },
         disabled: {
             background: { color: 'none' },
         },
+        border: {
+            error: {
+                color: 'border',
+            },
+            color: 'border',
+            side: 'all',
+        },
+        round: 'xsmall',
     },
     meter: {
         color: 'brand',
@@ -170,6 +181,7 @@ export const cpTheme = deepMerge(grommet, {
     },
     tabs: {
         header: {
+            background: 'background-front',
             border: { side: 'all' },
             extend: `
             border-radius: 5px;

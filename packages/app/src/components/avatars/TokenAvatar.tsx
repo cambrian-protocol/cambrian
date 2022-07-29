@@ -9,12 +9,7 @@ interface TokenAvatar {
 
 const TokenAvatar = ({ token }: TokenAvatar) => {
     return (
-        <Box
-            justify="center"
-            align="center"
-            gap="xsmall"
-            height={{ min: 'auto' }}
-        >
+        <Box justify="center" height={{ min: 'auto' }}>
             <Box
                 width={{ min: 'xxsmall', max: 'xxsmall' }}
                 height={{ min: 'xxsmall', max: 'xxsmall' }}
@@ -24,9 +19,7 @@ const TokenAvatar = ({ token }: TokenAvatar) => {
                 round="full"
                 elevation="small"
             >
-                <Text size="small" weight="bold">
-                    {token?.symbol || '?'}
-                </Text>
+                <Text size="small">{token?.symbol || '?'}</Text>
             </Box>
         </Box>
     )

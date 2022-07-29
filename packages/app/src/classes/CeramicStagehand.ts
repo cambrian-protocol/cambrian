@@ -82,58 +82,60 @@ export default class CeramicStagehand {
             throw GENERAL_ERROR['WRONG_SCHEMA']
         }
 
-        const currentData: TileDocument<StageModel> = await TileDocument.load(
-            this.selfID.client.ceramic,
-            streamID
-        )
+        try {
+            const currentData: TileDocument<StageModel> =
+                await TileDocument.load(this.selfID.client.ceramic, streamID)
 
-        const cleanedUserTitle = data.title.trim()
+            const cleanedUserTitle = data.title.trim()
 
-        if (currentData.content.title !== cleanedUserTitle) {
-            // StageLib and Meta Tag must be updated
-            const stageLib = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [stage],
-                },
-                { pin: true }
-            )
+            if (currentData.content.title !== cleanedUserTitle) {
+                // StageLib and Meta Tag must be updated
+                const stageLib = await TileDocument.deterministic(
+                    this.selfID.client.ceramic,
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
 
-            const stages = stageLib.content as StringHashmap
+                const stages = stageLib.content as StringHashmap
 
-            const currentTag = Object.keys(stages).find(
-                (tag) => stages[tag] === streamID
-            )
-            if (!currentTag) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+                const currentTag = Object.keys(stages).find(
+                    (tag) => stages[tag] === streamID
+                )
+                if (!currentTag) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
 
-            const updatedStageLib = {
-                ...(stageLib.content as StringHashmap),
+                const updatedStageLib = {
+                    ...(stageLib.content as StringHashmap),
+                }
+                // Attach counter to tag in case it exists already
+                let uniqueTag = cleanedUserTitle
+                let counter = 1
+                while (updatedStageLib[uniqueTag]) {
+                    uniqueTag = cleanedUserTitle + ` (${counter++})`
+                }
+                updatedStageLib[uniqueTag] = streamID
+                delete updatedStageLib[currentTag]
+
+                await stageLib.update(updatedStageLib, undefined, { pin: true })
+                await currentData.update(
+                    { ...data, title: uniqueTag },
+                    { ...currentData.metadata, tags: [uniqueTag] },
+                    { pin: true }
+                )
+                return { uniqueTag: uniqueTag }
+            } else {
+                await currentData.update(
+                    { ...data, title: cleanedUserTitle },
+                    undefined,
+                    { pin: true }
+                )
+                return { uniqueTag: cleanedUserTitle }
             }
-            // Attach counter to tag in case it exists already
-            let uniqueTag = cleanedUserTitle
-            let counter = 1
-            while (updatedStageLib[uniqueTag]) {
-                uniqueTag = cleanedUserTitle + ` (${counter++})`
-            }
-            updatedStageLib[uniqueTag] = streamID
-            delete updatedStageLib[currentTag]
-
-            await stageLib.update(updatedStageLib, undefined, { pin: true })
-            await currentData.update(
-                { ...data, title: uniqueTag },
-                { ...currentData.metadata, tags: [uniqueTag] },
-                { pin: true }
-            )
-            return { uniqueTag: uniqueTag }
-        } else {
-            await currentData.update(
-                { ...data, title: cleanedUserTitle },
-                undefined,
-                { pin: true }
-            )
-            return { uniqueTag: cleanedUserTitle }
+        } catch (e) {
+            throw e
         }
     }
 
