@@ -35,7 +35,7 @@ const TemplateRequirementsStep = ({
             <TemplateRequirementsForm
                 templateInput={templateInput}
                 setTemplateInput={setTemplateInput}
-                submitLabel="Save & Continue"
+                submitLabel="Save & Finish"
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)

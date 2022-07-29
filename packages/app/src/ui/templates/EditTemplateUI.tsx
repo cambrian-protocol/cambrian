@@ -20,7 +20,7 @@ interface EditTemplateUIProps {
         SetStateAction<CeramicTemplateModel | undefined>
     >
     templateStreamID: string
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
     onResetTemplate: () => void
     composition: CompositionModel
 }
@@ -44,6 +44,10 @@ const EditTemplateUI = ({
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
+    const onSubmit = async () => {
+        await onSaveTemplate()
+    }
+
     return (
         <Box gap="medium" pad="medium">
             <TemplateHeader
@@ -66,7 +70,7 @@ const EditTemplateUI = ({
                     <TemplateDescriptionForm
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
+                        onSubmit={onSubmit}
                         onCancel={onResetTemplate}
                     />
                 </Tab>
@@ -81,7 +85,7 @@ const EditTemplateUI = ({
                     <TemplatePricingForm
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
+                        onSubmit={onSubmit}
                         onCancel={onResetTemplate}
                         currentUser={currentUser}
                     />
@@ -99,7 +103,7 @@ const EditTemplateUI = ({
                             composition={composition}
                             templateInput={templateInput}
                             setTemplateInput={setTemplateInput}
-                            onSubmit={onSaveTemplate}
+                            onSubmit={onSubmit}
                             onCancel={onResetTemplate}
                         />
                     </Tab>
@@ -115,7 +119,7 @@ const EditTemplateUI = ({
                     <TemplateRequirementsForm
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
-                        onSubmit={onSaveTemplate}
+                        onSubmit={onSubmit}
                         onCancel={onResetTemplate}
                     />
                 </Tab>
