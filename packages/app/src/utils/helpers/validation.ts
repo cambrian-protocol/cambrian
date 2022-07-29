@@ -34,8 +34,9 @@ export const isAddress = (address: string) => {
         !address.startsWith('0x') ||
         !ethers.utils.isAddress(address)
     ) {
-        return 'Invalid address'
+        return false
     }
+    return true
 }
 
 export const validateAddress = [
@@ -51,6 +52,6 @@ export const isRequired = (value: string) => {
         value.length === 0 ||
         value.trim() === ''
     ) {
-        return 'required'
+        return 'Required'
     }
 }

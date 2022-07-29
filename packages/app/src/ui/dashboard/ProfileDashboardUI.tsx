@@ -6,6 +6,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 interface ProfileDashboardUIProps {
@@ -57,7 +58,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     return (
         <PageLayout kind="narrow" contextTitle="Dashboard">
             <Box gap="large" pad="large">
-                <Box direction="row" align="center" gap="medium">
+                <Box direction="row" align="center" gap="medium" wrap>
                     {currentUser.basicProfile?.avatar ? (
                         <BaseAvatar
                             size="large"
@@ -69,7 +70,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                             address={currentUser.address}
                         />
                     )}
-                    <Box gap="small">
+                    <Box gap="small" pad={{ top: 'medium' }}>
                         <Heading>
                             {currentUser.basicProfile?.name || 'Anonym'}
                         </Heading>
@@ -77,7 +78,9 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                             {(currentUser.basicProfile?.title as string) ||
                                 'Unknown'}
                         </Text>
-                        <Text color="dark-4">{currentUser.address}</Text>
+                        <Text color="dark-4">
+                            {ellipseAddress(currentUser.address, 10)}
+                        </Text>
                     </Box>
                 </Box>
                 <Box gap="large">

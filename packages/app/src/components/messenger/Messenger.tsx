@@ -1,8 +1,8 @@
+import { Box, ResponsiveContext } from 'grommet'
 import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
 import CoreMessenger, { ChatType } from './CoreMessenger'
 
 import BasicProfileInfo from '../info/BasicProfileInfo'
-import { Box } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { useState } from 'react'
 
@@ -19,40 +19,68 @@ const Messenger = ({
     chatType,
     participantDIDs,
 }: MessengerProps) => {
-    const [showMessenger, setShowMessenger] = useState(true)
+    const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     return (
-        <Box pad={{ right: 'large' }}>
-            <Box
-                width={{ min: 'medium' }}
-                background="background-contrast"
-                round={{ corner: 'top', size: 'xsmall' }}
-            >
-                <Box direction="row" justify="between" pad="small">
-                    <BasicProfileInfo
-                        did={participantDIDs[0]}
-                        hideDetails
-                        size="small"
-                    />
-                    <IconContext.Provider value={{ size: '18' }}>
+        <ResponsiveContext.Consumer>
+            {(screenSize) => {
+                const isScreenSizeSmall = screenSize === 'small'
+                return (
+                    <Box
+                        pad={isScreenSizeSmall ? undefined : { right: 'large' }}
+                        width={{ max: '90vw' }}
+                    >
                         <Box
-                            onClick={toggleShowMessenger}
-                            focusIndicator={false}
-                            pad="small"
+                            width="medium"
+                            background="background-contrast-hover"
+                            round={{ corner: 'top', size: 'xsmall' }}
                         >
-                            {showMessenger ? <CaretDown /> : <CaretUp />}
+                            <Box
+                                direction="row"
+                                justify="between"
+                                pad={'small'}
+                                onClick={
+                                    !showMessenger
+                                        ? toggleShowMessenger
+                                        : undefined
+                                }
+                                focusIndicator={false}
+                            >
+                                <BasicProfileInfo
+                                    did={participantDIDs[0]}
+                                    hideDetails
+                                    size="small"
+                                />
+                                <IconContext.Provider value={{ size: '18' }}>
+                                    <Box
+                                        pad="small"
+                                        onClick={
+                                            showMessenger
+                                                ? toggleShowMessenger
+                                                : undefined
+                                        }
+                                        focusIndicator={false}
+                                    >
+                                        {showMessenger ? (
+                                            <CaretDown />
+                                        ) : (
+                                            <CaretUp />
+                                        )}
+                                    </Box>
+                                </IconContext.Provider>
+                            </Box>
+                            <CoreMessenger
+                                showMessenger={showMessenger}
+                                currentUser={currentUser}
+                                chatID={chatID}
+                                chatType={chatType}
+                            />
                         </Box>
-                    </IconContext.Provider>
-                </Box>
-                <CoreMessenger
-                    showMessenger={showMessenger}
-                    currentUser={currentUser}
-                    chatID={chatID}
-                    chatType={chatType}
-                />
-            </Box>
-        </Box>
+                    </Box>
+                )
+            }}
+        </ResponsiveContext.Consumer>
     )
 }
 

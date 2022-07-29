@@ -18,7 +18,7 @@ interface TemplateWizardProps {
         SetStateAction<CeramicTemplateModel | undefined>
     >
     templateStreamID: string
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
     composition: CompositionModel
 }
 

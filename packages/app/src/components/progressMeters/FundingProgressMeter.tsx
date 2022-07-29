@@ -32,7 +32,7 @@ const FundingProgressMeter = ({
             : BigNumber.from(0)
 
     return (
-        <Box fill>
+        <Box pad="medium">
             <Box align="center" pad={{ vertical: 'medium' }}>
                 <Stack anchor="center">
                     <Meter

@@ -5,6 +5,8 @@ import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposal } from '@cambrian/app/hooks/useProposal'
@@ -12,7 +14,8 @@ import { useState } from 'react'
 
 const ProposalReviewControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack, proposalStreamID, updateProposal } = useProposal()
+    const { proposalStack, proposalStreamDoc, templateStreamDoc } =
+        useProposal()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -20,15 +23,20 @@ const ProposalReviewControl = () => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (currentUser && proposalStack) {
+        if (
+            currentUser &&
+            proposalStack &&
+            proposalStreamDoc &&
+            templateStreamDoc
+        ) {
             try {
                 const cs = new CeramicStagehand(currentUser.selfID)
                 await cs.approveProposal(
                     currentUser,
-                    proposalStreamID,
+                    proposalStreamDoc,
+                    templateStreamDoc,
                     proposalStack
                 )
-                await updateProposal()
             } catch (e) {
                 setIsApproving(false)
                 setErrorMessage(await cpLogger.push(e))
@@ -38,34 +46,45 @@ const ProposalReviewControl = () => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (currentUser) {
+        if (currentUser && proposalStreamDoc && templateStreamDoc) {
             try {
                 const cs = new CeramicStagehand(currentUser.selfID)
-                await cs.requestProposalChange(proposalStreamID)
-                await updateProposal()
+                await cs.requestProposalChange(
+                    proposalStreamDoc,
+                    templateStreamDoc
+                )
             } catch (e) {
+                setIsRequestingChange(false)
                 setErrorMessage(await cpLogger.push(e))
             }
         }
-        setIsRequestingChange(false)
     }
 
     return (
         <>
-            <Box gap="small" direction="row" justify="end">
-                <LoaderButton
-                    isLoading={isRequestingChange}
-                    label="Request Change"
-                    secondary
-                    icon={<PencilLine />}
-                    onClick={onRequestChange}
-                />
-                <LoaderButton
-                    icon={<CheckCircle />}
-                    isLoading={isApproving}
-                    label="Approve Proposal"
-                    primary
-                    onClick={onApproveProposal}
+            <Box gap="medium">
+                <PlainSectionDivider />
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            disabled={isRequestingChange}
+                            icon={<CheckCircle />}
+                            isLoading={isApproving}
+                            label="Approve Proposal"
+                            primary
+                            onClick={onApproveProposal}
+                        />
+                    }
+                    secondaryButton={
+                        <LoaderButton
+                            disabled={isApproving}
+                            isLoading={isRequestingChange}
+                            label="Request Change"
+                            secondary
+                            icon={<PencilLine />}
+                            onClick={onRequestChange}
+                        />
+                    }
                 />
             </Box>
             {errorMessage && (

@@ -1,5 +1,5 @@
 import { Box, ResponsiveContext, Text } from 'grommet'
-import { ClipboardText, File, IconContext, TreeStructure } from 'phosphor-react'
+import { IconContext, Rows, StackSimple, TreeStructure } from 'phosphor-react'
 
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
@@ -39,16 +39,16 @@ const Appbar = () => {
                             )}
                             <Box flex />
                             {currentUser && (
-                                <Box direction="row">
+                                <Box direction="row" gap="small">
                                     <AppbarMenuItem
                                         pathname="/dashboard/templates"
                                         label="Templates"
-                                        icon={<File />}
+                                        icon={<StackSimple />}
                                     />
                                     <AppbarMenuItem
                                         pathname="/dashboard/proposals"
                                         label="Proposals"
-                                        icon={<ClipboardText />}
+                                        icon={<Rows />}
                                     />
                                     <AppbarMenuItem
                                         pathname="/dashboard/compositions"

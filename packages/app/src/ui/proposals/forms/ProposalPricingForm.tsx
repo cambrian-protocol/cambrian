@@ -6,6 +6,7 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
@@ -138,25 +139,25 @@ const ProposalPricingForm = ({
                                 />
                             </Box>
                         </Box>
-                        <Box
-                            direction="row"
-                            justify="between"
-                            pad={{ top: 'medium' }}
-                        >
-                            <Button
-                                size="small"
-                                secondary
-                                label={cancelLabel || 'Reset all changes'}
-                                onClick={onCancel}
-                            />
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                size="small"
-                                primary
-                                label={submitLabel || 'Save'}
-                                type="submit"
-                            />
-                        </Box>
+                        <TwoButtonWrapContainer
+                            primaryButton={
+                                <LoaderButton
+                                    isLoading={isSubmitting}
+                                    size="small"
+                                    primary
+                                    label={submitLabel || 'Save'}
+                                    type="submit"
+                                />
+                            }
+                            secondaryButton={
+                                <Button
+                                    size="small"
+                                    secondary
+                                    label={cancelLabel || 'Reset all changes'}
+                                    onClick={onCancel}
+                                />
+                            }
+                        />
                     </>
                 )}
             </Box>

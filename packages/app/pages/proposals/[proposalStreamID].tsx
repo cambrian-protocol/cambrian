@@ -1,9 +1,4 @@
-import { useEffect, useState } from 'react'
-
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
-import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { ProposalContextProvider } from '@cambrian/app/store/ProposalContext'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
@@ -17,20 +12,19 @@ export default function ViewProposalPage() {
 
     return (
         <>
-            {isUserLoaded ? (
-                currentUser ? (
-                    <ProposalContextProvider
-                        proposalStreamID={proposalStreamID as string}
-                    >
-                        <ProposalUI />
-                    </ProposalContextProvider>
-                ) : (
-                    <PageLayout contextTitle="Connect your Wallet">
-                        <ConnectWalletSection />
-                    </PageLayout>
-                )
+            {isUserLoaded && !currentUser ? (
+                <PageLayout contextTitle="Connect your Wallet">
+                    <ConnectWalletSection />
+                </PageLayout>
+            ) : currentUser ? (
+                <ProposalContextProvider
+                    currentUser={currentUser}
+                    proposalStreamID={proposalStreamID as string}
+                >
+                    <ProposalUI />
+                </ProposalContextProvider>
             ) : (
-                <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
+                <></>
             )}
         </>
     )

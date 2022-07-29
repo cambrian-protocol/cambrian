@@ -45,7 +45,7 @@ export type ReceivedProposalPropsType = {
 export type TemplatePriceModel = {
     amount: number
     denominationTokenAddress: string
-    preferredTokens?: TokenModel[]
+    preferredTokens: TokenModel[]
     allowAnyPaymentToken: boolean
     isCollateralFlex: boolean
 }

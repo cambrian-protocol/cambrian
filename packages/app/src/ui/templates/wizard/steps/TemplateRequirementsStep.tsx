@@ -2,14 +2,12 @@ import {
     TEMPLATE_WIZARD_STEPS,
     TemplateWizardStepsType,
 } from '../TemplateWizard'
-import TemplateRequirementsForm, {
-    TemplateRequirementsFormType,
-} from '../../forms/TemplateRequirementsForm'
 
 import { Box } from 'grommet'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { SetStateAction } from 'react'
+import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
 
 interface TemplateRequirementsStepProps {
     templateInput: CeramicTemplateModel
@@ -17,7 +15,7 @@ interface TemplateRequirementsStepProps {
         SetStateAction<CeramicTemplateModel | undefined>
     >
     stepperCallback: (step: TemplateWizardStepsType) => void
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateRequirementsStep = ({
@@ -27,18 +25,20 @@ const TemplateRequirementsStep = ({
     onSaveTemplate,
 }: TemplateRequirementsStepProps) => {
     return (
-        <Box height={{ min: '60vh' }}>
-            <HeaderTextSection
-                title="Requirements"
-                paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
-            />
+        <Box>
+            <Box pad="xsmall">
+                <HeaderTextSection
+                    title="Requirements"
+                    paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
+                />
+            </Box>
             <TemplateRequirementsForm
                 templateInput={templateInput}
                 setTemplateInput={setTemplateInput}
-                submitLabel="Save & Continue"
+                submitLabel="Save & Finish"
                 onSubmit={async () => {
-                    await onSaveTemplate()
-                    stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
+                    if (await onSaveTemplate())
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
                 }}
                 cancelLabel={'Back'}
                 onCancel={() => {

@@ -1,4 +1,4 @@
-import { Box, Stack, Tab, Tabs } from 'grommet'
+import { Box, Heading, Stack, Tab, Tabs, Text } from 'grommet'
 
 import Custom404Page from 'packages/app/pages/404'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -55,7 +55,26 @@ const EditProposalUI = () => {
                                 }
                             >
                                 <Tab title="Description">
-                                    <Box pad={{ top: 'medium' }}>
+                                    <Box pad={{ top: 'medium' }} gap="medium">
+                                        {proposalStack.template.requirements.trim() !==
+                                            '' && (
+                                            <Box gap="xsmall">
+                                                <Heading level="4">
+                                                    Requirements
+                                                </Heading>
+                                                <Text
+                                                    color="dark-4"
+                                                    style={{
+                                                        whiteSpace: 'pre-line',
+                                                    }}
+                                                >
+                                                    {
+                                                        proposalStack.template
+                                                            .requirements
+                                                    }
+                                                </Text>
+                                            </Box>
+                                        )}
                                         <ProposalDescriptionForm
                                             proposalInput={proposalInput}
                                             setProposalInput={setProposalInput}

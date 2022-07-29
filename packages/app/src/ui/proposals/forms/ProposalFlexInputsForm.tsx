@@ -5,6 +5,7 @@ import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
@@ -76,21 +77,25 @@ const ProposalFlexInputsForm = ({
                         )
                     })}
                 </Box>
-                <Box direction="row" justify="between" height={{ min: 'auto' }}>
-                    <Button
-                        size="small"
-                        secondary
-                        label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
-                    />
-                    <LoaderButton
-                        isLoading={isSubmitting}
-                        size="small"
-                        primary
-                        label={submitLabel || 'Save'}
-                        type="submit"
-                    />
-                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
             </Box>
         </Form>
     )

@@ -8,7 +8,6 @@ interface TemplateListItemProps {
     onDelete: (templateID: string) => Promise<void>
 }
 
-// TODO Styling
 const TemplateListItem = ({
     templateID,
     templateStreamID,
@@ -42,7 +41,13 @@ const TemplateListItem = ({
             wrap
         >
             <Text>{templateID}</Text>
-            <Box direction="row" justify="end" flex width={{ min: 'auto' }}>
+            <Box
+                direction="row"
+                justify="end"
+                flex
+                width={{ min: 'auto' }}
+                gap="small"
+            >
                 <Anchor
                     href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
                 >
@@ -53,12 +58,18 @@ const TemplateListItem = ({
                 >
                     <Button icon={<Eye />} />
                 </Anchor>
-                <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
                 <Button
-                    tip={{
-                        content: 'Copy link to clipboard',
-                        dropProps: { align: { left: 'right' } },
+                    icon={<Trash />}
+                    onClick={() => {
+                        if (
+                            window.confirm(
+                                'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
+                            )
+                        )
+                            onDelete(templateID)
                     }}
+                />
+                <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {
                         navigator.clipboard.writeText(

@@ -90,7 +90,12 @@ const CompositionsDashboardUI = () => {
                                 Create, Import or Work on your compositions here
                             </Text>
                         </Box>
-                        <Box direction="row" height={{ min: 'auto' }} wrap>
+                        <Box
+                            direction="row"
+                            height={{ min: 'auto' }}
+                            wrap
+                            pad="medium"
+                        >
                             <DashboardUtilityButton
                                 label="New Composition"
                                 primaryIcon={<TreeStructure />}

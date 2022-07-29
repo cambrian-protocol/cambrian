@@ -55,6 +55,7 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
+                        requirements={proposalStack.template.requirements}
                         stepperCallback={setCurrentStep}
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}

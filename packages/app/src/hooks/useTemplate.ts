@@ -34,12 +34,14 @@ const useTemplate = () => {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     setCeramicStagehand(cs)
                     const template = (await (
-                        await cs.loadStream(templateStreamID)
+                        await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
                     if (template) {
                         const comp = (await (
-                            await cs.loadStream(template.composition.commitID)
+                            await cs.loadTileDocument(
+                                template.composition.commitID
+                            )
                         ).content) as CompositionModel
 
                         if (comp) {
@@ -56,22 +58,30 @@ const useTemplate = () => {
         }
     }
 
-    const onSaveTemplate = async () => {
+    const onSaveTemplate = async (): Promise<boolean> => {
         if (templateInput && ceramicStagehand) {
             if (!_.isEqual(templateInput, cachedTemplate)) {
-                const { uniqueTag } = await ceramicStagehand.updateStage(
-                    templateStreamID as string,
-                    templateInput,
-                    StageNames.template
-                )
-                const templateWithUniqueTitle = {
-                    ...templateInput,
-                    title: uniqueTag,
+                try {
+                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                        templateStreamID as string,
+                        templateInput,
+                        StageNames.template
+                    )
+                    const templateWithUniqueTitle = {
+                        ...templateInput,
+                        title: uniqueTag,
+                    }
+                    setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
+                    setTemplateInput(templateWithUniqueTitle)
+                    return true
+                } catch (e) {
+                    setErrorMessage(await cpLogger.push(e))
                 }
-                setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
-                setTemplateInput(templateWithUniqueTitle)
+            } else {
+                return true
             }
         }
+        return false
     }
 
     const onResetTemplate = () => {

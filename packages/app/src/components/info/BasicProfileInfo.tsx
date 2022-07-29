@@ -24,7 +24,7 @@ const BasicProfileInfo = ({
                     size={size ? undefined : 'medium'}
                 />
                 <Box pad="small">
-                    <Heading level={size === 'small' ? '4' : '3'}>
+                    <Heading level={size === 'small' ? '4' : '3'} truncate>
                         {sellerBasicProfile.content?.name}
                     </Heading>
                     {size !== 'small' && (

@@ -17,7 +17,7 @@ interface TemplateFlexInputsStepProps {
     >
     stepperCallback: (step: TemplateWizardStepsType) => void
     composition: CompositionModel
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateFlexInputsStep = ({
@@ -28,18 +28,20 @@ const TemplateFlexInputsStep = ({
     composition,
 }: TemplateFlexInputsStepProps) => {
     return (
-        <Box height={{ min: '60vh' }}>
-            <HeaderTextSection
-                title="Solver Config"
-                paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
-            />
+        <Box>
+            <Box pad="xsmall">
+                <HeaderTextSection
+                    title="Solver Config"
+                    paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
+                />
+            </Box>
             <TemplateFlexInputsForm
                 composition={composition}
                 templateInput={templateInput}
                 setTemplateInput={setTemplateInput}
                 onSubmit={async () => {
-                    await onSaveTemplate()
-                    stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
+                    if (await onSaveTemplate())
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
                 }}
                 submitLabel="Save & Continue"
                 onCancel={() => stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)}

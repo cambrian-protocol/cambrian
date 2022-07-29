@@ -15,6 +15,9 @@ export const IPFS_GATEWAYS = [
     'ipfs.infura-ipfs.io',
 ]
 
+// Ceramic
+export const CERAMIC_NODE_ENDPOINT = 'http://ceramic.cambrianprotocol.com:7007'
+
 // BE Endpoints
 export const WEBHOOK_API_ENDPOINT =
     'https://app.cambrianprotocol.com/api/addWebhook'

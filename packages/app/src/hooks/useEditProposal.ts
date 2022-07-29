@@ -8,7 +8,6 @@ import { ProposalStatus } from '../models/ProposalStatus'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import _ from 'lodash'
 import { cpLogger } from './../services/api/Logger.api'
-import { getProposalStatus } from '@cambrian/app/utils/helpers/proposalHelper'
 import { useCurrentUser } from './useCurrentUser'
 import { useRouter } from 'next/router'
 
@@ -42,24 +41,33 @@ const useEditProposal = () => {
                 )
                 setCeramicStagehand(ceramicStagehand)
 
-                const _proposalStreamDoc = (await ceramicStagehand.loadStream(
-                    proposalStreamID
-                )) as TileDocument<CeramicProposalModel>
+                const _proposalStreamDoc =
+                    (await ceramicStagehand.loadTileDocument(
+                        proposalStreamID
+                    )) as TileDocument<CeramicProposalModel>
+                const _templateStreamDoc =
+                    (await ceramicStagehand.loadTileDocument(
+                        _proposalStreamDoc.content.template.streamID
+                    )) as TileDocument<CeramicTemplateModel>
 
-                setProposalStreamDoc(_proposalStreamDoc)
+                if (_proposalStreamDoc.content.isSubmitted) {
+                    setProposalStatus(ProposalStatus.ChangeRequested)
+                } else if (
+                    _templateStreamDoc.content.receivedProposals[
+                        proposalStreamID
+                    ]
+                ) {
+                    setProposalStatus(ProposalStatus.Modified)
+                } else {
+                    setProposalStatus(ProposalStatus.Draft)
+                }
 
                 const _proposalStackClones =
-                    await ceramicStagehand.loadAndCloneProposalStack(
-                        _proposalStreamDoc.commitId.toString()
+                    await ceramicStagehand.loadProposalStackFromID(
+                        proposalStreamID
                     )
 
-                const _templateStreamDoc = (await ceramicStagehand.loadStream(
-                    _proposalStackClones.proposal.template.streamID
-                )) as TileDocument<CeramicTemplateModel>
-
-                setProposalStatus(
-                    getProposalStatus(_proposalStreamDoc, _templateStreamDoc)
-                )
+                setProposalStreamDoc(_proposalStreamDoc)
                 setProposalStack(_proposalStackClones)
                 setProposalInput(_.cloneDeep(_proposalStackClones.proposal))
                 setIsLoaded(true)
