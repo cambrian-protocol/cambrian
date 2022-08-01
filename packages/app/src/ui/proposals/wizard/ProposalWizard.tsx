@@ -15,7 +15,7 @@ interface ProposalWizardProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    onSaveProposal: () => Promise<void>
+    onSaveProposal: () => Promise<boolean>
     proposalStack: ProposalStackType
     proposalStreamDoc: TileDocument<CeramicProposalModel>
 }
@@ -95,33 +95,7 @@ const ProposalWizard = ({
 
     return (
         <>
-            <Box
-                height={{ min: '90vh' }}
-                justify="center"
-                width={'xlarge'}
-                pad={{ horizontal: 'large' }}
-            >
-                {/* TODO Wizard Nav <Box direction="row" align="center">
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Description</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Pricing</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Solver Configuration</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Requirements</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Publish</Text>
-                    </Box>
-                </Box> */}
+            <Box height={{ min: '90vh' }} justify="center" width={'xlarge'}>
                 {renderCurrentFormStep()}
             </Box>
         </>

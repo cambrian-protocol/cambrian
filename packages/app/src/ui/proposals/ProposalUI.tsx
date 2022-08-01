@@ -16,12 +16,12 @@ import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalUI = () => {
     const { currentUser } = useCurrentUser()
     const { isLoaded, proposalStack, proposalStatus, proposalStreamDoc } =
-        useProposal()
+        useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {

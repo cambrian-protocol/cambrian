@@ -1,17 +1,26 @@
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { PaperPlaneRight } from 'phosphor-react'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const ProposalSubmitControl = () => {
+interface ProposalSubmitControlProps {
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
+    isValidProposal: boolean
+}
+
+const ProposalSubmitControl = ({
+    isValidProposal,
+    proposalStreamDoc,
+}: ProposalSubmitControlProps) => {
     const { currentUser } = useCurrentUser()
-    const { proposalStreamDoc } = useEditProposal()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,9 +46,12 @@ const ProposalSubmitControl = () => {
         }
     }
     return (
-        <Box align="end" pad={{ horizontal: 'small' }}>
+        <Box>
             <LoaderButton
+                icon={<PaperPlaneRight />}
+                disabled={!isValidProposal}
                 isLoading={isSubmitting}
+                reverse
                 label="Submit Proposal"
                 primary
                 onClick={onSubmitProposal}

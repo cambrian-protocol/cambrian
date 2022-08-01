@@ -3,7 +3,7 @@ import Custom404Page from '../404'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
-import useTemplate from '@cambrian/app/hooks/useTemplate'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function ViewTemplatePage() {
     const {
@@ -14,7 +14,7 @@ export default function ViewTemplatePage() {
         errorMessage,
         setErrorMessage,
         show404NotFound,
-    } = useTemplate()
+    } = useEditTemplate()
 
     return (
         <>

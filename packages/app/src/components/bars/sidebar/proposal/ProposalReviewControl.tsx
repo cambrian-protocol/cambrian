@@ -9,13 +9,13 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 import { useState } from 'react'
 
 const ProposalReviewControl = () => {
     const { currentUser } = useCurrentUser()
     const { proposalStack, proposalStreamDoc, templateStreamDoc } =
-        useProposal()
+        useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)

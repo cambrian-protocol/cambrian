@@ -9,7 +9,7 @@ import ProposalReviewControl from '@cambrian/app/components/bars/sidebar/proposa
 import ProposalStartFundingControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingControl'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalControlbar = () => {
     const { currentUser } = useCurrentUser()
@@ -18,7 +18,7 @@ const ProposalControlbar = () => {
         proposalStatus,
         proposalStreamDoc,
         proposalContract,
-    } = useProposal()
+    } = useProposalContext()
 
     const isProposalAuthor =
         currentUser?.selfID.did.id === proposalStack?.proposal.author

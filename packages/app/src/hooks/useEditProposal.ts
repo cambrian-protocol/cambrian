@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '../models/ProposalModel'
 import { CeramicTemplateModel } from '../models/TemplateModel'
+import { ErrorMessageType } from '../constants/ErrorMessages'
 import { ProposalStackType } from '../store/ProposalContext'
 import { ProposalStatus } from '../models/ProposalStatus'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -24,6 +25,8 @@ const useEditProposal = () => {
     const [proposalStreamDoc, setProposalStreamDoc] =
         useState<TileDocument<CeramicProposalModel>>()
     const [isLoaded, setIsLoaded] = useState(false)
+    const [isValidProposal, setIsValidProposal] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         if (router.isReady) fetchProposal()
@@ -66,7 +69,7 @@ const useEditProposal = () => {
                     await ceramicStagehand.loadProposalStackFromID(
                         proposalStreamID
                     )
-
+                validateProposal(_proposalStackClones.proposal)
                 setProposalStreamDoc(_proposalStreamDoc)
                 setProposalStack(_proposalStackClones)
                 setProposalInput(_.cloneDeep(_proposalStackClones.proposal))
@@ -77,29 +80,38 @@ const useEditProposal = () => {
         }
     }
 
-    const saveProposal = async () => {
+    const saveProposal = async (): Promise<boolean> => {
         if (proposalInput && ceramicStagehand && proposalStack) {
             if (!_.isEqual(proposalInput, proposalStack.proposal)) {
-                const { uniqueTag } = await ceramicStagehand.updateStage(
-                    proposalStreamID as string,
-                    { ...proposalInput, isSubmitted: false },
-                    StageNames.proposal
-                )
-                const proposalWithUniqueTitle = {
-                    ...proposalInput,
-                    title: uniqueTag,
-                    isSubmitted: false,
-                }
+                try {
+                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                        proposalStreamID as string,
+                        { ...proposalInput, isSubmitted: false },
+                        StageNames.proposal
+                    )
+                    const proposalWithUniqueTitle = {
+                        ...proposalInput,
+                        title: uniqueTag,
+                        isSubmitted: false,
+                    }
+                    validateProposal(proposalWithUniqueTitle)
+                    setProposalInput(proposalWithUniqueTitle)
+                    setProposalStack({
+                        ...proposalStack,
+                        proposal: _.cloneDeep(proposalWithUniqueTitle),
+                    })
+                    if (proposalStatus === ProposalStatus.ChangeRequested)
+                        setProposalStatus(ProposalStatus.Modified)
 
-                setProposalInput(proposalWithUniqueTitle)
-                setProposalStack({
-                    ...proposalStack,
-                    proposal: _.cloneDeep(proposalWithUniqueTitle),
-                })
-                if (proposalStatus === ProposalStatus.ChangeRequested)
-                    setProposalStatus(ProposalStatus.Modified)
+                    return true
+                } catch (e) {
+                    setErrorMessage(await cpLogger.push(e))
+                }
+            } else {
+                return true
             }
         }
+        return false
     }
 
     const resetProposalInput = () => {
@@ -107,7 +119,20 @@ const useEditProposal = () => {
             setProposalInput(_.cloneDeep(proposalStack.proposal))
         }
     }
+
+    const validateProposal = (proposal: CeramicProposalModel) => {
+        setIsValidProposal(
+            proposal.title.trim().length > 0 &&
+                proposal.description.trim().length > 0 &&
+                proposal.price.tokenAddress.trim().length > 0 &&
+                proposal.flexInputs.every(
+                    (flexInput) => flexInput.value.trim().length > 0
+                )
+        )
+    }
+
     return {
+        isValidProposal: isValidProposal,
         proposalStreamDoc: proposalStreamDoc,
         proposalStack: proposalStack,
         onResetProposalInput: resetProposalInput,
@@ -116,6 +141,8 @@ const useEditProposal = () => {
         setProposalInput: setProposalInput,
         proposalStatus: proposalStatus,
         isLoaded: isLoaded,
+        errorMessage: errorMessage,
+        setErrorMessage: setErrorMessage,
     }
 }
 

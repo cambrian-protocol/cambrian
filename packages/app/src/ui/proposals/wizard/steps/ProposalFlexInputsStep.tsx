@@ -16,7 +16,7 @@ interface ProposalFlexInputsStepProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    onSaveProposal: () => Promise<void>
+    onSaveProposal: () => Promise<boolean>
     composition: CompositionModel
 }
 
@@ -29,17 +29,19 @@ const ProposalFlexInputsStep = ({
 }: ProposalFlexInputsStepProps) => (
     <Box height={{ min: '60vh' }}>
         <Box gap="medium">
-            <HeaderTextSection
-                title="Reasonable. Just a few more details"
-                paragraph="Please input the following information to set up the Solver correctly."
-            />
+            <Box pad="xsmall">
+                <HeaderTextSection
+                    title="Reasonable. Just a few more details"
+                    paragraph="Please input the following information to set up the Solver correctly."
+                />
+            </Box>
             <ProposalFlexInputsForm
                 composition={composition}
                 proposalInput={proposalInput}
                 setProposalInput={setProposalInput}
                 onSubmit={async () => {
-                    await onSaveProposal()
-                    stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
+                    if (await onSaveProposal())
+                        stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
                 }}
                 submitLabel="Save & Continue"
                 onCancel={() => stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)}
