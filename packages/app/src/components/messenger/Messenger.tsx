@@ -22,6 +22,11 @@ const Messenger = ({
     const [showMessenger, setShowMessenger] = useState(true)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
+    // TODO Integrate >2 participants
+    const counterPart = participantDIDs.filter(
+        (did) => did !== currentUser.selfID.did.id
+    )[0]
+
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
@@ -48,7 +53,7 @@ const Messenger = ({
                                 focusIndicator={false}
                             >
                                 <BasicProfileInfo
-                                    did={participantDIDs[0]}
+                                    did={counterPart}
                                     hideDetails
                                     size="small"
                                 />
@@ -75,6 +80,7 @@ const Messenger = ({
                                 currentUser={currentUser}
                                 chatID={chatID}
                                 chatType={chatType}
+                                participants={participantDIDs}
                             />
                         </Box>
                     </Box>

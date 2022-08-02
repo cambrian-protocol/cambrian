@@ -42,7 +42,7 @@ export default function CoreMessenger({
     currentUser: UserType
     chatID: string
     chatType: ChatType
-    participants?: string[] // For 'Other'
+    participants: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
@@ -199,7 +199,7 @@ export default function CoreMessenger({
             }>[] = (
                 (
                     await Promise.allSettled(
-                        participants!.map((DID) =>
+                        participants.map((DID) =>
                             TileDocument.deterministic(
                                 currentUser.selfID.client.ceramic,
                                 {
@@ -238,23 +238,13 @@ export default function CoreMessenger({
      */
     const loadChatDraftProposal = async () => {
         try {
-            const proposalDoc = await ceramicClient.loadStream(chatID)
-            const templateDoc = await ceramicClient.loadStream(
-                proposalDoc.content.template.streamID
-            )
-
-            const authors = [
-                templateDoc.content.author,
-                proposalDoc.content.author,
-            ]
-
             // Load, then filter out streams that failed to load & streams with no messages
             const messagesDocs: TileDocument<{
                 messages: ChatMessageType[]
             }>[] = (
                 (
                     await Promise.allSettled(
-                        authors.map(
+                        participants.map(
                             async (DID) =>
                                 await TileDocument.deterministic(
                                     currentUser.selfID.client.ceramic,

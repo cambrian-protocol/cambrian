@@ -41,7 +41,9 @@ const ProposalUI = () => {
     const initMessenger =
         (currentUser?.selfID.did.id === proposalStack?.template.author ||
             currentUser?.selfID.did.id === proposalStack?.proposal.author) &&
-        proposalStatus !== ProposalStatus.Draft
+        proposalStatus !== ProposalStatus.Draft &&
+        proposalStatus !== ProposalStatus.Funding &&
+        proposalStatus !== ProposalStatus.Executed
 
     return (
         <>
@@ -101,18 +103,11 @@ const ProposalUI = () => {
                             <Messenger
                                 chatID={proposalStreamDoc.id.toString()}
                                 currentUser={currentUser}
-                                chatType={
-                                    proposalStatus === ProposalStatus.Funding ||
-                                    proposalStatus === ProposalStatus.Executed
-                                        ? 'Proposal'
-                                        : 'Draft'
-                                }
-                                participantDIDs={
-                                    currentUser?.selfID.did.id ===
-                                    proposalStack.proposal.author
-                                        ? [proposalStack.template.author]
-                                        : [proposalStack.proposal.author]
-                                }
+                                chatType={'Draft'}
+                                participantDIDs={[
+                                    proposalStack.template.author,
+                                    proposalStack.proposal.author,
+                                ]}
                             />
                         )}
                 </Stack>
