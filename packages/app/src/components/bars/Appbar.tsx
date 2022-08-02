@@ -27,7 +27,6 @@ const Appbar = () => {
                             direction="row"
                             flex
                             justify="between"
-                            align={screenSize === 'small' ? 'center' : 'end'}
                             gap="medium"
                         >
                             {screenSize === 'small' ? (
@@ -39,7 +38,16 @@ const Appbar = () => {
                             )}
                             <Box flex />
                             {currentUser && (
-                                <Box direction="row" gap="small">
+                                <Box
+                                    direction="row"
+                                    gap="small"
+                                    align={
+                                        screenSize === 'small'
+                                            ? 'center'
+                                            : 'end'
+                                    }
+                                    pad={{ right: 'large' }}
+                                >
                                     <AppbarMenuItem
                                         pathname="/dashboard/templates"
                                         label="Templates"
@@ -57,9 +65,7 @@ const Appbar = () => {
                                     />
                                 </Box>
                             )}
-                            <Box alignSelf="center" pad={{ left: 'large' }}>
-                                <UserMenu />
-                            </Box>
+                            <UserMenu />
                         </Box>
                     </Header>
                 )
