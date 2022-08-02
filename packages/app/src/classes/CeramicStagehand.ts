@@ -368,7 +368,7 @@ export default class CeramicStagehand {
             if (success) {
                 // Hit mailbox server
                 const res = await fetch(
-                    `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
+                    `https://trilobot.cambrianprotocol.com/approveProposal`,
                     {
                         method: 'POST',
                         body: proposalStreamDoc.id.toString(),
@@ -579,7 +579,7 @@ export default class CeramicStagehand {
         try {
             // Hit mailbox server
             const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/proposeDraft`,
+                `https://trilobot.cambrianprotocol.com/proposeDraft`,
                 {
                     method: 'POST',
                     body: proposalStreamDoc.id.toString(),
@@ -666,7 +666,7 @@ export default class CeramicStagehand {
         try {
             // Hit mailbox server
             const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/requestChange`,
+                `https://trilobot.cambrianprotocol.com/requestChange`,
                 {
                     method: 'POST',
                     body: proposalStreamDoc.id.toString(),
