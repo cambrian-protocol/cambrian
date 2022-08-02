@@ -77,7 +77,7 @@ const TemplatesDashboardUI = () => {
                             direction="row"
                             justify="between"
                             align="center"
-                            pad="medium"
+                            pad="large"
                             wrap
                         >
                             <Box>
@@ -113,7 +113,7 @@ const TemplatesDashboardUI = () => {
                             </Box>
                         </Box>
                     </Box>
-                    <Box fill pad={'medium'}>
+                    <Box fill pad={'large'}>
                         <Tabs alignControls="start">
                             <Tab
                                 title={`Your Templates (${
