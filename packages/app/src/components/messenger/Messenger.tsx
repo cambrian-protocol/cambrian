@@ -19,7 +19,7 @@ const Messenger = ({
     chatType,
     participantDIDs,
 }: MessengerProps) => {
-    const [showMessenger, setShowMessenger] = useState(false)
+    const [showMessenger, setShowMessenger] = useState(true)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     return (

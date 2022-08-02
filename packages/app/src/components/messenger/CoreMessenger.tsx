@@ -2,8 +2,8 @@ import { Box, Button, Form, TextInput } from 'grommet'
 import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
-import { CeramicProposalModel } from '../../models/ProposalModel'
-import { CeramicTemplateModel } from '../../models/TemplateModel'
+import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
+import CeramicClient from '@ceramicnetwork/http-client'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -45,6 +45,7 @@ export default function CoreMessenger({
     participants?: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
+    const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     // useRef for publishing messages in outbox, otherwise setInterval has stale state
     const outboxCallback = useRef(async () => {})
 
@@ -232,22 +233,15 @@ export default function CoreMessenger({
 
     /**
      * @notice Loads an array of message streams from TileDocument<CeramicProposalModel>
-     * @dev chatID == proposalID of draft
+     * @dev chatID == proposalStreamID of draft
      * @dev Gets DIDs from proposal.authors
      */
     const loadChatDraftProposal = async () => {
         try {
-            const proposalDoc: TileDocument<CeramicProposalModel> =
-                await TileDocument.load(
-                    currentUser.selfID.client.ceramic,
-                    chatID
-                )
-
-            const templateDoc: TileDocument<CeramicTemplateModel> =
-                await TileDocument.load(
-                    currentUser.selfID.client.ceramic,
-                    proposalDoc.content.template.streamID
-                )
+            const proposalDoc = await ceramicClient.loadStream(chatID)
+            const templateDoc = await ceramicClient.loadStream(
+                proposalDoc.content.template.streamID
+            )
 
             const authors = [
                 templateDoc.content.author,
@@ -260,15 +254,16 @@ export default function CoreMessenger({
             }>[] = (
                 (
                     await Promise.allSettled(
-                        authors.map((DID) =>
-                            TileDocument.deterministic(
-                                currentUser.selfID.client.ceramic,
-                                {
-                                    controllers: [DID],
-                                    family: 'cambrian-chat',
-                                    tags: [chatID],
-                                }
-                            )
+                        authors.map(
+                            async (DID) =>
+                                await TileDocument.deterministic(
+                                    currentUser.selfID.client.ceramic,
+                                    {
+                                        controllers: [DID],
+                                        family: 'cambrian-chat',
+                                        tags: [chatID],
+                                    }
+                                )
                         )
                     )
                 )
@@ -276,7 +271,8 @@ export default function CoreMessenger({
                     .filter(Boolean) as TileDocument<{
                     messages: ChatMessageType[]
                 }>[]
-            ).filter((doc) => doc.content?.messages?.length > 1)
+            ).filter((doc) => doc.content?.messages?.length > 0)
+
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
                 (doc) => doc.content.messages

@@ -33,6 +33,7 @@ const TemplateUI = ({ ceramicTemplate, templateStreamID }: TemplateUIProps) => (
                         />
                         <PlainSectionDivider />
                         <BasicProfileInfo did={ceramicTemplate.author} />
+                        <PlainSectionDivider />
                     </Box>
                     <CreateProposalCTA templateStreamID={templateStreamID} />
                 </Box>

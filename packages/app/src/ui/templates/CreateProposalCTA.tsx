@@ -42,7 +42,7 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
         }
     }
     return (
-        <Box align="end" pad={{ top: 'medium' }}>
+        <Box pad={{ top: 'medium' }}>
             <LoaderButton
                 onClick={onCreateProposal}
                 isLoading={isCreatingProposal}
