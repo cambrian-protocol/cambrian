@@ -78,9 +78,11 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 proposalStatus === ProposalStatus.ChangeRequested
             ) {
                 if (proposalStreamDoc && templateStreamDoc) {
-                    const proposalSub = proposalStreamDoc.subscribe((x) => {
-                        refreshProposal()
-                    })
+                    const proposalSub = proposalStreamDoc.subscribe(
+                        async (x) => {
+                            await refreshProposal()
+                        }
+                    )
                     const templateSub = templateStreamDoc.subscribe(
                         async (x) => {
                             setProposalStatus(
@@ -147,6 +149,8 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     (await ceramicStagehand.loadTileDocument(
                         proposalStreamID
                     )) as TileDocument<CeramicProposalModel>
+
+                _proposalStreamDoc.makeReadOnly()
 
                 const _templateStreamDoc =
                     (await ceramicStagehand.loadTileDocument(
