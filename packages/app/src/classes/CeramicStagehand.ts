@@ -1,3 +1,4 @@
+import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from './../../config/index'
 import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
@@ -7,7 +8,6 @@ import {
     getSolutionSafeBaseId,
 } from '../utils/helpers/proposalHelper'
 
-import { CERAMIC_NODE_ENDPOINT } from './../../config/index'
 import CeramicClient from '@ceramicnetwork/http-client'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -24,7 +24,6 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
-import { ethers } from 'ethers'
 import initialComposer from '../store/composer/composer.init'
 import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
 import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
@@ -77,7 +76,6 @@ export default class CeramicStagehand {
         data: StageModel,
         stage: StageNames
     ) => {
-        console.log('updated Stage at updateStage')
         if (!this.isStageSchema(data, stage)) {
             throw GENERAL_ERROR['WRONG_SCHEMA']
         }
@@ -368,7 +366,7 @@ export default class CeramicStagehand {
             if (success) {
                 // Hit mailbox server
                 const res = await fetch(
-                    `http://trilobot.cambrianprotocol.com:4242/approveProposal`,
+                    `${TRILOBOT_ENDPOINT}/approveProposal`,
                     {
                         method: 'POST',
                         body: proposalStreamDoc.id.toString(),
@@ -383,6 +381,9 @@ export default class CeramicStagehand {
                         }
                     )
                     return true
+                } else {
+                    cpLogger.push(res.status)
+                    return false
                 }
             }
         } catch (e) {
@@ -481,7 +482,7 @@ export default class CeramicStagehand {
                 (event) => event.event === 'CreateProposal'
             )
             console.log(event)
-            if (!event) throw GENERAL_ERROR['PROPOSAL_DEPLOY_ERROR']
+            if (!event) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
 
             // If for some reason some POS wants to DOS we can save the correct id nonce
             // on ceramic to save time for subsequent loads
@@ -578,13 +579,10 @@ export default class CeramicStagehand {
     ) => {
         try {
             // Hit mailbox server
-            const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/proposeDraft`,
-                {
-                    method: 'POST',
-                    body: proposalStreamDoc.id.toString(),
-                }
-            )
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
+                method: 'POST',
+                body: proposalStreamDoc.id.toString(),
+            })
 
             if (res.status === 200) {
                 await proposalStreamDoc.update(
@@ -596,6 +594,9 @@ export default class CeramicStagehand {
                     { pin: true }
                 )
                 return true
+            } else {
+                cpLogger.push(res.status)
+                return false
             }
         } catch (e) {
             console.log(e)
@@ -665,13 +666,10 @@ export default class CeramicStagehand {
     ) => {
         try {
             // Hit mailbox server
-            const res = await fetch(
-                `http://trilobot.cambrianprotocol.com:4242/requestChange`,
-                {
-                    method: 'POST',
-                    body: proposalStreamDoc.id.toString(),
-                }
-            )
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
+                method: 'POST',
+                body: proposalStreamDoc.id.toString(),
+            })
 
             if (res.status === 200) {
                 await this.updateProposalEntry(
@@ -682,6 +680,9 @@ export default class CeramicStagehand {
                     }
                 )
                 return true
+            } else {
+                cpLogger.push(res.status)
+                return false
             }
         } catch (e) {
             cpLogger.push(e)

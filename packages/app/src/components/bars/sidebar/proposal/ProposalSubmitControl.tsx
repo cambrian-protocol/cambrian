@@ -1,7 +1,11 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
+
 import { Box } from 'grommet'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { PaperPlaneRight } from 'phosphor-react'
@@ -33,12 +37,15 @@ const ProposalSubmitControl = ({
                 const ceramicStagehand = new CeramicStagehand(
                     currentUser.selfID
                 )
-                await ceramicStagehand.submitProposal(proposalStreamDoc)
-                router.push(
-                    `${
-                        window.location.origin
-                    }/proposals/${proposalStreamDoc.id.toString()}`
-                )
+                if (await ceramicStagehand.submitProposal(proposalStreamDoc)) {
+                    router.push(
+                        `${
+                            window.location.origin
+                        }/proposals/${proposalStreamDoc.id.toString()}`
+                    )
+                } else {
+                    throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']
+                }
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))

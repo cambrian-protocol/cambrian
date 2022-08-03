@@ -1,8 +1,8 @@
 import { Box, Button, Form, TextInput } from 'grommet'
+import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from 'packages/app/config'
 import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CeramicClient from '@ceramicnetwork/http-client'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
@@ -28,7 +28,7 @@ import io from 'socket.io-client'
  *  On-Chain Proposal => <proposalId>
  */
 
-const socket = io('ws://trilobot.cambrianprotocol.com:4242') // TODO Replace with env var
+const socket = io(TRILOBOT_ENDPOINT) // TODO Replace with env var
 
 export type ChatType = 'Draft' | 'Proposal' | 'Solver' | 'Other'
 

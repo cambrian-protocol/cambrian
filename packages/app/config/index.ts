@@ -17,6 +17,9 @@ export const IPFS_GATEWAYS = [
 
 // Ceramic
 export const CERAMIC_NODE_ENDPOINT = 'http://ceramic.cambrianprotocol.com:7007'
+/* export const CERAMIC_NODE_ENDPOINT = 'https://ceramic-clay.3boxlabs.com/' */
+
+export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com/'
 
 // BE Endpoints
 export const WEBHOOK_API_ENDPOINT =

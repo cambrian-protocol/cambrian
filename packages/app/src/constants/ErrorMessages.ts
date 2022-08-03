@@ -132,8 +132,19 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         title: 'Error while creating a Solution Base',
         logLevel: 1,
     },
-    PROPOSAL_DEPLOY_ERROR: {
-        title: 'Error while deploying proposal',
+    PROPOSAL_SUBMIT_ERROR: {
+        title: 'Error while submitting Proposal',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
+    PROPOSAL_REQUEST_CHANGE_ERROR: {
+        title: 'Error while requesting change',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
+    PROPOSAL_APPROVE_ERROR: {
+        title: 'Error while approving Proposal',
+        message: 'Please try again later...',
         logLevel: 1,
     },
 }

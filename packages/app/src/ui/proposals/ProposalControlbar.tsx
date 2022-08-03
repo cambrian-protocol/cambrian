@@ -28,7 +28,13 @@ const ProposalControlbar = () => {
     const renderControls = () => {
         switch (proposalStatus) {
             case ProposalStatus.OnReview:
-                return <>{isTemplateAuthor && <ProposalReviewControl />}</>
+                return (
+                    <>
+                        {isTemplateAuthor && currentUser && (
+                            <ProposalReviewControl currentUser={currentUser} />
+                        )}
+                    </>
+                )
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
