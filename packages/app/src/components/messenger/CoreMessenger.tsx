@@ -45,7 +45,6 @@ export default function CoreMessenger({
     participants: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
-    const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     // useRef for publishing messages in outbox, otherwise setInterval has stale state
     const outboxCallback = useRef(async () => {})
 

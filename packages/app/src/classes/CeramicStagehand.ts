@@ -352,14 +352,12 @@ export default class CeramicStagehand {
 
     approveProposal = async (
         currentUser: UserType,
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         templateStreamDoc: TileDocument<CeramicTemplateModel>,
         proposalStack: ProposalStackType
     ) => {
         try {
             const success = await this.deploySolutionBase(
                 currentUser,
-                proposalStreamDoc,
                 proposalStack
             )
 
@@ -369,12 +367,12 @@ export default class CeramicStagehand {
                     `${TRILOBOT_ENDPOINT}/approveProposal`,
                     {
                         method: 'POST',
-                        body: proposalStreamDoc.id.toString(),
+                        body: proposalStack.proposalDoc.id.toString(),
                     }
                 )
                 if (res.status === 200) {
                     await this.updateProposalEntry(
-                        proposalStreamDoc,
+                        proposalStack.proposalDoc,
                         templateStreamDoc,
                         {
                             approved: true,
@@ -393,7 +391,6 @@ export default class CeramicStagehand {
 
     deploySolutionBase = async (
         currentUser: UserType,
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         try {
@@ -406,7 +403,7 @@ export default class CeramicStagehand {
                 // Pin solverConfigs separately to have access without metaData from Solution
                 const solverConfigsDoc = await this.saveSolverConfigs(
                     parsedSolvers,
-                    proposalStreamDoc.commitId.toString()
+                    proposalStack.proposalDoc.commitId.toString()
                 )
 
                 if (!solverConfigsDoc)
@@ -418,8 +415,8 @@ export default class CeramicStagehand {
                 )
 
                 const solutionBaseId: string = getSolutionBaseId(
-                    proposalStreamDoc.commitId.toString(),
-                    proposalStack.proposal.template.commitID
+                    proposalStack.proposalDoc.commitId.toString(),
+                    proposalStack.proposalDoc.content.template.commitID
                 )
 
                 const transaction = await solutionsHub.createBase(
@@ -441,7 +438,6 @@ export default class CeramicStagehand {
 
     deployProposal = async (
         currentUser: UserType,
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
         proposalStack: ProposalStackType
     ) => {
         // TODO Sanity check function that this is approved
@@ -455,7 +451,7 @@ export default class CeramicStagehand {
             // URI will differ from that on the Solution Base, but it should refer to identical data
             const solverConfigsDoc = await this.saveSolverConfigs(
                 parsedSolvers,
-                proposalStreamDoc.commitId.toString()
+                proposalStack.proposalDoc.commitId.toString()
             )
 
             if (!solverConfigsDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -466,16 +462,16 @@ export default class CeramicStagehand {
             )
 
             const solutionSafeBaseId: string = getSolutionSafeBaseId(
-                proposalStreamDoc.commitId.toString(),
-                proposalStack.proposal.template.commitID
+                proposalStack.proposalDoc.commitId.toString(),
+                proposalStack.proposalDoc.content.template.commitID
             )
 
             const transaction = await proposalsHub.createProposal(
                 parsedSolvers[0].collateralToken,
-                proposalStreamDoc.content.price.amount,
+                proposalStack.proposalDoc.content.price.amount,
                 solutionSafeBaseId,
                 parsedSolvers.map((solver) => solver.config),
-                proposalStreamDoc.commitId.toString()
+                proposalStack.proposalDoc.commitId.toString()
             )
             let rc = await transaction.wait()
             const event = rc.events?.find(
@@ -512,13 +508,11 @@ export default class CeramicStagehand {
         }
     }
 
-    loadStreamContent = async (streamOrCommitID: string) => {
+    loadStream = async (streamOrCommitID: string) => {
         try {
-            const streamContent = await (
-                await this.ceramicClient.loadStream(streamOrCommitID)
-            ).content
-
-            return streamContent
+            return (await this.ceramicClient.loadStream(
+                streamOrCommitID
+            )) as unknown as TileDocument<unknown>
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
@@ -609,16 +603,16 @@ export default class CeramicStagehand {
     ) => {
         const _compositionWithFlexInputs = mergeFlexIntoComposition(
             mergeFlexIntoComposition(
-                proposalStack.composition,
-                proposalStack.template.flexInputs
+                proposalStack.compositionDoc.content,
+                proposalStack.templateDoc.content.flexInputs
             ),
-            proposalStack.proposal.flexInputs
+            proposalStack.proposalDoc.content.flexInputs
         )
 
-        if (proposalStack.template.price.isCollateralFlex) {
+        if (proposalStack.templateDoc.content.price.isCollateralFlex) {
             _compositionWithFlexInputs.solvers.forEach((solver) => {
                 solver.config.collateralToken =
-                    proposalStack.proposal.price.tokenAddress
+                    proposalStack.proposalDoc.content.price.tokenAddress
             })
         }
 
@@ -630,33 +624,29 @@ export default class CeramicStagehand {
         return _parsedSolvers
     }
 
-    loadProposalStackFromID = async (proposalStreamOrCommitID: string) => {
-        const _proposalContent = (
-            await this.ceramicClient.loadStream(proposalStreamOrCommitID)
-        ).content as CeramicProposalModel
+    loadProposalStackFromID = async (proposalCommitOrStreamID: string) => {
+        const proposalDoc = (await this.ceramicClient.loadStream(
+            proposalCommitOrStreamID
+        )) as unknown as TileDocument<CeramicProposalModel>
 
-        return this.loadProposalStackFromProposal(_proposalContent)
+        return this.loadProposalStackFromProposal(proposalDoc)
     }
 
     loadProposalStackFromProposal = async (
-        proposalContent: CeramicProposalModel
-    ) => {
-        const _templateCommitContent = (
-            await this.ceramicClient.loadStream(
-                proposalContent.template.commitID
-            )
-        ).content as CeramicTemplateModel
+        proposalDoc: TileDocument<CeramicProposalModel>
+    ): Promise<ProposalStackType> => {
+        const templateDoc = (await this.ceramicClient.loadStream(
+            proposalDoc.content.template.commitID
+        )) as unknown as TileDocument<CeramicTemplateModel>
 
-        const _compositionCommitContent = (
-            await this.ceramicClient.loadStream(
-                _templateCommitContent.composition.commitID
-            )
-        ).content as CompositionModel
+        const compositionDoc = (await this.ceramicClient.loadStream(
+            templateDoc.content.composition.commitID
+        )) as unknown as TileDocument<CompositionModel>
 
         return {
-            proposal: proposalContent,
-            template: _templateCommitContent,
-            composition: _compositionCommitContent,
+            proposalDoc: proposalDoc,
+            templateDoc: templateDoc,
+            compositionDoc: compositionDoc,
         }
     }
 

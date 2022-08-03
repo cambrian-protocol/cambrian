@@ -1,11 +1,17 @@
-import { ArrowsClockwise, CircleDashed, Trash } from 'phosphor-react'
-import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
+import { ArrowsClockwise, CircleDashed } from 'phosphor-react'
+import { Box, Heading, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
 import ProposalListItem, {
     ProposalListItemType,
 } from '@cambrian/app/components/list/ProposalListItem'
+import {
+    getApprovedProposalCommitID,
+    getLatestProposalSubmission,
+    getOnChainProposal,
+    getProposalStatus,
+} from '@cambrian/app/utils/helpers/proposalHelper'
 import { useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -18,33 +24,29 @@ import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { getProposalStatus } from '@cambrian/app/utils/helpers/proposalHelper'
+import { ethers } from 'ethers'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
+    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]
     >([])
 
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
 
     useEffect(() => {
-        const ceramicStagehandInstance = new CeramicStagehand(
-            currentUser.selfID
-        )
-        setCeramicStagehand(ceramicStagehandInstance)
-        fetchMyProposals(ceramicStagehandInstance)
-        fetchReceivedProposals(ceramicStagehandInstance)
+        fetchMyProposals()
+        fetchReceivedProposals()
     }, [])
 
-    const fetchReceivedProposals = async (cs: CeramicStagehand) => {
-        const templateStreamIDs = (await cs.loadStages(
+    const fetchReceivedProposals = async () => {
+        const templateStreamIDs = (await ceramicStagehand.loadStages(
             StageNames.template
         )) as StringHashmap
 
@@ -52,9 +54,10 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
         await Promise.all(
             Object.values(templateStreamIDs).map(async (streamID) => {
-                const _templateStreamDoc = (await cs.loadTileDocument(
-                    streamID
-                )) as TileDocument<CeramicTemplateModel>
+                const _templateStreamDoc =
+                    (await ceramicStagehand.loadTileDocument(
+                        streamID
+                    )) as TileDocument<CeramicTemplateModel>
                 if (
                     _templateStreamDoc &&
                     _templateStreamDoc.content.receivedProposals &&
@@ -65,25 +68,72 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         Object.keys(
                             _templateStreamDoc.content.receivedProposals
                         ).map(async (proposalStreamID) => {
-                            const _proposalDoc = (await cs.loadTileDocument(
-                                proposalStreamID
-                            )) as TileDocument<CeramicProposalModel>
+                            let proposalDoc:
+                                | TileDocument<CeramicProposalModel>
+                                | undefined
 
-                            const _proposalContent =
-                                _proposalDoc.content as CeramicProposalModel
+                            let onChainProposal: ethers.Contract | undefined
 
-                            if (_proposalContent) {
+                            const approvedProposalCommitID =
+                                getApprovedProposalCommitID(
+                                    _templateStreamDoc.content,
+                                    proposalStreamID
+                                )
+
+                            if (approvedProposalCommitID) {
+                                proposalDoc =
+                                    (await ceramicStagehand.loadStream(
+                                        approvedProposalCommitID
+                                    )) as TileDocument<CeramicProposalModel>
+
+                                onChainProposal = await getOnChainProposal(
+                                    currentUser,
+                                    approvedProposalCommitID,
+                                    proposalDoc.content.template.commitID
+                                )
+                            } else {
+                                proposalDoc =
+                                    (await ceramicStagehand.loadStream(
+                                        proposalStreamID
+                                    )) as TileDocument<CeramicProposalModel>
+
+                                if (!proposalDoc.content.isSubmitted) {
+                                    const latestProposalSubmission =
+                                        getLatestProposalSubmission(
+                                            proposalStreamID,
+                                            _templateStreamDoc.content
+                                                .receivedProposals
+                                        )
+                                    if (latestProposalSubmission) {
+                                        proposalDoc =
+                                            (await ceramicStagehand.loadStream(
+                                                latestProposalSubmission.proposalCommitID
+                                            )) as TileDocument<CeramicProposalModel>
+                                    }
+                                }
+                            }
+
+                            const templateCommit = (await (
+                                await ceramicStagehand.loadStream(
+                                    proposalDoc.content.template.commitID
+                                )
+                            ).content) as CeramicTemplateModel
+
+                            if (proposalDoc) {
                                 _receivedProposals.push({
-                                    status: await getProposalStatus(
-                                        _proposalDoc,
-                                        _templateStreamDoc,
-                                        currentUser,
-                                        cs
+                                    status: getProposalStatus(
+                                        proposalDoc,
+                                        _templateStreamDoc.content
+                                            .receivedProposals[
+                                            proposalDoc.id.toString()
+                                        ],
+                                        onChainProposal
                                     ),
                                     streamID: proposalStreamID,
-                                    title: _proposalContent.title,
+                                    title: proposalDoc.content.title,
+                                    templateTitle: templateCommit.title,
                                     isAuthor:
-                                        _proposalContent.author ===
+                                        proposalDoc.content.author ===
                                         currentUser.selfID.did.id,
                                 })
                             }
@@ -95,36 +145,67 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
         setReceivedProposals(_receivedProposals)
     }
 
-    const fetchMyProposals = async (cs: CeramicStagehand) => {
+    const fetchMyProposals = async () => {
         setIsFetching(true)
         try {
-            const proposalStreamIDs = (await cs.loadStages(
+            const proposalStreamIDs = (await ceramicStagehand.loadStages(
                 StageNames.proposal
             )) as StringHashmap
 
-            const proposalStreamMap = (await cs.multiQuery(
+            const proposalStreamMap = (await ceramicStagehand.multiQuery(
                 Object.values(proposalStreamIDs).map((s) => {
                     return { streamId: s }
                 })
             )) as { [streamId: string]: TileDocument<CeramicProposalModel> }
 
             const proposalListItems: ProposalListItemType[] = await Promise.all(
-                Object.keys(proposalStreamMap).map(async (p) => {
-                    const _proposalDoc = proposalStreamMap[p]
-                    const _template = (await cs.loadTileDocument(
-                        _proposalDoc.content.template.streamID
-                    )) as TileDocument<CeramicTemplateModel>
-                    return {
-                        status: await getProposalStatus(
-                            _proposalDoc,
-                            _template,
+                Object.keys(proposalStreamMap).map(async (proposalStreamID) => {
+                    let proposalDoc = proposalStreamMap[proposalStreamID]
+                    let onChainProposal: ethers.Contract | undefined = undefined
+
+                    const _templateStreamContent = (
+                        await ceramicStagehand.loadStream(
+                            proposalDoc.content.template.streamID
+                        )
+                    ).content as CeramicTemplateModel
+
+                    const approvedProposalCommitID =
+                        getApprovedProposalCommitID(
+                            _templateStreamContent,
+                            proposalStreamID
+                        )
+
+                    if (approvedProposalCommitID) {
+                        proposalDoc = (await ceramicStagehand.loadStream(
+                            approvedProposalCommitID
+                        )) as TileDocument<CeramicProposalModel>
+
+                        onChainProposal = await getOnChainProposal(
                             currentUser,
-                            cs
+                            approvedProposalCommitID,
+                            proposalDoc.content.template.commitID
+                        )
+                    }
+
+                    const templateCommit = (await (
+                        await ceramicStagehand.loadStream(
+                            proposalDoc.content.template.commitID
+                        )
+                    ).content) as CeramicTemplateModel
+
+                    return {
+                        status: getProposalStatus(
+                            proposalDoc,
+                            _templateStreamContent.receivedProposals[
+                                proposalStreamID
+                            ],
+                            onChainProposal
                         ),
-                        streamID: p,
-                        title: _proposalDoc.content.title,
+                        streamID: proposalStreamID,
+                        title: proposalDoc.content.title,
+                        templateTitle: templateCommit.title,
                         isAuthor:
-                            _proposalDoc.content.author ===
+                            proposalDoc.content.author ===
                             currentUser.selfID.did.id,
                     }
                 })
@@ -177,28 +258,26 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                             gap="small"
                             pad={{ vertical: 'small' }}
                         >
+                            {/*  
+                            TODO For dev purposes
                             <Button
                                 secondary
                                 size="small"
                                 label="Delete all"
                                 icon={<Trash />}
                                 onClick={() => {
-                                    if (ceramicStagehand) {
-                                        ceramicStagehand.clearStages(
-                                            StageNames.proposal
-                                        )
-                                    }
+                                    ceramicStagehand.clearStages(
+                                        StageNames.proposal
+                                    )
                                 }}
-                            />
+                            /> */}
                             <LoaderButton
                                 secondary
                                 isLoading={isFetching}
                                 icon={<ArrowsClockwise />}
                                 onClick={() => {
-                                    if (ceramicStagehand) {
-                                        fetchMyProposals(ceramicStagehand)
-                                        fetchReceivedProposals(ceramicStagehand)
-                                    }
+                                    fetchMyProposals()
+                                    fetchReceivedProposals()
                                 }}
                             />
                         </Box>
@@ -244,16 +323,14 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     {receivedProposals.length > 0 ? (
                                         <Box gap="small">
                                             {receivedProposals.map(
-                                                (receivedProposal, idx) => {
-                                                    return (
-                                                        <ProposalListItem
-                                                            key={idx}
-                                                            proposal={
-                                                                receivedProposal
-                                                            }
-                                                        />
-                                                    )
-                                                }
+                                                (receivedProposal, idx) => (
+                                                    <ProposalListItem
+                                                        key={idx}
+                                                        proposal={
+                                                            receivedProposal
+                                                        }
+                                                    />
+                                                )
                                             )}
                                         </Box>
                                     ) : (

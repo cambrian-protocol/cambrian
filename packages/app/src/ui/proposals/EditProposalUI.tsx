@@ -29,7 +29,8 @@ const EditProposalUI = () => {
         proposalStreamDoc,
         isValidProposal,
         errorMessage,
-        setErrorMessage
+        setErrorMessage,
+        isLoaded,
     } = useEditProposal()
 
     const { currentUser } = useCurrentUser()
@@ -46,9 +47,12 @@ const EditProposalUI = () => {
 
     return (
         <>
-            {!proposalStack ? (
+            {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && isEditable && proposalStreamDoc ? (
+            ) : proposalInput &&
+              isEditable &&
+              proposalStreamDoc &&
+              proposalStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box pad="large" gap="medium">
@@ -73,7 +77,7 @@ const EditProposalUI = () => {
                                                     'Please be sure to include information requested by the Template description.'
                                                 }
                                             />
-                                            {proposalStack.template.requirements.trim() !==
+                                            {proposalStack.templateDoc.content.requirements.trim() !==
                                                 '' && (
                                                 <Box gap="xsmall">
                                                     <Heading level="4">
@@ -88,7 +92,8 @@ const EditProposalUI = () => {
                                                     >
                                                         {
                                                             proposalStack
-                                                                .template
+                                                                .templateDoc
+                                                                .content
                                                                 .requirements
                                                         }
                                                     </Text>
@@ -112,7 +117,10 @@ const EditProposalUI = () => {
                                             />
                                         </Box>
                                         <ProposalPricingForm
-                                            template={proposalStack.template}
+                                            template={
+                                                proposalStack.templateDoc
+                                                    .content
+                                            }
                                             proposalInput={proposalInput}
                                             setProposalInput={setProposalInput}
                                             onSubmit={handleSubmit}
@@ -132,7 +140,8 @@ const EditProposalUI = () => {
                                             </Box>
                                             <ProposalFlexInputsForm
                                                 composition={
-                                                    proposalStack.composition
+                                                    proposalStack.compositionDoc
+                                                        .content
                                                 }
                                                 proposalInput={proposalInput}
                                                 setProposalInput={
@@ -159,7 +168,7 @@ const EditProposalUI = () => {
                                 currentUser={currentUser}
                                 chatID={proposalStreamDoc.id.toString()}
                                 participantDIDs={[
-                                    proposalStack.template.author,
+                                    proposalStack.templateDoc.content.author,
                                 ]}
                                 chatType={'Draft'}
                             />

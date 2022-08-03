@@ -20,8 +20,7 @@ import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalUI = () => {
     const { currentUser } = useCurrentUser()
-    const { isLoaded, proposalStack, proposalStatus, proposalStreamDoc } =
-        useProposalContext()
+    const { isLoaded, proposalStack, proposalStatus } = useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {
@@ -31,7 +30,7 @@ const ProposalUI = () => {
     const initCollateralToken = async () => {
         if (proposalStack && currentUser) {
             const ct = await fetchTokenInfo(
-                proposalStack.proposal.price.tokenAddress,
+                proposalStack.proposalDoc.content.price.tokenAddress,
                 currentUser.web3Provider
             )
             if (ct) setCollateralToken(ct)
@@ -39,11 +38,14 @@ const ProposalUI = () => {
     }
 
     const initMessenger =
-        (currentUser?.selfID.did.id === proposalStack?.template.author ||
-            currentUser?.selfID.did.id === proposalStack?.proposal.author) &&
+        (currentUser?.selfID.did.id ===
+            proposalStack?.templateDoc.content.author ||
+            currentUser?.selfID.did.id ===
+                proposalStack?.proposalDoc.content.author) &&
         proposalStatus !== ProposalStatus.Draft &&
         proposalStatus !== ProposalStatus.Funding &&
-        proposalStatus !== ProposalStatus.Executed
+        proposalStatus !== ProposalStatus.Executed &&
+        proposalStatus !== ProposalStatus.Unknown
 
     return (
         <>
@@ -53,7 +55,8 @@ const ProposalUI = () => {
                 <Stack anchor="bottom-right">
                     <PageLayout
                         contextTitle={
-                            proposalStack?.proposal.title || 'Loading...'
+                            proposalStack?.proposalDoc.content.title ||
+                            'Loading...'
                         }
                         kind="narrow"
                     >
@@ -70,24 +73,31 @@ const ProposalUI = () => {
                                 >
                                     <ProposalContentInfo
                                         hideTitle
-                                        proposal={proposalStack.proposal}
+                                        proposal={
+                                            proposalStack.proposalDoc.content
+                                        }
                                     />
                                     <PlainSectionDivider />
                                     <PriceInfo
                                         amount={
-                                            proposalStack.proposal.price.amount
+                                            proposalStack.proposalDoc.content
+                                                .price.amount
                                         }
                                         label="Proposed Price"
                                         token={collateralToken}
                                     />
                                     <FlexInputInfo
                                         flexInputs={
-                                            proposalStack.proposal.flexInputs
+                                            proposalStack.proposalDoc.content
+                                                .flexInputs
                                         }
                                     />
                                     <PlainSectionDivider />
                                     <BasicProfileInfo
-                                        did={proposalStack.proposal.author}
+                                        did={
+                                            proposalStack.proposalDoc.content
+                                                .author
+                                        }
                                     />
                                     <ProposalControlbar />
                                 </Box>
@@ -96,20 +106,17 @@ const ProposalUI = () => {
                             <ProposalSkeleton />
                         )}
                     </PageLayout>
-                    {initMessenger &&
-                        currentUser &&
-                        proposalStack &&
-                        proposalStreamDoc && (
-                            <Messenger
-                                chatID={proposalStreamDoc.id.toString()}
-                                currentUser={currentUser}
-                                chatType={'Draft'}
-                                participantDIDs={[
-                                    proposalStack.template.author,
-                                    proposalStack.proposal.author,
-                                ]}
-                            />
-                        )}
+                    {initMessenger && currentUser && proposalStack && (
+                        <Messenger
+                            chatID={proposalStack.proposalDoc.id.toString()}
+                            currentUser={currentUser}
+                            chatType={'Draft'}
+                            participantDIDs={[
+                                proposalStack.templateDoc.content.author,
+                                proposalStack.proposalDoc.content.author,
+                            ]}
+                        />
+                    )}
                 </Stack>
             )}
         </>

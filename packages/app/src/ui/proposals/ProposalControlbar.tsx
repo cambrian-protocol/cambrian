@@ -13,17 +13,13 @@ import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalControlbar = () => {
     const { currentUser } = useCurrentUser()
-    const {
-        proposalStack,
-        proposalStatus,
-        proposalStreamDoc,
-        proposalContract,
-    } = useProposalContext()
+    const { proposalStack, proposalStatus, proposalContract } =
+        useProposalContext()
 
     const isProposalAuthor =
-        currentUser?.selfID.did.id === proposalStack?.proposal.author
+        currentUser?.selfID.did.id === proposalStack?.proposalDoc.content.author
     const isTemplateAuthor =
-        currentUser?.selfID.did.id === proposalStack?.template.author
+        currentUser?.selfID.did.id === proposalStack?.templateDoc.content.author
 
     const renderControls = () => {
         switch (proposalStatus) {
@@ -38,13 +34,13 @@ const ProposalControlbar = () => {
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && proposalStreamDoc && (
+                        {isProposalAuthor && proposalStack && (
                             <Box gap="medium">
                                 <PlainSectionDivider />
                                 <Link
                                     href={`${
                                         window.location.origin
-                                    }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
+                                    }/dashboard/proposals/edit/${proposalStack.proposalDoc.id.toString()}`}
                                     passHref
                                 >
                                     <Button

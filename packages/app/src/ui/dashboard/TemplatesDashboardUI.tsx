@@ -12,13 +12,16 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
-const TemplatesDashboardUI = () => {
-    const { currentUser } = useCurrentUser()
+interface TemplatesDashboardUIProps {
+    currentUser: UserType
+}
+
+const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
+    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
     const [templates, setTemplates] = useState<StringHashmap>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -28,19 +31,13 @@ const TemplatesDashboardUI = () => {
         setShowCreateTemplateModal(!showCreateTemplateModal)
 
     useEffect(() => {
-        if (currentUser) {
-            const ceramicStagehandInstance = new CeramicStagehand(
-                currentUser.selfID
-            )
-            setCeramicStagehand(ceramicStagehandInstance)
-            fetchTemplates(ceramicStagehandInstance)
-        }
-    }, [currentUser])
+        fetchTemplates()
+    }, [])
 
-    const fetchTemplates = async (cs: CeramicStagehand) => {
+    const fetchTemplates = async () => {
         setIsFetching(true)
         try {
-            const templateStreams = (await cs.loadStages(
+            const templateStreams = (await ceramicStagehand.loadStages(
                 StageNames.template
             )) as StringHashmap
 
@@ -52,18 +49,13 @@ const TemplatesDashboardUI = () => {
     }
 
     const onDeleteTemplate = async (templateID: string) => {
-        if (ceramicStagehand) {
-            try {
-                await ceramicStagehand.deleteStage(
-                    templateID,
-                    StageNames.template
-                )
-                const updatedCompositions = { ...templates }
-                delete updatedCompositions[templateID]
-                setTemplates(updatedCompositions)
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
-            }
+        try {
+            await ceramicStagehand.deleteStage(templateID, StageNames.template)
+            const updatedCompositions = { ...templates }
+            delete updatedCompositions[templateID]
+            setTemplates(updatedCompositions)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
@@ -106,8 +98,7 @@ const TemplatesDashboardUI = () => {
                                     isLoading={isFetching}
                                     icon={<ArrowsClockwise />}
                                     onClick={() => {
-                                        ceramicStagehand &&
-                                            fetchTemplates(ceramicStagehand)
+                                        fetchTemplates()
                                     }}
                                 />
                             </Box>
@@ -127,24 +118,20 @@ const TemplatesDashboardUI = () => {
                                     Object.keys(templates).length > 0 ? (
                                         <Box gap="small">
                                             {Object.keys(templates).map(
-                                                (templateID) => {
-                                                    return (
-                                                        <TemplateListItem
-                                                            key={templateID}
-                                                            templateStreamID={
-                                                                templates[
-                                                                    templateID
-                                                                ]
-                                                            }
-                                                            templateID={
+                                                (templateID) => (
+                                                    <TemplateListItem
+                                                        key={templateID}
+                                                        templateStreamID={
+                                                            templates[
                                                                 templateID
-                                                            }
-                                                            onDelete={
+                                                            ]
+                                                        }
+                                                        templateID={templateID}
+                                                        /*  onDelete={
                                                                 onDeleteTemplate
-                                                            }
-                                                        />
-                                                    )
-                                                }
+                                                            } */
+                                                    />
+                                                )
                                             )}
                                         </Box>
                                     ) : (

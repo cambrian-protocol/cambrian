@@ -16,8 +16,7 @@ import { useState } from 'react'
 
 const ProposalStartFundingControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack, proposalStreamDoc, updateProposal } =
-        useProposalContext()
+    const { proposalStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -25,16 +24,10 @@ const ProposalStartFundingControl = () => {
         setIsInTransaction(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStack || !proposalStreamDoc)
-                throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+            if (!proposalStack) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.deployProposal(
-                currentUser,
-                proposalStreamDoc,
-                proposalStack
-            )
-            await updateProposal()
+            await ceramicStagehand.deployProposal(currentUser, proposalStack)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

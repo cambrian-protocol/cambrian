@@ -55,7 +55,9 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
-                        requirements={proposalStack.template.requirements}
+                        requirements={
+                            proposalStack.templateDoc.content.requirements
+                        }
                         stepperCallback={setCurrentStep}
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
@@ -69,7 +71,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        template={proposalStack.template}
+                        template={proposalStack.templateDoc.content}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
@@ -79,7 +81,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        composition={proposalStack.composition}
+                        composition={proposalStack.compositionDoc.content}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:

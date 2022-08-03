@@ -31,10 +31,12 @@ export type CeramicTemplateModel = {
 }
 
 export type ReceivedProposalsHashmapType = {
-    [proposalStreamID: string]: ({
-        proposalCommitID: string
-    } & ReceivedProposalPropsType)[]
+    [proposalStreamID: string]: ReceivedProposalCommitType[]
 }
+
+export type ReceivedProposalCommitType = {
+    proposalCommitID: string
+} & ReceivedProposalPropsType
 
 export type ReceivedProposalPropsType = {
     approved?: boolean

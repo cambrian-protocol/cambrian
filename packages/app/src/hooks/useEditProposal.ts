@@ -48,31 +48,39 @@ const useEditProposal = () => {
                     (await ceramicStagehand.loadTileDocument(
                         proposalStreamID
                     )) as TileDocument<CeramicProposalModel>
-                const _templateStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
-                        _proposalStreamDoc.content.template.streamID
-                    )) as TileDocument<CeramicTemplateModel>
 
-                if (_proposalStreamDoc.content.isSubmitted) {
-                    setProposalStatus(ProposalStatus.ChangeRequested)
-                } else if (
-                    _templateStreamDoc.content.receivedProposals[
-                        proposalStreamID
-                    ]
+                if (
+                    _proposalStreamDoc.content.author ===
+                    currentUser.selfID.did.id
                 ) {
-                    setProposalStatus(ProposalStatus.Modified)
-                } else {
-                    setProposalStatus(ProposalStatus.Draft)
-                }
+                    const _templateStreamDoc =
+                        (await ceramicStagehand.loadTileDocument(
+                            _proposalStreamDoc.content.template.streamID
+                        )) as TileDocument<CeramicTemplateModel>
 
-                const _proposalStackClones =
-                    await ceramicStagehand.loadProposalStackFromID(
-                        proposalStreamID
+                    if (_proposalStreamDoc.content.isSubmitted) {
+                        setProposalStatus(ProposalStatus.ChangeRequested)
+                    } else if (
+                        _templateStreamDoc.content.receivedProposals[
+                            proposalStreamID
+                        ]
+                    ) {
+                        setProposalStatus(ProposalStatus.Modified)
+                    } else {
+                        setProposalStatus(ProposalStatus.Draft)
+                    }
+
+                    const _proposalStackClones =
+                        await ceramicStagehand.loadProposalStackFromID(
+                            proposalStreamID
+                        )
+                    validateProposal(_proposalStackClones.proposalDoc.content)
+                    setProposalStreamDoc(_proposalStreamDoc)
+                    setProposalStack(_proposalStackClones)
+                    setProposalInput(
+                        _.cloneDeep(_proposalStackClones.proposalDoc.content)
                     )
-                validateProposal(_proposalStackClones.proposal)
-                setProposalStreamDoc(_proposalStreamDoc)
-                setProposalStack(_proposalStackClones)
-                setProposalInput(_.cloneDeep(_proposalStackClones.proposal))
+                }
                 setIsLoaded(true)
             } catch (e) {
                 cpLogger.push(e)
@@ -82,7 +90,7 @@ const useEditProposal = () => {
 
     const saveProposal = async (): Promise<boolean> => {
         if (proposalInput && ceramicStagehand && proposalStack) {
-            if (!_.isEqual(proposalInput, proposalStack.proposal)) {
+            if (!_.isEqual(proposalInput, proposalStack.proposalDoc.content)) {
                 try {
                     const { uniqueTag } = await ceramicStagehand.updateStage(
                         proposalStreamID as string,
@@ -96,10 +104,15 @@ const useEditProposal = () => {
                     }
                     validateProposal(proposalWithUniqueTitle)
                     setProposalInput(proposalWithUniqueTitle)
-                    setProposalStack({
-                        ...proposalStack,
-                        proposal: _.cloneDeep(proposalWithUniqueTitle),
-                    })
+
+                    await ceramicStagehand.loadProposalStackFromID(
+                        proposalStreamID as string
+                    )
+                    setProposalStack(
+                        await ceramicStagehand.loadProposalStackFromID(
+                            proposalStreamID as string
+                        )
+                    )
                     if (proposalStatus === ProposalStatus.ChangeRequested)
                         setProposalStatus(ProposalStatus.Modified)
 
@@ -116,7 +129,7 @@ const useEditProposal = () => {
 
     const resetProposalInput = () => {
         if (proposalStack) {
-            setProposalInput(_.cloneDeep(proposalStack.proposal))
+            setProposalInput(_.cloneDeep(proposalStack.proposalDoc.content))
         }
     }
 

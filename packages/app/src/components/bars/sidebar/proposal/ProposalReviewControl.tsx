@@ -21,8 +21,7 @@ interface ProposalReviewControlProps {
 
 const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
     const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-    const { proposalStack, proposalStreamDoc, templateStreamDoc } =
-        useProposalContext()
+    const { proposalStack, templateStreamDoc } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -30,11 +29,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (proposalStack && proposalStreamDoc && templateStreamDoc) {
+        if (proposalStack && templateStreamDoc) {
             try {
                 const res = await ceramicStagehand.approveProposal(
                     currentUser,
-                    proposalStreamDoc,
                     templateStreamDoc,
                     proposalStack
                 )
@@ -49,10 +47,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (proposalStreamDoc && templateStreamDoc) {
+        if (proposalStack && templateStreamDoc) {
             try {
                 const res = await ceramicStagehand.requestProposalChange(
-                    proposalStreamDoc,
+                    proposalStack.proposalDoc,
                     templateStreamDoc
                 )
 
