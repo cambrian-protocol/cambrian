@@ -64,7 +64,7 @@ const TemplateFlexInputsForm = ({
                         return (
                             <Box key={idx}>
                                 <FormField
-                                    name={`flexInput.[${idx}]`}
+                                    name={`flexInputs[${idx}].value`}
                                     label={flexInput.label}
                                     type={type}
                                     value={templateInput.flexInputs[idx].value}

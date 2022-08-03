@@ -54,6 +54,7 @@ const ProposalFlexInputsForm = ({
                         return (
                             <Box key={idx}>
                                 <FormField
+                                    name={`flexInputs[${idx}].value`}
                                     label={flexInput.label}
                                     type={type}
                                     value={flexInput.value}
