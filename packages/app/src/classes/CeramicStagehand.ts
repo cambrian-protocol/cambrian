@@ -1,4 +1,4 @@
-import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from './../../config/index'
+import { CERAMIC_NODE_ENDPOINT } from './../../config/index'
 import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
@@ -364,7 +364,7 @@ export default class CeramicStagehand {
             if (success) {
                 // Hit mailbox server
                 const res = await fetch(
-                    `${TRILOBOT_ENDPOINT}/approveProposal`,
+                    `https://trilobot.cambrianprotocol.com/approveProposal`,
                     {
                         method: 'POST',
                         body: proposalStack.proposalDoc.id.toString(),
@@ -573,11 +573,13 @@ export default class CeramicStagehand {
     ) => {
         try {
             // Hit mailbox server
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
-                method: 'POST',
-                body: proposalStreamDoc.id.toString(),
-            })
-
+            const res = await fetch(
+                `https://trilobot.cambrianprotocol.com/proposeDraft`,
+                {
+                    method: 'POST',
+                    body: proposalStreamDoc.id.toString(),
+                }
+            )
             if (res.status === 200) {
                 await proposalStreamDoc.update(
                     {
@@ -656,10 +658,13 @@ export default class CeramicStagehand {
     ) => {
         try {
             // Hit mailbox server
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
-                method: 'POST',
-                body: proposalStreamDoc.id.toString(),
-            })
+            const res = await fetch(
+                `https://trilobot.cambrianprotocol.com/requestChange`,
+                {
+                    method: 'POST',
+                    body: proposalStreamDoc.id.toString(),
+                }
+            )
 
             if (res.status === 200) {
                 await this.updateProposalEntry(
