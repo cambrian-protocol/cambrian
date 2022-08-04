@@ -1,4 +1,4 @@
-import { Box, Stack, WorldMap } from 'grommet'
+import { Box, WorldMap } from 'grommet'
 import React, { PropsWithChildren, useContext } from 'react'
 
 import Appbar from '../bars/Appbar'
@@ -6,9 +6,12 @@ import BaseFooter from './footer/BaseFooter'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
+import WrongChainSection from '../sections/WrongChainSection'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
@@ -19,6 +22,7 @@ export const siteTitle = 'Cambrian Protocol'
 
 const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
+    const { currentUser } = useCurrentUser()
 
     return (
         <>
@@ -59,12 +63,17 @@ const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        <Box
-                            width={kind === 'narrow' ? 'xlarge' : undefined}
-                            height={{ min: '90vh' }}
-                        >
-                            {children}
-                        </Box>
+                        {currentUser &&
+                        !SUPPORTED_CHAINS[currentUser.chainId] ? (
+                            <WrongChainSection />
+                        ) : (
+                            <Box
+                                width={kind === 'narrow' ? 'xlarge' : undefined}
+                                height={{ min: '90vh' }}
+                            >
+                                {children}
+                            </Box>
+                        )}
                         <BaseFooter />
                     </Box>
                 </Page>
