@@ -50,7 +50,10 @@ const TemplatePublishStep = ({
                 </Box>
                 <TwoButtonWrapContainer
                     primaryButton={
-                        <Link href={`/templates/${templateStreamID}`} passHref>
+                        <Link
+                            href={`${window.location.origin}/templates/${templateStreamID}`}
+                            passHref
+                        >
                             <Button
                                 primary
                                 label="View template"
@@ -60,7 +63,7 @@ const TemplatePublishStep = ({
                     }
                     secondaryButton={
                         <Link
-                            href={`/dashboard/templates/edit/${templateStreamID}`}
+                            href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
                             passHref
                         >
                             <Button

@@ -49,8 +49,13 @@ const ProposalPublishStep = ({
     }
     return (
         <>
-            <Box height={{ min: '60vh' }} justify="between">
-                <HeaderTextSection title="Proposal ready to submit" />
+            <Box height={{ min: '50vh' }} justify="between">
+                <Box pad="xsmall">
+                    <HeaderTextSection
+                        title="Proposal ready to submit"
+                        paragraph="You can submit your Proposal to the Seller or keep it as a draft and send it as soon as it is good to go."
+                    />
+                </Box>
                 <TwoButtonWrapContainer
                     primaryButton={
                         <LoaderButton

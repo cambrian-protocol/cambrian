@@ -82,9 +82,9 @@ const CompositionsDashboardUI = () => {
     return (
         <>
             <PageLayout kind="narrow" contextTitle="Compositions">
-                <Box fill pad={{ top: 'large' }}>
+                <Box fill>
                     <Box height={{ min: 'auto' }}>
-                        <Box pad="medium">
+                        <Box pad="large">
                             <Heading level="2">Composition Management</Heading>
                             <Text color="dark-4">
                                 Create, Import or Work on your compositions here
@@ -94,7 +94,7 @@ const CompositionsDashboardUI = () => {
                             direction="row"
                             height={{ min: 'auto' }}
                             wrap
-                            pad="medium"
+                            pad={{ horizontal: 'large' }}
                         >
                             <DashboardUtilityButton
                                 label="New Composition"
@@ -108,7 +108,7 @@ const CompositionsDashboardUI = () => {
                                 onClick={toggleShowLoadCompositionModal}
                             />
                         </Box>
-                        <Box pad={'medium'} gap="small">
+                        <Box pad={'large'} gap="small">
                             <Box
                                 direction="row"
                                 align="center"
@@ -129,7 +129,12 @@ const CompositionsDashboardUI = () => {
                     </Box>
                     {ceramicStagehand && compositions ? (
                         Object.keys(compositions).length > 0 ? (
-                            <Box direction="row" wrap height={{ min: 'auto' }}>
+                            <Box
+                                direction="row"
+                                wrap
+                                height={{ min: 'auto' }}
+                                pad={{ horizontal: 'large' }}
+                            >
                                 {Object.keys(compositions).map((tag) => {
                                     const streamID = compositions[tag]
                                     return (

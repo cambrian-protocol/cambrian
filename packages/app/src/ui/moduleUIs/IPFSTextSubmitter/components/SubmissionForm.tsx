@@ -1,16 +1,15 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
+import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { TextArea } from 'grommet'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -33,52 +32,85 @@ const SubmissionForm = ({
 }: WriterUIProps) => {
     const [input, setInput] = useState<SubmissionModel>(initialSubmission)
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
+    const [submissionsTileDocument, setSubmissionsTileDocument] =
+        useState<TileDocument<SubmissionModel>>()
 
     useEffect(() => {
-        setInput(latestSubmission)
-    }, [latestSubmission])
+        init()
+    }, [])
+
+    const init = async () => {
+        const submissionDoc = (await TileDocument.deterministic(
+            currentUser.selfID.client.ceramic,
+            {
+                controllers: [currentUser.selfID.id],
+                family: 'cambrian-ipfs-text-submitter',
+                tags: [solverAddress],
+            },
+            { pin: true }
+        )) as TileDocument<SubmissionModel>
+        setInput(submissionDoc.content)
+        setSubmissionsTileDocument(submissionDoc)
+    }
 
     const onSubmit = async (): Promise<void> => {
         setIsSubmitting(true)
         try {
-            if (input.submission === '') {
-                throw new Error(
-                    'Please insert something into the text area before you submit.'
+            if (submissionsTileDocument) {
+                await onSave()
+                const transaction: ethers.ContractTransaction =
+                    await moduleContract.submit(
+                        solverAddress,
+                        submissionsTileDocument.commitId.toString(),
+                        currentCondition.executions - 1
+                    )
+                const rc = await transaction.wait()
+                if (
+                    !rc.events?.find((event) => event.event === 'SubmittedWork')
                 )
+                    throw new Error('Error while submitting work')
             }
-
-            if (!currentUser.address)
-                throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-
-            const submission: SubmissionModel = {
-                submission: input.submission,
-                conditionId: currentCondition.conditionId,
-                sender: { address: currentUser.address },
-                timestamp: new Date(),
-            }
-            const ipfs = new IPFSAPI()
-            const response = await ipfs.pin(submission)
-
-            if (!response) throw GENERAL_ERROR['IPFS_PIN_ERROR']
-
-            const transaction: ethers.ContractTransaction =
-                await moduleContract.submit(
-                    solverAddress,
-                    response.IpfsHash,
-                    currentCondition.executions - 1
-                )
-            const rc = await transaction.wait()
-            if (!rc.events?.find((event) => event.event === 'SubmittedWork'))
-                throw new Error('Error while submitting work')
         } catch (e) {
             setErrorMsg(await cpLogger.push(e))
         }
         setIsSubmitting(false)
     }
+
+    const onSave = async () => {
+        setIsSaving(true)
+        try {
+            if (submissionsTileDocument) {
+                await submissionsTileDocument.update(
+                    {
+                        submission: input.submission,
+                        conditionId: currentCondition.conditionId,
+                        sender: { address: currentUser.address },
+                        timestamp: new Date(),
+                    },
+                    {
+                        controllers: [currentUser.selfID.id],
+                        family: 'cambrian-ipfs-text-submitter',
+                        tags: [solverAddress],
+                    },
+                    { pin: true }
+                )
+            }
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
+        }
+        setIsSaving(false)
+    }
+
     return (
         <>
-            <Box fill gap="medium" height={{ min: 'large' }}>
+            <Box
+                fill
+                gap="small"
+                height={{ min: 'large' }}
+                pad={{ bottom: 'medium' }}
+            >
                 <TextArea
                     disabled={isSubmitting}
                     placeholder="Type your article here..."
@@ -93,12 +125,34 @@ const SubmissionForm = ({
                         })
                     }
                 />
-                <LoaderButton
-                    isLoading={isSubmitting}
-                    disabled={isSubmitting}
-                    primary
-                    label={'Submit work'}
-                    onClick={onSubmit}
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            disabled={
+                                latestSubmission.submission === input.submission
+                            }
+                            primary
+                            reverse
+                            icon={<PaperPlaneRight />}
+                            label={'Submit'}
+                            onClick={onSubmit}
+                        />
+                    }
+                    secondaryButton={
+                        <LoaderButton
+                            secondary
+                            disabled={
+                                isSubmitting ||
+                                input.submission ===
+                                    submissionsTileDocument?.content.submission
+                            }
+                            isLoading={isSaving}
+                            onClick={onSave}
+                            label="Save"
+                            icon={<FloppyDisk />}
+                        />
+                    }
                 />
             </Box>
             {errorMsg && (

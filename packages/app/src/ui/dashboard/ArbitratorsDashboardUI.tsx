@@ -1,67 +1,67 @@
-import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
+import { ArrowsClockwise, CircleDashed, Scales } from 'phosphor-react'
 import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
-import CreateTemplateModal from './modals/CreateTemplateModal'
+import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem'
+import { CAMBRIAN_LIB_NAME } from '@cambrian/app/classes/CeramicStagehand'
+import CreateArbitratorModal from './modals/CreateArbitratorModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
-import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
-interface TemplatesDashboardUIProps {
+interface ArbitratorsDashboardUIProps {
     currentUser: UserType
 }
 
-const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-    const [templates, setTemplates] = useState<StringHashmap>()
-    const [showCreateTemplateModal, setShowCreateTemplateModal] =
-        useState(false)
+const ArbitratorsDashboardUI = ({
+    currentUser,
+}: ArbitratorsDashboardUIProps) => {
+    const [arbitratorContracts, setArbitratorContracts] =
+        useState<{ [address: string]: number }>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
 
-    const toggleShowCreateTemplateModal = () =>
-        setShowCreateTemplateModal(!showCreateTemplateModal)
+    const [showCreateArbitrator, setShowCreateArbitrator] = useState(false)
+
+    const toggleShowCreateArbitrator = () => {
+        if (showCreateArbitrator) {
+            fetchArbitratorContracts()
+        }
+        setShowCreateArbitrator(!showCreateArbitrator)
+    }
 
     useEffect(() => {
-        fetchTemplates()
+        fetchArbitratorContracts()
     }, [])
 
-    const fetchTemplates = async () => {
+    const fetchArbitratorContracts = async () => {
         setIsFetching(true)
         try {
-            const templateStreams = (await ceramicStagehand.loadStages(
-                StageNames.template
-            )) as StringHashmap
-
-            setTemplates(templateStreams)
+            const arbitratorLib = (await TileDocument.deterministic(
+                currentUser.selfID.client.ceramic,
+                {
+                    controllers: [currentUser.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: ['arbitrators'],
+                },
+                { pin: true }
+            )) as TileDocument<{ [address: string]: number }>
+            if (arbitratorLib.content) {
+                setArbitratorContracts(arbitratorLib.content)
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsFetching(false)
     }
 
-    const onDeleteTemplate = async (templateID: string) => {
-        try {
-            await ceramicStagehand.deleteStage(templateID, StageNames.template)
-            const updatedCompositions = { ...templates }
-            delete updatedCompositions[templateID]
-            setTemplates(updatedCompositions)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-    }
-
     return (
         <>
-            <PageLayout contextTitle="Templates" kind="narrow">
+            <PageLayout contextTitle="Arbitrators" kind="narrow">
                 <Box fill pad={{ top: 'large' }}>
                     <Box
                         height={{ min: 'auto' }}
@@ -72,9 +72,10 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                         wrap
                     >
                         <Box>
-                            <Heading level="2">Templates Management</Heading>
+                            <Heading level="2">Arbitrators Management</Heading>
                             <Text color="dark-4">
-                                Create, edit or distribute your templates here
+                                Create and distribute your arbitrator contracts
+                                here
                             </Text>
                         </Box>
                         <Box
@@ -85,49 +86,46 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                             <Button
                                 secondary
                                 size="small"
-                                label="New Template"
-                                icon={<FilePlus />}
-                                onClick={toggleShowCreateTemplateModal}
+                                label="New Arbitrator Contract"
+                                icon={<Scales />}
+                                onClick={toggleShowCreateArbitrator}
                             />
                             <LoaderButton
                                 secondary
                                 isLoading={isFetching}
                                 icon={<ArrowsClockwise />}
-                                onClick={() => {
-                                    fetchTemplates()
-                                }}
+                                onClick={fetchArbitratorContracts}
                             />
                         </Box>
                     </Box>
                     <Box fill pad={'large'}>
                         <Tabs alignControls="start">
                             <Tab
-                                title={`Your Templates (${
-                                    templates
-                                        ? Object.keys(templates).length
+                                title={`Your Arbitrator Contracts (${
+                                    arbitratorContracts
+                                        ? Object.keys(arbitratorContracts)
+                                              .length
                                         : 0
                                 })`}
                             >
                                 <Box pad={{ top: 'medium' }}>
-                                    {templates &&
-                                    Object.keys(templates).length > 0 ? (
+                                    {arbitratorContracts &&
+                                    Object.keys(arbitratorContracts).length >
+                                        0 ? (
                                         <Box gap="small">
-                                            {Object.keys(templates).map(
-                                                (templateID) => (
-                                                    <TemplateListItem
-                                                        key={templateID}
-                                                        templateStreamID={
-                                                            templates[
-                                                                templateID
-                                                            ]
-                                                        }
-                                                        templateID={templateID}
-                                                        /*  onDelete={
-                                                                onDeleteTemplate
-                                                            } */
-                                                    />
-                                                )
-                                            )}
+                                            {Object.keys(
+                                                arbitratorContracts
+                                            ).map((arbitratorContract) => (
+                                                <ArbitratorListItem
+                                                    key={arbitratorContract}
+                                                    address={arbitratorContract}
+                                                    fee={
+                                                        arbitratorContracts[
+                                                            arbitratorContract
+                                                        ]
+                                                    }
+                                                />
+                                            ))}
                                         </Box>
                                     ) : (
                                         <Box
@@ -141,7 +139,8 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                                         >
                                             <CircleDashed size="32" />
                                             <Text size="small" color="dark-4">
-                                                You don't have any templates yet
+                                                You don't have any arbitrator
+                                                contracts yet
                                             </Text>
                                         </Box>
                                     )}
@@ -152,10 +151,10 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                     <Box pad="large" />
                 </Box>
             </PageLayout>
-            {showCreateTemplateModal && (
-                <CreateTemplateModal
-                    onClose={toggleShowCreateTemplateModal}
-                    ceramicStagehand={ceramicStagehand}
+            {showCreateArbitrator && (
+                <CreateArbitratorModal
+                    currentUser={currentUser}
+                    onClose={toggleShowCreateArbitrator}
                 />
             )}
             {errorMessage && (
@@ -168,4 +167,4 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
     )
 }
 
-export default TemplatesDashboardUI
+export default ArbitratorsDashboardUI

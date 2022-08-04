@@ -4,6 +4,7 @@ import React, { SetStateAction, useEffect, useState } from 'react'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface ProposalDescriptionFormProps {
     proposalInput: CeramicProposalModel
@@ -16,12 +17,6 @@ interface ProposalDescriptionFormProps {
     cancelLabel?: string
 }
 
-type ProposalDescriptionFormType = {
-    title: string
-    description: string
-}
-
-// TODO Validation
 const ProposalDescriptionForm = ({
     proposalInput,
     setProposalInput,
@@ -42,62 +37,65 @@ const ProposalDescriptionForm = ({
         setIsSubmitting(false)
     }
     return (
-        <>
-            {proposalInput && (
-                <Form<ProposalDescriptionFormType> onSubmit={handleSubmit}>
-                    <Box justify="between" height={{ min: '50vh' }}>
-                        <Box>
-                            <FormField
-                                label="Title"
-                                placeholder={'Type your proposal title here...'}
-                                value={proposalInput.title}
-                                onChange={(e) => {
-                                    setProposalInput({
-                                        ...proposalInput,
-                                        title: e.target.value,
-                                    })
-                                }}
-                            />
-                            <FormField label="Description">
-                                <TextArea
-                                    placeholder={
-                                        'Type your proposal desciption here...'
-                                    }
-                                    rows={15}
-                                    resize={false}
-                                    value={proposalInput.description}
-                                    onChange={(e) =>
-                                        setProposalInput({
-                                            ...proposalInput,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                />
-                            </FormField>
-                        </Box>
-                        <TwoButtonWrapContainer
-                            primaryButton={
-                                <LoaderButton
-                                    isLoading={isSubmitting}
-                                    size="small"
-                                    primary
-                                    label={submitLabel || 'Save'}
-                                    type="submit"
-                                />
+        <Form onSubmit={handleSubmit}>
+            <Box justify="between" height={{ min: '50vh' }}>
+                <Box height={{ min: 'auto' }} pad="xsmall">
+                    <FormField
+                        name="title"
+                        label="Title"
+                        placeholder={'Type your proposal title here...'}
+                        value={proposalInput.title}
+                        onChange={(e) => {
+                            setProposalInput({
+                                ...proposalInput,
+                                title: e.target.value,
+                            })
+                        }}
+                        validate={[() => isRequired(proposalInput.title)]}
+                    />
+                    <FormField
+                        name="description"
+                        label="Description"
+                        validate={[() => isRequired(proposalInput.description)]}
+                    >
+                        <TextArea
+                            name="description"
+                            placeholder={
+                                'Type your proposal desciption here...'
                             }
-                            secondaryButton={
-                                <Button
-                                    size="small"
-                                    secondary
-                                    label={cancelLabel || 'Reset all changes'}
-                                    onClick={onCancel}
-                                />
+                            rows={15}
+                            resize={false}
+                            value={proposalInput.description}
+                            onChange={(e) =>
+                                setProposalInput({
+                                    ...proposalInput,
+                                    description: e.target.value,
+                                })
                             }
                         />
-                    </Box>
-                </Form>
-            )}
-        </>
+                    </FormField>
+                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
+            </Box>
+        </Form>
     )
 }
 

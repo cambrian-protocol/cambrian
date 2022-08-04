@@ -38,7 +38,6 @@ const BaseListItemButton = ({
                 background={isActive ? 'active' : 'none'}
                 onClick={disabled ? undefined : onClick}
                 focusIndicator={false}
-                hoverIndicator
                 height={{ min: 'auto' }}
                 width={{ min: 'auto' }}
             >

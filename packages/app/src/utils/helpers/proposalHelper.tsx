@@ -1,36 +1,29 @@
 import {
     CeramicTemplateModel,
+    ReceivedProposalCommitType,
     ReceivedProposalsHashmapType,
 } from '@cambrian/app/models/TemplateModel'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 
-export const getProposalStatus = async (
+export const getProposalStatus = (
     proposalDoc: TileDocument<CeramicProposalModel>,
-    templateDoc: TileDocument<CeramicTemplateModel>,
-    currentUser: UserType,
-    ceramicStagehand: CeramicStagehand
-): Promise<ProposalStatus> => {
-    const proposalCommits =
-        templateDoc.content.receivedProposals[proposalDoc.id.toString()]
-    if (proposalCommits) {
+    receivedProposalCommits?: ReceivedProposalCommitType[],
+    onChainProposal?: ethers.Contract
+): ProposalStatus => {
+    if (receivedProposalCommits) {
         if (
-            proposalCommits[proposalCommits.length - 1].proposalCommitID ===
-            proposalDoc.commitId.toString()
+            receivedProposalCommits[receivedProposalCommits.length - 1]
+                .proposalCommitID === proposalDoc.commitId.toString()
         ) {
-            const proposalCommit = proposalCommits[proposalCommits.length - 1]
+            const proposalCommit =
+                receivedProposalCommits[receivedProposalCommits.length - 1]
             if (proposalCommit.approved) {
-                const onChainProposal = await getOnChainProposal(
-                    currentUser,
-                    proposalDoc,
-                    ceramicStagehand
-                )
                 if (onChainProposal) {
                     if (onChainProposal.isExecuted) {
                         return ProposalStatus.Executed
@@ -64,8 +57,6 @@ export const getProposalStatus = async (
 /**
  * Returns the latest registered proposalCommit from the templateStream
  *
- * @param templateDoc Template STREAM TileDocument
- * @returns The latest registered proposal submission from the templates receivedProposals
  */
 export const getLatestProposalSubmission = (
     proposalStreamID: string,
@@ -85,16 +76,13 @@ export const getLatestProposalSubmission = (
 
 export const getOnChainProposal = async (
     currentUser: UserType,
-    proposalStreamDoc: TileDocument<CeramicProposalModel>,
-    ceramicStagehand: CeramicStagehand
+    proposalCommitID: string,
+    templateCommitID: string
 ) => {
+    const proposalID = getOnChainProposalId(proposalCommitID, templateCommitID)
     const proposalsHub = new ProposalsHub(
         currentUser.signer,
         currentUser.chainId
-    )
-    const proposalID = await getOnChainProposalId(
-        proposalStreamDoc.commitId.toString(),
-        proposalStreamDoc.content.template.commitID
     )
     const res = await proposalsHub.getProposal(proposalID)
 
@@ -168,3 +156,11 @@ export const getOnChainProposalId = (
         )
     )
 }
+
+export const getApprovedProposalCommitID = (
+    template: CeramicTemplateModel,
+    proposalStreamID: string
+) =>
+    template.receivedProposals[proposalStreamID]?.find(
+        (commit) => commit.approved
+    )?.proposalCommitID

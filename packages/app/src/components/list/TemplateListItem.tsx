@@ -7,7 +7,7 @@ import Link from 'next/link'
 interface TemplateListItemProps {
     templateID: string
     templateStreamID: string
-    onDelete: (templateID: string) => Promise<void>
+    onDelete?: (templateID: string) => Promise<void>
 }
 
 const TemplateListItem = ({
@@ -62,17 +62,19 @@ const TemplateListItem = ({
                 >
                     <Button icon={<Eye />} />
                 </Link>
-                <Button
-                    icon={<Trash />}
-                    onClick={() => {
-                        if (
-                            window.confirm(
-                                'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
+                {onDelete && (
+                    <Button
+                        icon={<Trash />}
+                        onClick={() => {
+                            if (
+                                window.confirm(
+                                    'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
+                                )
                             )
-                        )
-                            onDelete(templateID)
-                    }}
-                />
+                                onDelete(templateID)
+                        }}
+                    />
+                )}
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {

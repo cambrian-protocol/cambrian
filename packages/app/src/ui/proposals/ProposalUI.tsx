@@ -14,14 +14,16 @@ import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeade
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
-const ProposalUI = () => {
-    const { currentUser } = useCurrentUser()
-    const { isLoaded, proposalStack, proposalStatus, proposalStreamDoc } =
-        useProposal()
+interface ProposalUIProps {
+    currentUser: UserType
+}
+
+const ProposalUI = ({ currentUser }: ProposalUIProps) => {
+    const { isLoaded, proposalStack, proposalStatus } = useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {
@@ -31,7 +33,7 @@ const ProposalUI = () => {
     const initCollateralToken = async () => {
         if (proposalStack && currentUser) {
             const ct = await fetchTokenInfo(
-                proposalStack.proposal.price.tokenAddress,
+                proposalStack.proposalDoc.content.price.tokenAddress,
                 currentUser.web3Provider
             )
             if (ct) setCollateralToken(ct)
@@ -39,9 +41,14 @@ const ProposalUI = () => {
     }
 
     const initMessenger =
-        (currentUser?.selfID.did.id === proposalStack?.template.author ||
-            currentUser?.selfID.did.id === proposalStack?.proposal.author) &&
-        proposalStatus !== ProposalStatus.Draft
+        (currentUser.selfID.did.id ===
+            proposalStack?.templateDoc.content.author ||
+            currentUser.selfID.did.id ===
+                proposalStack?.proposalDoc.content.author) &&
+        proposalStatus !== ProposalStatus.Draft &&
+        proposalStatus !== ProposalStatus.Funding &&
+        proposalStatus !== ProposalStatus.Executed &&
+        proposalStatus !== ProposalStatus.Unknown
 
     return (
         <>
@@ -51,7 +58,8 @@ const ProposalUI = () => {
                 <Stack anchor="bottom-right">
                     <PageLayout
                         contextTitle={
-                            proposalStack?.proposal.title || 'Loading...'
+                            proposalStack?.proposalDoc.content.title ||
+                            'Proposal'
                         }
                         kind="narrow"
                     >
@@ -68,24 +76,31 @@ const ProposalUI = () => {
                                 >
                                     <ProposalContentInfo
                                         hideTitle
-                                        proposal={proposalStack.proposal}
+                                        proposal={
+                                            proposalStack.proposalDoc.content
+                                        }
                                     />
                                     <PlainSectionDivider />
                                     <PriceInfo
                                         amount={
-                                            proposalStack.proposal.price.amount
+                                            proposalStack.proposalDoc.content
+                                                .price.amount
                                         }
                                         label="Proposed Price"
                                         token={collateralToken}
                                     />
                                     <FlexInputInfo
                                         flexInputs={
-                                            proposalStack.proposal.flexInputs
+                                            proposalStack.proposalDoc.content
+                                                .flexInputs
                                         }
                                     />
                                     <PlainSectionDivider />
                                     <BasicProfileInfo
-                                        did={proposalStack.proposal.author}
+                                        did={
+                                            proposalStack.proposalDoc.content
+                                                .author
+                                        }
                                     />
                                     <ProposalControlbar />
                                 </Box>
@@ -94,27 +109,17 @@ const ProposalUI = () => {
                             <ProposalSkeleton />
                         )}
                     </PageLayout>
-                    {initMessenger &&
-                        currentUser &&
-                        proposalStack &&
-                        proposalStreamDoc && (
-                            <Messenger
-                                chatID={proposalStreamDoc.id.toString()}
-                                currentUser={currentUser}
-                                chatType={
-                                    proposalStatus === ProposalStatus.Funding ||
-                                    proposalStatus === ProposalStatus.Executed
-                                        ? 'Proposal'
-                                        : 'Draft'
-                                }
-                                participantDIDs={
-                                    currentUser?.selfID.did.id ===
-                                    proposalStack.proposal.author
-                                        ? [proposalStack.template.author]
-                                        : [proposalStack.proposal.author]
-                                }
-                            />
-                        )}
+                    {initMessenger && proposalStack && (
+                        <Messenger
+                            chatID={proposalStack.proposalDoc.id.toString()}
+                            currentUser={currentUser}
+                            chatType={'Draft'}
+                            participantDIDs={[
+                                proposalStack.templateDoc.content.author,
+                                proposalStack.proposalDoc.content.author,
+                            ]}
+                        />
+                    )}
                 </Stack>
             )}
         </>

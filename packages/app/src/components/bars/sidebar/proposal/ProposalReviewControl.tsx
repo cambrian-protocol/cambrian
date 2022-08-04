@@ -1,21 +1,27 @@
 import { CheckCircle, PencilLine } from 'phosphor-react'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 import { useState } from 'react'
 
-const ProposalReviewControl = () => {
-    const { currentUser } = useCurrentUser()
-    const { proposalStack, proposalStreamDoc, templateStreamDoc } =
-        useProposal()
+interface ProposalReviewControlProps {
+    currentUser: UserType
+}
+
+const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
+    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+    const { proposalStack, templateStreamDoc } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -23,20 +29,15 @@ const ProposalReviewControl = () => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (
-            currentUser &&
-            proposalStack &&
-            proposalStreamDoc &&
-            templateStreamDoc
-        ) {
+        if (proposalStack && templateStreamDoc) {
             try {
-                const cs = new CeramicStagehand(currentUser.selfID)
-                await cs.approveProposal(
+                const res = await ceramicStagehand.approveProposal(
                     currentUser,
-                    proposalStreamDoc,
                     templateStreamDoc,
                     proposalStack
                 )
+
+                if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
             } catch (e) {
                 setIsApproving(false)
                 setErrorMessage(await cpLogger.push(e))
@@ -46,13 +47,14 @@ const ProposalReviewControl = () => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (currentUser && proposalStreamDoc && templateStreamDoc) {
+        if (proposalStack && templateStreamDoc) {
             try {
-                const cs = new CeramicStagehand(currentUser.selfID)
-                await cs.requestProposalChange(
-                    proposalStreamDoc,
+                const res = await ceramicStagehand.requestProposalChange(
+                    proposalStack.proposalDoc,
                     templateStreamDoc
                 )
+
+                if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']
             } catch (e) {
                 setIsRequestingChange(false)
                 setErrorMessage(await cpLogger.push(e))

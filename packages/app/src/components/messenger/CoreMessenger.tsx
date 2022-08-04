@@ -1,9 +1,9 @@
 import { Box, Button, Form, TextInput } from 'grommet'
+import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from 'packages/app/config'
 import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
-import { CeramicProposalModel } from '../../models/ProposalModel'
-import { CeramicTemplateModel } from '../../models/TemplateModel'
+import CeramicClient from '@ceramicnetwork/http-client'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -28,7 +28,7 @@ import io from 'socket.io-client'
  *  On-Chain Proposal => <proposalId>
  */
 
-const socket = io('ws://trilobot.cambrianprotocol.com:4242') // TODO Replace with env var
+const socket = io(TRILOBOT_ENDPOINT) // TODO Replace with env var
 
 export type ChatType = 'Draft' | 'Proposal' | 'Solver' | 'Other'
 
@@ -42,7 +42,7 @@ export default function CoreMessenger({
     currentUser: UserType
     chatID: string
     chatType: ChatType
-    participants?: string[] // For 'Other'
+    participants: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
     // useRef for publishing messages in outbox, otherwise setInterval has stale state
@@ -198,7 +198,7 @@ export default function CoreMessenger({
             }>[] = (
                 (
                     await Promise.allSettled(
-                        participants!.map((DID) =>
+                        participants.map((DID) =>
                             TileDocument.deterministic(
                                 currentUser.selfID.client.ceramic,
                                 {
@@ -232,43 +232,27 @@ export default function CoreMessenger({
 
     /**
      * @notice Loads an array of message streams from TileDocument<CeramicProposalModel>
-     * @dev chatID == proposalID of draft
+     * @dev chatID == proposalStreamID of draft
      * @dev Gets DIDs from proposal.authors
      */
     const loadChatDraftProposal = async () => {
         try {
-            const proposalDoc: TileDocument<CeramicProposalModel> =
-                await TileDocument.load(
-                    currentUser.selfID.client.ceramic,
-                    chatID
-                )
-
-            const templateDoc: TileDocument<CeramicTemplateModel> =
-                await TileDocument.load(
-                    currentUser.selfID.client.ceramic,
-                    proposalDoc.content.template.streamID
-                )
-
-            const authors = [
-                templateDoc.content.author,
-                proposalDoc.content.author,
-            ]
-
             // Load, then filter out streams that failed to load & streams with no messages
             const messagesDocs: TileDocument<{
                 messages: ChatMessageType[]
             }>[] = (
                 (
                     await Promise.allSettled(
-                        authors.map((DID) =>
-                            TileDocument.deterministic(
-                                currentUser.selfID.client.ceramic,
-                                {
-                                    controllers: [DID],
-                                    family: 'cambrian-chat',
-                                    tags: [chatID],
-                                }
-                            )
+                        participants.map(
+                            async (DID) =>
+                                await TileDocument.deterministic(
+                                    currentUser.selfID.client.ceramic,
+                                    {
+                                        controllers: [DID],
+                                        family: 'cambrian-chat',
+                                        tags: [chatID],
+                                    }
+                                )
                         )
                     )
                 )
@@ -276,7 +260,8 @@ export default function CoreMessenger({
                     .filter(Boolean) as TileDocument<{
                     messages: ChatMessageType[]
                 }>[]
-            ).filter((doc) => doc.content?.messages?.length > 1)
+            ).filter((doc) => doc.content?.messages?.length > 0)
+
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs.map(
                 (doc) => doc.content.messages

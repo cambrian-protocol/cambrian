@@ -16,6 +16,7 @@ export type ProposalListItemType = {
     status: ProposalStatus
     title: string
     isAuthor: boolean
+    templateTitle: string
 }
 
 const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
@@ -54,6 +55,9 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
             <Box direction="row" wrap="reverse" align="center">
                 <Box pad="xsmall">
                     <Text>{proposal.title}</Text>
+                    <Text size="xsmall" color="dark-4">
+                        {proposal.templateTitle}
+                    </Text>
                 </Box>
                 <Box pad="xsmall">
                     <ProposalStatusBadge status={proposal.status} />

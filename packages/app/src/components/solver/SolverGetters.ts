@@ -452,11 +452,13 @@ export const getMetadataFromProposal = async (
                 if (solverIndex !== undefined) {
                     return {
                         slotTags:
-                            proposalStack.composition.solvers[solverIndex]
-                                .slotTags,
+                            proposalStack.compositionDoc.content.solvers[
+                                solverIndex
+                            ].slotTags,
                         solverTag:
-                            proposalStack.composition.solvers[solverIndex]
-                                .solverTag,
+                            proposalStack.compositionDoc.content.solvers[
+                                solverIndex
+                            ].solverTag,
                         proposalStack: proposalStack,
                     }
                 }

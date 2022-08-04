@@ -123,6 +123,7 @@ const TemplatePricingForm = ({
                                         label="Amount"
                                         type="number"
                                         min={0}
+                                        step={0.000000001}
                                         name="amount"
                                         value={templateInput.price.amount}
                                         onChange={(e) =>
@@ -133,7 +134,7 @@ const TemplatePricingForm = ({
                                                     amount:
                                                         e.target.value === ''
                                                             ? 0
-                                                            : parseInt(
+                                                            : Number(
                                                                   e.target.value
                                                               ),
                                                 },

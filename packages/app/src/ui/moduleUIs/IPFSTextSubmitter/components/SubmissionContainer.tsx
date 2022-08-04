@@ -1,15 +1,15 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
+import CeramicClient from '@ceramicnetwork/http-client'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SubmissionForm from './SubmissionForm'
 import { SubmissionModel } from '../models/SubmissionModel'
 import SubmissionView from './SubmissionView'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { fetchSubmissions } from '../helpers/fetchLatestSubmission'
 import usePermission from '@cambrian/app/hooks/usePermission'
 
 interface ContentMarketingSolverContentProps {
@@ -34,37 +34,35 @@ const SubmissionContainer = ({
     const allowedToWrite = usePermission('Submitter')
     const [latestSubmission, setLatestSubmission] =
         useState<SubmissionModel>(initialSubmission)
-    const [submissions, setSubmissions] = useState<SubmissionModel[]>([])
-
     const submittedWorkFilter = moduleContract.filters.SubmittedWork(
         solverAddress,
         null,
         null,
         null
     )
-    useEffect(() => {
-        initSubmission()
-        moduleContract.on(submittedWorkFilter, initSubmission)
-        return () => {
-            moduleContract.removeListener(submittedWorkFilter, initSubmission)
-        }
-    }, [currentUser])
 
-    const initSubmission = async () => {
+    useEffect(() => {
         initLatestSubmission()
-            .then((submissions) => {
-                if (submissions !== undefined) {
-                    setSubmissions(submissions)
-                    if (submissions[submissions.length - 1])
-                        setLatestSubmission(submissions[submissions.length - 1])
-                }
-            })
-            .catch((e) => cpLogger.push(e))
-    }
+        moduleContract.on(submittedWorkFilter, initLatestSubmission)
+        return () => {
+            moduleContract.removeListener(
+                submittedWorkFilter,
+                initLatestSubmission
+            )
+        }
+    }, [])
 
     const initLatestSubmission = async () => {
+        // TODO Filter for Conditions
         const logs = await moduleContract.queryFilter(submittedWorkFilter)
-        return await fetchSubmissions(logs, currentCondition)
+        const commitIDs: any[] = logs.map((l) => l.args?.cid).filter(Boolean)
+        if (commitIDs.length > 0) {
+            const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            const latestCommit = await ceramicClient.loadStream(
+                commitIDs[commitIDs.length - 1]
+            )
+            setLatestSubmission(latestCommit.content)
+        }
     }
     return (
         <Box gap="medium">
@@ -80,7 +78,7 @@ const SubmissionContainer = ({
             ) : (
                 <SubmissionView latestSubmission={latestSubmission} />
             )}
-            <Box direction="row" border={{ side: 'top' }} wrap justify="end">
+            <Box border={{ side: 'top' }} align="end">
                 <Box pad="small">
                     <Text size="small" color="brand">
                         Latest submission:{' '}
@@ -89,11 +87,6 @@ const SubmissionContainer = ({
                                   latestSubmission.timestamp
                               ).toLocaleString()}`
                             : 'Nothing submitted yet'}
-                    </Text>
-                </Box>
-                <Box pad="small">
-                    <Text size="small" color="brand">
-                        Submissions: {submissions.length}
                     </Text>
                 </Box>
             </Box>

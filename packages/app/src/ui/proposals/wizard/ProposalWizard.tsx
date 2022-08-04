@@ -15,7 +15,7 @@ interface ProposalWizardProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    onSaveProposal: () => Promise<void>
+    onSaveProposal: () => Promise<boolean>
     proposalStack: ProposalStackType
     proposalStreamDoc: TileDocument<CeramicProposalModel>
 }
@@ -55,7 +55,9 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
-                        requirements={proposalStack.template.requirements}
+                        requirements={
+                            proposalStack.templateDoc.content.requirements
+                        }
                         stepperCallback={setCurrentStep}
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
@@ -69,7 +71,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        template={proposalStack.template}
+                        template={proposalStack.templateDoc.content}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
@@ -79,7 +81,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        composition={proposalStack.composition}
+                        composition={proposalStack.compositionDoc.content}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
@@ -95,33 +97,7 @@ const ProposalWizard = ({
 
     return (
         <>
-            <Box
-                height={{ min: '90vh' }}
-                justify="center"
-                width={'xlarge'}
-                pad={{ horizontal: 'large' }}
-            >
-                {/* TODO Wizard Nav <Box direction="row" align="center">
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Description</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Pricing</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Solver Configuration</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Requirements</Text>
-                    </Box>
-                    <CaretRight size="32" />
-                    <Box border={{ color: 'brand' }} round="xsmall" pad="small">
-                        <Text>Publish</Text>
-                    </Box>
-                </Box> */}
+            <Box height={{ min: '90vh' }} justify="center" width={'xlarge'}>
                 {renderCurrentFormStep()}
             </Box>
         </>

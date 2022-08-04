@@ -4,6 +4,7 @@ import { SetStateAction, useContext, useEffect, useState } from 'react'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
@@ -49,11 +50,12 @@ const EditTemplateUI = ({
     }
 
     return (
-        <Box gap="medium" pad="medium">
+        <Box gap="medium" pad="large">
             <TemplateHeader
                 title={cachedTemplateTitle}
                 link={`${window.location.origin}/templates/${templateStreamID}`}
             />
+            <PlainSectionDivider />
             <Tabs
                 justify="start"
                 activeIndex={activeIndex}

@@ -312,7 +312,8 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         />
                     }
                     contextTitle={
-                        metadata?.proposalStack?.proposal?.title || 'Solver'
+                        metadata?.proposalStack?.proposalDoc.content?.title ||
+                        'Solver'
                     }
                     actionBar={
                         <SolverActionbar

@@ -5,11 +5,11 @@ import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseForm
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import Link from 'next/link'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalExecutedControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalContract } = useProposal()
+    const { proposalContract } = useProposalContext()
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
 
     useEffect(() => {

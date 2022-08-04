@@ -5,11 +5,11 @@ import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import _ from 'lodash'
-import { cpLogger } from './../services/api/Logger.api'
+import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUser } from './useCurrentUser'
 import { useRouter } from 'next/router'
 
-const useTemplate = () => {
+const useEditTemplate = () => {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
     const { templateStreamID } = router.query
@@ -104,4 +104,4 @@ const useTemplate = () => {
     }
 }
 
-export default useTemplate
+export default useEditTemplate
