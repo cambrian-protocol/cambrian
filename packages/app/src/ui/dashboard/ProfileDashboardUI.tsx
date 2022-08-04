@@ -5,6 +5,7 @@ import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
@@ -58,7 +59,13 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     return (
         <PageLayout kind="narrow" contextTitle="Dashboard">
             <Box gap="large" pad="large">
-                <Box direction="row" align="center" gap="medium" wrap>
+                <Box
+                    direction="row"
+                    align="center"
+                    gap="medium"
+                    wrap
+                    pad="xsmall"
+                >
                     {currentUser.basicProfile?.avatar ? (
                         <BaseAvatar
                             size="large"
@@ -83,24 +90,68 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                         </Text>
                     </Box>
                 </Box>
-                <Box gap="large">
-                    <Box gap="small">
-                        <Box direction="row" gap="small">
-                            <Box gap="xsmall">
-                                <Heading level="3">Profile Management</Heading>
-                                <Text color="dark-4" size="small">
-                                    Update your Web3 profile. We don’t store
-                                    this data, it is saved to your decentralized
-                                    ID and tied to your wallet.
+                <Box gap="medium">
+                    <Box gap="small" pad="xsmall">
+                        <Box gap="xsmall">
+                            <Heading level="3">Profile Management</Heading>
+                            <Text color="dark-4" size="small">
+                                Update your Web3 profile. We don’t store this
+                                data, it is saved to your decentralized ID and
+                                tied to your wallet.
+                            </Text>
+                        </Box>
+                        <PlainSectionDivider />
+                    </Box>
+                    <Form<ProfileFormType>
+                        onChange={(nextValue: ProfileFormType) => {
+                            setInput(nextValue)
+                        }}
+                        value={input}
+                    >
+                        <Box pad="xsmall">
+                            <FormField label="Name" name="name" />
+                            <FormField label="Title" name="title" />
+                            <Box>
+                                <FormField label="Bio" name="description">
+                                    <TextArea
+                                        name="description"
+                                        rows={5}
+                                        resize={false}
+                                        maxLength={420}
+                                    />
+                                </FormField>
+                                <Text
+                                    color="dark-4"
+                                    size="small"
+                                    textAlign="end"
+                                >
+                                    {input.description.length}/420
                                 </Text>
                             </Box>
-                            <Box
-                                direction="row"
-                                gap="medium"
-                                justify="end"
-                                alignSelf="end"
-                                width={{ min: 'auto' }}
-                            >
+                            <FormField
+                                label="Avatar URL"
+                                name="avatar"
+                                placeholder="https://your.profile.picture"
+                            />
+                            <FormField label="Email Address" name="email" />
+                            <FormField label="Company" name="company" />
+                            <FormField label="Website" name="website" />
+                            <FormField label="Twitter" name="twitter" />
+                            <FormField
+                                label="Dicord Webhook"
+                                name="discordWebhook"
+                            />
+                        </Box>
+                        <TwoButtonWrapContainer
+                            primaryButton={
+                                <LoaderButton
+                                    onClick={onSave}
+                                    isLoading={isSaving}
+                                    primary
+                                    label="Save"
+                                />
+                            }
+                            secondaryButton={
                                 <Button
                                     size="small"
                                     secondary
@@ -112,49 +163,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                                         })
                                     }
                                 />
-                                <LoaderButton
-                                    onClick={onSave}
-                                    isLoading={isSaving}
-                                    primary
-                                    label="Save"
-                                />
-                            </Box>
-                        </Box>
-                        <PlainSectionDivider />
-                    </Box>
-                    <Form<ProfileFormType>
-                        onChange={(nextValue: ProfileFormType) => {
-                            setInput(nextValue)
-                        }}
-                        value={input}
-                    >
-                        <FormField label="Name" name="name" />
-                        <FormField label="Title" name="title" />
-                        <Box>
-                            <FormField label="Bio" name="description">
-                                <TextArea
-                                    name="description"
-                                    rows={5}
-                                    resize={false}
-                                    maxLength={420}
-                                />
-                            </FormField>
-                            <Text color="dark-4" size="small" textAlign="end">
-                                {input.description.length}/420
-                            </Text>
-                        </Box>
-                        <FormField
-                            label="Avatar URL"
-                            name="avatar"
-                            placeholder="https://your.profile.picture"
-                        />
-                        <FormField label="Email Address" name="email" />
-                        <FormField label="Company" name="company" />
-                        <FormField label="Website" name="website" />
-                        <FormField label="Twitter" name="twitter" />
-                        <FormField
-                            label="Dicord Webhook"
-                            name="discordWebhook"
+                            }
                         />
                     </Form>
                 </Box>
