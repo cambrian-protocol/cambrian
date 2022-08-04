@@ -23,3 +23,6 @@ export const WEBHOOK_API_ENDPOINT =
     'https://app.cambrianprotocol.com/api/addWebhook'
 export const ERROR_LOG_API_ENDPOINT =
     'https://us-central1-cambrian-app.cloudfunctions.net/errorLog'
+
+// Trilobot
+export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com'

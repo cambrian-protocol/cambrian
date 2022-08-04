@@ -1,11 +1,10 @@
 import { Box, Button, Form, TextInput } from 'grommet'
-import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from 'packages/app/config'
 import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
-import CeramicClient from '@ceramicnetwork/http-client'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
+import { TRILOBOT_ENDPOINT } from 'packages/app/config'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
