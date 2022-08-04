@@ -40,7 +40,7 @@ export type Stages = {
     [key in StageNames]: StageModel
 }
 
-const CAMBRIAN_LIB_NAME = 'cambrian-lib'
+export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
 export default class CeramicStagehand {
     selfID: SelfID
