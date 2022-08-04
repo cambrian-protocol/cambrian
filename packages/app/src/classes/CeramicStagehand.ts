@@ -367,7 +367,9 @@ export default class CeramicStagehand {
                     `${TRILOBOT_ENDPOINT}/approveProposal`,
                     {
                         method: 'POST',
-                        body: proposalStack.proposalDoc.id.toString(),
+                        body: JSON.stringify({
+                            id: proposalStack.proposalDoc.id.toString(),
+                        }),
                     }
                 )
                 if (res.status === 200) {
@@ -575,7 +577,7 @@ export default class CeramicStagehand {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',
-                body: proposalStreamDoc.id.toString(),
+                body: JSON.stringify({ id: proposalStreamDoc.id.toString() }),
             })
             if (res.status === 200) {
                 await proposalStreamDoc.update(
@@ -657,7 +659,7 @@ export default class CeramicStagehand {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
                 method: 'POST',
-                body: proposalStreamDoc.id.toString(),
+                body: JSON.stringify({ id: proposalStreamDoc.id.toString() }),
             })
 
             if (res.status === 200) {
