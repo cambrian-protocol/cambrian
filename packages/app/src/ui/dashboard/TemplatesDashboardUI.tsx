@@ -63,45 +63,40 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
         <>
             <PageLayout contextTitle="Templates" kind="narrow">
                 <Box fill pad={{ top: 'large' }}>
-                    <Box height={{ min: 'auto' }}>
+                    <Box
+                        height={{ min: 'auto' }}
+                        direction="row"
+                        justify="between"
+                        align="center"
+                        pad="large"
+                        wrap
+                    >
+                        <Box>
+                            <Heading level="2">Templates Management</Heading>
+                            <Text color="dark-4">
+                                Create, edit or distribute your templates here
+                            </Text>
+                        </Box>
                         <Box
-                            height={{ min: 'auto' }}
                             direction="row"
-                            justify="between"
-                            align="center"
-                            pad="large"
-                            wrap
+                            gap="small"
+                            pad={{ vertical: 'small' }}
                         >
-                            <Box>
-                                <Heading level="2">
-                                    Templates Management
-                                </Heading>
-                                <Text color="dark-4">
-                                    Create, edit or distribute your templates
-                                    here
-                                </Text>
-                            </Box>
-                            <Box
-                                direction="row"
-                                gap="small"
-                                pad={{ vertical: 'small' }}
-                            >
-                                <Button
-                                    secondary
-                                    size="small"
-                                    label="New Template"
-                                    icon={<FilePlus />}
-                                    onClick={toggleShowCreateTemplateModal}
-                                />
-                                <LoaderButton
-                                    secondary
-                                    isLoading={isFetching}
-                                    icon={<ArrowsClockwise />}
-                                    onClick={() => {
-                                        fetchTemplates()
-                                    }}
-                                />
-                            </Box>
+                            <Button
+                                secondary
+                                size="small"
+                                label="New Template"
+                                icon={<FilePlus />}
+                                onClick={toggleShowCreateTemplateModal}
+                            />
+                            <LoaderButton
+                                secondary
+                                isLoading={isFetching}
+                                icon={<ArrowsClockwise />}
+                                onClick={() => {
+                                    fetchTemplates()
+                                }}
+                            />
                         </Box>
                     </Box>
                     <Box fill pad={'large'}>
@@ -157,7 +152,7 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                     <Box pad="large" />
                 </Box>
             </PageLayout>
-            {showCreateTemplateModal && ceramicStagehand && (
+            {showCreateTemplateModal && (
                 <CreateTemplateModal
                     onClose={toggleShowCreateTemplateModal}
                     ceramicStagehand={ceramicStagehand}

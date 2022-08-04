@@ -14,12 +14,15 @@ import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeade
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
-const ProposalUI = () => {
-    const { currentUser } = useCurrentUser()
+interface ProposalUIProps {
+    currentUser: UserType
+}
+
+const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     const { isLoaded, proposalStack, proposalStatus } = useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
@@ -38,9 +41,9 @@ const ProposalUI = () => {
     }
 
     const initMessenger =
-        (currentUser?.selfID.did.id ===
+        (currentUser.selfID.did.id ===
             proposalStack?.templateDoc.content.author ||
-            currentUser?.selfID.did.id ===
+            currentUser.selfID.did.id ===
                 proposalStack?.proposalDoc.content.author) &&
         proposalStatus !== ProposalStatus.Draft &&
         proposalStatus !== ProposalStatus.Funding &&
@@ -56,7 +59,7 @@ const ProposalUI = () => {
                     <PageLayout
                         contextTitle={
                             proposalStack?.proposalDoc.content.title ||
-                            'Loading...'
+                            'Proposal'
                         }
                         kind="narrow"
                     >
@@ -106,7 +109,7 @@ const ProposalUI = () => {
                             <ProposalSkeleton />
                         )}
                     </PageLayout>
-                    {initMessenger && currentUser && proposalStack && (
+                    {initMessenger && proposalStack && (
                         <Messenger
                             chatID={proposalStack.proposalDoc.id.toString()}
                             currentUser={currentUser}

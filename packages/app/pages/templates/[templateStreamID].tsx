@@ -26,7 +26,7 @@ export default function ViewTemplatePage() {
                 <Custom404Page />
             ) : (
                 <PageLayout
-                    contextTitle={templateInput?.title || 'Loading...'}
+                    contextTitle={templateInput?.title || 'Template'}
                     kind="narrow"
                 >
                     <TemplateUI

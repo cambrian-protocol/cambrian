@@ -21,7 +21,7 @@ export default function ViewProposalPage() {
                     currentUser={currentUser}
                     proposalStreamID={proposalStreamID as string}
                 >
-                    <ProposalUI />
+                    <ProposalUI currentUser={currentUser} />
                 </ProposalContextProvider>
             ) : (
                 <></>
