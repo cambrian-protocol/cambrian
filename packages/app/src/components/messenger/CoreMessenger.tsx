@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
-import { TRILOBOT_ENDPOINT } from 'packages/app/config'
+import { TRILOBOT_WS_ENDPOINT } from 'packages/app/config'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
@@ -27,7 +27,7 @@ import io from 'socket.io-client'
  *  On-Chain Proposal => <proposalId>
  */
 
-const socket = io(TRILOBOT_ENDPOINT) // TODO Replace with env var
+const socket = io(TRILOBOT_WS_ENDPOINT) // TODO Replace with env var
 
 export type ChatType = 'Draft' | 'Proposal' | 'Solver' | 'Other'
 

@@ -26,3 +26,6 @@ export const ERROR_LOG_API_ENDPOINT =
 
 // Trilobot
 export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com'
+
+// Websocket
+export const TRILOBOT_WS_ENDPOINT = 'wss://trilobot.cambrianprotocol.com'
