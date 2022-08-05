@@ -41,7 +41,7 @@ const EditProposalUI = () => {
         proposalStatus === ProposalStatus.ChangeRequested ||
         proposalStatus === ProposalStatus.Modified
 
-    const handleSubmit = async () => {
+    const handleSave = async () => {
         await onSaveProposal()
     }
 
@@ -103,7 +103,7 @@ const EditProposalUI = () => {
                                         <ProposalDescriptionForm
                                             proposalInput={proposalInput}
                                             setProposalInput={setProposalInput}
-                                            onSubmit={handleSubmit}
+                                            onSubmit={handleSave}
                                             onCancel={onResetProposalInput}
                                         />
                                     </Box>
@@ -123,7 +123,7 @@ const EditProposalUI = () => {
                                             }
                                             proposalInput={proposalInput}
                                             setProposalInput={setProposalInput}
-                                            onSubmit={handleSubmit}
+                                            onSubmit={handleSave}
                                             onCancel={onResetProposalInput}
                                         />
                                     </Box>
@@ -147,7 +147,7 @@ const EditProposalUI = () => {
                                                 setProposalInput={
                                                     setProposalInput
                                                 }
-                                                onSubmit={handleSubmit}
+                                                onSubmit={handleSave}
                                                 onCancel={onResetProposalInput}
                                             />
                                         </Box>
@@ -156,6 +156,7 @@ const EditProposalUI = () => {
                             </Tabs>
                             <PlainSectionDivider />
                             <ProposalSubmitControl
+                                onSave={onSaveProposal}
                                 proposalStreamDoc={proposalStreamDoc}
                                 isValidProposal={isValidProposal}
                             />
