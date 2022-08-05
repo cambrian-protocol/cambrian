@@ -11,7 +11,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -26,7 +26,7 @@ const ProposalSubmitControl = ({
     isValidProposal,
     proposalStreamDoc,
 }: ProposalSubmitControlProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)

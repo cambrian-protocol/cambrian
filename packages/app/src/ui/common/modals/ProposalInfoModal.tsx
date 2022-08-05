@@ -12,7 +12,7 @@ import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import ProposalContentInfo from '../../proposals/ProposalContentInfo'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProposalInfoModalProps {
     onClose: () => void
@@ -23,7 +23,7 @@ const ProposalInfoModal = ({
     onClose,
     ceramicProposal,
 }: ProposalInfoModalProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {

@@ -8,7 +8,7 @@ import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProposalPricingFormProps {
     proposalInput: CeramicProposalModel
@@ -31,7 +31,7 @@ const ProposalPricingForm = ({
     onCancel,
     cancelLabel,
 }: ProposalPricingFormProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
 

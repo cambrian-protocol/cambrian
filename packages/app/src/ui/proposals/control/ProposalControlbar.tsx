@@ -8,11 +8,11 @@ import ProposalExecutedControl from '@cambrian/app/ui/proposals/control/Proposal
 import ProposalReviewControl from './ProposalReviewControl'
 import ProposalStartFundingControl from './ProposalStartFundingControl'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalControlbar = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const { proposalStack, proposalStatus, proposalContract } =
         useProposalContext()
 

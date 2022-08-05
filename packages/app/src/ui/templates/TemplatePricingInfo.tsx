@@ -7,14 +7,14 @@ import PriceInfo from '../../components/info/PriceInfo'
 import TokenAvatar from '../../components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplatePricingInfoProps {
     template: CeramicTemplateModel
 }
 
 const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {

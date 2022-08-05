@@ -9,7 +9,7 @@ import { Text } from 'grommet'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import _ from 'lodash'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TokenInputProps {
     denominationToken: TokenModel
@@ -26,7 +26,7 @@ const TokenInput = ({
     template,
     setProposalInput,
 }: TokenInputProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [options, setOptions] = useState<TokenModel[]>(
         template.price.preferredTokens
             ? template.price.preferredTokens.concat(denominationToken)

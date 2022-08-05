@@ -8,7 +8,7 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProfileDashboardUIProps {
     currentUser: UserType
@@ -39,7 +39,7 @@ const initalInput = {
 }
 
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
-    const { initSelfID } = useCurrentUser()
+    const { initSelfID } = useCurrentUserContext()
     const [input, setInput] = useState<ProfileFormType>(initalInput)
     const [isSaving, setIsSaving] = useState(false)
 

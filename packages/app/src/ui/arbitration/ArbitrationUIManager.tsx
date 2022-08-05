@@ -14,7 +14,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
-import usePermission from '@cambrian/app/hooks/usePermission'
+import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
 interface ArbitrationUIManagerProps {
     solverData: SolverModel
@@ -33,8 +33,8 @@ const ArbitrationUIManager = ({
     solverMethods,
     solverTimelock,
 }: ArbitrationUIManagerProps) => {
-    const isArbitrator = usePermission('Arbitrator')
-    const isRecipient = usePermission('Recipient')
+    const isArbitrator = usePermissionContext('Arbitrator')
+    const isRecipient = usePermissionContext('Recipient')
 
     const { arbitratorContract, disputeId } = useArbitratorContract({
         currentUser: currentUser,

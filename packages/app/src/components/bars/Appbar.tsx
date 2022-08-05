@@ -7,10 +7,10 @@ import { Header } from 'grommet'
 import Link from 'next/link'
 import UserMenu from '../menu/UserMenu'
 import { cpTheme } from '@cambrian/app/theme/theme'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 const Appbar = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {

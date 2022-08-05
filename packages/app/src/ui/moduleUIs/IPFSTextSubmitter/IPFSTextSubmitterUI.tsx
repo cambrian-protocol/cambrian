@@ -8,7 +8,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SubmissionContainer from './components/SubmissionContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface IPFSTextSubmitterUIProps {
     solverAddress: string
@@ -23,7 +23,7 @@ const IPFSTextSubmitterUI = ({
     currentCondition,
     currentUser,
 }: IPFSTextSubmitterUIProps) => {
-    const { addPermission } = useCurrentUser()
+    const { addPermission } = useCurrentUserContext()
     const [moduleContract, setModuleContract] = useState<ethers.Contract>()
 
     useEffect(() => {

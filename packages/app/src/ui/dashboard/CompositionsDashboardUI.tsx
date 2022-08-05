@@ -22,10 +22,10 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 const CompositionsDashboardUI = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [compositions, setCompositions] = useState<StringHashmap>()
     const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()

@@ -10,12 +10,12 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { deployProposal } from '@cambrian/app/utils/helpers/proposalHelper'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 import { useState } from 'react'
 
 const ProposalStartFundingControl = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const { proposalStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()

@@ -18,10 +18,11 @@ import React from 'react'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export default function UserMenu() {
-    const { currentUser, disconnectWallet, connectWallet } = useCurrentUser()
+    const { currentUser, disconnectWallet, connectWallet } =
+        useCurrentUserContext()
 
     const menuItems: {}[] = [
         {

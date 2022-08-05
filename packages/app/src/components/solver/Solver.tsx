@@ -36,7 +36,7 @@ import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -68,7 +68,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     const [proposedOutcome, setProposedOutcome] =
         useState<OutcomeCollectionModel>()
 
-    const { addPermission } = useCurrentUser()
+    const { addPermission } = useCurrentUserContext()
 
     const changedStatusFilter = {
         address: currentUser.address,
