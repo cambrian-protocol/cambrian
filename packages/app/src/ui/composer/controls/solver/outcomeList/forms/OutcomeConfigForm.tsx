@@ -2,7 +2,6 @@ import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
 import React, { SetStateAction, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
-import BasePopupModal from '@cambrian/app/components/modals/BasePopupModal'
 import { CloudArrowDown } from 'phosphor-react'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -25,11 +24,8 @@ const OutcomeConfigForm = ({
     submitLabel,
     isPinning,
 }: OutcomeConfigFormProps) => {
-    const [showLoadCIDModal, setShowLoadCIDModal] = useState(false)
     const [err, setErr] = useState<string>()
     const [isLoading, setIsLoading] = useState(false)
-
-    const toggleShowLoadCIDModal = () => setShowLoadCIDModal(!showLoadCIDModal)
 
     const onLoadCID = async () => {
         if (outcomeInput.uri.trim() !== '') {
@@ -52,94 +48,80 @@ const OutcomeConfigForm = ({
     }
 
     return (
-        <>
-            <BaseFormContainer>
-                <Form<OutcomeModel>
-                    value={outcomeInput}
-                    onSubmit={(event) => onSubmit(event)}
-                    onChange={(nextValue: OutcomeModel) => {
-                        if (
-                            nextValue.title !== outcomeInput.title ||
-                            nextValue.description !==
-                                outcomeInput.description ||
-                            nextValue.context !== outcomeInput.context
-                        ) {
-                            nextValue.uri = ''
-                        }
-                        if (nextValue.uri !== outcomeInput.uri) {
-                            setErr(undefined)
-                        }
+        <BaseFormContainer>
+            <Form<OutcomeModel>
+                value={outcomeInput}
+                onSubmit={(event) => onSubmit(event)}
+                onChange={(nextValue: OutcomeModel) => {
+                    if (
+                        nextValue.title !== outcomeInput.title ||
+                        nextValue.description !== outcomeInput.description ||
+                        nextValue.context !== outcomeInput.context
+                    ) {
+                        nextValue.uri = ''
+                    }
+                    if (nextValue.uri !== outcomeInput.uri) {
+                        setErr(undefined)
+                    }
 
-                        setOutcomeInput(nextValue)
-                    }}
-                >
-                    <Box gap="medium">
-                        <>
-                            <FormField name="title" label="Title" required />
-                            <FormField
-                                name="description"
-                                label="Description"
-                                required
-                            >
-                                <TextArea
-                                    name="description"
-                                    resize={false}
-                                    rows={5}
-                                />
-                            </FormField>
-                            <FormField name="context" label="Context">
-                                <TextArea
-                                    name="context"
-                                    resize={false}
-                                    rows={5}
-                                />
-                            </FormField>
-                        </>
-                        <Box
-                            border
-                            pad="small"
-                            elevation="small"
-                            round="xsmall"
-                            background="background-contrast"
+                    setOutcomeInput(nextValue)
+                }}
+            >
+                <Box gap="medium">
+                    <>
+                        <FormField name="title" label="Title" required />
+                        <FormField
+                            name="description"
+                            label="Description"
+                            required
                         >
-                            <Box direction="row" gap="small">
-                                <Box flex>
-                                    <FormField name="uri" label="IPFS CID" />
-                                </Box>
-                                <Box justify="center">
-                                    <LoaderButton
-                                        isLoading={isLoading}
-                                        secondary
-                                        icon={<CloudArrowDown />}
-                                        onClick={onLoadCID}
-                                    />
-                                </Box>
-                            </Box>
-                            {err && (
-                                <Text size="small" color="status-error">
-                                    {err}
-                                </Text>
-                            )}
-                        </Box>
-                        <Box>
-                            <LoaderButton
-                                isLoading={isPinning}
-                                primary
-                                type="submit"
-                                label={submitLabel}
+                            <TextArea
+                                name="description"
+                                resize={false}
+                                rows={5}
                             />
+                        </FormField>
+                        <FormField name="context" label="Context">
+                            <TextArea name="context" resize={false} rows={5} />
+                        </FormField>
+                    </>
+                    <Box
+                        border
+                        pad="small"
+                        elevation="small"
+                        round="xsmall"
+                        background="background-contrast"
+                    >
+                        <Box direction="row" gap="small">
+                            <Box flex>
+                                <FormField name="uri" label="IPFS CID" />
+                            </Box>
+                            <Box justify="center">
+                                <LoaderButton
+                                    isLoading={isLoading}
+                                    secondary
+                                    icon={<CloudArrowDown />}
+                                    onClick={onLoadCID}
+                                />
+                            </Box>
                         </Box>
+                        {err && (
+                            <Text size="small" color="status-error">
+                                {err}
+                            </Text>
+                        )}
                     </Box>
-                </Form>
-            </BaseFormContainer>
-            {showLoadCIDModal && (
-                <BasePopupModal
-                    title="Load from CID"
-                    description="Bla"
-                    onClose={toggleShowLoadCIDModal}
-                />
-            )}
-        </>
+                    <Box>
+                        <LoaderButton
+                            isLoading={isPinning}
+                            primary
+                            type="submit"
+                            label={submitLabel}
+                        />
+                    </Box>
+                </Box>
+            </Form>
+        </BaseFormContainer>
     )
 }
 

@@ -6,7 +6,7 @@ import { Coins } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import SidebarComponentContainer from '../../../containers/SidebarComponentContainer'
+import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 

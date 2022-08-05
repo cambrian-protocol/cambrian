@@ -3,16 +3,16 @@ import { Box, Button, Heading, ResponsiveContext, Stack, Text } from 'grommet'
 
 import BaseLayerModal from '../../modals/BaseLayerModal'
 import { CONDITION_STATUS_INFO } from '@cambrian/app/models/ConditionStatus'
-import { MetadataModel } from '@cambrian/app/models/MetadataModel'
 import SolverConfigInfo from '../../info/SolverConfigInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import StatusBadge from '../../badges/StatusBadge'
+import SolverStatusBadge from '../../badges/SolverStatusBadge'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
 interface SolverHeaderProps {
-    metadata?: MetadataModel
+    metadata?: SolverMetadataModel
     solverData: SolverModel
     currentCondition: SolverContractCondition
 }
@@ -109,7 +109,7 @@ const SolverHeader = ({
                                             </Box>
                                         </Box>
                                     </Box>
-                                    <StatusBadge
+                                    <SolverStatusBadge
                                         status={
                                             CONDITION_STATUS_INFO[
                                                 currentCondition.status
