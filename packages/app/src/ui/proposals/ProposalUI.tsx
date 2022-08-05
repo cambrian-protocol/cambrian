@@ -45,10 +45,7 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
             proposalStack?.templateDoc.content.author ||
             currentUser.selfID.did.id ===
                 proposalStack?.proposalDoc.content.author) &&
-        proposalStatus !== ProposalStatus.Draft &&
-        proposalStatus !== ProposalStatus.Funding &&
-        proposalStatus !== ProposalStatus.Executed &&
-        proposalStatus !== ProposalStatus.Unknown
+        proposalStatus !== ProposalStatus.Draft
 
     return (
         <>
@@ -113,7 +110,7 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                         <Messenger
                             chatID={proposalStack.proposalDoc.id.toString()}
                             currentUser={currentUser}
-                            chatType={'Draft'}
+                            chatType={'Proposal'}
                             participantDIDs={[
                                 proposalStack.templateDoc.content.author,
                                 proposalStack.proposalDoc.content.author,

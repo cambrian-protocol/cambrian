@@ -161,18 +161,17 @@ const EditProposalUI = () => {
                             />
                         </Box>
                     </PageLayout>
-                    {proposalStatus !== ProposalStatus.Draft &&
-                        currentUser &&
-                        proposalStreamDoc && (
-                            <Messenger
-                                currentUser={currentUser}
-                                chatID={proposalStreamDoc.id.toString()}
-                                participantDIDs={[
-                                    proposalStack.templateDoc.content.author,
-                                ]}
-                                chatType={'Draft'}
-                            />
-                        )}
+                    {proposalStatus !== ProposalStatus.Draft && currentUser && (
+                        <Messenger
+                            currentUser={currentUser}
+                            chatID={proposalStreamDoc.id.toString()}
+                            participantDIDs={[
+                                proposalStack.templateDoc.content.author,
+                                proposalStack.proposalDoc.content.author,
+                            ]}
+                            chatType={'Proposal'}
+                        />
+                    )}
                 </Stack>
             ) : (
                 <Custom404Page />
