@@ -78,7 +78,7 @@ export const ComposerUI = () => {
                     setLoadedComposition(composition)
                     // Add composition to User DID so it shows up in his dashboard from now on
                     const userCompositions =
-                        (await newCeramicStagehand.loadStages(
+                        (await newCeramicStagehand.loadStagesMap(
                             StageNames.composition
                         )) as StringHashmap
 

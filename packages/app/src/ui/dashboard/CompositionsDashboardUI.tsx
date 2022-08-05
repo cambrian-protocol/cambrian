@@ -53,7 +53,7 @@ const CompositionsDashboardUI = () => {
     const fetchCompositions = async (cs: CeramicStagehand) => {
         setIsFetching(true)
         try {
-            const compositionStreams = (await cs.loadStages(
+            const compositionStreams = (await cs.loadStagesMap(
                 StageNames.composition
             )) as StringHashmap
             setCompositions(compositionStreams)

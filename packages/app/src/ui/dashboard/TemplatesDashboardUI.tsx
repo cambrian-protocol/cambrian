@@ -37,7 +37,7 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
     const fetchTemplates = async () => {
         setIsFetching(true)
         try {
-            const templateStreams = (await ceramicStagehand.loadStages(
+            const templateStreams = (await ceramicStagehand.loadStagesMap(
                 StageNames.template
             )) as StringHashmap
 
