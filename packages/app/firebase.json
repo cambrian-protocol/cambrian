@@ -21,7 +21,27 @@
                 "function": "errorLog"
             },
             {
-                "destination": "/proposals/[proposalId].html",
+                "destination": "/composer/composition/[compositionStreamID].html",
+                "regex": "^/composer/composition/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/dashboard/proposals/edit/[proposalStreamID].html",
+                "regex": "^/dashboard/proposals/edit/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/dashboard/proposals/new/[proposalStreamID].html",
+                "regex": "^/dashboard/proposals/new/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/dashboard/templates/edit/[templateStreamID].html",
+                "regex": "^/dashboard/templates/edit/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/dashboard/templates/new/[templateStreamID].html",
+                "regex": "^/dashboard/templates/new/([^/]+?)(?:/)?$"
+            },
+            {
+                "destination": "/proposals/[proposalStreamID].html",
                 "regex": "^/proposals/([^/]+?)(?:/)?$"
             },
             {
@@ -29,11 +49,7 @@
                 "regex": "^/solvers/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/templates/create/[compositionCID].html",
-                "regex": "^/templates/create/([^/]+?)(?:/)?$"
-            },
-            {
-                "destination": "/templates/[templateCID].html",
+                "destination": "/templates/[templateStreamID].html",
                 "regex": "^/templates/([^/]+?)(?:/)?$"
             }
         ]
