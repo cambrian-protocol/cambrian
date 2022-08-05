@@ -3,11 +3,11 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
-import { GenericMethods } from '../../../solver/Solver'
-import LoaderButton from '../../../buttons/LoaderButton'
+import ErrorPopupModal from '../../components/modals/ErrorPopupModal'
+import { GenericMethods } from '../../components/solver/Solver'
+import LoaderButton from '../../components/buttons/LoaderButton'
 import { ProhibitInset } from 'phosphor-react'
-import SidebarComponentContainer from '../../../containers/SidebarComponentContainer'
+import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'

@@ -1,4 +1,9 @@
 import { Box, Button, Form, FormField, Heading, Text, TextArea } from 'grommet'
+import {
+    CambrianProfileType,
+    UserType,
+    initialCambrianProfile,
+} from '@cambrian/app/store/UserContext'
 import { useEffect, useState } from 'react'
 
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
@@ -6,51 +11,39 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProfileDashboardUIProps {
     currentUser: UserType
 }
 
-type ProfileFormType = {
-    name: string
-    title: string
-    description: string
-    email: string
-    avatar: string
-    company: string
-    website: string
-    twitter: string
-    discordWebhook: string
-}
-
-const initalInput = {
-    name: '',
-    title: '',
-    description: '',
-    email: '',
-    avatar: '',
-    company: '',
-    website: '',
-    twitter: '',
-    discordWebhook: '',
-}
-
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
-    const { initSelfID } = useCurrentUser()
-    const [input, setInput] = useState<ProfileFormType>(initalInput)
+    const cambrianProfile = currentUser.cambrianProfileDoc.content
+    const { initSelfID } = useCurrentUserContext()
+    const [input, setInput] = useState<CambrianProfileType>(
+        initialCambrianProfile
+    )
     const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
-        setInput({ ...initalInput, ...currentUser.basicProfile })
+        setInput({
+            ...initialCambrianProfile,
+            ...currentUser.cambrianProfileDoc.content,
+        })
     }, [currentUser])
 
     const onSave = async () => {
         setIsSaving(true)
         try {
-            await currentUser.selfID.merge('basicProfile', input)
+            await currentUser.cambrianProfileDoc.update(
+                input,
+                {
+                    controllers: [currentUser.selfID.did.id],
+                    family: 'cambrian-profile',
+                },
+                { pin: true }
+            )
             initSelfID(currentUser.selfID)
         } catch (e) {}
         setIsSaving(false)
@@ -66,10 +59,10 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                     wrap
                     pad="xsmall"
                 >
-                    {currentUser.basicProfile?.avatar ? (
+                    {cambrianProfile.avatar ? (
                         <BaseAvatar
                             size="large"
-                            pfpPath={currentUser.basicProfile.avatar as string}
+                            pfpPath={cambrianProfile.avatar}
                         />
                     ) : (
                         <BaseAvatar
@@ -78,13 +71,8 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                         />
                     )}
                     <Box gap="small" pad={{ top: 'medium' }}>
-                        <Heading>
-                            {currentUser.basicProfile?.name || 'Anonym'}
-                        </Heading>
-                        <Text>
-                            {(currentUser.basicProfile?.title as string) ||
-                                'Unknown'}
-                        </Text>
+                        <Heading>{cambrianProfile.name || 'Anonym'}</Heading>
+                        <Text>{cambrianProfile.title || 'Unknown'}</Text>
                         <Text color="dark-4">
                             {ellipseAddress(currentUser.address, 10)}
                         </Text>
@@ -102,8 +90,8 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                         </Box>
                         <PlainSectionDivider />
                     </Box>
-                    <Form<ProfileFormType>
-                        onChange={(nextValue: ProfileFormType) => {
+                    <Form<CambrianProfileType>
+                        onChange={(nextValue: CambrianProfileType) => {
                             setInput(nextValue)
                         }}
                         value={input}
@@ -158,8 +146,8 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                                     label="Reset"
                                     onClick={() =>
                                         setInput({
-                                            ...initalInput,
-                                            ...currentUser.basicProfile,
+                                            ...initialCambrianProfile,
+                                            ...cambrianProfile,
                                         })
                                     }
                                 />

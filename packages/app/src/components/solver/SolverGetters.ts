@@ -21,7 +21,6 @@ import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
-import { MetadataModel } from '../../models/MetadataModel'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
@@ -29,6 +28,7 @@ import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { SolverMetadataModel } from '../../models/SolverMetadataModel'
 import { TimeLocksHashMapType } from '@cambrian/app/models/TimeLocksHashMapType'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -358,7 +358,7 @@ export const getSolverData = async (
     solverMethods: GenericMethods,
     currentUser: UserType,
     storedOutcomes?: OutcomeModel[],
-    storedMetadata?: MetadataModel,
+    storedMetadata?: SolverMetadataModel,
     solverConfig?: SolverConfigModel
 ): Promise<SolverModel> => {
     const config = solverConfig
@@ -431,7 +431,7 @@ export const getSolverData = async (
 export const getMetadataFromProposal = async (
     currentUser: UserType,
     solverMethods: GenericMethods
-): Promise<MetadataModel | undefined> => {
+): Promise<SolverMetadataModel | undefined> => {
     const proposalId = await solverMethods.trackingId()
     if (currentUser.chainId && currentUser.signer) {
         const proposalsHub = new ProposalsHub(

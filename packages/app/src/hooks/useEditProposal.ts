@@ -9,11 +9,11 @@ import { ProposalStatus } from '../models/ProposalStatus'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import _ from 'lodash'
 import { cpLogger } from './../services/api/Logger.api'
-import { useCurrentUser } from './useCurrentUser'
+import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 const useEditProposal = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
     const [proposalInput, setProposalInput] = useState<CeramicProposalModel>()

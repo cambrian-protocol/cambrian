@@ -11,11 +11,11 @@ import { Text } from 'grommet'
 import USPListSection from '@cambrian/app/components/sections/USPListSection'
 import USPSection from '@cambrian/app/components/sections/USPSection'
 import { useRef } from 'react'
-import { useTheme } from '@cambrian/app/hooks/useTheme'
+import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
 
 export default function Home() {
     const startRef = useRef<HTMLDivElement | null>(null)
-    const { themeMode } = useTheme()
+    const { themeMode } = useThemeContext()
 
     function handleClickHeaderCTA() {
         if (startRef) startRef.current?.scrollIntoView({ behavior: 'smooth' })

@@ -46,7 +46,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     }, [])
 
     const fetchReceivedProposals = async () => {
-        const templateStreamIDs = (await ceramicStagehand.loadStages(
+        const templateStreamIDs = (await ceramicStagehand.loadStagesMap(
             StageNames.template
         )) as StringHashmap
 
@@ -82,7 +82,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
 
                             if (approvedProposalCommitID) {
                                 proposalDoc =
-                                    (await ceramicStagehand.loadStream(
+                                    (await ceramicStagehand.loadReadOnlyStream(
                                         approvedProposalCommitID
                                     )) as TileDocument<CeramicProposalModel>
 
@@ -93,7 +93,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                 )
                             } else {
                                 proposalDoc =
-                                    (await ceramicStagehand.loadStream(
+                                    (await ceramicStagehand.loadReadOnlyStream(
                                         proposalStreamID
                                     )) as TileDocument<CeramicProposalModel>
 
@@ -106,7 +106,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                         )
                                     if (latestProposalSubmission) {
                                         proposalDoc =
-                                            (await ceramicStagehand.loadStream(
+                                            (await ceramicStagehand.loadReadOnlyStream(
                                                 latestProposalSubmission.proposalCommitID
                                             )) as TileDocument<CeramicProposalModel>
                                     }
@@ -114,7 +114,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                             }
 
                             const templateCommit = (await (
-                                await ceramicStagehand.loadStream(
+                                await ceramicStagehand.loadReadOnlyStream(
                                     proposalDoc.content.template.commitID
                                 )
                             ).content) as CeramicTemplateModel
@@ -148,15 +148,16 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     const fetchMyProposals = async () => {
         setIsFetching(true)
         try {
-            const proposalStreamIDs = (await ceramicStagehand.loadStages(
+            const proposalStreamIDs = (await ceramicStagehand.loadStagesMap(
                 StageNames.proposal
             )) as StringHashmap
 
-            const proposalStreamMap = (await ceramicStagehand.multiQuery(
-                Object.values(proposalStreamIDs).map((s) => {
-                    return { streamId: s }
-                })
-            )) as { [streamId: string]: TileDocument<CeramicProposalModel> }
+            const proposalStreamMap =
+                (await ceramicStagehand.loadReadOnlyStreams(
+                    Object.values(proposalStreamIDs).map((s) => {
+                        return { streamId: s }
+                    })
+                )) as { [streamId: string]: TileDocument<CeramicProposalModel> }
 
             const proposalListItems: ProposalListItemType[] = await Promise.all(
                 Object.keys(proposalStreamMap).map(async (proposalStreamID) => {
@@ -164,7 +165,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                     let onChainProposal: ethers.Contract | undefined = undefined
 
                     const _templateStreamContent = (
-                        await ceramicStagehand.loadStream(
+                        await ceramicStagehand.loadReadOnlyStream(
                             proposalDoc.content.template.streamID
                         )
                     ).content as CeramicTemplateModel
@@ -176,9 +177,10 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         )
 
                     if (approvedProposalCommitID) {
-                        proposalDoc = (await ceramicStagehand.loadStream(
-                            approvedProposalCommitID
-                        )) as TileDocument<CeramicProposalModel>
+                        proposalDoc =
+                            (await ceramicStagehand.loadReadOnlyStream(
+                                approvedProposalCommitID
+                            )) as TileDocument<CeramicProposalModel>
 
                         onChainProposal = await getOnChainProposal(
                             currentUser,
@@ -188,7 +190,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                     }
 
                     const templateCommit = (await (
-                        await ceramicStagehand.loadStream(
+                        await ceramicStagehand.loadReadOnlyStream(
                             proposalDoc.content.template.commitID
                         )
                     ).content) as CeramicTemplateModel

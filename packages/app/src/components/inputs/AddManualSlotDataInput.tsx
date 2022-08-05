@@ -14,16 +14,18 @@ const AddManualSlotDataInput = ({
 }: AddManualSlotDataInputProps) => {
     return (
         <>
-            <Box direction="row" gap="medium" align="center">
+            <Box direction="row" gap="medium" align="start">
                 <Box flex>
                     <FormField {...rest} disabled={isAddingData} />
                 </Box>
-                <LoaderButton
-                    isLoading={isAddingData}
-                    primary
-                    label="Submit"
-                    type="submit"
-                />
+                <Box pad={{ top: '2.5em' }}>
+                    <LoaderButton
+                        isLoading={isAddingData}
+                        primary
+                        label="Submit"
+                        type="submit"
+                    />
+                </Box>
             </Box>
             <Text size="small" color="dark-6">
                 {description}

@@ -1,12 +1,16 @@
 import { Box, Text, Tip } from 'grommet'
 
-interface StatusBadgeProps {
+interface SolverStatusBadgeProps {
     status: string
     background: string
     tipContent?: string
 }
 
-const StatusBadge = ({ status, background, tipContent }: StatusBadgeProps) => {
+const SolverStatusBadge = ({
+    status,
+    background,
+    tipContent,
+}: SolverStatusBadgeProps) => {
     return (
         <Box justify="center" pad="xsmall">
             <Tip
@@ -32,4 +36,4 @@ const StatusBadge = ({ status, background, tipContent }: StatusBadgeProps) => {
     )
 }
 
-export default StatusBadge
+export default SolverStatusBadge

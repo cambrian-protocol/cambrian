@@ -13,7 +13,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -24,7 +24,7 @@ interface ProposalPublishStepProps {
 const ProposalPublishStep = ({
     proposalStreamDoc,
 }: ProposalPublishStepProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
 
     const router = useRouter()
     const [isSubmitting, setIsSubmitting] = useState(false)

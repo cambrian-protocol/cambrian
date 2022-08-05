@@ -56,32 +56,6 @@ export default class ProposalsHub {
         return tx
     }
 
-    createSolutionAndProposal = async (
-        collateralToken: TokenModel,
-        price: number,
-        solverConfigs: SolverConfigModel[],
-        solverConfigsURI: string,
-        proposalCID: string
-    ) => {
-        const weiPrice = ethers.utils.parseUnits(
-            price.toString(),
-            collateralToken.decimals
-        )
-
-        const tx: ethers.ContractTransaction =
-            await this.contract.createIPFSSolutionAndProposal(
-                ethers.utils.formatBytes32String(ulid()),
-                collateralToken.address,
-                SUPPORTED_CHAINS[this.chainId].contracts.ipfsSolutionsHub,
-                weiPrice,
-                solverConfigs,
-                solverConfigsURI,
-                proposalCID
-            )
-
-        return tx
-    }
-
     getProposal = async (proposalId: string) => {
         const res = await this.contract.getProposal(proposalId)
         return res

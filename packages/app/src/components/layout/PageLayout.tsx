@@ -11,7 +11,7 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
 import WrongChainSection from '../sections/WrongChainSection'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
@@ -22,7 +22,7 @@ export const siteTitle = 'Cambrian Protocol'
 
 const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
 
     return (
         <>

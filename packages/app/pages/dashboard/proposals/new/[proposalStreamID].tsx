@@ -4,10 +4,10 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import NewProposalUI from '@cambrian/app/ui/proposals/NewProposalUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import _ from 'lodash'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export default function NewProposalPage() {
-    const { currentUser, isUserLoaded } = useCurrentUser()
+    const { currentUser, isUserLoaded } = useCurrentUserContext()
 
     return (
         <>

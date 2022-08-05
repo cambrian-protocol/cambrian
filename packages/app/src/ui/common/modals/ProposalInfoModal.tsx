@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'
 import { Box } from 'grommet'
+import CambrianProfileInfo from '@cambrian/app/components/info/CambrianProfileInfo'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ClipboardText } from 'phosphor-react'
 import FlexInputInfo from '../FlexInputInfo'
@@ -12,7 +12,8 @@ import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import ProposalContentInfo from '../../proposals/ProposalContentInfo'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProposalInfoModalProps {
     onClose: () => void
@@ -23,8 +24,9 @@ const ProposalInfoModal = ({
     onClose,
     ceramicProposal,
 }: ProposalInfoModalProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
+    const [proposerProfile] = useCambrianProfile(ceramicProposal.author)
 
     useEffect(() => {
         initCollateralToken()
@@ -49,8 +51,8 @@ const ProposalInfoModal = ({
                     icon={<ClipboardText />}
                 />
                 <Box border gap="medium" pad="medium" round="xsmall">
-                    <BasicProfileInfo
-                        did={ceramicProposal.author}
+                    <CambrianProfileInfo
+                        cambrianProfile={proposerProfile}
                         size={'small'}
                         hideDetails
                     />
@@ -64,7 +66,7 @@ const ProposalInfoModal = ({
                     />
                     <FlexInputInfo flexInputs={ceramicProposal.flexInputs} />
                     <PlainSectionDivider />
-                    <BasicProfileInfo did={ceramicProposal.author} />
+                    <CambrianProfileInfo cambrianProfile={proposerProfile} />
                 </Box>
             </Box>
         </BaseLayerModal>

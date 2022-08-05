@@ -1,15 +1,13 @@
 import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import Stagehand from '@cambrian/app/classes/Stagehand'
 import { TreeStructure } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
@@ -30,7 +28,6 @@ const ImportCompositionModal = ({
     onClose,
     ceramicStagehand,
 }: ImportCompositionModalProps) => {
-    const stagehand = new Stagehand()
     const [input, setInput] = useState<ImportCompositionFormType>({
         compositionCID: '',
     })
@@ -42,17 +39,17 @@ const ImportCompositionModal = ({
         setIsLoading(true)
         event.preventDefault()
         try {
-            const compositionObject = (await stagehand.loadStage(
-                input.compositionCID,
-                StageNames.composition
+            const ipfs = new IPFSAPI()
+            const composition = (await ipfs.getFromCID(
+                input.compositionCID
             )) as CompositionModel
 
-            if (!compositionObject)
+            if (!composition)
                 throw new Error('No Composition found at provided CID')
 
             const tag = randimals()
             const { streamID } = await ceramicStagehand.createComposition(tag, {
-                ...compositionObject,
+                ...composition,
                 title: tag,
                 description: '',
             })

@@ -34,7 +34,7 @@ const CreateTemplateModal = ({
 
     const fetchCompositions = async () => {
         try {
-            const compositionStreams = (await ceramicStagehand.loadStages(
+            const compositionStreams = (await ceramicStagehand.loadStagesMap(
                 StageNames.composition
             )) as StringHashmap
             setCompositions(compositionStreams)

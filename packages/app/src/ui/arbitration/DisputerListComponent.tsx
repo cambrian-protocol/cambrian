@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import DisputerListItem from './DisputerListItem'
-import SidebarComponentContainer from '../../../containers/SidebarComponentContainer'
+import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { ethers } from 'ethers'

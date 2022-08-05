@@ -23,7 +23,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { getSolverRecipientSlots } from '@cambrian/app/components/solver/SolverHelpers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface SolverConfigInfoProps {
     solverData: SolverModel
@@ -34,7 +34,7 @@ const SolverConfigInfo = ({
     solverData,
     currentCondition,
 }: SolverConfigInfoProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [showRecipientModal, setShowRecipientModal] = useState(false)
     const [showOutcomeModal, setShowOutcomeModal] = useState(false)
     const [showKeeperInputModal, setShowKeeperInputModal] = useState(false)

@@ -1,6 +1,6 @@
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'
 import { Box } from 'grommet'
+import CambrianProfileInfo from '@cambrian/app/components/info/CambrianProfileInfo'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { File } from 'phosphor-react'
 import FlexInputInfo from '../FlexInputInfo'
@@ -8,6 +8,7 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateContentInfo from '../../templates/TemplateContentInfo'
 import TemplatePricingInfo from '@cambrian/app/ui/templates/TemplatePricingInfo'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface TemplateInfoModalProps {
     ceramicTemplate: CeramicTemplateModel
@@ -18,6 +19,8 @@ const TemplateInfoModal = ({
     ceramicTemplate,
     onClose,
 }: TemplateInfoModalProps) => {
+    const [templaterProfile] = useCambrianProfile(ceramicTemplate.author)
+
     return (
         <BaseLayerModal onClose={onClose}>
             <Box height={{ min: 'auto' }}>
@@ -27,8 +30,8 @@ const TemplateInfoModal = ({
                     icon={<File />}
                 />
                 <Box border gap="medium" pad="medium" round="xsmall">
-                    <BasicProfileInfo
-                        did={ceramicTemplate.author}
+                    <CambrianProfileInfo
+                        cambrianProfile={templaterProfile}
                         size={'small'}
                         hideDetails
                     />
@@ -38,7 +41,7 @@ const TemplateInfoModal = ({
                     <TemplatePricingInfo template={ceramicTemplate} />
                     <FlexInputInfo flexInputs={ceramicTemplate.flexInputs} />
                     <PlainSectionDivider />
-                    <BasicProfileInfo did={ceramicTemplate.author} />
+                    <CambrianProfileInfo cambrianProfile={templaterProfile} />
                 </Box>
             </Box>
         </BaseLayerModal>

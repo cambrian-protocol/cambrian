@@ -6,7 +6,7 @@ import { Grommet } from 'grommet'
 import { Provider } from '@self.id/framework'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
-import { useTheme } from '@cambrian/app/hooks/useTheme'
+import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
 
 // @ts-ignore
 declare global {
@@ -35,7 +35,7 @@ export default function App({ ...props }: AppProps) {
 }
 
 const Core = ({ Component, pageProps }: AppProps) => {
-    const { themeMode } = useTheme()
+    const { themeMode } = useThemeContext()
     return (
         <Grommet
             full

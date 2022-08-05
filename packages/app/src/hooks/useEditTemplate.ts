@@ -6,11 +6,11 @@ import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
-import { useCurrentUser } from './useCurrentUser'
+import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 const useEditTemplate = () => {
-    const { currentUser, isUserLoaded } = useCurrentUser()
+    const { currentUser, isUserLoaded } = useCurrentUserContext()
     const router = useRouter()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()

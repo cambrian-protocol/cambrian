@@ -3,19 +3,13 @@ import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
 } from '@cambrian/app/models/TemplateModel'
-import {
-    getSolutionBaseId,
-    getSolutionSafeBaseId,
-} from '../utils/helpers/proposalHelper'
 
 import CeramicClient from '@ceramicnetwork/http-client'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
-import IPFSSolutionsHub from '../hubs/IPFSSolutionsHub'
 import { ProposalStackType } from '../store/ProposalContext'
-import ProposalsHub from '../hubs/ProposalsHub'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
 import { SelfID } from '@self.id/framework'
 import { SolverModel } from '../models/SolverModel'
@@ -24,9 +18,8 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
+import { deploySolutionBase } from '../utils/helpers/proposalHelper'
 import initialComposer from '../store/composer/composer.init'
-import { mergeFlexIntoComposition } from '../utils/transformers/Composition'
-import { parseComposerSolvers } from '../utils/transformers/ComposerTransformer'
 
 export enum StageNames {
     composition = 'composition',
@@ -51,176 +44,7 @@ export default class CeramicStagehand {
         this.ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     }
 
-    // TODO
-    isStageSchema = (data: StageModel, stage: StageNames) => {
-        return true
-    }
-
-    // Warning: Just for dev purposes to clean DID from all stages
-    clearStages = async (stage: StageNames) => {
-        const stageLib = await TileDocument.deterministic(
-            this.selfID.client.ceramic,
-            {
-                controllers: [this.selfID.id],
-                family: CAMBRIAN_LIB_NAME,
-                tags: [stage],
-            },
-            { pin: true }
-        )
-
-        stageLib.update({})
-    }
-
-    updateStage = async (
-        streamID: string,
-        data: StageModel,
-        stage: StageNames
-    ) => {
-        if (!this.isStageSchema(data, stage)) {
-            throw GENERAL_ERROR['WRONG_SCHEMA']
-        }
-
-        try {
-            const currentData: TileDocument<StageModel> =
-                await TileDocument.load(this.selfID.client.ceramic, streamID)
-
-            const cleanedUserTitle = data.title.trim()
-
-            if (currentData.content.title !== cleanedUserTitle) {
-                // StageLib and Meta Tag must be updated
-                const stageLib = await TileDocument.deterministic(
-                    this.selfID.client.ceramic,
-                    {
-                        controllers: [this.selfID.id],
-                        family: CAMBRIAN_LIB_NAME,
-                        tags: [stage],
-                    },
-                    { pin: true }
-                )
-
-                const stages = stageLib.content as StringHashmap
-
-                const currentTag = Object.keys(stages).find(
-                    (tag) => stages[tag] === streamID
-                )
-                if (!currentTag) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
-                const updatedStageLib = {
-                    ...(stageLib.content as StringHashmap),
-                }
-                // Attach counter to tag in case it exists already
-                let uniqueTag = cleanedUserTitle
-                let counter = 1
-                while (updatedStageLib[uniqueTag]) {
-                    uniqueTag = cleanedUserTitle + ` (${counter++})`
-                }
-                updatedStageLib[uniqueTag] = streamID
-                delete updatedStageLib[currentTag]
-
-                await stageLib.update(updatedStageLib, undefined, { pin: true })
-                await currentData.update(
-                    { ...data, title: uniqueTag },
-                    { ...currentData.metadata, tags: [uniqueTag] },
-                    { pin: true }
-                )
-                return { uniqueTag: uniqueTag }
-            } else {
-                await currentData.update(
-                    { ...data, title: cleanedUserTitle },
-                    undefined,
-                    { pin: true }
-                )
-                return { uniqueTag: cleanedUserTitle }
-            }
-        } catch (e) {
-            throw e
-        }
-    }
-
-    createStage = async (tag: string, data: StageModel, stage: StageNames) => {
-        if (!this.isStageSchema(data, stage)) {
-            throw GENERAL_ERROR['WRONG_SCHEMA']
-        }
-
-        try {
-            const stageLib = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [stage],
-                },
-                { pin: true }
-            )
-
-            let uniqueTag = tag
-            if (
-                stageLib.content !== null &&
-                typeof stageLib.content === 'object'
-            ) {
-                const stages = {
-                    ...(stageLib.content as StringHashmap),
-                }
-                // Attach counter to tag in case it exists already
-                let counter = 1
-                while (stages[uniqueTag]) {
-                    uniqueTag = tag + ` (${counter++})`
-                }
-            }
-
-            // Overwrite title if tag wasn't unique
-            if (uniqueTag !== tag) {
-                data = { ...data, title: uniqueTag }
-            }
-
-            const currentDoc = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: `cambrian-${stage}`,
-                    tags: [uniqueTag],
-                },
-                { pin: true }
-            )
-            await currentDoc.update(data)
-            const streamID = currentDoc.id.toString()
-
-            if (
-                stageLib.content !== null &&
-                typeof stageLib.content === 'object'
-            ) {
-                await stageLib.update(
-                    {
-                        ...stageLib.content,
-                        [uniqueTag]: streamID,
-                    },
-                    {
-                        controllers: [this.selfID.id],
-                        family: CAMBRIAN_LIB_NAME,
-                        tags: [stage],
-                    },
-                    { pin: true }
-                )
-            } else {
-                await stageLib.update(
-                    {
-                        [uniqueTag]: streamID,
-                    },
-                    {
-                        controllers: [this.selfID.id],
-                        family: CAMBRIAN_LIB_NAME,
-                        tags: [stage],
-                    },
-                    { pin: true }
-                )
-            }
-
-            return { uniqueTag: uniqueTag, streamID: streamID }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
+    /* ========================== CREATE =============================== */
 
     createComposition = async (tag: string, composition?: CompositionModel) => {
         return await this.createStage(
@@ -317,7 +141,88 @@ export default class CeramicStagehand {
         return await this.createStage(tag, proposal, StageNames.proposal)
     }
 
-    saveSolverConfigs = async (
+    createStage = async (tag: string, data: StageModel, stage: StageNames) => {
+        try {
+            const stageLib = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: [stage],
+                },
+                { pin: true }
+            )
+
+            let uniqueTag = tag
+            if (
+                stageLib.content !== null &&
+                typeof stageLib.content === 'object'
+            ) {
+                const stages = {
+                    ...(stageLib.content as StringHashmap),
+                }
+                // Attach counter to tag in case it exists already
+                let counter = 1
+                while (stages[uniqueTag]) {
+                    uniqueTag = tag + ` (${counter++})`
+                }
+            }
+
+            // Overwrite title if tag wasn't unique
+            if (uniqueTag !== tag) {
+                data = { ...data, title: uniqueTag }
+            }
+
+            const currentDoc = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: `cambrian-${stage}`,
+                    tags: [uniqueTag],
+                },
+                { pin: true }
+            )
+            await currentDoc.update(data)
+            const streamID = currentDoc.id.toString()
+
+            if (
+                stageLib.content !== null &&
+                typeof stageLib.content === 'object'
+            ) {
+                await stageLib.update(
+                    {
+                        ...stageLib.content,
+                        [uniqueTag]: streamID,
+                    },
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
+            } else {
+                await stageLib.update(
+                    {
+                        [uniqueTag]: streamID,
+                    },
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
+            }
+
+            return { uniqueTag: uniqueTag, streamID: streamID }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    createSolverConfigs = async (
         parsedSolvers: SolverModel[],
         proposalCommitId: string
     ) => {
@@ -350,155 +255,7 @@ export default class CeramicStagehand {
         }
     }
 
-    approveProposal = async (
-        currentUser: UserType,
-        templateStreamDoc: TileDocument<CeramicTemplateModel>,
-        proposalStack: ProposalStackType
-    ) => {
-        try {
-            const success = await this.deploySolutionBase(
-                currentUser,
-                proposalStack
-            )
-
-            if (success) {
-                // Hit mailbox server
-                const res = await fetch(
-                    `${TRILOBOT_ENDPOINT}/approveProposal`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            id: proposalStack.proposalDoc.id.toString(),
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                )
-                if (res.status === 200) {
-                    await this.updateProposalEntry(
-                        proposalStack.proposalDoc,
-                        templateStreamDoc,
-                        {
-                            approved: true,
-                        }
-                    )
-                    return true
-                } else {
-                    cpLogger.push(res.status)
-                    return false
-                }
-            }
-        } catch (e) {
-            throw e
-        }
-    }
-
-    deploySolutionBase = async (
-        currentUser: UserType,
-        proposalStack: ProposalStackType
-    ) => {
-        try {
-            const parsedSolvers = await this.getParsedSolvers(
-                proposalStack,
-                currentUser
-            )
-
-            if (parsedSolvers) {
-                // Pin solverConfigs separately to have access without metaData from Solution
-                const solverConfigsDoc = await this.saveSolverConfigs(
-                    parsedSolvers,
-                    proposalStack.proposalDoc.commitId.toString()
-                )
-
-                if (!solverConfigsDoc)
-                    throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
-                const solutionsHub = new IPFSSolutionsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-
-                const solutionBaseId: string = getSolutionBaseId(
-                    proposalStack.proposalDoc.commitId.toString(),
-                    proposalStack.proposalDoc.content.template.commitID
-                )
-
-                const transaction = await solutionsHub.createBase(
-                    solutionBaseId,
-                    parsedSolvers[0].collateralToken.address,
-                    parsedSolvers.map((solver) => solver.config),
-                    solverConfigsDoc.commitId.toString()
-                )
-                let rc = await transaction.wait()
-                const event = rc.events?.find(
-                    (event) => event.event === 'CreateBase'
-                )
-                if (event) return true
-            }
-        } catch (e) {
-            throw e
-        }
-    }
-
-    deployProposal = async (
-        currentUser: UserType,
-        proposalStack: ProposalStackType
-    ) => {
-        // TODO Sanity check function that this is approved
-        const parsedSolvers = await this.getParsedSolvers(
-            proposalStack,
-            currentUser
-        )
-
-        if (parsedSolvers) {
-            // Pin solverConfigs separately to have access without metaData from Solution
-            // URI will differ from that on the Solution Base, but it should refer to identical data
-            const solverConfigsDoc = await this.saveSolverConfigs(
-                parsedSolvers,
-                proposalStack.proposalDoc.commitId.toString()
-            )
-
-            if (!solverConfigsDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-
-            const proposalsHub = new ProposalsHub(
-                currentUser.signer,
-                currentUser.chainId
-            )
-
-            const solutionSafeBaseId: string = getSolutionSafeBaseId(
-                proposalStack.proposalDoc.commitId.toString(),
-                proposalStack.proposalDoc.content.template.commitID
-            )
-
-            const transaction = await proposalsHub.createProposal(
-                parsedSolvers[0].collateralToken,
-                proposalStack.proposalDoc.content.price.amount,
-                solutionSafeBaseId,
-                parsedSolvers.map((solver) => solver.config),
-                proposalStack.proposalDoc.commitId.toString()
-            )
-            let rc = await transaction.wait()
-            const event = rc.events?.find(
-                (event) => event.event === 'CreateProposal'
-            )
-            console.log(event)
-            if (!event) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
-
-            // If for some reason some POS wants to DOS we can save the correct id nonce
-            // on ceramic to save time for subsequent loads
-        }
-    }
-
-    multiQuery = async (queries: { streamId: string }[]): Promise<any> => {
-        try {
-            const streamMap = await this.ceramicClient.multiQuery(queries)
-            return streamMap
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
-    }
+    /* ========================== READ =============================== */
 
     loadTileDocument = async (streamID: string) => {
         try {
@@ -513,7 +270,7 @@ export default class CeramicStagehand {
         }
     }
 
-    loadStream = async (streamOrCommitID: string) => {
+    loadReadOnlyStream = async (streamOrCommitID: string) => {
         try {
             return (await this.ceramicClient.loadStream(
                 streamOrCommitID
@@ -524,7 +281,19 @@ export default class CeramicStagehand {
         }
     }
 
-    loadStages = async (stage: StageNames) => {
+    loadReadOnlyStreams = async (
+        queries: { streamId: string }[]
+    ): Promise<any> => {
+        try {
+            const streamMap = await this.ceramicClient.multiQuery(queries)
+            return streamMap
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    loadStagesMap = async (stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
                 this.selfID.client.ceramic,
@@ -541,94 +310,6 @@ export default class CeramicStagehand {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
-    }
-
-    deleteStage = async (tag: string, stage: StageNames) => {
-        try {
-            const stageCollection = await TileDocument.deterministic(
-                this.selfID.client.ceramic,
-                {
-                    controllers: [this.selfID.id],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [stage],
-                },
-                { pin: true }
-            )
-            if (
-                stageCollection.content !== null &&
-                typeof stageCollection.content === 'object'
-            ) {
-                const updatedStageLib: StringHashmap = {
-                    ...stageCollection.content,
-                }
-
-                delete updatedStageLib[tag]
-                await stageCollection.update({
-                    ...updatedStageLib,
-                })
-            }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    submitProposal = async (
-        proposalStreamDoc: TileDocument<CeramicProposalModel>
-    ) => {
-        try {
-            // Hit mailbox server
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
-                method: 'POST',
-                body: JSON.stringify({ id: proposalStreamDoc.id.toString() }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            if (res.status === 200) {
-                await proposalStreamDoc.update(
-                    {
-                        ...(proposalStreamDoc.content as CeramicProposalModel),
-                        isSubmitted: true,
-                    },
-                    { ...proposalStreamDoc.metadata },
-                    { pin: true }
-                )
-                return true
-            } else {
-                cpLogger.push(res.status)
-                return false
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    getParsedSolvers = async (
-        proposalStack: ProposalStackType,
-        currentUser: UserType
-    ) => {
-        const _compositionWithFlexInputs = mergeFlexIntoComposition(
-            mergeFlexIntoComposition(
-                proposalStack.compositionDoc.content,
-                proposalStack.templateDoc.content.flexInputs
-            ),
-            proposalStack.proposalDoc.content.flexInputs
-        )
-
-        if (proposalStack.templateDoc.content.price.isCollateralFlex) {
-            _compositionWithFlexInputs.solvers.forEach((solver) => {
-                solver.config.collateralToken =
-                    proposalStack.proposalDoc.content.price.tokenAddress
-            })
-        }
-
-        const _parsedSolvers = await parseComposerSolvers(
-            _compositionWithFlexInputs.solvers,
-            currentUser.web3Provider
-        )
-
-        return _parsedSolvers
     }
 
     loadProposalStackFromID = async (proposalCommitOrStreamID: string) => {
@@ -657,28 +338,33 @@ export default class CeramicStagehand {
         }
     }
 
-    requestProposalChange = async (
-        proposalStreamDoc: TileDocument<CeramicProposalModel>,
-        templateStreamDoc: TileDocument<CeramicTemplateModel>
+    /* ========================== UPDATE =============================== */
+
+    /**
+     * Hits mailbox server and submits the proposal / sets the isSubmitted flag to true
+     *
+     * @auth Must be done by the proposer
+     */
+    submitProposal = async (
+        proposalStreamDoc: TileDocument<CeramicProposalModel>
     ) => {
         try {
             // Hit mailbox server
-            console.log('fe: ', proposalStreamDoc.id.toString())
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',
                 body: JSON.stringify({ id: proposalStreamDoc.id.toString() }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
             })
-
             if (res.status === 200) {
-                await this.updateProposalEntry(
-                    proposalStreamDoc,
-                    templateStreamDoc,
+                await proposalStreamDoc.update(
                     {
-                        requestChange: true,
-                    }
+                        ...(proposalStreamDoc.content as CeramicProposalModel),
+                        isSubmitted: true,
+                    },
+                    { ...proposalStreamDoc.metadata },
+                    { pin: true }
                 )
                 return true
             } else {
@@ -686,8 +372,7 @@ export default class CeramicStagehand {
                 return false
             }
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            console.log(e)
         }
     }
 
@@ -738,12 +423,105 @@ export default class CeramicStagehand {
     }
 
     /**
+     * Hits mailbox server and sets requestChange flag in the template.receivedProposals to true
+     *
+     * @param templateStreamDoc TemplateStream Tiledoc controlled by the Templater
+     * @param proposalStack ReadOnly ProposalStack
+     * @auth must be done by the Templater
+     */
+    requestProposalChange = async (
+        templateStreamDoc: TileDocument<CeramicTemplateModel>,
+        proposalStack: ProposalStackType
+    ) => {
+        try {
+            // Hit mailbox server
+            console.log('fe: ', proposalStack.proposalDoc.id.toString())
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStack.proposalDoc.id.toString(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (res.status === 200) {
+                await this.updateProposalEntry(
+                    proposalStack.proposalDoc,
+                    templateStreamDoc,
+                    {
+                        requestChange: true,
+                    }
+                )
+                return true
+            } else {
+                cpLogger.push(res.status)
+                return false
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    /**
+     * Deploys a SolutionBase from the ProposalCommitID and the TemplateCommitID, hits mailbox server and sets the approved flag in the template.receivedProposals to true
+     *
+     * @param currentUser
+     * @param templateStreamDoc TemplateStream Tiledoc controlled by the Templater
+     * @param proposalStack ReadOnly ProposalStack
+     * @auth must be done by the Templater
+     */
+    approveProposal = async (
+        currentUser: UserType,
+        templateStreamDoc: TileDocument<CeramicTemplateModel>,
+        proposalStack: ProposalStackType
+    ) => {
+        try {
+            const success = await deploySolutionBase(
+                currentUser,
+                proposalStack,
+                this
+            )
+
+            if (success) {
+                // Hit mailbox server
+                const res = await fetch(
+                    `${TRILOBOT_ENDPOINT}/approveProposal`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            id: proposalStack.proposalDoc.id.toString(),
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                )
+                if (res.status === 200) {
+                    await this.updateProposalEntry(
+                        proposalStack.proposalDoc,
+                        templateStreamDoc,
+                        {
+                            approved: true,
+                        }
+                    )
+                    return true
+                } else {
+                    cpLogger.push(res.status)
+                    return false
+                }
+            }
+        } catch (e) {
+            throw e
+        }
+    }
+
+    /**
      * Updates the templates receivedProposals[proposalStreamID] commit-entry.
      *
-     * @param proposalStreamID StreamID
-     * @param updatedProposalEntry
-     * @auth Must be done by the template author
-     *
+     * @auth Must be done by the templater
      */
     updateProposalEntry = async (
         proposalDoc: TileDocument<CeramicProposalModel>,
@@ -781,5 +559,114 @@ export default class CeramicStagehand {
             undefined,
             { pin: true }
         )
+    }
+
+    updateStage = async (
+        streamID: string,
+        data: StageModel,
+        stage: StageNames
+    ) => {
+        try {
+            const currentData: TileDocument<StageModel> =
+                await TileDocument.load(this.selfID.client.ceramic, streamID)
+
+            const cleanedUserTitle = data.title.trim()
+
+            if (currentData.content.title !== cleanedUserTitle) {
+                // StageLib and Meta Tag must be updated
+                const stageLib = await TileDocument.deterministic(
+                    this.selfID.client.ceramic,
+                    {
+                        controllers: [this.selfID.id],
+                        family: CAMBRIAN_LIB_NAME,
+                        tags: [stage],
+                    },
+                    { pin: true }
+                )
+
+                const stages = stageLib.content as StringHashmap
+
+                const currentTag = Object.keys(stages).find(
+                    (tag) => stages[tag] === streamID
+                )
+                if (!currentTag) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+
+                const updatedStageLib = {
+                    ...(stageLib.content as StringHashmap),
+                }
+                // Attach counter to tag in case it exists already
+                let uniqueTag = cleanedUserTitle
+                let counter = 1
+                while (updatedStageLib[uniqueTag]) {
+                    uniqueTag = cleanedUserTitle + ` (${counter++})`
+                }
+                updatedStageLib[uniqueTag] = streamID
+                delete updatedStageLib[currentTag]
+
+                await stageLib.update(updatedStageLib, undefined, { pin: true })
+                await currentData.update(
+                    { ...data, title: uniqueTag },
+                    { ...currentData.metadata, tags: [uniqueTag] },
+                    { pin: true }
+                )
+                return { uniqueTag: uniqueTag }
+            } else {
+                await currentData.update(
+                    { ...data, title: cleanedUserTitle },
+                    undefined,
+                    { pin: true }
+                )
+                return { uniqueTag: cleanedUserTitle }
+            }
+        } catch (e) {
+            throw e
+        }
+    }
+
+    /* ========================== DELETE =============================== */
+
+    deleteStage = async (tag: string, stage: StageNames) => {
+        try {
+            const stageCollection = await TileDocument.deterministic(
+                this.selfID.client.ceramic,
+                {
+                    controllers: [this.selfID.id],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: [stage],
+                },
+                { pin: true }
+            )
+            if (
+                stageCollection.content !== null &&
+                typeof stageCollection.content === 'object'
+            ) {
+                const updatedStageLib: StringHashmap = {
+                    ...stageCollection.content,
+                }
+
+                delete updatedStageLib[tag]
+                await stageCollection.update({
+                    ...updatedStageLib,
+                })
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    // Warning: Just for dev purposes to clean DID from all stages
+    clearStages = async (stage: StageNames) => {
+        const stageLib = await TileDocument.deterministic(
+            this.selfID.client.ceramic,
+            {
+                controllers: [this.selfID.id],
+                family: CAMBRIAN_LIB_NAME,
+                tags: [stage],
+            },
+            { pin: true }
+        )
+
+        stageLib.update({})
     }
 }

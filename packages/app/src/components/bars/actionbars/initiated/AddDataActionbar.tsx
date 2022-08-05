@@ -5,7 +5,7 @@ import { Button } from 'grommet'
 import { GenericMethods } from '../../../solver/Solver'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { Shield } from 'phosphor-react'
-import usePermission from '@cambrian/app/hooks/usePermission'
+import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 import { useState } from 'react'
 
 interface ExecuteSolverActionbarProps {
@@ -19,7 +19,7 @@ const AddDataActionbar = ({
 }: ExecuteSolverActionbarProps) => {
     // To keep track if the Keeper is currently in a transaction
     const [isAddingData, setIsAddingData] = useState(false)
-    const allowed = usePermission('Keeper')
+    const allowed = usePermissionContext('Keeper')
 
     const [showAddDataModal, setShowAddDataModal] = useState(false)
     const toggleShowAddDataModal = () => setShowAddDataModal(!showAddDataModal)

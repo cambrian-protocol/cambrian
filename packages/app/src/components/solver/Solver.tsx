@@ -17,7 +17,6 @@ import InitiatedSolverContent from '@cambrian/app/components/info/InitiatedSolve
 import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
-import { MetadataModel } from '../../models/MetadataModel'
 import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
@@ -28,6 +27,7 @@ import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
+import { SolverMetadataModel } from '../../models/SolverMetadataModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SolverSidebar from '../bars/sidebar/SolverSidebar'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
@@ -36,7 +36,7 @@ import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -61,14 +61,14 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
     // IPFS data
-    const [metadata, setMetadata] = useState<MetadataModel>()
+    const [metadata, setMetadata] = useState<SolverMetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const [proposedOutcome, setProposedOutcome] =
         useState<OutcomeCollectionModel>()
 
-    const { addPermission } = useCurrentUser()
+    const { addPermission } = useCurrentUserContext()
 
     const changedStatusFilter = {
         address: currentUser.address,

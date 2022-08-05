@@ -1,18 +1,18 @@
 import { Box, Button } from 'grommet'
 
-import FundProposalForm from './forms/FundProposalForm'
+import FundProposalForm from '../forms/FundProposalForm'
 import Link from 'next/link'
 import { PencilCircle } from 'phosphor-react'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import ProposalExecutedControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalExecutedControl'
-import ProposalReviewControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewControl'
-import ProposalStartFundingControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingControl'
+import ProposalExecutedControl from '@cambrian/app/ui/proposals/control/ProposalExecutedControl'
+import ProposalReviewControl from './ProposalReviewControl'
+import ProposalStartFundingControl from './ProposalStartFundingControl'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalControlbar = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const { proposalStack, proposalStatus, proposalContract } =
         useProposalContext()
 
