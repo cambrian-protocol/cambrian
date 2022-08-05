@@ -21,5 +21,4 @@ export type CeramicProposalModel = {
     price: { amount: number; tokenAddress: string }
     author: string // DID
     isSubmitted: boolean
-    proposalID?: string // Stores the onChain ProposalsHub proposalID if it was deployed by the proposal creator
 }
