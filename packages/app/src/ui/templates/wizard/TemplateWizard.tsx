@@ -18,7 +18,7 @@ interface TemplateWizardProps {
         SetStateAction<CeramicTemplateModel | undefined>
     >
     templateStreamID: string
-    onSaveTemplate: () => Promise<void>
+    onSaveTemplate: () => Promise<boolean>
     composition: CompositionModel
 }
 
@@ -105,7 +105,7 @@ const TemplateWizard = ({
 
     return (
         <>
-            <Box height={{ min: '90vh' }} justify="center">
+            <Box height={{ min: '90vh' }} justify="center" pad="large">
                 {/* TODO Wizard Nav  */}
                 {renderCurrentFormStep()}
             </Box>

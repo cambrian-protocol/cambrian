@@ -4,18 +4,27 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
+import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { PaperPlaneRight } from 'phosphor-react'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const ProposalSubmitControl = () => {
+interface ProposalSubmitControlProps {
+    proposalStreamDoc: TileDocument<CeramicProposalModel>
+    isValidProposal: boolean
+}
+
+const ProposalSubmitControl = ({
+    isValidProposal,
+    proposalStreamDoc,
+}: ProposalSubmitControlProps) => {
     const { currentUser } = useCurrentUser()
-    const { proposalStreamDoc } = useEditProposal()
     const router = useRouter()
 
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -24,26 +33,32 @@ const ProposalSubmitControl = () => {
     const onSubmitProposal = async () => {
         setIsSubmitting(true)
         try {
-            if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStreamDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStreamDoc)
-
-            router.push(
-                `${
-                    window.location.origin
-                }/proposals/${proposalStreamDoc?.id.toString()}`
-            )
+            if (currentUser && proposalStreamDoc) {
+                const ceramicStagehand = new CeramicStagehand(
+                    currentUser.selfID
+                )
+                if (await ceramicStagehand.submitProposal(proposalStreamDoc)) {
+                    router.push(
+                        `${
+                            window.location.origin
+                        }/proposals/${proposalStreamDoc.id.toString()}`
+                    )
+                } else {
+                    throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']
+                }
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsSubmitting(false)
         }
     }
     return (
-        <Box align="end" pad={{ horizontal: 'small' }}>
+        <Box>
             <LoaderButton
+                icon={<PaperPlaneRight />}
+                disabled={!isValidProposal}
                 isLoading={isSubmitting}
+                reverse
                 label="Submit Proposal"
                 primary
                 onClick={onSubmitProposal}

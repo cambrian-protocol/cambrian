@@ -6,6 +6,7 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
@@ -21,12 +22,6 @@ interface ProposalPricingFormProps {
     cancelLabel?: string
 }
 
-type ProposalPricingFormType = {
-    tokenAddress: string
-    price: number
-}
-
-// TODO Validation
 const ProposalPricingForm = ({
     proposalInput,
     template,
@@ -58,9 +53,7 @@ const ProposalPricingForm = ({
         }
     }
 
-    const handleSubmit = async (
-        event: FormExtendedEvent<ProposalPricingFormType, Element>
-    ) => {
+    const handleSubmit = async (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
         setIsSubmitting(true)
         await onSubmit()
@@ -68,97 +61,92 @@ const ProposalPricingForm = ({
     }
 
     return (
-        <Form<ProposalPricingFormType> onSubmit={handleSubmit}>
-            <Box justify="between" height={{ min: '50vh' }}>
-                {denominationToken && proposalInput && (
-                    <>
-                        <Box gap="medium">
-                            <Box
-                                pad="small"
-                                round="xsmall"
-                                background="background-contrast"
-                                border
-                                elevation="small"
-                            >
-                                {template.price.allowAnyPaymentToken ||
-                                (template.price.preferredTokens &&
-                                    template.price.preferredTokens.length >
-                                        0) ? (
-                                    <>
-                                        <Text>
-                                            The seller quotes an equivalent of{' '}
-                                            {template.price?.amount}{' '}
-                                            {denominationToken.symbol}
-                                        </Text>
-                                        <Text color="dark-4" size="small">
-                                            Please make sure you match the value
-                                            if you want to pay with a different
-                                            token.
-                                        </Text>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Text>
-                                            The seller quotes{' '}
-                                            {template.price?.amount}{' '}
-                                            {denominationToken.symbol}
-                                        </Text>
-                                        <Text color="dark-4" size="small">
-                                            Feel free to make a counter offer,
-                                            if you assume it might be accepted
-                                        </Text>
-                                    </>
-                                )}
-                            </Box>
-                            <Box direction="row" gap="small">
-                                <Box width={{ max: 'medium' }}>
-                                    <FormField
-                                        label="Amount"
-                                        type="number"
-                                        min={0}
-                                        value={proposalInput.price.amount}
-                                        onChange={(e) =>
-                                            setProposalInput({
-                                                ...proposalInput,
-                                                price: {
-                                                    ...proposalInput.price,
-                                                    amount: Number(
-                                                        e.target.value
-                                                    ),
-                                                },
-                                            })
-                                        }
-                                    />
-                                </Box>
+        <Form onSubmit={handleSubmit}>
+            <Box justify="between" height={{ min: '50vh' }} gap="medium">
+                <Box gap="medium">
+                    <Box gap="medium" pad="xsmall">
+                        <Box
+                            pad="small"
+                            round="xsmall"
+                            background="background-contrast"
+                            border
+                            elevation="small"
+                        >
+                            {template.price.allowAnyPaymentToken ||
+                            (template.price.preferredTokens &&
+                                template.price.preferredTokens.length > 0) ? (
+                                <>
+                                    <Text>
+                                        The seller quotes an equivalent of{' '}
+                                        {template.price?.amount}{' '}
+                                        {denominationToken?.symbol}
+                                    </Text>
+                                    <Text color="dark-4" size="small">
+                                        Please make sure you match the value if
+                                        you want to pay with a different token.
+                                    </Text>
+                                </>
+                            ) : (
+                                <>
+                                    <Text>
+                                        The seller quotes{' '}
+                                        {template.price?.amount}{' '}
+                                        {denominationToken?.symbol}
+                                    </Text>
+                                    <Text color="dark-4" size="small">
+                                        Feel free to make a counter offer, if
+                                        you assume it might be accepted
+                                    </Text>
+                                </>
+                            )}
+                        </Box>
+                        <Box direction="row" gap="small">
+                            <FormField
+                                label="Amount"
+                                type="number"
+                                step={0.000000001}
+                                min={0}
+                                value={proposalInput.price.amount}
+                                onChange={(e) =>
+                                    setProposalInput({
+                                        ...proposalInput,
+                                        price: {
+                                            ...proposalInput.price,
+                                            amount: Number(e.target.value),
+                                        },
+                                    })
+                                }
+                            />
+                            {denominationToken && (
                                 <TokenInput
                                     template={template}
                                     denominationToken={denominationToken}
                                     proposalInput={proposalInput}
                                     setProposalInput={setProposalInput}
                                 />
-                            </Box>
+                            )}
                         </Box>
-                        <Box
-                            direction="row"
-                            justify="between"
-                            pad={{ top: 'medium' }}
-                        >
-                            <Button
-                                size="small"
-                                secondary
-                                label={cancelLabel || 'Reset all changes'}
-                                onClick={onCancel}
-                            />
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                size="small"
-                                primary
-                                label={submitLabel || 'Save'}
-                                type="submit"
-                            />
-                        </Box>
-                    </>
-                )}
+                    </Box>
+                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
             </Box>
         </Form>
     )

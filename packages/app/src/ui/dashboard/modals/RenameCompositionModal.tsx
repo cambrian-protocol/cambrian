@@ -35,7 +35,7 @@ const RenameCompositionModal = ({
         setIsSaving(true)
         try {
             const composition = (await (
-                await ceramicStagehand.loadStream(compositionStreamID)
+                await ceramicStagehand.loadTileDocument(compositionStreamID)
             ).content) as CompositionModel
 
             const { uniqueTag } = await ceramicStagehand.updateStage(

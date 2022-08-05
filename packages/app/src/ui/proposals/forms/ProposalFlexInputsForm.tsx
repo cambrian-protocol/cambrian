@@ -1,10 +1,11 @@
 import { Box, Button, Form, FormField, Text } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
+import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
@@ -20,7 +21,6 @@ interface ProposalFlexInputsFormProps {
     cancelLabel?: string
 }
 
-// TODO Validation
 const ProposalFlexInputsForm = ({
     proposalInput,
     setProposalInput,
@@ -43,9 +43,9 @@ const ProposalFlexInputsForm = ({
     }
 
     return (
-        <Form<FlexInputFormType[]> onSubmit={handleSubmit}>
-            <Box height="50vh" justify="between">
-                <Box height={{ min: 'auto' }}>
+        <Form onSubmit={handleSubmit}>
+            <Box height={{ min: '50vh' }} justify="between">
+                <Box height={{ min: 'auto' }} pad="xsmall">
                     {proposalInput.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
@@ -54,6 +54,7 @@ const ProposalFlexInputsForm = ({
                         return (
                             <Box key={idx}>
                                 <FormField
+                                    name={`flexInputs[${idx}].value`}
                                     label={flexInput.label}
                                     type={type}
                                     value={flexInput.value}
@@ -66,6 +67,25 @@ const ProposalFlexInputsForm = ({
 
                                         setProposalInput(inputsClone)
                                     }}
+                                    validate={[
+                                        () =>
+                                            isRequired(
+                                                proposalInput.flexInputs[idx]
+                                                    .value
+                                            ),
+                                        () => {
+                                            if (
+                                                type === 'address' &&
+                                                !isAddress(
+                                                    proposalInput.flexInputs[
+                                                        idx
+                                                    ].value
+                                                )
+                                            ) {
+                                                return 'Invalid Address'
+                                            }
+                                        },
+                                    ]}
                                 />
                                 {flexInput.description !== '' && (
                                     <Text size="small" color="dark-4">
@@ -76,21 +96,25 @@ const ProposalFlexInputsForm = ({
                         )
                     })}
                 </Box>
-                <Box direction="row" justify="between" height={{ min: 'auto' }}>
-                    <Button
-                        size="small"
-                        secondary
-                        label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
-                    />
-                    <LoaderButton
-                        isLoading={isSubmitting}
-                        size="small"
-                        primary
-                        label={submitLabel || 'Save'}
-                        type="submit"
-                    />
-                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
             </Box>
         </Form>
     )

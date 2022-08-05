@@ -1,9 +1,9 @@
 import {
     BookOpen,
+    ClipboardText,
     File,
     IconContext,
     Question,
-    TreeStructure,
 } from 'phosphor-react'
 import { Box, Heading, Text } from 'grommet'
 import {
@@ -13,6 +13,7 @@ import {
 
 import { Button } from 'grommet'
 import Link from 'next/link'
+import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
 import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
@@ -24,13 +25,19 @@ import { useState } from 'react'
 interface ProposalHeaderProps {
     proposalStack?: ProposalStackType
     proposalStatus: ProposalStatus
+    showProposalDetails?: boolean
 }
 
 const ProposalHeader = ({
     proposalStack,
     proposalStatus,
+    showProposalDetails,
 }: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
+    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+
+    const toggleShowProposalInfoModal = () =>
+        setShowProposalInfoModal(!showProposalInfoModal)
 
     const toggleShowTemplateInfoModal = () =>
         setShowTemplateInfoModal(!showTemplateInfoModal)
@@ -41,6 +48,8 @@ const ProposalHeader = ({
                 {(screenSize) => {
                     return (
                         <Box
+                            fill="horizontal"
+                            height={{ min: 'auto' }}
                             pad={{
                                 top: 'medium',
                                 bottom: 'xsmall',
@@ -55,18 +64,41 @@ const ProposalHeader = ({
                                     />
                                 </Box>
                                 <Heading>
-                                    {proposalStack?.proposal.title ||
+                                    {proposalStack?.proposalDoc.content.title ||
                                         'Untitled Proposal'}
                                 </Heading>
                             </Box>
                             <Box
                                 direction="row"
                                 justify="end"
-                                wrap
+                                gap="small"
                                 border={{ side: 'bottom' }}
                                 pad={{ bottom: 'xsmall' }}
                             >
                                 <IconContext.Provider value={{ size: '18' }}>
+                                    {showProposalDetails && proposalStack && (
+                                        <Button
+                                            color="dark-4"
+                                            size="small"
+                                            onClick={
+                                                toggleShowProposalInfoModal
+                                            }
+                                            label={
+                                                screenSize !== 'small'
+                                                    ? 'Proposal Details'
+                                                    : undefined
+                                            }
+                                            icon={
+                                                <ClipboardText
+                                                    color={
+                                                        cpTheme.global.colors[
+                                                            'dark-4'
+                                                        ]
+                                                    }
+                                                />
+                                            }
+                                        />
+                                    )}
                                     {proposalStack && (
                                         <Button
                                             color="dark-4"
@@ -90,7 +122,7 @@ const ProposalHeader = ({
                                             }
                                         />
                                     )}
-                                    <Button
+                                    {/* <Button
                                         color="dark-4"
                                         size="small"
                                         disabled
@@ -108,7 +140,7 @@ const ProposalHeader = ({
                                                 }
                                             />
                                         }
-                                    />
+                                    /> */}
                                     <Link href={WIKI_NOTION_LINK} passHref>
                                         <a
                                             target="_blank"
@@ -169,8 +201,14 @@ const ProposalHeader = ({
             </ResponsiveContext.Consumer>
             {showTemplateInfoModal && proposalStack && (
                 <TemplateInfoModal
-                    ceramicTemplate={proposalStack.template}
+                    ceramicTemplate={proposalStack.templateDoc.content}
                     onClose={toggleShowTemplateInfoModal}
+                />
+            )}
+            {showProposalInfoModal && proposalStack && (
+                <ProposalInfoModal
+                    ceramicProposal={proposalStack.proposalDoc.content}
+                    onClose={toggleShowProposalInfoModal}
                 />
             )}
         </>

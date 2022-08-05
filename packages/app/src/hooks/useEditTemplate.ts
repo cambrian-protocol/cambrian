@@ -5,11 +5,11 @@ import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import _ from 'lodash'
-import { cpLogger } from './../services/api/Logger.api'
+import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUser } from './useCurrentUser'
 import { useRouter } from 'next/router'
 
-const useTemplate = () => {
+const useEditTemplate = () => {
     const { currentUser, isUserLoaded } = useCurrentUser()
     const router = useRouter()
     const { templateStreamID } = router.query
@@ -34,12 +34,14 @@ const useTemplate = () => {
                     const cs = new CeramicStagehand(currentUser.selfID)
                     setCeramicStagehand(cs)
                     const template = (await (
-                        await cs.loadStream(templateStreamID)
+                        await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
                     if (template) {
                         const comp = (await (
-                            await cs.loadStream(template.composition.commitID)
+                            await cs.loadTileDocument(
+                                template.composition.commitID
+                            )
                         ).content) as CompositionModel
 
                         if (comp) {
@@ -56,22 +58,30 @@ const useTemplate = () => {
         }
     }
 
-    const onSaveTemplate = async () => {
+    const onSaveTemplate = async (): Promise<boolean> => {
         if (templateInput && ceramicStagehand) {
             if (!_.isEqual(templateInput, cachedTemplate)) {
-                const { uniqueTag } = await ceramicStagehand.updateStage(
-                    templateStreamID as string,
-                    templateInput,
-                    StageNames.template
-                )
-                const templateWithUniqueTitle = {
-                    ...templateInput,
-                    title: uniqueTag,
+                try {
+                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                        templateStreamID as string,
+                        templateInput,
+                        StageNames.template
+                    )
+                    const templateWithUniqueTitle = {
+                        ...templateInput,
+                        title: uniqueTag,
+                    }
+                    setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
+                    setTemplateInput(templateWithUniqueTitle)
+                    return true
+                } catch (e) {
+                    setErrorMessage(await cpLogger.push(e))
                 }
-                setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
-                setTemplateInput(templateWithUniqueTitle)
+            } else {
+                return true
             }
         }
+        return false
     }
 
     const onResetTemplate = () => {
@@ -94,4 +104,4 @@ const useTemplate = () => {
     }
 }
 
-export default useTemplate
+export default useEditTemplate

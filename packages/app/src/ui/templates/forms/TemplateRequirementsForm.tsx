@@ -10,6 +10,7 @@ import { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 
 interface TemplateRequirementsFormProps {
     templateInput: CeramicTemplateModel
@@ -52,34 +53,40 @@ const TemplateRequirementsForm = ({
     return (
         <Form<TemplateRequirementsFormType> onSubmit={handleSubmit}>
             <Box height="50vh" justify="between">
-                <FormField label="Requirements" name="requirements">
-                    <TextArea
-                        value={templateInput.requirements}
-                        resize={false}
-                        rows={10}
-                        onChange={(e) =>
-                            setTemplateInput({
-                                ...templateInput,
-                                requirements: e.target.value,
-                            })
-                        }
-                    />
-                </FormField>
-                <Box direction="row" justify="between">
-                    <Button
-                        size="small"
-                        secondary
-                        label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
-                    />
-                    <LoaderButton
-                        isLoading={isSubmitting}
-                        size="small"
-                        primary
-                        label={submitLabel || 'Save'}
-                        type="submit"
-                    />
+                <Box pad="xsmall">
+                    <FormField label="Requirements" name="requirements">
+                        <TextArea
+                            value={templateInput.requirements}
+                            resize={false}
+                            rows={10}
+                            onChange={(e) =>
+                                setTemplateInput({
+                                    ...templateInput,
+                                    requirements: e.target.value,
+                                })
+                            }
+                        />
+                    </FormField>
                 </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
             </Box>
         </Form>
     )

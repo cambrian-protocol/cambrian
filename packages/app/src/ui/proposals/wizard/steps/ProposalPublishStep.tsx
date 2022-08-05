@@ -11,6 +11,7 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 import { useRouter } from 'next/router'
@@ -33,7 +34,6 @@ const ProposalPublishStep = ({
         setIsSubmitting(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStreamDoc) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
             await ceramicStagehand.submitProposal(proposalStreamDoc)
@@ -49,10 +49,23 @@ const ProposalPublishStep = ({
     }
     return (
         <>
-            <Box height={{ min: '60vh' }} justify="between">
-                <HeaderTextSection title="Proposal ready to submit" />
-                {proposalStreamDoc && (
-                    <Box direction="row" justify="between">
+            <Box height={{ min: '50vh' }} justify="between">
+                <Box pad="xsmall">
+                    <HeaderTextSection
+                        title="Proposal ready to submit"
+                        paragraph="You can submit your Proposal to the Seller or keep it as a draft and send it as soon as it is good to go."
+                    />
+                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            primary
+                            label={'Submit'}
+                            onClick={onSubmitProposal}
+                        />
+                    }
+                    secondaryButton={
                         <Link
                             href={`${
                                 window.location.origin
@@ -65,14 +78,8 @@ const ProposalPublishStep = ({
                                 label={'Edit Proposal'}
                             />
                         </Link>
-                        <LoaderButton
-                            isLoading={isSubmitting}
-                            primary
-                            label={'Submit'}
-                            onClick={onSubmitProposal}
-                        />
-                    </Box>
-                )}
+                    }
+                />
             </Box>
             {errorMessage && (
                 <ErrorPopupModal

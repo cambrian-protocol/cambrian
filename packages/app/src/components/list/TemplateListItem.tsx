@@ -1,14 +1,15 @@
-import { Anchor, Box, Button, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
 import { useEffect, useState } from 'react'
+
+import Link from 'next/link'
 
 interface TemplateListItemProps {
     templateID: string
     templateStreamID: string
-    onDelete: (templateID: string) => Promise<void>
+    onDelete?: (templateID: string) => Promise<void>
 }
 
-// TODO Styling
 const TemplateListItem = ({
     templateID,
     templateStreamID,
@@ -39,20 +40,41 @@ const TemplateListItem = ({
             justify="between"
             align="center"
             round="xsmall"
+            wrap
         >
             <Text>{templateID}</Text>
-            <Box direction="row">
-                <Anchor
+            <Box
+                direction="row"
+                justify="end"
+                flex
+                width={{ min: 'auto' }}
+                gap="small"
+            >
+                <Link
                     href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
+                    passHref
                 >
                     <Button icon={<Pen />} />
-                </Anchor>
-                <Anchor
+                </Link>
+                <Link
                     href={`${window.location.origin}/templates/${templateStreamID}`}
+                    passHref
                 >
                     <Button icon={<Eye />} />
-                </Anchor>
-                <Button icon={<Trash />} onClick={() => onDelete(templateID)} />
+                </Link>
+                {onDelete && (
+                    <Button
+                        icon={<Trash />}
+                        onClick={() => {
+                            if (
+                                window.confirm(
+                                    'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
+                                )
+                            )
+                                onDelete(templateID)
+                        }}
+                    />
+                )}
                 <Button
                     icon={isSavedToClipboard ? <Check /> : <Copy />}
                     onClick={() => {

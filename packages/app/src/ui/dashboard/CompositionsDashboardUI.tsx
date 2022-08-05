@@ -13,12 +13,12 @@ import { useEffect, useState } from 'react'
 
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
-import DashboardLayout from '@cambrian/app/components/layout/DashboardLayout'
 import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ImportCompositionModal from './modals/ImportCompositionModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -81,13 +81,21 @@ const CompositionsDashboardUI = () => {
 
     return (
         <>
-            <DashboardLayout contextTitle="Dashboard">
-                <Box fill pad={{ top: 'medium' }}>
+            <PageLayout kind="narrow" contextTitle="Compositions">
+                <Box fill>
                     <Box height={{ min: 'auto' }}>
-                        <Box pad="medium">
+                        <Box pad="large">
                             <Heading level="2">Composition Management</Heading>
+                            <Text color="dark-4">
+                                Create, Import or Work on your compositions here
+                            </Text>
                         </Box>
-                        <Box direction="row" height={{ min: 'auto' }} wrap>
+                        <Box
+                            direction="row"
+                            height={{ min: 'auto' }}
+                            wrap
+                            pad={{ horizontal: 'large' }}
+                        >
                             <DashboardUtilityButton
                                 label="New Composition"
                                 primaryIcon={<TreeStructure />}
@@ -100,14 +108,7 @@ const CompositionsDashboardUI = () => {
                                 onClick={toggleShowLoadCompositionModal}
                             />
                         </Box>
-                        <Box
-                            pad={{
-                                left: 'medium',
-                                right: 'large',
-                                vertical: 'medium',
-                            }}
-                            gap="medium"
-                        >
+                        <Box pad={'large'} gap="small">
                             <Box
                                 direction="row"
                                 align="center"
@@ -128,7 +129,12 @@ const CompositionsDashboardUI = () => {
                     </Box>
                     {ceramicStagehand && compositions ? (
                         Object.keys(compositions).length > 0 ? (
-                            <Box direction="row" wrap height={{ min: 'auto' }}>
+                            <Box
+                                direction="row"
+                                wrap
+                                height={{ min: 'auto' }}
+                                pad={{ horizontal: 'large' }}
+                            >
                                 {Object.keys(compositions).map((tag) => {
                                     const streamID = compositions[tag]
                                     return (
@@ -162,7 +168,7 @@ const CompositionsDashboardUI = () => {
                     )}
                     <Box pad="large" />
                 </Box>
-            </DashboardLayout>
+            </PageLayout>
             {showCreateCompositionModal && ceramicStagehand && (
                 <CreateCompositionModal
                     ceramicStagehand={ceramicStagehand}

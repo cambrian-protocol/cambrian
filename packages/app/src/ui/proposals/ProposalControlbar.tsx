@@ -1,50 +1,56 @@
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { Button } from 'grommet'
+import { Box, Button } from 'grommet'
+
 import FundProposalForm from './forms/FundProposalForm'
 import Link from 'next/link'
 import { PencilCircle } from 'phosphor-react'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import ProposalExecutedControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalExecutedControl'
 import ProposalReviewControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalReviewControl'
 import ProposalStartFundingControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalStartFundingControl'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalControlbar = () => {
     const { currentUser } = useCurrentUser()
-    const {
-        proposalStack,
-        proposalStatus,
-        proposalStreamDoc,
-        proposalContract,
-    } = useProposal()
+    const { proposalStack, proposalStatus, proposalContract } =
+        useProposalContext()
 
     const isProposalAuthor =
-        currentUser?.selfID.did.id === proposalStack?.proposal.author
+        currentUser?.selfID.did.id === proposalStack?.proposalDoc.content.author
     const isTemplateAuthor =
-        currentUser?.selfID.did.id === proposalStack?.template.author
+        currentUser?.selfID.did.id === proposalStack?.templateDoc.content.author
 
     const renderControls = () => {
         switch (proposalStatus) {
             case ProposalStatus.OnReview:
-                return <>{isTemplateAuthor && <ProposalReviewControl />}</>
+                return (
+                    <>
+                        {isTemplateAuthor && currentUser && (
+                            <ProposalReviewControl currentUser={currentUser} />
+                        )}
+                    </>
+                )
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && proposalStreamDoc && (
-                            <Link
-                                href={`${
-                                    window.location.origin
-                                }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
-                                passHref
-                            >
-                                <Button
-                                    icon={<PencilCircle />}
-                                    label="Edit Proposal"
-                                    primary
-                                    size="small"
-                                />
-                            </Link>
+                        {isProposalAuthor && proposalStack && (
+                            <Box gap="medium">
+                                <PlainSectionDivider />
+                                <Link
+                                    href={`${
+                                        window.location.origin
+                                    }/dashboard/proposals/edit/${proposalStack.proposalDoc.id.toString()}`}
+                                    passHref
+                                >
+                                    <Button
+                                        icon={<PencilCircle />}
+                                        label="Edit Proposal"
+                                        primary
+                                        size="small"
+                                    />
+                                </Link>
+                            </Box>
                         )}
                     </>
                 )
@@ -54,16 +60,10 @@ const ProposalControlbar = () => {
                 return (
                     <>
                         {currentUser && proposalContract && (
-                            <BaseFormGroupContainer
-                                border
-                                pad="medium"
-                                gap="medium"
-                            >
-                                <FundProposalForm
-                                    currentUser={currentUser}
-                                    proposal={proposalContract}
-                                />
-                            </BaseFormGroupContainer>
+                            <FundProposalForm
+                                currentUser={currentUser}
+                                proposal={proposalContract}
+                            />
                         )}
                     </>
                 )

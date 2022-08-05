@@ -3,18 +3,20 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
+import { Box } from 'grommet'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { Coins } from 'phosphor-react'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 import { useState } from 'react'
 
 const ProposalStartFundingControl = () => {
     const { currentUser } = useCurrentUser()
-    const { proposalStack, proposalStreamDoc, updateProposal } = useProposal()
+    const { proposalStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -22,15 +24,10 @@ const ProposalStartFundingControl = () => {
         setIsInTransaction(true)
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStack || !proposalStreamDoc)
-                throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+            if (!proposalStack) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.deployProposal(
-                currentUser,
-                proposalStreamDoc,
-                proposalStack
-            )
-            await updateProposal()
+            await ceramicStagehand.deployProposal(currentUser, proposalStack)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
@@ -39,14 +36,17 @@ const ProposalStartFundingControl = () => {
 
     return (
         <>
-            <LoaderButton
-                isLoading={isInTransaction}
-                label="Start funding"
-                primary
-                icon={<Coins />}
-                size="small"
-                onClick={onDeployProposal}
-            />
+            <Box gap="medium">
+                <PlainSectionDivider />
+                <LoaderButton
+                    isLoading={isInTransaction}
+                    label="Start funding"
+                    primary
+                    icon={<Coins />}
+                    size="small"
+                    onClick={onDeployProposal}
+                />
+            </Box>
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}

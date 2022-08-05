@@ -1,9 +1,9 @@
+import { Box, Heading, Text } from 'grommet'
 import {
     PROPOSAL_WIZARD_STEPS,
     ProposalWizardStepsType,
 } from '../ProposalWizard'
 
-import { Box } from 'grommet'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalDescriptionForm from '../../forms/ProposalDescriptionForm'
@@ -16,7 +16,8 @@ interface ProposalDescriptionStepProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    onSaveProposal: () => Promise<void>
+    onSaveProposal: () => Promise<boolean>
+    requirements: string
 }
 
 const ProposalDescriptionStep = ({
@@ -24,20 +25,31 @@ const ProposalDescriptionStep = ({
     setProposalInput,
     onSaveProposal,
     stepperCallback,
+    requirements,
 }: ProposalDescriptionStepProps) => (
-    <Box height={{ min: '60vh' }}>
-        <HeaderTextSection
-            title={`Provide us with details about the project`}
-            paragraph={
-                'Please be sure to include information requested by the Template description.'
-            }
-        />
+    <Box gap="medium">
+        <Box pad="xsmall">
+            <HeaderTextSection
+                title={`Provide us with details about the project`}
+                paragraph={
+                    'Please be sure to include information requested by the Template description.'
+                }
+            />
+            {requirements.trim() !== '' && (
+                <Box gap="xsmall">
+                    <Heading level="4">Requirements</Heading>
+                    <Text color="dark-4" style={{ whiteSpace: 'pre-line' }}>
+                        {requirements}
+                    </Text>
+                </Box>
+            )}
+        </Box>
         <ProposalDescriptionForm
             proposalInput={proposalInput}
             setProposalInput={setProposalInput}
             onSubmit={async () => {
-                await onSaveProposal()
-                stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
+                if (await onSaveProposal())
+                    stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
             }}
             submitLabel="Save & Continue"
             onCancel={() =>

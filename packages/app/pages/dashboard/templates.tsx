@@ -12,7 +12,7 @@ export default function TemplatesDashboardPage() {
         <>
             {isUserLoaded ? (
                 currentUser ? (
-                    <TemplatesDashboardUI />
+                    <TemplatesDashboardUI currentUser={currentUser} />
                 ) : (
                     <PageLayout contextTitle="Connect your Wallet">
                         <ConnectWalletSection />

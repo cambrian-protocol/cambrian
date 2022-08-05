@@ -6,33 +6,42 @@ import FlexInputInfo from '../common/FlexInputInfo'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateContentInfo from './TemplateContentInfo'
 import TemplatePricingInfo from '@cambrian/app/ui/templates/TemplatePricingInfo'
-import { UserType } from '@cambrian/app/store/UserContext'
+import TemplateSkeleton from '@cambrian/app/components/skeletons/TemplateSkeleton'
 
 interface TemplateUIProps {
-    ceramicTemplate: CeramicTemplateModel
-    currentUser: UserType
+    ceramicTemplate?: CeramicTemplateModel
     templateStreamID: string
 }
 
-const TemplateUI = ({
-    ceramicTemplate,
-    currentUser,
-    templateStreamID,
-}: TemplateUIProps) => {
-    return (
-        <Box pad="large" height={{ min: '80vh' }} gap="medium">
-            <TemplateContentInfo template={ceramicTemplate} />
-            <PlainSectionDivider />
-            <TemplatePricingInfo template={ceramicTemplate} />
-            <FlexInputInfo flexInputs={ceramicTemplate.flexInputs} />
-            <PlainSectionDivider />
-            <BasicProfileInfo did={ceramicTemplate.author} />
-            <CreateProposalCTA
-                currentUser={currentUser}
-                templateStreamID={templateStreamID}
-            />
+const TemplateUI = ({ ceramicTemplate, templateStreamID }: TemplateUIProps) => (
+    <Box pad="large">
+        <Box pad="large" height={{ min: '80vh' }} border round="xsmall">
+            {ceramicTemplate ? (
+                <Box justify="between" fill>
+                    <Box gap="medium">
+                        <BasicProfileInfo
+                            did={ceramicTemplate.author}
+                            hideDetails
+                            size="small"
+                        />
+                        <PlainSectionDivider />
+                        <TemplateContentInfo template={ceramicTemplate} />
+                        <PlainSectionDivider />
+                        <TemplatePricingInfo template={ceramicTemplate} />
+                        <FlexInputInfo
+                            flexInputs={ceramicTemplate.flexInputs}
+                        />
+                        <PlainSectionDivider />
+                        <BasicProfileInfo did={ceramicTemplate.author} />
+                        <PlainSectionDivider />
+                    </Box>
+                    <CreateProposalCTA templateStreamID={templateStreamID} />
+                </Box>
+            ) : (
+                <TemplateSkeleton />
+            )}
         </Box>
-    )
-}
+    </Box>
+)
 
 export default TemplateUI

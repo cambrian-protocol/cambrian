@@ -15,7 +15,6 @@ type InteractionLayoutProps = PageLayoutProps & {
     solverHeader?: JSX.Element
 }
 
-// TODO Mobile responsive toggle Sidebar
 const InteractionLayout = ({
     contextTitle,
     children,
@@ -72,7 +71,7 @@ const InteractionLayout = ({
                                 return (
                                     <>
                                         {screenSize === 'small' ? (
-                                            <Box gap="medium">
+                                            <Box gap="medium" fill>
                                                 {proposalHeader}
                                                 {solverHeader}
                                                 {sidebar}
@@ -81,7 +80,7 @@ const InteractionLayout = ({
                                                 </Box>
                                             </Box>
                                         ) : (
-                                            <>
+                                            <Box width={'xlarge'}>
                                                 {proposalHeader}
                                                 {solverHeader}
                                                 <Box
@@ -98,7 +97,7 @@ const InteractionLayout = ({
                                                     )}
                                                     <Box flex>{children}</Box>
                                                 </Box>
-                                            </>
+                                            </Box>
                                         )}
                                     </>
                                 )

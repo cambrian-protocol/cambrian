@@ -42,7 +42,7 @@ export default class MyDocument extends Document {
                     <link
                         rel="icon"
                         type="image/x-icon"
-                        href="/images/favicon.ico"
+                        href="/images/logo/cambrian_protocol_logo.svg"
                     />
                 </Head>
                 <body>

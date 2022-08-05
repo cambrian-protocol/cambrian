@@ -6,7 +6,7 @@ import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import TemplateWizard from '@cambrian/app/ui/templates/wizard/TemplateWizard'
 import _ from 'lodash'
-import useTemplate from '@cambrian/app/hooks/useTemplate'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function NewTemplatePage() {
     const {
@@ -20,7 +20,7 @@ export default function NewTemplatePage() {
         onSaveTemplate,
         errorMessage,
         setErrorMessage,
-    } = useTemplate()
+    } = useEditTemplate()
 
     return (
         <>

@@ -23,7 +23,6 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
 import ProposalHeader from '../layout/header/ProposalHeader'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
@@ -309,10 +308,12 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         <ProposalHeader
                             proposalStack={metadata?.proposalStack}
                             proposalStatus={ProposalStatus.Executed}
+                            showProposalDetails
                         />
                     }
                     contextTitle={
-                        metadata?.proposalStack?.proposal?.title || 'Solver'
+                        metadata?.proposalStack?.proposalDoc.content?.title ||
+                        'Solver'
                     }
                     actionBar={
                         <SolverActionbar

@@ -8,7 +8,6 @@ import {
     SolverModel,
     SolverResponseModel,
 } from '@cambrian/app/models/SolverModel'
-import Stagehand, { StageNames } from '@cambrian/app/classes/Stagehand'
 import {
     calculateCollectionId,
     calculatePositionId,
@@ -19,7 +18,6 @@ import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -445,7 +443,7 @@ export const getMetadataFromProposal = async (
         if (metadataURI) {
             const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
             const proposalStack =
-                await ceramicStagehand.loadAndCloneProposalStack(metadataURI)
+                await ceramicStagehand.loadProposalStackFromID(metadataURI)
 
             if (proposalStack) {
                 const solverIndex = (await solverMethods.chainIndex()) as
@@ -454,11 +452,13 @@ export const getMetadataFromProposal = async (
                 if (solverIndex !== undefined) {
                     return {
                         slotTags:
-                            proposalStack.composition.solvers[solverIndex]
-                                .slotTags,
+                            proposalStack.compositionDoc.content.solvers[
+                                solverIndex
+                            ].slotTags,
                         solverTag:
-                            proposalStack.composition.solvers[solverIndex]
-                                .solverTag,
+                            proposalStack.compositionDoc.content.solvers[
+                                solverIndex
+                            ].solverTag,
                         proposalStack: proposalStack,
                     }
                 }

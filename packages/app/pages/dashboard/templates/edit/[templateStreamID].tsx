@@ -1,4 +1,3 @@
-import { Box } from 'grommet'
 import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
 import EditTemplateUI from '@cambrian/app/ui/templates/EditTemplateUI'
@@ -6,9 +5,8 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
 import _ from 'lodash'
-import useTemplate from '@cambrian/app/hooks/useTemplate'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function EditTemplatePage() {
     const {
@@ -24,7 +22,7 @@ export default function EditTemplatePage() {
         setErrorMessage,
         cachedTemplate,
         onResetTemplate,
-    } = useTemplate()
+    } = useEditTemplate()
 
     return (
         <>

@@ -16,7 +16,7 @@ interface ProposalPricingStepProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    onSaveProposal: () => Promise<void>
+    onSaveProposal: () => Promise<boolean>
     template: CeramicTemplateModel
 }
 
@@ -28,15 +28,16 @@ const ProposalPricingStep = ({
     setProposalInput,
 }: ProposalPricingStepProps) => {
     return (
-        <Box height={{ min: '60vh' }}>
-            <Box gap="medium">
+        <Box>
+            <Box pad="xsmall">
                 <HeaderTextSection title="Great! And how much are you willing to pay?" />
-                <ProposalPricingForm
-                    template={template}
-                    proposalInput={proposalInput}
-                    setProposalInput={setProposalInput}
-                    onSubmit={async () => {
-                        await onSaveProposal()
+            </Box>
+            <ProposalPricingForm
+                template={template}
+                proposalInput={proposalInput}
+                setProposalInput={setProposalInput}
+                onSubmit={async () => {
+                    if (await onSaveProposal()) {
                         if (
                             proposalInput &&
                             proposalInput.flexInputs.length > 0
@@ -45,14 +46,14 @@ const ProposalPricingStep = ({
                         } else {
                             stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
                         }
-                    }}
-                    submitLabel="Save & Continue"
-                    onCancel={() =>
-                        stepperCallback(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
                     }
-                    cancelLabel="Back"
-                />
-            </Box>
+                }}
+                submitLabel="Save & Continue"
+                onCancel={() =>
+                    stepperCallback(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
+                }
+                cancelLabel="Back"
+            />
         </Box>
     )
 }

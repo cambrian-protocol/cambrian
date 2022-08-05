@@ -1,13 +1,9 @@
-import { Box, Button, Stack } from 'grommet'
-import { CaretDown, CaretUp } from 'phosphor-react'
+import { Box, Stack } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BasicProfileInfo from '@cambrian/app/components/info/BasicProfileInfo'
 import Custom404Page from 'packages/app/pages/404'
 import FlexInputInfo from '../common/FlexInputInfo'
-import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -15,34 +11,29 @@ import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import ProposalContentInfo from './ProposalContentInfo'
 import ProposalControlbar from './ProposalControlbar'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
-import { useProposal } from '@cambrian/app/hooks/useProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
-const ProposalUI = ({}) => {
-    const { currentUser } = useCurrentUser()
-    const {
-        isLoaded,
-        proposalStack,
-        proposalStatus,
-        proposalStreamDoc,
-        templateStreamDoc,
-    } = useProposal()
+interface ProposalUIProps {
+    currentUser: UserType
+}
+
+const ProposalUI = ({ currentUser }: ProposalUIProps) => {
+    const { isLoaded, proposalStack, proposalStatus } = useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
-    const [showMessenger, setShowMessenger] = useState(true)
-    const toggleShowMessenger = () => setShowMessenger(!showMessenger)
-
     useEffect(() => {
-        init()
-    }, [currentUser])
+        initCollateralToken()
+    }, [currentUser, proposalStack])
 
-    const init = async () => {
+    const initCollateralToken = async () => {
         if (proposalStack && currentUser) {
             const ct = await fetchTokenInfo(
-                proposalStack.proposal.price.tokenAddress,
+                proposalStack.proposalDoc.content.price.tokenAddress,
                 currentUser.web3Provider
             )
             if (ct) setCollateralToken(ct)
@@ -50,104 +41,86 @@ const ProposalUI = ({}) => {
     }
 
     const initMessenger =
-        proposalStreamDoc &&
-        !!templateStreamDoc?.content.receivedProposals[
-            proposalStreamDoc.id.toString()
-        ] &&
-        currentUser
+        (currentUser.selfID.did.id ===
+            proposalStack?.templateDoc.content.author ||
+            currentUser.selfID.did.id ===
+                proposalStack?.proposalDoc.content.author) &&
+        proposalStatus !== ProposalStatus.Draft &&
+        proposalStatus !== ProposalStatus.Funding &&
+        proposalStatus !== ProposalStatus.Executed &&
+        proposalStatus !== ProposalStatus.Unknown
 
     return (
         <>
-            {!isLoaded ? (
-                <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalStack ? (
+            {isLoaded && proposalStack === undefined ? (
+                <Custom404Page />
+            ) : (
                 <Stack anchor="bottom-right">
                     <PageLayout
-                        contextTitle={proposalStack.proposal.title}
+                        contextTitle={
+                            proposalStack?.proposalDoc.content.title ||
+                            'Proposal'
+                        }
                         kind="narrow"
                     >
-                        <Box pad="large">
-                            <ProposalHeader
-                                proposalStack={proposalStack}
-                                proposalStatus={proposalStatus}
-                            />
-                            <Box
-                                height={{ min: 'auto' }}
-                                pad={{ top: 'large' }}
-                                gap="medium"
-                            >
-                                <ProposalContentInfo
-                                    hideTitle
-                                    proposal={proposalStack.proposal}
+                        {proposalStack ? (
+                            <Box pad="large">
+                                <ProposalHeader
+                                    proposalStack={proposalStack}
+                                    proposalStatus={proposalStatus}
                                 />
-                                <PlainSectionDivider />
-                                <PriceInfo
-                                    amount={proposalStack.proposal.price.amount}
-                                    label="Proposed Price"
-                                    token={collateralToken}
-                                />
-                                <FlexInputInfo
-                                    flexInputs={
-                                        proposalStack.proposal.flexInputs
-                                    }
-                                />
-                                <PlainSectionDivider />
-                                <BasicProfileInfo
-                                    did={proposalStack.proposal.author}
-                                />
-                                <ProposalControlbar />
-                            </Box>
-                        </Box>
-                    </PageLayout>
-                    {initMessenger && (
-                        <Box pad={{ right: 'large' }}>
-                            <BaseFormContainer
-                                pad="small"
-                                width={{ min: 'medium' }}
-                                gap="medium"
-                            >
-                                <Box direction="row" justify="between">
+                                <Box
+                                    height={{ min: 'auto' }}
+                                    pad={{ top: 'large' }}
+                                    gap="medium"
+                                >
+                                    <ProposalContentInfo
+                                        hideTitle
+                                        proposal={
+                                            proposalStack.proposalDoc.content
+                                        }
+                                    />
+                                    <PlainSectionDivider />
+                                    <PriceInfo
+                                        amount={
+                                            proposalStack.proposalDoc.content
+                                                .price.amount
+                                        }
+                                        label="Proposed Price"
+                                        token={collateralToken}
+                                    />
+                                    <FlexInputInfo
+                                        flexInputs={
+                                            proposalStack.proposalDoc.content
+                                                .flexInputs
+                                        }
+                                    />
+                                    <PlainSectionDivider />
                                     <BasicProfileInfo
                                         did={
-                                            currentUser?.selfID.did.id ===
-                                            proposalStack.proposal.author
-                                                ? proposalStack.template.author
-                                                : proposalStack.proposal.author
+                                            proposalStack.proposalDoc.content
+                                                .author
                                         }
-                                        hideDetails
-                                        size="small"
                                     />
-                                    <Button
-                                        icon={
-                                            showMessenger ? (
-                                                <CaretDown />
-                                            ) : (
-                                                <CaretUp />
-                                            )
-                                        }
-                                        onClick={toggleShowMessenger}
-                                    />
+                                    <ProposalControlbar />
                                 </Box>
-                                {showMessenger && (
-                                    <Messenger
-                                        currentUser={currentUser}
-                                        chatID={proposalStreamDoc.id.toString()}
-                                        chatType={
-                                            proposalStatus ===
-                                                ProposalStatus.Funding ||
-                                            proposalStatus ===
-                                                ProposalStatus.Executed
-                                                ? 'Proposal'
-                                                : 'Draft'
-                                        }
-                                    />
-                                )}
-                            </BaseFormContainer>
-                        </Box>
+                            </Box>
+                        ) : (
+                            <ProposalSkeleton />
+                        )}
+                    </PageLayout>
+                    {initMessenger && proposalStack && (
+                        <Messenger
+                            chatID={proposalStack.proposalDoc.id.toString()}
+                            currentUser={currentUser}
+                            chatType={'Draft'}
+                            participantDIDs={[
+                                proposalStack.templateDoc.content.author,
+                                proposalStack.proposalDoc.content.author,
+                            ]}
+                        />
                     )}
                 </Stack>
-            ) : (
-                <Custom404Page />
             )}
         </>
     )

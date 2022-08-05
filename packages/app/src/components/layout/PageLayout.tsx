@@ -6,25 +6,23 @@ import BaseFooter from './footer/BaseFooter'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
+import WrongChainSection from '../sections/WrongChainSection'
+import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
-    hideBanner?: boolean
     kind?: 'narrow'
 }
 
 export const siteTitle = 'Cambrian Protocol'
 
-const PageLayout = ({
-    contextTitle,
-    children,
-    hideBanner,
-    kind,
-}: PageLayoutProps) => {
+const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
+    const { currentUser } = useCurrentUser()
 
     return (
         <>
@@ -37,9 +35,7 @@ const PageLayout = ({
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
             <Box height={'100vh'}>
-                {!hideBanner && (
-                    <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
-                )}
+                <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
                 <Page
                     style={{ position: 'relative' }}
                     overflow={{ horizontal: 'hidden', vertical: 'auto' }}
@@ -67,9 +63,17 @@ const PageLayout = ({
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        <Box width={kind === 'narrow' ? 'xlarge' : undefined}>
-                            {children}
-                        </Box>
+                        {currentUser &&
+                        !SUPPORTED_CHAINS[currentUser.chainId] ? (
+                            <WrongChainSection />
+                        ) : (
+                            <Box
+                                width={kind === 'narrow' ? 'xlarge' : undefined}
+                                height={{ min: '90vh' }}
+                            >
+                                {children}
+                            </Box>
+                        )}
                         <BaseFooter />
                     </Box>
                 </Page>

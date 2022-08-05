@@ -1,5 +1,6 @@
 import { Box, Select } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
+import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -43,7 +44,7 @@ const TokenInput = ({
     }, [])
 
     const onChangeTokenAddress = async (address: string) => {
-        if (currentUser) {
+        if (currentUser && address.length === 42) {
             const token = await fetchTokenInfo(
                 address,
                 currentUser.web3Provider
@@ -62,49 +63,61 @@ const TokenInput = ({
     }
 
     return (
-        <Box direction="row" fill gap="small" align="start">
-            <Box basis="1/4">
-                <FormField label="Token">
-                    <Select
-                        options={options}
-                        labelKey="symbol"
-                        valueKey={{ key: 'address', reduce: true }}
-                        value={proposalInput.price.tokenAddress}
-                        onChange={({ option }) => {
+        <Box fill>
+            <Box direction="row" gap="small">
+                <Box basis="1/4" width={{ min: 'xsmall' }}>
+                    <FormField label="Token">
+                        <Select
+                            options={options}
+                            labelKey="symbol"
+                            valueKey={{ key: 'address', reduce: true }}
+                            value={proposalInput.price.tokenAddress}
+                            onChange={({ option }) => {
+                                setProposalInput({
+                                    ...proposalInput,
+                                    price: {
+                                        ...proposalInput.price,
+                                        tokenAddress: option.address,
+                                    },
+                                })
+                            }}
+                        />
+                    </FormField>
+                </Box>
+                <Box flex>
+                    <FormField
+                        onChange={(event) => {
+                            onChangeTokenAddress(event.target.value)
                             setProposalInput({
                                 ...proposalInput,
                                 price: {
                                     ...proposalInput.price,
-                                    tokenAddress: option.address,
+                                    tokenAddress: event.target.value,
                                 },
                             })
                         }}
-                    />
-                </FormField>
-            </Box>
-            <Box flex>
-                <FormField
-                    onChange={(event) => {
-                        onChangeTokenAddress(event.target.value)
-                        setProposalInput({
-                            ...proposalInput,
-                            price: {
-                                ...proposalInput.price,
-                                tokenAddress: event.target.value,
+                        disabled={!template.price.allowAnyPaymentToken}
+                        value={proposalInput.price.tokenAddress}
+                        label="Token Address"
+                        name="collateralTokenAddress"
+                        validate={[
+                            () => isRequired(proposalInput.price.tokenAddress),
+                            () => {
+                                if (
+                                    !isAddress(proposalInput.price.tokenAddress)
+                                ) {
+                                    return 'Invalid Address'
+                                }
                             },
-                        })
-                    }}
-                    disabled={!template.price.allowAnyPaymentToken}
-                    value={proposalInput.price.tokenAddress || ''}
-                    label="Token Address"
-                />
-                {template.price.allowAnyPaymentToken && (
-                    <Text size="xsmall" color="dark-4">
-                        You can insert any ERC20 token address you want to pay
-                        with
-                    </Text>
-                )}
+                        ]}
+                    />
+                </Box>
             </Box>
+            {template.price.allowAnyPaymentToken && (
+                <Text size="xsmall" color="dark-4">
+                    You can insert any ERC20 token address you want to pay with
+                </Text>
+            )}
         </Box>
     )
 }

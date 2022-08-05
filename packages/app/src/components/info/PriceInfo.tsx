@@ -29,7 +29,7 @@ const PriceInfo = ({ label, amount, token }: PriceInfoProps) => {
             </Box>
             <Box
                 basis="1/2"
-                width={{ min: 'small' }}
+                width={{ min: 'auto' }}
                 height={'xsmall'}
                 justify="center"
             >

@@ -1,10 +1,12 @@
 import { Box, Text } from 'grommet'
+import { Check, Clock } from 'phosphor-react'
 
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface ChatMessageProps {
     message: ChatMessageType
     currentUser: UserType
+    pending: boolean
 }
 
 export type ChatMessageType = {
@@ -17,7 +19,7 @@ export type ChatMessageType = {
     images?: string[]
 }
 
-const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
+const ChatMessage = ({ message, currentUser, pending }: ChatMessageProps) => {
     const isSender = currentUser.selfID.did.id === message.author?.did
 
     return (
@@ -39,7 +41,8 @@ const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
                     </Text>
                 )}
                 <Text size="small">{message.text}</Text>
-                <Box align="end">
+                <Box align="end" justify="between" direction="row">
+                    {isSender ? pending ? <Clock /> : <Check /> : <Box />}
                     <Text size="xsmall" color="light-6">
                         {new Date(message.timestamp).toLocaleTimeString([], {
                             hour: '2-digit',

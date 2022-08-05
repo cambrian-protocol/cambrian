@@ -5,11 +5,13 @@ import {
     FormExtendedEvent,
     FormField,
     TextArea,
+    TextInput,
 } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface TemplateDescriptionFormProps {
@@ -52,21 +54,25 @@ const TemplateDescriptionForm = ({
     }
 
     return (
-        <Form<TemplateDescriptionFormType> onSubmit={handleSubmit}>
-            <Box height="50vh" justify="between">
-                <Box height={{ min: 'auto' }}>
+        <Form onSubmit={handleSubmit}>
+            <Box height={{ min: '50vh' }} justify="between">
+                <Box height={{ min: 'auto' }} pad="xsmall">
                     <FormField
+                        name="title"
                         label="Title"
-                        placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
-                        value={templateInput.title}
                         validate={[() => isRequired(templateInput.title)]}
-                        onChange={(e) =>
-                            setTemplateInput({
-                                ...templateInput,
-                                title: e.target.value,
-                            })
-                        }
-                    />
+                    >
+                        <TextInput
+                            placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
+                            value={templateInput.title}
+                            onChange={(e) =>
+                                setTemplateInput({
+                                    ...templateInput,
+                                    title: e.target.value,
+                                })
+                            }
+                        />
+                    </FormField>
                     <FormField
                         name="description"
                         label="Description"
@@ -86,21 +92,25 @@ const TemplateDescriptionForm = ({
                         />
                     </FormField>
                 </Box>
-                <Box direction="row" justify="between" height={{ min: 'auto' }}>
-                    <Button
-                        size="small"
-                        secondary
-                        label={cancelLabel || 'Reset all changes'}
-                        onClick={onCancel}
-                    />
-                    <LoaderButton
-                        isLoading={isSubmitting}
-                        size="small"
-                        primary
-                        label={submitLabel || 'Save'}
-                        type="submit"
-                    />
-                </Box>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset all changes'}
+                            onClick={onCancel}
+                        />
+                    }
+                />
             </Box>
         </Form>
     )
