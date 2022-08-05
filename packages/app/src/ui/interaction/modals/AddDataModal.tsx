@@ -6,12 +6,12 @@ import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
+import { ShieldCheck } from 'phosphor-react'
 import { ethers } from 'ethers'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
-import { validateAddress } from '@cambrian/app/utils/helpers/validation'
-import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { ShieldCheck } from 'phosphor-react'
+import { isAddress } from '@cambrian/app/utils/helpers/validation'
 
 interface ExecuteSolverModalProps {
     isAddingData: boolean
@@ -75,20 +75,22 @@ const AddDataModal = ({
                         e.preventDefault()
                         onAddData(idx)
                     }}
-                    onChange={(newFormState) => {
-                        const updatedManualInputs = [...manualInputs]
-                        updatedManualInputs[idx] = newFormState
-                        setManualInputs(updatedManualInputs)
-                    }}
-                    value={manualInputs[idx]}
-                    validate="blur"
                 >
                     <AddManualSlotDataInput
-                        name={'data'}
                         isAddingData={isAddingData}
                         label={input.slotWithMetaData.tag.label}
-                        required
-                        validate={validateAddress}
+                        value={manualInputs[idx].data}
+                        onChange={(e) => {
+                            const updatedManualInputs = [...manualInputs]
+                            updatedManualInputs[idx].data = e.target.value
+                            setManualInputs(updatedManualInputs)
+                        }}
+                        validate={[
+                            () => {
+                                if (!isAddress(manualInputs[idx].data))
+                                    return 'Invalid address'
+                            },
+                        ]}
                         description={input.slotWithMetaData.tag.description}
                     />
                 </Form>
