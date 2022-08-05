@@ -1,5 +1,4 @@
 import {
-    BasicProfile,
     EthereumAuthProvider,
     SelfID,
     useViewerConnection,
@@ -14,6 +13,7 @@ import React, {
 
 import { INFURA_ID } from 'packages/app/config'
 import PermissionProvider from './PermissionContext'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Web3Modal from 'web3modal'
 import _ from 'lodash'
@@ -21,6 +21,30 @@ import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
 export type PermissionType = string
+
+export type CambrianProfileType = {
+    name: string
+    title: string
+    description: string
+    email: string
+    avatar: string
+    company: string
+    website: string
+    twitter: string
+    discordWebhook: string
+}
+
+export const initialCambrianProfile = {
+    name: '',
+    title: '',
+    description: '',
+    email: '',
+    avatar: '',
+    company: '',
+    website: '',
+    twitter: '',
+    discordWebhook: '',
+}
 
 export type UserContextType = {
     currentUser: UserType | null
@@ -39,7 +63,7 @@ export type UserType = {
     chainId: number
     permissions: PermissionType[]
     selfID: SelfID
-    basicProfile?: BasicProfile
+    cambrianProfileDoc: TileDocument<CambrianProfileType>
 }
 
 type UserActionType =
@@ -51,16 +75,7 @@ type UserActionType =
           address: UserType['address']
           chainId: UserType['chainId']
           selfID: UserType['selfID']
-          basicProfile?: BasicProfile
-      }
-    | {
-          type: 'SET_SIGNER'
-          address: UserType['address']
-          signer: UserType['signer']
-      }
-    | {
-          type: 'SET_CHAIN_ID'
-          chainId: UserType['chainId']
+          cambrianProfileDoc: TileDocument<CambrianProfileType>
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -106,27 +121,9 @@ function userReducer(
                 address: action.address,
                 chainId: action.chainId,
                 selfID: action.selfID,
-                basicProfile: action.basicProfile,
+                cambrianProfileDoc: action.cambrianProfileDoc,
                 permissions: [],
             }
-        case 'SET_SIGNER':
-            if (state) {
-                return {
-                    ...state,
-                    address: action.address,
-                    signer: action.signer,
-                    permissions: [],
-                }
-            }
-            break
-        case 'SET_CHAIN_ID':
-            if (state) {
-                return {
-                    ...state,
-                    chainId: action.chainId,
-                }
-            }
-            break
         case 'ADD_PERMISSION':
             if (state) {
                 return {
@@ -159,7 +156,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [user, dispatch] = useReducer(userReducer, null)
     const [walletConnection, setWalletConnection] = useState<Omit<
         UserType,
-        'selfID' | 'basicProfile'
+        'selfID' | 'cambrianProfileDoc'
     > | null>(null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
 
@@ -198,7 +195,15 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const initSelfID = async (ceramicSelfID: SelfID) => {
         if (walletConnection) {
-            const basicProfile = await ceramicSelfID.get('basicProfile')
+            const cambrianProfileDoc = (await TileDocument.deterministic(
+                ceramicSelfID.client.ceramic,
+                {
+                    controllers: [ceramicSelfID.id],
+                    family: 'cambrian-profile',
+                },
+                { pin: true }
+            )) as TileDocument<CambrianProfileType>
+
             dispatch({
                 type: 'SET_USER',
                 provider: walletConnection.provider,
@@ -206,7 +211,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 signer: walletConnection.signer,
                 address: walletConnection.address,
                 chainId: walletConnection.chainId,
-                basicProfile: basicProfile || undefined,
+                cambrianProfileDoc: cambrianProfileDoc,
                 selfID: ceramicSelfID,
             })
             setIsUserLoaded(true)

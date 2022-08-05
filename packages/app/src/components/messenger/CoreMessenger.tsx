@@ -313,8 +313,8 @@ export default function CoreMessenger({
                                 text: messageInput,
                                 author: {
                                     name:
-                                        currentUser.basicProfile?.name ||
-                                        'Anon',
+                                        currentUser.cambrianProfileDoc.content
+                                            ?.name || 'Anon',
                                     did: currentUser.selfID.id,
                                 },
                                 timestamp: new Date().getTime(),

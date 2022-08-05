@@ -1,12 +1,4 @@
-import {
-    Books,
-    ChartBar,
-    Question,
-    SignIn,
-    SignOut,
-    User,
-    Wallet,
-} from 'phosphor-react'
+import { Books, Question, SignIn, SignOut, User, Wallet } from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -42,7 +34,9 @@ export default function UserMenu() {
             label: (
                 <UserMenuItemLabel
                     subTitle={ellipseAddress(currentUser.address, 9)}
-                    label={currentUser.basicProfile?.name || 'Anonym'}
+                    label={
+                        currentUser.cambrianProfileDoc.content?.name || 'Anonym'
+                    }
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
@@ -80,9 +74,12 @@ export default function UserMenu() {
             items={menuItems}
         >
             {currentUser ? (
-                currentUser.basicProfile?.avatar ? (
+                currentUser.cambrianProfileDoc.content?.avatar ? (
                     <BaseAvatar
-                        pfpPath={currentUser.basicProfile.avatar as string}
+                        pfpPath={
+                            currentUser.cambrianProfileDoc.content
+                                .avatar as string
+                        }
                     />
                 ) : (
                     <BaseAvatar address={currentUser.address} />
