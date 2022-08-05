@@ -16,11 +16,13 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface ProposalSubmitControlProps {
+    onSave: () => Promise<boolean>
     proposalStreamDoc: TileDocument<CeramicProposalModel>
     isValidProposal: boolean
 }
 
 const ProposalSubmitControl = ({
+    onSave,
     isValidProposal,
     proposalStreamDoc,
 }: ProposalSubmitControlProps) => {
@@ -34,17 +36,21 @@ const ProposalSubmitControl = ({
         setIsSubmitting(true)
         try {
             if (currentUser && proposalStreamDoc) {
-                const ceramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
-                )
-                if (await ceramicStagehand.submitProposal(proposalStreamDoc)) {
-                    router.push(
-                        `${
-                            window.location.origin
-                        }/proposals/${proposalStreamDoc.id.toString()}`
+                if (await onSave()) {
+                    const ceramicStagehand = new CeramicStagehand(
+                        currentUser.selfID
                     )
-                } else {
-                    throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']
+                    if (
+                        await ceramicStagehand.submitProposal(proposalStreamDoc)
+                    ) {
+                        router.push(
+                            `${
+                                window.location.origin
+                            }/proposals/${proposalStreamDoc.id.toString()}`
+                        )
+                    } else {
+                        throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']
+                    }
                 }
             }
         } catch (e) {
@@ -59,7 +65,7 @@ const ProposalSubmitControl = ({
                 disabled={!isValidProposal}
                 isLoading={isSubmitting}
                 reverse
-                label="Submit Proposal"
+                label="Save & Submit"
                 primary
                 onClick={onSubmitProposal}
             />

@@ -25,7 +25,7 @@ const BasicProfileInfo = ({
                 />
                 <Box pad="small">
                     <Heading level={size === 'small' ? '4' : '3'} truncate>
-                        {sellerBasicProfile.content?.name}
+                        {sellerBasicProfile.content?.name || 'Anonym'}
                     </Heading>
                     {size !== 'small' && (
                         <Text size="small" color="dark-4">

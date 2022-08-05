@@ -23,13 +23,12 @@ import io from 'socket.io-client'
  * Where <chatID> is:
  *
  *  Active Solver => <solverAddress>
- *  Draft Proposal => <proposalStreamID>
- *  On-Chain Proposal => <proposalId>
+ *  Proposal => <proposalStreamID>
  */
 
 const socket = io(TRILOBOT_WS_ENDPOINT) // TODO Replace with env var
 
-export type ChatType = 'Draft' | 'Proposal' | 'Solver' | 'Other'
+export type ChatType = 'Proposal' | 'Solver' | 'Other'
 
 export default function CoreMessenger({
     currentUser,
@@ -98,8 +97,8 @@ export default function CoreMessenger({
     const loadChat = async () => {
         let msgs
         switch (chatType) {
-            case 'Draft':
-                msgs = await loadChatDraftProposal()
+            case 'Proposal':
+                msgs = await loadChatProposal()
                 setMessages(msgs)
                 break
             case 'Other':
@@ -234,7 +233,7 @@ export default function CoreMessenger({
      * @dev chatID == proposalStreamID of draft
      * @dev Gets DIDs from proposal.authors
      */
-    const loadChatDraftProposal = async () => {
+    const loadChatProposal = async () => {
         try {
             // Load, then filter out streams that failed to load & streams with no messages
             const messagesDocs: TileDocument<{
