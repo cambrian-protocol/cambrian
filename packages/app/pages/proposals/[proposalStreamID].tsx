@@ -2,11 +2,11 @@ import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalle
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { ProposalContextProvider } from '@cambrian/app/store/ProposalContext'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 export default function ViewProposalPage() {
-    const { currentUser, isUserLoaded } = useCurrentUser()
+    const { currentUser, isUserLoaded } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
 

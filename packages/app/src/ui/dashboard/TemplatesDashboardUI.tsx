@@ -1,5 +1,5 @@
 import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
-import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
+import { Box, Button, Heading, Spinner, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
@@ -37,7 +37,7 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
     const fetchTemplates = async () => {
         setIsFetching(true)
         try {
-            const templateStreams = (await ceramicStagehand.loadStages(
+            const templateStreams = (await ceramicStagehand.loadStagesMap(
                 StageNames.template
             )) as StringHashmap
 
@@ -139,10 +139,20 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
                                             pad="large"
                                             round="xsmall"
                                         >
-                                            <CircleDashed size="32" />
-                                            <Text size="small" color="dark-4">
-                                                You don't have any templates yet
-                                            </Text>
+                                            {isFetching ? (
+                                                <Spinner />
+                                            ) : (
+                                                <>
+                                                    <CircleDashed size="32" />
+                                                    <Text
+                                                        size="small"
+                                                        color="dark-4"
+                                                    >
+                                                        You don't have any
+                                                        templates yet
+                                                    </Text>
+                                                </>
+                                            )}
                                         </Box>
                                     )}
                                 </Box>

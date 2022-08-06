@@ -1,6 +1,6 @@
 import { Box } from 'grommet'
 import { Calendar } from 'phosphor-react'
-import SidebarComponentContainer from '../../../containers/SidebarComponentContainer'
+import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { Text } from 'grommet'
 
 interface ArbitrationTimelockInfoComponentProps {

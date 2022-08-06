@@ -1,14 +1,15 @@
 import { Box, Form, FormField } from 'grommet'
+import CeramicStagehand, {
+    StageNames,
+} from '@cambrian/app/classes/CeramicStagehand'
 import { SetStateAction, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { StageNames } from '@cambrian/app/classes/Stagehand'
 import { Textbox } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 

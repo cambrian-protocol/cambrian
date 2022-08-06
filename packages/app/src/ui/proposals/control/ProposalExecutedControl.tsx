@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import Link from 'next/link'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalExecutedControl = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const { proposalContract } = useProposalContext()
     const [firstSolverAddress, setFirstSolverAddress] = useState<string>()
 
@@ -35,10 +35,7 @@ const ProposalExecutedControl = () => {
         <>
             {firstSolverAddress && (
                 <BaseFormGroupContainer border pad="medium" gap="medium">
-                    <Text>
-                        This Proposal has been funded and executed. To start
-                        working with it visit the first Solve
-                    </Text>
+                    <Text>This Proposal has been funded and executed.</Text>
                     <Link
                         href={`${window.location.origin}/solvers/${firstSolverAddress}`}
                         passHref

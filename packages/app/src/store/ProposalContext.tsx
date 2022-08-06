@@ -238,7 +238,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     if (_latestProposalSubmission) {
                         // Initialize the latest submission/commit as proposal stack
                         const latestProposalCommitContent =
-                            (await ceramicStagehand.loadStream(
+                            (await ceramicStagehand.loadReadOnlyStream(
                                 _latestProposalSubmission.proposalCommitID
                             )) as TileDocument<CeramicProposalModel>
 

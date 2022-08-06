@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import PayoutInfoComponent from '../PayoutInfoComponent'
+import PayoutInfoComponent from '../../components/bars/sidebar/PayoutInfoComponent'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'

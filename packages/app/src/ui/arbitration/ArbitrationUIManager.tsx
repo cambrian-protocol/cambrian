@@ -1,4 +1,4 @@
-import ArbitrateLockComponent from './ArbitrateLockCompopnent'
+import ArbitrateLockComponent from './ArbitrateLockComponent'
 import ArbitrateNullComponent from './ArbitrateNullComponent'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Box } from 'grommet'
@@ -6,15 +6,16 @@ import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DispatchArbitrationComponent from './DispatchArbitrationComponent'
 import DisputerListComponent from './DisputerListComponent'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
-import PlainSectionDivider from '../../../sections/PlainSectionDivider'
+import PlainSectionDivider from '../../components/sections/PlainSectionDivider'
 import ReimbursementComponent from './ReimbursementComponent'
 import RequestContractArbitrationComponent from './RequestContractArbitrationComponent'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
-import usePermission from '@cambrian/app/hooks/usePermission'
+import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
 interface ArbitrationUIManagerProps {
     solverData: SolverModel
@@ -33,8 +34,8 @@ const ArbitrationUIManager = ({
     solverMethods,
     solverTimelock,
 }: ArbitrationUIManagerProps) => {
-    const isArbitrator = usePermission('Arbitrator')
-    const isRecipient = usePermission('Recipient')
+    const isArbitrator = usePermissionContext('Arbitrator')
+    const isRecipient = usePermissionContext('Recipient')
 
     const { arbitratorContract, disputeId } = useArbitratorContract({
         currentUser: currentUser,
@@ -56,13 +57,18 @@ const ArbitrationUIManager = ({
             isRecipient
         ) {
             if (!arbitratorContract) {
-                ArbitrationUI = (
-                    <DispatchArbitrationComponent
-                        currentCondition={currentCondition}
-                        currentUser={currentUser}
-                        solverAddress={solverAddress}
-                    />
-                )
+                if (
+                    solverData.config.arbitrator !==
+                    ethers.constants.AddressZero
+                ) {
+                    ArbitrationUI = (
+                        <DispatchArbitrationComponent
+                            currentCondition={currentCondition}
+                            currentUser={currentUser}
+                            solverAddress={solverAddress}
+                        />
+                    )
+                }
             } else if (isTimelockActive) {
                 ArbitrationUI = (
                     <RequestContractArbitrationComponent

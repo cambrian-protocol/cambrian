@@ -1,6 +1,6 @@
 import { ArrowLineUp, CheckCircle, Info } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
-import { Box, Button, Form, FormField, Spinner, Text } from 'grommet'
+import { Box, Button, Form, FormField, Heading, Spinner, Text } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -101,10 +101,18 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
             )
             if (BigNumber.from(allowanceWei).gt(0)) {
                 setCurrentAllowance(allowanceWei)
+
+                // Init input with allowance but maximum the amount which is left
+                let initInput = allowanceWei
+                const max = proposal.fundingGoal.sub(
+                    await proposalsHub.getProposalFunding(proposal.id)
+                )
+                if (BigNumber.from(allowanceWei).gt(max)) initInput = max
+
                 setInput({
                     amount: Number(
                         ethers.utils.formatUnits(
-                            allowanceWei,
+                            initInput,
                             collateralToken?.decimals
                         )
                     ),
@@ -298,191 +306,232 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
         <>
             <Box gap="medium">
                 <PlainSectionDivider />
+                <>
+                    <Heading level="3">Back this Proposal</Heading>
+                    <Text color="dark-4" size="small">
+                        Invested funds can be defunded until the proposal has
+                        been executed
+                    </Text>
+                </>
                 <Box
                     align="center"
-                    justify="center"
-                    border
-                    round="xsmall"
-                    background={'background-contrast'}
-                    pad="medium"
+                    justify="around"
+                    direction="row"
+                    wrap={'reverse'}
                 >
                     {collateralToken ? (
                         <>
-                            <FundingProgressMeter
-                                token={collateralToken}
-                                funding={funding}
-                                fundingGoal={proposal.fundingGoal}
-                                userFunding={currentUserFunding}
-                            />
-                            <Form<FundProposalFormType>
-                                onChange={(nextValue: FundProposalFormType) => {
-                                    setInput(nextValue)
-                                }}
-                                value={input}
-                                onSubmit={
-                                    funding.eq(proposal.fundingGoal)
-                                        ? onExecuteProposal
-                                        : input.amount &&
-                                          currentAllowance?.gte(
-                                              ethers.utils.parseUnits(
-                                                  input.amount.toString(),
-                                                  collateralToken.decimals
-                                              )
-                                          )
-                                        ? onFundProposal
-                                        : onApproveFunding
-                                }
+                            <Box
+                                width="medium"
+                                border
+                                round="xsmall"
+                                pad="medium"
                             >
-                                <Box pad={{ top: 'medium' }} gap="medium">
-                                    <Box pad="xsmall" gap="medium">
-                                        <>
-                                            <Box
-                                                direction="row"
-                                                justify="between"
-                                                align="end"
-                                                pad={{ bottom: 'small' }}
-                                            >
-                                                <Button
-                                                    disabled={disableButtons}
-                                                    icon={<ArrowLineUp />}
-                                                    onClick={inputMaxAmount}
-                                                />
-                                                <FormField
-                                                    margin={{ bottom: 'none' }}
-                                                    name="amount"
-                                                    label="Amount"
-                                                    type="number"
-                                                    required={
-                                                        !funding.eq(
-                                                            proposal.fundingGoal
-                                                        )
-                                                    }
-                                                    disabled={disableButtons}
-                                                />
-                                                <TokenAvatar
-                                                    token={collateralToken}
-                                                />
-                                            </Box>
-                                        </>
-                                        <Box
-                                            justify="center"
-                                            align="center"
-                                            round="xsmall"
-                                            border
-                                            elevation="small"
-                                            pad="small"
-                                        >
-                                            {currentAllowance !== undefined &&
-                                            !currentAllowance.isZero() ? (
-                                                <Box
-                                                    direction="row"
-                                                    gap="small"
-                                                    align="center"
-                                                >
-                                                    <CheckCircle size="18" />
-                                                    <Text size="small">
-                                                        You have approved access
-                                                        to{' '}
-                                                        {Number(
-                                                            ethers.utils.formatUnits(
-                                                                currentAllowance,
-                                                                collateralToken.decimals
-                                                            )
-                                                        ).toFixed(2)}{' '}
-                                                        {collateralToken.symbol}
-                                                    </Text>
-                                                </Box>
-                                            ) : funding.eq(
-                                                  proposal.fundingGoal
-                                              ) ? (
-                                                <Box
-                                                    direction="row"
-                                                    gap="small"
-                                                    align="center"
-                                                >
-                                                    <Info size="18" />
-                                                    <Text size="small">
-                                                        Proposal is fully funded
-                                                    </Text>
-                                                </Box>
-                                            ) : (
-                                                <Box
-                                                    direction="row"
-                                                    gap="small"
-                                                    align="center"
-                                                >
-                                                    <Info size="18" />
-                                                    <Text size="small">
-                                                        Please approve transfer
-                                                        before funding
-                                                    </Text>
-                                                </Box>
-                                            )}
-                                        </Box>
-                                    </Box>
-                                    <TwoButtonWrapContainer
-                                        primaryButton={
-                                            funding.eq(proposal.fundingGoal) ? (
-                                                <LoaderButton
-                                                    isLoading={
-                                                        isInPrimaryTransaction
-                                                    }
-                                                    disabled={disableButtons}
-                                                    primary
-                                                    type="submit"
-                                                    label="Execute"
-                                                />
-                                            ) : input.amount &&
+                                <Form<FundProposalFormType>
+                                    onChange={(
+                                        nextValue: FundProposalFormType
+                                    ) => {
+                                        setInput(nextValue)
+                                    }}
+                                    value={input}
+                                    onSubmit={
+                                        funding.eq(proposal.fundingGoal)
+                                            ? onExecuteProposal
+                                            : input.amount &&
                                               currentAllowance?.gte(
                                                   ethers.utils.parseUnits(
                                                       input.amount.toString(),
                                                       collateralToken.decimals
                                                   )
-                                              ) ? (
+                                              )
+                                            ? onFundProposal
+                                            : onApproveFunding
+                                    }
+                                >
+                                    <Box gap="medium">
+                                        <Box pad="xsmall" gap="medium">
+                                            <>
+                                                <Box
+                                                    direction="row"
+                                                    justify="between"
+                                                    pad={{ bottom: 'small' }}
+                                                    align="end"
+                                                    gap="small"
+                                                >
+                                                    <Button
+                                                        disabled={
+                                                            disableButtons
+                                                        }
+                                                        icon={<ArrowLineUp />}
+                                                        onClick={inputMaxAmount}
+                                                        label="Max"
+                                                        size="small"
+                                                        secondary
+                                                    />
+                                                    <Box flex>
+                                                        <FormField
+                                                            margin={{
+                                                                bottom: 'none',
+                                                            }}
+                                                            name="amount"
+                                                            label="Amount"
+                                                            type="number"
+                                                            required={
+                                                                !funding.eq(
+                                                                    proposal.fundingGoal
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                disableButtons
+                                                            }
+                                                        />
+                                                    </Box>
+                                                    <TokenAvatar
+                                                        token={collateralToken}
+                                                    />
+                                                </Box>
+                                            </>
+                                            <Box
+                                                justify="center"
+                                                align="center"
+                                                round="xsmall"
+                                                border
+                                                elevation="small"
+                                                pad="small"
+                                            >
+                                                {currentAllowance !==
+                                                    undefined &&
+                                                !currentAllowance.isZero() ? (
+                                                    <Box
+                                                        direction="row"
+                                                        gap="small"
+                                                        align="center"
+                                                    >
+                                                        <CheckCircle size="18" />
+                                                        <Text size="small">
+                                                            You have approved
+                                                            access to{' '}
+                                                            {Number(
+                                                                ethers.utils.formatUnits(
+                                                                    currentAllowance,
+                                                                    collateralToken.decimals
+                                                                )
+                                                            ).toFixed(2)}{' '}
+                                                            {
+                                                                collateralToken.symbol
+                                                            }
+                                                        </Text>
+                                                    </Box>
+                                                ) : funding.eq(
+                                                      proposal.fundingGoal
+                                                  ) ? (
+                                                    <Box
+                                                        direction="row"
+                                                        gap="small"
+                                                        align="center"
+                                                    >
+                                                        <Info size="18" />
+                                                        <Text size="small">
+                                                            Proposal is fully
+                                                            funded
+                                                        </Text>
+                                                    </Box>
+                                                ) : (
+                                                    <Box
+                                                        direction="row"
+                                                        gap="small"
+                                                        align="center"
+                                                    >
+                                                        <Info size="18" />
+                                                        <Text size="small">
+                                                            Please approve
+                                                            transfer before
+                                                            funding
+                                                        </Text>
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                        <TwoButtonWrapContainer
+                                            primaryButton={
+                                                funding.eq(
+                                                    proposal.fundingGoal
+                                                ) ? (
+                                                    <LoaderButton
+                                                        isLoading={
+                                                            isInPrimaryTransaction
+                                                        }
+                                                        disabled={
+                                                            disableButtons
+                                                        }
+                                                        primary
+                                                        type="submit"
+                                                        label="Execute"
+                                                    />
+                                                ) : input.amount &&
+                                                  currentAllowance?.gte(
+                                                      ethers.utils.parseUnits(
+                                                          input.amount.toString(),
+                                                          collateralToken.decimals
+                                                      )
+                                                  ) ? (
+                                                    <LoaderButton
+                                                        isLoading={
+                                                            isInPrimaryTransaction
+                                                        }
+                                                        disabled={
+                                                            !isValidInput ||
+                                                            disableButtons
+                                                        }
+                                                        primary
+                                                        type="submit"
+                                                        label="Fund"
+                                                    />
+                                                ) : (
+                                                    <LoaderButton
+                                                        isLoading={
+                                                            isInPrimaryTransaction
+                                                        }
+                                                        disabled={
+                                                            !isValidInput ||
+                                                            disableButtons
+                                                        }
+                                                        primary
+                                                        type="submit"
+                                                        label="Approve"
+                                                    />
+                                                )
+                                            }
+                                            secondaryButton={
                                                 <LoaderButton
                                                     isLoading={
-                                                        isInPrimaryTransaction
+                                                        isInSecondaryTransaction
                                                     }
                                                     disabled={
                                                         !isValidInput ||
                                                         disableButtons
                                                     }
-                                                    primary
-                                                    type="submit"
-                                                    label="Fund"
+                                                    secondary
+                                                    label="Defund"
+                                                    onClick={onDefundProposal}
                                                 />
-                                            ) : (
-                                                <LoaderButton
-                                                    isLoading={
-                                                        isInPrimaryTransaction
-                                                    }
-                                                    disabled={
-                                                        !isValidInput ||
-                                                        disableButtons
-                                                    }
-                                                    primary
-                                                    type="submit"
-                                                    label="Approve"
-                                                />
-                                            )
-                                        }
-                                        secondaryButton={
-                                            <LoaderButton
-                                                isLoading={
-                                                    isInSecondaryTransaction
-                                                }
-                                                disabled={
-                                                    !isValidInput ||
-                                                    disableButtons
-                                                }
-                                                secondary
-                                                label="Defund"
-                                                onClick={onDefundProposal}
-                                            />
-                                        }
-                                    />
-                                </Box>
-                            </Form>
+                                            }
+                                        />
+                                    </Box>
+                                </Form>
+                            </Box>
+                            <Box
+                                width={{ min: 'medium' }}
+                                flex
+                                pad={{ bottom: 'medium' }}
+                            >
+                                <FundingProgressMeter
+                                    token={collateralToken}
+                                    funding={funding}
+                                    fundingGoal={proposal.fundingGoal}
+                                    userFunding={currentUserFunding}
+                                />
+                            </Box>
                         </>
                     ) : (
                         <Spinner />

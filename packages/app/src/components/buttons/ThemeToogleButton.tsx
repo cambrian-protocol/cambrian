@@ -2,7 +2,7 @@ import { Moon, MoonStars, Sun } from 'phosphor-react'
 
 import { Box } from 'grommet'
 import { Text } from 'grommet'
-import { useTheme } from '@cambrian/app/hooks/useTheme'
+import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
 
 interface ThemeToogleButtonProps {
     size?: 'small'
@@ -10,7 +10,7 @@ interface ThemeToogleButtonProps {
 }
 
 const ThemeToogleButton = ({ size, showLabel }: ThemeToogleButtonProps) => {
-    const { themeMode, toggleThemeMode } = useTheme()
+    const { themeMode, toggleThemeMode } = useThemeContext()
 
     return (
         <Box

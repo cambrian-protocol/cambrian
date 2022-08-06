@@ -10,7 +10,7 @@ import { SubmissionModel } from '../models/SubmissionModel'
 import SubmissionView from './SubmissionView'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import usePermission from '@cambrian/app/hooks/usePermission'
+import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
 interface ContentMarketingSolverContentProps {
     currentUser: UserType
@@ -31,7 +31,7 @@ const SubmissionContainer = ({
     currentCondition,
     currentUser,
 }: ContentMarketingSolverContentProps) => {
-    const allowedToWrite = usePermission('Submitter')
+    const allowedToWrite = usePermissionContext('Submitter')
     const [latestSubmission, setLatestSubmission] =
         useState<SubmissionModel>(initialSubmission)
     const submittedWorkFilter = moduleContract.filters.SubmittedWork(

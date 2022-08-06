@@ -23,7 +23,7 @@ import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 const nodeTypes = {
@@ -41,7 +41,7 @@ TODO
 
 */
 export const ComposerUI = () => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { compositionStreamID } = router.query
     const { composer, dispatch } = useComposerContext()
@@ -78,7 +78,7 @@ export const ComposerUI = () => {
                     setLoadedComposition(composition)
                     // Add composition to User DID so it shows up in his dashboard from now on
                     const userCompositions =
-                        (await newCeramicStagehand.loadStages(
+                        (await newCeramicStagehand.loadStagesMap(
                             StageNames.composition
                         )) as StringHashmap
 

@@ -1,4 +1,4 @@
-import { Box, Meter, Stack, Text } from 'grommet'
+import { Box, Heading, Meter, Stack, Text } from 'grommet'
 
 import { BigNumber } from '@ethersproject/bignumber'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -32,8 +32,8 @@ const FundingProgressMeter = ({
             : BigNumber.from(0)
 
     return (
-        <Box pad="medium">
-            <Box align="center" pad={{ vertical: 'medium' }}>
+        <Box gap="small" pad={{ vertical: 'medium' }}>
+            <Box align="center">
                 <Stack anchor="center">
                     <Meter
                         type="circle"
@@ -52,17 +52,24 @@ const FundingProgressMeter = ({
                         <Text size="small">%</Text>
                     </Box>
                 </Stack>
-                <Text textAlign="center">
-                    {formattedFunding} / {formattedFundingGoal}
+            </Box>
+            <>
+                <Heading level="2" textAlign="center">
+                    {formattedFunding} {token.name}
+                </Heading>
+                <Text color="dark-4" textAlign="center">
+                    pledged of {formattedFundingGoal} {token.name} goal
                 </Text>
-                <Text textAlign="center" size="small" color="dark-4">
+            </>
+            <>
+                <Text size="small" color="dark-4" textAlign="center">
                     Remaining:{' '}
                     {Number(formattedFundingGoal) - Number(formattedFunding)}
                 </Text>
-                <Text textAlign="center" size="small" color="dark-4">
+                <Text size="small" color="dark-4" textAlign="center">
                     Your funds: {Number(formattedUserFunding)}
                 </Text>
-            </Box>
+            </>
         </Box>
     )
 }

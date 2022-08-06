@@ -13,8 +13,8 @@ import ProposalFlexInputsForm from './forms/ProposalFlexInputsForm'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import ProposalPricingForm from './forms/ProposalPricingForm'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import ProposalSubmitControl from '@cambrian/app/components/bars/sidebar/proposal/ProposalSubmitControl'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import ProposalSubmitControl from './control/ProposalSubmitControl'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 import { useState } from 'react'
 
@@ -33,7 +33,7 @@ const EditProposalUI = () => {
         isLoaded,
     } = useEditProposal()
 
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [activeIndex, setActiveIndex] = useState(0)
 
     const isEditable =

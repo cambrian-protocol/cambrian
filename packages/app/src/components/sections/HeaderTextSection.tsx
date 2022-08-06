@@ -1,4 +1,4 @@
-import { Box, Heading, ResponsiveContext } from 'grommet'
+import { Box, Heading } from 'grommet'
 
 import { ConditionalWrapper } from '@cambrian/app/components/utils/ConditionalWrapper'
 import { IconContext } from 'phosphor-react'

@@ -50,8 +50,8 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
         if (proposalStack && templateStreamDoc) {
             try {
                 const res = await ceramicStagehand.requestProposalChange(
-                    proposalStack.proposalDoc,
-                    templateStreamDoc
+                    templateStreamDoc,
+                    proposalStack
                 )
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']

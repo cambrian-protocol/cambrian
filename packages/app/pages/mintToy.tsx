@@ -6,11 +6,11 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { SUPPORTED_CHAINS } from '../config/SupportedChains'
 import { ethers } from 'ethers'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 
 export default function MintToy() {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [isMinting, setIsMinting] = useState(false)
 
     const onMintTOY = async () => {

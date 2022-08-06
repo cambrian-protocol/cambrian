@@ -11,7 +11,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
 import router from 'next/router'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 
 interface CreateProposalCTAProps {
@@ -19,7 +19,7 @@ interface CreateProposalCTAProps {
 }
 
 const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
-    const { currentUser } = useCurrentUser()
+    const { currentUser } = useCurrentUserContext()
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 

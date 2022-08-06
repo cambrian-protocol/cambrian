@@ -11,7 +11,7 @@ import { SetStateAction } from 'react'
 import SidebarCard from '@cambrian/app/components/cards/SidebarCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
-import usePermission from '@cambrian/app/hooks/usePermission'
+import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
 interface ConditionVersionSidebarProps {
     solverConditions: SolverContractCondition[]
@@ -30,7 +30,7 @@ const ConditionVersionSidebar = ({
     solverMethods,
     solverTag,
 }: ConditionVersionSidebarProps) => {
-    const allowed = usePermission('Keeper')
+    const allowed = usePermissionContext('Keeper')
 
     const conditions = [...solverConditions]
 

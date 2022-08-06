@@ -1,21 +1,6 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { TokenModel } from './TokenModel'
 
-export type TemplateModel = {
-    pfp?: string
-    name?: string
-    title: string
-    description: string
-    price?: {
-        amount: number
-        denominationTokenAddress: string
-        preferredTokens?: TokenModel[]
-        allowAnyPaymentToken: boolean
-    }
-    compositionCID: string
-    flexInputs: FlexInputFormType[]
-}
-
 export type CeramicTemplateModel = {
     title: string
     description: string
@@ -41,7 +26,6 @@ export type ReceivedProposalCommitType = {
 export type ReceivedProposalPropsType = {
     approved?: boolean
     requestChange?: boolean
-    proposalID?: string // Stores the onChain ProposalsHub proposalID if it was deployed by the template creator
 }
 
 export type TemplatePriceModel = {

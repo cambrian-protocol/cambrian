@@ -3,10 +3,10 @@ import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalle
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export default function ArbitratorsDashboardPage() {
-    const { currentUser, isUserLoaded } = useCurrentUser()
+    const { currentUser, isUserLoaded } = useCurrentUserContext()
 
     return (
         <>

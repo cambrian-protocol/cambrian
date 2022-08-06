@@ -1,10 +1,10 @@
 import { Box, Button } from 'grommet'
 
 import HeaderTextSection from './HeaderTextSection'
-import { useCurrentUser } from '@cambrian/app/hooks/useCurrentUser'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 const ConnectWalletSection = () => {
-    const { connectWallet } = useCurrentUser()
+    const { connectWallet } = useCurrentUserContext()
 
     return (
         <Box

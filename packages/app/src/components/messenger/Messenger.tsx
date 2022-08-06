@@ -2,8 +2,9 @@ import { Box, ResponsiveContext } from 'grommet'
 import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
 import CoreMessenger, { ChatType } from './CoreMessenger'
 
-import BasicProfileInfo from '../info/BasicProfileInfo'
+import CambrianProfileInfo from '../info/CambrianProfileInfo'
 import { UserType } from '@cambrian/app/store/UserContext'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import { useState } from 'react'
 
 interface MessengerProps {
@@ -26,6 +27,8 @@ const Messenger = ({
     const counterPart = participantDIDs.filter(
         (did) => did !== currentUser.selfID.did.id
     )[0]
+
+    const [counterPartProfile] = useCambrianProfile(counterPart)
 
     return (
         <ResponsiveContext.Consumer>
@@ -52,8 +55,8 @@ const Messenger = ({
                                 }
                                 focusIndicator={false}
                             >
-                                <BasicProfileInfo
-                                    did={counterPart}
+                                <CambrianProfileInfo
+                                    cambrianProfile={counterPartProfile}
                                     hideDetails
                                     size="small"
                                 />
