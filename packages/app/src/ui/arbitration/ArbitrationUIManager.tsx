@@ -13,6 +13,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
 import useArbitratorContract from '@cambrian/app/hooks/useArbitratorContract'
 import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
@@ -56,13 +57,18 @@ const ArbitrationUIManager = ({
             isRecipient
         ) {
             if (!arbitratorContract) {
-                ArbitrationUI = (
-                    <DispatchArbitrationComponent
-                        currentCondition={currentCondition}
-                        currentUser={currentUser}
-                        solverAddress={solverAddress}
-                    />
-                )
+                if (
+                    solverData.config.arbitrator !==
+                    ethers.constants.AddressZero
+                ) {
+                    ArbitrationUI = (
+                        <DispatchArbitrationComponent
+                            currentCondition={currentCondition}
+                            currentUser={currentUser}
+                            solverAddress={solverAddress}
+                        />
+                    )
+                }
             } else if (isTimelockActive) {
                 ArbitrationUI = (
                     <RequestContractArbitrationComponent

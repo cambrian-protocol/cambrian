@@ -35,10 +35,7 @@ const ProposalExecutedControl = () => {
         <>
             {firstSolverAddress && (
                 <BaseFormGroupContainer border pad="medium" gap="medium">
-                    <Text>
-                        This Proposal has been funded and executed. To start
-                        working with it visit the first Solve
-                    </Text>
+                    <Text>This Proposal has been funded and executed.</Text>
                     <Link
                         href={`${window.location.origin}/solvers/${firstSolverAddress}`}
                         passHref
