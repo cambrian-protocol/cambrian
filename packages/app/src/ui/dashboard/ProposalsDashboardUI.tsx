@@ -1,5 +1,5 @@
 import { ArrowsClockwise, CircleDashed } from 'phosphor-react'
-import { Box, Heading, Tab, Tabs, Text } from 'grommet'
+import { Box, Heading, Spinner, Tab, Tabs, Text } from 'grommet'
 import CeramicStagehand, {
     StageNames,
 } from '@cambrian/app/classes/CeramicStagehand'
@@ -113,13 +113,13 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                 }
                             }
 
-                            const templateCommit = (await (
-                                await ceramicStagehand.loadReadOnlyStream(
-                                    proposalDoc.content.template.commitID
-                                )
-                            ).content) as CeramicTemplateModel
-
                             if (proposalDoc) {
+                                const templateCommit = (await (
+                                    await ceramicStagehand.loadReadOnlyStream(
+                                        proposalDoc.content.template.commitID
+                                    )
+                                ).content) as CeramicTemplateModel
+
                                 _receivedProposals.push({
                                     status: getProposalStatus(
                                         proposalDoc,
@@ -310,10 +310,19 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                             round="xsmall"
                                             border
                                         >
-                                            <CircleDashed size="32" />
-                                            <Text size="small" color="dark-4">
-                                                No Proposals created yet
-                                            </Text>
+                                            {isFetching ? (
+                                                <Spinner />
+                                            ) : (
+                                                <>
+                                                    <CircleDashed size="32" />
+                                                    <Text
+                                                        size="small"
+                                                        color="dark-4"
+                                                    >
+                                                        No Proposals created yet
+                                                    </Text>
+                                                </>
+                                            )}
                                         </Box>
                                     )}
                                 </Box>
@@ -345,10 +354,19 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                             round="xsmall"
                                             border
                                         >
-                                            <CircleDashed size="32" />
-                                            <Text size="small" color="dark-4">
-                                                No proposals received yet
-                                            </Text>
+                                            {isFetching ? (
+                                                <Spinner />
+                                            ) : (
+                                                <>
+                                                    <CircleDashed size="32" />
+                                                    <Text
+                                                        size="small"
+                                                        color="dark-4"
+                                                    >
+                                                        No Proposals created yet
+                                                    </Text>
+                                                </>
+                                            )}
                                         </Box>
                                     )}
                                 </Box>
