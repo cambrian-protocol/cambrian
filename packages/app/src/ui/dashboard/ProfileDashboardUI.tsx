@@ -126,7 +126,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                             <FormField label="Website" name="website" />
                             <FormField label="Twitter" name="twitter" />
                             <FormField
-                                label="Dicord Webhook"
+                                label="Discord Webhook"
                                 name="discordWebhook"
                             />
                         </Box>
