@@ -8,10 +8,8 @@ import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { SetStateAction } from 'react'
 import TemplatePricingForm from '../../forms/TemplatePricingForm'
-import { UserType } from '@cambrian/app/store/UserContext'
 
 interface TemplatePricingStepProps {
-    currentUser: UserType
     stepperCallback: (step: TemplateWizardStepsType) => void
     templateInput: CeramicTemplateModel
     setTemplateInput: React.Dispatch<
@@ -22,7 +20,6 @@ interface TemplatePricingStepProps {
 
 const TemplatePricingStep = ({
     stepperCallback,
-    currentUser,
     templateInput,
     setTemplateInput,
     onSaveTemplate,
@@ -52,7 +49,6 @@ const TemplatePricingStep = ({
                     stepperCallback(TEMPLATE_WIZARD_STEPS.DESCRIPTION)
                 }
                 cancelLabel="Back"
-                currentUser={currentUser}
             />
         </Box>
     )

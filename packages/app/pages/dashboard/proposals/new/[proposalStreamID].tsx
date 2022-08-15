@@ -1,26 +1,51 @@
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
+import { Box } from 'grommet'
+import Custom404Page from 'packages/app/pages/404'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import NewProposalUI from '@cambrian/app/ui/proposals/NewProposalUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import ProposalWizard from '@cambrian/app/ui/proposals/wizard/ProposalWizard'
 import _ from 'lodash'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function NewProposalPage() {
-    const { currentUser, isUserLoaded } = useCurrentUserContext()
+    const {
+        isLoaded,
+        proposalInput,
+        setProposalInput,
+        proposalStack,
+        onSaveProposal,
+        proposalStreamDoc,
+        errorMessage,
+        setErrorMessage,
+    } = useEditProposal()
 
     return (
         <>
-            {isUserLoaded ? (
-                currentUser ? (
-                    <NewProposalUI />
-                ) : (
-                    <PageLayout contextTitle="Connect your Wallet">
-                        <ConnectWalletSection />
-                    </PageLayout>
-                )
+            {!isLoaded ? (
+                <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
+            ) : proposalInput && proposalStack && proposalStreamDoc ? (
+                <PageLayout contextTitle="New Proposal" kind="narrow">
+                    <Box align="center" pad="large">
+                        <Box width={'xlarge'} gap="large">
+                            <ProposalWizard
+                                proposalStreamDoc={proposalStreamDoc}
+                                onSaveProposal={onSaveProposal}
+                                proposalStack={proposalStack}
+                                proposalInput={proposalInput}
+                                setProposalInput={setProposalInput}
+                            />
+                        </Box>
+                    </Box>
+                </PageLayout>
             ) : (
-                <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
+                <Custom404Page />
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    errorMessage={errorMessage}
+                    onClose={() => setErrorMessage(undefined)}
+                />
             )}
         </>
     )

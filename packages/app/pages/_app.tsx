@@ -27,9 +27,7 @@ export default function App({ ...props }: AppProps) {
                 connectNetwork: 'testnet-clay',
             }}
         >
-            <Store>
-                <Core {...props} />
-            </Store>
+            <Core {...props} />
         </Provider>
     )
 }
@@ -44,9 +42,11 @@ const Core = ({ Component, pageProps }: AppProps) => {
             background={'background-back'}
         >
             <GlobalStyle />
-            <ErrorBoundary>
-                <Component {...pageProps} />
-            </ErrorBoundary>
+            <Store>
+                <ErrorBoundary>
+                    <Component {...pageProps} />
+                </ErrorBoundary>
+            </Store>
         </Grommet>
     )
 }

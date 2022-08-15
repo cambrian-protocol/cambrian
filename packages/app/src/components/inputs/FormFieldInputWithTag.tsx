@@ -1,6 +1,6 @@
-import { Box } from 'grommet'
+import { Box, Text } from 'grommet'
+
 import { Button } from 'grommet'
-import { FormField } from 'grommet'
 import SlotTagModal from '@cambrian/app/ui/composer/controls/solver/general/modals/SlotTagModal'
 import { Tag } from 'phosphor-react'
 import { useState } from 'react'
@@ -21,16 +21,12 @@ const FormFieldInputWithTag = ({
 
     return (
         <>
-            <Box direction="row" align="center">
-                <Box flex>
-                    <FormField label={label}>{input}</FormField>
+            <Box direction="row" align="end" gap="small">
+                <Box flex gap="small">
+                    <Text>{label}</Text>
+                    {input}
                 </Box>
-                <Box basis="1/5" pad={'xsmall'}>
-                    <Button
-                        icon={<Tag size="24" />}
-                        onClick={toggleShowTagModal}
-                    />
-                </Box>
+                <Button icon={<Tag />} onClick={toggleShowTagModal} />
             </Box>
             {showTagModal && (
                 <SlotTagModal slotId={slotId} onBack={toggleShowTagModal} />

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import InvalidQueryComponent from '@cambrian/app/components/errors/InvalidQueryComponent'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -13,7 +12,7 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 import { useRouter } from 'next/router'
 
 export default function SolverPage() {
-    const { currentUser, isUserLoaded } = useCurrentUserContext()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { solverAddress } = router.query
 
@@ -55,26 +54,20 @@ export default function SolverPage() {
 
     return (
         <>
-            {isUserLoaded ? (
-                currentUser ? (
-                    isInitialized ? (
-                        solverContract ? (
-                            <Solver
-                                currentUser={currentUser}
-                                solverContract={solverContract}
-                            />
-                        ) : (
-                            <PageLayout contextTitle="No Solver found">
-                                <InvalidQueryComponent context="Solver" />
-                            </PageLayout>
-                        )
+            {currentUser ? (
+                isInitialized ? (
+                    solverContract ? (
+                        <Solver
+                            currentUser={currentUser}
+                            solverContract={solverContract}
+                        />
                     ) : (
-                        <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
+                        <PageLayout contextTitle="No Solver found">
+                            <InvalidQueryComponent context="Solver" />
+                        </PageLayout>
                     )
                 ) : (
-                    <PageLayout contextTitle="Connect your Wallet">
-                        <ConnectWalletSection />
-                    </PageLayout>
+                    <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
                 )
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
