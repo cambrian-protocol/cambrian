@@ -18,30 +18,116 @@ const USPSection = () => {
         >
             <Glow height="800px" width="2000px" left={'40%'} top={'10%'} />
             <Box gap="medium" align="center" style={{ position: 'relative' }}>
-                <Heading textAlign="center">Zero Fees. Owned By You.</Heading>
-                <Box width={'large'} gap="medium">
-                    <Text color="dark-4" textAlign="center">
-                        Say goodbye to invoices, wire transfers, freelancing
-                        platforms and more. We build smart contracts that allow
-                        anybody in the world to easily, securely work together.
-                    </Text>
-                    <Text color="dark-4" textAlign="center">
-                        Cambrian Protocol is free forever, earning revenue with
-                        value-added services and returning governance shares to
-                        users who contribute optional payments back to the
-                        community.
-                    </Text>
-                    {/* <Anchor
-                        color="brand"
-                        href="https://www.notion.so/cambrianprotocol/Project-Description-97ba57659ed2421386065588ee052600"
-                    >
-                        <Box direction="row" gap="small" justify="center">
-                            <Text>Check out our Notion</Text>
-                            <ArrowCircleRight size="24" />
-                        </Box>
-                    </Anchor> */}
+                <Box width={'large'} gap="xlarge">
+                    <Box width={'large'} gap="medium">
+                        <Heading textAlign="start">Choice & Control</Heading>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Banks control your money.{'\n'}
+                            Government controls your identity.{'\n'}
+                            Tech companies control your information.{'\n'}
+                            You pay taxes and fees to use what's already yours.
+                        </Text>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Cambrian users are empowered by blockchain
+                            technology to manage their own identities, operate
+                            using the currencies of their choice, and leverage a
+                            growing suite of information technologies for their
+                            work and business — Without paying middlemen for
+                            their monopolies.
+                        </Text>
+                    </Box>
+
+                    <Box width={'large'} gap="medium">
+                        <Heading textAlign="start">Freedom & Stability</Heading>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Thousands of livelihoods disappear every day from
+                            censorship, deplatforming, and simple mistakes. Your
+                            access to the financial services and digital
+                            platforms you need is at constant risk of being shut
+                            off.
+                        </Text>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Our technology is built on Ethereum, the world's
+                            leading smart contract network. Our software is kept
+                            running by thousands of independent operators around
+                            the world, making downtime and censorship next to
+                            impossible. Even we can't ban you.
+                        </Text>
+                    </Box>
+
+                    <Box width={'large'} gap="medium">
+                        <Heading textAlign="start">
+                            Consensus & Cooperation
+                        </Heading>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Misalignment between the owning and working class
+                            breeds exploitative conditions and unsustainable
+                            business practices. The future of work should be
+                            owned by the workers.
+                        </Text>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Cambrian is establishing a Decentralized Autonomous
+                            Organization (DAO), an evolution of the platform
+                            cooperative, to own and govern the protocol. Our
+                            founding team will dissolve into the DAO,
+                            transferring our intellectual property and exiting
+                            to the community.
+                        </Text>
+                    </Box>
+
+                    <Box width={'large'} gap="medium">
+                        <Heading textAlign="start">
+                            Extensible & Customizable
+                        </Heading>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            The world moves too fast for one solution, and no
+                            software is right for everyone. The future of work
+                            needs something better than generic escrow and
+                            bounty solutions.
+                        </Text>
+                        <Text
+                            color="dark-4"
+                            textAlign="start"
+                            style={{ whiteSpace: 'pre-line' }}
+                        >
+                            Our Solver technology is modular, composable, and
+                            easily extended by developers. More, we've built an
+                            entire no-code workflow for regular users to
+                            configure custom solutions — eliminating engineering
+                            as a bottleneck to growth and adoption.
+                        </Text>
+                    </Box>
                 </Box>
-                <Box direction="row" justify="around" wrap>
+
+                <Box direction="row" justify="around" pad="large" wrap>
                     <USPCard
                         icon={<Coins />}
                         title="Earn Together"

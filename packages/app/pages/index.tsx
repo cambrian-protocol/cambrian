@@ -63,7 +63,7 @@ export default function Home() {
                     />
                     <Box style={{ position: 'relative' }}>
                         <USPSection />
-                        <USPListSection />
+                        {/* <USPListSection /> */}
                         <BaseContentSection
                             title={'Quit a Boss'}
                             subTitle={'Everyone'}

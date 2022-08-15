@@ -26,6 +26,7 @@ export default function App({ ...props }: AppProps) {
                 ceramic: CERAMIC_NODE_ENDPOINT,
                 connectNetwork: 'testnet-clay',
             }}
+            session
         >
             <Store>
                 <Core {...props} />

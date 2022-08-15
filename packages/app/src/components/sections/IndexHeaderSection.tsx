@@ -35,6 +35,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                         style={{ position: 'relative' }}
                         fill
                         justify="center"
+                        align="center"
                     >
                         <Box
                             pad="large"
@@ -53,9 +54,8 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 size="large"
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                Buy and sell services, freelance work and
-                                bounties on a trustless, non-custodial Web3
-                                platform.
+                                Buy and sell services, freelance work and more
+                                on a free platform owned by its users.
                             </Text>
                             <Box
                                 direction={isSmallScreen ? 'column' : 'row'}
