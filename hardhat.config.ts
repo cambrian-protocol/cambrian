@@ -31,6 +31,10 @@ export const config = {
         : [],
       blockGasLimit: 4000000,
     },
+    nova: {
+      url: "https://nova.arbitrum.io/rpc",
+      accounts: process.env.CRD_KEY ? [`${process.env.CRD_KEY}`] : [],
+    },
   },
   solidity: {
     compilers: [

@@ -18,6 +18,15 @@ import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHu
 import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
 import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
 import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
+import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
+import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
+import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
+import NOVA_BasicSolverV1 from '@cambrian/core/deployments/nova/BasicSolverV1.json'
+import NOVA_ConditionalTokens from '@cambrian/core/deployments/nova/ConditionalTokens.json'
+import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutionsHub.json'
+import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
+import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
+import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
 
 interface ChainInfo {
     name: string
@@ -112,6 +121,37 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             toyToken: ROPSTEN_ToyToken.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
+        },
+    },
+    42170: {
+        chainData: {
+            name: 'Arbitrum Nova',
+            shortName: 'arb-nova',
+            chain: 'ETH',
+            network: 'arbitrum-nova',
+            chainId: 42170,
+            networkId: 42170,
+            rpcUrl: 'https://nova.arbitrum.io/rpc',
+            nativeCurrency: {
+                symbol: 'ETH',
+                name: 'Ethereum',
+                decimals: '18',
+                contractAddress: '',
+                balance: '',
+            },
+        },
+        contracts: {
+            arbitratorFactory: NOVA_ArbitratorFactory.address,
+            arbitrationDispatch: NOVA_ArbitrationDispatch.address,
+            basicArbitrator: NOVA_BasicArbitrator.address,
+            basicSolverV1: NOVA_BasicSolverV1.address,
+            conditionalTokens: NOVA_ConditionalTokens.address,
+            ipfsSolutionsHub: NOVA_IPFSSolutionsHub.address,
+            proposalsHub: NOVA_ProposalsHub.address,
+            solverFactory: NOVA_SolverFactory.address,
+            solverLib: NOVA_SolverLib.address,
+            defaultDenominationToken:
+                '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
     },
 }
