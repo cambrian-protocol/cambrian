@@ -23,18 +23,17 @@ import PreferredTokenItem from '@cambrian/app/components/list/PreferredTokenItem
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { isAddress } from '@cambrian/app/utils/helpers/validation'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplatePricingFormProps {
     templateInput: CeramicTemplateModel
     setTemplateInput: React.Dispatch<
         SetStateAction<CeramicTemplateModel | undefined>
     >
-    currentUser: UserType
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel: () => void
@@ -45,11 +44,11 @@ const TemplatePricingForm = ({
     onSubmit,
     templateInput,
     setTemplateInput,
-    currentUser,
     submitLabel,
     onCancel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
+    const { currentUser } = useCurrentUserContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
@@ -68,8 +67,13 @@ const TemplatePricingForm = ({
     }
 
     const initCollateralToken = async (ctAddress: string) => {
-        const token = await fetchTokenInfo(ctAddress, currentUser.web3Provider)
-        setCollateralToken(token)
+        if (currentUser) {
+            const token = await fetchTokenInfo(
+                ctAddress,
+                currentUser.web3Provider
+            )
+            setCollateralToken(token)
+        }
     }
 
     const onAddPreferredToken = (token: TokenModel) => {
@@ -280,7 +284,6 @@ const TemplatePricingForm = ({
             </Form>
             {showImportTokenModal && (
                 <ImportTokenModal
-                    currentUser={currentUser}
                     onClose={toggleShowImportTokenModal}
                     onAddToken={onAddPreferredToken}
                 />

@@ -11,11 +11,9 @@ import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeade
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { UserType } from '@cambrian/app/store/UserContext'
 
 interface EditTemplateUIProps {
     cachedTemplateTitle: string
-    currentUser: UserType
     templateInput: CeramicTemplateModel
     setTemplateInput: React.Dispatch<
         SetStateAction<CeramicTemplateModel | undefined>
@@ -32,7 +30,6 @@ const EditTemplateUI = ({
     setTemplateInput,
     onSaveTemplate,
     onResetTemplate,
-    currentUser,
     composition,
     templateStreamID,
 }: EditTemplateUIProps) => {
@@ -89,7 +86,6 @@ const EditTemplateUI = ({
                         setTemplateInput={setTemplateInput}
                         onSubmit={onSubmit}
                         onCancel={onResetTemplate}
-                        currentUser={currentUser}
                     />
                 </Tab>
                 {templateInput.flexInputs.length > 0 && (

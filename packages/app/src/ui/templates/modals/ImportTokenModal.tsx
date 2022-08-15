@@ -13,22 +13,18 @@ import { Coin } from 'phosphor-react'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { isAddress } from '@cambrian/app/utils/helpers/validation'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 
 interface ImportTokenModalProps {
     onClose: () => void
     onAddToken: (token: TokenModel) => boolean
-    currentUser: UserType
 }
 
-const ImportTokenModal = ({
-    onClose,
-    currentUser,
-    onAddToken,
-}: ImportTokenModalProps) => {
+const ImportTokenModal = ({ onClose, onAddToken }: ImportTokenModalProps) => {
+    const { currentUser } = useCurrentUserContext()
     const [tokenAddressInput, setTokenAddressInput] = useState('')
     const [showError, setShowError] = useState(false)
     const [token, setToken] = useState<TokenModel>()
@@ -66,7 +62,10 @@ const ImportTokenModal = ({
                                         onChange={async (e) => {
                                             if (showError) setShowError(false)
                                             setTokenAddressInput(e.target.value)
-                                            if (isAddress(e.target.value)) {
+                                            if (
+                                                currentUser &&
+                                                isAddress(e.target.value)
+                                            ) {
                                                 setToken(
                                                     await fetchTokenInfo(
                                                         e.target.value,

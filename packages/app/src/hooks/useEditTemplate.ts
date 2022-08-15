@@ -10,7 +10,7 @@ import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 const useEditTemplate = () => {
-    const { currentUser, isUserLoaded } = useCurrentUserContext()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
@@ -97,8 +97,6 @@ const useEditTemplate = () => {
         setErrorMessage: setErrorMessage,
         onSaveTemplate: onSaveTemplate,
         onResetTemplate: onResetTemplate,
-        currentUser: currentUser,
-        isUserLoaded: isUserLoaded,
         templateStreamID: templateStreamID as string,
         cachedTemplate: cachedTemplate,
     }

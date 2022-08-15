@@ -12,7 +12,6 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface TemplateWizardProps {
-    currentUser: UserType
     templateInput: CeramicTemplateModel
     setTemplateInput: React.Dispatch<
         SetStateAction<CeramicTemplateModel | undefined>
@@ -37,7 +36,6 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
 const TemplateWizard = ({
-    currentUser,
     templateInput,
     setTemplateInput,
     templateStreamID,
@@ -71,7 +69,6 @@ const TemplateWizard = ({
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
                         stepperCallback={setCurrentStep}
-                        currentUser={currentUser}
                         onSaveTemplate={onSaveTemplate}
                     />
                 )
