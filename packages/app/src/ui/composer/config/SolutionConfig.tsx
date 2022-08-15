@@ -58,14 +58,14 @@ const SolutionConfig = () => {
                 subTitle="Global settings"
                 paragraph="These settings are universal between Solvers."
             />
-            <BaseFormContainer>
-                <Form<SolutionConfigFormType>
-                    value={input}
-                    onSubmit={(event) => onSubmit(event)}
-                    onChange={(nextValue: SolutionConfigFormType) => {
-                        setInput(nextValue)
-                    }}
-                >
+            <Form<SolutionConfigFormType>
+                value={input}
+                onSubmit={(event) => onSubmit(event)}
+                onChange={(nextValue: SolutionConfigFormType) => {
+                    setInput(nextValue)
+                }}
+            >
+                <BaseFormContainer>
                     <FormFieldInputWithTag
                         slotId="collateralToken"
                         label="Collateral token address"
@@ -82,8 +82,8 @@ const SolutionConfig = () => {
                             label="Save"
                         />
                     </Box>
-                </Form>
-            </BaseFormContainer>
+                </BaseFormContainer>
+            </Form>
         </>
     )
 }

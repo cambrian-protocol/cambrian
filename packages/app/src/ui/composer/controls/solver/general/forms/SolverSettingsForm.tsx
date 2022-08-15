@@ -93,7 +93,6 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
         onClose()
     }
 
-    // TODO Implementation Contract Select, move Core Settings here
     return (
         <Form<SolverSettingsFormType>
             value={input}
@@ -104,36 +103,47 @@ const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {
         >
             <BaseFormContainer>
                 <BaseFormGroupContainer>
-                    <FormFieldInputWithTag
-                        slotId="keeper"
-                        label="Keeper Address"
-                        input={<TextInput name="keeperAddress" />}
-                    />
-                    <FormFieldInputWithTag
-                        slotId="arbitrator"
-                        label="Arbitrator Address"
-                        input={<TextInput name="arbitratorAddress" />}
-                    />
+                    <Box gap="medium">
+                        <FormFieldInputWithTag
+                            slotId="keeper"
+                            label="Keeper Address"
+                            input={<TextInput name="keeperAddress" />}
+                        />
+                        <FormFieldInputWithTag
+                            slotId="arbitrator"
+                            label="Arbitrator Address"
+                            input={<TextInput name="arbitratorAddress" />}
+                        />
+                    </Box>
                 </BaseFormGroupContainer>
                 <BaseFormGroupContainer>
                     <FormFieldInputWithTag
                         slotId="timelockSeconds"
                         label="Timelock"
                         input={
-                            <Box direction="row">
-                                <FormField label="Days">
+                            <Box direction="row" gap="small" align="center">
+                                <FormField
+                                    label="Days"
+                                    margin={{ bottom: 'none' }}
+                                >
                                     <TextInput
                                         type="number"
                                         name="timelockDays"
                                     />
                                 </FormField>
-                                <FormField label="Hours">
+                                <FormField
+                                    label="Hours"
+                                    margin={{ bottom: 'none' }}
+                                >
                                     <TextInput
                                         type="number"
                                         name="timelockHours"
                                     />
                                 </FormField>
-                                <FormField label="Minutes">
+                                <FormField
+                                    label="Minutes"
+                                    margin={{ bottom: 'none' }}
+                                >
                                     <TextInput
                                         type="number"
                                         name="timelockMinutes"

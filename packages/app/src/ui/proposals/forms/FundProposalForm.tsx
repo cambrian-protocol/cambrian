@@ -307,7 +307,7 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
             <Box gap="medium">
                 <PlainSectionDivider />
                 <>
-                    <Heading level="3">Back this Proposal</Heading>
+                    <Heading level="3">Fund this Proposal</Heading>
                     <Text color="dark-4" size="small">
                         Invested funds can be defunded until the proposal has
                         been executed

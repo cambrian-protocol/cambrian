@@ -201,13 +201,13 @@ const ProposalHeader = ({
             </ResponsiveContext.Consumer>
             {showTemplateInfoModal && proposalStack && (
                 <TemplateInfoModal
-                    ceramicTemplate={proposalStack.templateDoc.content}
+                    proposalStack={proposalStack}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
             {showProposalInfoModal && proposalStack && (
                 <ProposalInfoModal
-                    ceramicProposal={proposalStack.proposalDoc.content}
+                    proposalStack={proposalStack}
                     onClose={toggleShowProposalInfoModal}
                 />
             )}

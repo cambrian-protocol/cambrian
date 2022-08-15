@@ -11,7 +11,9 @@ import React, {
     useState,
 } from 'react'
 
+import ConnectWalletSection from '../components/sections/ConnectWalletSection'
 import { INFURA_ID } from 'packages/app/config'
+import PageLayout from '../components/layout/PageLayout'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -191,6 +193,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         ) {
             initSelfID(ceramicConnection.selfID)
         }
+        if (ceramicConnection.status === 'failed') {
+            setIsUserLoaded(true)
+        }
     }, [ceramicConnection])
 
     const initSelfID = async (ceramicSelfID: SelfID) => {
@@ -304,7 +309,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     }, [user, disconnectWallet])
 
     const addPermission = (newPermission: PermissionType) => {
-        if (user && user.signer && !user.permissions.includes(newPermission)) {
+        if (user && !user.permissions.includes(newPermission)) {
             dispatch({ type: 'ADD_PERMISSION', permission: newPermission })
         }
     }
@@ -321,7 +326,13 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             }}
         >
             <PermissionProvider permissions={user ? user.permissions : []}>
-                {children}
+                {isUserLoaded && !user ? (
+                    <PageLayout contextTitle="Connect wallet">
+                        <ConnectWalletSection />
+                    </PageLayout>
+                ) : (
+                    children
+                )}
             </PermissionProvider>
         </UserContext.Provider>
     )

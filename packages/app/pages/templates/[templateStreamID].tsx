@@ -1,4 +1,3 @@
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from '../404'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
@@ -7,22 +6,17 @@ import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function ViewTemplatePage() {
     const {
-        isUserLoaded,
-        currentUser,
         templateInput,
         templateStreamID,
         errorMessage,
         setErrorMessage,
         show404NotFound,
+        composition,
     } = useEditTemplate()
 
     return (
         <>
-            {isUserLoaded && !currentUser ? (
-                <PageLayout contextTitle="Connect your Wallet">
-                    <ConnectWalletSection />
-                </PageLayout>
-            ) : show404NotFound ? (
+            {show404NotFound ? (
                 <Custom404Page />
             ) : (
                 <PageLayout
@@ -30,6 +24,7 @@ export default function ViewTemplatePage() {
                     kind="narrow"
                 >
                     <TemplateUI
+                        composition={composition}
                         ceramicTemplate={templateInput}
                         templateStreamID={templateStreamID}
                     />
