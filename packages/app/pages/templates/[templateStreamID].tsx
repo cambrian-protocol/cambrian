@@ -11,6 +11,7 @@ export default function ViewTemplatePage() {
         errorMessage,
         setErrorMessage,
         show404NotFound,
+        composition,
     } = useEditTemplate()
 
     return (
@@ -23,6 +24,7 @@ export default function ViewTemplatePage() {
                     kind="narrow"
                 >
                     <TemplateUI
+                        composition={composition}
                         ceramicTemplate={templateInput}
                         templateStreamID={templateStreamID}
                     />

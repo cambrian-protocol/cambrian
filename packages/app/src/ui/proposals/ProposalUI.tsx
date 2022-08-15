@@ -91,6 +91,9 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                                         token={collateralToken}
                                     />
                                     <FlexInputInfo
+                                        composition={
+                                            proposalStack.compositionDoc.content
+                                        }
                                         flexInputs={
                                             proposalStack.proposalDoc.content
                                                 .flexInputs
