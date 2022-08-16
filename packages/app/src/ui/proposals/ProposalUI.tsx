@@ -32,6 +32,8 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
 
     useEffect(() => {
         initCollateralToken()
+        console.log(proposalStack)
+        console.log(currentUser)
     }, [currentUser, proposalStack])
 
     const initCollateralToken = async () => {

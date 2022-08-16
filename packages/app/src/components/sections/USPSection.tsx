@@ -121,8 +121,8 @@ const USPSection = () => {
                             Our Solver technology is modular, composable, and
                             easily extended by developers. More, we've built an
                             entire no-code workflow for regular users to
-                            configure custom solutions — eliminating engineering
-                            as a bottleneck to growth and adoption.
+                            configure custom solutions — eliminating the
+                            engineering bottleneck to growth and adoption.
                         </Text>
                     </Box>
                 </Box>

@@ -165,6 +165,9 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             proposalStreamDoc: TileDocument<CeramicProposalModel>,
             templateStreamDoc: TileDocument<CeramicTemplateModel>
         ) => {
+            console.log('pdoc: ', proposalStreamDoc)
+            console.log('tdoc: ', templateStreamDoc)
+
             const approvedCommitID = getApprovedProposalCommitID(
                 templateStreamDoc.content,
                 proposalStreamDoc.id.toString()
