@@ -242,11 +242,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     )
 
     // Auto connect to the cached provider
-    useEffect(() => {
-        if (web3Modal.cachedProvider) {
-            connectWallet()
-        }
-    }, [connectWallet])
+    // useEffect(() => {
+    //     if (web3Modal.cachedProvider) {
+    //         connectWallet()
+    //     }
+    // }, [connectWallet])
 
     // EIP-1193 Event Listener
     useEffect(() => {
