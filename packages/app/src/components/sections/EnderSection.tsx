@@ -1,4 +1,5 @@
-import { Box } from 'grommet'
+import { Box, Image } from 'grommet'
+
 import { Heading } from 'grommet'
 import { ResponsiveContext } from 'grommet'
 import { Text } from 'grommet'
@@ -43,6 +44,7 @@ const EnderSection = () => (
                             </Heading>
                         </Box>
                     </Box>
+                    <Image src="illustrations/build-it.svg" height="200px" />
                 </Box>
             )
         }}
