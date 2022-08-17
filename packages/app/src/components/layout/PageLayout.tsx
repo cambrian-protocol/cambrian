@@ -16,11 +16,17 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle: string
     kind?: 'narrow'
+    plain?: boolean
 }
 
 export const siteTitle = 'Cambrian Protocol'
 
-const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
+const PageLayout = ({
+    contextTitle,
+    children,
+    kind,
+    plain,
+}: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
     const { currentUser } = useCurrentUserContext()
 
@@ -47,16 +53,18 @@ const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
                         left={'5%'}
                         top={'-200px'}
                     />
-                    <WorldMap
-                        color="brand"
-                        style={{
-                            position: 'absolute',
-                            top: '10%',
-                            left: '20%',
-                            opacity: 0.03,
-                            height: '70vh',
-                        }}
-                    />
+                    {!plain && (
+                        <WorldMap
+                            color="brand"
+                            style={{
+                                position: 'absolute',
+                                top: '10%',
+                                left: '20%',
+                                opacity: 0.03,
+                                height: '70vh',
+                            }}
+                        />
+                    )}
                     <Appbar />
                     <Box
                         align={kind === 'narrow' ? 'center' : undefined}

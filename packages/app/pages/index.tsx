@@ -8,7 +8,6 @@ import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSec
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import RecommendedReadingsSection from '@cambrian/app/components/sections/RecommendedReadingsSection'
 import { Text } from 'grommet'
-import USPListSection from '@cambrian/app/components/sections/USPListSection'
 import USPSection from '@cambrian/app/components/sections/USPSection'
 import { useRef } from 'react'
 import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
@@ -22,7 +21,7 @@ export default function Home() {
     }
 
     return (
-        <PageLayout contextTitle="Index">
+        <PageLayout contextTitle="Index" plain>
             <Box style={{ position: 'relative', overflow: 'hidden' }} fill>
                 <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
                 <Box ref={startRef} />
