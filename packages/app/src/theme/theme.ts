@@ -20,6 +20,7 @@ const colors: any = {
         dark: '#012e3d',
         light: '#95d4e8',
     },
+    'background-contrast-transparent': '#00202b70',
     'background-popup': { dark: '#132e33', light: '#0A1F23' },
     'primary-gradient':
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',

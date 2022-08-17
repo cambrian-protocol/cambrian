@@ -43,6 +43,7 @@ const PageLayout = ({
             <Box height={'100vh'}>
                 <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
                 <Page
+                    id="root-page"
                     style={{ position: 'relative' }}
                     overflow={{ horizontal: 'hidden', vertical: 'auto' }}
                 >

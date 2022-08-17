@@ -1,18 +1,18 @@
-import { ArrowCircleRight, IconContext } from 'phosphor-react'
+import { Box, Image } from 'grommet'
 
-import { Box } from 'grommet'
+import { ArrowCircleRight } from 'phosphor-react'
 import { Card } from 'grommet'
 import Link from 'next/link'
 import { Text } from 'grommet'
 
 interface USPCardProps {
-    icon: JSX.Element
+    image: string
     title: string
     description: string
     href: string
 }
 
-const USPCard = ({ icon, title, description, href }: USPCardProps) => {
+const USPCard = ({ image, title, description, href }: USPCardProps) => {
     return (
         <Box pad="medium">
             <Link href={href}>
@@ -22,19 +22,13 @@ const USPCard = ({ icon, title, description, href }: USPCardProps) => {
                     pad={{ vertical: 'large', horizontal: 'medium' }}
                     round="xsmall"
                     height="medium"
-                    width={{ min: '20rem', max: '20rem' }}
+                    width={'medium'}
                     background="background-contrast"
                     justify="around"
                     align="center"
                     gap="large"
                 >
-                    <IconContext.Provider
-                        value={{
-                            size: '48',
-                        }}
-                    >
-                        {icon}
-                    </IconContext.Provider>
+                    <Image src={image} height="100px" />
                     <Box gap="small">
                         <Text size="large" textAlign="center">
                             {title}
