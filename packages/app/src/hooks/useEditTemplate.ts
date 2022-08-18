@@ -36,22 +36,24 @@ const useEditTemplate = () => {
                     const template = (await (
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
+                    if (template) {
+                        // Just initialize edit paths if currentUser is the author
+                        if (
+                            (!router.pathname.includes('edit') &&
+                                !router.pathname.includes('new')) ||
+                            currentUser.selfID.did.id === template.author
+                        ) {
+                            const comp = (await (
+                                await cs.loadTileDocument(
+                                    template.composition.commitID
+                                )
+                            ).content) as CompositionModel
 
-                    // Just initialize if currentUser is the author
-                    if (
-                        template &&
-                        template.author === currentUser.selfID.did.id
-                    ) {
-                        const comp = (await (
-                            await cs.loadTileDocument(
-                                template.composition.commitID
-                            )
-                        ).content) as CompositionModel
-
-                        if (comp) {
-                            setComposition(comp)
-                            setCachedTemplate(_.cloneDeep(template))
-                            return setTemplateInput(template)
+                            if (comp) {
+                                setComposition(comp)
+                                setCachedTemplate(_.cloneDeep(template))
+                                return setTemplateInput(template)
+                            }
                         }
                     }
                 } catch (e) {
