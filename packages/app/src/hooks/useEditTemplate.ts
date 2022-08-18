@@ -37,7 +37,11 @@ const useEditTemplate = () => {
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
-                    if (template) {
+                    // Just initialize if currentUser is the author
+                    if (
+                        template &&
+                        template.author === currentUser.selfID.did.id
+                    ) {
                         const comp = (await (
                             await cs.loadTileDocument(
                                 template.composition.commitID
