@@ -35,7 +35,7 @@ export default function UserMenu() {
                 <UserMenuItemLabel
                     subTitle={ellipseAddress(currentUser.address, 9)}
                     label={
-                        currentUser.cambrianProfileDoc.content?.name || 'Anonym'
+                        currentUser.cambrianProfileDoc.content?.name || 'Anon'
                     }
                 />
             ),

@@ -167,9 +167,11 @@ export const getApprovedProposalCommitID = (
     template: CeramicTemplateModel,
     proposalStreamID: string
 ) =>
-    template.receivedProposals[proposalStreamID]?.find(
-        (commit) => commit.approved
-    )?.proposalCommitID
+    (template.receivedProposals &&
+        template.receivedProposals[proposalStreamID]?.find(
+            (commit) => commit.approved
+        )?.proposalCommitID) ||
+    false
 
 const getParsedSolvers = async (
     proposalStack: ProposalStackType,
