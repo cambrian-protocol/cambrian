@@ -22,7 +22,7 @@ export const config = {
   },
   networks: {
     hardhat: {
-      blockGasLimit: 15000000,
+      // blockGasLimit: 15000000,
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_ROPSTEN_ID}`,

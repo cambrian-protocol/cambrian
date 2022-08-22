@@ -202,9 +202,7 @@ contract IPFSSolutionsHub {
 
         try
             ISolver(instances[solutionId].solverAddresses[0]).executeSolve(0)
-        {} catch {
-            console.log("Oops");
-        }
+        {} catch {}
 
         emit ExecuteSolution(solutionId);
     }

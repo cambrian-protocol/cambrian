@@ -63,13 +63,13 @@ contract ProposalsHub is ERC1155Receiver {
             "ProposalsHub::Proposal already executed"
         );
 
+        proposals[proposalId].isExecuted = true;
+
         IIPFSSolutionsHub(proposals[proposalId].solutionsHub).executeSolution(
             proposalId,
             proposals[proposalId].solutionId,
             solverConfigs
         );
-
-        proposals[proposalId].isExecuted = true;
 
         emit ExecuteProposal(proposalId);
     }

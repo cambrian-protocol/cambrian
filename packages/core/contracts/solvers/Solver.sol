@@ -155,7 +155,6 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
         @param _index Index of condition to execute on
      */
     function executeSolve(uint256 _index) public {
-        console.log(ingestsValid());
         require(ingestsValid() == true, "ingests invalid");
 
         SolverLib.executeSolve(
