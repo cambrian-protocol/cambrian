@@ -11,8 +11,10 @@ import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useRouter } from 'next/router'
 
 export default function UserMenu() {
+    const router = useRouter()
     const { currentUser, disconnectWallet, connectWallet } =
         useCurrentUserContext()
 
@@ -40,7 +42,8 @@ export default function UserMenu() {
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
-            href: '/dashboard/profile',
+            // href: '/dashboard/profile',
+            onClick: () => router.push('/dashboard/profile'),
         })
         menuItems.push({
             label: (

@@ -24,8 +24,9 @@ export default function App({ ...props }: AppProps) {
         <Provider
             client={{
                 ceramic: CERAMIC_NODE_ENDPOINT,
-                connectNetwork: 'testnet-clay',
+                connectNetwork: 'mainnet',
             }}
+            // session // Research more
         >
             <Core {...props} />
         </Provider>

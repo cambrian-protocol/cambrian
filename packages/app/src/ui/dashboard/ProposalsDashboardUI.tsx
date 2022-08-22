@@ -25,6 +25,7 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
@@ -195,14 +196,22 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         )
                     ).content) as CeramicTemplateModel
 
-                    return {
-                        status: getProposalStatus(
+                    let status
+                    try {
+                        status = getProposalStatus(
                             proposalDoc,
                             _templateStreamContent.receivedProposals[
                                 proposalStreamID
                             ],
                             onChainProposal
-                        ),
+                        )
+                    } catch (e) {
+                        status = ProposalStatus.Unknown
+                    } // Probably not the best spot for this, but I did it to clear an error
+                    // Had a template which was missing "receivedProposals" field
+
+                    return {
+                        status: status,
                         streamID: proposalStreamID,
                         title: proposalDoc.content.title,
                         templateTitle: templateCommit.title,
