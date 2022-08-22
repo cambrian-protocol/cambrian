@@ -435,7 +435,6 @@ export default class CeramicStagehand {
     ) => {
         try {
             // Hit mailbox server
-            console.log('fe: ', proposalStack.proposalDoc.id.toString())
             const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -486,7 +485,7 @@ export default class CeramicStagehand {
             )
 
             if (success) {
-                // Hit mailbox server
+                // Archive Proposal & Send Mail
                 const res = await fetch(
                     `${TRILOBOT_ENDPOINT}/approveProposal`,
                     {

@@ -8,6 +8,8 @@ import "../interfaces/IProposalsHub.sol";
 import "../solvers/Solver.sol";
 import "../solvers/SolverLib.sol";
 
+import "hardhat/console.sol";
+
 contract IPFSSolutionsHub {
     mapping(bytes32 => uint256) public nonces;
 
@@ -200,7 +202,9 @@ contract IPFSSolutionsHub {
 
         try
             ISolver(instances[solutionId].solverAddresses[0]).executeSolve(0)
-        {} catch {}
+        {} catch {
+            console.log("Oops");
+        }
 
         emit ExecuteSolution(solutionId);
     }
