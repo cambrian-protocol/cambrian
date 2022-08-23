@@ -187,9 +187,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 )
 
                 if (sessionStr && sessionStr != 'undefined') {
-                    console.log('sessionStr: ', sessionStr)
                     selfId = await ceramicConnect(
                         new EthereumAuthProvider(provider, address),
+                        //@ts-ignore too many params
                         sessionStr
                     )
                 }
@@ -200,7 +200,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                     selfId = await ceramicConnect(
                         new EthereumAuthProvider(provider, address)
                     )
-                    // @ts-ignore
+                    // @ts-ignore no session param on WebClient
                     const serializedSession = selfId?.client.session.serialize()
                     if (serializedSession) {
                         try {

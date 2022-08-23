@@ -154,4 +154,35 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
     },
+    // 42161: {
+    //     chainData: {
+    //         name: 'Arbitrum One',
+    //         shortName: 'arb-one',
+    //         chain: 'ETH',
+    //         network: 'arbitrum-one',
+    //         chainId: 421761,
+    //         networkId: 42161,
+    //         rpcUrl: 'https://arb1.arbitrum.io/rpc',
+    //         nativeCurrency: {
+    //             symbol: 'ETH',
+    //             name: 'Ethereum',
+    //             decimals: '18',
+    //             contractAddress: '',
+    //             balance: '',
+    //         },
+    //     },
+    //     contracts: {
+    //         arbitratorFactory: NOVA_ArbitratorFactory.address,
+    //         arbitrationDispatch: NOVA_ArbitrationDispatch.address,
+    //         basicArbitrator: NOVA_BasicArbitrator.address,
+    //         basicSolverV1: NOVA_BasicSolverV1.address,
+    //         conditionalTokens: NOVA_ConditionalTokens.address,
+    //         ipfsSolutionsHub: NOVA_IPFSSolutionsHub.address,
+    //         proposalsHub: NOVA_ProposalsHub.address,
+    //         solverFactory: NOVA_SolverFactory.address,
+    //         solverLib: NOVA_SolverLib.address,
+    //         defaultDenominationToken:
+    //             '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
+    //     },
+    // },
 }
