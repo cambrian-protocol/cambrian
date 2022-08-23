@@ -50,7 +50,7 @@ const ImportTokenModal = ({ onClose, onAddToken }: ImportTokenModalProps) => {
             <Form onSubmit={onSubmit}>
                 <Box height={{ min: 'auto' }} gap="medium">
                     <Box>
-                        <Box direction="row" gap="small">
+                        <Box direction="row" gap="small" align="start">
                             <Box flex>
                                 <FormField
                                     htmlFor="tokenAddressInput"
@@ -79,7 +79,9 @@ const ImportTokenModal = ({ onClose, onAddToken }: ImportTokenModalProps) => {
                                     />
                                 </FormField>
                             </Box>
-                            <TokenAvatar token={token} />
+                            <Box pad={{ top: '2.2em' }}>
+                                <TokenAvatar token={token} />
+                            </Box>
                         </Box>
                     </Box>
                     <Box gap="small">

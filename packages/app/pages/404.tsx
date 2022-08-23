@@ -1,8 +1,7 @@
-import { Box, Button, Text } from 'grommet'
+import { Box, Button, Image, Text } from 'grommet'
 
 import Link from 'next/link'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { SmileyXEyes } from 'phosphor-react'
 
 const Custom404Page = () => {
     return (
@@ -13,11 +12,14 @@ const Custom404Page = () => {
                 gap="small"
                 height={{ min: '90vh' }}
             >
-                <SmileyXEyes size="32" />
+                <Image
+                    src="/illustrations/page-not-found.svg"
+                    height={'200px'}
+                />
                 <Text>404 - Page not found</Text>
                 <Link href="/">
                     <a>
-                        <Button primary label="Go back to home" />
+                        <Button primary label="Go back to home" size="small" />
                     </a>
                 </Link>
             </Box>

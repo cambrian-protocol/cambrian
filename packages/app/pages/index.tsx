@@ -53,7 +53,7 @@ const sections: BackgroundScrollSection[] = [
         title: 'Extensible & Customizable',
         subTitle:
             'The world moves too fast for one solution, and no software is right for everyone. The future of work needs something better than generic escrow and bounty solutions.',
-        text: "Our Solver technology is modular, composable, and easily extended by developers. More, we've built an entire no-code workflow for regular users to configure custom solutions — eliminating engineering as a bottleneck to growth and adoption.",
+        text: "Our Solver technology is modular, composable, and easily extended by developers. More, we've built an entire no-code workflow for regular users to configure custom solutions — eliminating the engineering bottleneck to growth and adoption.",
         objectPosition: 'center',
     },
 ]

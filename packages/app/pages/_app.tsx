@@ -26,7 +26,7 @@ export default function App({ ...props }: AppProps) {
                 ceramic: CERAMIC_NODE_ENDPOINT,
                 connectNetwork: 'mainnet',
             }}
-            session // Research more
+            session={true} // Research more
         >
             <Core {...props} />
         </Provider>
