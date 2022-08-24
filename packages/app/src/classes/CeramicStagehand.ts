@@ -352,7 +352,10 @@ export default class CeramicStagehand {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',
-                body: JSON.stringify({ id: proposalStreamDoc.id.toString() }),
+                body: JSON.stringify({
+                    id: proposalStreamDoc.id.toString(),
+                    session: (this.selfID.client as any).session.serialize(), // Ceramic types not updated for WebClientSession yet
+                }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -439,6 +442,7 @@ export default class CeramicStagehand {
                 method: 'POST',
                 body: JSON.stringify({
                     id: proposalStack.proposalDoc.id.toString(),
+                    session: (this.selfID.client as any).session.serialize(),
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -492,6 +496,9 @@ export default class CeramicStagehand {
                         method: 'POST',
                         body: JSON.stringify({
                             id: proposalStack.proposalDoc.id.toString(),
+                            session: (
+                                this.selfID.client as any
+                            ).session.serialize(),
                         }),
                         headers: {
                             'Content-Type': 'application/json',
