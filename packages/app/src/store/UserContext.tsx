@@ -246,7 +246,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 //@ts-ignore
                 ceramicSelfID.client.ceramic,
                 {
-                    controllers: [ceramicSelfID.id],
+                    controllers: [ceramicSelfID.did.id],
                     family: 'cambrian-profile',
                 },
                 { pin: true }
