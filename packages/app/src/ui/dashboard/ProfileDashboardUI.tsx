@@ -71,7 +71,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                         />
                     )}
                     <Box gap="small" pad={{ top: 'medium' }}>
-                        <Heading>{cambrianProfile.name || 'Anonym'}</Heading>
+                        <Heading>{cambrianProfile.name || 'Anon'}</Heading>
                         <Text>{cambrianProfile.title || 'Unknown'}</Text>
                         <Text color="dark-4">
                             {ellipseAddress(currentUser.address, 10)}

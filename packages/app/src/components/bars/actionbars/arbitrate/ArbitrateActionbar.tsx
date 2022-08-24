@@ -77,8 +77,8 @@ const ArbitrateActionbar = ({
                 'Somebody has disagreed with the proposed outcome and raised a dispute.',
             dropContent: (
                 <ActionbarItemDropContainer
-                    title="Report an outcome"
-                    description='Please hit the "Report Outcome"-Button at your
+                    title="Arbitrate Outcome"
+                    description='Please hit the "Arbitrate Outcome"-Button at your
                     right and select the outcome that resulted from the arbitration.'
                     list={[
                         {

@@ -150,6 +150,7 @@ export default function CoreMessenger({
         try {
             const messagesDoc: TileDocument<{ messages: ChatMessageType[] }> =
                 await TileDocument.deterministic(
+                    //@ts-ignore
                     currentUser.selfID.client.ceramic,
                     {
                         controllers: [currentUser.selfID.did.id],
@@ -198,6 +199,7 @@ export default function CoreMessenger({
                     await Promise.allSettled(
                         participants.map((DID) =>
                             TileDocument.deterministic(
+                                //@ts-ignore
                                 currentUser.selfID.client.ceramic,
                                 {
                                     controllers: [DID],
@@ -244,6 +246,7 @@ export default function CoreMessenger({
                         participants.map(
                             async (DID) =>
                                 await TileDocument.deterministic(
+                                    //@ts-ignore
                                     currentUser.selfID.client.ceramic,
                                     {
                                         controllers: [DID],

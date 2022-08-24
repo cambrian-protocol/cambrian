@@ -43,6 +43,7 @@ const SubmissionForm = ({
 
     const init = async () => {
         const submissionDoc = (await TileDocument.deterministic(
+            //@ts-ignore
             currentUser.selfID.client.ceramic,
             {
                 controllers: [currentUser.selfID.did.id],

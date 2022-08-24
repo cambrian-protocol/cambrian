@@ -38,6 +38,7 @@ export default function ArbitratorsDashboardPage() {
         if (currentUser) {
             try {
                 const arbitratorLib = (await TileDocument.deterministic(
+                    //@ts-ignore
                     currentUser.selfID.client.ceramic,
                     {
                         controllers: [currentUser.selfID.did.id],
