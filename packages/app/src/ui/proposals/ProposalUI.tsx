@@ -47,9 +47,8 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     }
 
     const initMessenger =
-        (currentUser.selfID.did.id ===
-            proposalStack?.templateDoc.content.author ||
-            currentUser.selfID.did.id ===
+        (currentUser.selfID.id === proposalStack?.templateDoc.content.author ||
+            currentUser.selfID.id ===
                 proposalStack?.proposalDoc.content.author) &&
         proposalStatus !== ProposalStatus.Draft
 

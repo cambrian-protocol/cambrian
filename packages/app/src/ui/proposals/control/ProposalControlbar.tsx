@@ -17,9 +17,9 @@ const ProposalControlbar = () => {
         useProposalContext()
 
     const isProposalAuthor =
-        currentUser?.selfID.did.id === proposalStack?.proposalDoc.content.author
+        currentUser?.selfID.id === proposalStack?.proposalDoc.content.author
     const isTemplateAuthor =
-        currentUser?.selfID.did.id === proposalStack?.templateDoc.content.author
+        currentUser?.selfID.id === proposalStack?.templateDoc.content.author
 
     const renderControls = () => {
         switch (proposalStatus) {

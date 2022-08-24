@@ -105,7 +105,7 @@ export default class CeramicStagehand {
                 streamID: compositionStreamID,
                 commitID: composition.commitId.toString(),
             },
-            author: this.selfID.did.id.toString(),
+            author: this.selfID.id.toString(),
             receivedProposals: {},
         }
 
@@ -132,7 +132,7 @@ export default class CeramicStagehand {
                     flexInput.tagId !== 'collateralToken' &&
                     flexInput.value === ''
             ),
-            author: this.selfID.did.id.toString(),
+            author: this.selfID.id.toString(),
             price: {
                 amount: 0,
                 tokenAddress: template.content.price.denominationTokenAddress,
@@ -149,7 +149,7 @@ export default class CeramicStagehand {
                 //@ts-ignore
                 this.selfID.client.ceramic,
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -180,7 +180,7 @@ export default class CeramicStagehand {
                 //@ts-ignore
                 this.selfID.client.ceramic,
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: `cambrian-${stage}`,
                     tags: [uniqueTag],
                 },
@@ -199,7 +199,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.selfID.did.id],
+                        controllers: [this.selfID.id],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -211,7 +211,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.selfID.did.id],
+                        controllers: [this.selfID.id],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -235,7 +235,7 @@ export default class CeramicStagehand {
                 //@ts-ignore
                 this.selfID.client.ceramic,
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -247,7 +247,7 @@ export default class CeramicStagehand {
                     solverConfigs: parsedSolvers.map((x) => x.config),
                 },
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -309,7 +309,7 @@ export default class CeramicStagehand {
                 //@ts-ignore
                 this.selfID.client.ceramic,
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -596,7 +596,7 @@ export default class CeramicStagehand {
                     //@ts-ignore
                     this.selfID.client.ceramic,
                     {
-                        controllers: [this.selfID.did.id],
+                        controllers: [this.selfID.id],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -650,7 +650,7 @@ export default class CeramicStagehand {
                 //@ts-ignore
                 this.selfID.client.ceramic,
                 {
-                    controllers: [this.selfID.did.id],
+                    controllers: [this.selfID.id],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -681,7 +681,7 @@ export default class CeramicStagehand {
             //@ts-ignore
             this.selfID.client.ceramic,
             {
-                controllers: [this.selfID.did.id],
+                controllers: [this.selfID.id],
                 family: CAMBRIAN_LIB_NAME,
                 tags: [stage],
             },

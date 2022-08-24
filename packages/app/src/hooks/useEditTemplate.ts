@@ -37,7 +37,7 @@ const useEditTemplate = () => {
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
-                    console.log(currentUser.selfID.did.id)
+                    console.log(currentUser.selfID.id)
                     console.log(template.author)
 
                     if (template) {
@@ -45,7 +45,7 @@ const useEditTemplate = () => {
                         if (
                             (!router.pathname.includes('edit') &&
                                 !router.pathname.includes('new')) ||
-                            currentUser.selfID.did.id === template.author
+                            currentUser.selfID.id === template.author
                         ) {
                             const comp = (await (
                                 await cs.loadTileDocument(

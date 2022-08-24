@@ -75,7 +75,7 @@ const CreateArbitratorModal = ({
                 //@ts-ignore
                 currentUser.selfID.client.ceramic,
                 {
-                    controllers: [currentUser.selfID.did.id],
+                    controllers: [currentUser.selfID.id],
                     family: CAMBRIAN_LIB_NAME,
                     tags: ['arbitrators'],
                 },
@@ -86,7 +86,7 @@ const CreateArbitratorModal = ({
                 //@ts-ignore
                 currentUser.selfID.client.ceramic,
                 {
-                    controllers: [currentUser.selfID.did.id],
+                    controllers: [currentUser.selfID.id],
                     family: `cambrian-arbitrators`,
                     tags: [arbitratorContract],
                 },

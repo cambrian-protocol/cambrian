@@ -46,7 +46,7 @@ const SubmissionForm = ({
             //@ts-ignore
             currentUser.selfID.client.ceramic,
             {
-                controllers: [currentUser.selfID.did.id],
+                controllers: [currentUser.selfID.id],
                 family: 'cambrian-ipfs-text-submitter',
                 tags: [solverAddress],
             },
@@ -91,7 +91,7 @@ const SubmissionForm = ({
                         timestamp: new Date(),
                     },
                     {
-                        controllers: [currentUser.selfID.did.id],
+                        controllers: [currentUser.selfID.id],
                         family: 'cambrian-ipfs-text-submitter',
                         tags: [solverAddress],
                     },
