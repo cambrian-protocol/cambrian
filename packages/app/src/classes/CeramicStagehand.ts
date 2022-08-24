@@ -64,6 +64,7 @@ export default class CeramicStagehand {
     createTemplate = async (tag: string, compositionStreamID: string) => {
         const composition: TileDocument<CompositionModel> =
             await TileDocument.load(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 compositionStreamID
             )
@@ -114,6 +115,7 @@ export default class CeramicStagehand {
     createProposal = async (tag: string, templateStreamID: string) => {
         const template: TileDocument<CeramicTemplateModel> =
             await TileDocument.load(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 templateStreamID
             )
@@ -144,6 +146,7 @@ export default class CeramicStagehand {
     createStage = async (tag: string, data: StageModel, stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.did.id],
@@ -174,6 +177,7 @@ export default class CeramicStagehand {
             }
 
             const currentDoc = await TileDocument.deterministic(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.did.id],
@@ -228,6 +232,7 @@ export default class CeramicStagehand {
     ) => {
         try {
             const solverConfigsDoc = await TileDocument.deterministic(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.did.id],
@@ -264,6 +269,7 @@ export default class CeramicStagehand {
             //     streamID
             // )
             const doc = await TileDocument.load(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 streamID
             )
@@ -300,6 +306,7 @@ export default class CeramicStagehand {
     loadStagesMap = async (stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.did.id],
@@ -578,6 +585,7 @@ export default class CeramicStagehand {
     ) => {
         try {
             const currentData: TileDocument<StageModel> =
+                //@ts-ignore
                 await TileDocument.load(this.selfID.client.ceramic, streamID)
 
             const cleanedUserTitle = data.title.trim()
@@ -585,6 +593,7 @@ export default class CeramicStagehand {
             if (currentData.content.title !== cleanedUserTitle) {
                 // StageLib and Meta Tag must be updated
                 const stageLib = await TileDocument.deterministic(
+                    //@ts-ignore
                     this.selfID.client.ceramic,
                     {
                         controllers: [this.selfID.did.id],
@@ -638,6 +647,7 @@ export default class CeramicStagehand {
     deleteStage = async (tag: string, stage: StageNames) => {
         try {
             const stageCollection = await TileDocument.deterministic(
+                //@ts-ignore
                 this.selfID.client.ceramic,
                 {
                     controllers: [this.selfID.did.id],
@@ -668,6 +678,7 @@ export default class CeramicStagehand {
     // Warning: Just for dev purposes to clean DID from all stages
     clearStages = async (stage: StageNames) => {
         const stageLib = await TileDocument.deterministic(
+            //@ts-ignore
             this.selfID.client.ceramic,
             {
                 controllers: [this.selfID.did.id],

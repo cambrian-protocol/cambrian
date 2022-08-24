@@ -72,6 +72,7 @@ const CreateArbitratorModal = ({
                 throw GENERAL_ERROR['CREATE_ARBITRATOR_ERROR']
 
             const arbitratorsLib = await TileDocument.deterministic(
+                //@ts-ignore
                 currentUser.selfID.client.ceramic,
                 {
                     controllers: [currentUser.selfID.did.id],
@@ -82,6 +83,7 @@ const CreateArbitratorModal = ({
             )
 
             const currentDoc = await TileDocument.deterministic(
+                //@ts-ignore
                 currentUser.selfID.client.ceramic,
                 {
                     controllers: [currentUser.selfID.did.id],

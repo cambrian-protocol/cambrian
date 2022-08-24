@@ -12,6 +12,7 @@ import React, {
 } from 'react'
 
 import ConnectWalletSection from '../components/sections/ConnectWalletSection'
+import { DIDSession } from 'did-session'
 import { INFURA_ID } from 'packages/app/config'
 import PageLayout from '../components/layout/PageLayout'
 import PermissionProvider from './PermissionContext'
@@ -21,8 +22,6 @@ import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
-
-import { DIDSession } from 'did-session'
 
 export type PermissionType = string
 
@@ -246,7 +245,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 //@ts-ignore
                 ceramicSelfID.client.ceramic,
                 {
-                    controllers: [ceramicSelfID.id],
+                    controllers: [ceramicSelfID.did.id],
                     family: 'cambrian-profile',
                 },
                 { pin: true }
