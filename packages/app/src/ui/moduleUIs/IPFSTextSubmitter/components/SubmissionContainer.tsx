@@ -2,7 +2,7 @@ import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
-import CeramicClient from '@ceramicnetwork/http-client'
+import { CeramicClient } from '@ceramicnetwork/http-client'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SubmissionForm from './SubmissionForm'

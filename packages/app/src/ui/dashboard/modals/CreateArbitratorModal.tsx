@@ -74,7 +74,7 @@ const CreateArbitratorModal = ({
             const arbitratorsLib = await TileDocument.deterministic(
                 currentUser.selfID.client.ceramic,
                 {
-                    controllers: [currentUser.selfID.id],
+                    controllers: [currentUser.selfID.did.id],
                     family: CAMBRIAN_LIB_NAME,
                     tags: ['arbitrators'],
                 },
@@ -84,7 +84,7 @@ const CreateArbitratorModal = ({
             const currentDoc = await TileDocument.deterministic(
                 currentUser.selfID.client.ceramic,
                 {
-                    controllers: [currentUser.selfID.id],
+                    controllers: [currentUser.selfID.did.id],
                     family: `cambrian-arbitrators`,
                     tags: [arbitratorContract],
                 },

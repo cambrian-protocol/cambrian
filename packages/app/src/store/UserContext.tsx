@@ -187,11 +187,17 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 )
 
                 if (sessionStr && sessionStr != 'undefined') {
-                    selfId = await ceramicConnect(
-                        new EthereumAuthProvider(provider, address),
-                        //@ts-ignore too many params
-                        sessionStr
-                    )
+                    const session = await DIDSession.fromSession(sessionStr)
+                    const expireTime = session.expireInSecs
+                    console.log(expireTime)
+
+                    if (expireTime > 3600) {
+                        selfId = await ceramicConnect(
+                            new EthereumAuthProvider(provider, address),
+                            //@ts-ignore too many params
+                            sessionStr
+                        )
+                    }
                 }
             } catch (e) {
                 console.log(e)
@@ -237,6 +243,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const initSelfID = async (ceramicSelfID: SelfID) => {
         if (walletConnection) {
             const cambrianProfileDoc = (await TileDocument.deterministic(
+                //@ts-ignore
                 ceramicSelfID.client.ceramic,
                 {
                     controllers: [ceramicSelfID.id],

@@ -76,6 +76,8 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 proposalStatus === ProposalStatus.ChangeRequested
             ) {
                 if (proposalStreamDoc && templateStreamDoc) {
+                    console.log('controllers: ', proposalStreamDoc.controllers)
+
                     const proposalSub = proposalStreamDoc.subscribe(
                         async (x) => {
                             await refreshProposal()
@@ -236,8 +238,11 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 )
 
                 if (_proposalStack.proposalDoc.content.isSubmitted) {
+                    console.log('isSubmitted')
                     setProposalStack(_proposalStack)
                 } else {
+                    console.log('notSubmitted')
+
                     if (_latestProposalSubmission) {
                         // Initialize the latest submission/commit as proposal stack
                         const latestProposalCommitContent =

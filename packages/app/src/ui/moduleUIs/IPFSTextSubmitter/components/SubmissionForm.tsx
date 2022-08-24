@@ -45,7 +45,7 @@ const SubmissionForm = ({
         const submissionDoc = (await TileDocument.deterministic(
             currentUser.selfID.client.ceramic,
             {
-                controllers: [currentUser.selfID.id],
+                controllers: [currentUser.selfID.did.id],
                 family: 'cambrian-ipfs-text-submitter',
                 tags: [solverAddress],
             },
@@ -90,7 +90,7 @@ const SubmissionForm = ({
                         timestamp: new Date(),
                     },
                     {
-                        controllers: [currentUser.selfID.id],
+                        controllers: [currentUser.selfID.did.id],
                         family: 'cambrian-ipfs-text-submitter',
                         tags: [solverAddress],
                     },

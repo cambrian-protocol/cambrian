@@ -152,7 +152,7 @@ export default function CoreMessenger({
                 await TileDocument.deterministic(
                     currentUser.selfID.client.ceramic,
                     {
-                        controllers: [currentUser.selfID.id],
+                        controllers: [currentUser.selfID.did.id],
                         family: 'cambrian-chat',
                         tags: [chatID],
                     },
@@ -315,7 +315,7 @@ export default function CoreMessenger({
                                     name:
                                         currentUser.cambrianProfileDoc.content
                                             ?.name || 'Anon',
-                                    did: currentUser.selfID.id,
+                                    did: currentUser.selfID.did.id,
                                 },
                                 timestamp: new Date().getTime(),
                             })

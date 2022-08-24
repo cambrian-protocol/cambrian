@@ -36,6 +36,10 @@ const useEditTemplate = () => {
                     const template = (await (
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
+
+                    console.log(currentUser.selfID.did.id)
+                    console.log(template.author)
+
                     if (template) {
                         // Just initialize edit paths if currentUser is the author
                         if (
