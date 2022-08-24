@@ -22,6 +22,8 @@ import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
+import { DIDSession } from 'did-session'
+
 export type PermissionType = string
 
 export type CambrianProfileType = {
@@ -177,7 +179,47 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 chainId: network.chainId,
                 permissions: [],
             })
-            await ceramicConnect(new EthereumAuthProvider(provider, address))
+
+            let selfId
+            try {
+                const sessionStr = localStorage.getItem(
+                    `cambrian-session/${address}`
+                )
+
+                if (sessionStr && sessionStr != 'undefined') {
+                    const session = await DIDSession.fromSession(sessionStr)
+                    const expireTime = session.expireInSecs
+                    console.log(expireTime)
+
+                    if (expireTime > 3600) {
+                        selfId = await ceramicConnect(
+                            new EthereumAuthProvider(provider, address),
+                            //@ts-ignore too many params
+                            sessionStr
+                        )
+                    }
+                }
+            } catch (e) {
+                console.log(e)
+            } finally {
+                if (!selfId) {
+                    selfId = await ceramicConnect(
+                        new EthereumAuthProvider(provider, address)
+                    )
+                    // @ts-ignore no session param on WebClient
+                    const serializedSession = selfId?.client.session.serialize()
+                    if (serializedSession) {
+                        try {
+                            localStorage.setItem(
+                                `cambrian-session/${address}`,
+                                serializedSession
+                            )
+                        } catch (e) {
+                            console.log(e)
+                        }
+                    }
+                }
+            }
         } catch (e) {
             setIsUserLoaded(true)
             cpLogger.push(e)
@@ -201,6 +243,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const initSelfID = async (ceramicSelfID: SelfID) => {
         if (walletConnection) {
             const cambrianProfileDoc = (await TileDocument.deterministic(
+                //@ts-ignore
                 ceramicSelfID.client.ceramic,
                 {
                     controllers: [ceramicSelfID.id],
