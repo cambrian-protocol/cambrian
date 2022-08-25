@@ -156,6 +156,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
      */
     function executeSolve(uint256 _index) public {
         require(ingestsValid() == true, "ingests invalid");
+        console.log("Meow");
 
         SolverLib.executeSolve(
             _index,
