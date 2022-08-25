@@ -55,7 +55,7 @@ library SolverLib {
         address keeper; // Keeper address
         address arbitrator; // Arbitrator address
         uint256 timelockSeconds; // Number of seconds to increment timelock for during critical activities
-        Modulated.Loader[] moduleLoaders; // Arbitrary data
+        Modulated.Loader[] moduleLoaders;
         Ingest[] ingests; // Data ingests to be performed to bring data in from other Solver
         ConditionBase conditionBase; // Base to create conditions from
     }

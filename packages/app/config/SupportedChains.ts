@@ -27,6 +27,16 @@ import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutions
 import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
 import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
 import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
+import GOERLI_ArbitrationDispatch from '@cambrian/core/deployments/goerli/ArbitrationDispatch.json'
+import GOERLI_ArbitratorFactory from '@cambrian/core/deployments/goerli/ArbitratorFactory.json'
+import GOERLI_BasicArbitrator from '@cambrian/core/deployments/goerli/BasicArbitrator.json'
+import GOERLI_BasicSolverV1 from '@cambrian/core/deployments/goerli/BasicSolverV1.json'
+import GOERLI_ConditionalTokens from '@cambrian/core/deployments/goerli/ConditionalTokens.json'
+import GOERLI_IPFSSolutionsHub from '@cambrian/core/deployments/goerli/IPFSSolutionsHub.json'
+import GOERLI_ProposalsHub from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import GOERLI_SolverFactory from '@cambrian/core/deployments/goerli/SolverFactory.json'
+import GOERLI_SolverLib from '@cambrian/core/deployments/goerli/SolverLib.json'
+import GOERLI_ToyToken from '@cambrian/core/deployments/goerli/ToyToken.json'
 
 interface ChainInfo {
     name: string
@@ -152,6 +162,37 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverLib: NOVA_SolverLib.address,
             defaultDenominationToken:
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
+        },
+    },
+    5: {
+        chainData: {
+            name: 'Goerli Test Network',
+            shortName: 'gor',
+            chain: 'ETH',
+            network: 'ropsten',
+            chainId: 5,
+            networkId: 5,
+            rpcUrl: 'https://goerli.infura.io/v3/5e5e73b367364266b008aed15e5b3189',
+            nativeCurrency: {
+                symbol: 'ETH',
+                name: 'Ethereum',
+                decimals: '18',
+                contractAddress: '',
+                balance: '',
+            },
+        },
+        contracts: {
+            arbitratorFactory: GOERLI_ArbitratorFactory.address,
+            arbitrationDispatch: GOERLI_ArbitrationDispatch.address,
+            basicArbitrator: GOERLI_BasicArbitrator.address,
+            basicSolverV1: GOERLI_BasicSolverV1.address,
+            conditionalTokens: GOERLI_ConditionalTokens.address,
+            ipfsSolutionsHub: GOERLI_IPFSSolutionsHub.address,
+            proposalsHub: GOERLI_ProposalsHub.address,
+            solverFactory: GOERLI_SolverFactory.address,
+            solverLib: GOERLI_SolverLib.address,
+            toyToken: GOERLI_ToyToken.address,
+            defaultDenominationToken: GOERLI_ToyToken.address,
         },
     },
     // 42161: {

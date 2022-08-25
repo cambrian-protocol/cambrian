@@ -153,7 +153,7 @@ export default function CoreMessenger({
                     //@ts-ignore
                     currentUser.selfID.client.ceramic,
                     {
-                        controllers: [currentUser.selfID.did.id],
+                        controllers: [currentUser.selfID.id],
                         family: 'cambrian-chat',
                         tags: [chatID],
                     },
@@ -318,7 +318,7 @@ export default function CoreMessenger({
                                     name:
                                         currentUser.cambrianProfileDoc.content
                                             ?.name || 'Anon',
-                                    did: currentUser.selfID.did.id,
+                                    did: currentUser.selfID.id,
                                 },
                                 timestamp: new Date().getTime(),
                             })

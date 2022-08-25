@@ -198,10 +198,12 @@ describe("IPFSSolutionsHub", function () {
       ethers.provider
     );
 
+    const condition = await solver.conditions(0);
+    console.log("condition0: ", condition);
+
     await solver.connect(this.keeper).proposePayouts(0, [1, 0]);
     await solver.connect(this.keeper).confirmPayouts(0);
 
-    const condition = await solver.conditions(0);
     await this.CT.connect(this.seller).redeemPositions(
       this.ToyToken.address,
       ethers.constants.HashZero,
