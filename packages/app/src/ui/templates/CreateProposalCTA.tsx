@@ -49,7 +49,6 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
                 size="small"
                 primary
                 label="Create Proposal"
-                icon={<ClipboardText />}
             />
             {errorMessage && (
                 <ErrorPopupModal
