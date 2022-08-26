@@ -271,10 +271,9 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
         router(_slot, _data);
         emit IngestedData();
 
-        // Try to Execute Solve
-        try
-            ISolver(address(this)).executeSolve(conditions.length - 1)
-        {} catch {}
+        if (ingestsValid() && allocationsValid(conditions.length - 1)) {
+            ISolver(address(this)).executeSolve(conditions.length - 1);
+        }
     }
 
     /**

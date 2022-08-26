@@ -49,6 +49,7 @@ contract IPFSSolutionsHub {
     event CreateBase(bytes32 id);
     event CreateSolution(bytes32 id);
     event ExecuteSolution(bytes32 id);
+    event ErrorNotHandled(bytes reason);
 
     constructor(
         ISolverFactory factoryAddress,
@@ -200,10 +201,13 @@ contract IPFSSolutionsHub {
         // Prepare first Solver
         ISolver(instances[solutionId].solverAddresses[0]).prepareSolve(0);
 
-        try
-            ISolver(instances[solutionId].solverAddresses[0]).executeSolve(0)
-        {} catch {
-            console.log("Woof");
+        if (
+            ISolver(instances[solutionId].solverAddresses[0]).ingestsValid() &&
+            ISolver(instances[solutionId].solverAddresses[0]).allocationsValid(
+                0
+            )
+        ) {
+            ISolver(instances[solutionId].solverAddresses[0]).executeSolve(0);
         }
 
         emit ExecuteSolution(solutionId);
