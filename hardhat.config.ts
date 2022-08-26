@@ -39,6 +39,11 @@ export const config = {
       accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
     },
   },
+  etherscan: {
+    apiKey: {
+      goerli: "2M5WQBZ8XMJSZW9HVIUAXKAAJW2ZCZEWQW",
+    },
+  },
   solidity: {
     compilers: [
       {

@@ -197,6 +197,8 @@ const getParsedSolvers = async (
         currentUser.web3Provider
     )
 
+    console.log(_parsedSolvers)
+
     return _parsedSolvers
 }
 
