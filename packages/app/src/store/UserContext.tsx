@@ -182,12 +182,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             let selfId
             try {
                 const sessionStr = localStorage.getItem(
-                    `cambrian-session/${address}`
+                    `cambrian-session/${network.chainId}/${address}`
                 )
                 if (sessionStr && sessionStr != 'undefined') {
                     const session = await DIDSession.fromSession(sessionStr)
                     const expireTime = session.expireInSecs
-                    console.log(expireTime)
                     if (expireTime > 3600) {
                         selfId = await ceramicConnect(
                             new EthereumAuthProvider(provider, address),
@@ -208,7 +207,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                     if (serializedSession) {
                         try {
                             localStorage.setItem(
-                                `cambrian-session/${address}`,
+                                `cambrian-session/${network.chainId}/${address}`,
                                 serializedSession
                             )
                         } catch (e) {
