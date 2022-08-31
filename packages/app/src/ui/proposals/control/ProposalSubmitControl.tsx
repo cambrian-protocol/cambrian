@@ -38,7 +38,7 @@ const ProposalSubmitControl = ({
             if (currentUser && proposalStreamDoc) {
                 if (await onSave()) {
                     const ceramicStagehand = new CeramicStagehand(
-                        currentUser.selfID
+                        currentUser.ceramic
                     )
                     if (
                         await ceramicStagehand.submitProposal(proposalStreamDoc)

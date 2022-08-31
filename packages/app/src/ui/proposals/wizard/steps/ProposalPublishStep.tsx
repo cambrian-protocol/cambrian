@@ -35,7 +35,7 @@ const ProposalPublishStep = ({
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+            const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
             await ceramicStagehand.submitProposal(proposalStreamDoc)
             router.push(
                 `${

@@ -43,7 +43,7 @@ const CompositionsDashboardUI = () => {
     useEffect(() => {
         if (currentUser) {
             const ceramicStagehandInstance = new CeramicStagehand(
-                currentUser.selfID
+                currentUser.ceramic
             )
             setCeramicStagehand(ceramicStagehandInstance)
             fetchCompositions(ceramicStagehandInstance)

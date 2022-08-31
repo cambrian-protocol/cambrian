@@ -3,7 +3,6 @@ import { CERAMIC_NODE_ENDPOINT } from '../config'
 import ErrorBoundary from '@cambrian/app/components/errors/ErrorBoundary'
 import { GlobalStyle } from '@cambrian/app/src/theme/globalStyle'
 import { Grommet } from 'grommet'
-import { Provider } from '@self.id/framework'
 import { Store } from '@cambrian/app/src/store/Store'
 import { cpTheme } from '@cambrian/app/src/theme/theme'
 import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
@@ -20,17 +19,7 @@ declare global {
 }
 
 export default function App({ ...props }: AppProps) {
-    return (
-        <Provider
-            client={{
-                ceramic: CERAMIC_NODE_ENDPOINT,
-                connectNetwork: 'mainnet',
-            }}
-            session={true} // Research more
-        >
-            <Core {...props} />
-        </Provider>
-    )
+    return <Core {...props} />
 }
 
 const Core = ({ Component, pageProps }: AppProps) => {

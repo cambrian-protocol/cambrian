@@ -65,7 +65,7 @@ export const ComposerUI = () => {
         ) {
             try {
                 const newCeramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
+                    currentUser.ceramic
                 )
                 setCeramicStagehand(newCeramicStagehand)
                 const composition = (

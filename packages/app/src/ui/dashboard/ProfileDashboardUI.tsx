@@ -20,7 +20,7 @@ interface ProfileDashboardUIProps {
 
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     const cambrianProfile = currentUser.cambrianProfileDoc.content
-    const { initSelfID } = useCurrentUserContext()
+    const { initUser } = useCurrentUserContext()
     const [input, setInput] = useState<CambrianProfileType>(
         initialCambrianProfile
     )
@@ -39,12 +39,12 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
             await currentUser.cambrianProfileDoc.update(
                 input,
                 {
-                    controllers: [currentUser.selfID.id],
+                    controllers: [currentUser.ceramic.did.id.toString()],
                     family: 'cambrian-profile',
                 },
                 { pin: true }
             )
-            initSelfID(currentUser.selfID)
+            initUser(currentUser.ceramic)
         } catch (e) {}
         setIsSaving(false)
     }

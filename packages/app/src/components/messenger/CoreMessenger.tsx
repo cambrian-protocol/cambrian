@@ -151,9 +151,9 @@ export default function CoreMessenger({
             const messagesDoc: TileDocument<{ messages: ChatMessageType[] }> =
                 await TileDocument.deterministic(
                     //@ts-ignore
-                    currentUser.selfID.client.ceramic,
+                    currentUser.ceramic,
                     {
-                        controllers: [currentUser.selfID.id],
+                        controllers: [currentUser.ceramic.did.id.toString()],
                         family: 'cambrian-chat',
                         tags: [chatID],
                     },
@@ -200,7 +200,7 @@ export default function CoreMessenger({
                         participants.map((DID) =>
                             TileDocument.deterministic(
                                 //@ts-ignore
-                                currentUser.selfID.client.ceramic,
+                                currentUser.ceramic,
                                 {
                                     controllers: [DID],
                                     family: 'cambrian-chat',
@@ -247,7 +247,7 @@ export default function CoreMessenger({
                             async (DID) =>
                                 await TileDocument.deterministic(
                                     //@ts-ignore
-                                    currentUser.selfID.client.ceramic,
+                                    currentUser.ceramic,
                                     {
                                         controllers: [DID],
                                         family: 'cambrian-chat',
@@ -318,7 +318,7 @@ export default function CoreMessenger({
                                     name:
                                         currentUser.cambrianProfileDoc.content
                                             ?.name || 'Anon',
-                                    did: currentUser.selfID.id,
+                                    did: currentUser.ceramic.did.id.toString(),
                                 },
                                 timestamp: new Date().getTime(),
                             })

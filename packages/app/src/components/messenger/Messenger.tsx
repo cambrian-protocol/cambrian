@@ -25,7 +25,7 @@ const Messenger = ({
 
     // TODO Integrate >2 participants
     const counterPart = participantDIDs.filter(
-        (did) => did !== currentUser.selfID.id
+        (did) => did !== currentUser.ceramic.did.id.toString()
     )[0]
 
     const [counterPartProfile] = useCambrianProfile(counterPart)

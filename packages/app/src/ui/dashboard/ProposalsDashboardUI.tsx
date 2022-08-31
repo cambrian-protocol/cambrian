@@ -32,7 +32,7 @@ interface ProposalsDashboardUIProps {
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+    const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]
@@ -135,7 +135,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     templateTitle: templateCommit.title,
                                     isAuthor:
                                         proposalDoc.content.author ===
-                                        currentUser.selfID.id,
+                                        currentUser.ceramic.did.id.toString(),
                                 })
                             }
                         })
@@ -217,7 +217,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         templateTitle: templateCommit.title,
                         isAuthor:
                             proposalDoc.content.author ===
-                            currentUser.selfID.id,
+                            currentUser.ceramic.did.id.toString(),
                     }
                 })
             )

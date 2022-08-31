@@ -40,7 +40,7 @@ const useEditProposal = () => {
         ) {
             try {
                 const ceramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
+                    currentUser.ceramic
                 )
                 setCeramicStagehand(ceramicStagehand)
 
@@ -50,7 +50,8 @@ const useEditProposal = () => {
                     )) as TileDocument<CeramicProposalModel>
 
                 if (
-                    _proposalStreamDoc.content.author === currentUser.selfID.id
+                    _proposalStreamDoc.content.author ===
+                    currentUser.ceramic.did.id.toString()
                 ) {
                     const _templateStreamDoc =
                         (await ceramicStagehand.loadTileDocument(

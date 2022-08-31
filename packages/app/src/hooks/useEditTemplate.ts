@@ -31,13 +31,13 @@ const useEditTemplate = () => {
                 typeof templateStreamID === 'string'
             ) {
                 try {
-                    const cs = new CeramicStagehand(currentUser.selfID)
+                    const cs = new CeramicStagehand(currentUser.ceramic)
                     setCeramicStagehand(cs)
                     const template = (await (
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
 
-                    console.log(currentUser.selfID.id)
+                    console.log(currentUser.ceramic.did.id.toString())
                     console.log(template.author)
 
                     if (template) {
@@ -45,7 +45,8 @@ const useEditTemplate = () => {
                         if (
                             (!router.pathname.includes('edit') &&
                                 !router.pathname.includes('new')) ||
-                            currentUser.selfID.id === template.author
+                            currentUser.ceramic.did.id.toString() ===
+                                template.author
                         ) {
                             const comp = (await (
                                 await cs.loadTileDocument(
