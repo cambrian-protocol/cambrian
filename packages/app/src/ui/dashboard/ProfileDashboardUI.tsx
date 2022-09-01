@@ -12,7 +12,6 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProfileDashboardUIProps {
     currentUser: UserType
@@ -20,7 +19,6 @@ interface ProfileDashboardUIProps {
 
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     const cambrianProfile = currentUser.cambrianProfileDoc.content
-    const { initUser } = useCurrentUserContext()
     const [input, setInput] = useState<CambrianProfileType>(
         initialCambrianProfile
     )
@@ -36,15 +34,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     const onSave = async () => {
         setIsSaving(true)
         try {
-            await currentUser.cambrianProfileDoc.update(
-                input,
-                {
-                    controllers: [currentUser.ceramic.did?.id.toString() || ''],
-                    family: 'cambrian-profile',
-                },
-                { pin: true }
-            )
-            initUser(currentUser.ceramic)
+            await currentUser.cambrianProfileDoc.update(input)
         } catch (e) {}
         setIsSaving(false)
     }

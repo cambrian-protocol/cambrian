@@ -1,3 +1,4 @@
+import { CERAMIC_NODE_ENDPOINT, INFURA_ID } from 'packages/app/config'
 import React, {
     PropsWithChildren,
     useCallback,
@@ -6,9 +7,10 @@ import React, {
     useState,
 } from 'react'
 
+import { CeramicClient } from '@ceramicnetwork/http-client'
 import ConnectWalletSection from '../components/sections/ConnectWalletSection'
 import { DIDSession } from 'did-session'
-import { CERAMIC_NODE_ENDPOINT, INFURA_ID } from 'packages/app/config'
+import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import PageLayout from '../components/layout/PageLayout'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -17,8 +19,6 @@ import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
-import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
-import { CeramicClient } from '@ceramicnetwork/http-client'
 
 export type PermissionType = string
 
@@ -52,7 +52,6 @@ export type UserContextType = {
     connectWallet: () => Promise<void>
     addPermission: (permission: PermissionType) => void
     isUserLoaded: boolean
-    initUser: (ceramic: CeramicClient) => Promise<void>
 }
 
 export type UserType = {
@@ -150,16 +149,73 @@ export const UserContext = React.createContext<UserContextType>({
     disconnectWallet: () => {},
     connectWallet: async () => {},
     isUserLoaded: false,
-    initUser: async () => {},
 })
 
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [user, dispatch] = useReducer(userReducer, null)
-    const [walletConnection, setWalletConnection] = useState<Omit<
-        UserType,
-        'cambrianProfileDoc'
-    > | null>(null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
+
+    const disconnectWallet = useCallback(
+        async function () {
+            await web3Modal.clearCachedProvider()
+            if (
+                user &&
+                user.provider?.disconnect &&
+                typeof user.provider.disconnect === 'function'
+            ) {
+                await user.provider.disconnect()
+            }
+            dispatch({
+                type: 'RESET_WEB3_PROVIDER',
+            })
+        },
+        [user]
+    )
+
+    const connectWallet = useCallback(async function () {
+        try {
+            const provider = await web3Modal.connect()
+            const web3Provider = new ethers.providers.Web3Provider(provider)
+            const signer = web3Provider.getSigner()
+            const address = await signer.getAddress()
+            const network = await web3Provider.getNetwork()
+            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            const session = await loadSession(provider, network, address)
+            if (session?.did) {
+                ceramic.did = session.did
+
+                const cambrianProfileDoc = (await TileDocument.deterministic(
+                    ceramic,
+                    {
+                        controllers: [ceramic.did.parent],
+                        family: 'cambrian-profile',
+                    },
+                    { pin: true }
+                )) as TileDocument<CambrianProfileType>
+
+                console.log(
+                    'Cambrian Profile TileDocument:',
+                    cambrianProfileDoc
+                )
+
+                dispatch({
+                    type: 'SET_USER',
+                    provider: provider,
+                    web3Provider: web3Provider,
+                    signer: signer,
+                    address: address,
+                    chainId: network.chainId,
+                    cambrianProfileDoc: cambrianProfileDoc,
+                    ceramic: ceramic,
+                    session: session,
+                })
+                setIsUserLoaded(true)
+            }
+        } catch (e) {
+            setIsUserLoaded(true)
+            cpLogger.push(e)
+        }
+    }, [])
 
     const loadSession = async (
         provider: any,
@@ -178,20 +234,17 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 console.log(e)
             }
 
-            if (sessionStr && sessionStr != 'undefined') {
+            if (sessionStr && sessionStr !== undefined) {
                 session = await DIDSession.fromSession(sessionStr)
             }
 
-            const oneHour = 3600
-            if (
-                !session ||
-                (session.hasSession && session.expireInSecs > oneHour)
-            ) {
+            console.log('Session:', session)
+            if (!session || (session.hasSession && session.isExpired)) {
                 session = await DIDSession.authorize(
                     new EthereumAuthProvider(provider, accountAddress),
                     {
                         resources: ['ceramic://*'],
-                        expiresInSecs: 300, // TEMP, 5 min for testing
+                        expiresInSecs: 60, // TEMP, 1 min for testing
                     }
                 )
             }
@@ -213,93 +266,9 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         return session
     }
 
-    const connectWallet = useCallback(async function () {
-        try {
-            const provider = await web3Modal.connect()
-            const web3Provider = new ethers.providers.Web3Provider(provider)
-            const signer = web3Provider.getSigner()
-            const address = await signer.getAddress()
-            const network = await web3Provider.getNetwork()
-
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const session = await loadSession(provider, network, address)
-            if (session?.did) {
-                ceramic.did = session.did
-                console.log('ceramic.did: ', ceramic.did)
-                initUser(ceramic, session)
-            }
-
-            setWalletConnection({
-                address: address,
-                signer: signer,
-                web3Provider: web3Provider,
-                provider: provider,
-                chainId: network.chainId,
-                permissions: [],
-                ceramic: ceramic,
-                session: session,
-            })
-        } catch (e) {
-            setIsUserLoaded(true)
-            cpLogger.push(e)
-        }
+    useEffect(() => {
+        connectWallet()
     }, [])
-
-    useEffect(() => {
-        if (walletConnection) {
-            initUser(walletConnection.ceramic)
-        }
-    }, [walletConnection])
-
-    const initUser = async (ceramic: CeramicClient, session?: DIDSession) => {
-        if (walletConnection) {
-            const cambrianProfileDoc = (await TileDocument.deterministic(
-                ceramic,
-                {
-                    controllers: [ceramic.did!.id.toString()], // TODO IS THIS THE RIGHT DID????
-                    family: 'cambrian-profile',
-                },
-                { pin: true }
-            )) as TileDocument<CambrianProfileType>
-
-            dispatch({
-                type: 'SET_USER',
-                provider: walletConnection.provider,
-                web3Provider: walletConnection.web3Provider,
-                signer: walletConnection.signer,
-                address: walletConnection.address,
-                chainId: walletConnection.chainId,
-                cambrianProfileDoc: cambrianProfileDoc,
-                ceramic: ceramic,
-                session: session,
-            })
-            setIsUserLoaded(true)
-        }
-    }
-
-    const disconnectWallet = useCallback(
-        async function () {
-            await web3Modal.clearCachedProvider()
-            if (
-                user &&
-                user.provider?.disconnect &&
-                typeof user.provider.disconnect === 'function'
-            ) {
-                await user.provider.disconnect()
-            }
-            dispatch({
-                type: 'RESET_WEB3_PROVIDER',
-            })
-        },
-        [user]
-    )
-
-    // Auto connect to the cached provider
-    useEffect(() => {
-        if (web3Modal.cachedProvider) {
-            connectWallet()
-        }
-    }, [connectWallet])
 
     // EIP-1193 Event Listener
     useEffect(() => {
@@ -375,7 +344,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 connectWallet: connectWallet,
                 disconnectWallet: disconnectWallet,
                 isUserLoaded: isUserLoaded,
-                initUser: initUser,
             }}
         >
             <PermissionProvider permissions={user ? user.permissions : []}>
