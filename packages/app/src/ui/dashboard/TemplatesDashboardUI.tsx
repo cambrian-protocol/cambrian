@@ -20,7 +20,7 @@ interface TemplatesDashboardUIProps {
 }
 
 const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+    const ceramicStagehand = new CeramicStagehand(currentUser)
     const [templates, setTemplates] = useState<StringHashmap>()
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)

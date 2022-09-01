@@ -31,7 +31,7 @@ const useEditTemplate = () => {
                 typeof templateStreamID === 'string'
             ) {
                 try {
-                    const cs = new CeramicStagehand(currentUser.ceramic)
+                    const cs = new CeramicStagehand(currentUser)
                     setCeramicStagehand(cs)
                     const template = (await (
                         await cs.loadTileDocument(templateStreamID)

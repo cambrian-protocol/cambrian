@@ -1,10 +1,8 @@
-import { TRILOBOT_ENDPOINT } from './../../config/index'
 import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
 } from '@cambrian/app/models/TemplateModel'
 
-import { CeramicClient } from '@ceramicnetwork/http-client'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
@@ -13,13 +11,13 @@ import { ProposalStackType } from '../store/ProposalContext'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
 import { SolverModel } from '../models/SolverModel'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { TRILOBOT_ENDPOINT } from './../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { deploySolutionBase } from '../utils/helpers/proposalHelper'
 import initialComposer from '../store/composer/composer.init'
-import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
 export enum StageNames {
     composition = 'composition',
@@ -36,13 +34,10 @@ export type Stages = {
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
 export default class CeramicStagehand {
-    user: UserType | null
-    ceramic: CeramicClient
+    user: UserType
 
-    constructor(ceramic: CeramicClient) {
-        const { currentUser } = useCurrentUserContext()
+    constructor(currentUser: UserType) {
         this.user = currentUser
-        this.ceramic = ceramic
     }
 
     /* ========================== CREATE =============================== */
@@ -64,7 +59,7 @@ export default class CeramicStagehand {
 
     createTemplate = async (tag: string, compositionStreamID: string) => {
         const composition: TileDocument<CompositionModel> =
-            await TileDocument.load(this.ceramic, compositionStreamID)
+            await TileDocument.load(this.user.ceramic, compositionStreamID)
 
         let isCollateralFlex = false
         const formFlexInputs: FlexInputFormType[] = []
@@ -102,7 +97,7 @@ export default class CeramicStagehand {
                 streamID: compositionStreamID,
                 commitID: composition.commitId.toString(),
             },
-            author: this.ceramic.did?.id.toString() || '', // TODO no empty string
+            author: this.user.ceramic.did?.id.toString() || '', // TODO no empty string
             receivedProposals: {},
         }
 
@@ -111,7 +106,7 @@ export default class CeramicStagehand {
 
     createProposal = async (tag: string, templateStreamID: string) => {
         const template: TileDocument<CeramicTemplateModel> =
-            await TileDocument.load(this.ceramic, templateStreamID)
+            await TileDocument.load(this.user.ceramic, templateStreamID)
 
         const proposal: CeramicProposalModel = {
             title: tag,
@@ -125,7 +120,7 @@ export default class CeramicStagehand {
                     flexInput.tagId !== 'collateralToken' &&
                     flexInput.value === ''
             ),
-            author: this.ceramic.did?.id.toString() || '', // TODO no empty string
+            author: this.user.ceramic.did?.id.toString() || '', // TODO no empty string
             price: {
                 amount: 0,
                 tokenAddress: template.content.price.denominationTokenAddress,
@@ -139,9 +134,9 @@ export default class CeramicStagehand {
     createStage = async (tag: string, data: StageModel, stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
-                this.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -169,9 +164,9 @@ export default class CeramicStagehand {
             }
 
             const currentDoc = await TileDocument.deterministic(
-                this.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: `cambrian-${stage}`,
                     tags: [uniqueTag],
                 },
@@ -190,7 +185,9 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.ceramic.did?.id.toString() || ''],
+                        controllers: [
+                            this.user.ceramic.did?.id.toString() || '',
+                        ],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -202,7 +199,9 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.ceramic.did?.id.toString() || ''],
+                        controllers: [
+                            this.user.ceramic.did?.id.toString() || '',
+                        ],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -223,9 +222,9 @@ export default class CeramicStagehand {
     ) => {
         try {
             const solverConfigsDoc = await TileDocument.deterministic(
-                this.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -237,7 +236,7 @@ export default class CeramicStagehand {
                     solverConfigs: parsedSolvers.map((x) => x.config),
                 },
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -255,10 +254,10 @@ export default class CeramicStagehand {
     loadTileDocument = async (streamID: string) => {
         try {
             // const doc = await TileDocument.load(
-            //     this.ceramic,
+            //     this.user.ceramic,
             //     streamID
             // )
-            const doc = await TileDocument.load(this.ceramic, streamID)
+            const doc = await TileDocument.load(this.user.ceramic, streamID)
             return doc
         } catch (e) {
             cpLogger.push(e)
@@ -268,7 +267,7 @@ export default class CeramicStagehand {
 
     loadReadOnlyStream = async (streamOrCommitID: string) => {
         try {
-            return (await this.ceramic.loadStream(
+            return (await this.user.ceramic.loadStream(
                 streamOrCommitID
             )) as unknown as TileDocument<unknown>
         } catch (e) {
@@ -281,7 +280,7 @@ export default class CeramicStagehand {
         queries: { streamId: string }[]
     ): Promise<any> => {
         try {
-            const streamMap = await this.ceramic.multiQuery(queries)
+            const streamMap = await this.user.ceramic.multiQuery(queries)
             return streamMap
         } catch (e) {
             cpLogger.push(e)
@@ -292,9 +291,9 @@ export default class CeramicStagehand {
     loadStagesMap = async (stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
-                this.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -309,7 +308,7 @@ export default class CeramicStagehand {
     }
 
     loadProposalStackFromID = async (proposalCommitOrStreamID: string) => {
-        const proposalDoc = (await this.ceramic.loadStream(
+        const proposalDoc = (await this.user.ceramic.loadStream(
             proposalCommitOrStreamID
         )) as unknown as TileDocument<CeramicProposalModel>
 
@@ -319,11 +318,11 @@ export default class CeramicStagehand {
     loadProposalStackFromProposal = async (
         proposalDoc: TileDocument<CeramicProposalModel>
     ): Promise<ProposalStackType> => {
-        const templateDoc = (await this.ceramic.loadStream(
+        const templateDoc = (await this.user.ceramic.loadStream(
             proposalDoc.content.template.commitID
         )) as unknown as TileDocument<CeramicTemplateModel>
 
-        const compositionDoc = (await this.ceramic.loadStream(
+        const compositionDoc = (await this.user.ceramic.loadStream(
             templateDoc.content.composition.commitID
         )) as unknown as TileDocument<CompositionModel>
 
@@ -581,16 +580,18 @@ export default class CeramicStagehand {
     ) => {
         try {
             const currentData: TileDocument<StageModel> =
-                await TileDocument.load(this.ceramic, streamID)
+                await TileDocument.load(this.user.ceramic, streamID)
 
             const cleanedUserTitle = data.title.trim()
 
             if (currentData.content.title !== cleanedUserTitle) {
                 // StageLib and Meta Tag must be updated
                 const stageLib = await TileDocument.deterministic(
-                    this.ceramic,
+                    this.user.ceramic,
                     {
-                        controllers: [this.ceramic.did?.id.toString() || ''],
+                        controllers: [
+                            this.user.ceramic.did?.id.toString() || '',
+                        ],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -641,9 +642,9 @@ export default class CeramicStagehand {
     deleteStage = async (tag: string, stage: StageNames) => {
         try {
             const stageCollection = await TileDocument.deterministic(
-                this.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.id.toString() || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -671,9 +672,9 @@ export default class CeramicStagehand {
     // Warning: Just for dev purposes to clean DID from all stages
     clearStages = async (stage: StageNames) => {
         const stageLib = await TileDocument.deterministic(
-            this.ceramic,
+            this.user.ceramic,
             {
-                controllers: [this.ceramic.did?.id.toString() || ''],
+                controllers: [this.user.ceramic.did?.id.toString() || ''],
                 family: CAMBRIAN_LIB_NAME,
                 tags: [stage],
             },

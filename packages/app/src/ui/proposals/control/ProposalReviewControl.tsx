@@ -20,7 +20,7 @@ interface ProposalReviewControlProps {
 }
 
 const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+    const ceramicStagehand = new CeramicStagehand(currentUser)
     const { proposalStack, templateStreamDoc } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)

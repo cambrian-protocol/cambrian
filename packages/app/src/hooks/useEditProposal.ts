@@ -39,9 +39,7 @@ const useEditProposal = () => {
             typeof proposalStreamID === 'string'
         ) {
             try {
-                const ceramicStagehand = new CeramicStagehand(
-                    currentUser.ceramic
-                )
+                const ceramicStagehand = new CeramicStagehand(currentUser)
                 setCeramicStagehand(ceramicStagehand)
 
                 const _proposalStreamDoc =

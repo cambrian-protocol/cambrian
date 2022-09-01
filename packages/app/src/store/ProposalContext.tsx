@@ -49,7 +49,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             currentUser.signer,
             currentUser.chainId
         )
-        const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+        const ceramicStagehand = new CeramicStagehand(currentUser)
 
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown

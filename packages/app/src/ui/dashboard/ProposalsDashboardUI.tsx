@@ -32,7 +32,7 @@ interface ProposalsDashboardUIProps {
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+    const ceramicStagehand = new CeramicStagehand(currentUser)
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]

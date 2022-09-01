@@ -441,7 +441,7 @@ export const getMetadataFromProposal = async (
 
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
         if (metadataURI) {
-            const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+            const ceramicStagehand = new CeramicStagehand(currentUser)
             const proposalStack =
                 await ceramicStagehand.loadProposalStackFromID(metadataURI)
 

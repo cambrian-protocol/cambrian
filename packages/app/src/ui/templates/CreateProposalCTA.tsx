@@ -28,7 +28,7 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const ceramicStagehand = new CeramicStagehand(currentUser.ceramic)
+            const ceramicStagehand = new CeramicStagehand(currentUser)
             const { streamID } = await ceramicStagehand.createProposal(
                 randimals(),
                 templateStreamID
