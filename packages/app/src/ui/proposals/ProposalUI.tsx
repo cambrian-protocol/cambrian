@@ -32,8 +32,6 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
 
     useEffect(() => {
         initCollateralToken()
-        console.log('proposalStack: ', proposalStack)
-        console.log('currentUser: ', currentUser)
     }, [currentUser, proposalStack])
 
     const initCollateralToken = async () => {
@@ -47,9 +45,9 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     }
 
     const initMessenger =
-        (currentUser.ceramic.did.id.toString() ===
+        (currentUser.ceramic.did?.id.toString() ===
             proposalStack?.templateDoc.content.author ||
-            currentUser.ceramic.did.id.toString() ===
+            currentUser.ceramic.did?.id.toString() ===
                 proposalStack?.proposalDoc.content.author) &&
         proposalStatus !== ProposalStatus.Draft
 

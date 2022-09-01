@@ -39,7 +39,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
             await currentUser.cambrianProfileDoc.update(
                 input,
                 {
-                    controllers: [currentUser.ceramic.did.id.toString()],
+                    controllers: [currentUser.ceramic.did?.id.toString() || ''],
                     family: 'cambrian-profile',
                 },
                 { pin: true }

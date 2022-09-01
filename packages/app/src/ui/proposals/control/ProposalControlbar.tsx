@@ -17,10 +17,10 @@ const ProposalControlbar = () => {
         useProposalContext()
 
     const isProposalAuthor =
-        currentUser?.ceramic.did.id.toString() ===
+        currentUser?.ceramic.did?.id.toString() ===
         proposalStack?.proposalDoc.content.author
     const isTemplateAuthor =
-        currentUser?.ceramic.did.id.toString() ===
+        currentUser?.ceramic.did?.id.toString() ===
         proposalStack?.templateDoc.content.author
 
     const renderControls = () => {

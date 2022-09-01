@@ -153,7 +153,9 @@ export default function CoreMessenger({
                     //@ts-ignore
                     currentUser.ceramic,
                     {
-                        controllers: [currentUser.ceramic.did.id.toString()],
+                        controllers: [
+                            currentUser.ceramic.did?.id.toString() || '',
+                        ],
                         family: 'cambrian-chat',
                         tags: [chatID],
                     },
@@ -318,7 +320,9 @@ export default function CoreMessenger({
                                     name:
                                         currentUser.cambrianProfileDoc.content
                                             ?.name || 'Anon',
-                                    did: currentUser.ceramic.did.id.toString(),
+                                    did:
+                                        currentUser.ceramic.did?.id.toString() ||
+                                        '',
                                 },
                                 timestamp: new Date().getTime(),
                             })

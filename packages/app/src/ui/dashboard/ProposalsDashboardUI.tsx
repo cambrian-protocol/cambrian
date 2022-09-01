@@ -20,12 +20,12 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
@@ -135,7 +135,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     templateTitle: templateCommit.title,
                                     isAuthor:
                                         proposalDoc.content.author ===
-                                        currentUser.ceramic.did.id.toString(),
+                                        currentUser.ceramic.did?.id.toString(),
                                 })
                             }
                         })
@@ -217,7 +217,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         templateTitle: templateCommit.title,
                         isAuthor:
                             proposalDoc.content.author ===
-                            currentUser.ceramic.did.id.toString(),
+                            currentUser.ceramic.did?.id.toString(),
                     }
                 })
             )
