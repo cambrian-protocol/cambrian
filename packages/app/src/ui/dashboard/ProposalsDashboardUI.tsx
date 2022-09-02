@@ -135,7 +135,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     templateTitle: templateCommit.title,
                                     isAuthor:
                                         proposalDoc.content.author ===
-                                        currentUser.ceramic.did?.parent,
+                                        currentUser.did,
                                 })
                             }
                         })
@@ -216,8 +216,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         title: proposalDoc.content.title,
                         templateTitle: templateCommit.title,
                         isAuthor:
-                            proposalDoc.content.author ===
-                            currentUser.ceramic.did?.parent,
+                            proposalDoc.content.author === currentUser.did,
                     }
                 })
             )

@@ -63,7 +63,8 @@ export type UserType = {
     permissions: PermissionType[]
     cambrianProfileDoc: TileDocument<CambrianProfileType>
     ceramic: CeramicClient
-    session?: DIDSession
+    session: DIDSession
+    did: string // did:pkh
 }
 
 type UserActionType =
@@ -76,7 +77,8 @@ type UserActionType =
           chainId: UserType['chainId']
           ceramic: UserType['ceramic']
           cambrianProfileDoc: TileDocument<CambrianProfileType>
-          session?: UserType['session']
+          session: UserType['session']
+          did: UserType['did']
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -125,6 +127,7 @@ function userReducer(
                 permissions: [],
                 ceramic: action.ceramic,
                 session: action.session,
+                did: action.did,
             }
         case 'ADD_PERMISSION':
             if (state) {
@@ -155,6 +158,45 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [user, dispatch] = useReducer(userReducer, null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
 
+    const connectWallet = useCallback(async function () {
+        try {
+            const provider = await web3Modal.connect()
+            const web3Provider = new ethers.providers.Web3Provider(provider)
+            const signer = web3Provider.getSigner()
+            const address = await signer.getAddress()
+            const network = await web3Provider.getNetwork()
+
+            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            const session = await loadSession(provider, network, address)
+            ceramic.did = session.did
+
+            const cambrianProfileDoc = (await TileDocument.deterministic(
+                ceramic,
+                {
+                    controllers: [ceramic.did.parent],
+                    family: 'cambrian-profile',
+                },
+                { pin: true }
+            )) as TileDocument<CambrianProfileType>
+
+            dispatch({
+                type: 'SET_USER',
+                provider: provider,
+                web3Provider: web3Provider,
+                signer: signer,
+                address: address,
+                chainId: network.chainId,
+                cambrianProfileDoc: cambrianProfileDoc,
+                ceramic: ceramic,
+                session: session,
+                did: ceramic.did.parent,
+            })
+        } catch (e) {
+            cpLogger.push(e)
+        }
+        setIsUserLoaded(true)
+    }, [])
+
     const disconnectWallet = useCallback(
         async function () {
             await web3Modal.clearCachedProvider()
@@ -171,100 +213,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         },
         [user]
     )
-
-    const connectWallet = useCallback(async function () {
-        try {
-            const provider = await web3Modal.connect()
-            const web3Provider = new ethers.providers.Web3Provider(provider)
-            const signer = web3Provider.getSigner()
-            const address = await signer.getAddress()
-            const network = await web3Provider.getNetwork()
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const session = await loadSession(provider, network, address)
-            if (session?.did) {
-                ceramic.did = session.did
-
-                const cambrianProfileDoc = (await TileDocument.deterministic(
-                    ceramic,
-                    {
-                        controllers: [ceramic.did.parent],
-                        family: 'cambrian-profile',
-                    },
-                    { pin: true }
-                )) as TileDocument<CambrianProfileType>
-
-                console.log(
-                    'Cambrian Profile TileDocument:',
-                    cambrianProfileDoc
-                )
-
-                dispatch({
-                    type: 'SET_USER',
-                    provider: provider,
-                    web3Provider: web3Provider,
-                    signer: signer,
-                    address: address,
-                    chainId: network.chainId,
-                    cambrianProfileDoc: cambrianProfileDoc,
-                    ceramic: ceramic,
-                    session: session,
-                })
-                setIsUserLoaded(true)
-            }
-        } catch (e) {
-            setIsUserLoaded(true)
-            cpLogger.push(e)
-        }
-    }, [])
-
-    const loadSession = async (
-        provider: any,
-        network: ethers.providers.Network,
-        accountAddress: string
-    ) => {
-        let sessionStr
-        let session
-
-        try {
-            try {
-                sessionStr = localStorage.getItem(
-                    `cambrian-session/${network.chainId}/${accountAddress}`
-                )
-            } catch (e) {
-                console.log(e)
-            }
-
-            if (sessionStr && sessionStr !== undefined) {
-                session = await DIDSession.fromSession(sessionStr)
-            }
-
-            console.log('Session:', session)
-            if (!session || (session.hasSession && session.isExpired)) {
-                session = await DIDSession.authorize(
-                    new EthereumAuthProvider(provider, accountAddress),
-                    {
-                        resources: ['ceramic://*'],
-                        expiresInSecs: 300, // TEMP, 1 min for testing
-                    }
-                )
-            }
-        } catch (e) {
-            console.log('UserContext::loadSession::', e)
-        } finally {
-            if (session) {
-                try {
-                    localStorage.setItem(
-                        `cambrian-session/${network.chainId}/${accountAddress}`,
-                        session.serialize()
-                    )
-                } catch (e) {
-                    console.log(e)
-                }
-            }
-        }
-
-        return session
-    }
 
     useEffect(() => {
         connectWallet()
@@ -329,6 +277,35 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             }
         }
     }, [user, disconnectWallet])
+
+    const loadSession = async (
+        provider: any,
+        network: ethers.providers.Network,
+        accountAddress: string
+    ) => {
+        let sessionStr = localStorage.getItem(
+            `cambrian-session/${network.chainId}/${accountAddress}`
+        )
+        let session
+        if (sessionStr) {
+            session = await DIDSession.fromSession(sessionStr)
+        }
+
+        if (!session || (session.hasSession && session.isExpired)) {
+            session = await DIDSession.authorize(
+                new EthereumAuthProvider(provider, accountAddress),
+                {
+                    resources: ['ceramic://*'],
+                    expiresInSecs: 120, // TEMP, 2 min for testing
+                }
+            )
+            localStorage.setItem(
+                `cambrian-session/${network.chainId}/${accountAddress}`,
+                session.serialize()
+            )
+        }
+        return session
+    }
 
     const addPermission = (newPermission: PermissionType) => {
         if (user && !user.permissions.includes(newPermission)) {
