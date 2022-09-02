@@ -97,7 +97,7 @@ export default class CeramicStagehand {
                 streamID: compositionStreamID,
                 commitID: composition.commitId.toString(),
             },
-            author: this.user.ceramic.did?.id.toString() || '', // TODO no empty string
+            author: this.user.ceramic.did?.parent || '', // TODO no empty string
             receivedProposals: {},
         }
 
@@ -120,7 +120,7 @@ export default class CeramicStagehand {
                     flexInput.tagId !== 'collateralToken' &&
                     flexInput.value === ''
             ),
-            author: this.user.ceramic.did?.id.toString() || '', // TODO no empty string
+            author: this.user.ceramic.did?.parent || '', // TODO no empty string
             price: {
                 amount: 0,
                 tokenAddress: template.content.price.denominationTokenAddress,
@@ -136,7 +136,7 @@ export default class CeramicStagehand {
             const stageLib = await TileDocument.deterministic(
                 this.user.ceramic,
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -166,7 +166,7 @@ export default class CeramicStagehand {
             const currentDoc = await TileDocument.deterministic(
                 this.user.ceramic,
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: `cambrian-${stage}`,
                     tags: [uniqueTag],
                 },
@@ -185,9 +185,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [
-                            this.user.ceramic.did?.id.toString() || '',
-                        ],
+                        controllers: [this.user.ceramic.did?.parent || ''],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -199,9 +197,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [
-                            this.user.ceramic.did?.id.toString() || '',
-                        ],
+                        controllers: [this.user.ceramic.did?.parent || ''],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -224,7 +220,7 @@ export default class CeramicStagehand {
             const solverConfigsDoc = await TileDocument.deterministic(
                 this.user.ceramic,
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -236,7 +232,7 @@ export default class CeramicStagehand {
                     solverConfigs: parsedSolvers.map((x) => x.config),
                 },
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -293,7 +289,7 @@ export default class CeramicStagehand {
             const stageLib = await TileDocument.deterministic(
                 this.user.ceramic,
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -589,9 +585,7 @@ export default class CeramicStagehand {
                 const stageLib = await TileDocument.deterministic(
                     this.user.ceramic,
                     {
-                        controllers: [
-                            this.user.ceramic.did?.id.toString() || '',
-                        ],
+                        controllers: [this.user.ceramic.did?.parent || ''],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -644,7 +638,7 @@ export default class CeramicStagehand {
             const stageCollection = await TileDocument.deterministic(
                 this.user.ceramic,
                 {
-                    controllers: [this.user.ceramic.did?.id.toString() || ''],
+                    controllers: [this.user.ceramic.did?.parent || ''],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -674,7 +668,7 @@ export default class CeramicStagehand {
         const stageLib = await TileDocument.deterministic(
             this.user.ceramic,
             {
-                controllers: [this.user.ceramic.did?.id.toString() || ''],
+                controllers: [this.user.ceramic.did?.parent || ''],
                 family: CAMBRIAN_LIB_NAME,
                 tags: [stage],
             },
