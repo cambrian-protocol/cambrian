@@ -8,10 +8,9 @@ import React, {
 } from 'react'
 
 import { CeramicClient } from '@ceramicnetwork/http-client'
-import ConnectWalletSection from '../components/sections/ConnectWalletSection'
+import ConnectWalletPage from '../components/sections/ConnectWalletPage'
 import { DIDSession } from 'did-session'
 import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
-import PageLayout from '../components/layout/PageLayout'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -19,6 +18,7 @@ import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useRouter } from 'next/router'
 
 export type PermissionType = string
 
@@ -157,6 +157,7 @@ export const UserContext = React.createContext<UserContextType>({
 export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     const [user, dispatch] = useReducer(userReducer, null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
+    const router = useRouter()
 
     const connectWallet = useCallback(async function () {
         try {
@@ -191,10 +192,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 session: session,
                 did: ceramic.did.parent,
             })
+            setIsUserLoaded(true)
         } catch (e) {
             cpLogger.push(e)
+            setIsUserLoaded(true)
         }
-        setIsUserLoaded(true)
     }, [])
 
     const disconnectWallet = useCallback(
@@ -290,13 +292,14 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         if (sessionStr) {
             session = await DIDSession.fromSession(sessionStr)
         }
-
         if (!session || (session.hasSession && session.isExpired)) {
+            setIsUserLoaded(true)
             session = await DIDSession.authorize(
                 new EthereumAuthProvider(provider, accountAddress),
                 {
+                    statement:
+                        'This signature allows Cambrian Protocol to update your account data. The permission expires in 24 hours.',
                     resources: ['ceramic://*'],
-                    expiresInSecs: 120, // TEMP, 2 min for testing
                 }
             )
             localStorage.setItem(
@@ -324,10 +327,8 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             }}
         >
             <PermissionProvider permissions={user ? user.permissions : []}>
-                {isUserLoaded && !user ? (
-                    <PageLayout contextTitle="Connect wallet">
-                        <ConnectWalletSection />
-                    </PageLayout>
+                {!user && router.pathname !== '/' && isUserLoaded ? (
+                    <ConnectWalletPage />
                 ) : (
                     children
                 )}

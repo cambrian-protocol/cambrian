@@ -14,7 +14,7 @@ import WrongChainSection from '../sections/WrongChainSection'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
-    contextTitle: string
+    contextTitle?: string
     kind?: 'narrow'
     plain?: boolean
 }
@@ -34,7 +34,8 @@ const PageLayout = ({
         <>
             <Head>
                 <title>
-                    {contextTitle} | {siteTitle}
+                    {contextTitle && `${contextTitle} | `}
+                    {siteTitle}
                 </title>
                 <meta name="description" content={siteTitle} />
                 <meta name="og:title" content={siteTitle} />
