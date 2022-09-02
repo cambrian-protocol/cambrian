@@ -220,7 +220,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     _latestProposalSubmission?.proposalCommitID !==
                         proposalStreamDoc.commitId.toString() &&
                     templateStreamDoc.content.author ===
-                        currentUser.ceramic.did?.id.toString()
+                        currentUser.ceramic.did?.parent
                 ) {
                     await ceramicStagehand.registerNewProposalSubmission(
                         proposalStreamDoc,

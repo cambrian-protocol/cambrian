@@ -40,9 +40,7 @@ export default function ArbitratorsDashboardPage() {
                 const arbitratorLib = (await TileDocument.deterministic(
                     currentUser.ceramic,
                     {
-                        controllers: [
-                            currentUser.ceramic.did?.id.toString() || '',
-                        ],
+                        controllers: [currentUser.ceramic.did?.parent || ''],
                         family: CAMBRIAN_LIB_NAME,
                         tags: ['arbitrators'],
                     },

@@ -49,7 +49,7 @@ const useEditProposal = () => {
 
                 if (
                     _proposalStreamDoc.content.author ===
-                    currentUser.ceramic.did?.id.toString()
+                    currentUser.ceramic.did?.parent
                 ) {
                     const _templateStreamDoc =
                         (await ceramicStagehand.loadTileDocument(

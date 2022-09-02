@@ -244,7 +244,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                     new EthereumAuthProvider(provider, accountAddress),
                     {
                         resources: ['ceramic://*'],
-                        expiresInSecs: 60, // TEMP, 1 min for testing
+                        expiresInSecs: 300, // TEMP, 1 min for testing
                     }
                 )
             }

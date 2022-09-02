@@ -20,8 +20,7 @@ export type ChatMessageType = {
 }
 
 const ChatMessage = ({ message, currentUser, pending }: ChatMessageProps) => {
-    const isSender =
-        currentUser.ceramic.did?.id.toString() === message.author?.did
+    const isSender = currentUser.ceramic.did?.parent === message.author?.did
 
     return (
         <Box

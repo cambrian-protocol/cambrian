@@ -42,8 +42,7 @@ const useEditTemplate = () => {
                         if (
                             (!router.pathname.includes('edit') &&
                                 !router.pathname.includes('new')) ||
-                            currentUser.ceramic.did?.id.toString() ===
-                                template.author
+                            currentUser.ceramic.did?.parent === template.author
                         ) {
                             const comp = (await (
                                 await cs.loadTileDocument(
