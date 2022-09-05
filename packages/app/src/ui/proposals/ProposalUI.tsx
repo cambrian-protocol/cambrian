@@ -32,8 +32,6 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
 
     useEffect(() => {
         initCollateralToken()
-        console.log('proposalStack: ', proposalStack)
-        console.log('currentUser: ', currentUser)
     }, [currentUser, proposalStack])
 
     const initCollateralToken = async () => {
@@ -47,9 +45,8 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     }
 
     const initMessenger =
-        (currentUser.selfID.id === proposalStack?.templateDoc.content.author ||
-            currentUser.selfID.id ===
-                proposalStack?.proposalDoc.content.author) &&
+        (currentUser.did === proposalStack?.templateDoc.content.author ||
+            currentUser.did === proposalStack?.proposalDoc.content.author) &&
         proposalStatus !== ProposalStatus.Draft
 
     return (

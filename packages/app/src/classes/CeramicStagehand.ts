@@ -1,19 +1,17 @@
-import { CERAMIC_NODE_ENDPOINT, TRILOBOT_ENDPOINT } from './../../config/index'
 import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
 } from '@cambrian/app/models/TemplateModel'
 
-import { CeramicClient } from '@ceramicnetwork/http-client'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { ProposalStackType } from '../store/ProposalContext'
 import { ReceivedProposalsHashmapType } from './../models/TemplateModel'
-import { SelfID } from '@self.id/framework'
 import { SolverModel } from '../models/SolverModel'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { TRILOBOT_ENDPOINT } from './../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
@@ -36,12 +34,10 @@ export type Stages = {
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
 export default class CeramicStagehand {
-    selfID: SelfID
-    ceramicClient: CeramicClient
+    user: UserType
 
-    constructor(selfID: SelfID) {
-        this.selfID = selfID
-        this.ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+    constructor(currentUser: UserType) {
+        this.user = currentUser
     }
 
     /* ========================== CREATE =============================== */
@@ -63,11 +59,7 @@ export default class CeramicStagehand {
 
     createTemplate = async (tag: string, compositionStreamID: string) => {
         const composition: TileDocument<CompositionModel> =
-            await TileDocument.load(
-                //@ts-ignore
-                this.selfID.client.ceramic,
-                compositionStreamID
-            )
+            await TileDocument.load(this.user.ceramic, compositionStreamID)
 
         let isCollateralFlex = false
         const formFlexInputs: FlexInputFormType[] = []
@@ -105,7 +97,7 @@ export default class CeramicStagehand {
                 streamID: compositionStreamID,
                 commitID: composition.commitId.toString(),
             },
-            author: this.selfID.id.toString(),
+            author: this.user.did,
             receivedProposals: {},
         }
 
@@ -114,11 +106,7 @@ export default class CeramicStagehand {
 
     createProposal = async (tag: string, templateStreamID: string) => {
         const template: TileDocument<CeramicTemplateModel> =
-            await TileDocument.load(
-                //@ts-ignore
-                this.selfID.client.ceramic,
-                templateStreamID
-            )
+            await TileDocument.load(this.user.ceramic, templateStreamID)
 
         const proposal: CeramicProposalModel = {
             title: tag,
@@ -132,7 +120,7 @@ export default class CeramicStagehand {
                     flexInput.tagId !== 'collateralToken' &&
                     flexInput.value === ''
             ),
-            author: this.selfID.id.toString(),
+            author: this.user.did, // TODO no empty string
             price: {
                 amount: 0,
                 tokenAddress: template.content.price.denominationTokenAddress,
@@ -146,10 +134,9 @@ export default class CeramicStagehand {
     createStage = async (tag: string, data: StageModel, stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
-                //@ts-ignore
-                this.selfID.client.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -177,10 +164,9 @@ export default class CeramicStagehand {
             }
 
             const currentDoc = await TileDocument.deterministic(
-                //@ts-ignore
-                this.selfID.client.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: `cambrian-${stage}`,
                     tags: [uniqueTag],
                 },
@@ -199,7 +185,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.selfID.id],
+                        controllers: [this.user.did],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -211,7 +197,7 @@ export default class CeramicStagehand {
                         [uniqueTag]: streamID,
                     },
                     {
-                        controllers: [this.selfID.id],
+                        controllers: [this.user.did],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -232,10 +218,9 @@ export default class CeramicStagehand {
     ) => {
         try {
             const solverConfigsDoc = await TileDocument.deterministic(
-                //@ts-ignore
-                this.selfID.client.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -247,7 +232,7 @@ export default class CeramicStagehand {
                     solverConfigs: parsedSolvers.map((x) => x.config),
                 },
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: `cambrian-solverConfigs`,
                     tags: [proposalCommitId],
                 },
@@ -265,14 +250,10 @@ export default class CeramicStagehand {
     loadTileDocument = async (streamID: string) => {
         try {
             // const doc = await TileDocument.load(
-            //     this.selfID.client.ceramic,
+            //     this.user.ceramic,
             //     streamID
             // )
-            const doc = await TileDocument.load(
-                //@ts-ignore
-                this.selfID.client.ceramic,
-                streamID
-            )
+            const doc = await TileDocument.load(this.user.ceramic, streamID)
             return doc
         } catch (e) {
             cpLogger.push(e)
@@ -282,7 +263,7 @@ export default class CeramicStagehand {
 
     loadReadOnlyStream = async (streamOrCommitID: string) => {
         try {
-            return (await this.ceramicClient.loadStream(
+            return (await this.user.ceramic.loadStream(
                 streamOrCommitID
             )) as unknown as TileDocument<unknown>
         } catch (e) {
@@ -295,7 +276,7 @@ export default class CeramicStagehand {
         queries: { streamId: string }[]
     ): Promise<any> => {
         try {
-            const streamMap = await this.ceramicClient.multiQuery(queries)
+            const streamMap = await this.user.ceramic.multiQuery(queries)
             return streamMap
         } catch (e) {
             cpLogger.push(e)
@@ -306,10 +287,9 @@ export default class CeramicStagehand {
     loadStagesMap = async (stage: StageNames) => {
         try {
             const stageLib = await TileDocument.deterministic(
-                //@ts-ignore
-                this.selfID.client.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -324,7 +304,7 @@ export default class CeramicStagehand {
     }
 
     loadProposalStackFromID = async (proposalCommitOrStreamID: string) => {
-        const proposalDoc = (await this.ceramicClient.loadStream(
+        const proposalDoc = (await this.user.ceramic.loadStream(
             proposalCommitOrStreamID
         )) as unknown as TileDocument<CeramicProposalModel>
 
@@ -334,11 +314,11 @@ export default class CeramicStagehand {
     loadProposalStackFromProposal = async (
         proposalDoc: TileDocument<CeramicProposalModel>
     ): Promise<ProposalStackType> => {
-        const templateDoc = (await this.ceramicClient.loadStream(
+        const templateDoc = (await this.user.ceramic.loadStream(
             proposalDoc.content.template.commitID
         )) as unknown as TileDocument<CeramicTemplateModel>
 
-        const compositionDoc = (await this.ceramicClient.loadStream(
+        const compositionDoc = (await this.user.ceramic.loadStream(
             templateDoc.content.composition.commitID
         )) as unknown as TileDocument<CompositionModel>
 
@@ -359,13 +339,18 @@ export default class CeramicStagehand {
     submitProposal = async (
         proposalStreamDoc: TileDocument<CeramicProposalModel>
     ) => {
+        if (!this.user?.session) {
+            console.log('No user session')
+            return false
+        }
+
         try {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',
                 body: JSON.stringify({
                     id: proposalStreamDoc.id.toString(),
-                    session: (this.selfID.client as any).session.serialize(), // Ceramic types not updated for WebClientSession yet
+                    session: this.user.session.serialize(), // Ceramic types not updated for WebClientSession yet
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -447,13 +432,17 @@ export default class CeramicStagehand {
         templateStreamDoc: TileDocument<CeramicTemplateModel>,
         proposalStack: ProposalStackType
     ) => {
+        if (!this.user?.session) {
+            console.log('No user session')
+            return false
+        }
         try {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
                 method: 'POST',
                 body: JSON.stringify({
                     id: proposalStack.proposalDoc.id.toString(),
-                    session: (this.selfID.client as any).session.serialize(),
+                    session: this.user.session.serialize(),
                 }),
                 headers: {
                     'Content-Type': 'application/json',
@@ -492,6 +481,10 @@ export default class CeramicStagehand {
         templateStreamDoc: TileDocument<CeramicTemplateModel>,
         proposalStack: ProposalStackType
     ) => {
+        if (!this.user?.session) {
+            console.log('No user session')
+            return false
+        }
         try {
             const success = await deploySolutionBase(
                 currentUser,
@@ -507,9 +500,7 @@ export default class CeramicStagehand {
                         method: 'POST',
                         body: JSON.stringify({
                             id: proposalStack.proposalDoc.id.toString(),
-                            session: (
-                                this.selfID.client as any
-                            ).session.serialize(),
+                            session: this.user.session.serialize(),
                         }),
                         headers: {
                             'Content-Type': 'application/json',
@@ -585,18 +576,16 @@ export default class CeramicStagehand {
     ) => {
         try {
             const currentData: TileDocument<StageModel> =
-                //@ts-ignore
-                await TileDocument.load(this.selfID.client.ceramic, streamID)
+                await TileDocument.load(this.user.ceramic, streamID)
 
             const cleanedUserTitle = data.title.trim()
 
             if (currentData.content.title !== cleanedUserTitle) {
                 // StageLib and Meta Tag must be updated
                 const stageLib = await TileDocument.deterministic(
-                    //@ts-ignore
-                    this.selfID.client.ceramic,
+                    this.user.ceramic,
                     {
-                        controllers: [this.selfID.id],
+                        controllers: [this.user.did],
                         family: CAMBRIAN_LIB_NAME,
                         tags: [stage],
                     },
@@ -647,10 +636,9 @@ export default class CeramicStagehand {
     deleteStage = async (tag: string, stage: StageNames) => {
         try {
             const stageCollection = await TileDocument.deterministic(
-                //@ts-ignore
-                this.selfID.client.ceramic,
+                this.user.ceramic,
                 {
-                    controllers: [this.selfID.id],
+                    controllers: [this.user.did],
                     family: CAMBRIAN_LIB_NAME,
                     tags: [stage],
                 },
@@ -678,10 +666,9 @@ export default class CeramicStagehand {
     // Warning: Just for dev purposes to clean DID from all stages
     clearStages = async (stage: StageNames) => {
         const stageLib = await TileDocument.deterministic(
-            //@ts-ignore
-            this.selfID.client.ceramic,
+            this.user.ceramic,
             {
-                controllers: [this.selfID.id],
+                controllers: [this.user.did],
                 family: CAMBRIAN_LIB_NAME,
                 tags: [stage],
             },

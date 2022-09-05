@@ -19,7 +19,7 @@ const useCambrianProfile = (did?: string) => {
             const cambrianProfile = (
                 await TileDocument.deterministic(
                     //@ts-ignore
-                    currentUser.selfID.client.ceramic,
+                    currentUser.ceramic,
                     {
                         controllers: [did],
                         family: 'cambrian-profile',

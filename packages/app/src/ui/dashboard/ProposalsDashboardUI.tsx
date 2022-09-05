@@ -20,19 +20,19 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+    const ceramicStagehand = new CeramicStagehand(currentUser)
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]
@@ -135,7 +135,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                                     templateTitle: templateCommit.title,
                                     isAuthor:
                                         proposalDoc.content.author ===
-                                        currentUser.selfID.id,
+                                        currentUser.did,
                                 })
                             }
                         })
@@ -216,8 +216,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         title: proposalDoc.content.title,
                         templateTitle: templateCommit.title,
                         isAuthor:
-                            proposalDoc.content.author ===
-                            currentUser.selfID.id,
+                            proposalDoc.content.author === currentUser.did,
                     }
                 })
             )

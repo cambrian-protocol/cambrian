@@ -20,7 +20,7 @@ export type ChatMessageType = {
 }
 
 const ChatMessage = ({ message, currentUser, pending }: ChatMessageProps) => {
-    const isSender = currentUser.selfID.id === message.author?.did
+    const isSender = currentUser.did === message.author?.did
 
     return (
         <Box

@@ -64,9 +64,7 @@ export const ComposerUI = () => {
             currentUser
         ) {
             try {
-                const newCeramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
-                )
+                const newCeramicStagehand = new CeramicStagehand(currentUser)
                 setCeramicStagehand(newCeramicStagehand)
                 const composition = (
                     await newCeramicStagehand.loadTileDocument(

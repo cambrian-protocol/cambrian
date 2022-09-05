@@ -49,7 +49,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             currentUser.signer,
             currentUser.chainId
         )
-        const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
+        const ceramicStagehand = new CeramicStagehand(currentUser)
 
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown
@@ -219,7 +219,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     proposalStreamDoc.content.isSubmitted &&
                     _latestProposalSubmission?.proposalCommitID !==
                         proposalStreamDoc.commitId.toString() &&
-                    templateStreamDoc.content.author === currentUser.selfID.id
+                    templateStreamDoc.content.author === currentUser.did
                 ) {
                     await ceramicStagehand.registerNewProposalSubmission(
                         proposalStreamDoc,

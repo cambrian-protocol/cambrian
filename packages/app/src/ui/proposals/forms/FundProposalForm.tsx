@@ -265,7 +265,7 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
                 if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
 
                 if (solution.solverConfigsURI) {
-                    const cs = new CeramicStagehand(currentUser.selfID)
+                    const cs = new CeramicStagehand(currentUser)
                     const ceramicSolverConfigs = (await cs.loadTileDocument(
                         solution.solverConfigsURI
                     )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>

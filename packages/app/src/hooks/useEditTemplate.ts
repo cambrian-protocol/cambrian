@@ -31,21 +31,18 @@ const useEditTemplate = () => {
                 typeof templateStreamID === 'string'
             ) {
                 try {
-                    const cs = new CeramicStagehand(currentUser.selfID)
+                    const cs = new CeramicStagehand(currentUser)
                     setCeramicStagehand(cs)
                     const template = (await (
                         await cs.loadTileDocument(templateStreamID)
                     ).content) as CeramicTemplateModel
-
-                    console.log(currentUser.selfID.id)
-                    console.log(template.author)
 
                     if (template) {
                         // Just initialize edit paths if currentUser is the author
                         if (
                             (!router.pathname.includes('edit') &&
                                 !router.pathname.includes('new')) ||
-                            currentUser.selfID.id === template.author
+                            currentUser.did === template.author
                         ) {
                             const comp = (await (
                                 await cs.loadTileDocument(
