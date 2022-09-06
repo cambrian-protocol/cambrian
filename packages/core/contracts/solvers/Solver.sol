@@ -14,8 +14,6 @@ import "./SolverLib.sol";
 
 import "../modules/Modulated.sol";
 
-import "hardhat/console.sol";
-
 abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
     address private factoryAddress; // Factory which creates Solver proxies
     address private ctfAddress; // Conditional token framework
@@ -156,7 +154,6 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
      */
     function executeSolve(uint256 _index) public {
         require(ingestsValid() == true, "ingests invalid");
-        console.log("Meow");
 
         SolverLib.executeSolve(
             _index,
@@ -270,10 +267,6 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
 
         router(_slot, _data);
         emit IngestedData();
-
-        if (ingestsValid() && allocationsValid(conditions.length - 1)) {
-            ISolver(address(this)).executeSolve(conditions.length - 1);
-        }
     }
 
     /**
