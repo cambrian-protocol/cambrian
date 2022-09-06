@@ -10,6 +10,9 @@ import LOCAL_IPFSTextSubmitter from '@cambrian/core/deployments/localhost/IPFSTe
 import LOCAL_Unanimity from '@cambrian/core/deployments/localhost/Unanimity.json'
 import ROPSTEN_IPFSTextSubmitter from '@cambrian/core/deployments/ropsten/IPFSTextSubmitter.json'
 import ROPSTEN_Unanimity from '@cambrian/core/deployments/ropsten/Unanimity.json'
+import GOERLI_IPFSTextSubmitter from '@cambrian/core/deployments/goerli/IPFSTextSubmitter.json'
+import ARBITRUM_IPFSTextSubmitter from '@cambrian/core/deployments/arbitrum/IPFSTextSubmitter.json'
+
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 
 type ModuleRegistryType = {
@@ -34,6 +37,8 @@ moduleRegistry[IPFS_TEXT_SUBMITTER_MODULE_KEY] = {
     deployments: {
         31337: LOCAL_IPFSTextSubmitter.address,
         3: ROPSTEN_IPFSTextSubmitter.address,
+        5: GOERLI_IPFSTextSubmitter.address,
+        42161: ARBITRUM_IPFSTextSubmitter.address,
     },
     component: IPFSTextSubmitterUI,
 }
