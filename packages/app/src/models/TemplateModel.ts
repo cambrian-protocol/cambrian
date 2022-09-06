@@ -13,6 +13,7 @@ export type CeramicTemplateModel = {
     flexInputs: FlexInputFormType[]
     author: string // DID
     receivedProposals: ReceivedProposalsHashmapType
+    isActive?: boolean
 }
 
 export type ReceivedProposalsHashmapType = {
@@ -26,6 +27,7 @@ export type ReceivedProposalCommitType = {
 export type ReceivedProposalPropsType = {
     approved?: boolean
     requestChange?: boolean
+    isDeclined?: boolean
 }
 
 export type TemplatePriceModel = {

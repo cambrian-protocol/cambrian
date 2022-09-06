@@ -7,21 +7,24 @@ import {
     getProposalStatus,
 } from '../utils/helpers/proposalHelper'
 
+import { CAMBRIAN_DID } from 'packages/app/config'
+import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '../models/ProposalModel'
-import CeramicStagehand from '../classes/CeramicStagehand'
+import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
+import { ProposalStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from './UserContext'
 import _ from 'lodash'
+import { ceramicInstance } from '../services/ceramic/CeramicUtils'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
 export type ProposalContextType = {
-    proposalStack?: ProposalStackType
-    templateStreamDoc?: TileDocument<CeramicTemplateModel>
+    proposalStack?: ProposalDocsStackType
     proposalContract?: ethers.Contract
     proposalStatus: ProposalStatus
     isLoaded: boolean
@@ -37,7 +40,7 @@ export const ProposalContext = React.createContext<ProposalContextType>({
     isLoaded: false,
 })
 
-export type ProposalStackType = {
+export type ProposalDocsStackType = {
     proposalDoc: TileDocument<CeramicProposalModel>
     templateDoc: TileDocument<CeramicTemplateModel>
     compositionDoc: TileDocument<CompositionModel>
@@ -49,13 +52,14 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             currentUser.signer,
             currentUser.chainId
         )
-        const ceramicStagehand = new CeramicStagehand(currentUser)
+        const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+        const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
 
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
             ProposalStatus.Unknown
         )
-        // Clones of the commit contents
-        const [proposalStack, setProposalStack] = useState<ProposalStackType>()
+        const [proposalStack, setProposalStack] =
+            useState<ProposalDocsStackType>()
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
         const [isLoaded, setIsLoaded] = useState(false)
@@ -69,6 +73,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             init()
         }, [])
 
+        useEffect(() => {
+            updateProposalLib()
+        }, [proposalStatus, proposalStack])
+
         // Init offchain Listeners
         useEffect(() => {
             if (
@@ -76,23 +84,24 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 proposalStatus === ProposalStatus.ChangeRequested
             ) {
                 if (proposalStreamDoc && templateStreamDoc) {
-                    console.log('controllers: ', proposalStreamDoc.controllers)
-
                     const proposalSub = proposalStreamDoc.subscribe(
                         async (x) => {
-                            await refreshProposal()
+                            console.log('Proposal changed: ', x)
+                            await initProposal(
+                                proposalStreamDoc,
+                                templateStreamDoc
+                            )
                         }
                     )
-                    const templateSub = templateStreamDoc.subscribe((x) => {
-                        setProposalStatus(
-                            getProposalStatus(
+                    const templateSub = templateStreamDoc.subscribe(
+                        async (x) => {
+                            console.log('Template changed: ', x)
+                            await initProposal(
                                 proposalStreamDoc,
-                                templateStreamDoc.content.receivedProposals[
-                                    proposalStreamDoc.id.toString()
-                                ]
+                                templateStreamDoc
                             )
-                        )
-                    })
+                        }
+                    )
                     return () => {
                         proposalSub.unsubscribe()
                         templateSub.unsubscribe()
@@ -101,7 +110,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             }
         }, [proposalStreamDoc, templateStreamDoc, proposalStatus])
 
-        // Init Proposalshub listener
+        // Init onchain Listeners
         useEffect(() => {
             if (proposalStack) {
                 initProposalsHubListener(proposalsHub, proposalStack)
@@ -111,9 +120,24 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             }
         }, [proposalStatus, proposalStack])
 
+        const updateProposalLib = async () => {
+            if (proposalStack && proposalStatus !== ProposalStatus.Unknown) {
+                await ceramicProposalAPI.addRecentProposal(proposalStreamID)
+                if (
+                    proposalStack.templateDoc.content.author ===
+                        currentUser.did &&
+                    proposalStatus !== ProposalStatus.Canceled
+                ) {
+                    await ceramicProposalAPI.addReceivedProposal(
+                        proposalStreamID
+                    )
+                }
+            }
+        }
+
         const initProposalsHubListener = async (
             proposalsHub: ProposalsHub,
-            proposalStack: ProposalStackType
+            proposalStack: ProposalDocsStackType
         ) => {
             const proposalID = getOnChainProposalId(
                 proposalStack.proposalDoc.commitId.toString(),
@@ -142,16 +166,14 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const init = async () => {
             try {
                 const _proposalStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
-                        proposalStreamID
-                    )) as TileDocument<CeramicProposalModel>
+                    await ceramicProposalAPI.loadProposalDoc(proposalStreamID)
 
                 _proposalStreamDoc.makeReadOnly()
 
                 const _templateStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
+                    await ceramicTemplateAPI.loadTemplateDoc(
                         _proposalStreamDoc.content.template.streamID
-                    )) as TileDocument<CeramicTemplateModel>
+                    )
 
                 await initProposal(_proposalStreamDoc, _templateStreamDoc)
 
@@ -167,108 +189,118 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             proposalStreamDoc: TileDocument<CeramicProposalModel>,
             templateStreamDoc: TileDocument<CeramicTemplateModel>
         ) => {
-            console.log('pdoc: ', proposalStreamDoc)
-            console.log('tdoc: ', templateStreamDoc)
+            try {
+                const cambrianProposalStackDoc =
+                    (await TileDocument.deterministic(
+                        ceramicInstance(currentUser),
+                        {
+                            controllers: [CAMBRIAN_DID],
+                            family: 'cambrian-archive',
+                            tags: [proposalStreamID],
+                        }
+                    )) as TileDocument<{ proposalStack: ProposalStackType }>
 
-            const approvedCommitID = getApprovedProposalCommitID(
-                templateStreamDoc.content,
-                proposalStreamDoc.id.toString()
-            )
-
-            if (
-                approvedCommitID &&
-                proposalStreamDoc.allCommitIds.find(
-                    (commitID) => commitID.toString() === approvedCommitID
-                )
-            ) {
-                const _proposalStack =
-                    await ceramicStagehand.loadProposalStackFromID(
-                        approvedCommitID
+                if (cambrianProposalStackDoc.content.proposalStack) {
+                    const proposalStack =
+                        await ceramicProposalAPI.loadProposalStackFromID(
+                            cambrianProposalStackDoc.content.proposalStack
+                                .proposalCommitID
+                        )
+                    const onChainProposal = await getOnChainProposal(
+                        currentUser,
+                        cambrianProposalStackDoc.content.proposalStack
+                            .proposalCommitID,
+                        cambrianProposalStackDoc.content.proposalStack.proposal
+                            .template.commitID
                     )
 
-                const onChainProposal = await getOnChainProposal(
-                    currentUser,
-                    approvedCommitID,
-                    _proposalStack.proposalDoc.content.template.commitID
-                )
-
-                setOnChainProposal(onChainProposal)
-                setProposalStack(_proposalStack)
-                setProposalStatus(
-                    getProposalStatus(
-                        _proposalStack.proposalDoc,
-                        templateStreamDoc.content.receivedProposals[
-                            proposalStreamDoc.id.toString()
-                        ],
-                        onChainProposal
+                    setProposalStatus(
+                        getProposalStatus(
+                            proposalStack.proposalDoc.commitId.toString(),
+                            proposalStack.proposalDoc.content,
+                            cambrianProposalStackDoc.content.proposalStack,
+                            onChainProposal
+                        )
                     )
-                )
-            } else {
-                const _proposalStack =
-                    await ceramicStagehand.loadProposalStackFromProposal(
-                        proposalStreamDoc
-                    )
-
-                const _latestProposalSubmission = getLatestProposalSubmission(
-                    proposalStreamID,
-                    templateStreamDoc.content.receivedProposals
-                )
-
-                // Register new submitted proposal if user is template author
-                if (
-                    proposalStreamDoc.content.isSubmitted &&
-                    _latestProposalSubmission?.proposalCommitID !==
-                        proposalStreamDoc.commitId.toString() &&
-                    templateStreamDoc.content.author === currentUser.did
-                ) {
-                    await ceramicStagehand.registerNewProposalSubmission(
-                        proposalStreamDoc,
-                        templateStreamDoc
-                    )
-                }
-
-                setProposalStatus(
-                    getProposalStatus(
-                        _proposalStack.proposalDoc,
-                        templateStreamDoc.content.receivedProposals[
-                            proposalStreamDoc.id.toString()
-                        ]
-                    )
-                )
-
-                if (_proposalStack.proposalDoc.content.isSubmitted) {
-                    console.log('isSubmitted')
-                    setProposalStack(_proposalStack)
+                    setOnChainProposal(onChainProposal)
+                    setProposalStack(proposalStack)
                 } else {
-                    console.log('notSubmitted')
-
-                    if (_latestProposalSubmission) {
-                        // Initialize the latest submission/commit as proposal stack
-                        const latestProposalCommitContent =
-                            (await ceramicStagehand.loadReadOnlyStream(
-                                _latestProposalSubmission.proposalCommitID
-                            )) as TileDocument<CeramicProposalModel>
-
-                        setProposalStack({
-                            ..._proposalStack,
-                            proposalDoc: latestProposalCommitContent,
-                        })
+                    // Fallback in case cambrianProposalStack had no entry but there is an approved commit
+                    const approvedCommitID = getApprovedProposalCommitID(
+                        templateStreamDoc.content,
+                        proposalStreamDoc.id.toString()
+                    )
+                    let onChainProposal: ethers.Contract | undefined
+                    if (approvedCommitID) {
+                        onChainProposal = await getOnChainProposal(
+                            currentUser,
+                            approvedCommitID,
+                            proposalStreamDoc.content.template.commitID
+                        )
+                        setOnChainProposal(onChainProposal)
                     }
-                    // Note: If there are no latest submissions and the proposal has not been submitted, no stack will be set
-                }
-            }
-        }
 
-        const refreshProposal = async () => {
-            if (proposalStreamDoc && templateStreamDoc) {
-                await initProposal(proposalStreamDoc, templateStreamDoc)
+                    const _proposalStack =
+                        await ceramicProposalAPI.loadProposalStackFromID(
+                            proposalStreamID
+                        )
+
+                    const _latestProposalSubmission =
+                        getLatestProposalSubmission(
+                            proposalStreamID,
+                            templateStreamDoc.content.receivedProposals
+                        )
+
+                    // Register new submitted proposal if user is template author
+                    if (
+                        _proposalStack.proposalDoc.content.isSubmitted &&
+                        _latestProposalSubmission?.proposalCommitID !==
+                            _proposalStack.proposalDoc.commitId.toString() &&
+                        templateStreamDoc.content.author === currentUser.did
+                    ) {
+                        console.log('Trying to register new Proposal')
+                        await ceramicTemplateAPI.registerNewProposalSubmission(
+                            proposalStreamID
+                        )
+                    }
+
+                    setProposalStatus(
+                        getProposalStatus(
+                            _proposalStack.proposalDoc.commitId.toString(),
+                            _proposalStack.proposalDoc.content,
+                            undefined,
+                            onChainProposal,
+                            templateStreamDoc.content.receivedProposals[
+                                _proposalStack.proposalDoc.id.toString()
+                            ]
+                        )
+                    )
+                    if (proposalStreamDoc.content.isSubmitted) {
+                        setProposalStack(_proposalStack)
+                    } else {
+                        if (_latestProposalSubmission) {
+                            // Initialize the latest submission/commit as proposal stack
+
+                            const latestProposalCommitDoc =
+                                (await ceramicInstance(currentUser).loadStream(
+                                    _latestProposalSubmission.proposalCommitID
+                                )) as TileDocument<CeramicProposalModel>
+                            setProposalStack({
+                                ..._proposalStack,
+                                proposalDoc: latestProposalCommitDoc,
+                            })
+                        }
+                        // Note: If there are no latest submissions and the proposal has not been submitted, no stack will be set
+                    }
+                }
+            } catch (e) {
+                cpLogger.push(e)
             }
         }
 
         return (
             <ProposalContext.Provider
                 value={{
-                    templateStreamDoc: templateStreamDoc,
                     proposalStack: proposalStack,
                     proposalStatus: proposalStatus,
                     proposalContract: onChainProposal,

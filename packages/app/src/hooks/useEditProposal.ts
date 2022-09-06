@@ -1,14 +1,16 @@
-import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
+import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '../models/ProposalModel'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
-import { ProposalStackType } from '../store/ProposalContext'
+import { ProposalDocsStackType } from '../store/ProposalContext'
 import { ProposalStatus } from '../models/ProposalStatus'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { StageNames } from '../services/ceramic/CeramicStagehand'
 import _ from 'lodash'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from './../services/api/Logger.api'
+import { updateStage } from '../utils/helpers/stageHelpers'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -17,64 +19,86 @@ const useEditProposal = () => {
     const router = useRouter()
     const { proposalStreamID } = router.query
     const [proposalInput, setProposalInput] = useState<CeramicProposalModel>()
-    const [proposalStack, setProposalStack] = useState<ProposalStackType>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
+    const [proposalDocStack, setProposalDocStack] =
+        useState<ProposalDocsStackType>()
+
+    const [ceramicProposalAPI, setCeramicProposalAPI] =
+        useState<CeramicProposalAPI>()
     const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
         ProposalStatus.Unknown
     )
-    const [proposalStreamDoc, setProposalStreamDoc] =
-        useState<TileDocument<CeramicProposalModel>>()
     const [isLoaded, setIsLoaded] = useState(false)
     const [isValidProposal, setIsValidProposal] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        if (router.isReady) fetchProposal()
-    }, [router, currentUser])
+        initCeramic()
+    }, [currentUser])
 
-    const fetchProposal = async () => {
+    useEffect(() => {
+        if (router.isReady && ceramicProposalAPI)
+            fetchProposal(ceramicProposalAPI)
+    }, [router, ceramicProposalAPI])
+
+    const initCeramic = () => {
+        if (currentUser) {
+            setCeramicProposalAPI(new CeramicProposalAPI(currentUser))
+        }
+    }
+
+    const fetchProposal = async (ceramicProposalAPI: CeramicProposalAPI) => {
         if (
             currentUser &&
             proposalStreamID !== undefined &&
             typeof proposalStreamID === 'string'
         ) {
             try {
-                const ceramicStagehand = new CeramicStagehand(currentUser)
-                setCeramicStagehand(ceramicStagehand)
-
                 const _proposalStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
-                        proposalStreamID
-                    )) as TileDocument<CeramicProposalModel>
+                    await ceramicProposalAPI.loadProposalDoc(proposalStreamID)
 
                 if (_proposalStreamDoc.content.author === currentUser.did) {
-                    const _templateStreamDoc =
-                        (await ceramicStagehand.loadTileDocument(
+                    const _templateStreamContent = (
+                        await ceramicInstance(currentUser).loadStream(
                             _proposalStreamDoc.content.template.streamID
-                        )) as TileDocument<CeramicTemplateModel>
+                        )
+                    ).content as CeramicTemplateModel
 
-                    if (_proposalStreamDoc.content.isSubmitted) {
-                        setProposalStatus(ProposalStatus.ChangeRequested)
-                    } else if (
-                        _templateStreamDoc.content.receivedProposals[
+                    // Note: To edit a proposal it must be either not submitted or a change has been requested
+                    const receivedSubmissions =
+                        _templateStreamContent.receivedProposals[
                             proposalStreamID
                         ]
+                    if (
+                        (receivedSubmissions &&
+                            receivedSubmissions[receivedSubmissions.length - 1]
+                                .requestChange) ||
+                        !_proposalStreamDoc.content.isSubmitted
                     ) {
-                        setProposalStatus(ProposalStatus.Modified)
-                    } else {
-                        setProposalStatus(ProposalStatus.Draft)
-                    }
-
-                    const _proposalStackClones =
-                        await ceramicStagehand.loadProposalStackFromID(
-                            proposalStreamID
+                        if (_proposalStreamDoc.content.isSubmitted) {
+                            setProposalStatus(ProposalStatus.ChangeRequested)
+                        } else if (
+                            _templateStreamContent.receivedProposals[
+                                proposalStreamID
+                            ]
+                        ) {
+                            setProposalStatus(ProposalStatus.Modified)
+                        } else {
+                            setProposalStatus(ProposalStatus.Draft)
+                        }
+                        const _proposalStackClones =
+                            await ceramicProposalAPI.loadProposalStackFromID(
+                                proposalStreamID
+                            )
+                        validateProposal(
+                            _proposalStackClones.proposalDoc.content
                         )
-                    validateProposal(_proposalStackClones.proposalDoc.content)
-                    setProposalStreamDoc(_proposalStreamDoc)
-                    setProposalStack(_proposalStackClones)
-                    setProposalInput(
-                        _.cloneDeep(_proposalStackClones.proposalDoc.content)
-                    )
+                        setProposalDocStack(_proposalStackClones)
+                        setProposalInput(
+                            _.cloneDeep(
+                                _proposalStackClones.proposalDoc.content
+                            )
+                        )
+                    }
                 }
                 setIsLoaded(true)
             } catch (e) {
@@ -84,27 +108,35 @@ const useEditProposal = () => {
     }
 
     const saveProposal = async (): Promise<boolean> => {
-        if (proposalInput && ceramicStagehand && proposalStack) {
-            if (!_.isEqual(proposalInput, proposalStack.proposalDoc.content)) {
+        if (
+            proposalInput &&
+            proposalDocStack &&
+            ceramicProposalAPI &&
+            currentUser
+        ) {
+            if (
+                !_.isEqual(proposalInput, proposalDocStack.proposalDoc.content)
+            ) {
                 try {
-                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                    const title = await updateStage(
                         proposalStreamID as string,
                         { ...proposalInput, isSubmitted: false },
-                        StageNames.proposal
+                        StageNames.proposal,
+                        currentUser
                     )
                     const proposalWithUniqueTitle = {
                         ...proposalInput,
-                        title: uniqueTag,
+                        title: title,
                         isSubmitted: false,
                     }
                     validateProposal(proposalWithUniqueTitle)
                     setProposalInput(proposalWithUniqueTitle)
 
-                    await ceramicStagehand.loadProposalStackFromID(
+                    await ceramicProposalAPI.loadProposalStackFromID(
                         proposalStreamID as string
                     )
-                    setProposalStack(
-                        await ceramicStagehand.loadProposalStackFromID(
+                    setProposalDocStack(
+                        await ceramicProposalAPI.loadProposalStackFromID(
                             proposalStreamID as string
                         )
                     )
@@ -123,8 +155,8 @@ const useEditProposal = () => {
     }
 
     const resetProposalInput = () => {
-        if (proposalStack) {
-            setProposalInput(_.cloneDeep(proposalStack.proposalDoc.content))
+        if (proposalDocStack) {
+            setProposalInput(_.cloneDeep(proposalDocStack.proposalDoc.content))
         }
     }
 
@@ -140,9 +172,9 @@ const useEditProposal = () => {
     }
 
     return {
+        proposalStreamID: proposalStreamID as string,
         isValidProposal: isValidProposal,
-        proposalStreamDoc: proposalStreamDoc,
-        proposalStack: proposalStack,
+        proposalDocStack: proposalDocStack,
         onResetProposalInput: resetProposalInput,
         onSaveProposal: saveProposal,
         proposalInput: proposalInput,

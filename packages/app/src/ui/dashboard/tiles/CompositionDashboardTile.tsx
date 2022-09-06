@@ -16,12 +16,12 @@ import {
     IconContext,
     Share,
     Textbox,
-    TrashSimple,
+    Trash,
     TreeStructure,
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -29,11 +29,12 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RenameCompositionModal from '../modals/RenameCompositionModal'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { cpTheme } from '@cambrian/app/theme/theme'
 import randimals from 'randimals'
 import router from 'next/router'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface CompositionDashboardTileProps {
-    ceramicStagehand: CeramicStagehand
     compositionTag: string
     compositionStreamID: string
     onDelete: () => void
@@ -43,8 +44,8 @@ const CompositionDashboardTile = ({
     compositionTag,
     compositionStreamID,
     onDelete,
-    ceramicStagehand,
 }: CompositionDashboardTileProps) => {
+    const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
     const [currentTag, setCurrentTag] = useState(compositionTag)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
@@ -69,13 +70,16 @@ const CompositionDashboardTile = ({
     const onCreateTemplate = async () => {
         setIsCreatingTemplate(true)
         try {
-            const { streamID } = await ceramicStagehand.createTemplate(
-                randimals(),
-                compositionStreamID
-            )
-            router.push(
-                `${window.location.origin}/dashboard/templates/new/${streamID}`
-            )
+            if (currentUser) {
+                const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
+                const streamID = await ceramicTemplateAPI.createTemplate(
+                    randimals(),
+                    compositionStreamID
+                )
+                router.push(
+                    `${window.location.origin}/dashboard/templates/new/${streamID}`
+                )
+            }
         } catch (e) {
             setIsCreatingTemplate(false)
             setErrorMessage(await cpLogger.push(e))
@@ -109,8 +113,17 @@ const CompositionDashboardTile = ({
                                                 toggleShowRenameCompositionModal
                                             }
                                         />
+                                        <PlainSectionDivider />
                                         <DropButtonListItem
-                                            icon={<TrashSimple />}
+                                            icon={
+                                                <Trash
+                                                    color={
+                                                        cpTheme.global.colors[
+                                                            'status-error'
+                                                        ]
+                                                    }
+                                                />
+                                            }
                                             label="Remove"
                                             onClick={onDelete}
                                         />
@@ -178,7 +191,6 @@ const CompositionDashboardTile = ({
                     currentTag={currentTag}
                     compositionStreamID={compositionStreamID}
                     setCurrentTag={setCurrentTag}
-                    ceramicStagehand={ceramicStagehand}
                     onClose={toggleShowRenameCompositionModal}
                 />
             )}

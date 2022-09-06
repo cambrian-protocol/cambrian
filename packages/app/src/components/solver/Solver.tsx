@@ -307,14 +307,14 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                 <InteractionLayout
                     proposalHeader={
                         <ProposalHeader
-                            proposalStack={metadata?.proposalStack}
+                            proposalDocStack={metadata?.proposalDocStack}
                             proposalStatus={ProposalStatus.Executed}
                             showProposalDetails
                         />
                     }
                     contextTitle={
-                        metadata?.proposalStack?.proposalDoc.content?.title ||
-                        'Solver'
+                        metadata?.proposalDocStack?.proposalDoc.content
+                            ?.title || 'Solver'
                     }
                     actionBar={
                         <SolverActionbar

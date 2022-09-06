@@ -22,7 +22,6 @@ const TemplateUI = ({
     composition,
 }: TemplateUIProps) => {
     const [templaterProfile] = useCambrianProfile(ceramicTemplate?.author)
-
     return (
         <Box pad="large">
             <Box pad="large" height={{ min: '80vh' }} border round="xsmall">
@@ -30,7 +29,7 @@ const TemplateUI = ({
                     <Box justify="between" fill>
                         <Box gap="medium">
                             <CambrianProfileInfo
-                                cambrianProfile={templaterProfile}
+                                cambrianProfileDoc={templaterProfile}
                                 hideDetails
                                 size="small"
                             />
@@ -44,13 +43,15 @@ const TemplateUI = ({
                             />
                             <PlainSectionDivider />
                             <CambrianProfileInfo
-                                cambrianProfile={templaterProfile}
+                                cambrianProfileDoc={templaterProfile}
                             />
                             <PlainSectionDivider />
                         </Box>
-                        <CreateProposalCTA
-                            templateStreamID={templateStreamID}
-                        />
+                        {ceramicTemplate?.isActive && (
+                            <CreateProposalCTA
+                                templateStreamID={templateStreamID}
+                            />
+                        )}
                     </Box>
                 ) : (
                     <TemplateSkeleton />

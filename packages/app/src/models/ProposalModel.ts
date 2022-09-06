@@ -11,4 +11,5 @@ export type CeramicProposalModel = {
     price: { amount: number; tokenAddress: string }
     author: string // DID
     isSubmitted: boolean
+    isDeleted?: boolean
 }

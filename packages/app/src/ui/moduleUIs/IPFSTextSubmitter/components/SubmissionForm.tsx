@@ -11,6 +11,7 @@ import { TextArea } from 'grommet'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { initialSubmission } from './SubmissionContainer'
@@ -43,8 +44,7 @@ const SubmissionForm = ({
 
     const init = async () => {
         const submissionDoc = (await TileDocument.deterministic(
-            //@ts-ignore
-            currentUser.ceramic,
+            ceramicInstance(currentUser),
             {
                 controllers: [currentUser.did],
                 family: 'cambrian-ipfs-text-submitter',
