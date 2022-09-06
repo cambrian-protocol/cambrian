@@ -30,6 +30,7 @@ const colors: any = {
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
     'status-ok': '#338233',
+    'status-error': 'red',
     'dark-4': '#999999',
     'status-initiated': '#cac63d',
     'status-reported': '#2ec090',

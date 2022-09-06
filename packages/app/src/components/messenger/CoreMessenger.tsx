@@ -8,6 +8,7 @@ import { TRILOBOT_WS_ENDPOINT } from 'packages/app/config'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '../../services/api/Logger.api'
 import io from 'socket.io-client'
 
@@ -15,7 +16,7 @@ import io from 'socket.io-client'
  * Messages are stored for a user in:
  *
  * TileDocument.deterministic(<client>, {
- *  controllers: [<selfID>],
+ *  controllers: [<did:pkh>],
  *  family: "cambrian-chat"
  *  tags: [<chatID>]
  * })
@@ -150,8 +151,7 @@ export default function CoreMessenger({
         try {
             const messagesDoc: TileDocument<{ messages: ChatMessageType[] }> =
                 await TileDocument.deterministic(
-                    //@ts-ignore
-                    currentUser.ceramic,
+                    ceramicInstance(currentUser),
                     {
                         controllers: [currentUser.did],
                         family: 'cambrian-chat',
@@ -199,8 +199,7 @@ export default function CoreMessenger({
                     await Promise.allSettled(
                         participants.map((DID) =>
                             TileDocument.deterministic(
-                                //@ts-ignore
-                                currentUser.ceramic,
+                                ceramicInstance(currentUser),
                                 {
                                     controllers: [DID],
                                     family: 'cambrian-chat',
@@ -246,8 +245,7 @@ export default function CoreMessenger({
                         participants.map(
                             async (DID) =>
                                 await TileDocument.deterministic(
-                                    //@ts-ignore
-                                    currentUser.ceramic,
+                                    ceramicInstance(currentUser),
                                     {
                                         controllers: [DID],
                                         family: 'cambrian-chat',

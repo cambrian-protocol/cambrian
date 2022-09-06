@@ -1,247 +1,190 @@
-import { ArrowsClockwise, CircleDashed } from 'phosphor-react'
-import { Box, Heading, Spinner, Tab, Tabs, Text } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
+import { Box, Heading, Spinner, Text } from 'grommet'
 import ProposalListItem, {
     ProposalListItemType,
 } from '@cambrian/app/components/list/ProposalListItem'
-import {
-    getApprovedProposalCommitID,
-    getLatestProposalSubmission,
-    getOnChainProposal,
-    getProposalStatus,
-} from '@cambrian/app/utils/helpers/proposalHelper'
 import { useEffect, useState } from 'react'
 
+import { ArrowsClockwise } from 'phosphor-react'
+import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
+import { CeramicClient } from '@ceramicnetwork/http-client'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import RecentProposalListItem from '@cambrian/app/components/list/RecentProposalListItem'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { ethers } from 'ethers'
+import { getProposalListItem } from '@cambrian/app/utils/helpers/proposalHelper'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
 }
 
+type ProposalHashmap = {
+    [proposalStreamID: string]: TileDocument<CeramicProposalModel>
+}
+
+export type ProposalStackType = {
+    proposalCommitID: string
+    proposal: CeramicProposalModel
+    template: CeramicTemplateModel
+    composition: CompositionModel
+}
+
+export type CambrianProposalArchiveType = {
+    [proposalStreamID: string]: ProposalStackType
+}
+
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser)
+    const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+
     const [myProposals, setMyProposals] = useState<ProposalListItemType[]>([])
+    const [recentProposals, setRecentProposals] = useState<ProposalHashmap>({})
     const [receivedProposals, setReceivedProposals] = useState<
         ProposalListItemType[]
     >([])
 
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        fetchMyProposals()
-        fetchReceivedProposals()
+        init()
     }, [])
 
-    const fetchReceivedProposals = async () => {
-        const templateStreamIDs = (await ceramicStagehand.loadStagesMap(
-            StageNames.template
-        )) as StringHashmap
-
-        const _receivedProposals: ProposalListItemType[] = []
-
-        await Promise.all(
-            Object.values(templateStreamIDs).map(async (streamID) => {
-                const _templateStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
-                        streamID
-                    )) as TileDocument<CeramicTemplateModel>
-                if (
-                    _templateStreamDoc &&
-                    _templateStreamDoc.content.receivedProposals &&
-                    Object.keys(_templateStreamDoc.content.receivedProposals)
-                        .length > 0
-                ) {
-                    await Promise.all(
-                        Object.keys(
-                            _templateStreamDoc.content.receivedProposals
-                        ).map(async (proposalStreamID) => {
-                            let proposalDoc:
-                                | TileDocument<CeramicProposalModel>
-                                | undefined
-
-                            let onChainProposal: ethers.Contract | undefined
-
-                            const approvedProposalCommitID =
-                                getApprovedProposalCommitID(
-                                    _templateStreamDoc.content,
-                                    proposalStreamID
-                                )
-
-                            if (approvedProposalCommitID) {
-                                proposalDoc =
-                                    (await ceramicStagehand.loadReadOnlyStream(
-                                        approvedProposalCommitID
-                                    )) as TileDocument<CeramicProposalModel>
-
-                                onChainProposal = await getOnChainProposal(
-                                    currentUser,
-                                    approvedProposalCommitID,
-                                    proposalDoc.content.template.commitID
-                                )
-                            } else {
-                                proposalDoc =
-                                    (await ceramicStagehand.loadReadOnlyStream(
-                                        proposalStreamID
-                                    )) as TileDocument<CeramicProposalModel>
-
-                                if (!proposalDoc.content.isSubmitted) {
-                                    const latestProposalSubmission =
-                                        getLatestProposalSubmission(
-                                            proposalStreamID,
-                                            _templateStreamDoc.content
-                                                .receivedProposals
-                                        )
-                                    if (latestProposalSubmission) {
-                                        proposalDoc =
-                                            (await ceramicStagehand.loadReadOnlyStream(
-                                                latestProposalSubmission.proposalCommitID
-                                            )) as TileDocument<CeramicProposalModel>
-                                    }
-                                }
-                            }
-
-                            if (proposalDoc) {
-                                const templateCommit = (await (
-                                    await ceramicStagehand.loadReadOnlyStream(
-                                        proposalDoc.content.template.commitID
-                                    )
-                                ).content) as CeramicTemplateModel
-
-                                _receivedProposals.push({
-                                    status: getProposalStatus(
-                                        proposalDoc,
-                                        _templateStreamDoc.content
-                                            .receivedProposals[
-                                            proposalDoc.id.toString()
-                                        ],
-                                        onChainProposal
-                                    ),
-                                    streamID: proposalStreamID,
-                                    title: proposalDoc.content.title,
-                                    templateTitle: templateCommit.title,
-                                    isAuthor:
-                                        proposalDoc.content.author ===
-                                        currentUser.did,
-                                })
-                            }
-                        })
-                    )
-                }
-            })
-        )
-        setReceivedProposals(_receivedProposals)
-    }
-
-    const fetchMyProposals = async () => {
+    const init = async () => {
         setIsFetching(true)
         try {
-            const proposalStreamIDs = (await ceramicStagehand.loadStagesMap(
-                StageNames.proposal
-            )) as StringHashmap
-
-            const proposalStreamMap =
-                (await ceramicStagehand.loadReadOnlyStreams(
-                    Object.values(proposalStreamIDs).map((s) => {
-                        return { streamId: s }
-                    })
-                )) as { [streamId: string]: TileDocument<CeramicProposalModel> }
-
-            const proposalListItems: ProposalListItemType[] = await Promise.all(
-                Object.keys(proposalStreamMap).map(async (proposalStreamID) => {
-                    let proposalDoc = proposalStreamMap[proposalStreamID]
-                    let onChainProposal: ethers.Contract | undefined = undefined
-
-                    const _templateStreamContent = (
-                        await ceramicStagehand.loadReadOnlyStream(
-                            proposalDoc.content.template.streamID
+            const proposalLib = await ceramicProposalAPI.loadProposalLib()
+            if (
+                proposalLib.content !== null &&
+                typeof proposalLib.content === 'object'
+            ) {
+                // My Proposals
+                if (proposalLib.content.lib) {
+                    setMyProposals(
+                        await Promise.all(
+                            Object.keys(proposalLib.content.lib).map(
+                                async (proposalTag) =>
+                                    await getProposalListItem(
+                                        currentUser,
+                                        proposalLib.content.lib[proposalTag]
+                                    )
+                            )
                         )
-                    ).content as CeramicTemplateModel
+                    )
+                } else {
+                    setMyProposals([])
+                }
 
-                    const approvedProposalCommitID =
-                        getApprovedProposalCommitID(
-                            _templateStreamContent,
-                            proposalStreamID
+                // Received Proposals
+                if (proposalLib.content.received) {
+                    setReceivedProposals(
+                        await Promise.all(
+                            proposalLib.content.received.map(
+                                async (proposalStreamID) =>
+                                    await getProposalListItem(
+                                        currentUser,
+                                        proposalStreamID
+                                    )
+                            )
                         )
+                    )
+                } else {
+                    setReceivedProposals([])
+                }
 
-                    if (approvedProposalCommitID) {
-                        proposalDoc =
-                            (await ceramicStagehand.loadReadOnlyStream(
-                                approvedProposalCommitID
-                            )) as TileDocument<CeramicProposalModel>
-
-                        onChainProposal = await getOnChainProposal(
-                            currentUser,
-                            approvedProposalCommitID,
-                            proposalDoc.content.template.commitID
-                        )
-                    }
-
-                    const templateCommit = (await (
-                        await ceramicStagehand.loadReadOnlyStream(
-                            proposalDoc.content.template.commitID
-                        )
-                    ).content) as CeramicTemplateModel
-
-                    let status
-                    try {
-                        status = getProposalStatus(
-                            proposalDoc,
-                            _templateStreamContent.receivedProposals[
-                                proposalStreamID
-                            ],
-                            onChainProposal
-                        )
-                    } catch (e) {
-                        status = ProposalStatus.Unknown
-                    } // Probably not the best spot for this, but I did it to clear an error
-                    // Had a template which was missing "receivedProposals" field
-
-                    return {
-                        status: status,
-                        streamID: proposalStreamID,
-                        title: proposalDoc.content.title,
-                        templateTitle: templateCommit.title,
-                        isAuthor:
-                            proposalDoc.content.author === currentUser.did,
-                    }
-                })
-            )
-
-            setMyProposals(proposalListItems)
+                // Recent Proposals
+                if (proposalLib.content.recents) {
+                    setRecentProposals(
+                        (await ceramicInstance(currentUser).multiQuery(
+                            proposalLib.content.recents
+                                .map((r) => {
+                                    return { streamId: r }
+                                })
+                                .reverse()
+                                .slice(0, 4)
+                        )) as ProposalHashmap
+                    )
+                } else {
+                    setRecentProposals({})
+                }
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsFetching(false)
     }
 
-    const onDeleteProposal = async (proposalTag: string) => {
-        if (ceramicStagehand) {
-            try {
-                await ceramicStagehand.deleteStage(
-                    proposalTag,
-                    StageNames.proposal
+    const onRemove = async (
+        proposalTag: string,
+        type: 'DELETE' | 'ARCHIVE'
+    ) => {
+        try {
+            await ceramicProposalAPI.removeProposal(proposalTag, type)
+            setMyProposals(
+                myProposals.filter((proposal) => proposal.title !== proposalTag)
+            )
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+        }
+    }
+
+    const onRemoveReceived = async (
+        proposalTag: string,
+        type: 'DELETE' | 'ARCHIVE'
+    ) => {
+        try {
+            const proposalListItem = receivedProposals.find(
+                (r) => r.title === proposalTag
+            )
+            if (proposalListItem) {
+                await ceramicProposalAPI.removeReceivedProposal(
+                    proposalListItem.streamID,
+                    type
                 )
-                const updatedProposals = myProposals.filter(
-                    (proposal) => proposal.title !== proposalTag
+                setReceivedProposals(
+                    receivedProposals.filter(
+                        (r) => r.streamID !== proposalListItem.streamID
+                    )
                 )
-                setMyProposals(updatedProposals)
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
             }
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+        }
+    }
+
+    // TODO Functions for archive
+    const onUnarchive = async (proposalStreamID: string) => {
+        try {
+            await ceramicProposalAPI.unarchiveProposal(proposalStreamID)
+            const updatedProposals = [...myProposals]
+            updatedProposals.push(
+                await getProposalListItem(currentUser, proposalStreamID)
+            )
+            setMyProposals(updatedProposals)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+        }
+    }
+
+    const onUnarchiveReceived = async (proposalStreamID: string) => {
+        try {
+            await ceramicProposalAPI.unarchiveReceivedProposal(proposalStreamID)
+            const updatedReceivedProposals = [...receivedProposals]
+            updatedReceivedProposals.push(
+                await getProposalListItem(currentUser, proposalStreamID)
+            )
+            setReceivedProposals(updatedReceivedProposals)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
@@ -260,7 +203,7 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                         <Box>
                             <Heading level="2">Proposals Management</Heading>
                             <Text color="dark-4">
-                                Edit, Review, and fund your proposals here
+                                Edit, review, and fund your proposals here
                             </Text>
                         </Box>
                         <Box
@@ -268,118 +211,124 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
                             gap="small"
                             pad={{ vertical: 'small' }}
                         >
-                            {/*  
-                            TODO For dev purposes
-                            <Button
-                                secondary
-                                size="small"
-                                label="Delete all"
-                                icon={<Trash />}
-                                onClick={() => {
-                                    ceramicStagehand.clearStages(
-                                        StageNames.proposal
-                                    )
-                                }}
-                            /> */}
                             <LoaderButton
                                 secondary
                                 isLoading={isFetching}
                                 icon={<ArrowsClockwise />}
                                 onClick={() => {
-                                    fetchMyProposals()
-                                    fetchReceivedProposals()
+                                    init()
                                 }}
                             />
                         </Box>
                     </Box>
-                    <Box fill pad={'large'}>
-                        <Tabs alignControls="start">
-                            <Tab
-                                title={`Your Proposals (${myProposals.length})`}
-                            >
-                                <Box pad={{ top: 'medium' }}>
-                                    {myProposals.length > 0 ? (
-                                        <Box gap="small">
-                                            {myProposals.map((proposal) => (
+                    <Box fill pad={{ horizontal: 'large' }} gap="medium">
+                        <Box>
+                            <Text color={'dark-4'}>
+                                Your Proposals ({myProposals.length})
+                            </Text>
+                            <Box pad={{ top: 'medium' }}>
+                                {myProposals.length > 0 ? (
+                                    <Box gap="small">
+                                        {myProposals.map((proposal) => (
+                                            <ProposalListItem
+                                                key={proposal.title}
+                                                proposal={proposal}
+                                                onRemove={onRemove}
+                                            />
+                                        ))}
+                                    </Box>
+                                ) : (
+                                    <Box
+                                        fill
+                                        justify="center"
+                                        align="center"
+                                        gap="medium"
+                                        pad="large"
+                                        round="xsmall"
+                                        border
+                                    >
+                                        {isFetching ? (
+                                            <Spinner />
+                                        ) : (
+                                            <Box>
+                                                <Text
+                                                    size="small"
+                                                    color="dark-4"
+                                                >
+                                                    No proposals
+                                                </Text>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                )}
+                            </Box>
+                        </Box>
+                        <PlainSectionDivider />
+                        <Box>
+                            <Text color={'dark-4'}>
+                                Received Proposals ({receivedProposals.length})
+                            </Text>
+                            <Box pad={{ top: 'medium' }}>
+                                {receivedProposals.length > 0 ? (
+                                    <Box gap="small">
+                                        {receivedProposals.map(
+                                            (receivedProposal, idx) => (
                                                 <ProposalListItem
-                                                    key={proposal.title}
-                                                    proposal={proposal}
-                                                    onDelete={onDeleteProposal}
+                                                    key={idx}
+                                                    proposal={receivedProposal}
+                                                    onRemove={onRemoveReceived}
                                                 />
-                                            ))}
-                                        </Box>
-                                    ) : (
-                                        <Box
-                                            fill
-                                            justify="center"
-                                            align="center"
-                                            gap="medium"
-                                            pad="large"
-                                            round="xsmall"
-                                            border
-                                        >
-                                            {isFetching ? (
-                                                <Spinner />
-                                            ) : (
-                                                <>
-                                                    <CircleDashed size="32" />
-                                                    <Text
-                                                        size="small"
-                                                        color="dark-4"
-                                                    >
-                                                        No Proposals created yet
-                                                    </Text>
-                                                </>
-                                            )}
-                                        </Box>
-                                    )}
-                                </Box>
-                            </Tab>
-                            <Tab
-                                title={`Received Proposals (${receivedProposals.length})`}
-                            >
-                                <Box pad={{ top: 'medium' }}>
-                                    {receivedProposals.length > 0 ? (
-                                        <Box gap="small">
-                                            {receivedProposals.map(
-                                                (receivedProposal, idx) => (
-                                                    <ProposalListItem
-                                                        key={idx}
-                                                        proposal={
-                                                            receivedProposal
-                                                        }
-                                                    />
-                                                )
-                                            )}
-                                        </Box>
-                                    ) : (
-                                        <Box
-                                            fill
-                                            justify="center"
-                                            align="center"
-                                            gap="medium"
-                                            pad="large"
-                                            round="xsmall"
-                                            border
-                                        >
-                                            {isFetching ? (
-                                                <Spinner />
-                                            ) : (
-                                                <>
-                                                    <CircleDashed size="32" />
-                                                    <Text
-                                                        size="small"
-                                                        color="dark-4"
-                                                    >
-                                                        No Proposals created yet
-                                                    </Text>
-                                                </>
-                                            )}
-                                        </Box>
-                                    )}
-                                </Box>
-                            </Tab>
-                        </Tabs>
+                                            )
+                                        )}
+                                    </Box>
+                                ) : (
+                                    <Box
+                                        fill
+                                        justify="center"
+                                        align="center"
+                                        gap="medium"
+                                        pad="large"
+                                        round="xsmall"
+                                        border
+                                    >
+                                        {isFetching ? (
+                                            <Spinner />
+                                        ) : (
+                                            <Box>
+                                                <Text
+                                                    size="small"
+                                                    color="dark-4"
+                                                >
+                                                    No proposals
+                                                </Text>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                )}
+                            </Box>
+                        </Box>
+                        <PlainSectionDivider />
+                        <BaseFormGroupContainer
+                            groupTitle="Recently viewed"
+                            height={{ min: 'xsmall' }}
+                        >
+                            <Box gap="small">
+                                {Object.keys(recentProposals).map(
+                                    (proposal) => {
+                                        return (
+                                            <RecentProposalListItem
+                                                key={proposal}
+                                                proposal={
+                                                    recentProposals[proposal]
+                                                        .content
+                                                }
+                                                proposalStreamID={proposal}
+                                            />
+                                        )
+                                    }
+                                )}
+                            </Box>
+                        </BaseFormGroupContainer>
                     </Box>
                     <Box pad="large" />
                 </Box>

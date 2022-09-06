@@ -10,7 +10,7 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import ProposalContentInfo from '../../proposals/ProposalContentInfo'
-import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
+import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
@@ -18,7 +18,7 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 
 interface ProposalInfoModalProps {
     onClose: () => void
-    proposalStack: ProposalStackType
+    proposalStack: ProposalDocsStackType
 }
 
 const ProposalInfoModal = ({
@@ -55,7 +55,7 @@ const ProposalInfoModal = ({
                 />
                 <Box border gap="medium" pad="medium" round="xsmall">
                     <CambrianProfileInfo
-                        cambrianProfile={proposerProfile}
+                        cambrianProfileDoc={proposerProfile}
                         size={'small'}
                         hideDetails
                     />
@@ -76,7 +76,7 @@ const ProposalInfoModal = ({
                         composition={proposalStack.compositionDoc.content}
                     />
                     <PlainSectionDivider />
-                    <CambrianProfileInfo cambrianProfile={proposerProfile} />
+                    <CambrianProfileInfo cambrianProfileDoc={proposerProfile} />
                 </Box>
             </Box>
         </BaseLayerModal>

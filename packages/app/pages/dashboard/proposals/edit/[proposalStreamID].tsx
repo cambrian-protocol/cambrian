@@ -22,13 +22,13 @@ export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
 
     const {
-        proposalStack,
+        proposalDocStack,
         proposalStatus,
         proposalInput,
         setProposalInput,
         onSaveProposal,
         onResetProposalInput,
-        proposalStreamDoc,
+        proposalStreamID,
         isValidProposal,
         errorMessage,
         setErrorMessage,
@@ -50,16 +50,13 @@ export default function EditProposalPage() {
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput &&
-              isEditable &&
-              proposalStreamDoc &&
-              proposalStack ? (
+            ) : proposalInput && isEditable && proposalDocStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box pad="large" gap="medium">
                             <ProposalHeader
                                 proposalStatus={proposalStatus}
-                                proposalStack={proposalStack}
+                                proposalDocStack={proposalDocStack}
                             />
                             <Tabs
                                 justify="start"
@@ -78,7 +75,7 @@ export default function EditProposalPage() {
                                                     'Please be sure to include information requested by the Template description.'
                                                 }
                                             />
-                                            {proposalStack.templateDoc.content.requirements.trim() !==
+                                            {proposalDocStack.templateDoc.content.requirements.trim() !==
                                                 '' && (
                                                 <Box gap="xsmall">
                                                     <Heading level="4">
@@ -92,7 +89,7 @@ export default function EditProposalPage() {
                                                         }}
                                                     >
                                                         {
-                                                            proposalStack
+                                                            proposalDocStack
                                                                 .templateDoc
                                                                 .content
                                                                 .requirements
@@ -119,7 +116,7 @@ export default function EditProposalPage() {
                                         </Box>
                                         <ProposalPricingForm
                                             template={
-                                                proposalStack.templateDoc
+                                                proposalDocStack.templateDoc
                                                     .content
                                             }
                                             proposalInput={proposalInput}
@@ -141,8 +138,8 @@ export default function EditProposalPage() {
                                             </Box>
                                             <ProposalFlexInputsForm
                                                 composition={
-                                                    proposalStack.compositionDoc
-                                                        .content
+                                                    proposalDocStack
+                                                        .compositionDoc.content
                                                 }
                                                 proposalInput={proposalInput}
                                                 setProposalInput={
@@ -158,7 +155,7 @@ export default function EditProposalPage() {
                             <PlainSectionDivider />
                             <ProposalSubmitControl
                                 onSave={onSaveProposal}
-                                proposalStreamDoc={proposalStreamDoc}
+                                proposalStreamID={proposalStreamID}
                                 isValidProposal={isValidProposal}
                             />
                         </Box>
@@ -166,10 +163,10 @@ export default function EditProposalPage() {
                     {proposalStatus !== ProposalStatus.Draft && currentUser && (
                         <Messenger
                             currentUser={currentUser}
-                            chatID={proposalStreamDoc.id.toString()}
+                            chatID={proposalStreamID}
                             participantDIDs={[
-                                proposalStack.templateDoc.content.author,
-                                proposalStack.proposalDoc.content.author,
+                                proposalDocStack.templateDoc.content.author,
+                                proposalDocStack.proposalDoc.content.author,
                             ]}
                             chatType={'Proposal'}
                         />

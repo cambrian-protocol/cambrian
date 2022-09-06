@@ -13,9 +13,9 @@ export default function NewProposalPage() {
         isLoaded,
         proposalInput,
         setProposalInput,
-        proposalStack,
+        proposalDocStack,
         onSaveProposal,
-        proposalStreamDoc,
+        proposalStreamID,
         errorMessage,
         setErrorMessage,
     } = useEditProposal()
@@ -24,14 +24,14 @@ export default function NewProposalPage() {
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && proposalStack && proposalStreamDoc ? (
+            ) : proposalInput && proposalDocStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center" pad="large">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
-                                proposalStreamDoc={proposalStreamDoc}
+                                proposalStreamID={proposalStreamID}
                                 onSaveProposal={onSaveProposal}
-                                proposalStack={proposalStack}
+                                proposalDocStack={proposalDocStack}
                                 proposalInput={proposalInput}
                                 setProposalInput={setProposalInput}
                             />

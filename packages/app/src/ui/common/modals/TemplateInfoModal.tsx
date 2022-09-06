@@ -5,13 +5,13 @@ import { File } from 'phosphor-react'
 import FlexInputInfo from '../FlexInputInfo'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
+import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import TemplateContentInfo from '../../templates/TemplateContentInfo'
 import TemplatePricingInfo from '@cambrian/app/ui/templates/TemplatePricingInfo'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface TemplateInfoModalProps {
-    proposalStack: ProposalStackType
+    proposalStack: ProposalDocsStackType
     onClose: () => void
 }
 
@@ -22,7 +22,6 @@ const TemplateInfoModal = ({
     const [templaterProfile] = useCambrianProfile(
         proposalStack.templateDoc.content.author
     )
-
     return (
         <BaseLayerModal onClose={onClose}>
             <Box height={{ min: 'auto' }}>
@@ -33,7 +32,7 @@ const TemplateInfoModal = ({
                 />
                 <Box border gap="medium" pad="medium" round="xsmall">
                     <CambrianProfileInfo
-                        cambrianProfile={templaterProfile}
+                        cambrianProfileDoc={templaterProfile}
                         size={'small'}
                         hideDetails
                     />
@@ -52,7 +51,9 @@ const TemplateInfoModal = ({
                         composition={proposalStack.compositionDoc.content}
                     />
                     <PlainSectionDivider />
-                    <CambrianProfileInfo cambrianProfile={templaterProfile} />
+                    <CambrianProfileInfo
+                        cambrianProfileDoc={templaterProfile}
+                    />
                 </Box>
             </Box>
         </BaseLayerModal>

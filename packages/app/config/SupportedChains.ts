@@ -185,7 +185,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             name: 'Goerli Test Network',
             shortName: 'gor',
             chain: 'ETH',
-            network: 'ropsten',
+            network: 'goerli',
             chainId: 5,
             networkId: 5,
             rpcUrl: 'https://goerli.infura.io/v3/5e5e73b367364266b008aed15e5b3189',

@@ -3,13 +3,14 @@ import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem'
-import { CAMBRIAN_LIB_NAME } from '@cambrian/app/classes/CeramicStagehand'
+import { CAMBRIAN_LIB_NAME } from '@cambrian/app/services/ceramic/CeramicStagehand'
 import CreateArbitratorModal from '@cambrian/app/ui/dashboard/modals/CreateArbitratorModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -38,7 +39,7 @@ export default function ArbitratorsDashboardPage() {
         if (currentUser) {
             try {
                 const arbitratorLib = (await TileDocument.deterministic(
-                    currentUser.ceramic,
+                    ceramicInstance(currentUser),
                     {
                         controllers: [currentUser.did],
                         family: CAMBRIAN_LIB_NAME,

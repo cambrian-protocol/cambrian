@@ -30,6 +30,11 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Please try again later...',
         logLevel: 1,
     },
+    STAGE_LIB_ERROR: {
+        title: 'Error while loading stage lib from Ceramic',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
     NO_SELF_ID: {
         title: 'Ceramic connection necessary',
         message: 'Please connect your wallet to ceramic.',
