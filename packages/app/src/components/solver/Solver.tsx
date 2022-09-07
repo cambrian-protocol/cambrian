@@ -101,7 +101,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     useEffect(() => {
         if (solverData) {
-            console.log(solverData)
             if (currentUser.address === solverData.config.keeper)
                 addPermission('Keeper')
 

@@ -166,7 +166,7 @@ export default class CeramicProposalAPI {
                 return false
             }
         } catch (e) {
-            console.log(e)
+            cpLogger.push(e)
         }
     }
 

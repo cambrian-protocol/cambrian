@@ -265,28 +265,8 @@ export default class CeramicTemplateAPI {
                     templateStreamDoc.content.receivedProposals
                 )
             }
-            const proposalStream = await cs.loadStream(proposalStreamID)
-            console.log('Proposal ', proposalStream)
-            console.log(
-                'Proposal Stream Tip (Most recent commitID):',
-                proposalStream.tip.toString()
-            )
 
             const proposalCommmitID = proposalStreamDoc.commitId.toString()
-            console.log('Proposal commitID', proposalCommmitID)
-            console.log(
-                'Second last CommitID:',
-                proposalStreamDoc.allCommitIds[
-                    proposalStreamDoc.allCommitIds.length - 2
-                ].toString()
-            )
-            console.log(
-                'Last CommitID:',
-                proposalStreamDoc.allCommitIds[
-                    proposalStreamDoc.allCommitIds.length - 1
-                ].toString()
-            )
-
             if (!updatedReceivedProposals[proposalStreamID]) {
                 updatedReceivedProposals[proposalStreamID] = [
                     {
@@ -298,10 +278,6 @@ export default class CeramicTemplateAPI {
                     proposalCommitID: proposalCommmitID,
                 })
             }
-            console.log(
-                'Registering new Proposal Submission',
-                templateStreamDoc
-            )
             await templateStreamDoc.update({
                 ...templateStreamDoc.content,
                 receivedProposals: updatedReceivedProposals,

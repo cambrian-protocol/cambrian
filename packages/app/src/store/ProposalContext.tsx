@@ -86,7 +86,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 if (proposalStreamDoc && templateStreamDoc) {
                     const proposalSub = proposalStreamDoc.subscribe(
                         async (x) => {
-                            console.log('Proposal changed: ', x)
                             await initProposal(
                                 proposalStreamDoc,
                                 templateStreamDoc
@@ -95,7 +94,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     )
                     const templateSub = templateStreamDoc.subscribe(
                         async (x) => {
-                            console.log('Template changed: ', x)
                             await initProposal(
                                 proposalStreamDoc,
                                 templateStreamDoc
@@ -258,7 +256,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             _proposalStack.proposalDoc.commitId.toString() &&
                         templateStreamDoc.content.author === currentUser.did
                     ) {
-                        console.log('Trying to register new Proposal')
                         await ceramicTemplateAPI.registerNewProposalSubmission(
                             proposalStreamID
                         )

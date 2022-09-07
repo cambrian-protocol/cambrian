@@ -240,7 +240,6 @@ export const deployProposal = async (
         const event = rc.events?.find(
             (event) => event.event === 'CreateProposal'
         )
-        console.log(event)
         if (!event) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
 
         // If for some reason some POS wants to DOS we can save the correct id nonce
