@@ -8,7 +8,6 @@ import { GENERAL_ERROR } from './../constants/ErrorMessages'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { SolverConfigModel } from '../models/SolverConfigModel'
 import { TokenModel } from '../models/TokenModel'
-import { ulid } from 'ulid'
 
 export default class ProposalsHub {
     contract: ethers.Contract

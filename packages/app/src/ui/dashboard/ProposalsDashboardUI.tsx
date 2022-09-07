@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react'
 
 import { ArrowsClockwise } from 'phosphor-react'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
-import { CeramicClient } from '@ceramicnetwork/http-client'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'

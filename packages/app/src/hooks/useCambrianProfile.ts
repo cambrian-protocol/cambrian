@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { CambrianProfileType } from '../store/UserContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { ceramicInstance } from './../services/ceramic/CeramicUtils'
+import { ceramicInstance } from '../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 
 const useCambrianProfile = (did?: string) => {
