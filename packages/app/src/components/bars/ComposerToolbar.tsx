@@ -1,4 +1,4 @@
-import { ArrowSquareRight, Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
+import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -12,9 +12,9 @@ import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import StackedIcon from '../icons/StackedIcon'
-import { StageNames } from '@cambrian/app/services/ceramic/CeramicStagehand'
+import { StageNames } from '@cambrian/app/models/StageModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { updateStage } from '@cambrian/app/utils/helpers/stageHelpers'
+import { updateStage } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 

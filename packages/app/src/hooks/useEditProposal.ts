@@ -1,3 +1,4 @@
+import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
@@ -6,11 +7,9 @@ import { CeramicTemplateModel } from '../models/TemplateModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import { ProposalDocsStackType } from '../store/ProposalContext'
 import { ProposalStatus } from '../models/ProposalStatus'
-import { StageNames } from '../services/ceramic/CeramicStagehand'
+import { StageNames } from '../models/StageModel'
 import _ from 'lodash'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from './../services/api/Logger.api'
-import { updateStage } from '../utils/helpers/stageHelpers'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 

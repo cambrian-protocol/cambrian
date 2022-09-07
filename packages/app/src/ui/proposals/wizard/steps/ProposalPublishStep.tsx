@@ -4,7 +4,7 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import CeramicStagehand from '@cambrian/app/services/ceramic/CeramicStagehand'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
@@ -33,8 +33,8 @@ const ProposalPublishStep = ({
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const ceramicStagehand = new CeramicStagehand(currentUser)
-            await ceramicStagehand.submitProposal(proposalStreamID)
+            const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+            await ceramicProposalAPI.submitProposal(proposalStreamID)
             router.push(
                 `${window.location.origin}/proposals/${proposalStreamID}`
             )

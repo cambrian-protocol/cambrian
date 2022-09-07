@@ -1,12 +1,11 @@
-import { CAMBRIAN_LIB_NAME, StageLibType, StageNames } from './CeramicStagehand'
+import { CAMBRIAN_LIB_NAME, ceramicInstance, createStage } from './CeramicUtils'
+import { StageLibType, StageNames } from '../../models/StageModel'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from './CeramicUtils'
 import { cpLogger } from '../api/Logger.api'
-import { createStage } from './../../utils/helpers/stageHelpers'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
 import { pushUnique } from '../../utils/helpers/arrayHelper'
 

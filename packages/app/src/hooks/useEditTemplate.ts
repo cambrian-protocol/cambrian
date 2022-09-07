@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
-import { StageNames } from '../services/ceramic/CeramicStagehand'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
-import { updateStage } from '@cambrian/app/utils/helpers/stageHelpers'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
-import { ceramicInstance } from '../services/ceramic/CeramicUtils'
+import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
+import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
+import { StageNames } from '../models/StageModel'
 
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()

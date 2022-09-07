@@ -4,7 +4,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import CeramicStagehand from '@cambrian/app/services/ceramic/CeramicStagehand'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { PaperPlaneRight } from 'phosphor-react'
@@ -35,9 +35,13 @@ const ProposalSubmitControl = ({
         try {
             if (currentUser) {
                 if (await onSave()) {
-                    const ceramicStagehand = new CeramicStagehand(currentUser)
+                    const ceramicProposalAPI = new CeramicProposalAPI(
+                        currentUser
+                    )
                     if (
-                        await ceramicStagehand.submitProposal(proposalStreamID)
+                        await ceramicProposalAPI.submitProposal(
+                            proposalStreamID
+                        )
                     ) {
                         router.push(
                             `${window.location.origin}/proposals/${proposalStreamID}`

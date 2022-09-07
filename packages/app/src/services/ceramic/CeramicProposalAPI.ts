@@ -1,15 +1,15 @@
-import { CAMBRIAN_LIB_NAME, StageLibType, StageNames } from './CeramicStagehand'
+import { CAMBRIAN_LIB_NAME, ceramicInstance, createStage } from './CeramicUtils'
+import { StageLibType, StageNames } from '../../models/StageModel'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '../../models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { Controls } from 'react-flow-renderer'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import { TRILOBOT_ENDPOINT } from 'packages/app/config'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from './CeramicUtils'
+import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { createStage } from './../../utils/helpers/stageHelpers'
 import { pushUnique } from '../../utils/helpers/arrayHelper'
 
 export type CeramicProposalLibType = StageLibType & {
@@ -124,6 +124,49 @@ export default class CeramicProposalAPI {
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    /**
+     * Hits mailbox server and submits the proposal / sets the isSubmitted flag to true
+     *
+     * @auth Must be done by the proposer
+     */
+    submitProposal = async (proposalStreamID: string) => {
+        try {
+            // Hit mailbox server
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: this.user.session.serialize(), // Ceramic types not updated for WebClientSession yet
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if (res.status === 200) {
+                const proposalStreamDoc = (await ceramicInstance(
+                    this.user
+                ).loadStream(
+                    proposalStreamID
+                )) as TileDocument<CeramicProposalModel>
+
+                await proposalStreamDoc.update(
+                    {
+                        ...(proposalStreamDoc.content as CeramicProposalModel),
+                        isSubmitted: true,
+                    },
+                    { ...proposalStreamDoc.metadata },
+                    { pin: true }
+                )
+                return true
+            } else {
+                cpLogger.push(res.status)
+                return false
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
 
