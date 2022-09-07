@@ -10,7 +10,6 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { pushUnique } from '../../utils/helpers/arrayHelper'
 
 export type CeramicProposalLibType = StageLibType & {
     received: string[]
@@ -167,36 +166,6 @@ export default class CeramicProposalAPI {
             }
         } catch (e) {
             cpLogger.push(e)
-        }
-    }
-
-    /***
-     * Pushes passed proposalStreamID to recents as singleton. Removes pre-existent entry therefore keeps chronological order.
-     *
-     * @param proposalStreamID proposalStreamID
-     */
-    addRecentProposal = async (proposalStreamID: string) => {
-        try {
-            const proposalLib = await this.loadProposalLib()
-
-            const updatedProposalLibContent = { ...proposalLib.content }
-            if (
-                updatedProposalLibContent.recents &&
-                updatedProposalLibContent.recents[
-                    updatedProposalLibContent.recents.length - 1
-                ] !== proposalStreamID
-            ) {
-                await proposalLib.update({
-                    ...updatedProposalLibContent,
-                    recents: pushUnique(
-                        proposalStreamID,
-                        updatedProposalLibContent.recents
-                    ),
-                })
-            }
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
 

@@ -17,7 +17,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { deploySolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
-import { pushUnique } from '../../utils/helpers/arrayHelper'
 
 /** 
  API functions to maintain the template-lib for the template dashboard
@@ -281,28 +280,6 @@ export default class CeramicTemplateAPI {
             await templateStreamDoc.update({
                 ...templateStreamDoc.content,
                 receivedProposals: updatedReceivedProposals,
-            })
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    /***
-     * Pushes templateStreamID to recents as singleton. Removes pre-existent entry therefore keeps chronological order.
-     *
-     * @param templateStreamID templateStreamID
-     */
-    addRecentTemplate = async (templateStreamID: string) => {
-        try {
-            const templateLib = await this.loadTemplateLib()
-            const updatedTemplateLibContent = { ...templateLib.content }
-            await templateLib.update({
-                ...updatedTemplateLibContent,
-                recents: pushUnique(
-                    templateStreamID,
-                    updatedTemplateLibContent.recents
-                ),
             })
         } catch (e) {
             cpLogger.push(e)

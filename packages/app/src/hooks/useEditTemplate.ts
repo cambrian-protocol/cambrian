@@ -1,3 +1,4 @@
+import { addRecentStage } from './../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '../models/TemplateModel'
@@ -58,7 +59,9 @@ const useEditTemplate = () => {
                             !router.pathname.includes('new')) ||
                         currentUser.did === template.content.author
                     ) {
-                        await ceramicTemplateAPI.addRecentTemplate(
+                        await addRecentStage(
+                            currentUser,
+                            StageNames.template,
                             templateStreamID
                         )
 

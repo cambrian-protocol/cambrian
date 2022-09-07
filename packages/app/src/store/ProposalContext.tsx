@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import {
+    addRecentStage,
+    ceramicInstance,
+} from '../services/ceramic/CeramicUtils'
+import {
     getApprovedProposalCommitID,
     getLatestProposalSubmission,
     getOnChainProposal,
@@ -16,10 +20,10 @@ import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
+import { StageNames } from '../models/StageModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from './UserContext'
 import _ from 'lodash'
-import { ceramicInstance } from '../services/ceramic/CeramicUtils'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 
@@ -120,7 +124,11 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const updateProposalLib = async () => {
             if (proposalStack && proposalStatus !== ProposalStatus.Unknown) {
-                await ceramicProposalAPI.addRecentProposal(proposalStreamID)
+                await addRecentStage(
+                    currentUser,
+                    StageNames.proposal,
+                    proposalStreamID
+                )
                 if (
                     proposalStack.templateDoc.content.author ===
                         currentUser.did &&

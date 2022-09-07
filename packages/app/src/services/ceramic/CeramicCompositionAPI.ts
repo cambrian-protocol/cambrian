@@ -7,7 +7,6 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
-import { pushUnique } from '../../utils/helpers/arrayHelper'
 
 /** 
  API functions to maintain compositions and the composition-lib
@@ -72,28 +71,6 @@ export default class CeramicCompositionAPI {
                 StageNames.composition,
                 this.user
             )
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    /***
-     * Pushes compositionStreamID to recents as singleton. Removes pre-existent entry therefore keeps chronological order.
-     *
-     * @param compositionStreamID compositionStreamID
-     */
-    addRecentComposition = async (compositionStreamID: string) => {
-        try {
-            const compositionLib = await this.loadCompositionLib()
-            const updatedCompositionLibContent = { ...compositionLib.content }
-            await compositionLib.update({
-                ...updatedCompositionLibContent,
-                recents: pushUnique(
-                    compositionStreamID,
-                    updatedCompositionLibContent.recents
-                ),
-            })
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

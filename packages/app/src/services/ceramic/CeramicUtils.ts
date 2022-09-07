@@ -10,6 +10,7 @@ import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
+import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -139,6 +140,55 @@ export const updateStage = async (
                 title: cleanedUserTitle,
             })
             return cleanedUserTitle
+        }
+    } catch (e) {
+        cpLogger.push(e)
+        throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+    }
+}
+
+/**
+ * Pushes streamID to recents as singleton, removes pre-existent entry and therefore keeps chronological order.
+ *
+ * @param currentUser
+ * @param stageName
+ * @param streamID
+ */
+export const addRecentStage = async (
+    currentUser: UserType,
+    stageName: StageNames,
+    streamID: string
+) => {
+    try {
+        const stageLib = (await TileDocument.deterministic(
+            ceramicInstance(currentUser),
+            {
+                controllers: [currentUser.did],
+                family: CAMBRIAN_LIB_NAME,
+                tags: [stageName],
+            },
+            { pin: true }
+        )) as TileDocument<StageLibType>
+
+        const updatedProposalLibContent = { ...stageLib.content }
+
+        if (!updatedProposalLibContent.recents) {
+            await stageLib.update({
+                ...updatedProposalLibContent,
+                recents: [streamID],
+            })
+        } else if (
+            updatedProposalLibContent.recents[
+                updatedProposalLibContent.recents.length - 1
+            ] !== streamID
+        ) {
+            await stageLib.update({
+                ...updatedProposalLibContent,
+                recents: pushUnique(
+                    streamID,
+                    updatedProposalLibContent.recents
+                ),
+            })
         }
     } catch (e) {
         cpLogger.push(e)
