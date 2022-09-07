@@ -1,8 +1,8 @@
 import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -11,11 +11,9 @@ import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProposalPricingFormProps {
-    proposalInput: CeramicProposalModel
+    proposalInput: ProposalModel
     template: TemplateModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel?: () => void

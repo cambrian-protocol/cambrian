@@ -6,9 +6,9 @@ import {
 import { useEffect, useState } from 'react'
 
 import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
-import { CeramicProposalModel } from '../models/ProposalModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import { ProposalDocsStackType } from '../store/ProposalContext'
+import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
 import { StageNames } from '../models/StageModel'
 import { TemplateModel } from '../models/TemplateModel'
@@ -21,7 +21,7 @@ const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
-    const [proposalInput, setProposalInput] = useState<CeramicProposalModel>()
+    const [proposalInput, setProposalInput] = useState<ProposalModel>()
     const [proposalDocStack, setProposalDocStack] =
         useState<ProposalDocsStackType>()
 
@@ -56,11 +56,10 @@ const useEditProposal = () => {
             typeof proposalStreamID === 'string'
         ) {
             try {
-                const _proposalStreamDoc =
-                    await loadStageDoc<CeramicProposalModel>(
-                        currentUser,
-                        proposalStreamID
-                    )
+                const _proposalStreamDoc = await loadStageDoc<ProposalModel>(
+                    currentUser,
+                    proposalStreamID
+                )
 
                 if (_proposalStreamDoc.content.author === currentUser.did) {
                     const _templateStreamContent = (
@@ -166,7 +165,7 @@ const useEditProposal = () => {
         }
     }
 
-    const validateProposal = (proposal: CeramicProposalModel) => {
+    const validateProposal = (proposal: ProposalModel) => {
         setIsValidProposal(
             proposal.title.trim().length > 0 &&
                 proposal.description.trim().length > 0 &&

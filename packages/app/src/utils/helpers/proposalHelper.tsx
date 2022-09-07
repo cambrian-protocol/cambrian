@@ -5,11 +5,11 @@ import {
 } from '@cambrian/app/models/TemplateModel'
 
 import { CAMBRIAN_DID } from 'packages/app/config'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import { ProposalListItemType } from '@cambrian/app/components/list/ProposalListItem'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
@@ -23,7 +23,7 @@ import { parseComposerSolvers } from '../transformers/ComposerTransformer'
 
 export const getProposalStatus = (
     propopsalCommitID: string,
-    proposal: CeramicProposalModel,
+    proposal: ProposalModel,
     approvedProposalStack?: ProposalStackType,
     onChainProposal?: ethers.Contract,
     receivedProposalCommits?: ReceivedProposalCommitType[]
@@ -367,7 +367,7 @@ export const getProposalListItem = async (
         // before approved
         let proposalDoc = (await ceramicInstance(currentUser).loadStream(
             proposalStreamID
-        )) as TileDocument<CeramicProposalModel>
+        )) as TileDocument<ProposalModel>
 
         const templateStreamContent = (
             await ceramicInstance(currentUser).loadStream(

@@ -1,9 +1,9 @@
 import { Box, Heading, Text } from 'grommet'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 
 interface ProposalContentInfoProps {
-    proposal: CeramicProposalModel
+    proposal: ProposalModel
     hideTitle?: boolean
 }
 

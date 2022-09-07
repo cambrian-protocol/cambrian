@@ -2,19 +2,17 @@ import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
 interface ProposalFlexInputsFormProps {
-    proposalInput: CeramicProposalModel
+    proposalInput: ProposalModel
     composition: CompositionModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel?: () => void

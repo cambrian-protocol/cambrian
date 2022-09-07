@@ -1,19 +1,17 @@
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalDescriptionStep from './steps/ProposalDescriptionStep'
 import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 
 interface ProposalWizardProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSaveProposal: () => Promise<boolean>
     proposalDocStack: ProposalDocsStackType
     proposalStreamID: string

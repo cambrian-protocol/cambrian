@@ -11,11 +11,11 @@ import {
     loadStageLib,
 } from './CeramicUtils'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TRILOBOT_ENDPOINT } from './../../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -183,7 +183,7 @@ export default class CeramicTemplateAPI {
      * @auth Must be done by the templater
      */
     updateProposalEntry = async (
-        proposalDoc: TileDocument<CeramicProposalModel>,
+        proposalDoc: TileDocument<ProposalModel>,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
         const templateDoc = (await ceramicInstance(this.user).loadStream(
@@ -229,7 +229,7 @@ export default class CeramicTemplateAPI {
             const cs = ceramicInstance(this.user)
             const proposalStreamDoc = (await cs.loadStream(
                 proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
+            )) as TileDocument<ProposalModel>
             const templateStreamDoc = (await cs.loadStream(
                 proposalStreamDoc.content.template.streamID
             )) as TileDocument<TemplateModel>

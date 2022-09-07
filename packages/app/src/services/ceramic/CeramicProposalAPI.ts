@@ -6,9 +6,9 @@ import {
     loadStageLib,
 } from './CeramicUtils'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TRILOBOT_ENDPOINT } from 'packages/app/config'
 import { TemplateModel } from '../../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -41,7 +41,7 @@ export default class CeramicProposalAPI {
         const cs = ceramicInstance(this.user)
         const proposalDoc = (await cs.loadStream(
             proposalCommitOrStreamID
-        )) as TileDocument<CeramicProposalModel>
+        )) as TileDocument<ProposalModel>
 
         const templateDoc = (await cs.loadStream(
             proposalDoc.content.template.commitID
@@ -73,7 +73,7 @@ export default class CeramicProposalAPI {
             const templateStreamDoc: TileDocument<TemplateModel> =
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
-            const proposal: CeramicProposalModel = {
+            const proposal: ProposalModel = {
                 title: title,
                 description: '',
                 template: {
@@ -123,13 +123,11 @@ export default class CeramicProposalAPI {
             if (res.status === 200) {
                 const proposalStreamDoc = (await ceramicInstance(
                     this.user
-                ).loadStream(
-                    proposalStreamID
-                )) as TileDocument<CeramicProposalModel>
+                ).loadStream(proposalStreamID)) as TileDocument<ProposalModel>
 
                 await proposalStreamDoc.update(
                     {
-                        ...(proposalStreamDoc.content as CeramicProposalModel),
+                        ...(proposalStreamDoc.content as ProposalModel),
                         isSubmitted: true,
                     },
                     { ...proposalStreamDoc.metadata },
@@ -198,7 +196,7 @@ export default class CeramicProposalAPI {
                 const proposalDoc = (await TileDocument.load(
                     ceramicInstance(this.user),
                     updatedProposalLib.lib[tag]
-                )) as TileDocument<CeramicProposalModel>
+                )) as TileDocument<ProposalModel>
 
                 await proposalDoc.update({
                     ...proposalDoc.content,
@@ -244,7 +242,7 @@ export default class CeramicProposalAPI {
                 ...proposalLib.content,
             }
 
-            const proposalDoc = await loadStageDoc<CeramicProposalModel>(
+            const proposalDoc = await loadStageDoc<ProposalModel>(
                 this.user,
                 proposalStreamID
             )
@@ -291,9 +289,7 @@ export default class CeramicProposalAPI {
                 // Add isDeclined flag to template
                 const proposalDoc = (await ceramicInstance(
                     this.user
-                ).loadStream(
-                    proposalStreamID
-                )) as TileDocument<CeramicProposalModel>
+                ).loadStream(proposalStreamID)) as TileDocument<ProposalModel>
 
                 const templateDoc = (await TileDocument.load(
                     ceramicInstance(this.user),
