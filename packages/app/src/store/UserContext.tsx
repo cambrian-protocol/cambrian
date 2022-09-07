@@ -62,7 +62,6 @@ export type UserType = {
     chainId: number
     permissions: PermissionType[]
     cambrianProfileDoc: TileDocument<CambrianProfileType>
-    ceramic: CeramicClient
     session: DIDSession
     did: string // did:pkh
 }
@@ -75,7 +74,6 @@ type UserActionType =
           signer: UserType['signer']
           address: UserType['address']
           chainId: UserType['chainId']
-          ceramic: UserType['ceramic']
           cambrianProfileDoc: TileDocument<CambrianProfileType>
           session: UserType['session']
           did: UserType['did']
@@ -125,7 +123,6 @@ function userReducer(
                 chainId: action.chainId,
                 cambrianProfileDoc: action.cambrianProfileDoc,
                 permissions: [],
-                ceramic: action.ceramic,
                 session: action.session,
                 did: action.did,
             }
@@ -167,10 +164,11 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
             const address = await signer.getAddress()
             const network = await web3Provider.getNetwork()
 
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const session = await loadSession(provider, network, address)
-            ceramic.did = session.did
 
+            // TODO Remove cambrianProfileDoc from userObject and create instance every time
+            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            ceramic.did = session.did
             const cambrianProfileDoc = (await TileDocument.deterministic(
                 ceramic,
                 {
@@ -188,7 +186,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
                 address: address,
                 chainId: network.chainId,
                 cambrianProfileDoc: cambrianProfileDoc,
-                ceramic: ceramic,
                 session: session,
                 did: ceramic.did.parent,
             })

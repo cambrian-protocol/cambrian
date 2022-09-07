@@ -40,7 +40,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     }
 
     return (
-        <PageLayout kind="narrow" contextTitle="Dashboard">
+        <PageLayout kind="narrow" contextTitle={cambrianProfile.name || 'Anon'}>
             <Box gap="large" pad="large">
                 <Box
                     direction="row"

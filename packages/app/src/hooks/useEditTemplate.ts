@@ -1,82 +1,103 @@
-import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
+import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
+import { StageNames } from '../services/ceramic/CeramicStagehand'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
+import { updateStage } from '@cambrian/app/utils/helpers/stageHelpers'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
+import { ceramicInstance } from '../services/ceramic/CeramicUtils'
 
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
+    const [ceramicTemplateAPI, setCeramicTemplateAPI] =
+        useState<CeramicTemplateAPI>()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
     const [templateInput, setTemplateInput] = useState<CeramicTemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
 
     useEffect(() => {
-        if (router.isReady) fetchTemplate()
-    }, [router, currentUser])
+        initCeramic()
+    }, [currentUser])
 
-    const fetchTemplate = async () => {
+    useEffect(() => {
+        if (router.isReady && ceramicTemplateAPI)
+            fetchTemplate(ceramicTemplateAPI)
+    }, [router, ceramicTemplateAPI])
+
+    const initCeramic = () => {
         if (currentUser) {
-            if (
-                templateStreamID !== undefined &&
-                typeof templateStreamID === 'string'
-            ) {
-                try {
-                    const cs = new CeramicStagehand(currentUser)
-                    setCeramicStagehand(cs)
-                    const template = (await (
-                        await cs.loadTileDocument(templateStreamID)
-                    ).content) as CeramicTemplateModel
-
-                    if (template) {
-                        // Just initialize edit paths if currentUser is the author
-                        if (
-                            (!router.pathname.includes('edit') &&
-                                !router.pathname.includes('new')) ||
-                            currentUser.did === template.author
-                        ) {
-                            const comp = (await (
-                                await cs.loadTileDocument(
-                                    template.composition.commitID
-                                )
-                            ).content) as CompositionModel
-
-                            if (comp) {
-                                setComposition(comp)
-                                setCachedTemplate(_.cloneDeep(template))
-                                return setTemplateInput(template)
-                            }
-                        }
-                    }
-                } catch (e) {
-                    setErrorMessage(await cpLogger.push(e))
-                }
-            }
-            setShow404NotFound(true)
+            setCeramicTemplateAPI(new CeramicTemplateAPI(currentUser))
         }
     }
 
+    const fetchTemplate = async (ceramicTemplateAPI: CeramicTemplateAPI) => {
+        if (
+            templateStreamID !== undefined &&
+            typeof templateStreamID === 'string' &&
+            currentUser
+        ) {
+            try {
+                const template = await ceramicTemplateAPI.loadTemplateDoc(
+                    templateStreamID
+                )
+                if (
+                    template.content !== null &&
+                    typeof template.content === 'object'
+                ) {
+                    // Just initialize edit paths if currentUser is the author
+                    if (
+                        (!router.pathname.includes('edit') &&
+                            !router.pathname.includes('new')) ||
+                        currentUser.did === template.content.author
+                    ) {
+                        await ceramicTemplateAPI.addRecentTemplate(
+                            templateStreamID
+                        )
+
+                        const _composition = <CompositionModel>(
+                            (
+                                await ceramicInstance(currentUser).loadStream(
+                                    template.content.composition.commitID
+                                )
+                            ).content
+                        )
+
+                        if (_composition) {
+                            setComposition(_composition)
+                            setCachedTemplate(_.cloneDeep(template.content))
+                            return setTemplateInput(template.content)
+                        }
+                    }
+                }
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            }
+        }
+        setShow404NotFound(true)
+    }
+
     const onSaveTemplate = async (): Promise<boolean> => {
-        if (templateInput && ceramicStagehand) {
+        if (templateInput && currentUser) {
             if (!_.isEqual(templateInput, cachedTemplate)) {
                 try {
-                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                    const title = await updateStage(
                         templateStreamID as string,
                         templateInput,
-                        StageNames.template
+                        StageNames.template,
+                        currentUser
                     )
                     const templateWithUniqueTitle = {
                         ...templateInput,
-                        title: uniqueTag,
+                        title: title,
                     }
                     setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
                     setTemplateInput(templateWithUniqueTitle)

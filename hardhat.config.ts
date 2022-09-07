@@ -38,6 +38,10 @@ export const config = {
       url: "https://nova.arbitrum.io/rpc",
       accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
     },
+    arbitrum: {
+      url: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+    },
   },
   etherscan: {
     apiKey: {

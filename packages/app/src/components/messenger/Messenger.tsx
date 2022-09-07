@@ -20,7 +20,7 @@ const Messenger = ({
     chatType,
     participantDIDs,
 }: MessengerProps) => {
-    const [showMessenger, setShowMessenger] = useState(true)
+    const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     // TODO Integrate >2 participants
@@ -56,7 +56,7 @@ const Messenger = ({
                                 focusIndicator={false}
                             >
                                 <CambrianProfileInfo
-                                    cambrianProfile={counterPartProfile}
+                                    cambrianProfileDoc={counterPartProfile}
                                     hideDetails
                                     size="small"
                                 />

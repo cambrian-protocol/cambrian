@@ -5,7 +5,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicStagehand from '@cambrian/app/services/ceramic/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -21,7 +21,7 @@ interface ProposalReviewControlProps {
 
 const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
     const ceramicStagehand = new CeramicStagehand(currentUser)
-    const { proposalStack, templateStreamDoc } = useProposalContext()
+    const { proposalStack } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -29,11 +29,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (proposalStack && templateStreamDoc) {
+        if (proposalStack) {
             try {
                 const res = await ceramicStagehand.approveProposal(
                     currentUser,
-                    templateStreamDoc,
                     proposalStack
                 )
 
@@ -47,10 +46,9 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (proposalStack && templateStreamDoc) {
+        if (proposalStack) {
             try {
                 const res = await ceramicStagehand.requestProposalChange(
-                    templateStreamDoc,
                     proposalStack
                 )
 

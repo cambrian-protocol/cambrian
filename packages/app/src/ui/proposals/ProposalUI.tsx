@@ -65,7 +65,7 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                         {proposalStack ? (
                             <Box pad="large">
                                 <ProposalHeader
-                                    proposalStack={proposalStack}
+                                    proposalDocStack={proposalStack}
                                     proposalStatus={proposalStatus}
                                 />
                                 <Box
@@ -99,7 +99,7 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                                     />
                                     <PlainSectionDivider />
                                     <CambrianProfileInfo
-                                        cambrianProfile={proposerProfile}
+                                        cambrianProfileDoc={proposerProfile}
                                     />
                                     <ProposalControlbar />
                                 </Box>

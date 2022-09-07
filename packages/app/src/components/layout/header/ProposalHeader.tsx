@@ -13,8 +13,8 @@ import {
 
 import { Button } from 'grommet'
 import Link from 'next/link'
+import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
-import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
@@ -23,13 +23,13 @@ import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
 interface ProposalHeaderProps {
-    proposalStack?: ProposalStackType
+    proposalDocStack?: ProposalDocsStackType
     proposalStatus: ProposalStatus
     showProposalDetails?: boolean
 }
 
 const ProposalHeader = ({
-    proposalStack,
+    proposalDocStack,
     proposalStatus,
     showProposalDetails,
 }: ProposalHeaderProps) => {
@@ -64,8 +64,8 @@ const ProposalHeader = ({
                                     />
                                 </Box>
                                 <Heading>
-                                    {proposalStack?.proposalDoc.content.title ||
-                                        'Untitled Proposal'}
+                                    {proposalDocStack?.proposalDoc.content
+                                        .title || 'Untitled Proposal'}
                                 </Heading>
                             </Box>
                             <Box
@@ -76,30 +76,32 @@ const ProposalHeader = ({
                                 pad={{ bottom: 'xsmall' }}
                             >
                                 <IconContext.Provider value={{ size: '18' }}>
-                                    {showProposalDetails && proposalStack && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowProposalInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Proposal Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <ClipboardText
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {proposalStack && (
+                                    {showProposalDetails &&
+                                        proposalDocStack && (
+                                            <Button
+                                                color="dark-4"
+                                                size="small"
+                                                onClick={
+                                                    toggleShowProposalInfoModal
+                                                }
+                                                label={
+                                                    screenSize !== 'small'
+                                                        ? 'Proposal Details'
+                                                        : undefined
+                                                }
+                                                icon={
+                                                    <ClipboardText
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'dark-4'
+                                                            ]
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                        )}
+                                    {proposalDocStack && (
                                         <Button
                                             color="dark-4"
                                             size="small"
@@ -199,15 +201,15 @@ const ProposalHeader = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-            {showTemplateInfoModal && proposalStack && (
+            {showTemplateInfoModal && proposalDocStack && (
                 <TemplateInfoModal
-                    proposalStack={proposalStack}
+                    proposalStack={proposalDocStack}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
-            {showProposalInfoModal && proposalStack && (
+            {showProposalInfoModal && proposalDocStack && (
                 <ProposalInfoModal
-                    proposalStack={proposalStack}
+                    proposalStack={proposalDocStack}
                     onClose={toggleShowProposalInfoModal}
                 />
             )}

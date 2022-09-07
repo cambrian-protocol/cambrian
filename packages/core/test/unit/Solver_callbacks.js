@@ -160,6 +160,13 @@ describe("Solver.sol | callbacks", function () {
             solverIndex: 0,
             data: ethers.constants.HashZero,
           },
+          {
+            executions: 0,
+            ingestType: 3,
+            slot: ethers.utils.formatBytes32String("1"),
+            solverIndex: 0,
+            data: ethers.constants.HashZero,
+          },
         ],
         conditionBase: this.conditionBase,
       },

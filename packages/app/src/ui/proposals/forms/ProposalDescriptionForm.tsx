@@ -1,4 +1,4 @@
-import { Box, Button, Form, FormField, TextArea } from 'grommet'
+import { Box, Button, Form, FormField, TextArea, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -43,23 +43,25 @@ const ProposalDescriptionForm = ({
                     <FormField
                         name="title"
                         label="Title"
-                        placeholder={'Type your proposal title here...'}
-                        value={proposalInput.title}
-                        onChange={(e) => {
-                            setProposalInput({
-                                ...proposalInput,
-                                title: e.target.value,
-                            })
-                        }}
                         validate={[() => isRequired(proposalInput.title)]}
-                    />
+                    >
+                        <TextInput
+                            placeholder={'Type your proposal title here...'}
+                            value={proposalInput.title}
+                            onChange={(e) => {
+                                setProposalInput({
+                                    ...proposalInput,
+                                    title: e.target.value,
+                                })
+                            }}
+                        />
+                    </FormField>
                     <FormField
                         name="description"
                         label="Description"
                         validate={[() => isRequired(proposalInput.description)]}
                     >
                         <TextArea
-                            name="description"
                             placeholder={
                                 'Type your proposal desciption here...'
                             }

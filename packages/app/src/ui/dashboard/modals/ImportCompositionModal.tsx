@@ -1,7 +1,7 @@
 import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -15,7 +15,7 @@ import router from 'next/router'
 import { useState } from 'react'
 
 interface ImportCompositionModalProps {
-    ceramicStagehand: CeramicStagehand
+    ceramicCompositionAPI: CeramicCompositionAPI
     onClose: () => void
 }
 
@@ -26,7 +26,7 @@ type ImportCompositionFormType = {
 // Legacy Plain IPFS CID handling
 const ImportCompositionModal = ({
     onClose,
-    ceramicStagehand,
+    ceramicCompositionAPI,
 }: ImportCompositionModalProps) => {
     const [input, setInput] = useState<ImportCompositionFormType>({
         compositionCID: '',
@@ -48,11 +48,14 @@ const ImportCompositionModal = ({
                 throw new Error('No Composition found at provided CID')
 
             const tag = randimals()
-            const { streamID } = await ceramicStagehand.createComposition(tag, {
-                ...composition,
-                title: tag,
-                description: '',
-            })
+            const streamID = await ceramicCompositionAPI.createComposition(
+                tag,
+                {
+                    ...composition,
+                    title: tag,
+                    description: '',
+                }
+            )
 
             if (streamID) router.push(`/composer/composition/${streamID}`)
         } catch (e) {

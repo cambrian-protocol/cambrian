@@ -1,4 +1,15 @@
-import { Books, Question, SignIn, SignOut, User, Wallet } from 'phosphor-react'
+import {
+    Books,
+    Question,
+    SignIn,
+    SignOut,
+    User,
+    Wallet,
+    WarningOctagon,
+} from 'phosphor-react'
+import CeramicStagehand, {
+    StageNames,
+} from '@cambrian/app/services/ceramic/CeramicStagehand'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -44,6 +55,22 @@ export default function UserMenu() {
             icon: <UserMenuItemIcon icon={<User />} />,
             // href: '/dashboard/profile',
             onClick: () => router.push('/dashboard/profile'),
+        })
+        menuItems.push({
+            label: <UserMenuItemLabel label="Reset Account" />,
+            icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
+            onClick: async () => {
+                if (
+                    window.confirm(
+                        'Are you sure? All your compositions, templates and proposal will be gone after confirming.'
+                    )
+                ) {
+                    const cs = new CeramicStagehand(currentUser)
+                    await cs.clearStages(StageNames.composition)
+                    await cs.clearStages(StageNames.template)
+                    await cs.clearStages(StageNames.proposal)
+                }
+            },
         })
         menuItems.push({
             label: (

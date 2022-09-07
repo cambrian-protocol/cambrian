@@ -1,21 +1,35 @@
-import { Box, Button, Text } from 'grommet'
-import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
+import {
+    Article,
+    Check,
+    Copy,
+    DotsThree,
+    Pen,
+    Rows,
+    Trash,
+} from 'phosphor-react'
+import { Box, DropButton, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import DropButtonListItem from './DropButtonListItem'
 import Link from 'next/link'
+import PlainSectionDivider from '../sections/PlainSectionDivider'
+import { cpTheme } from '@cambrian/app/theme/theme'
+import { useRouter } from 'next/router'
 
 interface TemplateListItemProps {
-    templateID: string
     templateStreamID: string
-    onDelete?: (templateID: string) => Promise<void>
+    template: CeramicTemplateModel
+    onDelete: (templateID: string, templateStreamID: string) => Promise<void>
 }
 
 const TemplateListItem = ({
-    templateID,
+    template,
     templateStreamID,
     onDelete,
 }: TemplateListItemProps) => {
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -30,8 +44,6 @@ const TemplateListItem = ({
     return (
         <Box
             border
-            flex
-            height={{ min: 'auto' }}
             pad={{
                 horizontal: 'medium',
                 vertical: 'small',
@@ -40,50 +52,84 @@ const TemplateListItem = ({
             justify="between"
             align="center"
             round="xsmall"
-            wrap
         >
-            <Text>{templateID}</Text>
-            <Box
-                direction="row"
-                justify="end"
-                flex
-                width={{ min: 'auto' }}
-                gap="small"
-            >
-                <Link
-                    href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
-                    passHref
-                >
-                    <Button icon={<Pen />} />
-                </Link>
+            <Box direction="row" flex align="center">
                 <Link
                     href={`${window.location.origin}/templates/${templateStreamID}`}
                     passHref
                 >
-                    <Button icon={<Eye />} />
+                    <Box flex gap="xsmall" focusIndicator={false}>
+                        <Box direction="row" gap="small">
+                            <Article size="24" />
+                            <Text>{template.title}</Text>
+                        </Box>
+                        <Box direction="row" gap="small" align="center">
+                            <Rows
+                                size="18"
+                                color={cpTheme.global.colors['dark-4']}
+                            />
+                            <Text size="small" color="dark-4">
+                                Received proposals:{' '}
+                                {Object.keys(template.receivedProposals).length}
+                            </Text>
+                        </Box>
+                    </Box>
                 </Link>
-                {onDelete && (
-                    <Button
-                        icon={<Trash />}
-                        onClick={() => {
-                            if (
-                                window.confirm(
-                                    'Warning! Are you sure you want to delete this Template? Please make sure this Template has no received Proposals.'
-                                )
-                            )
-                                onDelete(templateID)
-                        }}
+                <Box width={{ min: 'auto' }}>
+                    <DropButton
+                        size="small"
+                        dropContent={
+                            <Box width={'small'}>
+                                <DropButtonListItem
+                                    icon={
+                                        isSavedToClipboard ? (
+                                            <Check />
+                                        ) : (
+                                            <Copy />
+                                        )
+                                    }
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            `${window.location.origin}/templates/${templateStreamID}`
+                                        )
+                                        setIsSavedToClipboard(true)
+                                    }}
+                                    label="Copy link"
+                                />
+                                <DropButtonListItem
+                                    icon={<Pen />}
+                                    label="Edit"
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/templates/edit/${templateStreamID}`
+                                        )
+                                    }
+                                />
+                                <PlainSectionDivider />
+                                <DropButtonListItem
+                                    icon={
+                                        <Trash
+                                            color={
+                                                cpTheme.global.colors[
+                                                    'status-error'
+                                                ]
+                                            }
+                                        />
+                                    }
+                                    label="Delete"
+                                    onClick={() =>
+                                        onDelete(
+                                            template.title,
+                                            templateStreamID
+                                        )
+                                    }
+                                />
+                            </Box>
+                        }
+                        dropAlign={{ top: 'bottom', right: 'right' }}
+                        icon={<DotsThree size="24" />}
                     />
-                )}
-                <Button
-                    icon={isSavedToClipboard ? <Check /> : <Copy />}
-                    onClick={() => {
-                        navigator.clipboard.writeText(
-                            `${window.location.origin}/templates/${templateStreamID}`
-                        )
-                        setIsSavedToClipboard(true)
-                    }}
-                />
+                </Box>
             </Box>
         </Box>
     )

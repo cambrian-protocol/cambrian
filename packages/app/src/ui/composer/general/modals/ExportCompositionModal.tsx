@@ -1,30 +1,25 @@
-import { ArrowSquareRight, CheckCircle } from 'phosphor-react'
 import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
+import { FloppyDisk } from 'phosphor-react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import StoredIdItem from '@cambrian/app/components/list/StoredIdItem'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useRouter } from 'next/router'
 
 interface ExportCompositionModalProps {
     onBack: () => void
-    ceramicStagehand: CeramicStagehand
 }
 
-const ExportCompositionModal = ({
-    onBack,
-    ceramicStagehand,
-}: ExportCompositionModalProps) => {
+const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
+    const router = useRouter()
+    const { currentUser } = useCurrentUserContext()
     const { composer } = useComposerContext()
-    const [exportedCompositionCID, setExportedCompositionCID] =
-        useState<{ compositionKey: string; streamID: string }>()
     const [isExporting, setIsExporting] = useState(false)
 
     const [compositionTitleInput, setCompositionTitleInput] =
@@ -38,8 +33,11 @@ const ExportCompositionModal = ({
         event.preventDefault()
         setIsExporting(true)
         try {
-            const { uniqueTag, streamID } =
-                await ceramicStagehand.createComposition(
+            if (currentUser) {
+                const ceramicCompositionAPI = new CeramicCompositionAPI(
+                    currentUser
+                )
+                const streamID = await ceramicCompositionAPI.createComposition(
                     compositionTitleInput,
                     {
                         ...composer,
@@ -47,11 +45,9 @@ const ExportCompositionModal = ({
                         description: '',
                     }
                 )
-
-            setExportedCompositionCID({
-                compositionKey: uniqueTag,
-                streamID: streamID,
-            })
+                if (streamID) router.push(`/composer/composition/${streamID}`)
+                onBack()
+            }
         } catch (e) {
             cpLogger.push(e)
         }
@@ -61,47 +57,29 @@ const ExportCompositionModal = ({
     return (
         <BaseLayerModal onBack={onBack}>
             <ModalHeader
-                title={
-                    exportedCompositionCID
-                        ? 'Successfully exported'
-                        : 'Export Composition'
-                }
+                title={'Save Composition as...'}
                 description="Your composition will be saved to IPFS and is going to be accessible for anybody with the created link."
-                icon={
-                    exportedCompositionCID ? (
-                        <CheckCircle />
-                    ) : (
-                        <ArrowSquareRight />
-                    )
-                }
+                icon={<FloppyDisk />}
             />
-            {exportedCompositionCID ? (
-                <StoredIdItem
-                    route={`${window.location.origin}/composer/composition/`}
-                    cid={exportedCompositionCID.streamID}
-                    title={exportedCompositionCID.compositionKey}
+            <Form onSubmit={onExport}>
+                <FormField
+                    required
+                    value={compositionTitleInput}
+                    label="Composition Title"
+                    name="compositionTitleInput"
+                    onChange={(event) =>
+                        setCompositionTitleInput(event.target.value)
+                    }
                 />
-            ) : (
-                <Form onSubmit={onExport}>
-                    <FormField
-                        required
-                        value={compositionTitleInput}
-                        label="Composition Title"
-                        name="compositionTitleInput"
-                        onChange={(event) =>
-                            setCompositionTitleInput(event.target.value)
-                        }
+                <Box>
+                    <LoaderButton
+                        type="submit"
+                        primary
+                        isLoading={isExporting}
+                        label="Export"
                     />
-                    <Box>
-                        <LoaderButton
-                            type="submit"
-                            primary
-                            isLoading={isExporting}
-                            label="Export"
-                        />
-                    </Box>
-                </Form>
-            )}
+                </Box>
+            </Form>
         </BaseLayerModal>
     )
 }

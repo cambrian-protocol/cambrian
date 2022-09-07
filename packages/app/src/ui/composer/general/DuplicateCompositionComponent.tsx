@@ -1,7 +1,7 @@
 import { Box, Form, FormField } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { Copy } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -13,13 +13,13 @@ import randimals from 'randimals'
 import { useRouter } from 'next/router'
 
 interface DuplicateCompositionComponentProps {
-    ceramicStagehand: CeramicStagehand
+    ceramicCompositionAPI: CeramicCompositionAPI
     composition: CompositionModel
     setShowDuplicateCompositionCTA: React.Dispatch<SetStateAction<boolean>>
 }
 
 const DuplicateCompositionComponent = ({
-    ceramicStagehand,
+    ceramicCompositionAPI,
     composition,
     setShowDuplicateCompositionCTA,
 }: DuplicateCompositionComponentProps) => {
@@ -35,7 +35,7 @@ const DuplicateCompositionComponent = ({
     const onSubmit = async () => {
         setIsDuplicating(true)
         try {
-            const { streamID } = await ceramicStagehand.createComposition(
+            const streamID = await ceramicCompositionAPI.createComposition(
                 input,
                 {
                     ...composition,

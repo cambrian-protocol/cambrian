@@ -1,5 +1,4 @@
 import { AppProps } from 'next/app'
-import { CERAMIC_NODE_ENDPOINT } from '../config'
 import ErrorBoundary from '@cambrian/app/components/errors/ErrorBoundary'
 import { GlobalStyle } from '@cambrian/app/src/theme/globalStyle'
 import { Grommet } from 'grommet'

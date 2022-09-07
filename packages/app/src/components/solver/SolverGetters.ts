@@ -17,7 +17,7 @@ import {
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -441,9 +441,9 @@ export const getMetadataFromProposal = async (
 
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
         if (metadataURI) {
-            const ceramicStagehand = new CeramicStagehand(currentUser)
+            const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
             const proposalStack =
-                await ceramicStagehand.loadProposalStackFromID(metadataURI)
+                await ceramicProposalAPI.loadProposalStackFromID(metadataURI)
 
             if (proposalStack) {
                 const solverIndex = (await solverMethods.chainIndex()) as
@@ -459,7 +459,7 @@ export const getMetadataFromProposal = async (
                             proposalStack.compositionDoc.content.solvers[
                                 solverIndex
                             ].solverTag,
-                        proposalStack: proposalStack,
+                        proposalDocStack: proposalStack,
                     }
                 }
             }

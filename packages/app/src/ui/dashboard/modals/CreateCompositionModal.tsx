@@ -1,27 +1,24 @@
 import { Box, Form, FormField } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { TreeStructure } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import initialComposer from '@cambrian/app/store/composer/composer.init'
 import randimals from 'randimals'
 import router from 'next/router'
 
 interface CreateCompositionModalProps {
-    ceramicStagehand: CeramicStagehand
+    ceramicCompositionAPI: CeramicCompositionAPI
     onClose: () => void
 }
 
 const CreateCompositionModal = ({
-    ceramicStagehand,
+    ceramicCompositionAPI,
     onClose,
 }: CreateCompositionModalProps) => {
     const [isCreating, setIsCreating] = useState(false)
@@ -35,7 +32,9 @@ const CreateCompositionModal = ({
     const onSubmit = async () => {
         setIsCreating(true)
         try {
-            const { streamID } = await ceramicStagehand.createComposition(input)
+            const streamID = await ceramicCompositionAPI.createComposition(
+                input
+            )
             router.push(`/composer/composition/${streamID}`)
         } catch (e) {
             setIsCreating(false)

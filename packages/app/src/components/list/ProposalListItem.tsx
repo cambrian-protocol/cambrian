@@ -1,14 +1,26 @@
-import { Box, Button, ResponsiveContext, Text } from 'grommet'
-import { Check, Copy, Eye, Pen, Trash } from 'phosphor-react'
+import {
+    Archive,
+    Check,
+    Copy,
+    DotsThree,
+    File,
+    Pen,
+    Trash,
+} from 'phosphor-react'
+import { Box, DropButton, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import DropButtonListItem from './DropButtonListItem'
 import Link from 'next/link'
+import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../badges/ProposalStatusBadge'
+import { cpTheme } from '@cambrian/app/theme/theme'
+import { useRouter } from 'next/router'
 
 interface ProposalListItemProps {
     proposal: ProposalListItemType
-    onDelete?: (proposalID: string) => Promise<void>
+    onRemove: (proposalTag: string, type: 'DELETE' | 'ARCHIVE') => Promise<void>
 }
 
 export type ProposalListItemType = {
@@ -19,8 +31,19 @@ export type ProposalListItemType = {
     templateTitle: string
 }
 
-const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
+const ProposalListItem = ({ proposal, onRemove }: ProposalListItemProps) => {
+    const router = useRouter()
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
+
+    const isEditable =
+        proposal.status === ProposalStatus.Draft ||
+        proposal.status === ProposalStatus.ChangeRequested ||
+        proposal.status === ProposalStatus.Modified
+
+    const isDeletable =
+        isEditable ||
+        proposal.status === ProposalStatus.OnReview ||
+        proposal.status === ProposalStatus.Canceled
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -31,11 +54,6 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
         }
         return () => clearInterval(intervalId)
     }, [isSavedToClipboard])
-
-    const isEditable =
-        proposal.status === ProposalStatus.Draft ||
-        proposal.status === ProposalStatus.ChangeRequested ||
-        proposal.status === ProposalStatus.Modified
 
     return (
         <Box
@@ -50,54 +68,95 @@ const ProposalListItem = ({ proposal, onDelete }: ProposalListItemProps) => {
             justify="between"
             align="center"
             round="xsmall"
-            wrap
         >
-            <Box direction="row" wrap="reverse" align="center">
-                <Box pad="xsmall">
-                    <Text>{proposal.title}</Text>
-                    <Text size="xsmall" color="dark-4">
-                        {proposal.templateTitle}
-                    </Text>
-                </Box>
-                <Box pad="xsmall">
-                    <ProposalStatusBadge status={proposal.status} />
-                </Box>
-            </Box>
-            <Box
-                direction="row"
-                flex
-                width={{ min: 'auto' }}
-                justify="end"
-                gap="small"
+            <Link
+                href={
+                    isEditable && proposal.isAuthor
+                        ? `/dashboard/proposals/edit/${proposal.streamID}`
+                        : `/proposals/${proposal.streamID}`
+                }
+                passHref
             >
-                {isEditable && proposal.isAuthor && (
-                    <Link
-                        href={`/dashboard/proposals/edit/${proposal.streamID}`}
-                        passHref
-                    >
-                        <Button icon={<Pen />} />
-                    </Link>
-                )}
-                {proposal.status !== ProposalStatus.Draft && (
-                    <Link href={`/proposals/${proposal.streamID}`} passHref>
-                        <Button icon={<Eye />} />
-                    </Link>
-                )}
-                {onDelete && proposal.status === ProposalStatus.Draft && (
-                    <Button
-                        icon={<Trash />}
-                        onClick={() => onDelete(proposal.title)}
-                    />
-                )}
-                <Button
-                    icon={isSavedToClipboard ? <Check /> : <Copy />}
-                    onClick={() => {
-                        console.log('was here')
-                        navigator.clipboard.writeText(
-                            `${window.location.origin}/proposals/${proposal.streamID}`
-                        )
-                        setIsSavedToClipboard(true)
-                    }}
+                <Box flex focusIndicator={false}>
+                    <Box direction="row" wrap="reverse" align="center">
+                        <Box pad="xsmall">
+                            <Text>{proposal.title}</Text>
+                        </Box>
+                        <Box pad="xsmall">
+                            <ProposalStatusBadge status={proposal.status} />
+                        </Box>
+                    </Box>
+                    <Box direction="row" gap="small" pad="xsmall" wrap>
+                        <Box direction="row" align="center" gap="xsmall">
+                            <File color={cpTheme.global.colors['dark-4']} />
+                            <Text size="small" color="dark-4">
+                                {proposal.templateTitle}
+                            </Text>
+                        </Box>
+                    </Box>
+                </Box>
+            </Link>
+            <Box direction="row" width={{ min: 'auto' }} justify="end">
+                <DropButton
+                    size="small"
+                    dropContent={
+                        <Box width={'small'}>
+                            {proposal.status !== ProposalStatus.Draft && (
+                                <DropButtonListItem
+                                    icon={
+                                        isSavedToClipboard ? (
+                                            <Check />
+                                        ) : (
+                                            <Copy />
+                                        )
+                                    }
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(
+                                            `${window.location.origin}/proposals/${proposal.streamID}`
+                                        )
+                                        setIsSavedToClipboard(true)
+                                    }}
+                                    label="Copy link"
+                                />
+                            )}
+                            {isEditable && proposal.isAuthor && (
+                                <DropButtonListItem
+                                    icon={<Pen />}
+                                    label="Edit"
+                                    onClick={() =>
+                                        router.push(
+                                            `/dashboard/proposals/edit/${proposal.streamID}`
+                                        )
+                                    }
+                                />
+                            )}
+                            <PlainSectionDivider />
+                            <DropButtonListItem
+                                icon={
+                                    isDeletable ? (
+                                        <Trash
+                                            color={
+                                                cpTheme.global.colors[
+                                                    'status-error'
+                                                ]
+                                            }
+                                        />
+                                    ) : (
+                                        <Archive />
+                                    )
+                                }
+                                label={isDeletable ? 'Delete' : 'Archive'}
+                                onClick={() =>
+                                    onRemove(
+                                        proposal.title,
+                                        isDeletable ? 'DELETE' : 'ARCHIVE'
+                                    )
+                                }
+                            />
+                        </Box>
+                    }
+                    dropAlign={{ top: 'bottom', right: 'right' }}
+                    icon={<DotsThree size="24" />}
                 />
             </Box>
         </Box>

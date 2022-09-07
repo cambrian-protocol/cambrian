@@ -5,12 +5,10 @@ import {
     Plus,
     TreeStructure,
 } from 'phosphor-react'
-import { Box, Heading, Spinner, Text } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
+import { Box, Heading, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
 import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
@@ -21,13 +19,19 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-const CompositionsDashboardUI = () => {
-    const { currentUser } = useCurrentUserContext()
-    const [compositions, setCompositions] = useState<StringHashmap>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
+interface CompositionsDashboardUIProps {
+    currentUser: UserType
+}
+
+const CompositionsDashboardUI = ({
+    currentUser,
+}: CompositionsDashboardUIProps) => {
+    const ceramicCompositionAPI = new CeramicCompositionAPI(currentUser)
+
+    const [compositions, setCompositions] = useState<StringHashmap>({})
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [showLoadCompositionModal, setShowLoadCompositionModal] =
         useState(false)
@@ -41,20 +45,20 @@ const CompositionsDashboardUI = () => {
         setShowCreateCompositionModal(!showCreateCompositionModal)
 
     useEffect(() => {
-        if (currentUser) {
-            const ceramicStagehandInstance = new CeramicStagehand(currentUser)
-            setCeramicStagehand(ceramicStagehandInstance)
-            fetchCompositions(ceramicStagehandInstance)
-        }
-    }, [currentUser])
+        init()
+    }, [])
 
-    const fetchCompositions = async (cs: CeramicStagehand) => {
+    const init = async () => {
         setIsFetching(true)
         try {
-            const compositionStreams = (await cs.loadStagesMap(
-                StageNames.composition
-            )) as StringHashmap
-            setCompositions(compositionStreams)
+            const compositionLib =
+                await ceramicCompositionAPI.loadCompositionLib()
+
+            if (compositionLib.content && compositionLib.content.lib) {
+                setCompositions(compositionLib.content.lib)
+            } else {
+                setCompositions({})
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
@@ -62,18 +66,14 @@ const CompositionsDashboardUI = () => {
     }
 
     const onDeleteComposition = async (compositionID: string) => {
-        if (ceramicStagehand) {
-            try {
-                await ceramicStagehand.deleteStage(
-                    compositionID,
-                    StageNames.composition
-                )
+        try {
+            if (await ceramicCompositionAPI.archiveComposition(compositionID)) {
                 const updatedCompositions = { ...compositions }
                 delete updatedCompositions[compositionID]
                 setCompositions(updatedCompositions)
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
             }
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
@@ -117,27 +117,25 @@ const CompositionsDashboardUI = () => {
                                     isLoading={isFetching}
                                     icon={<ArrowsClockwise />}
                                     onClick={() => {
-                                        ceramicStagehand &&
-                                            fetchCompositions(ceramicStagehand)
+                                        init()
                                     }}
                                 />
                             </Box>
                             <PlainSectionDivider />
                         </Box>
                     </Box>
-                    {ceramicStagehand && compositions ? (
+                    {compositions ? (
                         Object.keys(compositions).length > 0 ? (
                             <Box
                                 direction="row"
                                 wrap
                                 height={{ min: 'auto' }}
-                                pad={{ horizontal: 'large' }}
+                                pad={{ horizontal: 'medium' }}
                             >
                                 {Object.keys(compositions).map((tag) => {
                                     const streamID = compositions[tag]
                                     return (
                                         <CompositionDashboardTile
-                                            ceramicStagehand={ceramicStagehand}
                                             key={tag}
                                             compositionTag={tag}
                                             compositionStreamID={streamID}
@@ -167,15 +165,15 @@ const CompositionsDashboardUI = () => {
                     <Box pad="large" />
                 </Box>
             </PageLayout>
-            {showCreateCompositionModal && ceramicStagehand && (
+            {showCreateCompositionModal && (
                 <CreateCompositionModal
-                    ceramicStagehand={ceramicStagehand}
+                    ceramicCompositionAPI={ceramicCompositionAPI}
                     onClose={toggleShowCreateCompositionModal}
                 />
             )}
-            {showLoadCompositionModal && ceramicStagehand && (
+            {showLoadCompositionModal && (
                 <ImportCompositionModal
-                    ceramicStagehand={ceramicStagehand}
+                    ceramicCompositionAPI={ceramicCompositionAPI}
                     onClose={toggleShowLoadCompositionModal}
                 />
             )}
