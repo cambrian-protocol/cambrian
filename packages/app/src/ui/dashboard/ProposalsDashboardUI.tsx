@@ -36,7 +36,8 @@ type ProposalHashmap = {
     [proposalStreamID: string]: TileDocument<ProposalModel>
 }
 
-export type ProposalStackType = {
+export type StageStackType = {
+    proposalStreamID: string
     proposalCommitID: string
     proposal: ProposalModel
     template: TemplateModel
@@ -44,7 +45,7 @@ export type ProposalStackType = {
 }
 
 export type CambrianProposalArchiveType = {
-    [proposalStreamID: string]: ProposalStackType
+    [proposalStreamID: string]: StageStackType
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {

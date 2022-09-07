@@ -6,7 +6,11 @@ import {
 
 import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import { CeramicClient } from '@ceramicnetwork/http-client'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
@@ -59,6 +63,41 @@ export const loadStageLib = async <T>(
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+    }
+}
+
+/**
+ * Loads the corresponding proposal, template and composition from the passed proposalCommitID and stores the provided streamID for convience.
+ *
+ * @param proposalStreamID
+ * @param proposalCommitID
+ * @returns StageStack
+ */
+export const loadStageStackFromID = async (
+    currentUser: UserType,
+    proposalStreamID: string,
+    proposalCommitID?: string
+): Promise<StageStackType> => {
+    const cs = ceramicInstance(currentUser)
+    const proposalDoc = (await cs.loadStream(
+        proposalCommitID ? proposalCommitID : proposalStreamID
+    )) as TileDocument<ProposalModel>
+
+    const template = (
+        await cs.loadStream(proposalDoc.content.template.commitID)
+    ).content as TemplateModel
+
+    const composition = (await cs.loadStream(template.composition.commitID))
+        .content as CompositionModel
+
+    return {
+        proposalStreamID: proposalStreamID,
+        proposalCommitID: proposalCommitID
+            ? proposalCommitID
+            : proposalDoc.commitId.toString(),
+        proposal: proposalDoc.content,
+        template: template,
+        composition: composition,
     }
 }
 

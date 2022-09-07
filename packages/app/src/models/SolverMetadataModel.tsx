@@ -1,9 +1,9 @@
-import { ProposalDocsStackType } from '../store/ProposalContext'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
+import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 
 export type SolverMetadataModel = {
     slotTags: SlotTagsHashMapType
     solverTag: SolverTagModel
-    proposalDocStack?: ProposalDocsStackType
+    stageStack?: StageStackType
 }

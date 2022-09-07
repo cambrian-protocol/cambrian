@@ -5,23 +5,18 @@ import { File } from 'phosphor-react'
 import FlexInputInfo from '../FlexInputInfo'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
+import { StageStackType } from '../../dashboard/ProposalsDashboardUI'
 import TemplateContentInfo from '../../templates/TemplateContentInfo'
 import TemplatePricingInfo from '@cambrian/app/ui/templates/TemplatePricingInfo'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface TemplateInfoModalProps {
-    proposalStack: ProposalDocsStackType
+    stageStack: StageStackType
     onClose: () => void
 }
 
-const TemplateInfoModal = ({
-    proposalStack,
-    onClose,
-}: TemplateInfoModalProps) => {
-    const [templaterProfile] = useCambrianProfile(
-        proposalStack.templateDoc.content.author
-    )
+const TemplateInfoModal = ({ stageStack, onClose }: TemplateInfoModalProps) => {
+    const [templaterProfile] = useCambrianProfile(stageStack.template.author)
     return (
         <BaseLayerModal onClose={onClose}>
             <Box height={{ min: 'auto' }}>
@@ -37,18 +32,12 @@ const TemplateInfoModal = ({
                         hideDetails
                     />
                     <PlainSectionDivider />
-                    <TemplateContentInfo
-                        template={proposalStack.templateDoc.content}
-                    />
+                    <TemplateContentInfo template={stageStack.template} />
                     <PlainSectionDivider />
-                    <TemplatePricingInfo
-                        template={proposalStack.templateDoc.content}
-                    />
+                    <TemplatePricingInfo template={stageStack.template} />
                     <FlexInputInfo
-                        flexInputs={
-                            proposalStack.templateDoc.content.flexInputs
-                        }
-                        composition={proposalStack.compositionDoc.content}
+                        flexInputs={stageStack.template.flexInputs}
+                        composition={stageStack.composition}
                     />
                     <PlainSectionDivider />
                     <CambrianProfileInfo

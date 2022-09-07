@@ -21,7 +21,7 @@ interface ProposalReviewControlProps {
 
 const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-    const { proposalStack } = useProposalContext()
+    const { stageStack } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -29,11 +29,11 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (proposalStack) {
+        if (stageStack) {
             try {
                 const res = await ceramicTemplateAPI.approveProposal(
                     currentUser,
-                    proposalStack
+                    stageStack
                 )
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
@@ -46,10 +46,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (proposalStack) {
+        if (stageStack) {
             try {
                 const res = await ceramicTemplateAPI.requestProposalChange(
-                    proposalStack
+                    stageStack
                 )
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']

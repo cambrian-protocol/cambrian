@@ -7,13 +7,12 @@ import {
 import { CAMBRIAN_DID } from 'packages/app/config'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
-import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import { ProposalListItemType } from '@cambrian/app/components/list/ProposalListItem'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import { ProposalStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
@@ -24,7 +23,7 @@ import { parseComposerSolvers } from '../transformers/ComposerTransformer'
 export const getProposalStatus = (
     propopsalCommitID: string,
     proposal: ProposalModel,
-    approvedProposalStack?: ProposalStackType,
+    approvedStageStack?: StageStackType,
     onChainProposal?: ethers.Contract,
     receivedProposalCommits?: ReceivedProposalCommitType[]
 ): ProposalStatus => {
@@ -34,7 +33,7 @@ export const getProposalStatus = (
         } else {
             return ProposalStatus.Funding
         }
-    } else if (approvedProposalStack) {
+    } else if (approvedStageStack) {
         return ProposalStatus.Approved
     } else if (proposal.isDeleted) {
         return ProposalStatus.Canceled
@@ -185,21 +184,21 @@ export const getApprovedProposalCommitID = (
     undefined
 
 const getParsedSolvers = async (
-    proposalStack: ProposalDocsStackType,
+    stageStack: StageStackType,
     currentUser: UserType
 ) => {
     const _compositionWithFlexInputs = mergeFlexIntoComposition(
         mergeFlexIntoComposition(
-            proposalStack.compositionDoc.content,
-            proposalStack.templateDoc.content.flexInputs
+            stageStack.composition,
+            stageStack.template.flexInputs
         ),
-        proposalStack.proposalDoc.content.flexInputs
+        stageStack.proposal.flexInputs
     )
 
-    if (proposalStack.templateDoc.content.price.isCollateralFlex) {
+    if (stageStack.template.price.isCollateralFlex) {
         _compositionWithFlexInputs.solvers.forEach((solver) => {
             solver.config.collateralToken =
-                proposalStack.proposalDoc.content.price.tokenAddress
+                stageStack.proposal.price.tokenAddress
         })
     }
 
@@ -213,10 +212,10 @@ const getParsedSolvers = async (
 
 export const deployProposal = async (
     currentUser: UserType,
-    proposalStack: ProposalDocsStackType
+    stageStack: StageStackType
 ) => {
     // TODO Sanity check function that this is approved
-    const parsedSolvers = await getParsedSolvers(proposalStack, currentUser)
+    const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
 
     if (parsedSolvers) {
         const proposalsHub = new ProposalsHub(
@@ -225,16 +224,16 @@ export const deployProposal = async (
         )
 
         const solutionSafeBaseId = getSolutionSafeBaseId(
-            proposalStack.proposalDoc.commitId.toString(),
-            proposalStack.proposalDoc.content.template.commitID
+            stageStack.proposalCommitID,
+            stageStack.proposal.template.commitID
         )
 
         const transaction = await proposalsHub.createProposal(
             parsedSolvers[0].collateralToken,
-            proposalStack.proposalDoc.content.price.amount,
+            stageStack.proposal.price.amount,
             solutionSafeBaseId,
             parsedSolvers.map((solver) => solver.config),
-            proposalStack.proposalDoc.commitId.toString()
+            stageStack.proposalCommitID
         )
         let rc = await transaction.wait()
         const event = rc.events?.find(
@@ -249,16 +248,16 @@ export const deployProposal = async (
 
 export const deploySolutionBase = async (
     currentUser: UserType,
-    proposalStack: ProposalDocsStackType
+    stageStack: StageStackType
 ) => {
     try {
-        const parsedSolvers = await getParsedSolvers(proposalStack, currentUser)
+        const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
 
         if (parsedSolvers) {
             // Pin solverConfigs separately to have access without metaData from Solution
             const solverConfigsDoc = await createSolverConfigs(
                 parsedSolvers,
-                proposalStack.proposalDoc.commitId.toString(),
+                stageStack.proposalCommitID,
                 currentUser
             )
 
@@ -270,8 +269,8 @@ export const deploySolutionBase = async (
             )
 
             const solutionBaseId: string = getSolutionBaseId(
-                proposalStack.proposalDoc.commitId.toString(),
-                proposalStack.proposalDoc.content.template.commitID
+                stageStack.proposalCommitID,
+                stageStack.proposal.template.commitID
             )
 
             const transaction = await solutionsHub.createBase(
@@ -329,39 +328,39 @@ export const getProposalListItem = async (
     currentUser: UserType,
     proposalStreamID: string
 ): Promise<ProposalListItemType> => {
-    const cambrianProposal = (
+    const cambrianStageStack = (
         await TileDocument.deterministic(ceramicInstance(currentUser), {
             controllers: [CAMBRIAN_DID],
             family: 'cambrian-archive',
             tags: [proposalStreamID],
         })
-    ).content as { proposalStack: ProposalStackType }
+    ).content as { proposalStack: StageStackType }
 
-    if (cambrianProposal.proposalStack) {
+    if (cambrianStageStack.proposalStack) {
         // after approved
         const onChainProposal: ethers.Contract | undefined =
             await getOnChainProposal(
                 currentUser,
-                cambrianProposal.proposalStack.proposalCommitID,
-                cambrianProposal.proposalStack.proposal.template.commitID
+                cambrianStageStack.proposalStack.proposalCommitID,
+                cambrianStageStack.proposalStack.proposal.template.commitID
             )
 
         return {
             streamID: proposalStreamID,
             status: getProposalStatus(
-                cambrianProposal.proposalStack.proposalCommitID,
-                cambrianProposal.proposalStack.proposal,
-                cambrianProposal.proposalStack,
+                cambrianStageStack.proposalStack.proposalCommitID,
+                cambrianStageStack.proposalStack.proposal,
+                cambrianStageStack.proposalStack,
                 onChainProposal,
-                cambrianProposal.proposalStack.template.receivedProposals[
+                cambrianStageStack.proposalStack.template.receivedProposals[
                     proposalStreamID
                 ]
             ),
-            title: cambrianProposal.proposalStack.proposal.title,
+            title: cambrianStageStack.proposalStack.proposal.title,
             isAuthor:
-                cambrianProposal.proposalStack.proposal.author ===
+                cambrianStageStack.proposalStack.proposal.author ===
                 currentUser.did,
-            templateTitle: cambrianProposal.proposalStack.template.title,
+            templateTitle: cambrianStageStack.proposalStack.template.title,
         }
     } else {
         // before approved
@@ -375,7 +374,7 @@ export const getProposalListItem = async (
             )
         ).content as TemplateModel
 
-        // Fallback in case cambrianProposalStack had no entry but there is an approved commit
+        // Fallback in case cambrian- stagStack had no entry but there is an approved commit
         const approvedCommitID = getApprovedProposalCommitID(
             templateStreamContent,
             proposalStreamID

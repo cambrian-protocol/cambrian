@@ -6,7 +6,6 @@ import {
     loadStageLib,
 } from './CeramicUtils'
 
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TRILOBOT_ENDPOINT } from 'packages/app/config'
@@ -29,33 +28,6 @@ export default class CeramicProposalAPI {
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    /**
-     * Loads the corresponding TileDocuments proposal, template and composition from the passed proposalCommitOrStreamID.
-     *
-     * @param proposalCommitOrStreamID
-     * @returns Object containing proposal-, template- and composition- TileDocuments
-     */
-    loadProposalStackFromID = async (proposalCommitOrStreamID: string) => {
-        const cs = ceramicInstance(this.user)
-        const proposalDoc = (await cs.loadStream(
-            proposalCommitOrStreamID
-        )) as TileDocument<ProposalModel>
-
-        const templateDoc = (await cs.loadStream(
-            proposalDoc.content.template.commitID
-        )) as TileDocument<TemplateModel>
-
-        const compositionDoc = (await cs.loadStream(
-            templateDoc.content.composition.commitID
-        )) as TileDocument<CompositionModel>
-
-        return {
-            proposalDoc: proposalDoc,
-            templateDoc: templateDoc,
-            compositionDoc: compositionDoc,
-        }
     }
 
     /**

@@ -13,7 +13,7 @@ export default function NewProposalPage() {
         isLoaded,
         proposalInput,
         setProposalInput,
-        proposalDocStack,
+        stageStack,
         onSaveProposal,
         proposalStreamID,
         errorMessage,
@@ -24,14 +24,14 @@ export default function NewProposalPage() {
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && proposalDocStack ? (
+            ) : proposalInput && stageStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center" pad="large">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
                                 proposalStreamID={proposalStreamID}
                                 onSaveProposal={onSaveProposal}
-                                proposalDocStack={proposalDocStack}
+                                stageStack={stageStack}
                                 proposalInput={proposalInput}
                                 setProposalInput={setProposalInput}
                             />
