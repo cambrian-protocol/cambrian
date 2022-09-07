@@ -1,17 +1,17 @@
 import { Box } from 'grommet'
 import CambrianProfileInfo from '../../components/info/CambrianProfileInfo'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CreateProposalCTA from './CreateProposalCTA'
 import FlexInputInfo from '../common/FlexInputInfo'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateContentInfo from './TemplateContentInfo'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingInfo from '@cambrian/app/ui/templates/TemplatePricingInfo'
 import TemplateSkeleton from '@cambrian/app/components/skeletons/TemplateSkeleton'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface TemplateUIProps {
-    ceramicTemplate?: CeramicTemplateModel
+    ceramicTemplate?: TemplateModel
     templateStreamID: string
     composition?: CompositionModel
 }

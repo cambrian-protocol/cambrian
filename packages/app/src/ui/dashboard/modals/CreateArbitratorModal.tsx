@@ -26,6 +26,7 @@ interface CreateArbitratorModalProps {
     currentUser: UserType
 }
 
+// TODO Create arbitrator-lib and extract functionality to there
 const CreateArbitratorModal = ({
     onClose,
     currentUser,

@@ -4,7 +4,7 @@ import {
 } from './../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '../models/TemplateModel'
+import { TemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import _ from 'lodash'
@@ -21,8 +21,8 @@ const useEditTemplate = () => {
     const [ceramicTemplateAPI, setCeramicTemplateAPI] =
         useState<CeramicTemplateAPI>()
     const { templateStreamID } = router.query
-    const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
-    const [templateInput, setTemplateInput] = useState<CeramicTemplateModel>()
+    const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
+    const [templateInput, setTemplateInput] = useState<TemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -49,7 +49,7 @@ const useEditTemplate = () => {
             currentUser
         ) {
             try {
-                const templateDoc = await loadStageDoc<CeramicTemplateModel>(
+                const templateDoc = await loadStageDoc<TemplateModel>(
                     currentUser,
                     templateStreamID
                 )

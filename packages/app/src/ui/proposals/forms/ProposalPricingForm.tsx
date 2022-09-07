@@ -2,8 +2,8 @@ import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
@@ -12,7 +12,7 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 
 interface ProposalPricingFormProps {
     proposalInput: CeramicProposalModel
-    template: CeramicTemplateModel
+    template: TemplateModel
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >

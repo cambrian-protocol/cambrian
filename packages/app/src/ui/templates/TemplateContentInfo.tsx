@@ -1,9 +1,9 @@
 import { Box, Heading, Text } from 'grommet'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface TemplateContentInfoProps {
-    template: CeramicTemplateModel
+    template: TemplateModel
 }
 
 const TemplateContentInfo = ({ template }: TemplateContentInfoProps) => {

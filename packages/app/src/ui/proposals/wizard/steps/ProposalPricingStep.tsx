@@ -5,10 +5,10 @@ import {
 
 import { Box } from 'grommet'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
 import { SetStateAction } from 'react'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface ProposalPricingStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
@@ -17,7 +17,7 @@ interface ProposalPricingStepProps {
         SetStateAction<CeramicProposalModel | undefined>
     >
     onSaveProposal: () => Promise<boolean>
-    template: CeramicTemplateModel
+    template: TemplateModel
 }
 
 const ProposalPricingStep = ({

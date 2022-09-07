@@ -1,7 +1,7 @@
 import {
-    CeramicTemplateModel,
     ReceivedProposalCommitType,
     ReceivedProposalsHashmapType,
+    TemplateModel,
 } from '@cambrian/app/models/TemplateModel'
 
 import { CAMBRIAN_DID } from 'packages/app/config'
@@ -175,7 +175,7 @@ export const getOnChainProposalId = (
 }
 
 export const getApprovedProposalCommitID = (
-    template: CeramicTemplateModel,
+    template: TemplateModel,
     proposalStreamID: string
 ) =>
     (template.receivedProposals &&
@@ -373,7 +373,7 @@ export const getProposalListItem = async (
             await ceramicInstance(currentUser).loadStream(
                 proposalDoc.content.template.streamID
             )
-        ).content as CeramicTemplateModel
+        ).content as TemplateModel
 
         // Fallback in case cambrianProposalStack had no entry but there is an approved commit
         const approvedCommitID = getApprovedProposalCommitID(
@@ -409,7 +409,7 @@ export const getProposalListItem = async (
             await ceramicInstance(currentUser).loadStream(
                 proposalDoc.content.template.commitID
             )
-        ).content as CeramicTemplateModel
+        ).content as TemplateModel
 
         return {
             streamID: proposalStreamID,

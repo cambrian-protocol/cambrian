@@ -14,7 +14,6 @@ import { useEffect, useState } from 'react'
 import { ArrowsClockwise } from 'phosphor-react'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -23,6 +22,7 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecentProposalListItem from '@cambrian/app/components/list/RecentProposalListItem'
 import { StageNames } from '@cambrian/app/models/StageModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -39,7 +39,7 @@ type ProposalHashmap = {
 export type ProposalStackType = {
     proposalCommitID: string
     proposal: CeramicProposalModel
-    template: CeramicTemplateModel
+    template: TemplateModel
     composition: CompositionModel
 }
 

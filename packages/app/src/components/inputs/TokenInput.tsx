@@ -3,8 +3,8 @@ import { SetStateAction, useEffect, useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { FormField } from 'grommet'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import _ from 'lodash'
@@ -17,7 +17,7 @@ interface TokenInputProps {
     setProposalInput: React.Dispatch<
         SetStateAction<CeramicProposalModel | undefined>
     >
-    template: CeramicTemplateModel
+    template: TemplateModel
 }
 
 const TokenInput = ({

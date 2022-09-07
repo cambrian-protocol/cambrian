@@ -1,7 +1,7 @@
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 export enum StageNames {
     composition = 'composition',
@@ -15,10 +15,7 @@ export type StageLibType = {
     recents: string[]
 }
 
-export type StageModel =
-    | CompositionModel
-    | CeramicTemplateModel
-    | CeramicProposalModel
+export type StageModel = CompositionModel | TemplateModel | CeramicProposalModel
 
 export type Stages = {
     [key in StageNames]: StageModel

@@ -1,7 +1,7 @@
 import {
-    CeramicTemplateModel,
     ReceivedProposalPropsType,
     ReceivedProposalsHashmapType,
+    TemplateModel,
 } from '../../models/TemplateModel'
 import { StageLibType, StageNames } from '../../models/StageModel'
 import {
@@ -70,7 +70,7 @@ export default class CeramicTemplateAPI {
                 })
             })
 
-            const template: CeramicTemplateModel = {
+            const template: TemplateModel = {
                 title: title,
                 description: '',
                 requirements: '',
@@ -188,7 +188,7 @@ export default class CeramicTemplateAPI {
     ) => {
         const templateDoc = (await ceramicInstance(this.user).loadStream(
             proposalDoc.content.template.streamID
-        )) as TileDocument<CeramicTemplateModel>
+        )) as TileDocument<TemplateModel>
 
         const updatedReceivedProposals = _.cloneDeep(
             templateDoc.content.receivedProposals
@@ -232,7 +232,7 @@ export default class CeramicTemplateAPI {
             )) as TileDocument<CeramicProposalModel>
             const templateStreamDoc = (await cs.loadStream(
                 proposalStreamDoc.content.template.streamID
-            )) as TileDocument<CeramicTemplateModel>
+            )) as TileDocument<TemplateModel>
 
             let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
             if (templateStreamDoc.content.receivedProposals) {
@@ -279,7 +279,7 @@ export default class CeramicTemplateAPI {
             const updatedTemplateLib = {
                 ...templateLib.content,
             }
-            const templateDoc = await loadStageDoc<CeramicTemplateModel>(
+            const templateDoc = await loadStageDoc<TemplateModel>(
                 this.user,
                 updatedTemplateLib.lib[tag]
             )
@@ -329,7 +329,7 @@ export default class CeramicTemplateAPI {
 
             const templateDoc = ceramicInstance(this.user).loadStream(
                 templateStreamID
-            ) as unknown as TileDocument<CeramicTemplateModel>
+            ) as unknown as TileDocument<TemplateModel>
 
             updatedTemplateLib.lib[templateDoc.content.title] = templateStreamID
 

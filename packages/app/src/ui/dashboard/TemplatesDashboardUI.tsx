@@ -9,7 +9,6 @@ import { useEffect, useState } from 'react'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import CreateTemplateModal from './modals/CreateTemplateModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -18,6 +17,7 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecentTemplateListItem from '@cambrian/app/components/list/RecentTemplateListItem'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -27,7 +27,7 @@ interface TemplatesDashboardUIProps {
 }
 
 type TemplateHashmap = {
-    [templateStreamID: string]: TileDocument<CeramicTemplateModel>
+    [templateStreamID: string]: TileDocument<TemplateModel>
 }
 
 const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {

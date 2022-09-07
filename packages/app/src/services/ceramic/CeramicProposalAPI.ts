@@ -7,10 +7,10 @@ import {
 } from './CeramicUtils'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '../../models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { TRILOBOT_ENDPOINT } from 'packages/app/config'
+import { TemplateModel } from '../../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
@@ -45,7 +45,7 @@ export default class CeramicProposalAPI {
 
         const templateDoc = (await cs.loadStream(
             proposalDoc.content.template.commitID
-        )) as TileDocument<CeramicTemplateModel>
+        )) as TileDocument<TemplateModel>
 
         const compositionDoc = (await cs.loadStream(
             templateDoc.content.composition.commitID
@@ -70,7 +70,7 @@ export default class CeramicProposalAPI {
         templateStreamID: string
     ): Promise<string> => {
         try {
-            const templateStreamDoc: TileDocument<CeramicTemplateModel> =
+            const templateStreamDoc: TileDocument<TemplateModel> =
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
             const proposal: CeramicProposalModel = {
@@ -298,7 +298,7 @@ export default class CeramicProposalAPI {
                 const templateDoc = (await TileDocument.load(
                     ceramicInstance(this.user),
                     proposalDoc.content.template.streamID
-                )) as TileDocument<CeramicTemplateModel>
+                )) as TileDocument<TemplateModel>
 
                 const updatedReceivedProposals = {
                     ...templateDoc.content.receivedProposals,

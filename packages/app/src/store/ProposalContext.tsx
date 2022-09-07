@@ -16,12 +16,12 @@ import { CAMBRIAN_DID } from 'packages/app/config'
 import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '../models/ProposalModel'
 import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
-import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ProposalStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { StageNames } from '../models/StageModel'
+import { TemplateModel } from '../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from './UserContext'
 import _ from 'lodash'
@@ -47,7 +47,7 @@ export const ProposalContext = React.createContext<ProposalContextType>({
 
 export type ProposalDocsStackType = {
     proposalDoc: TileDocument<CeramicProposalModel>
-    templateDoc: TileDocument<CeramicTemplateModel>
+    templateDoc: TileDocument<TemplateModel>
     compositionDoc: TileDocument<CompositionModel>
 }
 
@@ -72,7 +72,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [proposalStreamDoc, setProposalStreamDoc] =
             useState<TileDocument<CeramicProposalModel>>()
         const [templateStreamDoc, setTemplateStreamDoc] =
-            useState<TileDocument<CeramicTemplateModel>>()
+            useState<TileDocument<TemplateModel>>()
 
         useEffect(() => {
             init()
@@ -180,11 +180,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 _proposalStreamDoc.makeReadOnly()
 
-                const _templateStreamDoc =
-                    await loadStageDoc<CeramicTemplateModel>(
-                        currentUser,
-                        _proposalStreamDoc.content.template.streamID
-                    )
+                const _templateStreamDoc = await loadStageDoc<TemplateModel>(
+                    currentUser,
+                    _proposalStreamDoc.content.template.streamID
+                )
 
                 await initProposal(_proposalStreamDoc, _templateStreamDoc)
 
@@ -198,7 +197,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const initProposal = async (
             proposalStreamDoc: TileDocument<CeramicProposalModel>,
-            templateStreamDoc: TileDocument<CeramicTemplateModel>
+            templateStreamDoc: TileDocument<TemplateModel>
         ) => {
             try {
                 const cambrianProposalStackDoc =

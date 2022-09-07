@@ -1,16 +1,16 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Coins } from 'phosphor-react'
 import PriceInfo from '../../components/info/PriceInfo'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TokenAvatar from '../../components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplatePricingInfoProps {
-    template: CeramicTemplateModel
+    template: TemplateModel
 }
 
 const TemplatePricingInfo = ({ template }: TemplatePricingInfoProps) => {

@@ -7,11 +7,11 @@ import { useEffect, useState } from 'react'
 
 import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '../models/ProposalModel'
-import { CeramicTemplateModel } from '../models/TemplateModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
 import { ProposalDocsStackType } from '../store/ProposalContext'
 import { ProposalStatus } from '../models/ProposalStatus'
 import { StageNames } from '../models/StageModel'
+import { TemplateModel } from '../models/TemplateModel'
 import _ from 'lodash'
 import { cpLogger } from './../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
@@ -67,7 +67,7 @@ const useEditProposal = () => {
                         await ceramicInstance(currentUser).loadStream(
                             _proposalStreamDoc.content.template.streamID
                         )
-                    ).content as CeramicTemplateModel
+                    ).content as TemplateModel
 
                     // Note: To edit a proposal it must be either not submitted or a change has been requested
                     const receivedSubmissions =
