@@ -1,5 +1,5 @@
-import { CAMBRIAN_LIB_NAME, ceramicInstance, createStage } from './CeramicUtils'
 import { StageLibType, StageNames } from '../../models/StageModel'
+import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
@@ -16,23 +16,6 @@ export default class CeramicCompositionAPI {
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadCompositionLib = async () => {
-        try {
-            return (await TileDocument.deterministic(
-                ceramicInstance(this.user),
-                {
-                    controllers: [this.user.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [StageNames.composition],
-                },
-                { pin: true }
-            )) as TileDocument<StageLibType>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
     }
 
     loadCompositionDoc = async (compositionStreamID: string) => {
@@ -84,7 +67,10 @@ export default class CeramicCompositionAPI {
      */
     archiveComposition = async (tag: string) => {
         try {
-            const compositionLib = await this.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.composition
+            )
             const updatedCompositionLib = {
                 ...compositionLib.content,
             }
@@ -119,7 +105,10 @@ export default class CeramicCompositionAPI {
      */
     unarchiveComposition = async (compositionStreamID: string) => {
         try {
-            const compositionLib = await this.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.composition
+            )
 
             const updatedCompositionLib = {
                 ...compositionLib.content,

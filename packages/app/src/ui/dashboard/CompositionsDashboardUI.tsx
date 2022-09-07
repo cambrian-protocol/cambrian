@@ -6,6 +6,7 @@ import {
     TreeStructure,
 } from 'phosphor-react'
 import { Box, Heading, Text } from 'grommet'
+import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
 import { useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
@@ -21,6 +22,7 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { loadStageLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 
 interface CompositionsDashboardUIProps {
     currentUser: UserType
@@ -51,8 +53,10 @@ const CompositionsDashboardUI = ({
     const init = async () => {
         setIsFetching(true)
         try {
-            const compositionLib =
-                await ceramicCompositionAPI.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                currentUser,
+                StageNames.composition
+            )
 
             if (compositionLib.content && compositionLib.content.lib) {
                 setCompositions(compositionLib.content.lib)

@@ -1,10 +1,10 @@
-import { CAMBRIAN_LIB_NAME, ceramicInstance, createStage } from './CeramicUtils'
 import {
     CeramicTemplateModel,
     ReceivedProposalPropsType,
     ReceivedProposalsHashmapType,
 } from '../../models/TemplateModel'
 import { StageLibType, StageNames } from '../../models/StageModel'
+import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -26,23 +26,6 @@ export default class CeramicTemplateAPI {
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadTemplateLib = async () => {
-        try {
-            return (await TileDocument.deterministic(
-                ceramicInstance(this.user),
-                {
-                    controllers: [this.user.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [StageNames.template],
-                },
-                { pin: true }
-            )) as TileDocument<StageLibType>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
     }
 
     loadTemplateDoc = async (templateStreamID: string) => {
@@ -295,7 +278,10 @@ export default class CeramicTemplateAPI {
      */
     archiveTemplate = async (tag: string) => {
         try {
-            const templateLib = await this.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.template
+            )
 
             const updatedTemplateLib = {
                 ...templateLib.content,
@@ -338,7 +324,10 @@ export default class CeramicTemplateAPI {
      */
     unarchiveTemplate = async (templateStreamID: string) => {
         try {
-            const templateLib = await this.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.template
+            )
 
             const updatedTemplateLib = {
                 ...templateLib.content,

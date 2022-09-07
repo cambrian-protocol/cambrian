@@ -1,12 +1,18 @@
 import { Box, Heading, Spinner, Text } from 'grommet'
+import CeramicProposalAPI, {
+    CeramicProposalLibType,
+} from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ProposalListItem, {
     ProposalListItemType,
 } from '@cambrian/app/components/list/ProposalListItem'
+import {
+    ceramicInstance,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { ArrowsClockwise } from 'phosphor-react'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -16,9 +22,9 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecentProposalListItem from '@cambrian/app/components/list/RecentProposalListItem'
+import { StageNames } from '@cambrian/app/models/StageModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { getProposalListItem } from '@cambrian/app/utils/helpers/proposalHelper'
 
@@ -60,7 +66,10 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     const init = async () => {
         setIsFetching(true)
         try {
-            const proposalLib = await ceramicProposalAPI.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                currentUser,
+                StageNames.proposal
+            )
             if (
                 proposalLib.content !== null &&
                 typeof proposalLib.content === 'object'

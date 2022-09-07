@@ -1,5 +1,5 @@
-import { CAMBRIAN_LIB_NAME, ceramicInstance, createStage } from './CeramicUtils'
 import { StageLibType, StageNames } from '../../models/StageModel'
+import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '../../models/TemplateModel'
@@ -24,23 +24,6 @@ export default class CeramicProposalAPI {
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadProposalLib = async () => {
-        try {
-            return (await TileDocument.deterministic(
-                ceramicInstance(this.user),
-                {
-                    controllers: [this.user.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [StageNames.proposal],
-                },
-                { pin: true }
-            )) as TileDocument<CeramicProposalLibType>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
     }
 
     loadProposalDoc = async (proposalStreamID: string) => {
@@ -176,7 +159,10 @@ export default class CeramicProposalAPI {
      */
     addReceivedProposal = async (proposalStreamID: string) => {
         try {
-            const proposalLib = await this.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                this.user,
+                StageNames.proposal
+            )
 
             const updatedProposalLib = { ...proposalLib.content }
             if (updatedProposalLib.received) {
@@ -206,7 +192,10 @@ export default class CeramicProposalAPI {
      */
     removeProposal = async (tag: string, type: 'DELETE' | 'ARCHIVE') => {
         try {
-            const proposalLib = await this.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                this.user,
+                StageNames.proposal
+            )
 
             const updatedProposalLib = {
                 ...proposalLib.content,
@@ -253,7 +242,10 @@ export default class CeramicProposalAPI {
      */
     unarchiveProposal = async (proposalStreamID: string) => {
         try {
-            const proposalLib = await this.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                this.user,
+                StageNames.proposal
+            )
 
             const updatedProposalLib = {
                 ...proposalLib.content,
@@ -291,7 +283,10 @@ export default class CeramicProposalAPI {
         type: 'DELETE' | 'ARCHIVE'
     ) => {
         try {
-            const proposalLib = await this.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                this.user,
+                StageNames.proposal
+            )
 
             const updatedProposalLib = {
                 ...proposalLib.content,
@@ -356,7 +351,10 @@ export default class CeramicProposalAPI {
      */
     unarchiveReceivedProposal = async (proposalStreamID: string) => {
         try {
-            const proposalLib = await this.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                this.user,
+                StageNames.proposal
+            )
 
             const updatedProposalLib = {
                 ...proposalLib.content,

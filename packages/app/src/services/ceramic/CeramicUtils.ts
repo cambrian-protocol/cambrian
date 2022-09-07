@@ -20,19 +20,31 @@ export const ceramicInstance = (currentUser: UserType) => {
     return ceramicClient
 }
 
-export const loadStageLib = async (
+/**
+ * Loads users stageLib.
+ *
+ * @param currentUser
+ * @param stageName
+ * @returns
+ */
+export const loadStageLib = async <T>(
     currentUser: UserType,
     stageName: StageNames
 ) => {
-    return (await TileDocument.deterministic(
-        ceramicInstance(currentUser),
-        {
-            controllers: [currentUser.did],
-            family: CAMBRIAN_LIB_NAME,
-            tags: [stageName],
-        },
-        { pin: true }
-    )) as TileDocument<StageLibType>
+    try {
+        return (await TileDocument.deterministic(
+            ceramicInstance(currentUser),
+            {
+                controllers: [currentUser.did],
+                family: CAMBRIAN_LIB_NAME,
+                tags: [stageName],
+            },
+            { pin: true }
+        )) as TileDocument<T>
+    } catch (e) {
+        cpLogger.push(e)
+        throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+    }
 }
 
 export const createStage = async (
@@ -41,7 +53,10 @@ export const createStage = async (
     currentUser: UserType
 ): Promise<string> => {
     try {
-        const stageLibDoc = await loadStageLib(currentUser, stageName)
+        const stageLibDoc = await loadStageLib<StageLibType>(
+            currentUser,
+            stageName
+        )
 
         let uniqueTitle = stage.title
         // Overwrite title if tag wasn't unique
@@ -109,7 +124,10 @@ export const updateStage = async (
         const cleanedUserTitle = updatedStage.title.trim()
         if (currentStage.content.title !== cleanedUserTitle) {
             // Title has changed - stageLib and metaTag must be updated
-            const stageLibDoc = await loadStageLib(currentUser, stageName)
+            const stageLibDoc = await loadStageLib<StageLibType>(
+                currentUser,
+                stageName
+            )
 
             if (
                 stageLibDoc.content === null ||
@@ -160,15 +178,10 @@ export const addRecentStage = async (
     streamID: string
 ) => {
     try {
-        const stageLib = (await TileDocument.deterministic(
-            ceramicInstance(currentUser),
-            {
-                controllers: [currentUser.did],
-                family: CAMBRIAN_LIB_NAME,
-                tags: [stageName],
-            },
-            { pin: true }
-        )) as TileDocument<StageLibType>
+        const stageLib = await loadStageLib<StageLibType>(
+            currentUser,
+            stageName
+        )
 
         const updatedProposalLibContent = { ...stageLib.content }
 
@@ -196,15 +209,10 @@ export const addRecentStage = async (
     }
 }
 
-export const clearStages = async (currentUser: UserType, stage: StageNames) => {
-    const stageLib = await TileDocument.deterministic(
-        ceramicInstance(currentUser),
-        {
-            controllers: [currentUser.did],
-            family: CAMBRIAN_LIB_NAME,
-            tags: [stage],
-        },
-        { pin: true }
-    )
-    stageLib.update({})
+export const clearStages = async (
+    currentUser: UserType,
+    stageName: StageNames
+) => {
+    const stageLib = await loadStageLib<StageLibType>(currentUser, stageName)
+    stageLib.update({ lib: {}, recents: [], archive: { lib: [] } })
 }

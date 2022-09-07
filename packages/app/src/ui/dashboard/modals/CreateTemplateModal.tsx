@@ -1,4 +1,5 @@
 import { Box, Spinner, Text } from 'grommet'
+import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
@@ -12,6 +13,7 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { loadStageLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import randimals from 'randimals'
 import router from 'next/router'
 
@@ -36,8 +38,10 @@ const CreateTemplateModal = ({
 
     const fetchCompositions = async () => {
         try {
-            const compositionLib =
-                await ceramicCompositionAPI.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                currentUser,
+                StageNames.composition
+            )
             if (compositionLib && compositionLib.content.lib) {
                 setCompositions(compositionLib.content.lib)
             } else {

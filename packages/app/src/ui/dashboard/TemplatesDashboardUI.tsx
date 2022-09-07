@@ -1,5 +1,10 @@
 import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
 import { Box, Button, Heading, Spinner, Text } from 'grommet'
+import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
+import {
+    ceramicInstance,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
@@ -15,7 +20,6 @@ import RecentTemplateListItem from '@cambrian/app/components/list/RecentTemplate
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface TemplatesDashboardUIProps {
@@ -46,7 +50,10 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
     const init = async () => {
         setIsFetching(true)
         try {
-            const templateLib = await ceramicTemplateAPI.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                currentUser,
+                StageNames.template
+            )
             if (
                 templateLib.content !== null &&
                 typeof templateLib.content === 'object'
