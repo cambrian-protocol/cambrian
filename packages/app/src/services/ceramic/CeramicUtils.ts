@@ -20,6 +20,21 @@ export const ceramicInstance = (currentUser: UserType) => {
     return ceramicClient
 }
 
+export const loadStageDoc = async <T>(
+    currentUser: UserType,
+    streamID: string
+) => {
+    try {
+        return (await TileDocument.load(
+            ceramicInstance(currentUser),
+            streamID
+        )) as TileDocument<T>
+    } catch (e) {
+        cpLogger.push(e)
+        throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+    }
+}
+
 /**
  * Loads users stageLib.
  *

@@ -8,6 +8,10 @@ import ReactFlow, {
     isNode,
 } from 'react-flow-renderer'
 import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
+import {
+    loadStageDoc,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
@@ -21,7 +25,6 @@ import DuplicateCompositionComponent from './general/DuplicateCompositionCompone
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { loadStageLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useRouter } from 'next/router'
 
@@ -66,10 +69,10 @@ export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
             currentUser
         ) {
             try {
-                const composition =
-                    await ceramicCompositionAPI.loadCompositionDoc(
-                        compositionStreamID
-                    )
+                const composition = await loadStageDoc<CompositionModel>(
+                    currentUser,
+                    compositionStreamID
+                )
 
                 if (
                     composition.content !== null &&

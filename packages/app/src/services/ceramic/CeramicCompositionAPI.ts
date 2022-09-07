@@ -3,31 +3,18 @@ import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
 
 /** 
- API functions to maintain compositions and the composition-lib
+ API functions to maintain compositions and the users composition-lib.
 */
 export default class CeramicCompositionAPI {
     user: UserType
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadCompositionDoc = async (compositionStreamID: string) => {
-        try {
-            return (await TileDocument.load(
-                ceramicInstance(this.user),
-                compositionStreamID
-            )) as TileDocument<CompositionModel>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
     }
 
     /**

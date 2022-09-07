@@ -1,4 +1,8 @@
-import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
+import {
+    ceramicInstance,
+    loadStageDoc,
+    updateStage,
+} from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
@@ -53,7 +57,10 @@ const useEditProposal = () => {
         ) {
             try {
                 const _proposalStreamDoc =
-                    await ceramicProposalAPI.loadProposalDoc(proposalStreamID)
+                    await loadStageDoc<CeramicProposalModel>(
+                        currentUser,
+                        proposalStreamID
+                    )
 
                 if (_proposalStreamDoc.content.author === currentUser.did) {
                     const _templateStreamContent = (

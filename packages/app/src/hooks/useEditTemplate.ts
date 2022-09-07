@@ -1,4 +1,7 @@
-import { addRecentStage } from './../services/ceramic/CeramicUtils'
+import {
+    addRecentStage,
+    loadStageDoc,
+} from './../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { CeramicTemplateModel } from '../models/TemplateModel'
@@ -46,18 +49,19 @@ const useEditTemplate = () => {
             currentUser
         ) {
             try {
-                const template = await ceramicTemplateAPI.loadTemplateDoc(
+                const templateDoc = await loadStageDoc<CeramicTemplateModel>(
+                    currentUser,
                     templateStreamID
                 )
                 if (
-                    template.content !== null &&
-                    typeof template.content === 'object'
+                    templateDoc.content !== null &&
+                    typeof templateDoc.content === 'object'
                 ) {
                     // Just initialize edit paths if currentUser is the author
                     if (
                         (!router.pathname.includes('edit') &&
                             !router.pathname.includes('new')) ||
-                        currentUser.did === template.content.author
+                        currentUser.did === templateDoc.content.author
                     ) {
                         await addRecentStage(
                             currentUser,
@@ -68,15 +72,15 @@ const useEditTemplate = () => {
                         const _composition = <CompositionModel>(
                             (
                                 await ceramicInstance(currentUser).loadStream(
-                                    template.content.composition.commitID
+                                    templateDoc.content.composition.commitID
                                 )
                             ).content
                         )
 
                         if (_composition) {
                             setComposition(_composition)
-                            setCachedTemplate(_.cloneDeep(template.content))
-                            return setTemplateInput(template.content)
+                            setCachedTemplate(_.cloneDeep(templateDoc.content))
+                            return setTemplateInput(templateDoc.content)
                         }
                     }
                 }

@@ -4,7 +4,12 @@ import {
     ReceivedProposalsHashmapType,
 } from '../../models/TemplateModel'
 import { StageLibType, StageNames } from '../../models/StageModel'
-import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
+import {
+    ceramicInstance,
+    createStage,
+    loadStageDoc,
+    loadStageLib,
+} from './CeramicUtils'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -19,25 +24,13 @@ import { cpLogger } from '../api/Logger.api'
 import { deploySolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 
 /** 
- API functions to maintain the template-lib for the template dashboard
+ API functions to maintain templates and the users template-lib
 */
 export default class CeramicTemplateAPI {
     user: UserType
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadTemplateDoc = async (templateStreamID: string) => {
-        try {
-            return (await TileDocument.load(
-                ceramicInstance(this.user),
-                templateStreamID
-            )) as TileDocument<CeramicTemplateModel>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
     }
 
     /**
@@ -286,7 +279,8 @@ export default class CeramicTemplateAPI {
             const updatedTemplateLib = {
                 ...templateLib.content,
             }
-            const templateDoc = await this.loadTemplateDoc(
+            const templateDoc = await loadStageDoc<CeramicTemplateModel>(
+                this.user,
                 updatedTemplateLib.lib[tag]
             )
 

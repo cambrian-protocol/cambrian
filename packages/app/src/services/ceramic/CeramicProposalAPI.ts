@@ -1,5 +1,10 @@
 import { StageLibType, StageNames } from '../../models/StageModel'
-import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
+import {
+    ceramicInstance,
+    createStage,
+    loadStageDoc,
+    loadStageLib,
+} from './CeramicUtils'
 
 import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CeramicTemplateModel } from '../../models/TemplateModel'
@@ -17,25 +22,13 @@ export type CeramicProposalLibType = StageLibType & {
 }
 
 /** 
- API functions to maintain proposals and the proposal-lib for the proposal dashboard.
+ API functions to maintain proposals and the users proposal-lib. 
 */
 export default class CeramicProposalAPI {
     user: UserType
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadProposalDoc = async (proposalStreamID: string) => {
-        try {
-            return (await TileDocument.load(
-                ceramicInstance(this.user),
-                proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
     }
 
     /**
@@ -251,7 +244,10 @@ export default class CeramicProposalAPI {
                 ...proposalLib.content,
             }
 
-            const proposalDoc = await this.loadProposalDoc(proposalStreamID)
+            const proposalDoc = await loadStageDoc<CeramicProposalModel>(
+                this.user,
+                proposalStreamID
+            )
 
             updatedProposalLib.lib[proposalDoc.content.title] = proposalStreamID
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {
     addRecentStage,
     ceramicInstance,
+    loadStageDoc,
 } from '../services/ceramic/CeramicUtils'
 import {
     getApprovedProposalCommitID,
@@ -172,12 +173,16 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const init = async () => {
             try {
                 const _proposalStreamDoc =
-                    await ceramicProposalAPI.loadProposalDoc(proposalStreamID)
+                    await loadStageDoc<CeramicProposalModel>(
+                        currentUser,
+                        proposalStreamID
+                    )
 
                 _proposalStreamDoc.makeReadOnly()
 
                 const _templateStreamDoc =
-                    await ceramicTemplateAPI.loadTemplateDoc(
+                    await loadStageDoc<CeramicTemplateModel>(
+                        currentUser,
                         _proposalStreamDoc.content.template.streamID
                     )
 
