@@ -1,16 +1,14 @@
 import { Box, Button, Form, FormField, TextArea, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface ProposalDescriptionFormProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel?: () => void

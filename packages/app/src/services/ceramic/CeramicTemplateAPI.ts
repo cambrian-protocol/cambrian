@@ -1,58 +1,36 @@
-import { CAMBRIAN_LIB_NAME, StageLibType, StageNames } from './CeramicStagehand'
 import {
-    CeramicTemplateModel,
+    ReceivedProposalPropsType,
     ReceivedProposalsHashmapType,
+    TemplateModel,
 } from '../../models/TemplateModel'
+import { StageLibType, StageNames } from '../../models/StageModel'
+import {
+    ceramicInstance,
+    createStage,
+    loadStageDoc,
+    loadStageLib,
+} from './CeramicUtils'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
+import { TRILOBOT_ENDPOINT } from './../../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
-import { ceramicInstance } from './CeramicUtils'
 import { cpLogger } from '../api/Logger.api'
-import { createStage } from './../../utils/helpers/stageHelpers'
-import { pushUnique } from '../../utils/helpers/arrayHelper'
+import { deploySolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 
 /** 
- API functions to maintain the template-lib for the template dashboard
+ API functions to maintain templates and the users template-lib
 */
 export default class CeramicTemplateAPI {
     user: UserType
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadTemplateLib = async () => {
-        try {
-            return (await TileDocument.deterministic(
-                ceramicInstance(this.user),
-                {
-                    controllers: [this.user.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [StageNames.template],
-                },
-                { pin: true }
-            )) as TileDocument<StageLibType>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    loadTemplateDoc = async (templateStreamID: string) => {
-        try {
-            return (await TileDocument.load(
-                ceramicInstance(this.user),
-                templateStreamID
-            )) as TileDocument<CeramicTemplateModel>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
     }
 
     /**
@@ -92,7 +70,7 @@ export default class CeramicTemplateAPI {
                 })
             })
 
-            const template: CeramicTemplateModel = {
+            const template: TemplateModel = {
                 title: title,
                 description: '',
                 requirements: '',
@@ -123,19 +101,143 @@ export default class CeramicTemplateAPI {
     }
 
     /**
+     * Hits mailbox server and sets requestChange flag in the template.receivedProposals to true
+     *
+     * @param stageStack
+     * @auth must be done by the Templater
+     */
+    requestProposalChange = async (stageStack: StageStackType) => {
+        try {
+            // Hit mailbox server
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: stageStack.proposalStreamID,
+                    session: this.user.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (res.status === 200) {
+                await this.updateProposalEntry(stageStack, {
+                    requestChange: true,
+                })
+                return true
+            } else {
+                cpLogger.push(res.status)
+                return false
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    /**
+     * Deploys a SolutionBase from the ProposalCommitID and the TemplateCommitID, hits mailbox server and sets the approved flag in the template.receivedProposals to true
+     *
+     * @param currentUser
+     * @param stageStack
+     * @auth must be done by the Templater
+     */
+    approveProposal = async (
+        currentUser: UserType,
+        stageStack: StageStackType
+    ) => {
+        try {
+            if (await deploySolutionBase(currentUser, stageStack)) {
+                // Hit mailbox server
+                const res = await fetch(
+                    `${TRILOBOT_ENDPOINT}/approveProposal`,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            id: stageStack.proposalStreamID,
+                            session: this.user.session.serialize(),
+                        }),
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                )
+                if (res.status === 200) {
+                    await this.updateProposalEntry(stageStack, {
+                        approved: true,
+                    })
+                    return true
+                } else {
+                    cpLogger.push(res.status)
+                    return false
+                }
+            }
+        } catch (e) {
+            throw e
+        }
+    }
+
+    /**
+     * Updates the templates receivedProposals[proposalStreamID] commit-entry.
+     *
+     * @auth Must be done by the templater
+     */
+    updateProposalEntry = async (
+        stageStack: StageStackType,
+        updatedProposalEntry: ReceivedProposalPropsType
+    ) => {
+        const cs = ceramicInstance(this.user)
+
+        const templateDoc = (await cs.loadStream(
+            stageStack.proposal.template.streamID
+        )) as TileDocument<TemplateModel>
+
+        const updatedReceivedProposals = _.cloneDeep(
+            templateDoc.content.receivedProposals
+        )
+
+        const proposalSubmissions =
+            updatedReceivedProposals[stageStack.proposalStreamID]
+        if (!proposalSubmissions || proposalSubmissions.length === 0)
+            throw Error('No Submissions found for provided Proposal StreamID.')
+
+        if (
+            !proposalSubmissions[proposalSubmissions.length - 1] ||
+            !_.isEqual(
+                (
+                    await cs.loadStream(
+                        proposalSubmissions[proposalSubmissions.length - 1]
+                            .proposalCommitID
+                    )
+                ).content as ProposalModel,
+                stageStack.proposal
+            )
+        )
+            throw Error(
+                'Provided Proposal commitID does not match with the most recent submission.'
+            )
+
+        proposalSubmissions[proposalSubmissions.length - 1] = {
+            proposalCommitID: stageStack.proposalCommitID,
+            ...updatedProposalEntry,
+        }
+        await templateDoc.update({
+            ...templateDoc.content,
+            receivedProposals: updatedReceivedProposals,
+        })
+    }
+
+    /**
      * Adds a new entry for a submitted proposal at the templates receivedProposals and at proposalLib received proposals if not existent yet
      *
      * @auth Must be done by the templater
      */
-    registerNewProposalSubmission = async (proposalStreamID: string) => {
+    registerNewProposalSubmission = async (stageStack: StageStackType) => {
         try {
             const cs = ceramicInstance(this.user)
-            const proposalStreamDoc = (await cs.loadStream(
-                proposalStreamID
-            )) as TileDocument<CeramicProposalModel>
             const templateStreamDoc = (await cs.loadStream(
-                proposalStreamDoc.content.template.streamID
-            )) as TileDocument<CeramicTemplateModel>
+                stageStack.proposal.template.streamID
+            )) as TileDocument<TemplateModel>
 
             let updatedReceivedProposals: ReceivedProposalsHashmapType = {}
             if (templateStreamDoc.content.receivedProposals) {
@@ -143,69 +245,47 @@ export default class CeramicTemplateAPI {
                     templateStreamDoc.content.receivedProposals
                 )
             }
-            const proposalStream = await cs.loadStream(proposalStreamID)
-            console.log('Proposal ', proposalStream)
-            console.log(
-                'Proposal Stream Tip (Most recent commitID):',
-                proposalStream.tip.toString()
-            )
 
-            const proposalCommmitID = proposalStreamDoc.commitId.toString()
-            console.log('Proposal commitID', proposalCommmitID)
-            console.log(
-                'Second last CommitID:',
-                proposalStreamDoc.allCommitIds[
-                    proposalStreamDoc.allCommitIds.length - 2
-                ].toString()
-            )
-            console.log(
-                'Last CommitID:',
-                proposalStreamDoc.allCommitIds[
-                    proposalStreamDoc.allCommitIds.length - 1
-                ].toString()
-            )
-
-            if (!updatedReceivedProposals[proposalStreamID]) {
-                updatedReceivedProposals[proposalStreamID] = [
+            if (!updatedReceivedProposals[stageStack.proposalStreamID]) {
+                updatedReceivedProposals[stageStack.proposalStreamID] = [
                     {
-                        proposalCommitID: proposalCommmitID,
+                        proposalCommitID: stageStack.proposalCommitID,
                     },
                 ]
-            } else {
-                updatedReceivedProposals[proposalStreamID].push({
-                    proposalCommitID: proposalCommmitID,
+                await templateStreamDoc.update({
+                    ...templateStreamDoc.content,
+                    receivedProposals: updatedReceivedProposals,
                 })
-            }
-            console.log(
-                'Registering new Proposal Submission',
-                templateStreamDoc
-            )
-            await templateStreamDoc.update({
-                ...templateStreamDoc.content,
-                receivedProposals: updatedReceivedProposals,
-            })
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
+            } else {
+                const proposalCommit = (await (
+                    await cs.loadStream(
+                        updatedReceivedProposals[stageStack.proposalStreamID][
+                            updatedReceivedProposals[
+                                stageStack.proposalStreamID
+                            ].length - 1
+                        ].proposalCommitID
+                    )
+                ).content) as ProposalModel
 
-    /***
-     * Pushes templateStreamID to recents as singleton. Removes pre-existent entry therefore keeps chronological order.
-     *
-     * @param templateStreamID templateStreamID
-     */
-    addRecentTemplate = async (templateStreamID: string) => {
-        try {
-            const templateLib = await this.loadTemplateLib()
-            const updatedTemplateLibContent = { ...templateLib.content }
-            await templateLib.update({
-                ...updatedTemplateLibContent,
-                recents: pushUnique(
-                    templateStreamID,
-                    updatedTemplateLibContent.recents
-                ),
-            })
+                // No duplicate and propoals must have changed
+                if (
+                    updatedReceivedProposals[
+                        stageStack.proposalStreamID
+                    ].findIndex(
+                        (e) =>
+                            e.proposalCommitID === stageStack.proposalCommitID
+                    ) === -1 &&
+                    !_.isEqual(proposalCommit, stageStack.proposal)
+                ) {
+                    updatedReceivedProposals[stageStack.proposalStreamID].push({
+                        proposalCommitID: stageStack.proposalCommitID,
+                    })
+                    await templateStreamDoc.update({
+                        ...templateStreamDoc.content,
+                        receivedProposals: updatedReceivedProposals,
+                    })
+                }
+            }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -220,12 +300,16 @@ export default class CeramicTemplateAPI {
      */
     archiveTemplate = async (tag: string) => {
         try {
-            const templateLib = await this.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.template
+            )
 
             const updatedTemplateLib = {
                 ...templateLib.content,
             }
-            const templateDoc = await this.loadTemplateDoc(
+            const templateDoc = await loadStageDoc<TemplateModel>(
+                this.user,
                 updatedTemplateLib.lib[tag]
             )
 
@@ -263,7 +347,10 @@ export default class CeramicTemplateAPI {
      */
     unarchiveTemplate = async (templateStreamID: string) => {
         try {
-            const templateLib = await this.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.template
+            )
 
             const updatedTemplateLib = {
                 ...templateLib.content,
@@ -271,7 +358,7 @@ export default class CeramicTemplateAPI {
 
             const templateDoc = ceramicInstance(this.user).loadStream(
                 templateStreamID
-            ) as unknown as TileDocument<CeramicTemplateModel>
+            ) as unknown as TileDocument<TemplateModel>
 
             updatedTemplateLib.lib[templateDoc.content.title] = templateStreamID
 

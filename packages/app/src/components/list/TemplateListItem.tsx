@@ -10,16 +10,16 @@ import {
 import { Box, DropButton, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import DropButtonListItem from './DropButtonListItem'
 import Link from 'next/link'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useRouter } from 'next/router'
 
 interface TemplateListItemProps {
     templateStreamID: string
-    template: CeramicTemplateModel
+    template: TemplateModel
     onDelete: (templateID: string, templateStreamID: string) => Promise<void>
 }
 

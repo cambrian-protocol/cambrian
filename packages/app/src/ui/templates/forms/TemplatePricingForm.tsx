@@ -8,12 +8,12 @@ import {
     Text,
     TextInput,
 } from 'grommet'
-import {
-    CeramicTemplateModel,
-    TemplatePriceModel,
-} from '@cambrian/app/models/TemplateModel'
 import { Info, Plus } from 'phosphor-react'
 import { SetStateAction, useEffect, useState } from 'react'
+import {
+    TemplateModel,
+    TemplatePriceModel,
+} from '@cambrian/app/models/TemplateModel'
 
 import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
 import ImportTokenModal from '../modals/ImportTokenModal'
@@ -30,10 +30,8 @@ import { isAddress } from '@cambrian/app/utils/helpers/validation'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplatePricingFormProps {
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel: () => void

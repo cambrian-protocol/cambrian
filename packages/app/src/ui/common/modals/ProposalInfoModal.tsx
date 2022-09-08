@@ -4,13 +4,12 @@ import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import CambrianProfileInfo from '@cambrian/app/components/info/CambrianProfileInfo'
 import { ClipboardText } from 'phosphor-react'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import FlexInputInfo from '../FlexInputInfo'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import ProposalContentInfo from '../../proposals/ProposalContentInfo'
-import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
+import { StageStackType } from '../../dashboard/ProposalsDashboardUI'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
@@ -18,18 +17,13 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 
 interface ProposalInfoModalProps {
     onClose: () => void
-    proposalStack: ProposalDocsStackType
+    stageStack: StageStackType
 }
 
-const ProposalInfoModal = ({
-    onClose,
-    proposalStack,
-}: ProposalInfoModalProps) => {
+const ProposalInfoModal = ({ onClose, stageStack }: ProposalInfoModalProps) => {
     const { currentUser } = useCurrentUserContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [proposerProfile] = useCambrianProfile(
-        proposalStack.proposalDoc.content.author
-    )
+    const [proposerProfile] = useCambrianProfile(stageStack.proposal.author)
 
     useEffect(() => {
         initCollateralToken()
@@ -38,7 +32,7 @@ const ProposalInfoModal = ({
     const initCollateralToken = async () => {
         if (currentUser) {
             const ct = await fetchTokenInfo(
-                proposalStack.proposalDoc.content.price.tokenAddress,
+                stageStack.proposal.price.tokenAddress,
                 currentUser.web3Provider
             )
             if (ct) setCollateralToken(ct)
@@ -60,20 +54,16 @@ const ProposalInfoModal = ({
                         hideDetails
                     />
                     <PlainSectionDivider />
-                    <ProposalContentInfo
-                        proposal={proposalStack.proposalDoc.content}
-                    />
+                    <ProposalContentInfo proposal={stageStack.proposal} />
                     <PlainSectionDivider />
                     <PriceInfo
-                        amount={proposalStack.proposalDoc.content.price.amount}
+                        amount={stageStack.proposal.price.amount}
                         label="Proposed Price"
                         token={collateralToken}
                     />
                     <FlexInputInfo
-                        flexInputs={
-                            proposalStack.proposalDoc.content.flexInputs
-                        }
-                        composition={proposalStack.compositionDoc.content}
+                        flexInputs={stageStack.proposal.flexInputs}
+                        composition={stageStack.composition}
                     />
                     <PlainSectionDivider />
                     <CambrianProfileInfo cambrianProfileDoc={proposerProfile} />

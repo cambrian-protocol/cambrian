@@ -7,6 +7,11 @@ import ReactFlow, {
     Controls as ReactFlowControls,
     isNode,
 } from 'react-flow-renderer'
+import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
+import {
+    loadStageDoc,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
@@ -64,10 +69,10 @@ export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
             currentUser
         ) {
             try {
-                const composition =
-                    await ceramicCompositionAPI.loadCompositionDoc(
-                        compositionStreamID
-                    )
+                const composition = await loadStageDoc<CompositionModel>(
+                    currentUser,
+                    compositionStreamID
+                )
 
                 if (
                     composition.content !== null &&
@@ -75,8 +80,10 @@ export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
                 ) {
                     setLoadedComposition(composition.content)
                     // Add composition to User DID so it shows up in his dashboard from now on
-                    const compositionLib =
-                        await ceramicCompositionAPI.loadCompositionLib()
+                    const compositionLib = await loadStageLib<StageLibType>(
+                        currentUser,
+                        StageNames.composition
+                    )
 
                     if (compositionLib.content && compositionLib.content.lib) {
                         const key = Object.keys(

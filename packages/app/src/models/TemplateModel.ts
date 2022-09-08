@@ -1,7 +1,7 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { TokenModel } from './TokenModel'
 
-export type CeramicTemplateModel = {
+export type TemplateModel = {
     title: string
     description: string
     requirements: string

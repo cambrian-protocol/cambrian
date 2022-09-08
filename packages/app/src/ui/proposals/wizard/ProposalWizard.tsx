@@ -1,21 +1,19 @@
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalDescriptionStep from './steps/ProposalDescriptionStep'
-import { ProposalDocsStackType } from '@cambrian/app/store/ProposalContext'
 import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
+import { StageStackType } from '../../dashboard/ProposalsDashboardUI'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 
 interface ProposalWizardProps {
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSaveProposal: () => Promise<boolean>
-    proposalDocStack: ProposalDocsStackType
+    stageStack: StageStackType
     proposalStreamID: string
 }
 
@@ -36,7 +34,7 @@ const ProposalWizard = ({
     proposalInput,
     setProposalInput,
     onSaveProposal,
-    proposalDocStack,
+    stageStack,
     proposalStreamID,
 }: ProposalWizardProps) => {
     const [currentStep, setCurrentStep] = useState<ProposalWizardStepsType>(
@@ -54,9 +52,7 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
-                        requirements={
-                            proposalDocStack.templateDoc.content.requirements
-                        }
+                        requirements={stageStack.template.requirements}
                         stepperCallback={setCurrentStep}
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
@@ -70,7 +66,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        template={proposalDocStack.templateDoc.content}
+                        template={stageStack.template}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
@@ -80,7 +76,7 @@ const ProposalWizard = ({
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
                         onSaveProposal={onSaveProposal}
-                        composition={proposalDocStack.compositionDoc.content}
+                        composition={stageStack.composition}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:

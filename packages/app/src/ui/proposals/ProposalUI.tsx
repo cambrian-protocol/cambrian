@@ -24,20 +24,18 @@ interface ProposalUIProps {
 }
 
 const ProposalUI = ({ currentUser }: ProposalUIProps) => {
-    const { isLoaded, proposalStack, proposalStatus } = useProposalContext()
+    const { isLoaded, stageStack, proposalStatus } = useProposalContext()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
-    const [proposerProfile] = useCambrianProfile(
-        proposalStack?.proposalDoc.content.author
-    )
+    const [proposerProfile] = useCambrianProfile(stageStack?.proposal.author)
 
     useEffect(() => {
         initCollateralToken()
-    }, [currentUser, proposalStack])
+    }, [currentUser, stageStack])
 
     const initCollateralToken = async () => {
-        if (proposalStack && currentUser) {
+        if (stageStack && currentUser) {
             const ct = await fetchTokenInfo(
-                proposalStack.proposalDoc.content.price.tokenAddress,
+                stageStack.proposal.price.tokenAddress,
                 currentUser.web3Provider
             )
             if (ct) setCollateralToken(ct)
@@ -45,27 +43,24 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     }
 
     const initMessenger =
-        (currentUser.did === proposalStack?.templateDoc.content.author ||
-            currentUser.did === proposalStack?.proposalDoc.content.author) &&
+        (currentUser.did === stageStack?.template.author ||
+            currentUser.did === stageStack?.proposal.author) &&
         proposalStatus !== ProposalStatus.Draft
 
     return (
         <>
-            {isLoaded && proposalStack === undefined ? (
+            {isLoaded && stageStack === undefined ? (
                 <Custom404Page />
             ) : (
                 <Stack anchor="bottom-right">
                     <PageLayout
-                        contextTitle={
-                            proposalStack?.proposalDoc.content.title ||
-                            'Proposal'
-                        }
+                        contextTitle={stageStack?.proposal.title || 'Proposal'}
                         kind="narrow"
                     >
-                        {proposalStack ? (
+                        {stageStack ? (
                             <Box pad="large">
                                 <ProposalHeader
-                                    proposalDocStack={proposalStack}
+                                    stageStack={stageStack}
                                     proposalStatus={proposalStatus}
                                 />
                                 <Box
@@ -75,26 +70,20 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                                 >
                                     <ProposalContentInfo
                                         hideTitle
-                                        proposal={
-                                            proposalStack.proposalDoc.content
-                                        }
+                                        proposal={stageStack.proposal}
                                     />
                                     <PlainSectionDivider />
                                     <PriceInfo
                                         amount={
-                                            proposalStack.proposalDoc.content
-                                                .price.amount
+                                            stageStack.proposal.price.amount
                                         }
                                         label="Proposed Price"
                                         token={collateralToken}
                                     />
                                     <FlexInputInfo
-                                        composition={
-                                            proposalStack.compositionDoc.content
-                                        }
+                                        composition={stageStack.composition}
                                         flexInputs={
-                                            proposalStack.proposalDoc.content
-                                                .flexInputs
+                                            stageStack.proposal.flexInputs
                                         }
                                     />
                                     <PlainSectionDivider />
@@ -108,14 +97,14 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                             <ProposalSkeleton />
                         )}
                     </PageLayout>
-                    {initMessenger && proposalStack && (
+                    {initMessenger && stageStack && (
                         <Messenger
-                            chatID={proposalStack.proposalDoc.id.toString()}
+                            chatID={stageStack.proposalStreamID}
                             currentUser={currentUser}
                             chatType={'Proposal'}
                             participantDIDs={[
-                                proposalStack.templateDoc.content.author,
-                                proposalStack.proposalDoc.content.author,
+                                stageStack.template.author,
+                                stageStack.proposal.author,
                             ]}
                         />
                     )}

@@ -1,52 +1,20 @@
-import { CAMBRIAN_LIB_NAME, StageLibType, StageNames } from './CeramicStagehand'
+import { StageLibType, StageNames } from '../../models/StageModel'
+import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from './CeramicUtils'
 import { cpLogger } from '../api/Logger.api'
-import { createStage } from './../../utils/helpers/stageHelpers'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
-import { pushUnique } from '../../utils/helpers/arrayHelper'
 
 /** 
- API functions to maintain compositions and the composition-lib
+ API functions to maintain compositions and the users composition-lib.
 */
 export default class CeramicCompositionAPI {
     user: UserType
 
     constructor(currentUser: UserType) {
         this.user = currentUser
-    }
-
-    loadCompositionLib = async () => {
-        try {
-            return (await TileDocument.deterministic(
-                ceramicInstance(this.user),
-                {
-                    controllers: [this.user.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: [StageNames.composition],
-                },
-                { pin: true }
-            )) as TileDocument<StageLibType>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    loadCompositionDoc = async (compositionStreamID: string) => {
-        try {
-            return (await TileDocument.load(
-                ceramicInstance(this.user),
-                compositionStreamID
-            )) as TileDocument<CompositionModel>
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
     }
 
     /**
@@ -79,28 +47,6 @@ export default class CeramicCompositionAPI {
         }
     }
 
-    /***
-     * Pushes compositionStreamID to recents as singleton. Removes pre-existent entry therefore keeps chronological order.
-     *
-     * @param compositionStreamID compositionStreamID
-     */
-    addRecentComposition = async (compositionStreamID: string) => {
-        try {
-            const compositionLib = await this.loadCompositionLib()
-            const updatedCompositionLibContent = { ...compositionLib.content }
-            await compositionLib.update({
-                ...updatedCompositionLibContent,
-                recents: pushUnique(
-                    compositionStreamID,
-                    updatedCompositionLibContent.recents
-                ),
-            })
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
     /**
      * Removes composition from composition-lib doc, and adds it to the composition-archive
      *
@@ -108,7 +54,10 @@ export default class CeramicCompositionAPI {
      */
     archiveComposition = async (tag: string) => {
         try {
-            const compositionLib = await this.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.composition
+            )
             const updatedCompositionLib = {
                 ...compositionLib.content,
             }
@@ -143,7 +92,10 @@ export default class CeramicCompositionAPI {
      */
     unarchiveComposition = async (compositionStreamID: string) => {
         try {
-            const compositionLib = await this.loadCompositionLib()
+            const compositionLib = await loadStageLib<StageLibType>(
+                this.user,
+                StageNames.composition
+            )
 
             const updatedCompositionLib = {
                 ...compositionLib.content,

@@ -1,10 +1,14 @@
 import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
 import { Box, Button, Heading, Spinner, Text } from 'grommet'
+import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
+import {
+    ceramicInstance,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import CreateTemplateModal from './modals/CreateTemplateModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -13,9 +17,9 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecentTemplateListItem from '@cambrian/app/components/list/RecentTemplateListItem'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface TemplatesDashboardUIProps {
@@ -23,7 +27,7 @@ interface TemplatesDashboardUIProps {
 }
 
 type TemplateHashmap = {
-    [templateStreamID: string]: TileDocument<CeramicTemplateModel>
+    [templateStreamID: string]: TileDocument<TemplateModel>
 }
 
 const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
@@ -46,7 +50,10 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
     const init = async () => {
         setIsFetching(true)
         try {
-            const templateLib = await ceramicTemplateAPI.loadTemplateLib()
+            const templateLib = await loadStageLib<StageLibType>(
+                currentUser,
+                StageNames.template
+            )
             if (
                 templateLib.content !== null &&
                 typeof templateLib.content === 'object'

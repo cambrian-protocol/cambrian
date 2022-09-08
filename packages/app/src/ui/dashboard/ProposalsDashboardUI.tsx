@@ -1,26 +1,30 @@
 import { Box, Heading, Spinner, Text } from 'grommet'
+import CeramicProposalAPI, {
+    CeramicProposalLibType,
+} from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ProposalListItem, {
     ProposalListItemType,
 } from '@cambrian/app/components/list/ProposalListItem'
+import {
+    ceramicInstance,
+    loadStageLib,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { ArrowsClockwise } from 'phosphor-react'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
-import { CeramicClient } from '@ceramicnetwork/http-client'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import RecentProposalListItem from '@cambrian/app/components/list/RecentProposalListItem'
+import { StageNames } from '@cambrian/app/models/StageModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { getProposalListItem } from '@cambrian/app/utils/helpers/proposalHelper'
 
@@ -29,18 +33,19 @@ interface ProposalsDashboardUIProps {
 }
 
 type ProposalHashmap = {
-    [proposalStreamID: string]: TileDocument<CeramicProposalModel>
+    [proposalStreamID: string]: TileDocument<ProposalModel>
 }
 
-export type ProposalStackType = {
+export type StageStackType = {
+    proposalStreamID: string
     proposalCommitID: string
-    proposal: CeramicProposalModel
-    template: CeramicTemplateModel
+    proposal: ProposalModel
+    template: TemplateModel
     composition: CompositionModel
 }
 
 export type CambrianProposalArchiveType = {
-    [proposalStreamID: string]: ProposalStackType
+    [proposalStreamID: string]: StageStackType
 }
 
 const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
@@ -62,7 +67,10 @@ const ProposalsDashboardUI = ({ currentUser }: ProposalsDashboardUIProps) => {
     const init = async () => {
         setIsFetching(true)
         try {
-            const proposalLib = await ceramicProposalAPI.loadProposalLib()
+            const proposalLib = await loadStageLib<CeramicProposalLibType>(
+                currentUser,
+                StageNames.proposal
+            )
             if (
                 proposalLib.content !== null &&
                 typeof proposalLib.content === 'object'

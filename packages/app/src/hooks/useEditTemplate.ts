@@ -1,16 +1,19 @@
+import {
+    addRecentStage,
+    loadStageDoc,
+} from './../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
-import { CeramicTemplateModel } from '../models/TemplateModel'
+import { TemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
-import { StageNames } from '../services/ceramic/CeramicStagehand'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
-import { updateStage } from '@cambrian/app/utils/helpers/stageHelpers'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
-import { ceramicInstance } from '../services/ceramic/CeramicUtils'
+import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
+import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
+import { StageNames } from '../models/StageModel'
 
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
@@ -18,8 +21,8 @@ const useEditTemplate = () => {
     const [ceramicTemplateAPI, setCeramicTemplateAPI] =
         useState<CeramicTemplateAPI>()
     const { templateStreamID } = router.query
-    const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
-    const [templateInput, setTemplateInput] = useState<CeramicTemplateModel>()
+    const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
+    const [templateInput, setTemplateInput] = useState<TemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -46,35 +49,38 @@ const useEditTemplate = () => {
             currentUser
         ) {
             try {
-                const template = await ceramicTemplateAPI.loadTemplateDoc(
+                const templateDoc = await loadStageDoc<TemplateModel>(
+                    currentUser,
                     templateStreamID
                 )
                 if (
-                    template.content !== null &&
-                    typeof template.content === 'object'
+                    templateDoc.content !== null &&
+                    typeof templateDoc.content === 'object'
                 ) {
                     // Just initialize edit paths if currentUser is the author
                     if (
                         (!router.pathname.includes('edit') &&
                             !router.pathname.includes('new')) ||
-                        currentUser.did === template.content.author
+                        currentUser.did === templateDoc.content.author
                     ) {
-                        await ceramicTemplateAPI.addRecentTemplate(
+                        await addRecentStage(
+                            currentUser,
+                            StageNames.template,
                             templateStreamID
                         )
 
                         const _composition = <CompositionModel>(
                             (
                                 await ceramicInstance(currentUser).loadStream(
-                                    template.content.composition.commitID
+                                    templateDoc.content.composition.commitID
                                 )
                             ).content
                         )
 
                         if (_composition) {
                             setComposition(_composition)
-                            setCachedTemplate(_.cloneDeep(template.content))
-                            return setTemplateInput(template.content)
+                            setCachedTemplate(_.cloneDeep(templateDoc.content))
+                            return setTemplateInput(templateDoc.content)
                         }
                     }
                 }

@@ -1,4 +1,8 @@
 import { Box, Form, FormField, Text, TextInput } from 'grommet'
+import {
+    CAMBRIAN_LIB_NAME,
+    ceramicInstance,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { CurrencyEth, Scales } from 'phosphor-react'
 import {
     ErrorMessageType,
@@ -7,14 +11,12 @@ import {
 
 import { ARBITRATOR_FACTORY_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { CAMBRIAN_LIB_NAME } from '@cambrian/app/services/ceramic/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useState } from 'react'
@@ -24,6 +26,7 @@ interface CreateArbitratorModalProps {
     currentUser: UserType
 }
 
+// TODO Create arbitrator-lib and extract functionality to there
 const CreateArbitratorModal = ({
     onClose,
     currentUser,

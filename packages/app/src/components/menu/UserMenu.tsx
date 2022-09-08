@@ -7,9 +7,6 @@ import {
     Wallet,
     WarningOctagon,
 } from 'phosphor-react'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/services/ceramic/CeramicStagehand'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -18,8 +15,10 @@ import {
 import BaseAvatar from '../avatars/BaseAvatar'
 import { Menu } from 'grommet'
 import React from 'react'
+import { StageNames } from '@cambrian/app/models/StageModel'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
+import { clearStages } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
@@ -53,7 +52,6 @@ export default function UserMenu() {
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
-            // href: '/dashboard/profile',
             onClick: () => router.push('/dashboard/profile'),
         })
         menuItems.push({
@@ -62,13 +60,12 @@ export default function UserMenu() {
             onClick: async () => {
                 if (
                     window.confirm(
-                        'Are you sure? All your compositions, templates and proposal will be gone after confirming.'
+                        'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
                     )
                 ) {
-                    const cs = new CeramicStagehand(currentUser)
-                    await cs.clearStages(StageNames.composition)
-                    await cs.clearStages(StageNames.template)
-                    await cs.clearStages(StageNames.proposal)
+                    await clearStages(currentUser, StageNames.composition)
+                    await clearStages(currentUser, StageNames.template)
+                    await clearStages(currentUser, StageNames.proposal)
                 }
             },
         })

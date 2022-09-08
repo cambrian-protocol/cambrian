@@ -1,13 +1,13 @@
 import { Article, UserCircle } from 'phosphor-react'
 import { Box, Text } from 'grommet'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import Link from 'next/link'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface RecentProposalListItemProps {
-    proposal: CeramicProposalModel
+    proposal: ProposalModel
     proposalStreamID: string
 }
 

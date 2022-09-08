@@ -2,9 +2,9 @@ import { Box, Select } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { FormField } from 'grommet'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { Text } from 'grommet'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import _ from 'lodash'
@@ -13,11 +13,9 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 
 interface TokenInputProps {
     denominationToken: TokenModel
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
-    template: CeramicTemplateModel
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
+    template: TemplateModel
 }
 
 const TokenInput = ({

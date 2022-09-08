@@ -22,7 +22,7 @@ export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
 
     const {
-        proposalDocStack,
+        stageStack,
         proposalStatus,
         proposalInput,
         setProposalInput,
@@ -50,13 +50,13 @@ export default function EditProposalPage() {
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && isEditable && proposalDocStack ? (
+            ) : proposalInput && isEditable && stageStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box pad="large" gap="medium">
                             <ProposalHeader
                                 proposalStatus={proposalStatus}
-                                proposalDocStack={proposalDocStack}
+                                stageStack={stageStack}
                             />
                             <Tabs
                                 justify="start"
@@ -75,7 +75,7 @@ export default function EditProposalPage() {
                                                     'Please be sure to include information requested by the Template description.'
                                                 }
                                             />
-                                            {proposalDocStack.templateDoc.content.requirements.trim() !==
+                                            {stageStack.template.requirements.trim() !==
                                                 '' && (
                                                 <Box gap="xsmall">
                                                     <Heading level="4">
@@ -89,9 +89,7 @@ export default function EditProposalPage() {
                                                         }}
                                                     >
                                                         {
-                                                            proposalDocStack
-                                                                .templateDoc
-                                                                .content
+                                                            stageStack.template
                                                                 .requirements
                                                         }
                                                     </Text>
@@ -115,10 +113,7 @@ export default function EditProposalPage() {
                                             />
                                         </Box>
                                         <ProposalPricingForm
-                                            template={
-                                                proposalDocStack.templateDoc
-                                                    .content
-                                            }
+                                            template={stageStack.template}
                                             proposalInput={proposalInput}
                                             setProposalInput={setProposalInput}
                                             onSubmit={handleSave}
@@ -138,8 +133,7 @@ export default function EditProposalPage() {
                                             </Box>
                                             <ProposalFlexInputsForm
                                                 composition={
-                                                    proposalDocStack
-                                                        .compositionDoc.content
+                                                    stageStack.composition
                                                 }
                                                 proposalInput={proposalInput}
                                                 setProposalInput={
@@ -165,8 +159,8 @@ export default function EditProposalPage() {
                             currentUser={currentUser}
                             chatID={proposalStreamID}
                             participantDIDs={[
-                                proposalDocStack.templateDoc.content.author,
-                                proposalDocStack.proposalDoc.content.author,
+                                stageStack.template.author,
+                                stageStack.proposal.author,
                             ]}
                             chatType={'Proposal'}
                         />

@@ -4,18 +4,16 @@ import {
     ProposalWizardStepsType,
 } from '../ProposalWizard'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalDescriptionForm from '../../forms/ProposalDescriptionForm'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SetStateAction } from 'react'
 import router from 'next/router'
 
 interface ProposalDescriptionStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSaveProposal: () => Promise<boolean>
     requirements: string
 }

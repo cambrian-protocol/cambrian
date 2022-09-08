@@ -4,18 +4,16 @@ import {
 } from '../ProposalWizard'
 
 import { Box } from 'grommet'
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalFlexInputsForm from '../../forms/ProposalFlexInputsForm'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SetStateAction } from 'react'
 
 interface ProposalFlexInputsStepProps {
     stepperCallback: (step: ProposalWizardStepsType) => void
-    proposalInput: CeramicProposalModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    proposalInput: ProposalModel
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSaveProposal: () => Promise<boolean>
     composition: CompositionModel
 }

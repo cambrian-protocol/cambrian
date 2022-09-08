@@ -1,13 +1,13 @@
 import { Article, UserCircle } from 'phosphor-react'
 import { Box, Text } from 'grommet'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import Link from 'next/link'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface RecentTemplateListItemProps {
-    template: CeramicTemplateModel
+    template: TemplateModel
     templateStreamID: string
 }
 

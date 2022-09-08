@@ -10,7 +10,6 @@ export const decodeData = (types: SolidityDataTypes[], data: any) => {
     } catch (e) {
         decoded = [`Invalid decoding`]
         cpLogger.push(e)
-        console.log(`Error decoding "${data}"`, e)
     }
     return decoded.toString()
 }
