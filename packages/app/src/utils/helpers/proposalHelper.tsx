@@ -21,7 +21,6 @@ import { mergeFlexIntoComposition } from '../transformers/Composition'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
 
 export const getProposalStatus = (
-    propopsalCommitID: string,
     proposal: ProposalModel,
     approvedStageStack?: StageStackType,
     onChainProposal?: ethers.Contract,
@@ -38,28 +37,17 @@ export const getProposalStatus = (
     } else if (proposal.isDeleted) {
         return ProposalStatus.Canceled
     } else if (receivedProposalCommits) {
-        if (
+        const proposalCommit =
             receivedProposalCommits[receivedProposalCommits.length - 1]
-                .proposalCommitID === propopsalCommitID.toString()
-        ) {
-            const proposalCommit =
-                receivedProposalCommits[receivedProposalCommits.length - 1]
 
-            if (proposalCommit.isDeclined) {
-                return ProposalStatus.Canceled
-            } else if (proposalCommit.approved) {
-                return ProposalStatus.Approved
-            } else if (proposalCommit.requestChange) {
-                return ProposalStatus.ChangeRequested
-            } else {
-                return ProposalStatus.OnReview
-            }
+        if (proposalCommit.isDeclined) {
+            return ProposalStatus.Canceled
+        } else if (proposalCommit.approved) {
+            return ProposalStatus.Approved
+        } else if (proposalCommit.requestChange) {
+            return ProposalStatus.ChangeRequested
         } else {
-            if (proposal.isSubmitted) {
-                return ProposalStatus.OnReview
-            } else {
-                return ProposalStatus.ChangeRequested
-            }
+            return ProposalStatus.OnReview
         }
     } else {
         if (proposal.isSubmitted) {
@@ -348,7 +336,6 @@ export const getProposalListItem = async (
         return {
             streamID: proposalStreamID,
             status: getProposalStatus(
-                cambrianStageStack.proposalStack.proposalCommitID,
                 cambrianStageStack.proposalStack.proposal,
                 cambrianStageStack.proposalStack,
                 onChainProposal,
@@ -413,7 +400,6 @@ export const getProposalListItem = async (
         return {
             streamID: proposalStreamID,
             status: getProposalStatus(
-                proposalDoc.commitId.toString(),
                 proposalDoc.content,
                 undefined,
                 onChainProposal,

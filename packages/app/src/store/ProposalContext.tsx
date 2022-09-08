@@ -203,6 +203,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 if (cambrianStageStackDoc.content.proposalStack) {
                     const stageStack = await loadStageStackFromID(
                         currentUser,
+                        proposalStreamID,
                         cambrianStageStackDoc.content.proposalStack
                             .proposalCommitID
                     )
@@ -217,7 +218,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                     setProposalStatus(
                         getProposalStatus(
-                            stageStack.proposalCommitID,
                             stageStack.proposal,
                             cambrianStageStackDoc.content.proposalStack,
                             onChainProposal
@@ -243,30 +243,22 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                     const stageStack = await loadStageStackFromID(
                         currentUser,
-                        proposalStreamID
+                        proposalStreamID,
+                        approvedCommitID
                     )
-
-                    const _latestProposalSubmission =
-                        getLatestProposalSubmission(
-                            proposalStreamID,
-                            templateStreamDoc.content.receivedProposals
-                        )
 
                     // Register new submitted proposal if user is template author
                     if (
-                        stageStack.proposal.isSubmitted &&
-                        _latestProposalSubmission?.proposalCommitID !==
-                            stageStack.proposalCommitID &&
-                        templateStreamDoc.content.author === currentUser.did
+                        stageStack.template.author === currentUser.did &&
+                        stageStack.proposal.isSubmitted
                     ) {
                         await ceramicTemplateAPI.registerNewProposalSubmission(
-                            proposalStreamID
+                            stageStack
                         )
                     }
 
                     setProposalStatus(
                         getProposalStatus(
-                            stageStack.proposalCommitID,
                             stageStack.proposal,
                             undefined,
                             onChainProposal,
@@ -278,6 +270,11 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     if (proposalStreamDoc.content.isSubmitted) {
                         setStageStack(stageStack)
                     } else {
+                        const _latestProposalSubmission =
+                            getLatestProposalSubmission(
+                                proposalStreamID,
+                                templateStreamDoc.content.receivedProposals
+                            )
                         if (_latestProposalSubmission) {
                             // Initialize the latest submission/commit as stageStack
                             const latestProposalCommitContent = (
