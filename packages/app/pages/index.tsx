@@ -18,7 +18,7 @@ import USPSection from '@cambrian/app/components/sections/USPSection'
 const sections: BackgroundScrollSection[] = [
     {
         id: 'control',
-        img: '/illustrations/control.svg',
+        img: '/illustrations/grid.svg',
         title: 'Choice & Control',
         icon: <ArrowsOut />,
         subTitle:
@@ -27,8 +27,8 @@ const sections: BackgroundScrollSection[] = [
         objectPosition: 'center',
     },
     {
-        img: '/illustrations/startup.svg',
         id: 'freedom',
+        img: '/illustrations/wave.svg',
         title: 'Freedom & Stability',
         icon: <ShareNetwork />,
         subTitle:
@@ -37,8 +37,8 @@ const sections: BackgroundScrollSection[] = [
         objectPosition: 'center',
     },
     {
-        img: '/illustrations/startup-launch.svg',
         id: 'consensus',
+        img: '/illustrations/twinkle.svg',
         title: 'Consensus & Cooperation',
         icon: <Handshake />,
         subTitle:
@@ -47,8 +47,8 @@ const sections: BackgroundScrollSection[] = [
         objectPosition: 'center',
     },
     {
-        img: '/illustrations/design-and-development-process.svg',
         id: 'customizable',
+        img: '/illustrations/coil.svg',
         icon: <Graph />,
         title: 'Extensible & Customizable',
         subTitle:

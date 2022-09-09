@@ -9,7 +9,12 @@ const EnderSection = () => (
         {(screenSize) => {
             return (
                 <Box justify="center" align="center" height={{ min: '30vh' }}>
+                    <Image
+                        src="/illustrations/wave.svg"
+                        style={{ position: 'absolute', opacity: '0.3' }}
+                    />
                     <Box
+                        style={{ position: 'relative' }}
                         direction="row"
                         width={'xlarge'}
                         wrap="reverse"
@@ -44,7 +49,6 @@ const EnderSection = () => (
                             </Heading>
                         </Box>
                     </Box>
-                    <Image src="illustrations/build-it.svg" height="200px" />
                 </Box>
             )
         }}
