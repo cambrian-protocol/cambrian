@@ -1,28 +1,20 @@
-import {
-    ArrowSquareIn,
-    ArrowsClockwise,
-    CircleDashed,
-    Plus,
-    TreeStructure,
-} from 'phosphor-react'
-import { Box, Heading, Text } from 'grommet'
-import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
+import { ArrowSquareIn, ArrowsClockwise, Plus } from 'phosphor-react'
+import { Box, Button, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
-import DashboardUtilityButton from '@cambrian/app/components/buttons/DashboardUtilityButton'
+import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ImportCompositionModal from './modals/ImportCompositionModal'
+import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { loadStageLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 
 interface CompositionsDashboardUIProps {
     currentUser: UserType
@@ -53,13 +45,9 @@ const CompositionsDashboardUI = ({
     const init = async () => {
         setIsFetching(true)
         try {
-            const compositionLib = await loadStageLib<StageLibType>(
-                currentUser,
-                StageNames.composition
-            )
-
-            if (compositionLib.content && compositionLib.content.lib) {
-                setCompositions(compositionLib.content.lib)
+            const stagesLib = await loadStagesLib(currentUser)
+            if (stagesLib.content && stagesLib.content.compositions) {
+                setCompositions(stagesLib.content.compositions.lib)
             } else {
                 setCompositions({})
             }
@@ -83,59 +71,43 @@ const CompositionsDashboardUI = ({
 
     return (
         <>
-            <PageLayout kind="narrow" contextTitle="Compositions">
+            <Box fill gap="medium" pad={{ top: 'medium' }}>
+                <DashboardHeader
+                    title="Composition Management"
+                    description="Create, import or work on your compositions here"
+                    controls={[
+                        <Button
+                            secondary
+                            size="small"
+                            label="New Composition"
+                            icon={<Plus />}
+                            onClick={toggleShowCreateCompositionModal}
+                        />,
+                        <Button
+                            secondary
+                            size="small"
+                            label="Import Composition"
+                            icon={<ArrowSquareIn />}
+                            onClick={toggleShowLoadCompositionModal}
+                        />,
+                        <LoaderButton
+                            secondary
+                            isLoading={isFetching}
+                            icon={<ArrowsClockwise />}
+                            onClick={() => {
+                                init()
+                            }}
+                        />,
+                    ]}
+                />
                 <Box fill>
-                    <Box height={{ min: 'auto' }}>
-                        <Box pad="large">
-                            <Heading level="2">Composition Management</Heading>
-                            <Text color="dark-4">
-                                Create, Import or Work on your compositions here
-                            </Text>
-                        </Box>
-                        <Box
-                            direction="row"
-                            height={{ min: 'auto' }}
-                            wrap
-                            pad={{ horizontal: 'large' }}
-                        >
-                            <DashboardUtilityButton
-                                label="New Composition"
-                                primaryIcon={<TreeStructure />}
-                                secondaryIcon={<Plus />}
-                                onClick={toggleShowCreateCompositionModal}
-                            />
-                            <DashboardUtilityButton
-                                label="Import composition"
-                                primaryIcon={<ArrowSquareIn />}
-                                onClick={toggleShowLoadCompositionModal}
-                            />
-                        </Box>
-                        <Box pad={'large'} gap="small">
-                            <Box
-                                direction="row"
-                                align="center"
-                                justify="between"
-                            >
-                                <Heading level="4">Your Compositions</Heading>
-                                <LoaderButton
-                                    isLoading={isFetching}
-                                    icon={<ArrowsClockwise />}
-                                    onClick={() => {
-                                        init()
-                                    }}
-                                />
-                            </Box>
-                            <PlainSectionDivider />
-                        </Box>
-                    </Box>
-                    {compositions ? (
+                    <Text color={'dark-4'}>
+                        Your Compositions ({Object.keys(compositions).length})
+                    </Text>
+                    <Box pad={{ top: 'medium' }}>
+                        {compositions &&
                         Object.keys(compositions).length > 0 ? (
-                            <Box
-                                direction="row"
-                                wrap
-                                height={{ min: 'auto' }}
-                                pad={{ horizontal: 'medium' }}
-                            >
+                            <Box direction="row" wrap>
                                 {Object.keys(compositions).map((tag) => {
                                     const streamID = compositions[tag]
                                     return (
@@ -151,24 +123,15 @@ const CompositionsDashboardUI = ({
                                 })}
                             </Box>
                         ) : (
-                            <Box
-                                fill
-                                justify="center"
-                                align="center"
-                                gap="medium"
-                            >
-                                <CircleDashed size="32" />
-                                <Text size="small" color="dark-4">
-                                    You don't have any compositions yet
-                                </Text>
-                            </Box>
-                        )
-                    ) : (
-                        <></>
-                    )}
-                    <Box pad="large" />
+                            <ListSkeleton
+                                isFetching={isFetching}
+                                subject="compositions"
+                            />
+                        )}
+                    </Box>
                 </Box>
-            </PageLayout>
+                <Box pad="large" />
+            </Box>
             {showCreateCompositionModal && (
                 <CreateCompositionModal
                     ceramicCompositionAPI={ceramicCompositionAPI}

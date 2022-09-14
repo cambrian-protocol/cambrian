@@ -14,12 +14,10 @@ import {
 } from '../utils/helpers/proposalHelper'
 
 import { CAMBRIAN_DID } from 'packages/app/config'
-import CeramicProposalAPI from '../services/ceramic/CeramicProposalAPI'
 import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
-import { StageNames } from '../models/StageModel'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { TemplateModel } from '../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -51,7 +49,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             currentUser.signer,
             currentUser.chainId
         )
-        const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
         const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
 
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
@@ -118,19 +115,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const updateProposalLib = async () => {
             if (stageStack && proposalStatus !== ProposalStatus.Unknown) {
-                await addRecentStage(
-                    currentUser,
-                    StageNames.proposal,
-                    proposalStreamID
-                )
-                if (
-                    stageStack.template.author === currentUser.did &&
-                    proposalStatus !== ProposalStatus.Canceled
-                ) {
-                    await ceramicProposalAPI.addReceivedProposal(
-                        proposalStreamID
-                    )
-                }
+                await addRecentStage(currentUser, proposalStreamID)
             }
         }
 

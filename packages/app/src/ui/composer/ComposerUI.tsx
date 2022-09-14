@@ -7,10 +7,9 @@ import ReactFlow, {
     Controls as ReactFlowControls,
     isNode,
 } from 'react-flow-renderer'
-import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
 import {
     loadStageDoc,
-    loadStageLib,
+    loadStagesLib,
 } from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
@@ -80,18 +79,16 @@ export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
                 ) {
                     setLoadedComposition(composition.content)
                     // Add composition to User DID so it shows up in his dashboard from now on
-                    const compositionLib = await loadStageLib<StageLibType>(
-                        currentUser,
-                        StageNames.composition
-                    )
+                    const stagesLib = await loadStagesLib(currentUser)
 
-                    if (compositionLib.content && compositionLib.content.lib) {
+                    if (stagesLib.content && stagesLib.content.compositions) {
                         const key = Object.keys(
-                            compositionLib.content.lib
+                            stagesLib.content.compositions.lib
                         ).find(
                             (streamKey) =>
-                                compositionLib.content.lib[streamKey] ===
-                                compositionStreamID
+                                stagesLib.content.compositions.lib[
+                                    streamKey
+                                ] === compositionStreamID
                         )
                         if (!key) {
                             setShowDuplicateCompositionCTA(true)

@@ -181,18 +181,28 @@ export const cpTheme = deepMerge(grommet, {
             size: '20px',
         },
     },
-    tabs: {
-        header: {
-            background: 'background-front',
-            border: { side: 'all' },
-            extend: `
-            border-radius: 5px;
-            padding: 10px;
-            `,
-        },
-    },
     tab: {
-        border: false,
-        color: 'dark-4',
+        color: colors['dark-4'],
+        border: {
+            side: 'bottom',
+            color: 'border',
+            active: {
+                color: 'brand',
+            },
+            hover: {
+                color: 'border',
+            },
+        },
+        hover: {
+            background: 'background-front',
+            color: 'white',
+            extend: 'border-radius: 5px 5px 0px 0px ;',
+        },
+        pad: { bottom: 'small', top: 'small', horizontal: 'medium' },
+        margin: {
+            horizontal: 'none',
+        },
+        active: { color: 'white' },
     },
+    accordion: { border: { color: 'transparent' } },
 })

@@ -3,18 +3,19 @@ import {
     ReceivedProposalsHashmapType,
     TemplateModel,
 } from '../../models/TemplateModel'
-import { StageLibType, StageNames } from '../../models/StageModel'
 import {
+    archiveStage,
     ceramicInstance,
     createStage,
     loadStageDoc,
-    loadStageLib,
+    loadStagesLib,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { StageNames } from '../../models/StageModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TRILOBOT_ENDPOINT } from './../../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -292,47 +293,41 @@ export default class CeramicTemplateAPI {
         }
     }
 
+    toggleActivate = async (templateStreamID: string) => {
+        try {
+            const templateStreamDoc = await loadStageDoc<TemplateModel>(
+                this.user,
+                templateStreamID
+            )
+
+            await templateStreamDoc.update({
+                ...templateStreamDoc.content,
+                isActive: !templateStreamDoc.content.isActive,
+            })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
     /**
      * Removes template from template-lib doc and sets isActive flag to false.
      *
      * @param tag Template Title / Unique tag
      * @auth Done by Templater
      */
-    archiveTemplate = async (tag: string) => {
+    archiveTemplate = async (tag: string, templateStreamID: string) => {
         try {
-            const templateLib = await loadStageLib<StageLibType>(
+            const templateStreamDoc = await loadStageDoc<TemplateModel>(
                 this.user,
-                StageNames.template
+                templateStreamID
             )
-
-            const updatedTemplateLib = {
-                ...templateLib.content,
-            }
-            const templateDoc = await loadStageDoc<TemplateModel>(
-                this.user,
-                updatedTemplateLib.lib[tag]
-            )
-
-            if (!updatedTemplateLib.archive)
-                updatedTemplateLib.archive = { lib: [] }
-
-            if (!updatedTemplateLib.archive.lib)
-                updatedTemplateLib.archive = {
-                    ...updatedTemplateLib.archive,
-                    lib: [],
-                }
-
-            updatedTemplateLib.archive.lib.push(updatedTemplateLib.lib[tag])
-
-            delete updatedTemplateLib.lib[tag]
-
-            await templateDoc.update({
-                ...templateDoc.content,
+            await templateStreamDoc.update({
+                ...templateStreamDoc.content,
                 isActive: false,
             })
-            await templateLib.update({
-                ...updatedTemplateLib,
-            })
+
+            await archiveStage(this.user, tag, StageNames.template)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -346,7 +341,7 @@ export default class CeramicTemplateAPI {
      * @auth Done by Templater
      */
     unarchiveTemplate = async (templateStreamID: string) => {
-        try {
+        /*    try {
             const templateLib = await loadStageLib<StageLibType>(
                 this.user,
                 StageNames.template
@@ -373,6 +368,47 @@ export default class CeramicTemplateAPI {
                     ),
                 },
             })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        } */
+    }
+
+    removeReceivedProposal = async (
+        proposalStreamID: string,
+        type: 'DECLINE' | 'ARCHIVE'
+    ) => {
+        try {
+            const stagesLib = await loadStagesLib(this.user)
+
+            const updatedStagesLib = {
+                ...stagesLib.content,
+            }
+
+            const proposalDoc = await loadStageDoc<ProposalModel>(
+                this.user,
+                proposalStreamID
+            )
+            // Set isDeclined if proposal is before approved
+            if (type === 'DECLINE') {
+                // Create new entry at receivedProposals with the flag isDeclined set to true
+                const templateDoc = await loadStageDoc<TemplateModel>(
+                    this.user,
+                    proposalDoc.content.template.streamID
+                )
+                const updatedTemplate = { ...templateDoc.content }
+                updatedTemplate.receivedProposals[proposalStreamID].push({
+                    proposalCommitID: proposalDoc.commitId.toString(),
+                    isDeclined: true,
+                })
+                await templateDoc.update(updatedTemplate)
+            }
+
+            updatedStagesLib.templates.archive.receivedProposals[
+                proposalDoc.content.title
+            ] = proposalStreamID
+
+            await stagesLib.update(updatedStagesLib)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

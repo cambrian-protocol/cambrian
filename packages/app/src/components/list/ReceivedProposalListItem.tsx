@@ -3,7 +3,7 @@ import {
     Check,
     Copy,
     DotsThree,
-    File,
+    HandPalm,
     Pen,
     XCircle,
 } from 'phosphor-react'
@@ -13,34 +13,24 @@ import { useEffect, useState } from 'react'
 import DropButtonListItem from './DropButtonListItem'
 import Link from 'next/link'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
+import { ProposalListItemType } from './ProposalListItem'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../badges/ProposalStatusBadge'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useRouter } from 'next/router'
 
-interface ProposalListItemProps {
+interface ReceivedProposalListItemProps {
     proposal: ProposalListItemType
     onRemove: (
-        proposalTag: string,
-        streamID: string,
-        type: 'CANCEL' | 'ARCHIVE'
+        proposalStreamID: string,
+        type: 'DECLINE' | 'ARCHIVE'
     ) => Promise<void>
-    showTemplateTitle?: boolean
 }
 
-export type ProposalListItemType = {
-    streamID: string
-    status: ProposalStatus
-    title: string
-    isAuthor: boolean
-    templateTitle: string
-}
-
-const ProposalListItem = ({
+const ReceivedProposalListItem = ({
     proposal,
     onRemove,
-    showTemplateTitle,
-}: ProposalListItemProps) => {
+}: ReceivedProposalListItemProps) => {
     const router = useRouter()
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
@@ -49,10 +39,11 @@ const ProposalListItem = ({
         proposal.status === ProposalStatus.ChangeRequested ||
         proposal.status === ProposalStatus.Modified
 
-    const isDeletable =
-        isEditable ||
-        proposal.status === ProposalStatus.OnReview ||
-        proposal.status === ProposalStatus.Canceled
+    const isRemoveable =
+        isEditable || proposal.status === ProposalStatus.Canceled
+
+    const isDeclinable =
+        isEditable || proposal.status === ProposalStatus.OnReview
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -95,16 +86,6 @@ const ProposalListItem = ({
                             <ProposalStatusBadge status={proposal.status} />
                         </Box>
                     </Box>
-                    {showTemplateTitle && (
-                        <Box direction="row" gap="small" pad="xsmall" wrap>
-                            <Box direction="row" align="center" gap="xsmall">
-                                <File color={cpTheme.global.colors['dark-4']} />
-                                <Text size="small" color="dark-4">
-                                    {proposal.templateTitle}
-                                </Text>
-                            </Box>
-                        </Box>
-                    )}
                 </Box>
             </Link>
             <Box direction="row" width={{ min: 'auto' }} justify="end">
@@ -144,8 +125,16 @@ const ProposalListItem = ({
                             <PlainSectionDivider />
                             <DropButtonListItem
                                 icon={
-                                    isDeletable ? (
+                                    isRemoveable ? (
                                         <XCircle
+                                            color={
+                                                cpTheme.global.colors[
+                                                    'status-error'
+                                                ]
+                                            }
+                                        />
+                                    ) : isDeclinable ? (
+                                        <HandPalm
                                             color={
                                                 cpTheme.global.colors[
                                                     'status-error'
@@ -156,12 +145,17 @@ const ProposalListItem = ({
                                         <Archive />
                                     )
                                 }
-                                label={isDeletable ? 'Cancel' : 'Archive'}
+                                label={
+                                    isRemoveable
+                                        ? 'Remove'
+                                        : isDeclinable
+                                        ? 'Decline'
+                                        : 'Archive'
+                                }
                                 onClick={() =>
                                     onRemove(
-                                        proposal.title,
                                         proposal.streamID,
-                                        isDeletable ? 'CANCEL' : 'ARCHIVE'
+                                        isDeclinable ? 'DECLINE' : 'ARCHIVE'
                                     )
                                 }
                             />
@@ -175,4 +169,4 @@ const ProposalListItem = ({
     )
 }
 
-export default ProposalListItem
+export default ReceivedProposalListItem

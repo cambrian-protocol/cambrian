@@ -34,7 +34,7 @@ export const getProposalStatus = (
         }
     } else if (approvedStageStack) {
         return ProposalStatus.Approved
-    } else if (proposal.isDeleted) {
+    } else if (proposal.isCanceled) {
         return ProposalStatus.Canceled
     } else if (receivedProposalCommits) {
         const proposalCommit =
