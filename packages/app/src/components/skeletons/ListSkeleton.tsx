@@ -1,5 +1,6 @@
-import { Box, Spinner, Text } from 'grommet'
+import { Box, Text } from 'grommet'
 
+import BaseSkeletonBox from './BaseSkeletonBox'
 import { CircleDashed } from 'phosphor-react'
 import { cpTheme } from '@cambrian/app/theme/theme'
 
@@ -10,25 +11,30 @@ interface ListSkeletonProps {
 
 const ListSkeleton = ({ isFetching, subject }: ListSkeletonProps) => {
     return (
-        <Box
-            fill
-            justify="center"
-            align="center"
-            round="xsmall"
-            border
-            height={{ min: 'small' }}
-        >
+        <>
             {isFetching ? (
-                <Spinner />
+                <Box gap="small">
+                    <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                </Box>
             ) : (
-                <Box direction="row" gap="small">
+                <Box
+                    direction="row"
+                    gap="small"
+                    border
+                    height={{ min: 'xsmall' }}
+                    justify="center"
+                    align="center"
+                    round="xsmall"
+                >
                     <CircleDashed color={cpTheme.global.colors['dark-4']} />
                     <Text size="small" color="dark-4">
                         No {subject} found
                     </Text>
                 </Box>
             )}
-        </Box>
+        </>
     )
 }
 
