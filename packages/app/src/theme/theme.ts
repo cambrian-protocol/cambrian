@@ -37,6 +37,7 @@ const colors: any = {
     'status-arbitration': '#be8b32',
     'status-executed': '#59b846',
     'status-proposed': '#aca0d6',
+    'background-skeleton': '#80808026',
 }
 
 export const cpTheme = deepMerge(grommet, {

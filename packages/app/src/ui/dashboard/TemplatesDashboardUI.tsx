@@ -1,14 +1,12 @@
 import { Accordion, Box, Button, Text } from 'grommet'
-import { ArrowsClockwise, FilePlus } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import CreateTemplateModal from './modals/CreateTemplateModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { FilePlus } from 'phosphor-react'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TemplateStagesLibType } from '@cambrian/app/models/StageModel'
@@ -30,9 +28,7 @@ const TemplatesDashboardUI = ({
     currentUser,
     templatesLib,
 }: TemplatesDashboardUIProps) => {
-    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [templates, setTemplates] = useState<TemplateHashmap>({})
-
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -42,38 +38,27 @@ const TemplatesDashboardUI = ({
         setShowCreateTemplateModal(!showCreateTemplateModal)
 
     useEffect(() => {
-        init()
+        fetchTemplates()
     }, [templatesLib])
 
-    const init = async () => {
-        setIsFetching(true)
-        if (templatesLib) {
-            setTemplates(
-                (await ceramicInstance(currentUser).multiQuery(
-                    Object.values(templatesLib.lib).map((t) => {
-                        return { streamId: t }
-                    })
-                )) as TemplateHashmap
-            )
-        }
-        setIsFetching(false)
-    }
-
-    const onArchiveTemplate = async (
-        templateTag: string,
-        templateStreamID: string
-    ) => {
+    const fetchTemplates = async () => {
         try {
-            await ceramicTemplateAPI.archiveTemplate(
-                templateTag,
-                templateStreamID
-            )
-            const updatedTemplates = { ...templates }
-            delete updatedTemplates[templateStreamID]
-            setTemplates(updatedTemplates)
+            setIsFetching(true)
+            if (templatesLib) {
+                setTemplates(
+                    (await ceramicInstance(currentUser).multiQuery(
+                        Object.values(templatesLib.lib).map((t) => {
+                            return { streamId: t }
+                        })
+                    )) as TemplateHashmap
+                )
+            } else {
+                setTemplates({})
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
+        setIsFetching(false)
     }
 
     return (
@@ -90,20 +75,12 @@ const TemplatesDashboardUI = ({
                             icon={<FilePlus />}
                             onClick={toggleShowCreateTemplateModal}
                         />,
-                        <LoaderButton
-                            secondary
-                            isLoading={isFetching}
-                            icon={<ArrowsClockwise />}
-                            onClick={() => {
-                                init()
-                            }}
-                        />,
                     ]}
                 />
                 <Box fill>
                     <Text color={'dark-4'}>
                         Your Templates (
-                        {templates ? Object.keys(templates).length : 0})
+                        {templates && Object.keys(templates).length})
                     </Text>
                     <Box pad={{ top: 'medium' }}>
                         {templates && Object.keys(templates).length > 0 ? (
@@ -112,12 +89,8 @@ const TemplatesDashboardUI = ({
                                     {Object.keys(templates).map(
                                         (templateStreamID) => (
                                             <TemplateListItem
-                                                receivedProposalsArchive={
-                                                    templatesLib?.archive
-                                                        .receivedProposals
-                                                }
-                                                currentUser={currentUser}
                                                 key={templateStreamID}
+                                                currentUser={currentUser}
                                                 templateStreamID={
                                                     templateStreamID
                                                 }
@@ -125,7 +98,10 @@ const TemplatesDashboardUI = ({
                                                     templates[templateStreamID]
                                                         .content
                                                 }
-                                                onArchive={onArchiveTemplate}
+                                                receivedProposalsArchive={
+                                                    templatesLib?.archive
+                                                        .receivedProposals
+                                                }
                                             />
                                         )
                                     )}

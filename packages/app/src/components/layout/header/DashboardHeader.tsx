@@ -3,7 +3,7 @@ import { Box, Heading, Text } from 'grommet'
 interface DashboardHeaderProps {
     title: string
     description: string
-    controls: JSX.Element[]
+    controls?: JSX.Element[]
 }
 
 const DashboardHeader = ({
@@ -23,11 +23,13 @@ const DashboardHeader = ({
                 <Heading level="2">{title}</Heading>
                 <Text color="dark-4">{description}</Text>
             </Box>
-            <Box direction="row" gap="small" pad={{ vertical: 'small' }}>
-                {controls.map((c, idx) => (
-                    <Box key={idx}>{c}</Box>
-                ))}
-            </Box>
+            {controls && (
+                <Box direction="row" gap="small" pad={{ vertical: 'small' }}>
+                    {controls.map((c, idx) => (
+                        <Box key={idx}>{c}</Box>
+                    ))}
+                </Box>
+            )}
         </Box>
     )
 }

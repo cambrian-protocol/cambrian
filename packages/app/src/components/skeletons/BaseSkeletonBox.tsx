@@ -1,16 +1,24 @@
 import { Box, BoxProps, Spinner } from 'grommet'
 
-const BaseSkeletonBox = ({ height }: BoxProps) => {
+type BaseSkeletonBoxProps = BoxProps & {
+    showSpinner?: boolean
+}
+
+const BaseSkeletonBox = ({
+    height,
+    width,
+    showSpinner,
+}: BaseSkeletonBoxProps) => {
     return (
         <Box
             height={height}
-            background={'background-contrast-hover'}
+            width={width}
+            background={'background-skeleton'}
             round="xsmall"
-            style={{ opacity: '0.5' }}
             justify="center"
             align="center"
         >
-            <Spinner />
+            {showSpinner && <Spinner />}
         </Box>
     )
 }

@@ -18,8 +18,8 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 
 interface DashboardUIProps {
@@ -28,28 +28,31 @@ interface DashboardUIProps {
 
 const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [stagesLibDoc, setStagesLibDoc] =
-        useState<TileDocument<CambrianStagesLibType>>()
+    const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
+    const [isFetching, setIsFetching] = useState(false)
 
     useEffect(() => {
-        initStagesLib()
+        initDocSubsciption()
     }, [])
 
-    /* TODO init Doc-Listeners     
-    useEffect(() => {
-        if (stagesLibDoc) {
-            const stagesLibSub = stagesLibDoc.subscribe(async () => {
-                initStagesLib()
-            })
-            return () => {
-                stagesLibSub.unsubscribe()
-            }
+    const initDocSubsciption = async () => {
+        const stagesLib = await loadStagesLib(currentUser)
+        const sub = stagesLib.subscribe(() => {
+            initStagesLib()
+        })
+        return () => {
+            sub.unsubscribe()
         }
-    }, [stagesLibDoc]) */
+    }
 
     const initStagesLib = async () => {
-        const stagesLib = await loadStagesLib(currentUser)
-        setStagesLibDoc(stagesLib)
+        setIsFetching(true)
+        try {
+            setStagesLib((await loadStagesLib(currentUser)).content)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+        }
+        setIsFetching(false)
     }
 
     return (
@@ -68,19 +71,20 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                             <Tab title="Templates" icon={<File />}>
                                 <TemplatesDashboardUI
                                     currentUser={currentUser}
-                                    templatesLib={
-                                        stagesLibDoc?.content.templates
-                                    }
+                                    templatesLib={stagesLib?.templates}
                                 />
                             </Tab>
                             <Tab title="Proposals" icon={<ClipboardText />}>
                                 <ProposalsDashboardUI
                                     currentUser={currentUser}
+                                    proposalsLib={stagesLib?.proposals}
                                 />
                             </Tab>
                             <Tab title="Compositions" icon={<TreeStructure />}>
                                 <CompositionsDashboardUI
+                                    isFetching={isFetching}
                                     currentUser={currentUser}
+                                    compositionsLib={stagesLib?.compositions}
                                 />
                             </Tab>
                             <Tab title="Arbitration" icon={<Scales />}>

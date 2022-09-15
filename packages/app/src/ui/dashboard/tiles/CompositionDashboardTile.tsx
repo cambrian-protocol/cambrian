@@ -7,6 +7,7 @@ import {
     CardHeader,
     DropButton,
     Heading,
+    Spinner,
     Text,
 } from 'grommet'
 import {
@@ -21,6 +22,7 @@ import {
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -37,13 +39,13 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 interface CompositionDashboardTileProps {
     compositionTag: string
     compositionStreamID: string
-    onDelete: () => void
+    ceramicCompositionAPI: CeramicCompositionAPI
 }
 
 const CompositionDashboardTile = ({
     compositionTag,
     compositionStreamID,
-    onDelete,
+    ceramicCompositionAPI,
 }: CompositionDashboardTileProps) => {
     const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
@@ -53,6 +55,7 @@ const CompositionDashboardTile = ({
         useState(false)
     const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [isRemoving, setIsRemoving] = useState(false)
 
     const toggleShowRenameCompositionModal = () =>
         setShowRenameCompositionModal(!showRenameCompositionModal)
@@ -82,6 +85,16 @@ const CompositionDashboardTile = ({
             }
         } catch (e) {
             setIsCreatingTemplate(false)
+            setErrorMessage(await cpLogger.push(e))
+        }
+    }
+
+    const onRemove = async (compositionID: string) => {
+        try {
+            setIsRemoving(true)
+            await ceramicCompositionAPI.archiveComposition(compositionID)
+        } catch (e) {
+            setIsRemoving(false)
             setErrorMessage(await cpLogger.push(e))
         }
     }
@@ -116,16 +129,28 @@ const CompositionDashboardTile = ({
                                         <PlainSectionDivider />
                                         <DropButtonListItem
                                             icon={
-                                                <Trash
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'status-error'
-                                                        ]
-                                                    }
-                                                />
+                                                isRemoving ? (
+                                                    <Spinner />
+                                                ) : (
+                                                    <Trash
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'status-error'
+                                                            ]
+                                                        }
+                                                    />
+                                                )
                                             }
                                             label="Remove"
-                                            onClick={onDelete}
+                                            onClick={
+                                                isRemoving
+                                                    ? undefined
+                                                    : () =>
+                                                          onRemove(
+                                                              compositionTag
+                                                          )
+                                            }
                                         />
                                     </Box>
                                 }

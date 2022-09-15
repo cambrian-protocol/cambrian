@@ -1,7 +1,7 @@
-import { ArrowSquareIn, ArrowsClockwise, Plus } from 'phosphor-react'
+import { ArrowSquareIn, Plus } from 'phosphor-react'
 import { Box, Button, Text } from 'grommet'
-import { useEffect, useState } from 'react'
 
+import { BaseStagesLibType } from '@cambrian/app/models/StageModel'
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
@@ -10,64 +10,32 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ImportCompositionModal from './modals/ImportCompositionModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { useState } from 'react'
 
 interface CompositionsDashboardUIProps {
     currentUser: UserType
+    compositionsLib?: BaseStagesLibType
+    isFetching: boolean
 }
 
 const CompositionsDashboardUI = ({
     currentUser,
+    compositionsLib,
+    isFetching,
 }: CompositionsDashboardUIProps) => {
     const ceramicCompositionAPI = new CeramicCompositionAPI(currentUser)
 
-    const [compositions, setCompositions] = useState<StringHashmap>({})
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [showLoadCompositionModal, setShowLoadCompositionModal] =
         useState(false)
     const [showCreateCompositionModal, setShowCreateCompositionModal] =
         useState(false)
-    const [isFetching, setIsFetching] = useState(false)
 
     const toggleShowLoadCompositionModal = () =>
         setShowLoadCompositionModal(!showLoadCompositionModal)
     const toggleShowCreateCompositionModal = () =>
         setShowCreateCompositionModal(!showCreateCompositionModal)
-
-    useEffect(() => {
-        init()
-    }, [])
-
-    const init = async () => {
-        setIsFetching(true)
-        try {
-            const stagesLib = await loadStagesLib(currentUser)
-            if (stagesLib.content && stagesLib.content.compositions) {
-                setCompositions(stagesLib.content.compositions.lib)
-            } else {
-                setCompositions({})
-            }
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-        setIsFetching(false)
-    }
-
-    const onDeleteComposition = async (compositionID: string) => {
-        try {
-            if (await ceramicCompositionAPI.archiveComposition(compositionID)) {
-                const updatedCompositions = { ...compositions }
-                delete updatedCompositions[compositionID]
-                setCompositions(updatedCompositions)
-            }
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-    }
 
     return (
         <>
@@ -90,33 +58,28 @@ const CompositionsDashboardUI = ({
                             icon={<ArrowSquareIn />}
                             onClick={toggleShowLoadCompositionModal}
                         />,
-                        <LoaderButton
-                            secondary
-                            isLoading={isFetching}
-                            icon={<ArrowsClockwise />}
-                            onClick={() => {
-                                init()
-                            }}
-                        />,
                     ]}
                 />
                 <Box fill>
                     <Text color={'dark-4'}>
-                        Your Compositions ({Object.keys(compositions).length})
+                        Your Compositions (
+                        {compositionsLib &&
+                            Object.keys(compositionsLib.lib).length}
+                        )
                     </Text>
                     <Box pad={{ top: 'medium' }}>
-                        {compositions &&
-                        Object.keys(compositions).length > 0 ? (
+                        {compositionsLib?.lib &&
+                        Object.keys(compositionsLib.lib).length > 0 ? (
                             <Box direction="row" wrap>
-                                {Object.keys(compositions).map((tag) => {
-                                    const streamID = compositions[tag]
+                                {Object.keys(compositionsLib.lib).map((tag) => {
+                                    const streamID = compositionsLib.lib[tag]
                                     return (
                                         <CompositionDashboardTile
                                             key={tag}
                                             compositionTag={tag}
                                             compositionStreamID={streamID}
-                                            onDelete={() =>
-                                                onDeleteComposition(tag)
+                                            ceramicCompositionAPI={
+                                                ceramicCompositionAPI
                                             }
                                         />
                                     )

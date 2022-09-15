@@ -1,4 +1,4 @@
-import { Box, Text } from 'grommet'
+import { Box, Spinner, Text } from 'grommet'
 import {
     PROPOSAL_STATUS_INFO,
     ProposalStatus,
@@ -7,7 +7,7 @@ import {
 import { IconContext } from 'phosphor-react'
 
 interface ProposalStatusBadgeProps {
-    status: ProposalStatus
+    status?: ProposalStatus
 }
 
 const ProposalStatusBadge = ({ status }: ProposalStatusBadgeProps) => {
@@ -16,14 +16,26 @@ const ProposalStatusBadge = ({ status }: ProposalStatusBadgeProps) => {
             direction="row"
             pad={{ horizontal: 'small', vertical: 'xxsmall' }}
             round="xsmall"
-            background={PROPOSAL_STATUS_INFO[status].color}
+            background={
+                status
+                    ? PROPOSAL_STATUS_INFO[status].color
+                    : 'background-skeleton'
+            }
             align="center"
             gap="xsmall"
+            border
         >
-            <IconContext.Provider value={{ size: '16' }}>
-                {PROPOSAL_STATUS_INFO[status].icon}
-            </IconContext.Provider>
-            <Text size="small">{PROPOSAL_STATUS_INFO[status].name}</Text>
+            {status ? (
+                <IconContext.Provider value={{ size: '16' }}>
+                    {PROPOSAL_STATUS_INFO[status].icon}
+                </IconContext.Provider>
+            ) : (
+                <Spinner size="xsmall" />
+            )}
+
+            <Text size="small">
+                {status ? PROPOSAL_STATUS_INFO[status].name : 'LOADING'}
+            </Text>
         </Box>
     )
 }
