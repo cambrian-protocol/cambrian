@@ -1,49 +1,22 @@
-import { Box, Spinner } from 'grommet'
+import BaseSkeletonBox from './BaseSkeletonBox'
+import { Box } from 'grommet'
+import PlainSectionDivider from '../sections/PlainSectionDivider'
 
-// WIP
 const ProposalSkeleton = () => {
     return (
         <Box height="large" pad="large" gap="medium">
-            <Box
-                background={'background-contrast-hover'}
-                round="xsmall"
-                height={'small'}
-                style={{ opacity: '0.5' }}
-                justify="center"
-                align="center"
-            >
-                <Spinner />
+            <BaseSkeletonBox height={'xxsmall'} width={'40%'} />
+            <BaseSkeletonBox height={'xsmall'} width={'50%'} />
+            <Box align="end">
+                <BaseSkeletonBox height={'xxsmall'} width={'medium'} />
             </Box>
-            <Box
-                background={'background-contrast-hover'}
-                fill
-                round="xsmall"
-                height={'medium'}
-                style={{ opacity: '0.5' }}
-                justify="center"
-                align="center"
-            >
-                <Spinner />
-            </Box>
-            <Box
-                background={'background-contrast-hover'}
-                round="xsmall"
-                height={'small'}
-                style={{ opacity: '0.5' }}
-                justify="center"
-                align="center"
-            >
-                <Spinner />
-            </Box>
-            <Box
-                background={'background-contrast-hover'}
-                round="xsmall"
-                height={'small'}
-                style={{ opacity: '0.5' }}
-                justify="center"
-                align="center"
-            >
-                <Spinner />
+            <PlainSectionDivider />
+            <BaseSkeletonBox height={'small'} width={'100%'} />
+            <BaseSkeletonBox height={'small'} width={'90%'} />
+            <PlainSectionDivider />
+            <Box direction="row" gap="medium">
+                <BaseSkeletonBox height={'xsmall'} width={'xsmall'} />
+                <BaseSkeletonBox height={'xsmall'} width={'50%'} />
             </Box>
         </Box>
     )

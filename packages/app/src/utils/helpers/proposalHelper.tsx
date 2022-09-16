@@ -3,6 +3,10 @@ import {
     ReceivedProposalsHashmapType,
     TemplateModel,
 } from '@cambrian/app/models/TemplateModel'
+import {
+    ceramicInstance,
+    loadCommitWorkaround,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import { CAMBRIAN_DID } from 'packages/app/config'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
@@ -15,7 +19,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../transformers/Composition'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
@@ -380,17 +383,18 @@ export const fetchProposalInfo = async (
                 templateStreamContent.receivedProposals
             )
             if (latestProposalSubmission) {
-                proposalDoc = await ceramicInstance(currentUser).loadStream(
+                proposalDoc = await loadCommitWorkaround<ProposalModel>(
+                    currentUser,
                     latestProposalSubmission.proposalCommitID
                 )
             }
         }
-
         const templateCommitContent = (
-            await ceramicInstance(currentUser).loadStream(
+            await loadCommitWorkaround<TemplateModel>(
+                currentUser,
                 proposalDoc.content.template.commitID
             )
-        ).content as TemplateModel
+        ).content
 
         return {
             title: proposalDoc.content.title,

@@ -1,10 +1,14 @@
+import {
+    CAMBRIAN_DID,
+    CERAMIC_NODE_ENDPOINT,
+    TRILOBOT_ENDPOINT,
+} from 'packages/app/config'
 import { StageModel, StageNames } from '../../models/StageModel'
 import {
     getUniqueTag,
     updateKeyFromValue,
 } from '@cambrian/app/utils/helpers/hashmapHelper'
 
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import { CambrianStagesLibType } from './../../models/StageModel'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -17,6 +21,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
+import { SubmissionModel } from '@cambrian/app/ui/moduleUIs/IPFSTextSubmitter/models/SubmissionModel'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -31,6 +36,44 @@ export const ceramicInstance = (currentUser: UserType) => {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     ceramicClient.did = currentUser.session.did
     return ceramicClient
+}
+
+// NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
+export const loadCommitWorkaround = async <T>(
+    currentUser: UserType,
+    commitID: string
+): Promise<TileDocument<T>> => {
+    try {
+        return (await TileDocument.load(
+            ceramicInstance(currentUser),
+            commitID
+        )) as TileDocument<T>
+    } catch (e) {
+        console.warn('Loading Cermic Commit failed. Fallback will be used.', e)
+    }
+
+    try {
+        const cambrianCommit = (await TileDocument.deterministic(
+            ceramicInstance(currentUser),
+            {
+                controllers: [CAMBRIAN_DID],
+                family: 'cambrian-commits',
+                tags: [commitID],
+            }
+        )) as TileDocument<T>
+
+        if (
+            cambrianCommit.content !== null &&
+            typeof cambrianCommit.content === 'object'
+        ) {
+            return cambrianCommit
+        } else {
+            throw new Error(`Provided CommitID not found ${commitID}`)
+        }
+    } catch (e) {
+        cpLogger.push(e)
+        throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+    }
 }
 
 export const loadStageDoc = async <T>(
@@ -74,7 +117,6 @@ export const loadStagesLib = async (currentUser: UserType) => {
 /**
  * Moves stage from provided stagesLib to its archive.
  *
- *
  * @param currentUser
  * @param tag
  * @param stageName
@@ -107,11 +149,8 @@ export const archiveStage = async (
         default:
             break
     }
-    console.log('Updated StagesLib', updatedStagesLib)
     await stagesLib.update(updatedStagesLib)
 }
-
-export const unarchiveStage = async () => {}
 
 /**
  * Loads the corresponding proposal, template and composition from the passed proposalCommitID and stores the provided streamID for convience.
@@ -125,17 +164,30 @@ export const loadStageStackFromID = async (
     proposalStreamID: string,
     proposalCommitID?: string
 ): Promise<StageStackType> => {
-    const cs = ceramicInstance(currentUser)
-    const proposalDoc = (await cs.loadStream(
-        proposalCommitID ? proposalCommitID : proposalStreamID
-    )) as TileDocument<ProposalModel>
+    const proposalDoc = <TileDocument<ProposalModel>>(
+        await loadCommitWorkaround(
+            currentUser,
+            proposalCommitID ? proposalCommitID : proposalStreamID
+        )
+    )
 
-    const template = (
-        await cs.loadStream(proposalDoc.content.template.commitID)
-    ).content as TemplateModel
+    const templateContent = <TemplateModel>(
+        (
+            await loadCommitWorkaround(
+                currentUser,
+                proposalDoc.content.template.commitID
+            )
+        ).content
+    )
 
-    const composition = (await cs.loadStream(template.composition.commitID))
-        .content as CompositionModel
+    const compositionContent = <CompositionModel>(
+        (
+            await loadCommitWorkaround(
+                currentUser,
+                templateContent.composition.commitID
+            )
+        ).content
+    )
 
     return {
         proposalStreamID: proposalStreamID,
@@ -143,8 +195,8 @@ export const loadStageStackFromID = async (
             ? proposalCommitID
             : proposalDoc.commitId.toString(),
         proposal: proposalDoc.content,
-        template: template,
-        composition: composition,
+        template: templateContent,
+        composition: compositionContent,
     }
 }
 
@@ -378,4 +430,30 @@ export const addRecentStage = async (
 export const clearStagesLib = async (currentUser: UserType) => {
     const stagesLib = await loadStagesLib(currentUser)
     await stagesLib.update(initialStagesLib)
+}
+
+// NOTE: Temporary workaround until Cermics Bugfix is merged.
+export const saveCambrianCommitData = async (
+    currentUser: UserType,
+    commitID: string,
+    data: CompositionModel | ProposalModel | TemplateModel | SubmissionModel
+) => {
+    try {
+        const res = await fetch(`${TRILOBOT_ENDPOINT}/saveCommit`, {
+            method: 'POST',
+            body: JSON.stringify({
+                id: commitID,
+                data: data,
+                session: currentUser.session.serialize(),
+            }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+
+        if (res.status !== 200)
+            throw new Error('TriloBot could not save commit.')
+    } catch (e) {
+        cpLogger.push(e)
+    }
 }

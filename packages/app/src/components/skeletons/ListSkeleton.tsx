@@ -15,18 +15,16 @@ const ListSkeleton = ({ isFetching, subject }: ListSkeletonProps) => {
             {isFetching ? (
                 <Box gap="small">
                     <BaseSkeletonBox height={'xsmall'} width={'100%'} />
-                    <BaseSkeletonBox height={'xsmall'} width={'100%'} />
-                    <BaseSkeletonBox height={'xsmall'} width={'100%'} />
                 </Box>
             ) : (
                 <Box
                     direction="row"
                     gap="small"
-                    border
                     height={{ min: 'xsmall' }}
                     justify="center"
                     align="center"
                     round="xsmall"
+                    background={'background-skeleton'}
                 >
                     <CircleDashed color={cpTheme.global.colors['dark-4']} />
                     <Text size="small" color="dark-4">

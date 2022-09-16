@@ -7,8 +7,11 @@ import {
     archiveStage,
     ceramicInstance,
     createStage,
+    loadCommitWorkaround,
     loadStageDoc,
     loadStagesLib,
+    loadStageStackFromID,
+    saveCambrianCommitData,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -93,6 +96,13 @@ export default class CeramicTemplateAPI {
                 receivedProposals: {},
                 isActive: true, // TODO Activate / Deactivate Template feature
             }
+
+            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+            await saveCambrianCommitData(
+                this.user,
+                composition.commitId.toString(),
+                composition.content
+            )
 
             return createStage(template, StageNames.template, this.user)
         } catch (e) {
@@ -187,9 +197,7 @@ export default class CeramicTemplateAPI {
         stageStack: StageStackType,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
-        const cs = ceramicInstance(this.user)
-
-        const templateDoc = (await cs.loadStream(
+        const templateDoc = (await ceramicInstance(this.user).loadStream(
             stageStack.proposal.template.streamID
         )) as TileDocument<TemplateModel>
 
@@ -205,17 +213,20 @@ export default class CeramicTemplateAPI {
         if (
             !proposalSubmissions[proposalSubmissions.length - 1] ||
             !_.isEqual(
-                (
-                    await cs.loadStream(
-                        proposalSubmissions[proposalSubmissions.length - 1]
-                            .proposalCommitID
-                    )
-                ).content as ProposalModel,
+                <ProposalModel>(
+                    (
+                        await loadCommitWorkaround(
+                            this.user,
+                            proposalSubmissions[proposalSubmissions.length - 1]
+                                .proposalCommitID
+                        )
+                    ).content
+                ),
                 stageStack.proposal
             )
         )
             throw Error(
-                'Provided Proposal commitID does not match with the most recent submission.'
+                'Provided Proposal commit does not match with the most recent submission.'
             )
 
         proposalSubmissions[proposalSubmissions.length - 1] = {
@@ -247,28 +258,42 @@ export default class CeramicTemplateAPI {
                 )
             }
 
-            if (!updatedReceivedProposals[stageStack.proposalStreamID]) {
+            const registeredProposalEntry =
+                updatedReceivedProposals[stageStack.proposalStreamID]
+
+            if (!registeredProposalEntry) {
+                // Entirely new proposal submission
                 updatedReceivedProposals[stageStack.proposalStreamID] = [
                     {
                         proposalCommitID: stageStack.proposalCommitID,
                     },
                 ]
+
+                // NOTE: Workaround until Ceramics load bugfix is merged
+                await saveCambrianCommitData(
+                    this.user,
+                    stageStack.proposalCommitID,
+                    stageStack.proposal
+                )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
                 })
             } else {
-                const proposalCommit = (await (
-                    await cs.loadStream(
-                        updatedReceivedProposals[stageStack.proposalStreamID][
-                            updatedReceivedProposals[
-                                stageStack.proposalStreamID
-                            ].length - 1
-                        ].proposalCommitID
-                    )
-                ).content) as ProposalModel
+                const latestRegisteredCommitID =
+                    registeredProposalEntry[registeredProposalEntry.length - 1]
+                        .proposalCommitID
 
-                // No duplicate and propoals must have changed
+                const latestProposalCommitContent = <ProposalModel>(
+                    (
+                        await loadCommitWorkaround(
+                            this.user,
+                            latestRegisteredCommitID
+                        )
+                    ).content
+                )
+
+                // No duplicate and proposal must have changed
                 if (
                     updatedReceivedProposals[
                         stageStack.proposalStreamID
@@ -276,11 +301,18 @@ export default class CeramicTemplateAPI {
                         (e) =>
                             e.proposalCommitID === stageStack.proposalCommitID
                     ) === -1 &&
-                    !_.isEqual(proposalCommit, stageStack.proposal)
+                    !_.isEqual(latestProposalCommitContent, stageStack.proposal)
                 ) {
                     updatedReceivedProposals[stageStack.proposalStreamID].push({
                         proposalCommitID: stageStack.proposalCommitID,
                     })
+
+                    // NOTE: Workaround until Ceramics load  bugfix is merged
+                    await saveCambrianCommitData(
+                        this.user,
+                        stageStack.proposalCommitID,
+                        stageStack.proposal
+                    )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
                         receivedProposals: updatedReceivedProposals,
@@ -385,27 +417,17 @@ export default class CeramicTemplateAPI {
                 ...stagesLib.content,
             }
 
-            const proposalDoc = await loadStageDoc<ProposalModel>(
+            const stageStack = await loadStageStackFromID(
                 this.user,
                 proposalStreamID
             )
             // Set isDeclined if proposal is before approved
             if (type === 'DECLINE') {
-                // Create new entry at receivedProposals with the flag isDeclined set to true
-                const templateDoc = await loadStageDoc<TemplateModel>(
-                    this.user,
-                    proposalDoc.content.template.streamID
-                )
-                const updatedTemplate = { ...templateDoc.content }
-                updatedTemplate.receivedProposals[proposalStreamID].push({
-                    proposalCommitID: proposalDoc.commitId.toString(),
-                    isDeclined: true,
-                })
-                await templateDoc.update(updatedTemplate)
+                await this.updateProposalEntry(stageStack, { isDeclined: true })
             }
 
             updatedStagesLib.templates.archive.receivedProposals[
-                proposalDoc.content.title
+                stageStack.proposal.title
             ] = proposalStreamID
 
             await stagesLib.update(updatedStagesLib)

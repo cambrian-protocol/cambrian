@@ -1,8 +1,9 @@
 import {
     addRecentStage,
+    loadCommitWorkaround,
     loadStageDoc,
 } from './../services/ceramic/CeramicUtils'
-import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
+import { updateStage } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { CompositionModel } from '../models/CompositionModel'
@@ -53,7 +54,8 @@ const useEditTemplate = () => {
 
                         const _composition = <CompositionModel>(
                             (
-                                await ceramicInstance(currentUser).loadStream(
+                                await loadCommitWorkaround(
+                                    currentUser,
                                     templateDoc.content.composition.commitID
                                 )
                             ).content

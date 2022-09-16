@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import {
     addRecentStage,
     ceramicInstance,
+    loadCommitWorkaround,
     loadStageDoc,
     loadStageStackFromID,
 } from '../services/ceramic/CeramicUtils'
@@ -29,7 +30,7 @@ import { ethers } from 'ethers'
 export type ProposalContextType = {
     stageStack?: StageStackType
     proposalContract?: ethers.Contract
-    proposalStatus: ProposalStatus
+    proposalStatus?: ProposalStatus
     isLoaded: boolean
 }
 
@@ -51,9 +52,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         )
         const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
 
-        const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
-            ProposalStatus.Unknown
-        )
+        const [proposalStatus, setProposalStatus] = useState<ProposalStatus>()
         const [stageStack, setStageStack] = useState<StageStackType>()
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
@@ -263,7 +262,8 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         if (_latestProposalSubmission) {
                             // Initialize the latest submission/commit as stageStack
                             const latestProposalCommitContent = (
-                                await ceramicInstance(currentUser).loadStream(
+                                await loadCommitWorkaround(
+                                    currentUser,
                                     _latestProposalSubmission.proposalCommitID
                                 )
                             ).content as ProposalModel
