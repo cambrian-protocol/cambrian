@@ -68,8 +68,7 @@ const SubmissionForm = ({
                 // NOTE: Work around until Ceramic fixes their commit load bug
                 await saveCambrianCommitData(
                     currentUser,
-                    submissionsTileDocument.commitId.toString(),
-                    submissionsTileDocument.content
+                    submissionsTileDocument.commitId.toString()
                 )
 
                 const transaction: ethers.ContractTransaction =

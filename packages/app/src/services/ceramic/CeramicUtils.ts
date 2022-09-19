@@ -435,15 +435,13 @@ export const clearStagesLib = async (currentUser: UserType) => {
 // NOTE: Temporary workaround until Cermics Bugfix is merged.
 export const saveCambrianCommitData = async (
     currentUser: UserType,
-    commitID: string,
-    data: CompositionModel | ProposalModel | TemplateModel | SubmissionModel
+    commitID: string
 ) => {
     try {
         const res = await fetch(`${TRILOBOT_ENDPOINT}/saveCommit`, {
             method: 'POST',
             body: JSON.stringify({
                 id: commitID,
-                data: data,
                 session: currentUser.session.serialize(),
             }),
             headers: {

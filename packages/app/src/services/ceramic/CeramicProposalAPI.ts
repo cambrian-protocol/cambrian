@@ -65,8 +65,7 @@ export default class CeramicProposalAPI {
             // NOTE: Workaround until Ceramics load commitID Bugfix is merged
             await saveCambrianCommitData(
                 this.user,
-                templateStreamDoc.commitId.toString(),
-                templateStreamDoc.content
+                templateStreamDoc.commitId.toString()
             )
 
             return await createStage(proposal, StageNames.proposal, this.user)

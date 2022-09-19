@@ -100,8 +100,7 @@ export default class CeramicTemplateAPI {
             // NOTE: Workaround until Ceramics load commitID Bugfix is merged
             await saveCambrianCommitData(
                 this.user,
-                composition.commitId.toString(),
-                composition.content
+                composition.commitId.toString()
             )
 
             return createStage(template, StageNames.template, this.user)
@@ -272,8 +271,7 @@ export default class CeramicTemplateAPI {
                 // NOTE: Workaround until Ceramics load bugfix is merged
                 await saveCambrianCommitData(
                     this.user,
-                    stageStack.proposalCommitID,
-                    stageStack.proposal
+                    stageStack.proposalCommitID
                 )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
@@ -310,8 +308,7 @@ export default class CeramicTemplateAPI {
                     // NOTE: Workaround until Ceramics load  bugfix is merged
                     await saveCambrianCommitData(
                         this.user,
-                        stageStack.proposalCommitID,
-                        stageStack.proposal
+                        stageStack.proposalCommitID
                     )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
