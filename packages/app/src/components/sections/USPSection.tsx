@@ -22,8 +22,8 @@ const USPSection = () => {
                 <USPCard
                     icon={<Coins />}
                     title="Earn Together"
-                    description="Publish your smart template in 5 minutes and sell your services or freelance skills"
-                    href="https://cambrianprotocol.notion.site/What-are-Solvers-Cambrian-Dapps-7f0733edf51c4deab97118f475082c88"
+                    description="Publish your smart template in 5 minutes to start selling your services and skills"
+                    href="https://cambrianprotocol.notion.site/Create-your-Freelance-Solver-13cd00c5ee6d42db900420eea97f4f74"
                 />
                 <USPCard
                     icon={<BoundingBox />}

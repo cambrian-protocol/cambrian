@@ -59,7 +59,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         <>
             <PageLayout contextTitle="Proposals">
                 <Box pad="large" gap="medium">
-                    <Heading>Cambrian Dashboard</Heading>
+                    <Heading>Dashboard</Heading>
                     <Text color="dark-4">
                         Welcome back,{' '}
                         {currentUser.cambrianProfileDoc.content.name}!
