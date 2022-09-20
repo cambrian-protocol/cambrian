@@ -88,7 +88,7 @@ export default function BackgroundScroll(props: BackgroundScrollProps) {
         <Box ref={rootRef} style={{ position: 'relative' }}>
             <ImageWrapper>
                 <Glow
-                    height="1500px"
+                    height="1000px"
                     width="1000px"
                     left={'-20%'}
                     top={'50%'}
@@ -157,7 +157,7 @@ const StyledImage = styled(Image)<
     ImageProps & { active?: boolean; objectPosition: ObjectPositionType }
 >`
     position: absolute;
-    height: 1500px;
+    height: 1000px;
     width: 100vw;
     top: 0;
     left: 0;
