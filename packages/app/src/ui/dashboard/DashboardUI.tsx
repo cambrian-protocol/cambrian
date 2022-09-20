@@ -21,19 +21,42 @@ import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { useRouter } from 'next/router'
 
 interface DashboardUIProps {
     currentUser: UserType
 }
 
 const DashboardUI = ({ currentUser }: DashboardUIProps) => {
+    const router = useRouter()
+    const { query } = router
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
     const [isFetching, setIsFetching] = useState(false)
+    const [activeIndex, setActiveIndex] = useState(0)
 
     useEffect(() => {
         initDocSubsciption()
     }, [])
+
+    useEffect(() => {
+        if (query.idx !== activeIndex.toString()) {
+            initIndex()
+        }
+    }, [query])
+
+    const initIndex = () => {
+        if (!query.idx) {
+            onActive(0)
+        } else {
+            onActive(Number(query.idx))
+        }
+    }
+
+    const onActive = (nextActiveIndex: number) => {
+        router.push(`?idx=${nextActiveIndex}`)
+        setActiveIndex(nextActiveIndex)
+    }
 
     const initDocSubsciption = async () => {
         const stagesLib = await loadStagesLib(currentUser)
@@ -67,7 +90,11 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                     <IconContext.Provider
                         value={{ size: '24', color: 'white' }}
                     >
-                        <Tabs alignControls="start">
+                        <Tabs
+                            activeIndex={activeIndex}
+                            onActive={onActive}
+                            alignControls="start"
+                        >
                             <Tab title="Templates" icon={<File />}>
                                 <TemplatesDashboardUI
                                     currentUser={currentUser}

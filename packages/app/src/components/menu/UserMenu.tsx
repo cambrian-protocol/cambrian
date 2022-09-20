@@ -51,7 +51,7 @@ export default function UserMenu() {
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
-            onClick: () => router.push('/dashboard/profile'),
+            onClick: () => router.push('/dashboard?idx=4'),
         })
         menuItems.push({
             label: <UserMenuItemLabel label="Reset Account" />,

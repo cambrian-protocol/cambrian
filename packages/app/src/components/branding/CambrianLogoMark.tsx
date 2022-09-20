@@ -10,7 +10,7 @@ const CambrianLogoMark = ({ size }: CambrianLogoMarkProps) => {
     const router = useRouter()
     return (
         <Box
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/')}
             focusIndicator={false}
             width={{
                 min: size ? size : 'xxsmall',

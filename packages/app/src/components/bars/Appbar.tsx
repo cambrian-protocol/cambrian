@@ -1,11 +1,17 @@
-import { Box, ResponsiveContext } from 'grommet'
+import { Box, Button, ResponsiveContext } from 'grommet'
+import { IconContext, Layout } from 'phosphor-react'
 
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
 import { Header } from 'grommet'
+import Link from 'next/link'
 import UserMenu from '../menu/UserMenu'
+import { cpTheme } from '@cambrian/app/theme/theme'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 const Appbar = () => {
+    const { currentUser } = useCurrentUserContext()
+
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
@@ -32,6 +38,15 @@ const Appbar = () => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
+                            {currentUser && (
+                                <Box justify={'center'}>
+                                    <AppbarMenuItem
+                                        pathname="/dashboard"
+                                        label="Dashboard"
+                                        icon={<Layout />}
+                                    />
+                                </Box>
+                            )}
                             <UserMenu />
                         </Box>
                     </Header>
@@ -42,3 +57,33 @@ const Appbar = () => {
 }
 
 export default Appbar
+
+interface AppbarMenuItemProps {
+    pathname: string
+    label: string
+    icon: JSX.Element
+}
+
+const AppbarMenuItem = ({ icon, pathname, label }: AppbarMenuItemProps) => {
+    let isActive = false
+    if (typeof window !== 'undefined') {
+        isActive = window.location.pathname === pathname
+    }
+
+    return (
+        <IconContext.Provider
+            value={
+                isActive
+                    ? { size: '24' }
+                    : {
+                          size: '24',
+                          color: cpTheme.global.colors['dark-4'],
+                      }
+            }
+        >
+            <Link href={pathname} passHref>
+                <Button icon={icon} tip={label} active={isActive} />
+            </Link>
+        </IconContext.Provider>
+    )
+}
