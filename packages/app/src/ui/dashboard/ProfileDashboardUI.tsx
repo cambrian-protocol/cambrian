@@ -40,25 +40,6 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
 
     return (
         <Box fill gap="medium" pad={{ top: 'medium' }}>
-            <Box
-                direction="row"
-                align="center"
-                gap="medium"
-                pad={{ top: 'medium' }}
-            >
-                {cambrianProfile.avatar ? (
-                    <BaseAvatar size="large" pfpPath={cambrianProfile.avatar} />
-                ) : (
-                    <BaseAvatar size="large" address={currentUser.address} />
-                )}
-                <Box gap="small" pad={{ top: 'medium' }}>
-                    <Heading>{cambrianProfile.name || 'Anon'}</Heading>
-                    <Text>{cambrianProfile.title || 'Unknown'}</Text>
-                    <Text color="dark-4">
-                        {ellipseAddress(currentUser.address, 10)}
-                    </Text>
-                </Box>
-            </Box>
             <DashboardHeader
                 title="Profile Management"
                 description="Update your Web3 profile. We don’t store this data,
@@ -86,6 +67,25 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                     />,
                 ]}
             />
+            <Box
+                direction="row"
+                align="center"
+                gap="medium"
+                pad={{ top: 'medium' }}
+            >
+                {cambrianProfile.avatar ? (
+                    <BaseAvatar size="large" pfpPath={cambrianProfile.avatar} />
+                ) : (
+                    <BaseAvatar size="large" address={currentUser.address} />
+                )}
+                <Box gap="small" pad={{ top: 'medium' }}>
+                    <Heading>{cambrianProfile.name || 'Anon'}</Heading>
+                    <Text>{cambrianProfile.title || 'Unknown'}</Text>
+                    <Text color="dark-4">
+                        {ellipseAddress(currentUser.address, 10)}
+                    </Text>
+                </Box>
+            </Box>
             <Form<CambrianProfileType>
                 onChange={(nextValue: CambrianProfileType) => {
                     setInput(nextValue)

@@ -63,8 +63,9 @@ const CompositionsDashboardUI = ({
                 <Box fill>
                     <Text color={'dark-4'}>
                         Your Compositions (
-                        {compositionsLib &&
-                            Object.keys(compositionsLib.lib).length}
+                        {compositionsLib
+                            ? Object.keys(compositionsLib.lib).length
+                            : 0}
                         )
                     </Text>
                     <Box pad={{ top: 'medium' }}>
