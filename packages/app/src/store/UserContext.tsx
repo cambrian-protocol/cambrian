@@ -19,6 +19,7 @@ import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
+import * as cacao from 'ceramic-cacao'
 
 export type PermissionType = string
 
@@ -282,6 +283,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         network: ethers.providers.Network,
         accountAddress: string
     ) => {
+        console.log(provider)
         let sessionStr = localStorage.getItem(
             `cambrian-session/${network.chainId}/${accountAddress}`
         )
