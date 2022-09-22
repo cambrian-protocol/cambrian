@@ -102,7 +102,7 @@ const CompositionDashboardTile = ({
     return (
         <>
             <IconContext.Provider value={{ size: '24' }}>
-                <Box pad={{ horizontal: 'medium', vertical: 'small' }}>
+                <Box pad={{ right: 'medium', vertical: 'small' }}>
                     <Card
                         height={{ min: 'medium', max: 'medium' }}
                         width="medium"
@@ -160,6 +160,7 @@ const CompositionDashboardTile = ({
                         </CardHeader>
                         <CardBody pad="small">
                             <Box
+                                round="xsmall"
                                 flex
                                 onClick={() =>
                                     router.push(

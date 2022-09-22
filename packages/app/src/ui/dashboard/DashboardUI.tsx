@@ -34,6 +34,9 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
     const [isFetching, setIsFetching] = useState(false)
     const [activeIndex, setActiveIndex] = useState(0)
+    const [userName, setUserName] = useState(
+        currentUser.cambrianProfileDoc.content.name || 'Anon'
+    )
 
     useEffect(() => {
         initDocSubsciption()
@@ -60,11 +63,19 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
 
     const initDocSubsciption = async () => {
         const stagesLib = await loadStagesLib(currentUser)
-        const sub = stagesLib.subscribe(() => {
+        const cambrianStagesLibSub = stagesLib.subscribe(() => {
             initStagesLib()
         })
+        const cambrianProfileSub = currentUser.cambrianProfileDoc.subscribe(
+            () => {
+                if (userName !== currentUser.cambrianProfileDoc.content.name) {
+                    setUserName(currentUser.cambrianProfileDoc.content.name)
+                }
+            }
+        )
         return () => {
-            sub.unsubscribe()
+            cambrianStagesLibSub.unsubscribe()
+            cambrianProfileSub.unsubscribe()
         }
     }
 
@@ -83,10 +94,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
             <PageLayout contextTitle="Proposals">
                 <Box pad="large" gap="medium">
                     <Heading>Dashboard</Heading>
-                    <Text color="dark-4">
-                        Welcome back,{' '}
-                        {currentUser.cambrianProfileDoc.content.name}!
-                    </Text>
+                    <Text color="dark-4">Welcome back, {userName}!</Text>
                     <IconContext.Provider
                         value={{ size: '24', color: 'white' }}
                     >
