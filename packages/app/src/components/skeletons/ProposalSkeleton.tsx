@@ -5,14 +5,11 @@ import PlainSectionDivider from '../sections/PlainSectionDivider'
 const ProposalSkeleton = () => {
     return (
         <Box height="large" pad="large" gap="medium">
-            <BaseSkeletonBox height={'xxsmall'} width={'40%'} />
-            <BaseSkeletonBox height={'xsmall'} width={'50%'} />
-            <Box align="end">
-                <BaseSkeletonBox height={'xxsmall'} width={'medium'} />
-            </Box>
+            <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+            <BaseSkeletonBox height={'xsmall'} width={'100%'} />
             <PlainSectionDivider />
             <BaseSkeletonBox height={'small'} width={'100%'} />
-            <BaseSkeletonBox height={'small'} width={'90%'} />
+            <BaseSkeletonBox height={'small'} width={'100%'} />
             <PlainSectionDivider />
             <Box direction="row" gap="medium">
                 <BaseSkeletonBox height={'xsmall'} width={'xsmall'} />
