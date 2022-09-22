@@ -316,6 +316,7 @@ export default class CeramicTemplateAPI {
                     })
                 }
             }
+            return updatedReceivedProposals
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

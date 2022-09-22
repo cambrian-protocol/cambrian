@@ -88,9 +88,15 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     )
                     const templateSub = templateStreamDoc.subscribe(
                         async (x) => {
-                            await initProposal(
-                                proposalStreamDoc,
-                                templateStreamDoc
+                            setProposalStatus(
+                                getProposalStatus(
+                                    proposalStreamDoc.content,
+                                    undefined,
+                                    onChainProposal,
+                                    templateStreamDoc.content.receivedProposals[
+                                        proposalStreamID
+                                    ]
+                                )
                             )
                         }
                     )
@@ -231,14 +237,18 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         approvedCommitID
                     )
 
+                    let receivedProposals =
+                        templateStreamDoc.content.receivedProposals
+
                     // Register new submitted proposal if user is template author
                     if (
                         stageStack.template.author === currentUser.did &&
                         stageStack.proposal.isSubmitted
                     ) {
-                        await ceramicTemplateAPI.registerNewProposalSubmission(
-                            stageStack
-                        )
+                        receivedProposals =
+                            await ceramicTemplateAPI.registerNewProposalSubmission(
+                                stageStack
+                            )
                     }
 
                     setProposalStatus(
@@ -246,9 +256,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             stageStack.proposal,
                             undefined,
                             onChainProposal,
-                            templateStreamDoc.content.receivedProposals[
-                                proposalStreamID
-                            ]
+                            receivedProposals[proposalStreamID]
                         )
                     )
                     if (proposalStreamDoc.content.isSubmitted) {
