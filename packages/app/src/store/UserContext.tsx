@@ -166,7 +166,6 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
             const session = await loadSession(provider, network, address)
 
-            // TODO Remove cambrianProfileDoc from userObject and create instance every time
             const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             ceramic.did = session.did
             const cambrianProfileDoc = (await TileDocument.deterministic(
@@ -290,7 +289,8 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         if (sessionStr) {
             session = await DIDSession.fromSession(sessionStr)
         }
-        if (!session || (session.hasSession && session.isExpired)) {
+
+        if (!session || (session.hasSession && session.expireInSecs < 3600)) {
             setIsUserLoaded(true)
             session = await DIDSession.authorize(
                 new EthereumAuthProvider(provider, accountAddress),
