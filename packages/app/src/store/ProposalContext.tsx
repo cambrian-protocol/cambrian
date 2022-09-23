@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 import {
     addRecentStage,
     ceramicInstance,
@@ -34,7 +34,7 @@ export type ProposalContextType = {
     isLoaded: boolean
 }
 
-type ProposalProviderProps = {
+type ProposalProviderProps = PropsWithChildren<{}> & {
     proposalStreamID: string
     currentUser: UserType
 }

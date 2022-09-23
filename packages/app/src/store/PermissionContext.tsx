@@ -1,10 +1,11 @@
+import React, { PropsWithChildren } from 'react'
+
 import { PermissionType } from './UserContext'
-import React from 'react'
 
 type PermissionContextType = {
     isAllowedTo: (permission: PermissionType) => boolean
 }
-type PermissionProviderProps = {
+type PermissionProviderProps = PropsWithChildren<{}> & {
     permissions: PermissionType[]
 }
 
