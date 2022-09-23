@@ -4,13 +4,11 @@ import { useEffect, useRef, useState } from 'react'
 
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { PaperPlaneRight } from 'phosphor-react'
-import { TRILOBOT_WS_ENDPOINT } from 'packages/app/config'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '../../services/api/Logger.api'
-import io from 'socket.io-client'
 
 /**
  * Messages are stored for a user in:
@@ -27,20 +25,16 @@ import io from 'socket.io-client'
  *  Proposal => <proposalStreamID>
  */
 
-const socket = io(TRILOBOT_WS_ENDPOINT) // TODO Replace with env var
-
-export type ChatType = 'Proposal' | 'Solver' | 'Other'
+type ChatMessagesType = { messages: ChatMessageType[] }
 
 export default function CoreMessenger({
     currentUser,
     chatID,
-    chatType,
     participants,
     showMessenger,
 }: {
     currentUser: UserType
     chatID: string
-    chatType: ChatType
     participants: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
@@ -54,18 +48,7 @@ export default function CoreMessenger({
     const [messageInput, setMessageInput] = useState('')
 
     useEffect(() => {
-        // Update chat upon receiving websocket emit
-        socket.on(`cambrian-chat-${chatID}`, (message: ChatMessageType) => {
-            setMessages((oldMessages) => [...oldMessages, message])
-        })
-
-        return () => {
-            socket.disconnect()
-        }
-    }, [])
-
-    useEffect(() => {
-        loadChat()
+        initSubscriptions()
     }, [])
 
     useEffect(() => {
@@ -93,41 +76,68 @@ export default function CoreMessenger({
         outboxCallback.current = publishOutbox
     })
 
-    // Load chat based on type
-    // Only difference is how we find the participants so we know which streams to load
-    const loadChat = async () => {
-        let msgs
-        switch (chatType) {
-            case 'Proposal':
-                msgs = await loadChatProposal()
-                setMessages(msgs)
-                break
-            case 'Other':
-                msgs = await loadChatOther()
-                setMessages(msgs)
-                break
+    // Subscribe to Messages TileDocuments
+    const initSubscriptions = async () => {
+        const messagesDocs = await fetchMessagesDocs()
+        const subscriptions = messagesDocs.map((doc) =>
+            doc.subscribe(() => {
+                if (outbox.length === 0) {
+                    loadChat()
+                }
+            })
+        )
+        return () => {
+            subscriptions.map((sub) => sub.unsubscribe())
         }
     }
 
-    // Emit message to websocket
-    // && add to outbox
+    const fetchMessagesDocs = async () => {
+        return (
+            await Promise.allSettled(
+                participants.concat(currentUser.did).map(
+                    async (DID) =>
+                        await TileDocument.deterministic(
+                            ceramicInstance(currentUser),
+                            {
+                                controllers: [DID],
+                                family: 'cambrian-chat',
+                                tags: [chatID],
+                            }
+                        )
+                )
+            )
+        )
+            .map((res) => {
+                return res.status === 'fulfilled' && res.value
+            })
+            .filter(Boolean) as TileDocument<ChatMessagesType>[]
+    }
+
+    // Load chat
+    const loadChat = async () => {
+        try {
+            const messagesDocs = await fetchMessagesDocs()
+            // Get message content
+            const messages: ChatMessageType[][] = messagesDocs
+                .filter((doc) => doc.content?.messages?.length > 0)
+                .map((doc) => doc.content.messages)
+            setMessages(mergeMessages(messages))
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    // Add message to state and outbox
     const sendMessage = async (message: ChatMessageType) => {
         try {
-            socket.emit(`sendMessage`, {
-                chatID: chatID,
-                message: message,
-            })
-
-            addToOutbox(message)
+            setMessages((oldMessages) => [...oldMessages, message])
+            setOutbox((oldOutbox) => [...oldOutbox, message])
             setMessageInput('')
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
-    }
-
-    const addToOutbox = (message: ChatMessageType) => {
-        setOutbox((oldOutbox) => [...oldOutbox, message])
     }
 
     // Call publishMessages with outbox
@@ -185,90 +195,6 @@ export default function CoreMessenger({
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
-    }
-
-    // Load "Other" chat with supplied participant DIDs
-    const loadChatOther = async () => {
-        try {
-            // Load, then filter out streams that failed to load & streams with no messages
-            const messagesDocs: TileDocument<{
-                messages: ChatMessageType[]
-            }>[] = (
-                (
-                    await Promise.allSettled(
-                        participants.map((DID) =>
-                            TileDocument.deterministic(
-                                ceramicInstance(currentUser),
-                                {
-                                    controllers: [DID],
-                                    family: 'cambrian-chat',
-                                    tags: [chatID],
-                                }
-                            )
-                        )
-                    )
-                )
-                    .map((res) => {
-                        return res.status === 'fulfilled' && res.value
-                    })
-                    .filter(Boolean) as TileDocument<{
-                    messages: ChatMessageType[]
-                }>[]
-            ).filter((doc) => doc.content?.messages?.length > 0)
-
-            // Get message content
-            const messages: ChatMessageType[][] = messagesDocs.map(
-                (doc) => doc.content.messages
-            )
-
-            return mergeMessages(messages)
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-        }
-    }
-
-    /**
-     * @notice Loads an array of message streams from TileDocument<CeramicProposalModel>
-     * @dev chatID == proposalStreamID of draft
-     * @dev Gets DIDs from proposal.authors
-     */
-    const loadChatProposal = async () => {
-        try {
-            // Load, then filter out streams that failed to load & streams with no messages
-            const messagesDocs: TileDocument<{
-                messages: ChatMessageType[]
-            }>[] = (
-                (
-                    await Promise.allSettled(
-                        participants.map(
-                            async (DID) =>
-                                await TileDocument.deterministic(
-                                    ceramicInstance(currentUser),
-                                    {
-                                        controllers: [DID],
-                                        family: 'cambrian-chat',
-                                        tags: [chatID],
-                                    }
-                                )
-                        )
-                    )
-                )
-                    .map((res) => res.status === 'fulfilled' && res.value)
-                    .filter(Boolean) as TileDocument<{
-                    messages: ChatMessageType[]
-                }>[]
-            ).filter((doc) => doc.content?.messages?.length > 0)
-
-            // Get message content
-            const messages: ChatMessageType[][] = messagesDocs.map(
-                (doc) => doc.content.messages
-            )
-            return mergeMessages(messages)
-        } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
     }
 

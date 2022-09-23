@@ -15,10 +15,9 @@ import {
 import BaseAvatar from '../avatars/BaseAvatar'
 import { Menu } from 'grommet'
 import React from 'react'
-import { StageNames } from '@cambrian/app/models/StageModel'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
-import { clearStages } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { clearStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
@@ -52,7 +51,7 @@ export default function UserMenu() {
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
-            onClick: () => router.push('/dashboard/profile'),
+            onClick: () => router.push('/dashboard?idx=4'),
         })
         menuItems.push({
             label: <UserMenuItemLabel label="Reset Account" />,
@@ -63,9 +62,7 @@ export default function UserMenu() {
                         'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
                     )
                 ) {
-                    await clearStages(currentUser, StageNames.composition)
-                    await clearStages(currentUser, StageNames.template)
-                    await clearStages(currentUser, StageNames.proposal)
+                    await clearStagesLib(currentUser)
                 }
             },
         })

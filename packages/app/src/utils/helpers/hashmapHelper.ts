@@ -29,7 +29,8 @@ export const getUniqueTag = (map: StringHashmap, key: string) => {
 export const updateKeyFromValue = (
     value: string,
     updatedKey: string,
-    map?: StringHashmap
+    map?: StringHashmap,
+    archiveMap?: StringHashmap
 ): { key: string; map: StringHashmap } => {
     let updatedMap: StringHashmap = {}
     let uniqueKey = updatedKey
@@ -43,7 +44,10 @@ export const updateKeyFromValue = (
             )
             if (!currentTag)
                 throw new Error(`Key not found. ${value} ${updatedKey} ${map}`)
-            uniqueKey = getUniqueTag(updatedMap, updatedKey)
+            uniqueKey = getUniqueTag(
+                { ...updatedMap, ...archiveMap },
+                updatedKey
+            )
             updatedMap[uniqueKey] = value
             delete updatedMap[currentTag]
         } else {

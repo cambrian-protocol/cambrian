@@ -1,9 +1,7 @@
 import { Box, Spinner, Text } from 'grommet'
-import { StageLibType, StageNames } from '@cambrian/app/models/StageModel'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -13,7 +11,7 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { loadStageLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import randimals from 'randimals'
 import router from 'next/router'
 
@@ -26,7 +24,6 @@ const CreateTemplateModal = ({
     onClose,
     currentUser,
 }: CreateTemplateModalProps) => {
-    const ceramicCompositionAPI = new CeramicCompositionAPI(currentUser)
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [compositions, setCompositions] = useState<StringHashmap>()
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
@@ -38,12 +35,9 @@ const CreateTemplateModal = ({
 
     const fetchCompositions = async () => {
         try {
-            const compositionLib = await loadStageLib<StageLibType>(
-                currentUser,
-                StageNames.composition
-            )
-            if (compositionLib && compositionLib.content.lib) {
-                setCompositions(compositionLib.content.lib)
+            const stagesLib = await loadStagesLib(currentUser)
+            if (stagesLib && stagesLib.content.compositions) {
+                setCompositions(stagesLib.content.compositions.lib)
             } else {
                 setCompositions({})
             }
@@ -59,7 +53,7 @@ const CreateTemplateModal = ({
                 randimals(),
                 compositionStreamID
             )
-            if (streamID) router.push(`templates/new/${streamID}`)
+            if (streamID) router.push(`/dashboard/templates/new/${streamID}`)
         } catch (e) {
             setIsCreatingTemplate(undefined)
             setErrorMessage(await cpLogger.push(e))

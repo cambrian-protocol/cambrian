@@ -24,7 +24,7 @@ import { useState } from 'react'
 
 interface ProposalHeaderProps {
     stageStack?: StageStackType
-    proposalStatus: ProposalStatus
+    proposalStatus?: ProposalStatus
     showProposalDetails?: boolean
 }
 

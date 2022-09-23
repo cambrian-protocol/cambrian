@@ -2,7 +2,6 @@ import { Box } from 'grommet'
 import FooterBrandingSection from './FooterBrandingSection'
 import FooterCTASection from './FooterCTASection'
 import FooterCopyrightSection from './FooterCopyrightSection'
-import FooterCreditSection from './FooterCreditSection'
 import FooterDisclamerSection from './FooterDisclamerSection'
 import FooterLinksSection from './FooterLinksSection'
 import FooterPartnersSection from './FooterPartnersSection'
@@ -40,7 +39,6 @@ const DesktopFooter = () => {
                     <FooterCopyrightSection />
                     <FooterTermsSection />
                     <FooterPrivacyPolicySection />
-                    <FooterCreditSection />
                     <Box flex />
                     {/* <ThemeToogleButton size="small" showLabel /> */}
                 </Box>

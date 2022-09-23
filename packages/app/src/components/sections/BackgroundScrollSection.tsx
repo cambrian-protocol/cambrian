@@ -2,7 +2,6 @@ import { Box, Heading, Image, ImageProps, Text } from 'grommet'
 import { useEffect, useRef, useState } from 'react'
 
 import Glow from '../branding/Glow'
-import { IconContext } from 'phosphor-react'
 import styled from 'styled-components'
 
 type ObjectPositionType =
@@ -92,7 +91,7 @@ export default function BackgroundScroll(props: BackgroundScrollProps) {
                     height="1000px"
                     width="1000px"
                     left={'-20%'}
-                    bottom={'0%'}
+                    top={'50%'}
                 />
                 {sections.map((section, i) => (
                     <StyledImage
@@ -120,28 +119,21 @@ export default function BackgroundScroll(props: BackgroundScrollProps) {
                                     width="large"
                                     gap="medium"
                                     pad="large"
-                                    background="background-contrast-transparent"
-                                    round="xsmall"
-                                    border
                                     align="center"
+                                    border
+                                    round="xsmall"
                                 >
-                                    <IconContext.Provider
-                                        value={{ size: '48' }}
-                                    >
-                                        <Box flex>{section.icon}</Box>
-                                    </IconContext.Provider>
-                                    <Box gap="small">
+                                    <Box gap="medium">
                                         <Heading
                                             level="1"
                                             style={{ fontWeight: 'bold' }}
-                                            textAlign="center"
                                         >
                                             {section.title}
                                         </Heading>
-                                        <Text color="dark-4" textAlign="center">
+                                        <Text textAlign="justify">
                                             {section.subTitle}
                                         </Text>
-                                        <Text color="dark-4" textAlign="center">
+                                        <Text textAlign="justify">
                                             {section.text}
                                         </Text>
                                     </Box>
@@ -158,20 +150,20 @@ export default function BackgroundScroll(props: BackgroundScrollProps) {
 const ImageWrapper = styled(Box)`
     position: sticky;
     top: 0;
-    height: 100vh;
+    height: 40vh;
 `
 
 const StyledImage = styled(Image)<
     ImageProps & { active?: boolean; objectPosition: ObjectPositionType }
 >`
     position: absolute;
-    height: 500px;
-    bottom: 20%;
-    right: 5%;
+    height: 1000px;
+    width: 100vw;
+    top: 0;
+    left: 0;
     object-fit: cover;
     opacity: ${(props) => (props.active ? '0.3' : '0')};
-    transition: opacity 0.6s;
-    transform: scale(-1, 1);
+    transition: opacity 2s;
     object-position: ${(props) => props.objectPosition};
 `
 

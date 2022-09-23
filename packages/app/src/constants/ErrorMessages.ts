@@ -10,6 +10,11 @@ export type ErrorMessageType = {
 }
 
 export const GENERAL_ERROR: ErrorMessagesType = {
+    TRILOBOT_ERROR: {
+        title: 'Error while fetching from Trilobot',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
     CHAIN_NOT_SUPPORTED: {
         title: 'Unsupported Blockchain',
         message: 'Please connect to the a supported Blockchain.',

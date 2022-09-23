@@ -2,7 +2,6 @@ import { Box } from 'grommet'
 import FooterBrandingSection from './FooterBrandingSection'
 import FooterCTASection from './FooterCTASection'
 import FooterCopyrightSection from './FooterCopyrightSection'
-import FooterCreditSection from './FooterCreditSection'
 import FooterDisclamerSection from './FooterDisclamerSection'
 import FooterLinksSection from './FooterLinksSection'
 import FooterPartnersSection from './FooterPartnersSection'
@@ -36,7 +35,6 @@ const MobileFooter = () => (
                 <FooterTermsSection />
                 <FooterPrivacyPolicySection />
                 <FooterCopyrightSection />
-                <FooterCreditSection />
             </Box>
         </Box>
     </Box>

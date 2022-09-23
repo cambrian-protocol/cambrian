@@ -3,18 +3,22 @@ import {
     ReceivedProposalsHashmapType,
     TemplateModel,
 } from '../../models/TemplateModel'
-import { StageLibType, StageNames } from '../../models/StageModel'
 import {
+    archiveStage,
     ceramicInstance,
     createStage,
+    loadCommitWorkaround,
     loadStageDoc,
-    loadStageLib,
+    loadStagesLib,
+    loadStageStackFromID,
+    saveCambrianCommitData,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { StageNames } from '../../models/StageModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TRILOBOT_ENDPOINT } from './../../../config/index'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -92,6 +96,12 @@ export default class CeramicTemplateAPI {
                 receivedProposals: {},
                 isActive: true, // TODO Activate / Deactivate Template feature
             }
+
+            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+            await saveCambrianCommitData(
+                this.user,
+                composition.commitId.toString()
+            )
 
             return createStage(template, StageNames.template, this.user)
         } catch (e) {
@@ -186,9 +196,7 @@ export default class CeramicTemplateAPI {
         stageStack: StageStackType,
         updatedProposalEntry: ReceivedProposalPropsType
     ) => {
-        const cs = ceramicInstance(this.user)
-
-        const templateDoc = (await cs.loadStream(
+        const templateDoc = (await ceramicInstance(this.user).loadStream(
             stageStack.proposal.template.streamID
         )) as TileDocument<TemplateModel>
 
@@ -204,17 +212,20 @@ export default class CeramicTemplateAPI {
         if (
             !proposalSubmissions[proposalSubmissions.length - 1] ||
             !_.isEqual(
-                (
-                    await cs.loadStream(
-                        proposalSubmissions[proposalSubmissions.length - 1]
-                            .proposalCommitID
-                    )
-                ).content as ProposalModel,
+                <ProposalModel>(
+                    (
+                        await loadCommitWorkaround(
+                            this.user,
+                            proposalSubmissions[proposalSubmissions.length - 1]
+                                .proposalCommitID
+                        )
+                    ).content
+                ),
                 stageStack.proposal
             )
         )
             throw Error(
-                'Provided Proposal commitID does not match with the most recent submission.'
+                'Provided Proposal commit does not match with the most recent submission.'
             )
 
         proposalSubmissions[proposalSubmissions.length - 1] = {
@@ -246,28 +257,41 @@ export default class CeramicTemplateAPI {
                 )
             }
 
-            if (!updatedReceivedProposals[stageStack.proposalStreamID]) {
+            const registeredProposalEntry =
+                updatedReceivedProposals[stageStack.proposalStreamID]
+
+            if (!registeredProposalEntry) {
+                // Entirely new proposal submission
                 updatedReceivedProposals[stageStack.proposalStreamID] = [
                     {
                         proposalCommitID: stageStack.proposalCommitID,
                     },
                 ]
+
+                // NOTE: Workaround until Ceramics load bugfix is merged
+                await saveCambrianCommitData(
+                    this.user,
+                    stageStack.proposalCommitID
+                )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
                 })
             } else {
-                const proposalCommit = (await (
-                    await cs.loadStream(
-                        updatedReceivedProposals[stageStack.proposalStreamID][
-                            updatedReceivedProposals[
-                                stageStack.proposalStreamID
-                            ].length - 1
-                        ].proposalCommitID
-                    )
-                ).content) as ProposalModel
+                const latestRegisteredCommitID =
+                    registeredProposalEntry[registeredProposalEntry.length - 1]
+                        .proposalCommitID
 
-                // No duplicate and propoals must have changed
+                const latestProposalCommitContent = <ProposalModel>(
+                    (
+                        await loadCommitWorkaround(
+                            this.user,
+                            latestRegisteredCommitID
+                        )
+                    ).content
+                )
+
+                // No duplicate and proposal must have changed
                 if (
                     updatedReceivedProposals[
                         stageStack.proposalStreamID
@@ -275,17 +299,41 @@ export default class CeramicTemplateAPI {
                         (e) =>
                             e.proposalCommitID === stageStack.proposalCommitID
                     ) === -1 &&
-                    !_.isEqual(proposalCommit, stageStack.proposal)
+                    !_.isEqual(latestProposalCommitContent, stageStack.proposal)
                 ) {
                     updatedReceivedProposals[stageStack.proposalStreamID].push({
                         proposalCommitID: stageStack.proposalCommitID,
                     })
+
+                    // NOTE: Workaround until Ceramics load  bugfix is merged
+                    await saveCambrianCommitData(
+                        this.user,
+                        stageStack.proposalCommitID
+                    )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
                         receivedProposals: updatedReceivedProposals,
                     })
                 }
             }
+            return updatedReceivedProposals
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    toggleActivate = async (templateStreamID: string) => {
+        try {
+            const templateStreamDoc = await loadStageDoc<TemplateModel>(
+                this.user,
+                templateStreamID
+            )
+
+            await templateStreamDoc.update({
+                ...templateStreamDoc.content,
+                isActive: !templateStreamDoc.content.isActive,
+            })
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -298,41 +346,18 @@ export default class CeramicTemplateAPI {
      * @param tag Template Title / Unique tag
      * @auth Done by Templater
      */
-    archiveTemplate = async (tag: string) => {
+    archiveTemplate = async (tag: string, templateStreamID: string) => {
         try {
-            const templateLib = await loadStageLib<StageLibType>(
+            const templateStreamDoc = await loadStageDoc<TemplateModel>(
                 this.user,
-                StageNames.template
+                templateStreamID
             )
-
-            const updatedTemplateLib = {
-                ...templateLib.content,
-            }
-            const templateDoc = await loadStageDoc<TemplateModel>(
-                this.user,
-                updatedTemplateLib.lib[tag]
-            )
-
-            if (!updatedTemplateLib.archive)
-                updatedTemplateLib.archive = { lib: [] }
-
-            if (!updatedTemplateLib.archive.lib)
-                updatedTemplateLib.archive = {
-                    ...updatedTemplateLib.archive,
-                    lib: [],
-                }
-
-            updatedTemplateLib.archive.lib.push(updatedTemplateLib.lib[tag])
-
-            delete updatedTemplateLib.lib[tag]
-
-            await templateDoc.update({
-                ...templateDoc.content,
+            await templateStreamDoc.update({
+                ...templateStreamDoc.content,
                 isActive: false,
             })
-            await templateLib.update({
-                ...updatedTemplateLib,
-            })
+
+            await archiveStage(this.user, tag, StageNames.template)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -346,7 +371,7 @@ export default class CeramicTemplateAPI {
      * @auth Done by Templater
      */
     unarchiveTemplate = async (templateStreamID: string) => {
-        try {
+        /*    try {
             const templateLib = await loadStageLib<StageLibType>(
                 this.user,
                 StageNames.template
@@ -373,6 +398,37 @@ export default class CeramicTemplateAPI {
                     ),
                 },
             })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        } */
+    }
+
+    removeReceivedProposal = async (
+        proposalStreamID: string,
+        type: 'DECLINE' | 'ARCHIVE'
+    ) => {
+        try {
+            const stagesLib = await loadStagesLib(this.user)
+
+            const updatedStagesLib = {
+                ...stagesLib.content,
+            }
+
+            const stageStack = await loadStageStackFromID(
+                this.user,
+                proposalStreamID
+            )
+            // Set isDeclined if proposal is before approved
+            if (type === 'DECLINE') {
+                await this.updateProposalEntry(stageStack, { isDeclined: true })
+            }
+
+            updatedStagesLib.templates.archive.receivedProposals[
+                stageStack.proposal.title
+            ] = proposalStreamID
+
+            await stagesLib.update(updatedStagesLib)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

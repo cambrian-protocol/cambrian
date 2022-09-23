@@ -9,14 +9,23 @@ export enum StageNames {
     proposal = 'proposal',
 }
 
-export type StageLibType = {
-    lib: StringHashmap
-    archive: { lib: string[] }
-    recents: string[]
-}
-
 export type StageModel = CompositionModel | TemplateModel | ProposalModel
 
 export type Stages = {
     [key in StageNames]: StageModel
+}
+
+export type BaseStagesLibType = {
+    lib: StringHashmap
+    archive: { lib: StringHashmap }
+}
+export type TemplateStagesLibType = BaseStagesLibType & {
+    archive: { receivedProposals: StringHashmap }
+}
+
+export type CambrianStagesLibType = {
+    recents: string[]
+    proposals: BaseStagesLibType
+    templates: TemplateStagesLibType
+    compositions: BaseStagesLibType
 }

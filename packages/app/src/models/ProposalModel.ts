@@ -11,5 +11,5 @@ export type ProposalModel = {
     price: { amount: number; tokenAddress: string }
     author: string // DID
     isSubmitted: boolean
-    isDeleted?: boolean
+    isCanceled?: boolean
 }

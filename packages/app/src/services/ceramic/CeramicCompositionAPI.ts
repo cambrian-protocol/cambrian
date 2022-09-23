@@ -1,8 +1,8 @@
-import { StageLibType, StageNames } from '../../models/StageModel'
-import { ceramicInstance, createStage, loadStageLib } from './CeramicUtils'
+import { archiveStage, createStage } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import { StageNames } from '../../models/StageModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
@@ -54,30 +54,7 @@ export default class CeramicCompositionAPI {
      */
     archiveComposition = async (tag: string) => {
         try {
-            const compositionLib = await loadStageLib<StageLibType>(
-                this.user,
-                StageNames.composition
-            )
-            const updatedCompositionLib = {
-                ...compositionLib.content,
-            }
-            if (!updatedCompositionLib.archive)
-                updatedCompositionLib.archive = { lib: [] }
-
-            if (!updatedCompositionLib.archive.lib)
-                updatedCompositionLib.archive = {
-                    ...updatedCompositionLib.archive,
-                    lib: [],
-                }
-
-            updatedCompositionLib.archive.lib.push(
-                updatedCompositionLib.lib[tag]
-            )
-
-            delete updatedCompositionLib.lib[tag]
-            await compositionLib.update({
-                ...updatedCompositionLib,
-            })
+            await archiveStage(this.user, tag, StageNames.composition)
             return true
         } catch (e) {
             cpLogger.push(e)
@@ -91,7 +68,7 @@ export default class CeramicCompositionAPI {
      * @param compositionStreamID compositionStreamID
      */
     unarchiveComposition = async (compositionStreamID: string) => {
-        try {
+        /*  try {
             const compositionLib = await loadStageLib<StageLibType>(
                 this.user,
                 StageNames.composition
@@ -122,6 +99,6 @@ export default class CeramicCompositionAPI {
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
-        }
+        } */
     }
 }

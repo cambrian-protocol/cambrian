@@ -282,6 +282,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
         network: ethers.providers.Network,
         accountAddress: string
     ) => {
+        console.log(provider)
         let sessionStr = localStorage.getItem(
             `cambrian-session/${network.chainId}/${accountAddress}`
         )

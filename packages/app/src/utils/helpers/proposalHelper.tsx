@@ -3,11 +3,15 @@ import {
     ReceivedProposalsHashmapType,
     TemplateModel,
 } from '@cambrian/app/models/TemplateModel'
+import {
+    ceramicInstance,
+    loadCommitWorkaround,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import { CAMBRIAN_DID } from 'packages/app/config'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
-import { ProposalListItemType } from '@cambrian/app/components/list/ProposalListItem'
+import { ProposalInfoType } from '@cambrian/app/components/list/ProposalListItem'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
@@ -15,7 +19,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../transformers/Composition'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
@@ -34,7 +37,7 @@ export const getProposalStatus = (
         }
     } else if (approvedStageStack) {
         return ProposalStatus.Approved
-    } else if (proposal.isDeleted) {
+    } else if (proposal.isCanceled) {
         return ProposalStatus.Canceled
     } else if (receivedProposalCommits) {
         const proposalCommit =
@@ -312,10 +315,10 @@ export const createSolverConfigs = async (
     }
 }
 
-export const getProposalListItem = async (
+export const fetchProposalInfo = async (
     currentUser: UserType,
     proposalStreamID: string
-): Promise<ProposalListItemType> => {
+): Promise<ProposalInfoType> => {
     const cambrianStageStack = (
         await TileDocument.deterministic(ceramicInstance(currentUser), {
             controllers: [CAMBRIAN_DID],
@@ -332,9 +335,8 @@ export const getProposalListItem = async (
                 cambrianStageStack.proposalStack.proposalCommitID,
                 cambrianStageStack.proposalStack.proposal.template.commitID
             )
-
         return {
-            streamID: proposalStreamID,
+            title: cambrianStageStack.proposalStack.template.title,
             status: getProposalStatus(
                 cambrianStageStack.proposalStack.proposal,
                 cambrianStageStack.proposalStack,
@@ -343,11 +345,7 @@ export const getProposalListItem = async (
                     proposalStreamID
                 ]
             ),
-            title: cambrianStageStack.proposalStack.proposal.title,
-            isAuthor:
-                cambrianStageStack.proposalStack.proposal.author ===
-                currentUser.did,
-            templateTitle: cambrianStageStack.proposalStack.template.title,
+            template: cambrianStageStack.proposalStack.template,
         }
     } else {
         // before approved
@@ -385,29 +383,28 @@ export const getProposalListItem = async (
                 templateStreamContent.receivedProposals
             )
             if (latestProposalSubmission) {
-                proposalDoc = await ceramicInstance(currentUser).loadStream(
+                proposalDoc = await loadCommitWorkaround<ProposalModel>(
+                    currentUser,
                     latestProposalSubmission.proposalCommitID
                 )
             }
         }
-
         const templateCommitContent = (
-            await ceramicInstance(currentUser).loadStream(
+            await loadCommitWorkaround<TemplateModel>(
+                currentUser,
                 proposalDoc.content.template.commitID
             )
-        ).content as TemplateModel
+        ).content
 
         return {
-            streamID: proposalStreamID,
+            title: proposalDoc.content.title,
             status: getProposalStatus(
                 proposalDoc.content,
                 undefined,
                 onChainProposal,
                 templateStreamContent.receivedProposals[proposalStreamID]
             ),
-            title: proposalDoc.content.title,
-            templateTitle: templateCommitContent.title,
-            isAuthor: proposalDoc.content.author === currentUser.did,
+            template: templateCommitContent,
         }
     }
 }

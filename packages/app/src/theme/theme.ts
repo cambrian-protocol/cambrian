@@ -37,6 +37,7 @@ const colors: any = {
     'status-arbitration': '#be8b32',
     'status-executed': '#59b846',
     'status-proposed': '#aca0d6',
+    'background-skeleton': '#80808026',
 }
 
 export const cpTheme = deepMerge(grommet, {
@@ -181,18 +182,28 @@ export const cpTheme = deepMerge(grommet, {
             size: '20px',
         },
     },
-    tabs: {
-        header: {
-            background: 'background-front',
-            border: { side: 'all' },
-            extend: `
-            border-radius: 5px;
-            padding: 10px;
-            `,
-        },
-    },
     tab: {
-        border: false,
-        color: 'dark-4',
+        color: colors['dark-4'],
+        border: {
+            side: 'bottom',
+            color: 'border',
+            active: {
+                color: 'brand',
+            },
+            hover: {
+                color: 'border',
+            },
+        },
+        hover: {
+            background: 'background-front',
+            color: 'white',
+            extend: 'border-radius: 5px 5px 0px 0px ;',
+        },
+        pad: { bottom: 'small', top: 'small', horizontal: 'medium' },
+        margin: {
+            horizontal: 'none',
+        },
+        active: { color: 'white' },
     },
+    accordion: { border: { color: 'transparent' } },
 })

@@ -1,4 +1,8 @@
 import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
+import {
+    ceramicInstance,
+    saveCambrianCommitData,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
@@ -11,7 +15,6 @@ import { TextArea } from 'grommet'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { initialSubmission } from './SubmissionContainer'
@@ -61,6 +64,13 @@ const SubmissionForm = ({
         try {
             if (submissionsTileDocument) {
                 await onSave()
+
+                // NOTE: Work around until Ceramic fixes their commit load bug
+                await saveCambrianCommitData(
+                    currentUser,
+                    submissionsTileDocument.commitId.toString()
+                )
+
                 const transaction: ethers.ContractTransaction =
                     await moduleContract.submit(
                         solverAddress,

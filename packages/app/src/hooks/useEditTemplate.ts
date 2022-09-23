@@ -1,25 +1,23 @@
 import {
     addRecentStage,
+    loadCommitWorkaround,
     loadStageDoc,
 } from './../services/ceramic/CeramicUtils'
+import { updateStage } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import { TemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
+import { StageNames } from '../models/StageModel'
+import { TemplateModel } from '../models/TemplateModel'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
-import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
-import { ceramicInstance, updateStage } from '../services/ceramic/CeramicUtils'
-import { StageNames } from '../models/StageModel'
 
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
-    const [ceramicTemplateAPI, setCeramicTemplateAPI] =
-        useState<CeramicTemplateAPI>()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
     const [templateInput, setTemplateInput] = useState<TemplateModel>()
@@ -28,21 +26,10 @@ const useEditTemplate = () => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        initCeramic()
-    }, [currentUser])
+        if (router.isReady && currentUser) fetchTemplate()
+    }, [router, currentUser])
 
-    useEffect(() => {
-        if (router.isReady && ceramicTemplateAPI)
-            fetchTemplate(ceramicTemplateAPI)
-    }, [router, ceramicTemplateAPI])
-
-    const initCeramic = () => {
-        if (currentUser) {
-            setCeramicTemplateAPI(new CeramicTemplateAPI(currentUser))
-        }
-    }
-
-    const fetchTemplate = async (ceramicTemplateAPI: CeramicTemplateAPI) => {
+    const fetchTemplate = async () => {
         if (
             templateStreamID !== undefined &&
             typeof templateStreamID === 'string' &&
@@ -63,15 +50,12 @@ const useEditTemplate = () => {
                             !router.pathname.includes('new')) ||
                         currentUser.did === templateDoc.content.author
                     ) {
-                        await addRecentStage(
-                            currentUser,
-                            StageNames.template,
-                            templateStreamID
-                        )
+                        await addRecentStage(currentUser, templateStreamID)
 
                         const _composition = <CompositionModel>(
                             (
-                                await ceramicInstance(currentUser).loadStream(
+                                await loadCommitWorkaround(
+                                    currentUser,
                                     templateDoc.content.composition.commitID
                                 )
                             ).content
