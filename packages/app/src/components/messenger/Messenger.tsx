@@ -1,8 +1,8 @@
 import { Box, ResponsiveContext } from 'grommet'
 import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
-import CoreMessenger, { ChatType } from './CoreMessenger'
 
 import CambrianProfileInfo from '../info/CambrianProfileInfo'
+import CoreMessenger from './CoreMessenger'
 import { UserType } from '@cambrian/app/store/UserContext'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import { useState } from 'react'
@@ -11,13 +11,11 @@ interface MessengerProps {
     currentUser: UserType
     participantDIDs: string[]
     chatID: string
-    chatType: ChatType
 }
 
 const Messenger = ({
     currentUser,
     chatID,
-    chatType,
     participantDIDs,
 }: MessengerProps) => {
     const [showMessenger, setShowMessenger] = useState(false)
@@ -44,11 +42,7 @@ const Messenger = ({
                                 direction="row"
                                 justify="between"
                                 pad={'small'}
-                                onClick={
-                                    !showMessenger
-                                        ? toggleShowMessenger
-                                        : undefined
-                                }
+                                onClick={toggleShowMessenger}
                                 focusIndicator={false}
                             >
                                 <CambrianProfileInfo
@@ -57,15 +51,7 @@ const Messenger = ({
                                     size="small"
                                 />
                                 <IconContext.Provider value={{ size: '18' }}>
-                                    <Box
-                                        pad="small"
-                                        onClick={
-                                            showMessenger
-                                                ? toggleShowMessenger
-                                                : undefined
-                                        }
-                                        focusIndicator={false}
-                                    >
+                                    <Box pad="small">
                                         {showMessenger ? (
                                             <CaretDown />
                                         ) : (
@@ -78,7 +64,6 @@ const Messenger = ({
                                 showMessenger={showMessenger}
                                 currentUser={currentUser}
                                 chatID={chatID}
-                                chatType={chatType}
                                 participants={participantDIDs}
                             />
                         </Box>

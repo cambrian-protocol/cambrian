@@ -101,7 +101,6 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                         <Messenger
                             chatID={stageStack.proposalStreamID}
                             currentUser={currentUser}
-                            chatType={'Proposal'}
                             participantDIDs={
                                 currentUser.did === stageStack.template.author
                                     ? [stageStack.proposal.author]
