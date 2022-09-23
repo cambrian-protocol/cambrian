@@ -8,6 +8,7 @@ import { Scales } from 'phosphor-react'
 import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface RequestContractArbitrationComponentProps {
@@ -44,7 +45,7 @@ const RequestContractArbitrationComponent = ({
                     setFee(fee)
                 }
             } catch (e) {
-                console.log(e)
+                cpLogger.push(e)
             }
         }
         getFee()

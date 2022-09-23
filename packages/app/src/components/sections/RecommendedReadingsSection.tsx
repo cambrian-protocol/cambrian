@@ -55,7 +55,7 @@ const RecommendedReadingsSection = () => (
                                 imageUrl="https://images.mirror-media.xyz/nft/amWVCen3Byp9ObE5mK-ou.jpg"
                             />
                             <RecommendedReadingCard
-                                title="Decentraliation Is Not Enough"
+                                title="Decentralization Is Not Enough"
                                 author="Nicholas Wickman"
                                 href="https://mirror.xyz/0xCef01218f74937187c93EcD12EdAFE76fbbEEc8B/DbSmaxc8DQyP6zFs04qHkKA0PBoiutgOlNqIc_Geqpw"
                                 imageUrl="https://miro.medium.com/max/996/1*wfIFsy9EGy9ckI3L34QbTw.png"

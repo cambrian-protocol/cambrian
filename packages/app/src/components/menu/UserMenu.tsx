@@ -1,4 +1,12 @@
-import { Books, Question, SignIn, SignOut, User, Wallet } from 'phosphor-react'
+import {
+    Books,
+    Question,
+    SignIn,
+    SignOut,
+    User,
+    Wallet,
+    WarningOctagon,
+} from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -9,10 +17,13 @@ import { Menu } from 'grommet'
 import React from 'react'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
+import { clearStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useRouter } from 'next/router'
 
 export default function UserMenu() {
+    const router = useRouter()
     const { currentUser, disconnectWallet, connectWallet } =
         useCurrentUserContext()
 
@@ -35,12 +46,25 @@ export default function UserMenu() {
                 <UserMenuItemLabel
                     subTitle={ellipseAddress(currentUser.address, 9)}
                     label={
-                        currentUser.cambrianProfileDoc.content?.name || 'Anonym'
+                        currentUser.cambrianProfileDoc.content?.name || 'Anon'
                     }
                 />
             ),
             icon: <UserMenuItemIcon icon={<User />} />,
-            href: '/dashboard/profile',
+            onClick: () => router.push('/dashboard?idx=4'),
+        })
+        menuItems.push({
+            label: <UserMenuItemLabel label="Reset Account" />,
+            icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
+            onClick: async () => {
+                if (
+                    window.confirm(
+                        'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
+                    )
+                ) {
+                    await clearStagesLib(currentUser)
+                }
+            },
         })
         menuItems.push({
             label: (

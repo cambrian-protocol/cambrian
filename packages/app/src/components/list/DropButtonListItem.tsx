@@ -14,7 +14,7 @@ const DropButtonListItem = ({
     onClick,
 }: DropButtonListItemProps) => (
     <Box
-        pad="small"
+        pad={{ horizontal: 'medium', vertical: 'small' }}
         onClick={onClick}
         direction="row"
         align="center"

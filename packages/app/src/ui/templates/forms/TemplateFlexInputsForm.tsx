@@ -1,10 +1,18 @@
-import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
+import {
+    Box,
+    Button,
+    Form,
+    FormExtendedEvent,
+    FormField,
+    Text,
+    TextInput,
+} from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
@@ -12,10 +20,8 @@ import { isAddress } from 'ethers/lib/utils'
 
 interface TemplateFlexInputsFormProps {
     composition: CompositionModel
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel: () => void
@@ -56,7 +62,6 @@ const TemplateFlexInputsForm = ({
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
                     {templateInput.flexInputs.map((flexInput, idx) => {
-                        // Keeping collateralToken out as it is handled previously on its own
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
@@ -64,19 +69,8 @@ const TemplateFlexInputsForm = ({
                         return (
                             <Box key={idx}>
                                 <FormField
-                                    name={`flexInputs[${idx}].value`}
+                                    name={`flexInput[${idx}].value`}
                                     label={flexInput.label}
-                                    type={type}
-                                    value={templateInput.flexInputs[idx].value}
-                                    onChange={(e) => {
-                                        const inputsClone =
-                                            _.cloneDeep(templateInput)
-
-                                        inputsClone.flexInputs[idx].value =
-                                            e.target.value
-
-                                        setTemplateInput(inputsClone)
-                                    }}
                                     validate={[
                                         () => {
                                             if (
@@ -97,9 +91,29 @@ const TemplateFlexInputsForm = ({
                                             }
                                         },
                                     ]}
-                                />
+                                >
+                                    <TextInput
+                                        type={type}
+                                        value={
+                                            templateInput.flexInputs[idx].value
+                                        }
+                                        onChange={(e) => {
+                                            const inputsClone =
+                                                _.cloneDeep(templateInput)
+
+                                            inputsClone.flexInputs[idx].value =
+                                                e.target.value
+
+                                            setTemplateInput(inputsClone)
+                                        }}
+                                    />
+                                </FormField>
                                 {flexInput.description !== '' && (
-                                    <Text size="small" color="dark-4">
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
                                         {flexInput.description}
                                     </Text>
                                 )}

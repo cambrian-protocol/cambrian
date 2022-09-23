@@ -1,27 +1,34 @@
-import { ArrowsClockwise, CircleDashed, FilePlus } from 'phosphor-react'
-import { Box, Button, Heading, Spinner, Tab, Tabs, Text } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
+import { Accordion, Box, Button, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import CreateTemplateModal from './modals/CreateTemplateModal'
+import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { FilePlus } from 'phosphor-react'
+import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TemplateStagesLibType } from '@cambrian/app/models/StageModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface TemplatesDashboardUIProps {
     currentUser: UserType
+    templatesLib?: TemplateStagesLibType
 }
 
-const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-    const [templates, setTemplates] = useState<StringHashmap>()
+type TemplateHashmap = {
+    [templateStreamID: string]: TileDocument<TemplateModel>
+}
+
+const TemplatesDashboardUI = ({
+    currentUser,
+    templatesLib,
+}: TemplatesDashboardUIProps) => {
+    const [templates, setTemplates] = useState<TemplateHashmap>({})
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -32,140 +39,88 @@ const TemplatesDashboardUI = ({ currentUser }: TemplatesDashboardUIProps) => {
 
     useEffect(() => {
         fetchTemplates()
-    }, [])
+    }, [templatesLib])
 
     const fetchTemplates = async () => {
-        setIsFetching(true)
         try {
-            const templateStreams = (await ceramicStagehand.loadStagesMap(
-                StageNames.template
-            )) as StringHashmap
-
-            setTemplates(templateStreams)
+            setIsFetching(true)
+            if (templatesLib) {
+                setTemplates(
+                    (await ceramicInstance(currentUser).multiQuery(
+                        Object.values(templatesLib.lib).map((t) => {
+                            return { streamId: t }
+                        })
+                    )) as TemplateHashmap
+                )
+            } else {
+                setTemplates({})
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsFetching(false)
     }
 
-    const onDeleteTemplate = async (templateID: string) => {
-        try {
-            await ceramicStagehand.deleteStage(templateID, StageNames.template)
-            const updatedCompositions = { ...templates }
-            delete updatedCompositions[templateID]
-            setTemplates(updatedCompositions)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-    }
-
     return (
         <>
-            <PageLayout contextTitle="Templates" kind="narrow">
-                <Box fill pad={{ top: 'large' }}>
-                    <Box
-                        height={{ min: 'auto' }}
-                        direction="row"
-                        justify="between"
-                        align="center"
-                        pad="large"
-                        wrap
-                    >
-                        <Box>
-                            <Heading level="2">Templates Management</Heading>
-                            <Text color="dark-4">
-                                Create, edit or distribute your templates here
-                            </Text>
-                        </Box>
-                        <Box
-                            direction="row"
-                            gap="small"
-                            pad={{ vertical: 'small' }}
-                        >
-                            <Button
-                                secondary
-                                size="small"
-                                label="New Template"
-                                icon={<FilePlus />}
-                                onClick={toggleShowCreateTemplateModal}
-                            />
-                            <LoaderButton
-                                secondary
-                                isLoading={isFetching}
-                                icon={<ArrowsClockwise />}
-                                onClick={() => {
-                                    fetchTemplates()
-                                }}
-                            />
-                        </Box>
-                    </Box>
-                    <Box fill pad={'large'}>
-                        <Tabs alignControls="start">
-                            <Tab
-                                title={`Your Templates (${
-                                    templates
-                                        ? Object.keys(templates).length
-                                        : 0
-                                })`}
-                            >
-                                <Box pad={{ top: 'medium' }}>
-                                    {templates &&
-                                    Object.keys(templates).length > 0 ? (
-                                        <Box gap="small">
-                                            {Object.keys(templates).map(
-                                                (templateID) => (
-                                                    <TemplateListItem
-                                                        key={templateID}
-                                                        templateStreamID={
-                                                            templates[
-                                                                templateID
-                                                            ]
-                                                        }
-                                                        templateID={templateID}
-                                                        /*  onDelete={
-                                                                onDeleteTemplate
-                                                            } */
-                                                    />
-                                                )
-                                            )}
-                                        </Box>
-                                    ) : (
-                                        <Box
-                                            border
-                                            fill
-                                            justify="center"
-                                            align="center"
-                                            gap="medium"
-                                            pad="large"
-                                            round="xsmall"
-                                        >
-                                            {isFetching ? (
-                                                <Spinner />
-                                            ) : (
-                                                <>
-                                                    <CircleDashed size="32" />
-                                                    <Text
-                                                        size="small"
-                                                        color="dark-4"
-                                                    >
-                                                        You don't have any
-                                                        templates yet
-                                                    </Text>
-                                                </>
-                                            )}
-                                        </Box>
+            <Box fill gap="medium" pad={{ top: 'medium' }}>
+                <DashboardHeader
+                    title="Templates Management"
+                    description="Create, edit or distribute your templates here"
+                    controls={[
+                        <Button
+                            secondary
+                            size="small"
+                            label="New Template"
+                            icon={<FilePlus />}
+                            onClick={toggleShowCreateTemplateModal}
+                        />,
+                    ]}
+                />
+                <Box fill>
+                    <Text color={'dark-4'}>
+                        Your Templates (
+                        {templates && Object.keys(templates).length})
+                    </Text>
+                    <Box pad={{ top: 'medium' }}>
+                        {templates && Object.keys(templates).length > 0 ? (
+                            <Box gap="small">
+                                <Accordion gap="small">
+                                    {Object.keys(templates).map(
+                                        (templateStreamID) => (
+                                            <TemplateListItem
+                                                key={templateStreamID}
+                                                currentUser={currentUser}
+                                                templateStreamID={
+                                                    templateStreamID
+                                                }
+                                                template={
+                                                    templates[templateStreamID]
+                                                        .content
+                                                }
+                                                receivedProposalsArchive={
+                                                    templatesLib?.archive
+                                                        .receivedProposals
+                                                }
+                                            />
+                                        )
                                     )}
-                                </Box>
-                            </Tab>
-                        </Tabs>
+                                </Accordion>
+                            </Box>
+                        ) : (
+                            <ListSkeleton
+                                isFetching={isFetching}
+                                subject="templates"
+                            />
+                        )}
                     </Box>
-                    <Box pad="large" />
                 </Box>
-            </PageLayout>
+                <Box pad="large" />
+            </Box>
             {showCreateTemplateModal && (
                 <CreateTemplateModal
+                    currentUser={currentUser}
                     onClose={toggleShowCreateTemplateModal}
-                    ceramicStagehand={ceramicStagehand}
                 />
             )}
             {errorMessage && (

@@ -4,13 +4,11 @@ import {
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -18,11 +16,11 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface ProposalPublishStepProps {
-    proposalStreamDoc: TileDocument<CeramicProposalModel>
+    proposalStreamID: string
 }
 
 const ProposalPublishStep = ({
-    proposalStreamDoc,
+    proposalStreamID,
 }: ProposalPublishStepProps) => {
     const { currentUser } = useCurrentUserContext()
 
@@ -35,12 +33,10 @@ const ProposalPublishStep = ({
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            await ceramicStagehand.submitProposal(proposalStreamDoc)
+            const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+            await ceramicProposalAPI.submitProposal(proposalStreamID)
             router.push(
-                `${
-                    window.location.origin
-                }/proposals/${proposalStreamDoc.id.toString()}`
+                `${window.location.origin}/proposals/${proposalStreamID}`
             )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -67,9 +63,7 @@ const ProposalPublishStep = ({
                     }
                     secondaryButton={
                         <Link
-                            href={`${
-                                window.location.origin
-                            }/dashboard/proposals/edit/${proposalStreamDoc.id.toString()}`}
+                            href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
                             passHref
                         >
                             <Button

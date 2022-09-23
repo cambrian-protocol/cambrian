@@ -216,6 +216,7 @@ describe("SolverCoopCallbacks", async function () {
     //Fund and execute Solver chain
     await this.ToyToken.connect(this.buyer).transfer(solvers[0].address, 100);
     await solvers[0].connect(this.keeper).prepareSolve(0);
+
     await solvers[0].connect(this.keeper).executeSolve(0);
 
     const indexSetSuccess = getIndexSetFromBinaryArray([1, 0]); // If success

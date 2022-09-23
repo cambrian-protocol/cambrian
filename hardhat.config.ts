@@ -22,14 +22,30 @@ export const config = {
   },
   networks: {
     hardhat: {
-      blockGasLimit: 15000000,
+      // blockGasLimit: 15000000,
     },
     ropsten: {
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_ROPSTEN_ID}`,
-      accounts: process.env.ROPSTEN_PRIVATE_KEY
-        ? [`${process.env.ROPSTEN_PRIVATE_KEY}`]
-        : [],
+      url: `https://ropsten.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
       blockGasLimit: 4000000,
+    },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+      // blockGasLimit: 4000000,
+    },
+    nova: {
+      url: "https://nova.arbitrum.io/rpc",
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+    },
+    arbitrum: {
+      url: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+    },
+  },
+  etherscan: {
+    apiKey: {
+      goerli: "2M5WQBZ8XMJSZW9HVIUAXKAAJW2ZCZEWQW",
     },
   },
   solidity: {

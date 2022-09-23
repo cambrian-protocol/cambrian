@@ -60,7 +60,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     const [currentCondition, setCurrentCondition] =
         useState<SolverContractCondition>()
-    // IPFS data
     const [metadata, setMetadata] = useState<SolverMetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -183,7 +182,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     }
 
     /* 
-        Initializes solver data and stores ipfs data into state. 
+        Initializes solver data and stores ceramic data into state. 
         Note: SolverConfig is fetched outside of getSolverData() to store IPFS Outcomes into state. Integrated as optional param so the updateSolverData function gets a fresh solverConfig on update.  
     */
     const init = async () => {
@@ -306,14 +305,13 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                 <InteractionLayout
                     proposalHeader={
                         <ProposalHeader
-                            proposalStack={metadata?.proposalStack}
+                            stageStack={metadata?.stageStack}
                             proposalStatus={ProposalStatus.Executed}
                             showProposalDetails
                         />
                     }
                     contextTitle={
-                        metadata?.proposalStack?.proposalDoc.content?.title ||
-                        'Solver'
+                        metadata?.stageStack?.proposal?.title || 'Solver'
                     }
                     actionBar={
                         <SolverActionbar

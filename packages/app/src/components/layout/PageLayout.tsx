@@ -14,13 +14,19 @@ import WrongChainSection from '../sections/WrongChainSection'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
-    contextTitle: string
+    contextTitle?: string
     kind?: 'narrow'
+    plain?: boolean
 }
 
 export const siteTitle = 'Cambrian Protocol'
 
-const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
+const PageLayout = ({
+    contextTitle,
+    children,
+    kind,
+    plain,
+}: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
     const { currentUser } = useCurrentUserContext()
 
@@ -28,7 +34,8 @@ const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
         <>
             <Head>
                 <title>
-                    {contextTitle} | {siteTitle}
+                    {contextTitle && `${contextTitle} | `}
+                    {siteTitle}
                 </title>
                 <meta name="description" content={siteTitle} />
                 <meta name="og:title" content={siteTitle} />
@@ -37,6 +44,7 @@ const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
             <Box height={'100vh'}>
                 <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
                 <Page
+                    id="root-page"
                     style={{ position: 'relative' }}
                     overflow={{ horizontal: 'hidden', vertical: 'auto' }}
                 >
@@ -47,16 +55,18 @@ const PageLayout = ({ contextTitle, children, kind }: PageLayoutProps) => {
                         left={'5%'}
                         top={'-200px'}
                     />
-                    <WorldMap
-                        color="brand"
-                        style={{
-                            position: 'absolute',
-                            top: '10%',
-                            left: '20%',
-                            opacity: 0.03,
-                            height: '70vh',
-                        }}
-                    />
+                    {!plain && (
+                        <WorldMap
+                            color="brand"
+                            style={{
+                                position: 'absolute',
+                                top: '10%',
+                                left: '20%',
+                                opacity: 0.03,
+                                height: '70vh',
+                            }}
+                        />
+                    )}
                     <Appbar />
                     <Box
                         align={kind === 'narrow' ? 'center' : undefined}

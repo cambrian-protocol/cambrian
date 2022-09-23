@@ -1,29 +1,30 @@
 import { Box, Spinner, Text } from 'grommet'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import randimals from 'randimals'
 import router from 'next/router'
 
 interface CreateTemplateModalProps {
     onClose: () => void
-    ceramicStagehand: CeramicStagehand
+    currentUser: UserType
 }
 
 const CreateTemplateModal = ({
     onClose,
-    ceramicStagehand,
+    currentUser,
 }: CreateTemplateModalProps) => {
+    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [compositions, setCompositions] = useState<StringHashmap>()
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -34,10 +35,12 @@ const CreateTemplateModal = ({
 
     const fetchCompositions = async () => {
         try {
-            const compositionStreams = (await ceramicStagehand.loadStagesMap(
-                StageNames.composition
-            )) as StringHashmap
-            setCompositions(compositionStreams)
+            const stagesLib = await loadStagesLib(currentUser)
+            if (stagesLib && stagesLib.content.compositions) {
+                setCompositions(stagesLib.content.compositions.lib)
+            } else {
+                setCompositions({})
+            }
         } catch (e) {
             await cpLogger.push(e)
         }
@@ -46,11 +49,11 @@ const CreateTemplateModal = ({
     const onSelectComposition = async (compositionStreamID: string) => {
         setIsCreatingTemplate(compositionStreamID)
         try {
-            const { streamID } = await ceramicStagehand.createTemplate(
+            const streamID = await ceramicTemplateAPI.createTemplate(
                 randimals(),
                 compositionStreamID
             )
-            router.push(`templates/new/${streamID}`)
+            if (streamID) router.push(`/dashboard/templates/new/${streamID}`)
         } catch (e) {
             setIsCreatingTemplate(undefined)
             setErrorMessage(await cpLogger.push(e))

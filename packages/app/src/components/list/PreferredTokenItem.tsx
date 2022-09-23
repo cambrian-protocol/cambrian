@@ -1,17 +1,15 @@
 import { Box } from 'grommet'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import ClipboardAddress from '../info/ClipboardAddress'
 import { SetStateAction } from 'react'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TokenAvatar from '../avatars/TokenAvatar'
 import { X } from 'phosphor-react'
 import _ from 'lodash'
 
 interface PreferredTokenItemProps {
     idx: number
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
 }
 const PreferredTokenItem = ({
     idx,

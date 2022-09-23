@@ -1,4 +1,5 @@
-import { Box } from 'grommet'
+import { Box, Image } from 'grommet'
+
 import { Heading } from 'grommet'
 import { ResponsiveContext } from 'grommet'
 import { Text } from 'grommet'
@@ -8,7 +9,12 @@ const EnderSection = () => (
         {(screenSize) => {
             return (
                 <Box justify="center" align="center" height={{ min: '30vh' }}>
+                    <Image
+                        src="/illustrations/wave.svg"
+                        style={{ position: 'absolute', opacity: '0.3' }}
+                    />
                     <Box
+                        style={{ position: 'relative' }}
                         direction="row"
                         width={'xlarge'}
                         wrap="reverse"

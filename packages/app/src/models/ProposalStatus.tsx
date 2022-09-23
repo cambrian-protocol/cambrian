@@ -4,6 +4,7 @@ import {
     Coins,
     Eye,
     FileDotted,
+    FileX,
     PencilSimpleLine,
     Question,
 } from 'phosphor-react'
@@ -14,6 +15,7 @@ export enum ProposalStatus {
     OnReview,
     ChangeRequested,
     Modified,
+    Canceled,
     Approved,
     Funding,
     Executed,
@@ -48,6 +50,13 @@ PROPOSAL_STATUS_INFO[ProposalStatus.OnReview] = {
     description:
         'Proposal has been submitted to the Seller and needs approval.',
     color: 'status-executed',
+}
+PROPOSAL_STATUS_INFO[ProposalStatus.Canceled] = {
+    name: 'CANCELED',
+    icon: <FileX />,
+    description:
+        'Proposal has been declined by the templater or deleted by the proposer.',
+    color: 'status-error',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.ChangeRequested] = {
     name: 'CHANGE REQUESTED',

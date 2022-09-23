@@ -2,15 +2,19 @@ import { Box } from 'grommet'
 import { Image } from 'grommet'
 import { useRouter } from 'next/router'
 
-const CambrianLogoMark = () => {
+interface CambrianLogoMarkProps {
+    size?: 'xxsmall' | 'xsmall' | 'small' | 'medium' | 'large'
+}
+
+const CambrianLogoMark = ({ size }: CambrianLogoMarkProps) => {
     const router = useRouter()
     return (
         <Box
             onClick={() => router.push('/')}
             focusIndicator={false}
             width={{
-                min: 'xxsmall',
-                max: 'xxsmall',
+                min: size ? size : 'xxsmall',
+                max: size ? size : 'xxsmall',
             }}
         >
             <Image src="/images/logo/cambrian_protocol_logo.svg" />

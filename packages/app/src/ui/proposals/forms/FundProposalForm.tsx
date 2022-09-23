@@ -7,7 +7,6 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
@@ -22,6 +21,7 @@ import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface FundProposalFormProps {
@@ -265,15 +265,20 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
                 if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
 
                 if (solution.solverConfigsURI) {
-                    const cs = new CeramicStagehand(currentUser.selfID)
-                    const ceramicSolverConfigs = (await cs.loadTileDocument(
+                    const solverConfigDoc = (await TileDocument.load(
+                        ceramicInstance(currentUser),
                         solution.solverConfigsURI
                     )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>
 
-                    await proposalsHub.executeProposal(
-                        proposal.id,
-                        ceramicSolverConfigs.content.solverConfigs
-                    )
+                    if (
+                        solverConfigDoc.content !== null &&
+                        typeof solverConfigDoc.content === 'object'
+                    ) {
+                        await proposalsHub.executeProposal(
+                            proposal.id,
+                            solverConfigDoc.content.solverConfigs
+                        )
+                    }
                 }
             }
         }, setIsInPrimaryTransaction)
@@ -307,7 +312,7 @@ const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
             <Box gap="medium">
                 <PlainSectionDivider />
                 <>
-                    <Heading level="3">Back this Proposal</Heading>
+                    <Heading level="3">Fund this Proposal</Heading>
                     <Text color="dark-4" size="small">
                         Invested funds can be defunded until the proposal has
                         been executed

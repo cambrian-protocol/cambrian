@@ -17,6 +17,8 @@ export const IPFS_GATEWAYS = [
 
 // Ceramic
 export const CERAMIC_NODE_ENDPOINT = 'https://ceramic.cambrianprotocol.com'
+export const CAMBRIAN_DID =
+    'did:key:z6MkqxJBUMkyryRaeYi6o2MKVNxr4kf1kzaK4ab7GsK8ByAz'
 
 // BE Endpoints
 export const WEBHOOK_API_ENDPOINT =
@@ -26,6 +28,3 @@ export const ERROR_LOG_API_ENDPOINT =
 
 // Trilobot
 export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com'
-
-// Websocket
-export const TRILOBOT_WS_ENDPOINT = 'wss://trilobot.cambrianprotocol.com'

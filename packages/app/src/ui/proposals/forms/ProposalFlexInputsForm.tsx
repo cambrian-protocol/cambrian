@@ -1,20 +1,18 @@
-import { Box, Button, Form, FormField, Text } from 'grommet'
+import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
-import { CeramicProposalModel } from '@cambrian/app/models/ProposalModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
 interface ProposalFlexInputsFormProps {
-    proposalInput: CeramicProposalModel
+    proposalInput: ProposalModel
     composition: CompositionModel
-    setProposalInput: React.Dispatch<
-        SetStateAction<CeramicProposalModel | undefined>
-    >
+    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
     onSubmit: () => Promise<void>
     submitLabel?: string
     onCancel?: () => void
@@ -56,17 +54,6 @@ const ProposalFlexInputsForm = ({
                                 <FormField
                                     name={`flexInputs[${idx}].value`}
                                     label={flexInput.label}
-                                    type={type}
-                                    value={flexInput.value}
-                                    onChange={(e) => {
-                                        const inputsClone =
-                                            _.cloneDeep(proposalInput)
-
-                                        inputsClone.flexInputs[idx].value =
-                                            e.target.value
-
-                                        setProposalInput(inputsClone)
-                                    }}
                                     validate={[
                                         () =>
                                             isRequired(
@@ -86,9 +73,27 @@ const ProposalFlexInputsForm = ({
                                             }
                                         },
                                     ]}
-                                />
+                                >
+                                    <TextInput
+                                        type={type}
+                                        value={flexInput.value}
+                                        onChange={(e) => {
+                                            const inputsClone =
+                                                _.cloneDeep(proposalInput)
+
+                                            inputsClone.flexInputs[idx].value =
+                                                e.target.value
+
+                                            setProposalInput(inputsClone)
+                                        }}
+                                    />
+                                </FormField>
                                 {flexInput.description !== '' && (
-                                    <Text size="small" color="dark-4">
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
                                         {flexInput.description}
                                     </Text>
                                 )}

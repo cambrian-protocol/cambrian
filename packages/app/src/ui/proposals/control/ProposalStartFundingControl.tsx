@@ -1,10 +1,6 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-
 import { Box } from 'grommet'
 import { Coins } from 'phosphor-react'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -16,17 +12,16 @@ import { useState } from 'react'
 
 const ProposalStartFundingControl = () => {
     const { currentUser } = useCurrentUserContext()
-    const { proposalStack } = useProposalContext()
+    const { stageStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onDeployProposal = async () => {
         setIsInTransaction(true)
         try {
-            if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
-            if (!proposalStack) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-
-            await deployProposal(currentUser, proposalStack)
+            if (currentUser && stageStack) {
+                await deployProposal(currentUser, stageStack)
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

@@ -10,6 +10,11 @@ export type ErrorMessageType = {
 }
 
 export const GENERAL_ERROR: ErrorMessagesType = {
+    TRILOBOT_ERROR: {
+        title: 'Error while fetching from Trilobot',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
     CHAIN_NOT_SUPPORTED: {
         title: 'Unsupported Blockchain',
         message: 'Please connect to the a supported Blockchain.',
@@ -27,6 +32,11 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
     CERAMIC_LOAD_ERROR: {
         title: 'Error while loading data from Ceramic',
+        message: 'Please try again later...',
+        logLevel: 1,
+    },
+    STAGE_LIB_ERROR: {
+        title: 'Error while loading stage lib from Ceramic',
         message: 'Please try again later...',
         logLevel: 1,
     },

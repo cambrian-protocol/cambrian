@@ -1,4 +1,3 @@
-import ConnectWalletSection from '@cambrian/app/components/sections/ConnectWalletSection'
 import Custom404Page from 'packages/app/pages/404'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
@@ -10,8 +9,6 @@ import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function NewTemplatePage() {
     const {
-        isUserLoaded,
-        currentUser,
         show404NotFound,
         templateInput,
         composition,
@@ -24,31 +21,20 @@ export default function NewTemplatePage() {
 
     return (
         <>
-            {isUserLoaded ? (
-                currentUser ? (
-                    show404NotFound ? (
-                        <Custom404Page />
-                    ) : templateInput && composition ? (
-                        <PageLayout contextTitle="New Template" kind="narrow">
-                            <TemplateWizard
-                                composition={composition}
-                                currentUser={currentUser}
-                                templateInput={templateInput}
-                                setTemplateInput={setTemplateInput}
-                                templateStreamID={templateStreamID as string}
-                                onSaveTemplate={onSaveTemplate}
-                            />
-                        </PageLayout>
-                    ) : (
-                        <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
-                    )
-                ) : (
-                    <PageLayout contextTitle="Connect your Wallet">
-                        <ConnectWalletSection />
-                    </PageLayout>
-                )
+            {show404NotFound ? (
+                <Custom404Page />
+            ) : templateInput && composition ? (
+                <PageLayout contextTitle="New Template" kind="narrow">
+                    <TemplateWizard
+                        composition={composition}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        templateStreamID={templateStreamID as string}
+                        onSaveTemplate={onSaveTemplate}
+                    />
+                </PageLayout>
             ) : (
-                <LoadingScreen context={LOADING_MESSAGE['WALLET']} />
+                <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
             )}
             {errorMessage && (
                 <ErrorPopupModal

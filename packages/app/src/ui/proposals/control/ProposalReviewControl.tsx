@@ -5,7 +5,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -20,8 +20,8 @@ interface ProposalReviewControlProps {
 }
 
 const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
-    const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-    const { proposalStack, templateStreamDoc } = useProposalContext()
+    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
+    const { stageStack } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [isApproving, setIsApproving] = useState(false)
@@ -29,12 +29,11 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (proposalStack && templateStreamDoc) {
+        if (stageStack) {
             try {
-                const res = await ceramicStagehand.approveProposal(
+                const res = await ceramicTemplateAPI.approveProposal(
                     currentUser,
-                    templateStreamDoc,
-                    proposalStack
+                    stageStack
                 )
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
@@ -47,11 +46,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (proposalStack && templateStreamDoc) {
+        if (stageStack) {
             try {
-                const res = await ceramicStagehand.requestProposalChange(
-                    templateStreamDoc,
-                    proposalStack
+                const res = await ceramicTemplateAPI.requestProposalChange(
+                    stageStack
                 )
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']

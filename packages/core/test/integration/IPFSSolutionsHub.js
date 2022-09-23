@@ -182,8 +182,6 @@ describe("IPFSSolutionsHub", function () {
 
     const solution = await this.IPFSSolutionsHub.getSolution(solutionId);
 
-    console.log(solution);
-
     expect(solution.executed).to.equal(true);
     expect(solution.solverConfigsURI).to.equal(cid);
 
@@ -198,10 +196,12 @@ describe("IPFSSolutionsHub", function () {
       ethers.provider
     );
 
+    const condition = await solver.conditions(0);
+    expect(condition.status).to.equal(1);
+
     await solver.connect(this.keeper).proposePayouts(0, [1, 0]);
     await solver.connect(this.keeper).confirmPayouts(0);
 
-    const condition = await solver.conditions(0);
     await this.CT.connect(this.seller).redeemPositions(
       this.ToyToken.address,
       ethers.constants.HashZero,

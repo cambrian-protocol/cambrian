@@ -1,4 +1,8 @@
 import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
+import {
+    ceramicInstance,
+    saveCambrianCommitData,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
@@ -43,9 +47,9 @@ const SubmissionForm = ({
 
     const init = async () => {
         const submissionDoc = (await TileDocument.deterministic(
-            currentUser.selfID.client.ceramic,
+            ceramicInstance(currentUser),
             {
-                controllers: [currentUser.selfID.id],
+                controllers: [currentUser.did],
                 family: 'cambrian-ipfs-text-submitter',
                 tags: [solverAddress],
             },
@@ -60,6 +64,13 @@ const SubmissionForm = ({
         try {
             if (submissionsTileDocument) {
                 await onSave()
+
+                // NOTE: Work around until Ceramic fixes their commit load bug
+                await saveCambrianCommitData(
+                    currentUser,
+                    submissionsTileDocument.commitId.toString()
+                )
+
                 const transaction: ethers.ContractTransaction =
                     await moduleContract.submit(
                         solverAddress,
@@ -90,7 +101,7 @@ const SubmissionForm = ({
                         timestamp: new Date(),
                     },
                     {
-                        controllers: [currentUser.selfID.id],
+                        controllers: [currentUser.did],
                         family: 'cambrian-ipfs-text-submitter',
                         tags: [solverAddress],
                     },

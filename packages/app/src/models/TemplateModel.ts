@@ -1,7 +1,7 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 import { TokenModel } from './TokenModel'
 
-export type CeramicTemplateModel = {
+export type TemplateModel = {
     title: string
     description: string
     requirements: string
@@ -13,6 +13,7 @@ export type CeramicTemplateModel = {
     flexInputs: FlexInputFormType[]
     author: string // DID
     receivedProposals: ReceivedProposalsHashmapType
+    isActive?: boolean
 }
 
 export type ReceivedProposalsHashmapType = {
@@ -26,6 +27,7 @@ export type ReceivedProposalCommitType = {
 export type ReceivedProposalPropsType = {
     approved?: boolean
     requestChange?: boolean
+    isDeclined?: boolean
 }
 
 export type TemplatePriceModel = {

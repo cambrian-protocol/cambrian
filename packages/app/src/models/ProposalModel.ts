@@ -1,6 +1,6 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 
-export type CeramicProposalModel = {
+export type ProposalModel = {
     title: string
     description: string
     flexInputs: FlexInputFormType[]
@@ -11,4 +11,5 @@ export type CeramicProposalModel = {
     price: { amount: number; tokenAddress: string }
     author: string // DID
     isSubmitted: boolean
+    isCanceled?: boolean
 }

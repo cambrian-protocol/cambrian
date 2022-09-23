@@ -1,14 +1,19 @@
-import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
+import {
+    ceramicInstance,
+    loadStageDoc,
+    updateStage,
+} from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import { CeramicProposalModel } from '../models/ProposalModel'
-import { CeramicTemplateModel } from '../models/TemplateModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
-import { ProposalStackType } from '../store/ProposalContext'
+import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { StageNames } from '../models/StageModel'
+import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
+import { TemplateModel } from '../models/TemplateModel'
 import _ from 'lodash'
 import { cpLogger } from './../services/api/Logger.api'
+import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -16,14 +21,12 @@ const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
-    const [proposalInput, setProposalInput] = useState<CeramicProposalModel>()
-    const [proposalStack, setProposalStack] = useState<ProposalStackType>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
+    const [proposalInput, setProposalInput] = useState<ProposalModel>()
+    const [stageStack, setStageStack] = useState<StageStackType>()
+
     const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
         ProposalStatus.Unknown
     )
-    const [proposalStreamDoc, setProposalStreamDoc] =
-        useState<TileDocument<CeramicProposalModel>>()
     const [isLoaded, setIsLoaded] = useState(false)
     const [isValidProposal, setIsValidProposal] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -39,47 +42,49 @@ const useEditProposal = () => {
             typeof proposalStreamID === 'string'
         ) {
             try {
-                const ceramicStagehand = new CeramicStagehand(
-                    currentUser.selfID
+                const _proposalStreamDoc = await loadStageDoc<ProposalModel>(
+                    currentUser,
+                    proposalStreamID
                 )
-                setCeramicStagehand(ceramicStagehand)
 
-                const _proposalStreamDoc =
-                    (await ceramicStagehand.loadTileDocument(
-                        proposalStreamID
-                    )) as TileDocument<CeramicProposalModel>
-
-                if (
-                    _proposalStreamDoc.content.author ===
-                    currentUser.selfID.did.id
-                ) {
-                    const _templateStreamDoc =
-                        (await ceramicStagehand.loadTileDocument(
+                if (_proposalStreamDoc.content.author === currentUser.did) {
+                    const _templateStreamContent = (
+                        await ceramicInstance(currentUser).loadStream(
                             _proposalStreamDoc.content.template.streamID
-                        )) as TileDocument<CeramicTemplateModel>
+                        )
+                    ).content as TemplateModel
 
-                    if (_proposalStreamDoc.content.isSubmitted) {
-                        setProposalStatus(ProposalStatus.ChangeRequested)
-                    } else if (
-                        _templateStreamDoc.content.receivedProposals[
+                    // Note: To edit a proposal it must be either not submitted or a change has been requested
+                    const receivedSubmissions =
+                        _templateStreamContent.receivedProposals[
                             proposalStreamID
                         ]
+                    if (
+                        (receivedSubmissions &&
+                            receivedSubmissions[receivedSubmissions.length - 1]
+                                .requestChange) ||
+                        !_proposalStreamDoc.content.isSubmitted
                     ) {
-                        setProposalStatus(ProposalStatus.Modified)
-                    } else {
-                        setProposalStatus(ProposalStatus.Draft)
-                    }
+                        if (_proposalStreamDoc.content.isSubmitted) {
+                            setProposalStatus(ProposalStatus.ChangeRequested)
+                        } else if (
+                            _templateStreamContent.receivedProposals[
+                                proposalStreamID
+                            ]
+                        ) {
+                            setProposalStatus(ProposalStatus.Modified)
+                        } else {
+                            setProposalStatus(ProposalStatus.Draft)
+                        }
 
-                    const _proposalStackClones =
-                        await ceramicStagehand.loadProposalStackFromID(
+                        const _stageStack = await loadStageStackFromID(
+                            currentUser,
                             proposalStreamID
                         )
-                    validateProposal(_proposalStackClones.proposalDoc.content)
-                    setProposalStreamDoc(_proposalStreamDoc)
-                    setProposalStack(_proposalStackClones)
-                    setProposalInput(
-                        _.cloneDeep(_proposalStackClones.proposalDoc.content)
-                    )
+                        validateProposal(_stageStack.proposal)
+                        setStageStack(_stageStack)
+                        setProposalInput(_.cloneDeep(_stageStack.proposal))
+                    }
                 }
                 setIsLoaded(true)
             } catch (e) {
@@ -89,27 +94,26 @@ const useEditProposal = () => {
     }
 
     const saveProposal = async (): Promise<boolean> => {
-        if (proposalInput && ceramicStagehand && proposalStack) {
-            if (!_.isEqual(proposalInput, proposalStack.proposalDoc.content)) {
+        if (proposalInput && stageStack && currentUser) {
+            if (!_.isEqual(proposalInput, stageStack.proposal)) {
                 try {
-                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                    const title = await updateStage(
                         proposalStreamID as string,
                         { ...proposalInput, isSubmitted: false },
-                        StageNames.proposal
+                        StageNames.proposal,
+                        currentUser
                     )
                     const proposalWithUniqueTitle = {
                         ...proposalInput,
-                        title: uniqueTag,
+                        title: title,
                         isSubmitted: false,
                     }
                     validateProposal(proposalWithUniqueTitle)
                     setProposalInput(proposalWithUniqueTitle)
 
-                    await ceramicStagehand.loadProposalStackFromID(
-                        proposalStreamID as string
-                    )
-                    setProposalStack(
-                        await ceramicStagehand.loadProposalStackFromID(
+                    setStageStack(
+                        await loadStageStackFromID(
+                            currentUser,
                             proposalStreamID as string
                         )
                     )
@@ -128,12 +132,12 @@ const useEditProposal = () => {
     }
 
     const resetProposalInput = () => {
-        if (proposalStack) {
-            setProposalInput(_.cloneDeep(proposalStack.proposalDoc.content))
+        if (stageStack) {
+            setProposalInput(_.cloneDeep(stageStack.proposal))
         }
     }
 
-    const validateProposal = (proposal: CeramicProposalModel) => {
+    const validateProposal = (proposal: ProposalModel) => {
         setIsValidProposal(
             proposal.title.trim().length > 0 &&
                 proposal.description.trim().length > 0 &&
@@ -145,9 +149,9 @@ const useEditProposal = () => {
     }
 
     return {
+        proposalStreamID: proposalStreamID as string,
         isValidProposal: isValidProposal,
-        proposalStreamDoc: proposalStreamDoc,
-        proposalStack: proposalStack,
+        stageStack: stageStack,
         onResetProposalInput: resetProposalInput,
         onSaveProposal: saveProposal,
         proposalInput: proposalInput,

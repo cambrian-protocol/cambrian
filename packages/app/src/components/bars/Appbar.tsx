@@ -1,5 +1,5 @@
-import { Box, ResponsiveContext, Text } from 'grommet'
-import { IconContext, Rows, StackSimple, TreeStructure } from 'phosphor-react'
+import { Box, Button, ResponsiveContext } from 'grommet'
+import { IconContext, Layout } from 'phosphor-react'
 
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
@@ -11,6 +11,7 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 
 const Appbar = () => {
     const { currentUser } = useCurrentUserContext()
+
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
@@ -38,30 +39,11 @@ const Appbar = () => {
                             )}
                             <Box flex />
                             {currentUser && (
-                                <Box
-                                    direction="row"
-                                    gap="small"
-                                    align={
-                                        screenSize === 'small'
-                                            ? 'center'
-                                            : 'end'
-                                    }
-                                    pad={{ right: 'large' }}
-                                >
+                                <Box justify={'center'}>
                                     <AppbarMenuItem
-                                        pathname="/dashboard/templates"
-                                        label="Templates"
-                                        icon={<StackSimple />}
-                                    />
-                                    <AppbarMenuItem
-                                        pathname="/dashboard/proposals"
-                                        label="Proposals"
-                                        icon={<Rows />}
-                                    />
-                                    <AppbarMenuItem
-                                        pathname="/dashboard/compositions"
-                                        label="Compositions"
-                                        icon={<TreeStructure />}
+                                        pathname="/dashboard"
+                                        label="Dashboard"
+                                        icon={<Layout />}
                                     />
                                 </Box>
                             )}
@@ -89,42 +71,19 @@ const AppbarMenuItem = ({ icon, pathname, label }: AppbarMenuItemProps) => {
     }
 
     return (
-        <ResponsiveContext.Consumer>
-            {(screenSize) => {
-                return (
-                    <Link href={pathname} passHref>
-                        <Box
-                            pad={{ vertical: 'small', horizontal: 'medium' }}
-                            align="center"
-                            focusIndicator={false}
-                            gap="xsmall"
-                        >
-                            <IconContext.Provider
-                                value={
-                                    isActive
-                                        ? { size: '24' }
-                                        : {
-                                              size: '24',
-                                              color: cpTheme.global.colors[
-                                                  'dark-4'
-                                              ],
-                                          }
-                                }
-                            >
-                                {icon}
-                            </IconContext.Provider>
-                            {screenSize !== 'small' && (
-                                <Text
-                                    size="xsmall"
-                                    color={isActive ? undefined : 'dark-4'}
-                                >
-                                    {label}
-                                </Text>
-                            )}
-                        </Box>
-                    </Link>
-                )
-            }}
-        </ResponsiveContext.Consumer>
+        <IconContext.Provider
+            value={
+                isActive
+                    ? { size: '24' }
+                    : {
+                          size: '24',
+                          color: cpTheme.global.colors['dark-4'],
+                      }
+            }
+        >
+            <Link href={pathname} passHref>
+                <Button icon={icon} tip={label} active={isActive} />
+            </Link>
+        </IconContext.Provider>
     )
 }

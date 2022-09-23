@@ -1,4 +1,8 @@
 import { Box, Form, FormField, Text, TextInput } from 'grommet'
+import {
+    CAMBRIAN_LIB_NAME,
+    ceramicInstance,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { CurrencyEth, Scales } from 'phosphor-react'
 import {
     ErrorMessageType,
@@ -7,7 +11,6 @@ import {
 
 import { ARBITRATOR_FACTORY_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { CAMBRIAN_LIB_NAME } from '@cambrian/app/classes/CeramicStagehand'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
@@ -23,6 +26,7 @@ interface CreateArbitratorModalProps {
     currentUser: UserType
 }
 
+// TODO Create arbitrator-lib and extract functionality to there
 const CreateArbitratorModal = ({
     onClose,
     currentUser,
@@ -72,9 +76,9 @@ const CreateArbitratorModal = ({
                 throw GENERAL_ERROR['CREATE_ARBITRATOR_ERROR']
 
             const arbitratorsLib = await TileDocument.deterministic(
-                currentUser.selfID.client.ceramic,
+                ceramicInstance(currentUser),
                 {
-                    controllers: [currentUser.selfID.id],
+                    controllers: [currentUser.did],
                     family: CAMBRIAN_LIB_NAME,
                     tags: ['arbitrators'],
                 },
@@ -82,9 +86,9 @@ const CreateArbitratorModal = ({
             )
 
             const currentDoc = await TileDocument.deterministic(
-                currentUser.selfID.client.ceramic,
+                ceramicInstance(currentUser),
                 {
-                    controllers: [currentUser.selfID.id],
+                    controllers: [currentUser.did],
                     family: `cambrian-arbitrators`,
                     tags: [arbitratorContract],
                 },

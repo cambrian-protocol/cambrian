@@ -4,8 +4,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
-import { ClipboardText } from 'phosphor-react'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -28,8 +27,8 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
         try {
             if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
 
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            const { streamID } = await ceramicStagehand.createProposal(
+            const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+            const streamID = await ceramicProposalAPI.createProposal(
                 randimals(),
                 templateStreamID
             )
@@ -49,7 +48,6 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
                 size="small"
                 primary
                 label="Create Proposal"
-                icon={<ClipboardText />}
             />
             {errorMessage && (
                 <ErrorPopupModal

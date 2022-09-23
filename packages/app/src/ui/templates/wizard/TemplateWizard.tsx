@@ -1,10 +1,10 @@
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import TemplateDescriptionStep from './steps/TemplateDescriptionStep'
 import TemplateFlexInputsStep from './steps/TemplateFlexInputsStep'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingStep from './steps/TemplatePricingStep'
 import TemplatePublishStep from './steps/TemplatePublishStep'
 import TemplateRequirementsStep from './steps/TemplateRequirementsStep'
@@ -12,11 +12,8 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface TemplateWizardProps {
-    currentUser: UserType
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     templateStreamID: string
     onSaveTemplate: () => Promise<boolean>
     composition: CompositionModel
@@ -37,7 +34,6 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
 const TemplateWizard = ({
-    currentUser,
     templateInput,
     setTemplateInput,
     templateStreamID,
@@ -71,7 +67,6 @@ const TemplateWizard = ({
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
                         stepperCallback={setCurrentStep}
-                        currentUser={currentUser}
                         onSaveTemplate={onSaveTemplate}
                     />
                 )

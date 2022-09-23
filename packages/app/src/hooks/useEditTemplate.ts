@@ -1,75 +1,93 @@
-import CeramicStagehand, { StageNames } from '../classes/CeramicStagehand'
+import {
+    addRecentStage,
+    loadCommitWorkaround,
+    loadStageDoc,
+} from './../services/ceramic/CeramicUtils'
+import { updateStage } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '../models/TemplateModel'
 import { CompositionModel } from '../models/CompositionModel'
 import { ErrorMessageType } from '../constants/ErrorMessages'
+import { StageNames } from '../models/StageModel'
+import { TemplateModel } from '../models/TemplateModel'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 const useEditTemplate = () => {
-    const { currentUser, isUserLoaded } = useCurrentUserContext()
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { templateStreamID } = router.query
-    const [cachedTemplate, setCachedTemplate] = useState<CeramicTemplateModel>()
-    const [templateInput, setTemplateInput] = useState<CeramicTemplateModel>()
+    const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
+    const [templateInput, setTemplateInput] = useState<TemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [ceramicStagehand, setCeramicStagehand] = useState<CeramicStagehand>()
 
     useEffect(() => {
-        if (router.isReady) fetchTemplate()
+        if (router.isReady && currentUser) fetchTemplate()
     }, [router, currentUser])
 
     const fetchTemplate = async () => {
-        if (currentUser) {
-            if (
-                templateStreamID !== undefined &&
-                typeof templateStreamID === 'string'
-            ) {
-                try {
-                    const cs = new CeramicStagehand(currentUser.selfID)
-                    setCeramicStagehand(cs)
-                    const template = (await (
-                        await cs.loadTileDocument(templateStreamID)
-                    ).content) as CeramicTemplateModel
+        if (
+            templateStreamID !== undefined &&
+            typeof templateStreamID === 'string' &&
+            currentUser
+        ) {
+            try {
+                const templateDoc = await loadStageDoc<TemplateModel>(
+                    currentUser,
+                    templateStreamID
+                )
+                if (
+                    templateDoc.content !== null &&
+                    typeof templateDoc.content === 'object'
+                ) {
+                    // Just initialize edit paths if currentUser is the author
+                    if (
+                        (!router.pathname.includes('edit') &&
+                            !router.pathname.includes('new')) ||
+                        currentUser.did === templateDoc.content.author
+                    ) {
+                        await addRecentStage(currentUser, templateStreamID)
 
-                    if (template) {
-                        const comp = (await (
-                            await cs.loadTileDocument(
-                                template.composition.commitID
-                            )
-                        ).content) as CompositionModel
+                        const _composition = <CompositionModel>(
+                            (
+                                await loadCommitWorkaround(
+                                    currentUser,
+                                    templateDoc.content.composition.commitID
+                                )
+                            ).content
+                        )
 
-                        if (comp) {
-                            setComposition(comp)
-                            setCachedTemplate(_.cloneDeep(template))
-                            return setTemplateInput(template)
+                        if (_composition) {
+                            setComposition(_composition)
+                            setCachedTemplate(_.cloneDeep(templateDoc.content))
+                            return setTemplateInput(templateDoc.content)
                         }
                     }
-                } catch (e) {
-                    setErrorMessage(await cpLogger.push(e))
                 }
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
             }
-            setShow404NotFound(true)
         }
+        setShow404NotFound(true)
     }
 
     const onSaveTemplate = async (): Promise<boolean> => {
-        if (templateInput && ceramicStagehand) {
+        if (templateInput && currentUser) {
             if (!_.isEqual(templateInput, cachedTemplate)) {
                 try {
-                    const { uniqueTag } = await ceramicStagehand.updateStage(
+                    const title = await updateStage(
                         templateStreamID as string,
                         templateInput,
-                        StageNames.template
+                        StageNames.template,
+                        currentUser
                     )
                     const templateWithUniqueTitle = {
                         ...templateInput,
-                        title: uniqueTag,
+                        title: title,
                     }
                     setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
                     setTemplateInput(templateWithUniqueTitle)
@@ -97,8 +115,6 @@ const useEditTemplate = () => {
         setErrorMessage: setErrorMessage,
         onSaveTemplate: onSaveTemplate,
         onResetTemplate: onResetTemplate,
-        currentUser: currentUser,
-        isUserLoaded: isUserLoaded,
         templateStreamID: templateStreamID as string,
         cachedTemplate: cachedTemplate,
     }

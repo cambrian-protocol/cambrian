@@ -41,14 +41,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("WriterSolverV1", {
-    from: deployer,
-    args: [],
-    libraries: {
-      SolverLib: solverLib.address,
-    },
-    log: true,
-  });
+  // await deploy("WriterSolverV1", {
+  //   from: deployer,
+  //   args: [],
+  //   libraries: {
+  //     SolverLib: solverLib.address,
+  //   },
+  //   log: true,
+  // });
 
   await deploy("ArbitrationDispatch", {
     from: deployer,
@@ -62,11 +62,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  await deploy("pWRK", {
-    from: deployer,
-    args: ["Placeholder WRK", "pWRK"],
-    log: true,
-  });
+  // await deploy("pWRK", {
+  //   from: deployer,
+  //   args: ["Placeholder WRK", "pWRK"],
+  //   log: true,
+  // });
 
   await deploy("ArbitratorFactory", {
     from: deployer,
@@ -96,10 +96,10 @@ module.exports.tags = [
   "SolverLib",
   "BasicSolverV1",
   "ToyToken",
-  "WriterSolverV1",
+  // "WriterSolverV1",
   "ArbitrationDispatch",
   "IPFSSolutionsHub",
-  "pWRK",
+  // "pWRK",
   "ArbitratorFactory",
   "IPFSTextSubmitter",
   "Unanimity",

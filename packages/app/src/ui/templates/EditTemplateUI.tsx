@@ -1,25 +1,21 @@
 import { Box, Tab, Tabs } from 'grommet'
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { UserType } from '@cambrian/app/store/UserContext'
 
 interface EditTemplateUIProps {
     cachedTemplateTitle: string
-    currentUser: UserType
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     templateStreamID: string
     onSaveTemplate: () => Promise<boolean>
     onResetTemplate: () => void
@@ -32,7 +28,6 @@ const EditTemplateUI = ({
     setTemplateInput,
     onSaveTemplate,
     onResetTemplate,
-    currentUser,
     composition,
     templateStreamID,
 }: EditTemplateUIProps) => {
@@ -89,7 +84,6 @@ const EditTemplateUI = ({
                         setTemplateInput={setTemplateInput}
                         onSubmit={onSubmit}
                         onCancel={onResetTemplate}
-                        currentUser={currentUser}
                     />
                 </Tab>
                 {templateInput.flexInputs.length > 0 && (

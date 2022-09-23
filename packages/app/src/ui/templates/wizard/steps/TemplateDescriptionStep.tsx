@@ -4,17 +4,15 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
-import { CeramicTemplateModel } from '@cambrian/app/models/TemplateModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { SetStateAction } from 'react'
 import TemplateDescriptionForm from '../../forms/TemplateDescriptionForm'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import router from 'next/router'
 
 interface TemplateDescriptionStepProps {
-    templateInput: CeramicTemplateModel
-    setTemplateInput: React.Dispatch<
-        SetStateAction<CeramicTemplateModel | undefined>
-    >
+    templateInput: TemplateModel
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     stepperCallback: (step: TemplateWizardStepsType) => void
     onSaveTemplate: () => Promise<boolean>
 }

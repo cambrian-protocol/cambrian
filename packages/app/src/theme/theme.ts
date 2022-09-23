@@ -20,6 +20,7 @@ const colors: any = {
         dark: '#012e3d',
         light: '#95d4e8',
     },
+    'background-contrast-transparent': '#00202b70',
     'background-popup': { dark: '#132e33', light: '#0A1F23' },
     'primary-gradient':
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
@@ -29,12 +30,14 @@ const colors: any = {
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
     'status-ok': '#338233',
+    'status-error': 'red',
     'dark-4': '#999999',
     'status-initiated': '#cac63d',
     'status-reported': '#2ec090',
     'status-arbitration': '#be8b32',
     'status-executed': '#59b846',
     'status-proposed': '#aca0d6',
+    'background-skeleton': '#80808026',
 }
 
 export const cpTheme = deepMerge(grommet, {
@@ -179,18 +182,28 @@ export const cpTheme = deepMerge(grommet, {
             size: '20px',
         },
     },
-    tabs: {
-        header: {
-            background: 'background-front',
-            border: { side: 'all' },
-            extend: `
-            border-radius: 5px;
-            padding: 10px;
-            `,
-        },
-    },
     tab: {
-        border: false,
-        color: 'dark-4',
+        color: colors['dark-4'],
+        border: {
+            side: 'bottom',
+            color: 'border',
+            active: {
+                color: 'brand',
+            },
+            hover: {
+                color: 'border',
+            },
+        },
+        hover: {
+            background: 'background-front',
+            color: 'white',
+            extend: 'border-radius: 5px 5px 0px 0px ;',
+        },
+        pad: { bottom: 'small', top: 'small', horizontal: 'medium' },
+        margin: {
+            horizontal: 'none',
+        },
+        active: { color: 'white' },
     },
+    accordion: { border: { color: 'transparent' } },
 })

@@ -17,7 +17,7 @@ import {
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import CeramicStagehand from '@cambrian/app/classes/CeramicStagehand'
+import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
@@ -35,6 +35,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { loadStageStackFromID } from './../../services/ceramic/CeramicUtils'
 
 export const getSolverConfig = async (
     contract: ethers.Contract
@@ -441,25 +442,24 @@ export const getMetadataFromProposal = async (
 
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
         if (metadataURI) {
-            const ceramicStagehand = new CeramicStagehand(currentUser.selfID)
-            const proposalStack =
-                await ceramicStagehand.loadProposalStackFromID(metadataURI)
+            const stageStack = await loadStageStackFromID(
+                currentUser,
+                metadataURI
+            )
 
-            if (proposalStack) {
+            if (stageStack) {
                 const solverIndex = (await solverMethods.chainIndex()) as
                     | number
                     | undefined
                 if (solverIndex !== undefined) {
                     return {
                         slotTags:
-                            proposalStack.compositionDoc.content.solvers[
-                                solverIndex
-                            ].slotTags,
+                            stageStack.composition.solvers[solverIndex]
+                                .slotTags,
                         solverTag:
-                            proposalStack.compositionDoc.content.solvers[
-                                solverIndex
-                            ].solverTag,
-                        proposalStack: proposalStack,
+                            stageStack.composition.solvers[solverIndex]
+                                .solverTag,
+                        stageStack: stageStack,
                     }
                 }
             }

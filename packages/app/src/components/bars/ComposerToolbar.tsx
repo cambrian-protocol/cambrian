@@ -1,7 +1,4 @@
-import { ArrowSquareRight, Bug, FloppyDisk, Gear } from 'phosphor-react'
-import CeramicStagehand, {
-    StageNames,
-} from '@cambrian/app/classes/CeramicStagehand'
+import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -14,22 +11,25 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
+import StackedIcon from '../icons/StackedIcon'
+import { StageNames } from '@cambrian/app/models/StageModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { updateStage } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 
 interface ComposerToolbarProps {
     disabled: boolean
-    ceramicStagehand?: CeramicStagehand
     currentComposition: CompositionModel
     compositionStreamID: string
 }
 
 const ComposerToolbar = ({
     disabled,
-    ceramicStagehand,
     currentComposition,
     compositionStreamID,
 }: ComposerToolbarProps) => {
+    const { currentUser } = useCurrentUserContext()
     const [showConfig, setShowConfig] = useState(false)
     const [showExportCompositionModal, setShowExportCompostionModal] =
         useState(false)
@@ -41,10 +41,10 @@ const ComposerToolbar = ({
         setShowExportCompostionModal(!showExportCompositionModal)
 
     const onSaveComposition = async () => {
-        if (ceramicStagehand) {
-            setIsSaving(true)
-            try {
-                await ceramicStagehand.updateStage(
+        setIsSaving(true)
+        try {
+            if (currentUser) {
+                await updateStage(
                     compositionStreamID,
                     {
                         title: currentComposition.title,
@@ -52,13 +52,14 @@ const ComposerToolbar = ({
                         solvers: currentComposition.solvers,
                         flowElements: currentComposition.flowElements,
                     },
-                    StageNames.composition
+                    StageNames.composition,
+                    currentUser
                 )
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
             }
-            setIsSaving(false)
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
+        setIsSaving(false)
     }
 
     const onTestLog = async () => {
@@ -91,8 +92,13 @@ const ComposerToolbar = ({
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowExportCompositionModal}
-                    label="Export"
-                    icon={<ArrowSquareRight />}
+                    label="Save As..."
+                    icon={
+                        <StackedIcon
+                            icon={<FloppyDisk />}
+                            stackedIcon={<Pen />}
+                        />
+                    }
                     disabled={disabled}
                 />
                 <ComposerToolbarButton
@@ -102,9 +108,8 @@ const ComposerToolbar = ({
                     disabled={disabled || isSaving}
                 />
             </Box>
-            {showExportCompositionModal && ceramicStagehand && (
+            {showExportCompositionModal && (
                 <ExportCompositionModal
-                    ceramicStagehand={ceramicStagehand}
                     onBack={toggleShowExportCompositionModal}
                 />
             )}

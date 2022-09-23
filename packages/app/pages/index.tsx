@@ -1,3 +1,8 @@
+import { ArrowsOut, Graph, Handshake, ShareNetwork } from 'phosphor-react'
+import BackgroundScroll, {
+    BackgroundScrollSection,
+} from '@cambrian/app/components/sections/BackgroundScrollSection'
+
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
 import { Box } from 'grommet'
 import CodeMirror from '@uiw/react-codemirror'
@@ -8,62 +13,70 @@ import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSec
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import RecommendedReadingsSection from '@cambrian/app/components/sections/RecommendedReadingsSection'
 import { Text } from 'grommet'
-import USPListSection from '@cambrian/app/components/sections/USPListSection'
 import USPSection from '@cambrian/app/components/sections/USPSection'
-import { useRef } from 'react'
-import { useThemeContext } from '@cambrian/app/hooks/useThemeContext'
+
+const sections: BackgroundScrollSection[] = [
+    {
+        id: 'control',
+        img: '/illustrations/grid.svg',
+        title: 'Choice & Control',
+        icon: <ArrowsOut />,
+        subTitle:
+            "Banks control your money. Government controls your identity. Tech companies control your information. You pay taxes and fees to use what's already yours.",
+        text: 'Cambrian users are empowered by blockchain technology to manage their own identities, operate using the currencies of their choice, and leverage a growing suite of information technologies for their work and business — Without paying middlemen for their monopolies.',
+        objectPosition: 'center',
+    },
+    {
+        id: 'freedom',
+        img: '/illustrations/wave.svg',
+        title: 'Freedom & Stability',
+        icon: <ShareNetwork />,
+        subTitle:
+            'Thousands of livelihoods disappear every day from censorship, deplatforming, and simple mistakes. Your access to the financial services and digital platforms you need is at constant risk of being shut off.',
+        text: "Our technology is built on Ethereum, the world's leading smart contract network. Our software is kept running by thousands of independent operators around the world, making downtime and censorship next to impossible. Even we can't ban you.",
+        objectPosition: 'center',
+    },
+    {
+        id: 'consensus',
+        img: '/illustrations/twinkle.svg',
+        title: 'Consensus & Cooperation',
+        icon: <Handshake />,
+        subTitle:
+            'Misalignment between the owning and working class breeds exploitative conditions and business practices. The future of work should be owned by the workers.',
+        text: 'Cambrian is establishing a Autonomous Organization (DAO), an evolution of the platform cooperative, to own and govern the protocol. Our founding team will dissolve into the DAO, transferring our intellectual property and exiting to the community.',
+        objectPosition: 'center',
+    },
+    {
+        id: 'customizable',
+        img: '/illustrations/coil.svg',
+        icon: <Graph />,
+        title: 'Extensible & Customizable',
+        subTitle:
+            'The world moves too fast for one solution, and no software is right for everyone. The future of work needs something better than generic escrow and bounty solutions.',
+        text: "Our Solver technology is modular, composable, and easily extended by developers. More, we've built an entire no-code workflow for regular users to configure custom solutions — eliminating the engineering bottleneck to growth and adoption.",
+        objectPosition: 'center',
+    },
+]
 
 export default function Home() {
-    const startRef = useRef<HTMLDivElement | null>(null)
-    const { themeMode } = useThemeContext()
-
     function handleClickHeaderCTA() {
-        if (startRef) startRef.current?.scrollIntoView({ behavior: 'smooth' })
+        document.getElementById('start')?.scrollIntoView({ behavior: 'smooth' })
     }
 
     return (
-        <PageLayout contextTitle="Index">
-            <Box style={{ position: 'relative', overflow: 'hidden' }} fill>
+        <PageLayout contextTitle="Work is evolving" plain>
+            <Box style={{ position: 'relative' }} fill>
                 <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
-                <Box ref={startRef} />
-                <Box style={{ position: 'relative', overflow: 'hidden' }}>
-                    <Glow
-                        height="1000px"
-                        width="1000px"
-                        left={'-30%'}
-                        top={'30%'}
-                    />
+                <Box>
                     <Glow
                         height="1000px"
                         width="1000px"
                         left={'-20%'}
                         bottom={'20%'}
                     />
-                    <Glow
-                        height="1500px"
-                        width="1500px"
-                        left={'40%'}
-                        bottom={'0%'}
-                    />
-                    <Glow
-                        height="1500px"
-                        width="1500px"
-                        left={'40%'}
-                        bottom={'40%'}
-                    />
-                    <Image
-                        src="/images/logo/cambrian_protocol_logo.svg"
-                        style={{
-                            position: 'absolute',
-                            top: '50vh',
-                            right: '-300px',
-                            opacity: 0.03,
-                        }}
-                        height="1000px"
-                    />
                     <Box style={{ position: 'relative' }}>
+                        <BackgroundScroll sections={sections} />
                         <USPSection />
-                        <USPListSection />
                         <BaseContentSection
                             title={'Quit a Boss'}
                             subTitle={'Everyone'}
@@ -75,7 +88,7 @@ export default function Home() {
                                     border
                                     overflow="hidden"
                                 >
-                                    <Image src="/images/template_example.jpg" />
+                                    <Image src="/images/template.png" />
                                 </Box>
                             }
                             anchor={
@@ -98,7 +111,7 @@ export default function Home() {
                                     overflow={{ vertical: 'auto' }}
                                 >
                                     <CodeMirror
-                                        theme={themeMode}
+                                        theme={'dark'}
                                         value={solverCode}
                                     />
                                 </Box>

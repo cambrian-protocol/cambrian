@@ -1,4 +1,3 @@
-import { Anchor } from 'grommet'
 import { Text } from 'grommet'
 
 const FooterPrivacyPolicySection = () => {

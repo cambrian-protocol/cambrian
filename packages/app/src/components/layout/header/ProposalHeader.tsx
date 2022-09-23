@@ -14,22 +14,22 @@ import {
 import { Button } from 'grommet'
 import Link from 'next/link'
 import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
-import { ProposalStackType } from '@cambrian/app/store/ProposalContext'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
+import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useState } from 'react'
 
 interface ProposalHeaderProps {
-    proposalStack?: ProposalStackType
-    proposalStatus: ProposalStatus
+    stageStack?: StageStackType
+    proposalStatus?: ProposalStatus
     showProposalDetails?: boolean
 }
 
 const ProposalHeader = ({
-    proposalStack,
+    stageStack,
     proposalStatus,
     showProposalDetails,
 }: ProposalHeaderProps) => {
@@ -64,7 +64,7 @@ const ProposalHeader = ({
                                     />
                                 </Box>
                                 <Heading>
-                                    {proposalStack?.proposalDoc.content.title ||
+                                    {stageStack?.proposal.title ||
                                         'Untitled Proposal'}
                                 </Heading>
                             </Box>
@@ -76,7 +76,7 @@ const ProposalHeader = ({
                                 pad={{ bottom: 'xsmall' }}
                             >
                                 <IconContext.Provider value={{ size: '18' }}>
-                                    {showProposalDetails && proposalStack && (
+                                    {showProposalDetails && stageStack && (
                                         <Button
                                             color="dark-4"
                                             size="small"
@@ -99,7 +99,7 @@ const ProposalHeader = ({
                                             }
                                         />
                                     )}
-                                    {proposalStack && (
+                                    {stageStack && (
                                         <Button
                                             color="dark-4"
                                             size="small"
@@ -199,15 +199,15 @@ const ProposalHeader = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-            {showTemplateInfoModal && proposalStack && (
+            {showTemplateInfoModal && stageStack && (
                 <TemplateInfoModal
-                    ceramicTemplate={proposalStack.templateDoc.content}
+                    stageStack={stageStack}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
-            {showProposalInfoModal && proposalStack && (
+            {showProposalInfoModal && stageStack && (
                 <ProposalInfoModal
-                    ceramicProposal={proposalStack.proposalDoc.content}
+                    stageStack={stageStack}
                     onClose={toggleShowProposalInfoModal}
                 />
             )}

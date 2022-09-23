@@ -28,7 +28,7 @@ const FooterBrandingSection = () => (
                                 screenSize === 'small' ? 'center' : 'start'
                             }
                         >
-                            Work is evolving.
+                            Work is Evolving.
                         </Text>
                     </Box>
                 </Box>
