@@ -197,7 +197,7 @@ export default function CoreMessenger({
             }>[] = (
                 (
                     await Promise.allSettled(
-                        participants.map((DID) =>
+                        participants.concat(currentUser.did).map((DID) =>
                             TileDocument.deterministic(
                                 ceramicInstance(currentUser),
                                 {
@@ -242,7 +242,7 @@ export default function CoreMessenger({
             }>[] = (
                 (
                     await Promise.allSettled(
-                        participants.map(
+                        participants.concat(currentUser.did).map(
                             async (DID) =>
                                 await TileDocument.deterministic(
                                     ceramicInstance(currentUser),
