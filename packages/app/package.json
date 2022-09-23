@@ -26,6 +26,7 @@
         "@ceramicnetwork/stream-tile": "2.4.4",
         "@ceramicnetwork/stream-tile-handler": "2.2.8",
         "@ceramicnetwork/streamid": "2.3.4",
+        "@gnosis.pm/safe-apps-web3modal": "^17.0.1",
         "@typechain/ethers-v5": "^9.0.0",
         "@uiw/react-codemirror": "^4.7.0",
         "@walletconnect/web3-provider": "^1.7.1",
