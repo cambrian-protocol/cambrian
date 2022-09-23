@@ -158,10 +158,7 @@ export default function EditProposalPage() {
                         <Messenger
                             currentUser={currentUser}
                             chatID={proposalStreamID}
-                            participantDIDs={[
-                                stageStack.template.author,
-                                stageStack.proposal.author,
-                            ]}
+                            participantDIDs={[stageStack.template.author]}
                             chatType={'Proposal'}
                         />
                     )}

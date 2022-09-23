@@ -23,12 +23,8 @@ const Messenger = ({
     const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
-    // TODO Integrate >2 participants
-    const counterPart = participantDIDs.filter(
-        (did) => did !== currentUser.did
-    )[0]
-
-    const [counterPartProfile] = useCambrianProfile(counterPart)
+    // TODO Integrate Group chats
+    const [counterPartProfile] = useCambrianProfile(participantDIDs[0])
 
     return (
         <ResponsiveContext.Consumer>

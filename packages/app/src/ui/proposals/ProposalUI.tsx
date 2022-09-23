@@ -102,10 +102,11 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                             chatID={stageStack.proposalStreamID}
                             currentUser={currentUser}
                             chatType={'Proposal'}
-                            participantDIDs={[
-                                stageStack.template.author,
-                                stageStack.proposal.author,
-                            ]}
+                            participantDIDs={
+                                currentUser.did === stageStack.template.author
+                                    ? [stageStack.proposal.author]
+                                    : [stageStack.template.author]
+                            }
                         />
                     )}
                 </Stack>
