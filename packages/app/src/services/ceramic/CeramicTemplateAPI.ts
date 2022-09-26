@@ -94,7 +94,7 @@ export default class CeramicTemplateAPI {
                 },
                 author: this.user.did,
                 receivedProposals: {},
-                isActive: true, // TODO Activate / Deactivate Template feature
+                isActive: true,
             }
 
             // NOTE: Workaround until Ceramics load commitID Bugfix is merged

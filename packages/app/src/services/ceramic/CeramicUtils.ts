@@ -21,7 +21,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
-import { SubmissionModel } from '@cambrian/app/ui/moduleUIs/IPFSTextSubmitter/models/SubmissionModel'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -49,7 +48,7 @@ export const loadCommitWorkaround = async <T>(
             commitID
         )) as TileDocument<T>
     } catch (e) {
-        console.warn('Loading Cermic Commit failed. Fallback will be used.', e)
+        console.warn('Loading Ceramic Commit failed. Fallback will be used.', e)
     }
 
     try {
@@ -266,6 +265,13 @@ export const createStage = async (
         )
 
         await stageStreamDoc.update(stage)
+
+        // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+        await saveCambrianCommitData(
+            currentUser,
+            stageStreamDoc.commitId.toString()
+        )
+
         const stageStreamID = stageStreamDoc.id.toString()
 
         // Updating StagesLib
@@ -311,7 +317,7 @@ export const updateStage = async (
             ceramicInstance(currentUser),
             streamID
         )
-        const cleanedUserTitle = updatedStage.title.trim()
+        let cleanedUserTitle = updatedStage.title.trim()
 
         // Title has changed - stagesLib and metaTag must be updated
         if (currentStage.content.title !== cleanedUserTitle) {
@@ -376,14 +382,22 @@ export const updateStage = async (
                 { ...currentStage.metadata, tags: [uniqueTitle] },
                 { pin: true }
             )
-            return uniqueTitle
+
+            cleanedUserTitle = uniqueTitle
         } else {
             await currentStage.update({
                 ...updatedStage,
                 title: cleanedUserTitle,
             })
-            return cleanedUserTitle
         }
+
+        // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+        await saveCambrianCommitData(
+            currentUser,
+            currentStage.commitId.toString()
+        )
+
+        return cleanedUserTitle
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
