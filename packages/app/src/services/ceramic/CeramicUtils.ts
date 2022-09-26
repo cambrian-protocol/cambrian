@@ -21,6 +21,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
+import { CommitID } from '@ceramicnetwork/streamid'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -35,44 +36,6 @@ export const ceramicInstance = (currentUser: UserType) => {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     ceramicClient.did = currentUser.session.did
     return ceramicClient
-}
-
-// NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
-export const loadCommitWorkaround = async <T>(
-    currentUser: UserType,
-    commitID: string
-): Promise<TileDocument<T>> => {
-    try {
-        return (await TileDocument.load(
-            ceramicInstance(currentUser),
-            commitID
-        )) as TileDocument<T>
-    } catch (e) {
-        console.warn('Loading Ceramic Commit failed. Fallback will be used.', e)
-    }
-
-    try {
-        const cambrianCommit = (await TileDocument.deterministic(
-            ceramicInstance(currentUser),
-            {
-                controllers: [CAMBRIAN_DID],
-                family: 'cambrian-commits',
-                tags: [commitID],
-            }
-        )) as TileDocument<T>
-
-        if (
-            cambrianCommit.content !== null &&
-            typeof cambrianCommit.content === 'object'
-        ) {
-            return cambrianCommit
-        } else {
-            throw new Error(`Provided CommitID not found ${commitID}`)
-        }
-    } catch (e) {
-        cpLogger.push(e)
-        throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-    }
 }
 
 export const loadStageDoc = async <T>(
@@ -467,5 +430,118 @@ export const saveCambrianCommitData = async (
             throw new Error('TriloBot could not save commit.')
     } catch (e) {
         cpLogger.push(e)
+    }
+}
+
+// NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
+export const loadCommitWorkaround = async <T>(
+    currentUser: UserType,
+    commitID: string
+): Promise<TileDocument<T>> => {
+    try {
+        return (await TileDocument.load(
+            ceramicInstance(currentUser),
+            commitID
+        )) as TileDocument<T>
+    } catch (e) {
+        console.warn('Loading Ceramic Commit failed. Fallback will be used.', e)
+    }
+
+    try {
+        const cambrianCommit = (await TileDocument.deterministic(
+            ceramicInstance(currentUser),
+            {
+                controllers: [CAMBRIAN_DID],
+                family: 'cambrian-commits',
+                tags: [commitID],
+            }
+        )) as TileDocument<T>
+
+        if (
+            cambrianCommit.content !== null &&
+            typeof cambrianCommit.content === 'object'
+        ) {
+            return cambrianCommit
+        } else {
+            throw new Error(`Provided CommitID not found ${commitID}`)
+        }
+    } catch (e) {
+        console.log('loading anchor backup')
+
+        try {
+            const streamDoc = (await TileDocument.load(
+                ceramicInstance(currentUser),
+                streamIDFromCommitID(commitID)
+            )) as TileDocument<Record<string, any>>
+
+            const nextAnchor = findNextAnchor(commitID, streamDoc)
+            console.log('nextAnchor: ', nextAnchor)
+
+            if (nextAnchor) {
+                const cambrianCommit = (await TileDocument.deterministic(
+                    ceramicInstance(currentUser),
+                    {
+                        controllers: [CAMBRIAN_DID],
+                        family: 'cambrian-commits',
+                        tags: [nextAnchor],
+                    }
+                )) as TileDocument<T>
+
+                console.log('cambrian commit: ', cambrianCommit)
+
+                if (
+                    cambrianCommit.content !== null &&
+                    typeof cambrianCommit.content === 'object'
+                ) {
+                    return cambrianCommit
+                } else {
+                    throw new Error(`Provided CommitID not found ${commitID}`)
+                }
+            } else {
+                throw new Error(
+                    `Provided CommitID ${commitID} and no subsequent anchor found`
+                )
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+}
+
+export const streamIDFromCommitID = (id: string) => {
+    const commitID = CommitID.fromString(id)
+    return commitID.baseID.toString()
+}
+
+const findNextAnchor = (
+    commitID: string,
+    streamDoc: TileDocument<Record<string, any>>
+) => {
+    if (
+        commitID ===
+        streamDoc.anchorCommitIds[
+            streamDoc.anchorCommitIds.length - 1
+        ].toString()
+    ) {
+        return commitID
+    }
+
+    const commitIdx = streamDoc.allCommitIds.findIndex(
+        (commit) => commit.toString() === commitID
+    )
+
+    const susbequentCommits = streamDoc.allCommitIds
+        .slice(commitIdx)
+        .map((commit) => commit.toString())
+
+    const nextAnchor = streamDoc.anchorCommitIds.find((commit) =>
+        susbequentCommits.includes(commit.toString())
+    )
+
+    if (nextAnchor) {
+        return nextAnchor.toString()
+    } else {
+        return null
     }
 }
