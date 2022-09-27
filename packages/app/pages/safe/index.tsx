@@ -1,13 +1,20 @@
-import { Anchor, Box, Heading, Paragraph } from 'grommet'
-
-import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
+import {
+    calculateCollectionId,
+    calculatePositionId,
+} from '@cambrian/app/components/solver/SolverHelpers'
 import { useCallback, useEffect, useState } from 'react'
-import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
+
+import { Box } from 'grommet'
+import CTFContract from '@cambrian/app/contracts/CTFContract'
+import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { INFURA_ID } from '../../config'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 const providerOptions = {
     injected: {
@@ -41,6 +48,7 @@ type ConnectedWallet = {
 export default function Safe() {
     const [connectedWallet, setConnectedWallet] = useState<ConnectedWallet>()
     const [ctf, setCtf] = useState<CTFContract>()
+    const [redeemablePayouts, setRedeemablePayouts] = useState([])
 
     useEffect(() => {
         connectWallet()
@@ -87,7 +95,9 @@ export default function Safe() {
             transferBatchFilter
         )
 
-        const positionIds = transferBatchLogs.map((log) => log.args![3]).flat()
+        const positionIds: BigNumber[] = transferBatchLogs
+            .map((log) => log.args![3])
+            .flat()
         const values = transferBatchLogs.map((log) => log.args![4]).flat()
 
         // These are the conditional token IDs and how much was transferred to our user
@@ -97,6 +107,7 @@ export default function Safe() {
                 value: values[i],
             }
         })
+        console.log({ positions })
 
         // For getting resolved conditions
         const conditionResolutionFilter =
@@ -115,6 +126,36 @@ export default function Safe() {
 
         const payoutRedemptionLogs = await ctf.contract.queryFilter(
             payoutRedemptionFilter
+        )
+
+        // Filter out already redeemed conditions
+        const redeemableConditionLogs = resolvedConditionLogs.filter(
+            (resolvedCondition) =>
+                payoutRedemptionLogs.find(
+                    (redeemedPayoutLog) =>
+                        redeemedPayoutLog.args![3] ===
+                        resolvedCondition.args![0]
+                ) === undefined
+        )
+
+        const conditionLogsPositionIds = redeemableConditionLogs.map(
+            (redeemableConditionLog) => {
+                const conditionID = redeemableConditionLog.args!.conditionId
+                const indexSet = getIndexSetFromBinaryArray(
+                    redeemableConditionLog.args!.payoutNumerators
+                )
+                const collectionId = calculateCollectionId(
+                    conditionID,
+                    indexSet
+                )
+                const positionId = calculatePositionId(
+                    '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79',
+                    collectionId
+                )
+
+                console.log(positionId)
+                return positionId
+            }
         )
     }
 
@@ -138,5 +179,30 @@ export default function Safe() {
         }
     }, [])
 
-    return <></>
+    return (
+        <PageLayout kind="narrow">
+            <Box pad="large" gap="medium">
+                <DashboardHeader
+                    title="Redeem your token"
+                    description="Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Donec rutrum congue leo eget malesuada. Vivamus suscipit tortor eget felis porttitor volutpat."
+                />
+                {redeemablePayouts.map((rp, idx) => (
+                    <Box
+                        key={idx}
+                        pad="small"
+                        border
+                        round="xsmall"
+                        direction="row"
+                    >
+                        <Box flex></Box>
+                        <LoaderButton
+                            primary
+                            isLoading={false}
+                            label="Redeem"
+                        />
+                    </Box>
+                ))}
+            </Box>
+        </PageLayout>
+    )
 }
