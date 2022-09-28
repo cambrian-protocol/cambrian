@@ -95,9 +95,19 @@ export default function Safe() {
             transferBatchFilter
         )
 
-        const positionIds: BigNumber[] = transferBatchLogs
+        console.log(transferBatchLogs)
+
+        // const positionIds: string[] = transferBatchLogs
+        //     .map((log) => log.args![3])
+        //     .flat()
+        //     .map((bn) => ethers.utils.hexZeroPad(bn.toHexString(), 32))
+
+        const positionIds: string[] = transferBatchLogs
             .map((log) => log.args![3])
-            .flat()
+            .map((bnArr) =>
+                bnArr.map((bn) => ethers.utils.hexZeroPad(bn.toHexString(), 32))
+            )
+
         const values = transferBatchLogs.map((log) => log.args![4]).flat()
 
         // These are the conditional token IDs and how much was transferred to our user
@@ -144,12 +154,13 @@ export default function Safe() {
                 const indexSet = getIndexSetFromBinaryArray(
                     redeemableConditionLog.args!.payoutNumerators
                 )
+
                 const collectionId = calculateCollectionId(
                     conditionID,
                     indexSet
                 )
                 const positionId = calculatePositionId(
-                    '0x4c7C2e0e069497D559fc74E0f53E88b5b889Ee79',
+                    '0x42c9E6d3c05030CF85f09DA606B551415a1F9eBC',
                     collectionId
                 )
 
