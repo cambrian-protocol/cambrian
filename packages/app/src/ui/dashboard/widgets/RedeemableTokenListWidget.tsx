@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ethers } from 'ethers'
 
@@ -22,7 +23,7 @@ const RedeemableTokenListWidget = ({
     chainId,
 }: RedeemableTokensWidgetProps) => {
     const [redeemablePositions, setRedeemablePositions] =
-        useState<RedeemablePositionsHash>({})
+        useState<RedeemablePositionsHash>()
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -54,61 +55,77 @@ const RedeemableTokenListWidget = ({
     }
 
     return (
-        <Box gap="small">
-            {Object.keys(redeemablePositions).map((positionId, idx) => {
-                const redeemablePosition = redeemablePositions[positionId]
-                const formattedAmount = ethers.utils.formatUnits(
-                    redeemablePositions[positionId].amount,
-                    redeemablePosition.collateralToken.decimals
-                )
-                return (
-                    <Box
-                        key={positionId}
-                        pad="small"
-                        border
-                        round="xsmall"
-                        direction="row"
-                    >
-                        <Box
-                            flex
-                            direction="row"
-                            justify="between"
-                            pad={{
-                                left: 'small',
-                                right: 'medium',
-                                vertical: 'small',
-                            }}
-                            align="center"
-                        >
-                            <Box>
-                                <Text>
-                                    {redeemablePosition.solverMetadata
-                                        ?.solverTag.title || 'Solver'}
-                                </Text>
-                                <Text color={'dark-4'} size="small">
-                                    {
-                                        redeemablePositions[positionId]
-                                            .solverAddress
-                                    }
-                                </Text>
+        <>
+            {redeemablePositions &&
+            Object.keys(redeemablePositions).length > 0 ? (
+                <Box gap="small">
+                    {Object.keys(redeemablePositions).map((positionId, idx) => {
+                        const redeemablePosition =
+                            redeemablePositions[positionId]
+                        const formattedAmount = ethers.utils.formatUnits(
+                            redeemablePositions[positionId].amount,
+                            redeemablePosition.collateralToken.decimals
+                        )
+                        return (
+                            <Box
+                                key={positionId}
+                                pad="small"
+                                border
+                                round="xsmall"
+                                direction="row"
+                            >
+                                <Box
+                                    flex
+                                    direction="row"
+                                    justify="between"
+                                    pad={{
+                                        left: 'small',
+                                        right: 'medium',
+                                        vertical: 'small',
+                                    }}
+                                    align="center"
+                                >
+                                    <Box>
+                                        <Text>
+                                            {redeemablePosition.solverMetadata
+                                                ?.solverTag.title || 'Solver'}
+                                        </Text>
+                                        <Text color={'dark-4'} size="small">
+                                            {
+                                                redeemablePositions[positionId]
+                                                    .solverAddress
+                                            }
+                                        </Text>
+                                    </Box>
+                                    <Text>
+                                        {formattedAmount}{' '}
+                                        {
+                                            redeemablePosition.collateralToken
+                                                .symbol
+                                        }
+                                    </Text>
+                                </Box>
+                                <Box justify="center">
+                                    <LoaderButton
+                                        primary
+                                        onClick={() =>
+                                            onRedeem(redeemablePosition)
+                                        }
+                                        isLoading={false}
+                                        label="Redeem"
+                                    />
+                                </Box>
                             </Box>
-                            <Text>
-                                {formattedAmount}{' '}
-                                {redeemablePosition.collateralToken.symbol}
-                            </Text>
-                        </Box>
-                        <Box justify="center">
-                            <LoaderButton
-                                primary
-                                onClick={() => onRedeem(redeemablePosition)}
-                                isLoading={false}
-                                label="Redeem"
-                            />
-                        </Box>
-                    </Box>
-                )
-            })}
-        </Box>
+                        )
+                    })}
+                </Box>
+            ) : (
+                <ListSkeleton
+                    isFetching={isLoading}
+                    subject="redeemable tokens"
+                />
+            )}
+        </>
     )
 }
 
