@@ -22,6 +22,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { mergeFlexIntoComposition } from '../transformers/Composition'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 
 export const getProposalStatus = (
     proposal: ProposalModel,
@@ -174,7 +175,7 @@ export const getApprovedProposalCommitID = (
         )?.proposalCommitID) ||
     undefined
 
-const getParsedSolvers = async (
+export const getParsedSolvers = async (
     stageStack: StageStackType,
     currentUser: UserType
 ) => {
