@@ -1,9 +1,9 @@
 import { EventFilter, ethers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import {
-    getMetadataFromProposal,
     getSolverConfig,
     getSolverData,
+    getSolverMetadata,
     getSolverOutcomes,
 } from './SolverGetters'
 import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
@@ -187,9 +187,10 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     */
     const init = async () => {
         try {
-            const fetchedMetadata = await getMetadataFromProposal(
-                currentUser,
-                solverMethods
+            const fetchedMetadata = await getSolverMetadata(
+                solverContract,
+                currentUser.signer,
+                currentUser.chainId
             )
 
             const fetchedSolverConfig = await getSolverConfig(solverContract)

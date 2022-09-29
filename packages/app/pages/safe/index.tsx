@@ -13,7 +13,6 @@ import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHea
 import { INFURA_ID } from '../../config'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -21,7 +20,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { loadStageStackFromID } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 const providerOptions = {
@@ -160,22 +159,21 @@ export default function Safe() {
 
                 if (!solverCache[solverAddress]) {
                     try {
-                        const newSolverContract = new ethers.Contract(
+                        const solverContract = new ethers.Contract(
                             solverAddress,
                             BASE_SOLVER_IFACE,
                             connectedWallet.signer
                         )
-                        const solverConfig = await newSolverContract.getConfig()
+                        const solverConfig = await solverContract.getConfig()
                         const allConditions =
-                            await newSolverContract.getConditions()
+                            await solverContract.getConditions()
                         const latestCondition =
                             allConditions[allConditions.length - 1]
                         // Check if already redeemed
                         if (!redemptionCache[latestCondition.conditionId]) {
-                            const solverStatus =
-                                await newSolverContract.getStatus(
-                                    allConditions.length - 1
-                                )
+                            const solverStatus = await solverContract.getStatus(
+                                allConditions.length - 1
+                            )
                             if (
                                 solverStatus ===
                                     ConditionStatus.OutcomeReported ||
@@ -197,48 +195,12 @@ export default function Safe() {
                                     )
                                 )
 
-                                let solverMetadata:
-                                    | SolverMetadataModel
-                                    | undefined = undefined
-                                // Fetch Solver Metadata
-                                const proposalId =
-                                    await newSolverContract.trackingId()
-                                if (proposalId && currentUser) {
-                                    const proposalsHub = new ProposalsHub(
-                                        connectedWallet.signer,
-                                        connectedWallet.network.chainId
-                                    )
+                                const solverMetadata = await getSolverMetadata(
+                                    solverContract,
+                                    connectedWallet.web3Provider,
+                                    connectedWallet.network.chainId
+                                )
 
-                                    const metadataURI =
-                                        await proposalsHub.getMetadataCID(
-                                            proposalId
-                                        )
-                                    const stageStack =
-                                        await loadStageStackFromID(
-                                            currentUser,
-                                            metadataURI
-                                        )
-
-                                    if (stageStack) {
-                                        const solverIndex =
-                                            (await newSolverContract.chainIndex()) as
-                                                | number
-                                                | undefined
-                                        if (solverIndex !== undefined) {
-                                            solverMetadata = {
-                                                slotTags:
-                                                    stageStack.composition
-                                                        .solvers[solverIndex]
-                                                        .slotTags,
-                                                solverTag:
-                                                    stageStack.composition
-                                                        .solvers[solverIndex]
-                                                        .solverTag,
-                                                stageStack: stageStack,
-                                            }
-                                        }
-                                    }
-                                }
                                 solverCache[solverAddress] = {
                                     collateralToken: collateralToken,
                                     partition:

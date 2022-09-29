@@ -200,7 +200,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 if (cambrianStageStackDoc.content.proposalStack) {
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         cambrianStageStackDoc.content.proposalStack
                             .proposalCommitID
@@ -240,7 +239,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     }
 
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         approvedCommitID
                     )
@@ -282,7 +280,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             // Initialize the latest submission/commit as stageStack
                             const latestProposalCommitContent = (
                                 await loadCommitWorkaround(
-                                    currentUser,
                                     _latestProposalSubmission.proposalCommitID
                                 )
                             ).content as ProposalModel
