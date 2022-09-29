@@ -25,6 +25,7 @@ const RedeemableTokenListWidget = ({
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
     const [isLoading, setIsLoading] = useState(false)
+    const [isRedeeming, setIsRedeeming] = useState<string>()
 
     useEffect(() => {
         init()
@@ -42,6 +43,7 @@ const RedeemableTokenListWidget = ({
 
     const onRedeem = async (redeemablePosition: RedeemablePosition) => {
         try {
+            setIsRedeeming(redeemablePosition.positionId)
             const ctfContract = new CTFContract(signerOrProvider, chainId)
             await ctfContract.contract.redeemPositions(
                 redeemablePosition.collateralToken.address,
@@ -52,6 +54,7 @@ const RedeemableTokenListWidget = ({
         } catch (e) {
             console.error(e)
         }
+        setIsRedeeming(undefined)
     }
 
     return (
@@ -111,7 +114,10 @@ const RedeemableTokenListWidget = ({
                                         onClick={() =>
                                             onRedeem(redeemablePosition)
                                         }
-                                        isLoading={false}
+                                        isLoading={
+                                            isRedeeming ===
+                                            redeemablePosition.positionId
+                                        }
                                         label="Redeem"
                                     />
                                 </Box>
