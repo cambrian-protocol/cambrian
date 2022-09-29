@@ -1,27 +1,20 @@
-import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
 import {
-    getCollectionId,
-    getPositionId,
-} from '@cambrian/app/utils/helpers/ctHelpers'
+    RedeemablePosition,
+    RedeemablePositionsHash,
+    getRedeemablePositions,
+} from '@cambrian/app/utils/helpers/redeemHelper'
 import { useCallback, useEffect, useState } from 'react'
 
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { INFURA_ID } from '../../config'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
-import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { ethers } from 'ethers'
 
 const providerOptions = {
     injected: {
@@ -52,31 +45,8 @@ type ConnectedWallet = {
     network: ethers.providers.Network
 }
 
-type RedeemablePosition = {
-    collateralToken: TokenModel
-    parentCollectionId: string
-    conditionId: string
-    partition: number[]
-    amount: BigNumber
-    solverAddress: string
-    solverMetadata?: SolverMetadataModel
-}
-
-type RedeemablePositionsHash = { [positionId: string]: RedeemablePosition }
-
-type PositionSolverInfoType = {
-    collateralToken: TokenModel
-    parentCollectionId: string
-    conditionId: string
-    partition: number[]
-    solverMetadata?: SolverMetadataModel
-    positionId: string
-}
-
 export default function Safe() {
-    const { currentUser } = useCurrentUserContext()
     const [connectedWallet, setConnectedWallet] = useState<ConnectedWallet>()
-    const [ctf, setCtf] = useState<CTFContract>()
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>({})
 
@@ -85,172 +55,27 @@ export default function Safe() {
     }, [])
 
     useEffect(() => {
-        if (connectedWallet) {
-            getCTF()
-        }
+        if (connectedWallet) init(connectedWallet)
     }, [connectedWallet])
 
-    useEffect(() => {
-        if (connectedWallet && ctf) {
-            getRedeemable()
-        }
-    }, [connectedWallet, ctf])
-
-    const getCTF = async () => {
-        if (connectedWallet) {
-            const contract = new CTFContract(
-                connectedWallet.signer,
+    const init = async (connectedWallet: ConnectedWallet) => {
+        setRedeemablePositions(
+            await getRedeemablePositions(
+                connectedWallet.address,
+                connectedWallet.web3Provider,
                 connectedWallet.network.chainId
             )
-
-            if (contract) {
-                setCtf(contract)
-            }
-        }
-    }
-
-    const getRedeemable = async () => {
-        if (!ctf || !connectedWallet) {
-            return
-        }
-
-        const redemptionCache: { [conditionId: string]: boolean } = {}
-        const solverCache: {
-            [solverAddress: string]: PositionSolverInfoType
-        } = {}
-        const positions: {
-            [positionId: string]: PositionSolverInfoType & {
-                amount: BigNumber
-                solverAddress: string
-            }
-        } = {}
-
-        // For getting payouts the user has already redeemed
-        const payoutRedemptionLogs = await ctf.contract.queryFilter(
-            ctf.contract.filters.PayoutRedemption(
-                connectedWallet.address, // redeemer
-                null, // collateralToken
-                null // parentCollectionID
-            )
         )
-
-        // Hash with already redeemed conditionId's
-        payoutRedemptionLogs.forEach((log) => {
-            if (!redemptionCache[log.args![3]])
-                redemptionCache[log.args![3]] = true
-        })
-
-        // Find all the conditional tokens that have ever been sent to our connected user's address
-        const transferBatchFilter = ctf.contract.filters.TransferBatch(
-            null, // operator
-            null, // from
-            connectedWallet.address // to
-        )
-
-        const transferBatchLogs = await ctf.contract.queryFilter(
-            transferBatchFilter
-        )
-
-        await Promise.all(
-            transferBatchLogs.map(async (log) => {
-                const solverAddress = log.args![0]
-                const positionIds: BigNumber[] = log.args![3]
-                const values: BigNumber[] = log.args![4]
-
-                if (!solverCache[solverAddress]) {
-                    try {
-                        const solverContract = new ethers.Contract(
-                            solverAddress,
-                            BASE_SOLVER_IFACE,
-                            connectedWallet.signer
-                        )
-                        const solverConfig = await solverContract.getConfig()
-                        const allConditions =
-                            await solverContract.getConditions()
-                        const latestCondition =
-                            allConditions[allConditions.length - 1]
-                        // Check if already redeemed
-                        if (!redemptionCache[latestCondition.conditionId]) {
-                            const solverStatus = await solverContract.getStatus(
-                                allConditions.length - 1
-                            )
-                            if (
-                                solverStatus ===
-                                    ConditionStatus.OutcomeReported ||
-                                solverStatus ===
-                                    ConditionStatus.ArbitrationDelivered
-                            ) {
-                                const collateralToken = await fetchTokenInfo(
-                                    solverConfig.conditionBase.collateralToken,
-                                    connectedWallet.web3Provider
-                                )
-
-                                const positionId = getPositionId(
-                                    collateralToken.address,
-                                    getCollectionId(
-                                        latestCondition.conditionId,
-                                        getIndexSetFromBinaryArray(
-                                            latestCondition.payouts
-                                        )
-                                    )
-                                )
-
-                                const solverMetadata = await getSolverMetadata(
-                                    solverContract,
-                                    connectedWallet.web3Provider,
-                                    connectedWallet.network.chainId
-                                )
-
-                                solverCache[solverAddress] = {
-                                    collateralToken: collateralToken,
-                                    partition:
-                                        solverConfig.conditionBase.partition,
-                                    conditionId: latestCondition.conditionId,
-                                    parentCollectionId:
-                                        latestCondition.parentCollectionId,
-                                    solverMetadata: solverMetadata,
-                                    positionId: positionId,
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        throw e
-                    }
-                }
-                if (solverCache[solverAddress]) {
-                    positionIds.forEach((positionId, idx) => {
-                        const positionIdHex = positionId.toHexString()
-                        if (
-                            solverCache[solverAddress].positionId ===
-                            positionIdHex
-                        ) {
-                            if (positions[positionIdHex]) {
-                                // Just add amount
-                                positions[positionIdHex] = {
-                                    ...positions[positionIdHex],
-                                    amount: positions[positionIdHex].amount.add(
-                                        values[idx]
-                                    ),
-                                }
-                            } else {
-                                positions[positionIdHex] = {
-                                    ...solverCache[solverAddress],
-                                    solverAddress: solverAddress,
-                                    amount: values[idx],
-                                }
-                            }
-                        }
-                    })
-                }
-            })
-        )
-        setRedeemablePositions(positions)
     }
 
     const onRedeem = async (redeemablePosition: RedeemablePosition) => {
-        if (ctf && connectedWallet) {
+        if (connectedWallet) {
             try {
-                await ctf.contract.redeemPositions(
+                const ctfContract = new CTFContract(
+                    connectedWallet.web3Provider,
+                    connectedWallet.network.chainId
+                )
+                await ctfContract.contract.redeemPositions(
                     redeemablePosition.collateralToken.address,
                     redeemablePosition.parentCollectionId,
                     redeemablePosition.conditionId,

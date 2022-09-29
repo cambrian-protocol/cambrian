@@ -5,10 +5,10 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 export const fetchTokenInfo = async (
     address: string,
-    provider: ethers.providers.Provider
+    signerOrProvider: ethers.Signer | ethers.providers.Provider
 ) => {
     if (address && address.length === 42) {
-        const token = await TokenAPI.getTokenInfo(address, provider)
+        const token = await TokenAPI.getTokenInfo(address, signerOrProvider)
         if (token) {
             return token
         }
