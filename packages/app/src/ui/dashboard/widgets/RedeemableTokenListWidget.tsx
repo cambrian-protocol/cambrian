@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import Link from 'next/link'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -66,7 +67,7 @@ const RedeemableTokenListWidget = ({
             {redeemablePositions &&
             Object.keys(redeemablePositions).length > 0 ? (
                 <Box gap="small">
-                    {Object.keys(redeemablePositions).map((positionId, idx) => {
+                    {Object.keys(redeemablePositions).map((positionId) => {
                         const redeemablePosition =
                             redeemablePositions[positionId]
                         const formattedAmount = ethers.utils.formatUnits(
@@ -76,42 +77,47 @@ const RedeemableTokenListWidget = ({
                         return (
                             <Box
                                 key={positionId}
-                                pad="small"
+                                pad={{
+                                    horizontal: 'medium',
+                                    vertical: 'small',
+                                }}
                                 border
                                 round="xsmall"
                                 direction="row"
                             >
-                                <Box
-                                    flex
-                                    direction="row"
-                                    justify="between"
-                                    pad={{
-                                        left: 'small',
-                                        right: 'medium',
-                                        vertical: 'small',
-                                    }}
-                                    align="center"
+                                <Link
+                                    href={`/solvers/${redeemablePosition.solverAddress}`}
+                                    passHref
                                 >
-                                    <Box>
+                                    <Box
+                                        focusIndicator={false}
+                                        flex
+                                        direction="row"
+                                        justify="between"
+                                        pad={{
+                                            right: 'medium',
+                                        }}
+                                        align="center"
+                                    >
+                                        <Box>
+                                            <Text size="small" color="dark-4">
+                                                Solver
+                                            </Text>
+                                            <Text>
+                                                {redeemablePosition
+                                                    .solverMetadata?.solverTag
+                                                    .title || 'Unnamed'}
+                                            </Text>
+                                        </Box>
                                         <Text>
-                                            {redeemablePosition.solverMetadata
-                                                ?.solverTag.title || 'Solver'}
-                                        </Text>
-                                        <Text color={'dark-4'} size="small">
+                                            {formattedAmount}{' '}
                                             {
-                                                redeemablePositions[positionId]
-                                                    .solverAddress
+                                                redeemablePosition
+                                                    .collateralToken.symbol
                                             }
                                         </Text>
                                     </Box>
-                                    <Text>
-                                        {formattedAmount}{' '}
-                                        {
-                                            redeemablePosition.collateralToken
-                                                .symbol
-                                        }
-                                    </Text>
-                                </Box>
+                                </Link>
                                 <Box justify="center">
                                     <LoaderButton
                                         primary
