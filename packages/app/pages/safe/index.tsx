@@ -18,6 +18,7 @@ import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { loadStageStackFromID } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { getCollectionId } from '@cambrian/app/utils/helpers/ctHelpers'
 
 const providerOptions = {
     injected: {
@@ -231,6 +232,12 @@ export default function Safe() {
                     ethers.constants.HashZero,
                     conditionId,
                     indexSet
+                )
+
+                console.log('onChain collectionId: ', collectionId)
+                console.log(
+                    'manual collectionId',
+                    getCollectionId(conditionId, indexSet)
                 )
 
                 await Promise.all(
