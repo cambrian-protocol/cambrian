@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
-import { INFURA_ID } from '../../config'
+import { INFURA_ID } from '../config'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import RedeemableTokenListWidget from '@cambrian/app/ui/dashboard/widgets/RedeemableTokenListWidget'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
