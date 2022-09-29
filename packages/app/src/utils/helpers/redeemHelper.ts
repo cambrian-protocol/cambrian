@@ -133,7 +133,9 @@ export const getRedeemablePositions = async (
                 positionIds.forEach((positionId, idx) => {
                     const positionIdHex = positionId.toHexString()
                     if (
-                        solverCache[solverAddress].positionId === positionIdHex
+                        solverCache[solverAddress].positionId ===
+                            positionIdHex &&
+                        values[idx].gt(0)
                     ) {
                         if (positions[positionIdHex]) {
                             // Just add amount
