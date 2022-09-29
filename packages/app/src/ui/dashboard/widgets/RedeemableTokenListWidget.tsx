@@ -7,8 +7,11 @@ import {
 import { useEffect, useState } from 'react'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface RedeemableTokensWidgetProps {
@@ -26,6 +29,7 @@ const RedeemableTokenListWidget = ({
         useState<RedeemablePositionsHash>()
     const [isLoading, setIsLoading] = useState(false)
     const [isRedeeming, setIsRedeeming] = useState<string>()
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         init()
@@ -52,7 +56,7 @@ const RedeemableTokenListWidget = ({
                 redeemablePosition.partition
             )
         } catch (e) {
-            console.error(e)
+            setErrorMessage(await cpLogger.push(e))
         }
         setIsRedeeming(undefined)
     }
@@ -129,6 +133,12 @@ const RedeemableTokenListWidget = ({
                 <ListSkeleton
                     isFetching={isLoading}
                     subject="redeemable tokens"
+                />
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    errorMessage={errorMessage}
+                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>
