@@ -222,7 +222,7 @@ const TemplateListItem = ({
                                                 pad={{ vertical: 'small' }}
                                             >
                                                 <ResponsiveLinkButton
-                                                    href={`/templates/${templateStreamID}`}
+                                                    href={`/solver/${templateStreamID}`}
                                                     label="View"
                                                     icon={
                                                         <Eye
@@ -263,7 +263,7 @@ const TemplateListItem = ({
                                                     }
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(
-                                                            `${window.location.origin}/templates/${templateStreamID}`
+                                                            `${window.location.origin}/solver/${templateStreamID}`
                                                         )
                                                         setIsSavedToClipboard(
                                                             true
@@ -276,7 +276,7 @@ const TemplateListItem = ({
                                                     }
                                                 />
                                                 <ResponsiveLinkButton
-                                                    href={`/dashboard/templates/edit/${templateStreamID}`}
+                                                    href={`/template/edit/${templateStreamID}`}
                                                     label="Edit"
                                                     icon={
                                                         <Pen

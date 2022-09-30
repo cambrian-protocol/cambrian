@@ -86,7 +86,7 @@ const RedeemableTokenListWidget = ({
                                 direction="row"
                             >
                                 <Link
-                                    href={`/solvers/${redeemablePosition.solverAddress}`}
+                                    href={`/solver/${redeemablePosition.solverAddress}`}
                                     passHref
                                 >
                                     <Box

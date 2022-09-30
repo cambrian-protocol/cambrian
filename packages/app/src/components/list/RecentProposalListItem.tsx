@@ -19,7 +19,7 @@ const RecentProposalListItem = ({
 
     return (
         <Link
-            href={`${window.location.origin}/proposals/${proposalStreamID}`}
+            href={`${window.location.origin}/solver/${proposalStreamID}`}
             passHref
         >
             <Box

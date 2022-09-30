@@ -39,32 +39,32 @@
                 "regex": "^/composer/composition/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/dashboard/proposals/edit/[proposalStreamID].html",
-                "regex": "^/dashboard/proposals/edit/([^/]+?)(?:/)?$"
+                "destination": "/proposal/edit/[proposalStreamID].html",
+                "regex": "^/proposal/edit/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/dashboard/proposals/new/[proposalStreamID].html",
-                "regex": "^/dashboard/proposals/new/([^/]+?)(?:/)?$"
+                "destination": "/proposal/new/[proposalStreamID].html",
+                "regex": "^/proposal/new/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/dashboard/templates/edit/[templateStreamID].html",
-                "regex": "^/dashboard/templates/edit/([^/]+?)(?:/)?$"
+                "destination": "/template/edit/[templateStreamID].html",
+                "regex": "^/template/edit/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/dashboard/templates/new/[templateStreamID].html",
-                "regex": "^/dashboard/templates/new/([^/]+?)(?:/)?$"
+                "destination": "/template/new/[templateStreamID].html",
+                "regex": "^/template/new/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/proposals/[proposalStreamID].html",
-                "regex": "^/proposals/([^/]+?)(?:/)?$"
+                "destination": "/proposal/[proposalStreamID].html",
+                "regex": "^/proposal/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/solvers/[solverAddress].html",
-                "regex": "^/solvers/([^/]+?)(?:/)?$"
+                "destination": "/solver/[solverAddress].html",
+                "regex": "^/solver/([^/]+?)(?:/)?$"
             },
             {
-                "destination": "/templates/[templateStreamID].html",
-                "regex": "^/templates/([^/]+?)(?:/)?$"
+                "destination": "/template/[templateStreamID].html",
+                "regex": "^/template/([^/]+?)(?:/)?$"
             }
         ]
     }
