@@ -215,7 +215,6 @@ export default class CeramicTemplateAPI {
                 <ProposalModel>(
                     (
                         await loadCommitWorkaround(
-                            this.user,
                             proposalSubmissions[proposalSubmissions.length - 1]
                                 .proposalCommitID
                         )
@@ -283,12 +282,8 @@ export default class CeramicTemplateAPI {
                         .proposalCommitID
 
                 const latestProposalCommitContent = <ProposalModel>(
-                    (
-                        await loadCommitWorkaround(
-                            this.user,
-                            latestRegisteredCommitID
-                        )
-                    ).content
+                    (await loadCommitWorkaround(latestRegisteredCommitID))
+                        .content
                 )
 
                 // No duplicate and proposal must have changed
@@ -415,10 +410,7 @@ export default class CeramicTemplateAPI {
                 ...stagesLib.content,
             }
 
-            const stageStack = await loadStageStackFromID(
-                this.user,
-                proposalStreamID
-            )
+            const stageStack = await loadStageStackFromID(proposalStreamID)
             // Set isDeclined if proposal is before approved
             if (type === 'DECLINE') {
                 await this.updateProposalEntry(stageStack, { isDeclined: true })

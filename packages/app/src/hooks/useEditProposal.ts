@@ -78,7 +78,6 @@ const useEditProposal = () => {
                         }
 
                         const _stageStack = await loadStageStackFromID(
-                            currentUser,
                             proposalStreamID
                         )
                         validateProposal(_stageStack.proposal)
@@ -112,10 +111,7 @@ const useEditProposal = () => {
                     setProposalInput(proposalWithUniqueTitle)
 
                     setStageStack(
-                        await loadStageStackFromID(
-                            currentUser,
-                            proposalStreamID as string
-                        )
+                        await loadStageStackFromID(proposalStreamID as string)
                     )
                     if (proposalStatus === ProposalStatus.ChangeRequested)
                         setProposalStatus(ProposalStatus.Modified)

@@ -1,4 +1,9 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react'
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react'
 import {
     addRecentStage,
     ceramicInstance,
@@ -26,6 +31,7 @@ import { UserType } from './UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
+import { solverSafetyCheck } from '../utils/helpers/safetyChecks'
 
 export type ProposalContextType = {
     stageStack?: StageStackType
@@ -60,6 +66,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         useEffect(() => {
             init()
+            safetyCheckSolver(stageStack, currentUser)
         }, [])
 
         useEffect(() => {
@@ -112,6 +119,15 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 }
             }
         }, [proposalStatus, stageStack])
+
+        const safetyCheckSolver = useCallback(
+            async (stageStack?: StageStackType, currentUser?: UserType) => {
+                if (stageStack && currentUser) {
+                    solverSafetyCheck(stageStack, currentUser)
+                }
+            },
+            [stageStack]
+        )
 
         const updateProposalLib = async () => {
             if (stageStack && proposalStatus !== ProposalStatus.Unknown) {
@@ -184,7 +200,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 if (cambrianStageStackDoc.content.proposalStack) {
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         cambrianStageStackDoc.content.proposalStack
                             .proposalCommitID
@@ -224,7 +239,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     }
 
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         approvedCommitID
                     )
@@ -266,7 +280,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             // Initialize the latest submission/commit as stageStack
                             const latestProposalCommitContent = (
                                 await loadCommitWorkaround(
-                                    currentUser,
                                     _latestProposalSubmission.proposalCommitID
                                 )
                             ).content as ProposalModel

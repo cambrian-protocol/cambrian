@@ -33,7 +33,6 @@ const TemplateUI = ({ templateStreamDoc, currentUser }: TemplateUIProps) => {
 
     const fetchComposition = async () => {
         const _compositionDoc = await loadCommitWorkaround<CompositionModel>(
-            currentUser,
             templateStreamDoc.content.composition.commitID
         )
         if (_compositionDoc.content && _compositionDoc.content.solvers) {

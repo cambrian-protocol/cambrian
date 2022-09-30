@@ -14,12 +14,11 @@ import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
+import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
-import { streamIDFromCommitID } from '../services/ceramic/CeramicUtils'
 
 export type PermissionType = string
 
@@ -101,7 +100,7 @@ const providerOptions = {
 
 let web3Modal: any
 if (typeof window !== 'undefined') {
-    web3Modal = new SafeAppWeb3Modal({
+    web3Modal = new Web3Modal({
         network: 'mainnet',
         cacheProvider: true,
         providerOptions,
@@ -159,7 +158,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
 
     const connectWallet = useCallback(async function () {
         try {
-            const provider = await web3Modal.requestProvider()
+            const provider = await web3Modal.connect()
             const web3Provider = new ethers.providers.Web3Provider(provider)
             const signer = web3Provider.getSigner()
             const address = await signer.getAddress()

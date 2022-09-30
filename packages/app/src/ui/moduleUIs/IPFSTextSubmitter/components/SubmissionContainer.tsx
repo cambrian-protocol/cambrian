@@ -57,7 +57,6 @@ const SubmissionContainer = ({
         const commitIDs: any[] = logs.map((l) => l.args?.cid).filter(Boolean)
         if (commitIDs.length > 0) {
             const latestCommit = await loadCommitWorkaround<SubmissionModel>(
-                currentUser,
                 commitIDs[commitIDs.length - 1]
             )
             setLatestSubmission(latestCommit.content)

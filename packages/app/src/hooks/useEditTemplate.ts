@@ -55,7 +55,6 @@ const useEditTemplate = () => {
                         const _composition = <CompositionModel>(
                             (
                                 await loadCommitWorkaround(
-                                    currentUser,
                                     templateDoc.content.composition.commitID
                                 )
                             ).content

@@ -16,7 +16,9 @@ import {
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { CeramicClient } from '@ceramicnetwork/http-client'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
@@ -425,30 +427,21 @@ export const getSolverData = async (
     }
 }
 
-/**
- * TrackingID is set to ProposalID when deployed from ProposalsHub
- * TODO, extract this logic elsewhere so that Solvers are not dependent on Proposals - Proposal Getters??
- */
-export const getMetadataFromProposal = async (
-    currentUser: UserType,
-    solverMethods: GenericMethods
-): Promise<SolverMetadataModel | undefined> => {
-    const proposalId = await solverMethods.trackingId()
-    if (currentUser.chainId && currentUser.signer) {
-        const proposalsHub = new ProposalsHub(
-            currentUser.signer,
-            currentUser.chainId
-        )
-
+export const getSolverMetadata = async (
+    solverContract: ethers.Contract,
+    signerOrProvider: ethers.Signer | ethers.providers.Provider,
+    chainId: number
+) => {
+    const proposalId = await solverContract.trackingId()
+    if (proposalId) {
+        const proposalsHub = new ProposalsHub(signerOrProvider, chainId)
         const metadataURI = await proposalsHub.getMetadataCID(proposalId)
-        if (metadataURI) {
-            const stageStack = await loadStageStackFromID(
-                currentUser,
-                metadataURI
-            )
+
+        if (proposalId) {
+            const stageStack = await loadStageStackFromID(metadataURI)
 
             if (stageStack) {
-                const solverIndex = (await solverMethods.chainIndex()) as
+                const solverIndex = (await solverContract.chainIndex()) as
                     | number
                     | undefined
                 if (solverIndex !== undefined) {

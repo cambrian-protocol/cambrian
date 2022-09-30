@@ -122,33 +122,23 @@ export const archiveStage = async (
  * @returns StageStack
  */
 export const loadStageStackFromID = async (
-    currentUser: UserType,
     proposalStreamID: string,
     proposalCommitID?: string
 ): Promise<StageStackType> => {
     const proposalDoc = <TileDocument<ProposalModel>>(
         await loadCommitWorkaround(
-            currentUser,
             proposalCommitID ? proposalCommitID : proposalStreamID
         )
     )
 
     const templateContent = <TemplateModel>(
-        (
-            await loadCommitWorkaround(
-                currentUser,
-                proposalDoc.content.template.commitID
-            )
-        ).content
+        (await loadCommitWorkaround(proposalDoc.content.template.commitID))
+            .content
     )
 
     const compositionContent = <CompositionModel>(
-        (
-            await loadCommitWorkaround(
-                currentUser,
-                templateContent.composition.commitID
-            )
-        ).content
+        (await loadCommitWorkaround(templateContent.composition.commitID))
+            .content
     )
 
     return {
@@ -435,12 +425,12 @@ export const saveCambrianCommitData = async (
 
 // NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
 export const loadCommitWorkaround = async <T>(
-    currentUser: UserType,
     commitID: string
 ): Promise<TileDocument<T>> => {
+    const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     try {
         return (await TileDocument.load(
-            ceramicInstance(currentUser),
+            ceramicClient,
             commitID
         )) as TileDocument<T>
     } catch (e) {
@@ -449,7 +439,7 @@ export const loadCommitWorkaround = async <T>(
 
     try {
         const cambrianCommit = (await TileDocument.deterministic(
-            ceramicInstance(currentUser),
+            ceramicClient,
             {
                 controllers: [CAMBRIAN_DID],
                 family: 'cambrian-commits',
@@ -470,7 +460,7 @@ export const loadCommitWorkaround = async <T>(
 
         try {
             const streamDoc = (await TileDocument.load(
-                ceramicInstance(currentUser),
+                ceramicClient,
                 streamIDFromCommitID(commitID)
             )) as TileDocument<Record<string, any>>
 
@@ -479,7 +469,7 @@ export const loadCommitWorkaround = async <T>(
 
             if (nextAnchor) {
                 const cambrianCommit = (await TileDocument.deterministic(
-                    ceramicInstance(currentUser),
+                    ceramicClient,
                     {
                         controllers: [CAMBRIAN_DID],
                         family: 'cambrian-commits',
