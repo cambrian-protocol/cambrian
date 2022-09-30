@@ -80,7 +80,7 @@ const CompositionDashboardTile = ({
                     compositionStreamID
                 )
                 router.push(
-                    `${window.location.origin}/dashboard/templates/new/${streamID}`
+                    `${window.location.origin}/template/new/${streamID}`
                 )
             }
         } catch (e) {
@@ -164,7 +164,7 @@ const CompositionDashboardTile = ({
                                 flex
                                 onClick={() =>
                                     router.push(
-                                        `/composer/composition/${compositionStreamID}`
+                                        `/solver/${compositionStreamID}`
                                     )
                                 }
                                 hoverIndicator
@@ -202,7 +202,7 @@ const CompositionDashboardTile = ({
                                     }
                                     onClick={() => {
                                         navigator.clipboard.writeText(
-                                            `${window.location.origin}/composer/composition/${compositionStreamID}`
+                                            `${window.location.origin}/solver/${compositionStreamID}`
                                         )
                                         setIsSavedToClipboard(true)
                                     }}

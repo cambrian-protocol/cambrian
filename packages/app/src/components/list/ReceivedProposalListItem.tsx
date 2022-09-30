@@ -114,8 +114,8 @@ const ReceivedProposalListItem = ({
                     href={
                         proposalInfo
                             ? isEditable && proposal.author === currentUser.did
-                                ? `/dashboard/proposals/edit/${proposalStreamID}`
-                                : `/proposals/${proposalStreamID}`
+                                ? `/proposal/edit/${proposalStreamID}`
+                                : `/solver/${proposalStreamID}`
                             : ''
                     }
                     passHref
@@ -151,7 +151,7 @@ const ReceivedProposalListItem = ({
                                             }
                                             onClick={() => {
                                                 navigator.clipboard.writeText(
-                                                    `${window.location.origin}/proposals/${proposalStreamID}`
+                                                    `${window.location.origin}/solver/${proposalStreamID}`
                                                 )
                                                 setIsSavedToClipboard(true)
                                             }}
@@ -166,7 +166,7 @@ const ReceivedProposalListItem = ({
                                             label="Edit"
                                             onClick={() =>
                                                 router.push(
-                                                    `/dashboard/proposals/edit/${proposalStreamID}`
+                                                    `/proposal/edit/${proposalStreamID}`
                                                 )
                                             }
                                         />

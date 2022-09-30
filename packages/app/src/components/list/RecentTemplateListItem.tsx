@@ -19,7 +19,7 @@ const RecentTemplateListItem = ({
 
     return (
         <Link
-            href={`${window.location.origin}/templates/${templateStreamID}`}
+            href={`${window.location.origin}/solver/${templateStreamID}`}
             passHref
         >
             <Box

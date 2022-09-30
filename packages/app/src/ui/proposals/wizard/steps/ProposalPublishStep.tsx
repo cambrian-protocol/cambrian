@@ -35,9 +35,7 @@ const ProposalPublishStep = ({
 
             const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
             await ceramicProposalAPI.submitProposal(proposalStreamID)
-            router.push(
-                `${window.location.origin}/proposals/${proposalStreamID}`
-            )
+            router.push(`${window.location.origin}/solver/${proposalStreamID}`)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsSubmitting(false)
@@ -63,7 +61,7 @@ const ProposalPublishStep = ({
                     }
                     secondaryButton={
                         <Link
-                            href={`${window.location.origin}/dashboard/proposals/edit/${proposalStreamID}`}
+                            href={`${window.location.origin}/proposal/edit/${proposalStreamID}`}
                             passHref
                         >
                             <Button

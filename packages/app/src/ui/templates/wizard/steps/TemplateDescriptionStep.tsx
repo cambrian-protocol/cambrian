@@ -40,7 +40,7 @@ const TemplateDescriptionStep = ({
                 }}
                 submitLabel="Save & Continue"
                 onCancel={() =>
-                    router.push(`${window.location.origin}/dashboard/templates`)
+                    router.push(`${window.location.origin}/dashboard?idx=1`)
                 }
                 cancelLabel="Cancel"
             />

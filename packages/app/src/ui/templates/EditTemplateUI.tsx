@@ -48,7 +48,7 @@ const EditTemplateUI = ({
         <Box gap="medium" pad="large">
             <TemplateHeader
                 title={cachedTemplateTitle}
-                link={`${window.location.origin}/templates/${templateStreamID}`}
+                link={`${window.location.origin}/solver/${templateStreamID}`}
             />
             <PlainSectionDivider />
             <Tabs

@@ -3,6 +3,7 @@ import {
     ClipboardText,
     File,
     IconContext,
+    Layout,
     Scales,
     TreeStructure,
     UserCircle,
@@ -14,6 +15,7 @@ import { CambrianStagesLibType } from '@cambrian/app/models/StageModel'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import OverviewDashboardUI from './OverviewDashboardUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
@@ -95,14 +97,18 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                 <Box pad="large" gap="medium">
                     <Heading>Dashboard</Heading>
                     <Text color="dark-4">Welcome back, {userName}!</Text>
-                    <IconContext.Provider
-                        value={{ size: '24', color: 'white' }}
-                    >
+                    <IconContext.Provider value={{ size: '18' }}>
                         <Tabs
                             activeIndex={activeIndex}
                             onActive={onActive}
                             alignControls="start"
                         >
+                            <Tab title="Overview" icon={<Layout />}>
+                                <OverviewDashboardUI
+                                    currentUser={currentUser}
+                                    recents={stagesLib?.recents}
+                                />
+                            </Tab>
                             <Tab title="Templates" icon={<File />}>
                                 <TemplatesDashboardUI
                                     currentUser={currentUser}

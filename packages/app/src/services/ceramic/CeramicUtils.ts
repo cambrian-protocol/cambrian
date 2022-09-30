@@ -21,7 +21,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
-import { SubmissionModel } from '@cambrian/app/ui/moduleUIs/IPFSTextSubmitter/models/SubmissionModel'
+import { CommitID } from '@ceramicnetwork/streamid'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -36,44 +36,6 @@ export const ceramicInstance = (currentUser: UserType) => {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     ceramicClient.did = currentUser.session.did
     return ceramicClient
-}
-
-// NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
-export const loadCommitWorkaround = async <T>(
-    currentUser: UserType,
-    commitID: string
-): Promise<TileDocument<T>> => {
-    try {
-        return (await TileDocument.load(
-            ceramicInstance(currentUser),
-            commitID
-        )) as TileDocument<T>
-    } catch (e) {
-        console.warn('Loading Cermic Commit failed. Fallback will be used.', e)
-    }
-
-    try {
-        const cambrianCommit = (await TileDocument.deterministic(
-            ceramicInstance(currentUser),
-            {
-                controllers: [CAMBRIAN_DID],
-                family: 'cambrian-commits',
-                tags: [commitID],
-            }
-        )) as TileDocument<T>
-
-        if (
-            cambrianCommit.content !== null &&
-            typeof cambrianCommit.content === 'object'
-        ) {
-            return cambrianCommit
-        } else {
-            throw new Error(`Provided CommitID not found ${commitID}`)
-        }
-    } catch (e) {
-        cpLogger.push(e)
-        throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-    }
 }
 
 export const loadStageDoc = async <T>(
@@ -160,33 +122,23 @@ export const archiveStage = async (
  * @returns StageStack
  */
 export const loadStageStackFromID = async (
-    currentUser: UserType,
     proposalStreamID: string,
     proposalCommitID?: string
 ): Promise<StageStackType> => {
     const proposalDoc = <TileDocument<ProposalModel>>(
         await loadCommitWorkaround(
-            currentUser,
             proposalCommitID ? proposalCommitID : proposalStreamID
         )
     )
 
     const templateContent = <TemplateModel>(
-        (
-            await loadCommitWorkaround(
-                currentUser,
-                proposalDoc.content.template.commitID
-            )
-        ).content
+        (await loadCommitWorkaround(proposalDoc.content.template.commitID))
+            .content
     )
 
     const compositionContent = <CompositionModel>(
-        (
-            await loadCommitWorkaround(
-                currentUser,
-                templateContent.composition.commitID
-            )
-        ).content
+        (await loadCommitWorkaround(templateContent.composition.commitID))
+            .content
     )
 
     return {
@@ -266,6 +218,13 @@ export const createStage = async (
         )
 
         await stageStreamDoc.update(stage)
+
+        // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+        await saveCambrianCommitData(
+            currentUser,
+            stageStreamDoc.commitId.toString()
+        )
+
         const stageStreamID = stageStreamDoc.id.toString()
 
         // Updating StagesLib
@@ -311,7 +270,7 @@ export const updateStage = async (
             ceramicInstance(currentUser),
             streamID
         )
-        const cleanedUserTitle = updatedStage.title.trim()
+        let cleanedUserTitle = updatedStage.title.trim()
 
         // Title has changed - stagesLib and metaTag must be updated
         if (currentStage.content.title !== cleanedUserTitle) {
@@ -376,14 +335,22 @@ export const updateStage = async (
                 { ...currentStage.metadata, tags: [uniqueTitle] },
                 { pin: true }
             )
-            return uniqueTitle
+
+            cleanedUserTitle = uniqueTitle
         } else {
             await currentStage.update({
                 ...updatedStage,
                 title: cleanedUserTitle,
             })
-            return cleanedUserTitle
         }
+
+        // NOTE: Workaround until Ceramics load commitID Bugfix is merged
+        await saveCambrianCommitData(
+            currentUser,
+            currentStage.commitId.toString()
+        )
+
+        return cleanedUserTitle
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -453,5 +420,118 @@ export const saveCambrianCommitData = async (
             throw new Error('TriloBot could not save commit.')
     } catch (e) {
         cpLogger.push(e)
+    }
+}
+
+// NOTE: Function to fallback on saved cambrianCommitData until Cermics bugfix is merged
+export const loadCommitWorkaround = async <T>(
+    commitID: string
+): Promise<TileDocument<T>> => {
+    const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+    try {
+        return (await TileDocument.load(
+            ceramicClient,
+            commitID
+        )) as TileDocument<T>
+    } catch (e) {
+        console.warn('Loading Ceramic Commit failed. Fallback will be used.', e)
+    }
+
+    try {
+        const cambrianCommit = (await TileDocument.deterministic(
+            ceramicClient,
+            {
+                controllers: [CAMBRIAN_DID],
+                family: 'cambrian-commits',
+                tags: [commitID],
+            }
+        )) as TileDocument<T>
+
+        if (
+            cambrianCommit.content !== null &&
+            typeof cambrianCommit.content === 'object'
+        ) {
+            return cambrianCommit
+        } else {
+            throw new Error(`Provided CommitID not found ${commitID}`)
+        }
+    } catch (e) {
+        console.log('loading anchor backup')
+
+        try {
+            const streamDoc = (await TileDocument.load(
+                ceramicClient,
+                streamIDFromCommitID(commitID)
+            )) as TileDocument<Record<string, any>>
+
+            const nextAnchor = findNextAnchor(commitID, streamDoc)
+            console.log('nextAnchor: ', nextAnchor)
+
+            if (nextAnchor) {
+                const cambrianCommit = (await TileDocument.deterministic(
+                    ceramicClient,
+                    {
+                        controllers: [CAMBRIAN_DID],
+                        family: 'cambrian-commits',
+                        tags: [nextAnchor],
+                    }
+                )) as TileDocument<T>
+
+                console.log('cambrian commit: ', cambrianCommit)
+
+                if (
+                    cambrianCommit.content !== null &&
+                    typeof cambrianCommit.content === 'object'
+                ) {
+                    return cambrianCommit
+                } else {
+                    throw new Error(`Provided CommitID not found ${commitID}`)
+                }
+            } else {
+                throw new Error(
+                    `Provided CommitID ${commitID} and no subsequent anchor found`
+                )
+            }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+}
+
+export const streamIDFromCommitID = (id: string) => {
+    const commitID = CommitID.fromString(id)
+    return commitID.baseID.toString()
+}
+
+const findNextAnchor = (
+    commitID: string,
+    streamDoc: TileDocument<Record<string, any>>
+) => {
+    if (
+        commitID ===
+        streamDoc.anchorCommitIds[
+            streamDoc.anchorCommitIds.length - 1
+        ].toString()
+    ) {
+        return commitID
+    }
+
+    const commitIdx = streamDoc.allCommitIds.findIndex(
+        (commit) => commit.toString() === commitID
+    )
+
+    const susbequentCommits = streamDoc.allCommitIds
+        .slice(commitIdx)
+        .map((commit) => commit.toString())
+
+    const nextAnchor = streamDoc.anchorCommitIds.find((commit) =>
+        susbequentCommits.includes(commit.toString())
+    )
+
+    if (nextAnchor) {
+        return nextAnchor.toString()
+    } else {
+        return null
     }
 }

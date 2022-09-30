@@ -45,7 +45,7 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
                         description: '',
                     }
                 )
-                if (streamID) router.push(`/composer/composition/${streamID}`)
+                if (streamID) router.push(`/solver/${streamID}`)
                 onBack()
             }
         } catch (e) {

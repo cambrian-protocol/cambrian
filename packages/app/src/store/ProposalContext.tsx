@@ -1,4 +1,9 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react'
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react'
 import {
     addRecentStage,
     ceramicInstance,
@@ -26,6 +31,7 @@ import { UserType } from './UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
+import { solverSafetyCheck } from '../utils/helpers/safetyChecks'
 
 export type ProposalContextType = {
     stageStack?: StageStackType
@@ -35,7 +41,7 @@ export type ProposalContextType = {
 }
 
 type ProposalProviderProps = PropsWithChildren<{}> & {
-    proposalStreamID: string
+    proposalStreamDoc: TileDocument<ProposalModel>
     currentUser: UserType
 }
 
@@ -45,26 +51,22 @@ export const ProposalContext = React.createContext<ProposalContextType>({
 })
 
 export const ProposalContextProvider: React.FunctionComponent<ProposalProviderProps> =
-    ({ proposalStreamID, currentUser, children }) => {
+    ({ proposalStreamDoc, currentUser, children }) => {
         const proposalsHub = new ProposalsHub(
             currentUser.signer,
             currentUser.chainId
         )
-        const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>()
         const [stageStack, setStageStack] = useState<StageStackType>()
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
         const [isLoaded, setIsLoaded] = useState(false)
-
-        const [proposalStreamDoc, setProposalStreamDoc] =
-            useState<TileDocument<ProposalModel>>()
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<TemplateModel>>()
 
         useEffect(() => {
             init()
+            safetyCheckSolver(stageStack, currentUser)
         }, [])
 
         useEffect(() => {
@@ -94,7 +96,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                                     undefined,
                                     onChainProposal,
                                     templateStreamDoc.content.receivedProposals[
-                                        proposalStreamID
+                                        proposalStreamDoc.id.toString()
                                     ]
                                 )
                             )
@@ -118,9 +120,21 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             }
         }, [proposalStatus, stageStack])
 
+        const safetyCheckSolver = useCallback(
+            async (stageStack?: StageStackType, currentUser?: UserType) => {
+                if (stageStack && currentUser) {
+                    solverSafetyCheck(stageStack, currentUser)
+                }
+            },
+            [stageStack]
+        )
+
         const updateProposalLib = async () => {
             if (stageStack && proposalStatus !== ProposalStatus.Unknown) {
-                await addRecentStage(currentUser, proposalStreamID)
+                await addRecentStage(
+                    currentUser,
+                    proposalStreamDoc.id.toString()
+                )
             }
         }
 
@@ -154,21 +168,13 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         const init = async () => {
             try {
-                const _proposalStreamDoc = await loadStageDoc<ProposalModel>(
-                    currentUser,
-                    proposalStreamID
-                )
-
-                _proposalStreamDoc.makeReadOnly()
-
                 const _templateStreamDoc = await loadStageDoc<TemplateModel>(
                     currentUser,
-                    _proposalStreamDoc.content.template.streamID
+                    proposalStreamDoc.content.template.streamID
                 )
 
-                await initProposal(_proposalStreamDoc, _templateStreamDoc)
+                await initProposal(proposalStreamDoc, _templateStreamDoc)
 
-                setProposalStreamDoc(_proposalStreamDoc)
                 setTemplateStreamDoc(_templateStreamDoc)
                 setIsLoaded(true)
             } catch (e) {
@@ -181,6 +187,8 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             templateStreamDoc: TileDocument<TemplateModel>
         ) => {
             try {
+                const proposalStreamID = proposalStreamDoc.id.toString()
+
                 const cambrianStageStackDoc = (await TileDocument.deterministic(
                     ceramicInstance(currentUser),
                     {
@@ -192,7 +200,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 if (cambrianStageStackDoc.content.proposalStack) {
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         cambrianStageStackDoc.content.proposalStack
                             .proposalCommitID
@@ -232,7 +239,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     }
 
                     const stageStack = await loadStageStackFromID(
-                        currentUser,
                         proposalStreamID,
                         approvedCommitID
                     )
@@ -245,6 +251,9 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         stageStack.template.author === currentUser.did &&
                         stageStack.proposal.isSubmitted
                     ) {
+                        const ceramicTemplateAPI = new CeramicTemplateAPI(
+                            currentUser
+                        )
                         receivedProposals =
                             await ceramicTemplateAPI.registerNewProposalSubmission(
                                 stageStack
@@ -271,7 +280,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                             // Initialize the latest submission/commit as stageStack
                             const latestProposalCommitContent = (
                                 await loadCommitWorkaround(
-                                    currentUser,
                                     _latestProposalSubmission.proposalCommitID
                                 )
                             ).content as ProposalModel

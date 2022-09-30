@@ -32,9 +32,7 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
                 randimals(),
                 templateStreamID
             )
-            router.push(
-                `${window.location.origin}/dashboard/proposals/new/${streamID}`
-            )
+            router.push(`${window.location.origin}/proposal/new/${streamID}`)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsCreatingProposal(false)
