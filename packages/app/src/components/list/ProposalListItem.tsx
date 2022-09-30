@@ -7,7 +7,7 @@ import {
     Pen,
     XCircle,
 } from 'phosphor-react'
-import { Box, DropButton, Spinner, Text } from 'grommet'
+import { Box, Button, DropButton, Spinner, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
@@ -120,52 +120,57 @@ const ProposalListItem = ({
                 align="center"
                 round="xsmall"
             >
-                <Link
-                    href={
-                        proposalInfo
-                            ? isEditable && proposal.author === currentUser.did
-                                ? `/proposal/edit/${proposalStreamID}`
-                                : `/solver/${proposalStreamID}`
-                            : ''
-                    }
-                    passHref
-                >
-                    <Box flex focusIndicator={false}>
-                        <Box direction="row" wrap="reverse" align="center">
-                            <Box pad="xsmall">
-                                <Text>{proposal.title}</Text>
-                            </Box>
-                            <Box pad="xsmall">
-                                <ProposalStatusBadge
-                                    status={proposalInfo?.status}
-                                />
-                            </Box>
-                        </Box>
-                        <Box direction="row" align="center" gap="xsmall">
-                            {proposalInfo ? (
-                                <Box
-                                    height="2em"
-                                    direction="row"
-                                    gap="xsmall"
-                                    align="center"
-                                >
-                                    <File
-                                        color={cpTheme.global.colors['dark-4']}
-                                    />
-                                    <Text size="small" color="dark-4">
-                                        {proposalInfo.template.title}
-                                    </Text>
+                <Box flex>
+                    <Link
+                        href={
+                            proposalInfo
+                                ? isEditable &&
+                                  proposal.author === currentUser.did
+                                    ? `/proposal/edit/${proposalStreamID}`
+                                    : `/solver/${proposalStreamID}`
+                                : ''
+                        }
+                        passHref
+                    >
+                        <Button>
+                            <Box direction="row" wrap="reverse" align="center">
+                                <Box pad="xsmall">
+                                    <Text>{proposal.title}</Text>
                                 </Box>
-                            ) : (
-                                <BaseSkeletonBox
-                                    height={'2em'}
-                                    width={'small'}
-                                />
-                            )}
-                        </Box>
-                    </Box>
-                </Link>
-                <Box direction="row" width={{ min: 'auto' }} justify="end">
+                                <Box pad="xsmall">
+                                    <ProposalStatusBadge
+                                        status={proposalInfo?.status}
+                                    />
+                                </Box>
+                            </Box>
+                            <Box direction="row" align="center" gap="xsmall">
+                                {proposalInfo ? (
+                                    <Box
+                                        height="2em"
+                                        direction="row"
+                                        gap="xsmall"
+                                        align="center"
+                                    >
+                                        <File
+                                            color={
+                                                cpTheme.global.colors['dark-4']
+                                            }
+                                        />
+                                        <Text size="small" color="dark-4">
+                                            {proposalInfo.template.title}
+                                        </Text>
+                                    </Box>
+                                ) : (
+                                    <BaseSkeletonBox
+                                        height={'2em'}
+                                        width={'small'}
+                                    />
+                                )}
+                            </Box>
+                        </Button>
+                    </Link>
+                </Box>
+                <Box width={{ min: 'auto' }} justify="end">
                     <DropButton
                         size="small"
                         dropContent={
