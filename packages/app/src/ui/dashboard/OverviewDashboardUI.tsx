@@ -1,16 +1,12 @@
 import { Box, Text } from 'grommet'
-import { useEffect, useState } from 'react'
 
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import RecentSolverTile from './tiles/RecentSolverTile'
 import RedeemableTokenListWidget from './widgets/RedeemableTokenListWidget'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { useState } from 'react'
 
 interface OverviewDashboardUIProps {
     currentUser: UserType
@@ -21,47 +17,37 @@ const OverviewDashboardUI = ({
     currentUser,
     recents,
 }: OverviewDashboardUIProps) => {
-    const [recentStages, setRecentStages] = useState<
-        TileDocument<TemplateModel | ProposalModel | CompositionModel>[]
-    >([])
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [isFetching, setIsFetching] = useState(false)
-
-    useEffect(() => {
-        fetchRecentStages()
-    }, [recents])
-
-    const fetchRecentStages = async () => {
-        try {
-            setIsFetching(true)
-            if (recents) {
-            } else {
-            }
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-        setIsFetching(false)
-    }
 
     return (
         <>
-            <Box fill gap="medium" pad={{ top: 'medium' }} direction="row">
-                {/*  <Box width={'large'}>
-                    <Box pad={{ top: 'medium' }}>
-                        <Text>Recents</Text>
+            <Box fill gap="medium" pad={{ top: 'medium' }}>
+                <Box pad={{ top: 'medium' }} gap="small">
+                    <Text size="small" color="dark-4">
+                        Recently viewed solvers
+                    </Text>
+                    <Box direction="row" overflow={{ horizontal: 'auto' }}>
                         {recents && recents.length > 0 ? (
-                            recents.map((recent) => (
-                                <Box key={recent}>{recent}</Box>
-                            ))
+                            recents
+                                .reverse()
+                                .slice(0, 10)
+                                .map((recent) => (
+                                    <RecentSolverTile
+                                        key={recent}
+                                        id={recent}
+                                        currentUser={currentUser}
+                                    />
+                                ))
                         ) : (
-                            <ListSkeleton
-                                isFetching={isFetching}
-                                subject="recents"
-                            />
+                            <></>
                         )}
                     </Box>
-                </Box> */}
-                <Box width={'large'}>
+                </Box>
+                <PlainSectionDivider />
+                <Box gap="small">
+                    <Text size="small" color="dark-4">
+                        Token to redeem
+                    </Text>
                     <RedeemableTokenListWidget
                         address={currentUser.address}
                         chainId={currentUser.chainId}
