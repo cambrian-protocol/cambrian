@@ -29,7 +29,7 @@ const OverviewDashboardUI = ({
                     <Box direction="row" overflow={{ horizontal: 'auto' }}>
                         {recents && recents.length > 0 ? (
                             recents
-                                .reverse()
+
                                 .slice(0, 10)
                                 .map((recent) => (
                                     <RecentSolverTile
@@ -38,6 +38,7 @@ const OverviewDashboardUI = ({
                                         currentUser={currentUser}
                                     />
                                 ))
+                                .reverse()
                         ) : (
                             <></>
                         )}
