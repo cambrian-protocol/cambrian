@@ -69,10 +69,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             safetyCheckSolver(stageStack, currentUser)
         }, [])
 
-        useEffect(() => {
-            updateProposalLib()
-        }, [proposalStatus, stageStack])
-
         // Init offchain Listeners
         useEffect(() => {
             if (
@@ -128,15 +124,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             },
             [stageStack]
         )
-
-        const updateProposalLib = async () => {
-            if (stageStack && proposalStatus !== ProposalStatus.Unknown) {
-                await addRecentStage(
-                    currentUser,
-                    proposalStreamDoc.id.toString()
-                )
-            }
-        }
 
         const initProposalsHubListener = async (
             proposalsHub: ProposalsHub,
