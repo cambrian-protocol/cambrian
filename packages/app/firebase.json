@@ -9,7 +9,7 @@
         "headers": [
             {
                 "key": "Access-Control-Allow-Origin",
-                "value": "*"
+                "value": "https://gnosis-safe.io"
             },
             {
                 "key": "Access-Control-Allow-Methods",
