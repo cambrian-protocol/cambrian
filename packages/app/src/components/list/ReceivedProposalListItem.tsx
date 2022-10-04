@@ -7,7 +7,7 @@ import {
     Pen,
     XCircle,
 } from 'phosphor-react'
-import { Box, DropButton, Spinner, Text } from 'grommet'
+import { Box, Button, DropButton, Spinner, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
@@ -110,29 +110,38 @@ const ReceivedProposalListItem = ({
                 align="center"
                 round="xsmall"
             >
-                <Link
-                    href={
-                        proposalInfo
-                            ? isEditable && proposal.author === currentUser.did
-                                ? `/dashboard/proposals/edit/${proposalStreamID}`
-                                : `/proposals/${proposalStreamID}`
-                            : ''
-                    }
-                    passHref
-                >
-                    <Box flex focusIndicator={false}>
-                        <Box direction="row" wrap="reverse" align="center">
-                            <Box pad="xsmall">
-                                <Text>{proposal.title}</Text>
+                <Box flex>
+                    <Link
+                        href={
+                            proposalInfo
+                                ? isEditable &&
+                                  proposal.author === currentUser.did
+                                    ? `/proposal/edit/${proposalStreamID}`
+                                    : `/solver/${proposalStreamID}`
+                                : ''
+                        }
+                        passHref
+                    >
+                        <Button>
+                            <Box flex focusIndicator={false}>
+                                <Box
+                                    direction="row"
+                                    wrap="reverse"
+                                    align="center"
+                                >
+                                    <Box pad="xsmall">
+                                        <Text>{proposal.title}</Text>
+                                    </Box>
+                                    <Box pad="xsmall">
+                                        <ProposalStatusBadge
+                                            status={proposalInfo?.status}
+                                        />
+                                    </Box>
+                                </Box>
                             </Box>
-                            <Box pad="xsmall">
-                                <ProposalStatusBadge
-                                    status={proposalInfo?.status}
-                                />
-                            </Box>
-                        </Box>
-                    </Box>
-                </Link>
+                        </Button>
+                    </Link>
+                </Box>
                 <Box direction="row" width={{ min: 'auto' }} justify="end">
                     <DropButton
                         size="small"
@@ -151,7 +160,7 @@ const ReceivedProposalListItem = ({
                                             }
                                             onClick={() => {
                                                 navigator.clipboard.writeText(
-                                                    `${window.location.origin}/proposals/${proposalStreamID}`
+                                                    `${window.location.origin}/solver/${proposalStreamID}`
                                                 )
                                                 setIsSavedToClipboard(true)
                                             }}
@@ -166,7 +175,7 @@ const ReceivedProposalListItem = ({
                                             label="Edit"
                                             onClick={() =>
                                                 router.push(
-                                                    `/dashboard/proposals/edit/${proposalStreamID}`
+                                                    `/proposal/edit/${proposalStreamID}`
                                                 )
                                             }
                                         />

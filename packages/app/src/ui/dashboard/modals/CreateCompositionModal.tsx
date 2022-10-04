@@ -35,7 +35,7 @@ const CreateCompositionModal = ({
             const streamID = await ceramicCompositionAPI.createComposition(
                 input
             )
-            router.push(`/composer/composition/${streamID}`)
+            router.push(`/solver/${streamID}`)
         } catch (e) {
             setIsCreating(false)
             setErrorMessage(await cpLogger.push(e))

@@ -36,7 +36,7 @@ const ProposalControlbar = () => {
                             <Box gap="medium">
                                 <PlainSectionDivider />
                                 <Link
-                                    href={`${window.location.origin}/dashboard/proposals/edit/${stageStack.proposalStreamID}`}
+                                    href={`${window.location.origin}/proposal/edit/${stageStack.proposalStreamID}`}
                                     passHref
                                 >
                                     <Button

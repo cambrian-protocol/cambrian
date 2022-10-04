@@ -57,7 +57,7 @@ const ImportCompositionModal = ({
                 }
             )
 
-            if (streamID) router.push(`/composer/composition/${streamID}`)
+            if (streamID) router.push(`/solver/${streamID}`)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsLoading(false)

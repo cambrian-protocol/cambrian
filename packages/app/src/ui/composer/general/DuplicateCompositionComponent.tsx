@@ -46,9 +46,7 @@ const DuplicateCompositionComponent = ({
                         title: input,
                     }
                 )
-                router.push(
-                    `${window.location.origin}/composer/composition/${streamID}`
-                )
+                router.push(`${window.location.origin}/solver/${streamID}`)
                 setShowDuplicateCompositionCTA(false)
             }
         } catch (e) {

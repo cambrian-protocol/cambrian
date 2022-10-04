@@ -33,3 +33,7 @@ export const fetchStageTileDoc = async (
         }
     }
 }
+
+export const isComposition = (stage: any) => stage.solvers !== undefined
+export const isTemplate = (stage: any) => stage.composition !== undefined
+export const isProposal = (stage: any) => stage.template !== undefined

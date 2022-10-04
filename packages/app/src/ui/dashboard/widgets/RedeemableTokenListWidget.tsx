@@ -1,4 +1,4 @@
-import { Box, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import {
     RedeemablePosition,
     RedeemablePositionsHash,
@@ -85,39 +85,47 @@ const RedeemableTokenListWidget = ({
                                 round="xsmall"
                                 direction="row"
                             >
-                                <Link
-                                    href={`/solvers/${redeemablePosition.solverAddress}`}
-                                    passHref
-                                >
-                                    <Box
-                                        focusIndicator={false}
-                                        flex
-                                        direction="row"
-                                        justify="between"
-                                        pad={{
-                                            right: 'medium',
-                                        }}
-                                        align="center"
+                                <Box flex>
+                                    <Link
+                                        href={`/solver/${redeemablePosition.solverAddress}`}
+                                        passHref
                                     >
-                                        <Box>
-                                            <Text size="small" color="dark-4">
-                                                Solver
-                                            </Text>
-                                            <Text>
-                                                {redeemablePosition
-                                                    .solverMetadata?.solverTag
-                                                    .title || 'Unnamed'}
-                                            </Text>
-                                        </Box>
-                                        <Text>
-                                            {formattedAmount}{' '}
-                                            {
-                                                redeemablePosition
-                                                    .collateralToken.symbol
-                                            }
-                                        </Text>
-                                    </Box>
-                                </Link>
+                                        <Button>
+                                            <Box
+                                                focusIndicator={false}
+                                                direction="row"
+                                                justify="between"
+                                                pad={{
+                                                    right: 'medium',
+                                                }}
+                                                align="center"
+                                            >
+                                                <Box>
+                                                    <Text
+                                                        size="small"
+                                                        color="dark-4"
+                                                    >
+                                                        Solver
+                                                    </Text>
+                                                    <Text>
+                                                        {redeemablePosition
+                                                            .solverMetadata
+                                                            ?.solverTag.title ||
+                                                            'Unnamed'}
+                                                    </Text>
+                                                </Box>
+                                                <Text>
+                                                    {formattedAmount}{' '}
+                                                    {
+                                                        redeemablePosition
+                                                            .collateralToken
+                                                            .symbol
+                                                    }
+                                                </Text>
+                                            </Box>
+                                        </Button>
+                                    </Link>
+                                </Box>
                                 <Box justify="center">
                                     <LoaderButton
                                         primary

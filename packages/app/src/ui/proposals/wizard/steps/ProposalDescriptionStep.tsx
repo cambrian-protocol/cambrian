@@ -51,7 +51,7 @@ const ProposalDescriptionStep = ({
             }}
             submitLabel="Save & Continue"
             onCancel={() =>
-                router.push(`${window.location.origin}/dashboard/proposals`)
+                router.push(`${window.location.origin}/dashboard?idx=2`)
             }
             cancelLabel="Cancel"
         />

@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import {
+    addRecentStage,
+    ceramicInstance,
+} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import { ComposerContextProvider } from '@cambrian/app/store/composer/composer.context'
 import { ComposerUI } from '@cambrian/app/ui/composer/ComposerUI'
@@ -10,7 +14,6 @@ import SolverUI from '@cambrian/app/ui/solver/SolverUI'
 import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -22,12 +25,15 @@ export default function SolverPage() {
     const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
-        if (router.isReady && currentUser) determineQuery(currentUser)
+        if (router.isReady && currentUser) {
+            determineQuery(currentUser)
+        }
     }, [currentUser, router])
 
     const determineQuery = async (currentUser: UserType) => {
         if (solverAddress !== undefined && typeof solverAddress === 'string') {
             try {
+                await addRecentStage(currentUser, solverAddress as string)
                 if (solverAddress.startsWith('0x')) {
                     setUi(
                         <SolverUI
