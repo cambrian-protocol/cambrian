@@ -331,18 +331,25 @@ export const updateStage = async (
                 }
             }
 
+            console.log(currentStage.commitId.toString())
+
             await currentStage.update(
                 { ...updatedStage, title: uniqueTitle },
                 { ...currentStage.metadata, tags: [uniqueTitle] },
                 { pin: true }
             )
 
+            console.log(currentStage.commitId.toString())
+
             cleanedUserTitle = uniqueTitle
         } else {
+            console.log(currentStage.commitId.toString())
+
             await currentStage.update({
                 ...updatedStage,
                 title: cleanedUserTitle,
             })
+            console.log(currentStage.commitId.toString())
         }
 
         // NOTE: Workaround until Ceramics load commitID Bugfix is merged
@@ -419,6 +426,10 @@ export const saveCambrianCommitData = async (
 
         if (res.status !== 200)
             throw new Error('TriloBot could not save commit.')
+
+        console.log(res)
+
+        return res
     } catch (e) {
         cpLogger.push(e)
     }
@@ -451,7 +462,7 @@ export const loadCommitWorkaround = async <T>(
         if (
             cambrianCommit.content !== null &&
             typeof cambrianCommit.content === 'object' &&
-            Object.keys(cambrianCommit.content).length
+            Object.keys(cambrianCommit.content).length > 0
         ) {
             return cambrianCommit
         } else {
