@@ -21,7 +21,9 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
+
 import { CommitID } from '@ceramicnetwork/streamid'
+import { ConflictResolution } from '@ceramicnetwork/core/lib/conflict-resolution'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -449,7 +451,8 @@ export const loadCommitWorkaround = async <T>(
 
         if (
             cambrianCommit.content !== null &&
-            typeof cambrianCommit.content === 'object'
+            typeof cambrianCommit.content === 'object' &&
+            Object.keys(cambrianCommit.content).length
         ) {
             return cambrianCommit
         } else {
