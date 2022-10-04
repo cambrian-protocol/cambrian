@@ -44,7 +44,7 @@ const OverviewDashboardUI = ({
                     ) : (
                         <ListSkeleton
                             isFetching={false}
-                            subject="recently viewed solvers"
+                            subject="recently viewed Solvers"
                         />
                     )}
                 </Box>

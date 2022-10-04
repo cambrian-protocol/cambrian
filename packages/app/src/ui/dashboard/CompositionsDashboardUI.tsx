@@ -89,7 +89,7 @@ const CompositionsDashboardUI = ({
                         ) : (
                             <ListSkeleton
                                 isFetching={isFetching}
-                                subject="compositions"
+                                subject="Solver Compositions"
                             />
                         )}
                     </Box>
