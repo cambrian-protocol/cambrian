@@ -1,9 +1,4 @@
-import {
-    archiveStage,
-    ceramicInstance,
-    createStage,
-    saveCambrianCommitData,
-} from './CeramicUtils'
+import { archiveStage, ceramicInstance, createStage } from './CeramicUtils'
 
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -61,12 +56,6 @@ export default class CeramicProposalAPI {
                 },
                 isSubmitted: false,
             }
-
-            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-            await saveCambrianCommitData(
-                this.user,
-                templateStreamDoc.commitId.toString()
-            )
 
             return await createStage(proposal, StageNames.proposal, this.user)
         } catch (e) {

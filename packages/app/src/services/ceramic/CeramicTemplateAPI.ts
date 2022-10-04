@@ -11,7 +11,6 @@ import {
     loadStageDoc,
     loadStagesLib,
     loadStageStackFromID,
-    saveCambrianCommitData,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -96,12 +95,6 @@ export default class CeramicTemplateAPI {
                 receivedProposals: {},
                 isActive: true,
             }
-
-            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-            await saveCambrianCommitData(
-                this.user,
-                composition.commitId.toString()
-            )
 
             return createStage(template, StageNames.template, this.user)
         } catch (e) {
@@ -267,11 +260,6 @@ export default class CeramicTemplateAPI {
                     },
                 ]
 
-                // NOTE: Workaround until Ceramics load bugfix is merged
-                await saveCambrianCommitData(
-                    this.user,
-                    stageStack.proposalCommitID
-                )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
@@ -300,11 +288,6 @@ export default class CeramicTemplateAPI {
                         proposalCommitID: stageStack.proposalCommitID,
                     })
 
-                    // NOTE: Workaround until Ceramics load  bugfix is merged
-                    await saveCambrianCommitData(
-                        this.user,
-                        stageStack.proposalCommitID
-                    )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
                         receivedProposals: updatedReceivedProposals,
