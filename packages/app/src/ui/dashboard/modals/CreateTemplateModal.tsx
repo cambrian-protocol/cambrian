@@ -1,4 +1,4 @@
-import { Box, Spinner, Text } from 'grommet'
+import { Box, Text } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
