@@ -10,8 +10,8 @@ import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAP
 import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
+import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -31,9 +31,10 @@ const CreateTemplateModal = ({
     currentUser,
 }: CreateTemplateModalProps) => {
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-    const [compositions, setCompositions] = useState<StringHashmap>({})
+    const [compositions, setCompositions] = useState<StringHashmap>()
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [isFetching, setIsFetching] = useState(false)
 
     useEffect(() => {
         fetchCompositions()
@@ -41,6 +42,7 @@ const CreateTemplateModal = ({
 
     const fetchCompositions = async () => {
         try {
+            setIsFetching(true)
             const stagesLib = await loadStagesLib(currentUser)
             if (
                 stagesLib &&
@@ -52,6 +54,7 @@ const CreateTemplateModal = ({
         } catch (e) {
             await cpLogger.push(e)
         }
+        setIsFetching(false)
     }
 
     const onSelectComposition = async (compositionStreamID: string) => {
@@ -88,9 +91,9 @@ const CreateTemplateModal = ({
                         {Object.keys(
                             SUPPORTED_CHAINS[currentUser.chainId].compositions
                         ).length > 0 && (
-                            <Box gap="medium">
+                            <Box gap="medium" height={{ min: 'auto' }}>
                                 <Text color="dark-4" size="small">
-                                    Predefined Composition Solvers
+                                    Predefined Solver Compositions
                                 </Text>
                                 {Object.keys(
                                     SUPPORTED_CHAINS[currentUser.chainId]
@@ -124,11 +127,11 @@ const CreateTemplateModal = ({
                                 ))}
                             </Box>
                         )}
-                        <PlainSectionDivider />
                         <Text color="dark-4" size="small">
-                            User Compositions
+                            Your Solver Compositions
                         </Text>
-                        {compositions ? (
+                        {compositions &&
+                        Object.keys(compositions).length > 0 ? (
                             <Box height={{ min: 'auto' }} gap="small">
                                 {Object.keys(compositions).map(
                                     (compositionTag) => {
@@ -158,17 +161,10 @@ const CreateTemplateModal = ({
                                 )}
                             </Box>
                         ) : (
-                            <Box
-                                fill
-                                justify="center"
-                                align="center"
-                                gap="medium"
-                            >
-                                <Spinner size="medium" />
-                                <Text size="small" color="dark-4">
-                                    Loading Compositions...
-                                </Text>
-                            </Box>
+                            <ListSkeleton
+                                isFetching={isFetching}
+                                subject="Solver Compositions"
+                            />
                         )}
                         <Box pad="large" />
                     </Box>
