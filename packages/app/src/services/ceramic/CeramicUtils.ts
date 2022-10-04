@@ -23,7 +23,6 @@ import { cpLogger } from '../api/Logger.api'
 import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
 
 import { CommitID } from '@ceramicnetwork/streamid'
-import { ConflictResolution } from '@ceramicnetwork/core/lib/conflict-resolution'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 

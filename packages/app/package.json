@@ -12,7 +12,6 @@
         "@babel/core": "7.0.0",
         "@cambrian/core": "0.1.0",
         "@ceramicnetwork/blockchain-utils-linking": "2.0.12",
-        "@ceramicnetwork/core": "^2.10.0",
         "@ceramicnetwork/http-client": "2.4.0",
         "@ceramicnetwork/stream-tile": "2.4.4",
         "@gnosis.pm/safe-apps-sdk": "^7.8.0",
