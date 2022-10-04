@@ -40,7 +40,9 @@ const ChatMessage = ({ message, currentUser, pending }: ChatMessageProps) => {
                         {message.author?.name || message.author?.did}
                     </Text>
                 )}
-                <Text size="small">{message.text}</Text>
+                <Text size="small" wordBreak={'break-all'}>
+                    {message.text}
+                </Text>
                 <Box align="end" justify="between" direction="row">
                     {isSender ? pending ? <Clock /> : <Check /> : <Box />}
                     <Text size="xsmall" color="light-6">
