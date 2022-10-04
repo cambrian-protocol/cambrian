@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber, Signer, ethers } from 'ethers'
 import {
     ERC20_IFACE,
     PROPOSALS_HUB_IFACE,
@@ -11,10 +11,13 @@ import { TokenModel } from '../models/TokenModel'
 
 export default class ProposalsHub {
     contract: ethers.Contract
-    signerOrProvider: ethers.Signer
+    signerOrProvider: ethers.Signer | ethers.providers.Provider
     chainId: number
 
-    constructor(signerOrProvider: ethers.Signer, chainId: number) {
+    constructor(
+        signerOrProvider: ethers.Signer | ethers.providers.Provider,
+        chainId: number
+    ) {
         const chainData = SUPPORTED_CHAINS[chainId]
         if (!chainData) throw GENERAL_ERROR['CHAIN_NOT_SUPPORTED']
 
@@ -62,6 +65,9 @@ export default class ProposalsHub {
 
     approveFunding = async (amount: number, token?: TokenModel) => {
         if (!token) throw GENERAL_ERROR['MISSING_COLLATERAL_TOKEN']
+        if (!Signer.isSigner(this.signerOrProvider))
+            throw GENERAL_ERROR['NO_WALLET_CONNECTION']
+
         const weiAmount = ethers.utils.parseUnits(
             amount.toString(),
             token.decimals

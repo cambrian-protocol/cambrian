@@ -174,7 +174,7 @@ export const getApprovedProposalCommitID = (
         )?.proposalCommitID) ||
     undefined
 
-const getParsedSolvers = async (
+export const getParsedSolvers = async (
     stageStack: StageStackType,
     currentUser: UserType
 ) => {
@@ -384,14 +384,12 @@ export const fetchProposalInfo = async (
             )
             if (latestProposalSubmission) {
                 proposalDoc = await loadCommitWorkaround<ProposalModel>(
-                    currentUser,
                     latestProposalSubmission.proposalCommitID
                 )
             }
         }
         const templateCommitContent = (
             await loadCommitWorkaround<TemplateModel>(
-                currentUser,
                 proposalDoc.content.template.commitID
             )
         ).content

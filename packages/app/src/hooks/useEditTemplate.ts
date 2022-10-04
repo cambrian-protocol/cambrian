@@ -55,11 +55,12 @@ const useEditTemplate = () => {
                         const _composition = <CompositionModel>(
                             (
                                 await loadCommitWorkaround(
-                                    currentUser,
                                     templateDoc.content.composition.commitID
                                 )
                             ).content
                         )
+
+                        console.log(_composition)
 
                         if (_composition) {
                             setComposition(_composition)

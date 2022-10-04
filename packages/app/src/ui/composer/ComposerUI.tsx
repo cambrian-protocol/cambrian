@@ -7,12 +7,7 @@ import ReactFlow, {
     Controls as ReactFlowControls,
     isNode,
 } from 'react-flow-renderer'
-import {
-    loadStageDoc,
-    loadStagesLib,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
 import ComposerLayout from '@cambrian/app/components/layout/ComposerLayout'
 import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
@@ -23,12 +18,14 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DuplicateCompositionComponent from './general/DuplicateCompositionComponent'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
-import { useRouter } from 'next/router'
 
 interface ComposerUIProps {
     currentUser: UserType
+    compositionStreamDoc: TileDocument<CompositionModel>
 }
 
 const nodeTypes = {
@@ -45,68 +42,48 @@ TODO
 - Manual connection of Nodes
 
 */
-export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
-    const router = useRouter()
-    const ceramicCompositionAPI = new CeramicCompositionAPI(currentUser)
-    const { compositionStreamID } = router.query
+export const ComposerUI = ({
+    currentUser,
+    compositionStreamDoc,
+}: ComposerUIProps) => {
     const { composer, dispatch } = useComposerContext()
-    const [loadedComposition, setLoadedComposition] =
-        useState<CompositionModel>()
     const [isInitialized, setIsInitialized] = useState(false)
     const [showDuplicateCompositionCTA, setShowDuplicateCompositionCTA] =
         useState(false)
 
     useEffect(() => {
-        if (router.isReady) fetchComposition()
-    }, [router, currentUser])
+        init()
+    }, [])
 
     // TODO Error handling, if query doesn't get something, show invalid query and cta to create a new
-    const fetchComposition = async () => {
-        if (
-            compositionStreamID !== undefined &&
-            typeof compositionStreamID === 'string' &&
-            currentUser
-        ) {
-            try {
-                const composition = await loadStageDoc<CompositionModel>(
-                    currentUser,
-                    compositionStreamID
+    const init = async () => {
+        try {
+            // Add composition to User DID so it shows up in his dashboard from now on
+            const stagesLib = await loadStagesLib(currentUser)
+
+            if (stagesLib.content && stagesLib.content.compositions) {
+                const key = Object.keys(
+                    stagesLib.content.compositions.lib
+                ).find(
+                    (streamKey) =>
+                        stagesLib.content.compositions.lib[streamKey] ===
+                        compositionStreamDoc.id.toString()
                 )
-
-                if (
-                    composition.content !== null &&
-                    typeof composition.content === 'object'
-                ) {
-                    setLoadedComposition(composition.content)
-                    // Add composition to User DID so it shows up in his dashboard from now on
-                    const stagesLib = await loadStagesLib(currentUser)
-
-                    if (stagesLib.content && stagesLib.content.compositions) {
-                        const key = Object.keys(
-                            stagesLib.content.compositions.lib
-                        ).find(
-                            (streamKey) =>
-                                stagesLib.content.compositions.lib[
-                                    streamKey
-                                ] === compositionStreamID
-                        )
-                        if (!key) {
-                            setShowDuplicateCompositionCTA(true)
-                        }
-                    } else {
-                        setShowDuplicateCompositionCTA(true)
-                    }
-
-                    dispatch({
-                        type: 'LOAD_COMPOSITION',
-                        payload: {
-                            ...composition.content,
-                        },
-                    })
+                if (!key) {
+                    setShowDuplicateCompositionCTA(true)
                 }
-            } catch (e) {}
+            } else {
+                setShowDuplicateCompositionCTA(true)
+            }
+
+            dispatch({
+                type: 'LOAD_COMPOSITION',
+                payload: {
+                    ...compositionStreamDoc.content,
+                },
+            })
             setIsInitialized(true)
-        }
+        } catch (e) {}
     }
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
@@ -161,16 +138,15 @@ export const ComposerUI = ({ currentUser }: ComposerUIProps) => {
                     <ComposerToolbar
                         disabled={showDuplicateCompositionCTA}
                         currentComposition={composer}
-                        compositionStreamID={compositionStreamID as string}
+                        compositionStreamID={compositionStreamDoc.id.toString()}
                     />
                 }
             >
                 <Box direction="row" justify="between" fill>
                     {isInitialized ? (
-                        showDuplicateCompositionCTA && loadedComposition ? (
+                        showDuplicateCompositionCTA ? (
                             <DuplicateCompositionComponent
-                                ceramicCompositionAPI={ceramicCompositionAPI}
-                                composition={loadedComposition}
+                                composition={compositionStreamDoc.content}
                                 setShowDuplicateCompositionCTA={
                                     setShowDuplicateCompositionCTA
                                 }

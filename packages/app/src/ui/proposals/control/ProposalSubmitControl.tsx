@@ -44,7 +44,7 @@ const ProposalSubmitControl = ({
                         )
                     ) {
                         router.push(
-                            `${window.location.origin}/proposals/${proposalStreamID}`
+                            `${window.location.origin}/solver/${proposalStreamID}`
                         )
                     } else {
                         throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']

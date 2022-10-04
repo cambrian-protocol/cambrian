@@ -53,7 +53,7 @@ const CreateTemplateModal = ({
                 randimals(),
                 compositionStreamID
             )
-            if (streamID) router.push(`/dashboard/templates/new/${streamID}`)
+            if (streamID) router.push(`/template/new/${streamID}`)
         } catch (e) {
             setIsCreatingTemplate(undefined)
             setErrorMessage(await cpLogger.push(e))

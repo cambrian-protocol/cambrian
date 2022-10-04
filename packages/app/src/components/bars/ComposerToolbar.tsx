@@ -17,6 +17,7 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { updateStage } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
+import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 interface ComposerToolbarProps {
     disabled: boolean
@@ -63,7 +64,15 @@ const ComposerToolbar = ({
     }
 
     const onTestLog = async () => {
-        await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
+        if (currentUser?.signer.provider) {
+            const solvers = await parseComposerSolvers(
+                currentComposition.solvers,
+                currentUser.signer.provider
+            )
+            console.log(solvers)
+        }
+
+        // await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
     }
 
     return (

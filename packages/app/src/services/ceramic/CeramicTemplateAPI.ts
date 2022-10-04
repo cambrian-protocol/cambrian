@@ -11,7 +11,6 @@ import {
     loadStageDoc,
     loadStagesLib,
     loadStageStackFromID,
-    saveCambrianCommitData,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -94,14 +93,8 @@ export default class CeramicTemplateAPI {
                 },
                 author: this.user.did,
                 receivedProposals: {},
-                isActive: true, // TODO Activate / Deactivate Template feature
+                isActive: true,
             }
-
-            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-            await saveCambrianCommitData(
-                this.user,
-                composition.commitId.toString()
-            )
 
             return createStage(template, StageNames.template, this.user)
         } catch (e) {
@@ -215,7 +208,6 @@ export default class CeramicTemplateAPI {
                 <ProposalModel>(
                     (
                         await loadCommitWorkaround(
-                            this.user,
                             proposalSubmissions[proposalSubmissions.length - 1]
                                 .proposalCommitID
                         )
@@ -268,11 +260,6 @@ export default class CeramicTemplateAPI {
                     },
                 ]
 
-                // NOTE: Workaround until Ceramics load bugfix is merged
-                await saveCambrianCommitData(
-                    this.user,
-                    stageStack.proposalCommitID
-                )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
@@ -283,12 +270,8 @@ export default class CeramicTemplateAPI {
                         .proposalCommitID
 
                 const latestProposalCommitContent = <ProposalModel>(
-                    (
-                        await loadCommitWorkaround(
-                            this.user,
-                            latestRegisteredCommitID
-                        )
-                    ).content
+                    (await loadCommitWorkaround(latestRegisteredCommitID))
+                        .content
                 )
 
                 // No duplicate and proposal must have changed
@@ -305,11 +288,6 @@ export default class CeramicTemplateAPI {
                         proposalCommitID: stageStack.proposalCommitID,
                     })
 
-                    // NOTE: Workaround until Ceramics load  bugfix is merged
-                    await saveCambrianCommitData(
-                        this.user,
-                        stageStack.proposalCommitID
-                    )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
                         receivedProposals: updatedReceivedProposals,
@@ -415,10 +393,7 @@ export default class CeramicTemplateAPI {
                 ...stagesLib.content,
             }
 
-            const stageStack = await loadStageStackFromID(
-                this.user,
-                proposalStreamID
-            )
+            const stageStack = await loadStageStackFromID(proposalStreamID)
             // Set isDeclined if proposal is before approved
             if (type === 'DECLINE') {
                 await this.updateProposalEntry(stageStack, { isDeclined: true })

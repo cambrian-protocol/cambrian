@@ -35,13 +35,13 @@ const TemplatePublishStep = ({
                     />
                     <Box direction="row" gap="small">
                         <TextInput
-                            value={`${window.location.origin}/templates/${templateStreamID}`}
+                            value={`${window.location.origin}/solver/${templateStreamID}`}
                         />
                         <Button
                             icon={isSavedToClipboard ? <Check /> : <Copy />}
                             onClick={() => {
                                 navigator.clipboard.writeText(
-                                    `${window.location.origin}/templates/${templateStreamID}`
+                                    `${window.location.origin}/solver/${templateStreamID}`
                                 )
                                 setIsSavedToClipboard(true)
                             }}
@@ -51,7 +51,7 @@ const TemplatePublishStep = ({
                 <TwoButtonWrapContainer
                     primaryButton={
                         <Link
-                            href={`${window.location.origin}/templates/${templateStreamID}`}
+                            href={`${window.location.origin}/solver/${templateStreamID}`}
                             passHref
                         >
                             <Button
@@ -63,7 +63,7 @@ const TemplatePublishStep = ({
                     }
                     secondaryButton={
                         <Link
-                            href={`${window.location.origin}/dashboard/templates/edit/${templateStreamID}`}
+                            href={`${window.location.origin}/template/edit/${templateStreamID}`}
                             passHref
                         >
                             <Button

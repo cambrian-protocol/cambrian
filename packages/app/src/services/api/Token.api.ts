@@ -14,11 +14,15 @@ export type TokenResponseType = {
 export const TokenAPI = {
     getTokenInfo: async (
         address: string,
-        provider: ethers.providers.Provider
+        signerOrProvider: ethers.Signer | ethers.providers.Provider
     ): Promise<TokenResponseType> => {
         let erc20Contract
         try {
-            erc20Contract = new ethers.Contract(address, ERC20_IFACE, provider)
+            erc20Contract = new ethers.Contract(
+                address,
+                ERC20_IFACE,
+                signerOrProvider
+            )
         } catch (e) {
             cpLogger.push(e)
         }

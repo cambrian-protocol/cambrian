@@ -10,20 +10,20 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 interface DuplicateCompositionComponentProps {
-    ceramicCompositionAPI: CeramicCompositionAPI
     composition: CompositionModel
     setShowDuplicateCompositionCTA: React.Dispatch<SetStateAction<boolean>>
 }
 
 const DuplicateCompositionComponent = ({
-    ceramicCompositionAPI,
     composition,
     setShowDuplicateCompositionCTA,
 }: DuplicateCompositionComponentProps) => {
     const router = useRouter()
+    const { currentUser } = useCurrentUserContext()
     const [input, setInput] = useState('')
     const [isDuplicating, setIsDuplicating] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -35,17 +35,20 @@ const DuplicateCompositionComponent = ({
     const onSubmit = async () => {
         setIsDuplicating(true)
         try {
-            const streamID = await ceramicCompositionAPI.createComposition(
-                input,
-                {
-                    ...composition,
-                    title: input,
-                }
-            )
-            router.push(
-                `${window.location.origin}/composer/composition/${streamID}`
-            )
-            setShowDuplicateCompositionCTA(false)
+            if (currentUser) {
+                const ceramicCompositionAPI = new CeramicCompositionAPI(
+                    currentUser
+                )
+                const streamID = await ceramicCompositionAPI.createComposition(
+                    input,
+                    {
+                        ...composition,
+                        title: input,
+                    }
+                )
+                router.push(`${window.location.origin}/solver/${streamID}`)
+                setShowDuplicateCompositionCTA(false)
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
