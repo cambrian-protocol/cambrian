@@ -1,47 +1,3 @@
-import LOCAL_ArbitrationDispatch from '@cambrian/core/deployments/localhost/ArbitrationDispatch.json'
-import LOCAL_ArbitratorFactory from '@cambrian/core/deployments/localhost/ArbitratorFactory.json'
-import LOCAL_BasicArbitrator from '@cambrian/core/deployments/localhost/BasicArbitrator.json'
-import LOCAL_BasicSolverV1 from '@cambrian/core/deployments/localhost/BasicSolverV1.json'
-import LOCAL_ConditionalTokens from '@cambrian/core/deployments/localhost/ConditionalTokens.json'
-import LOCAL_IPFSSolutionsHub from '@cambrian/core/deployments/localhost/IPFSSolutionsHub.json'
-import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHub.json'
-import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
-import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
-import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
-
-import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
-import ROPSTEN_ArbitratorFactory from '@cambrian/core/deployments/ropsten/ArbitratorFactory.json'
-import ROPSTEN_BasicArbitrator from '@cambrian/core/deployments/ropsten/BasicArbitrator.json'
-import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
-import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
-import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
-import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHub.json'
-import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
-import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
-import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
-
-import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
-import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
-import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
-import NOVA_BasicSolverV1 from '@cambrian/core/deployments/nova/BasicSolverV1.json'
-import NOVA_ConditionalTokens from '@cambrian/core/deployments/nova/ConditionalTokens.json'
-import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutionsHub.json'
-import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
-import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
-import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
-import NOVA_ToyToken from '@cambrian/core/deployments/nova/ToyToken.json'
-
-import GOERLI_ArbitrationDispatch from '@cambrian/core/deployments/goerli/ArbitrationDispatch.json'
-import GOERLI_ArbitratorFactory from '@cambrian/core/deployments/goerli/ArbitratorFactory.json'
-import GOERLI_BasicArbitrator from '@cambrian/core/deployments/goerli/BasicArbitrator.json'
-import GOERLI_BasicSolverV1 from '@cambrian/core/deployments/goerli/BasicSolverV1.json'
-import GOERLI_ConditionalTokens from '@cambrian/core/deployments/goerli/ConditionalTokens.json'
-import GOERLI_IPFSSolutionsHub from '@cambrian/core/deployments/goerli/IPFSSolutionsHub.json'
-import GOERLI_ProposalsHub from '@cambrian/core/deployments/goerli/ProposalsHub.json'
-import GOERLI_SolverFactory from '@cambrian/core/deployments/goerli/SolverFactory.json'
-import GOERLI_SolverLib from '@cambrian/core/deployments/goerli/SolverLib.json'
-import GOERLI_ToyToken from '@cambrian/core/deployments/goerli/ToyToken.json'
-
 import ARBITRUM_ArbitrationDispatch from '@cambrian/core/deployments/arbitrum/ArbitrationDispatch.json'
 import ARBITRUM_ArbitratorFactory from '@cambrian/core/deployments/arbitrum/ArbitratorFactory.json'
 import ARBITRUM_BasicArbitrator from '@cambrian/core/deployments/arbitrum/BasicArbitrator.json'
@@ -52,6 +8,46 @@ import ARBITRUM_ProposalsHub from '@cambrian/core/deployments/arbitrum/Proposals
 import ARBITRUM_SolverFactory from '@cambrian/core/deployments/arbitrum/SolverFactory.json'
 import ARBITRUM_SolverLib from '@cambrian/core/deployments/arbitrum/SolverLib.json'
 import ARBITRUM_ToyToken from '@cambrian/core/deployments/arbitrum/ToyToken.json'
+import GOERLI_ArbitrationDispatch from '@cambrian/core/deployments/goerli/ArbitrationDispatch.json'
+import GOERLI_ArbitratorFactory from '@cambrian/core/deployments/goerli/ArbitratorFactory.json'
+import GOERLI_BasicArbitrator from '@cambrian/core/deployments/goerli/BasicArbitrator.json'
+import GOERLI_BasicSolverV1 from '@cambrian/core/deployments/goerli/BasicSolverV1.json'
+import GOERLI_ConditionalTokens from '@cambrian/core/deployments/goerli/ConditionalTokens.json'
+import GOERLI_IPFSSolutionsHub from '@cambrian/core/deployments/goerli/IPFSSolutionsHub.json'
+import GOERLI_ProposalsHub from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import GOERLI_SolverFactory from '@cambrian/core/deployments/goerli/SolverFactory.json'
+import GOERLI_SolverLib from '@cambrian/core/deployments/goerli/SolverLib.json'
+import GOERLI_ToyToken from '@cambrian/core/deployments/goerli/ToyToken.json'
+import LOCAL_ArbitrationDispatch from '@cambrian/core/deployments/localhost/ArbitrationDispatch.json'
+import LOCAL_ArbitratorFactory from '@cambrian/core/deployments/localhost/ArbitratorFactory.json'
+import LOCAL_BasicArbitrator from '@cambrian/core/deployments/localhost/BasicArbitrator.json'
+import LOCAL_BasicSolverV1 from '@cambrian/core/deployments/localhost/BasicSolverV1.json'
+import LOCAL_ConditionalTokens from '@cambrian/core/deployments/localhost/ConditionalTokens.json'
+import LOCAL_IPFSSolutionsHub from '@cambrian/core/deployments/localhost/IPFSSolutionsHub.json'
+import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHub.json'
+import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
+import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
+import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
+import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
+import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
+import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
+import NOVA_BasicSolverV1 from '@cambrian/core/deployments/nova/BasicSolverV1.json'
+import NOVA_ConditionalTokens from '@cambrian/core/deployments/nova/ConditionalTokens.json'
+import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutionsHub.json'
+import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
+import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
+import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
+import NOVA_ToyToken from '@cambrian/core/deployments/nova/ToyToken.json'
+import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
+import ROPSTEN_ArbitratorFactory from '@cambrian/core/deployments/ropsten/ArbitratorFactory.json'
+import ROPSTEN_BasicArbitrator from '@cambrian/core/deployments/ropsten/BasicArbitrator.json'
+import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
+import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
+import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
+import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHub.json'
+import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
+import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
+import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
 
 interface ChainInfo {
     name: string
@@ -80,6 +76,7 @@ export type ChainDataHashMapType = {
     [chainId: number]: {
         chainData: ChainInfo
         contracts: ContractAddresses
+        compositions: { [title: string]: string }
     }
 }
 
@@ -115,6 +112,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
+        compositions: {},
     },
     3: {
         chainData: {
@@ -147,6 +145,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
+        compositions: {},
     },
     42170: {
         chainData: {
@@ -179,6 +178,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
+        compositions: {},
     },
     5: {
         chainData: {
@@ -209,6 +209,10 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverLib: GOERLI_SolverLib.address,
             toyToken: GOERLI_ToyToken.address,
             defaultDenominationToken: GOERLI_ToyToken.address,
+        },
+        compositions: {
+            'Basic Content Marketing Freelancer':
+                'k2t6wyfsu4pfwvnb4khe97cey3z9p9loifmbvgj7vrf2h2imdpjfk44mrziir4',
         },
     },
     42161: {
@@ -242,5 +246,6 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
+        compositions: {},
     },
 }

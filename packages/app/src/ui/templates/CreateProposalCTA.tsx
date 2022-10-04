@@ -8,6 +8,7 @@ import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAP
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -32,7 +33,16 @@ const CreateProposalCTA = ({ templateStreamID }: CreateProposalCTAProps) => {
                 randimals(),
                 templateStreamID
             )
-            router.push(`${window.location.origin}/proposal/new/${streamID}`)
+
+            if (!streamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+
+            if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
+                router.push(`/profile/new/${streamID}?target=proposal`)
+            } else {
+                router.push(
+                    `${window.location.origin}/proposal/new/${streamID}`
+                )
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsCreatingProposal(false)

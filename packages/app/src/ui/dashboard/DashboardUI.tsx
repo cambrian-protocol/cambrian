@@ -96,7 +96,9 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
             <PageLayout contextTitle="Dashboard">
                 <Box pad="large" gap="medium">
                     <Heading>Dashboard</Heading>
-                    <Text color="dark-4">Welcome back, {userName}!</Text>
+                    <Text color="dark-4">
+                        Welcome back, {userName || 'Anon'}!
+                    </Text>
                     <IconContext.Provider value={{ size: '18' }}>
                         <Tabs
                             activeIndex={activeIndex}

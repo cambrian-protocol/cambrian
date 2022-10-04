@@ -1,16 +1,22 @@
 import { Box, Spinner, Text } from 'grommet'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
+import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import randimals from 'randimals'
 import router from 'next/router'
@@ -25,7 +31,7 @@ const CreateTemplateModal = ({
     currentUser,
 }: CreateTemplateModalProps) => {
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-    const [compositions, setCompositions] = useState<StringHashmap>()
+    const [compositions, setCompositions] = useState<StringHashmap>({})
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -36,10 +42,12 @@ const CreateTemplateModal = ({
     const fetchCompositions = async () => {
         try {
             const stagesLib = await loadStagesLib(currentUser)
-            if (stagesLib && stagesLib.content.compositions) {
+            if (
+                stagesLib &&
+                stagesLib.content.compositions &&
+                stagesLib.content.compositions.lib
+            ) {
                 setCompositions(stagesLib.content.compositions.lib)
-            } else {
-                setCompositions({})
             }
         } catch (e) {
             await cpLogger.push(e)
@@ -53,7 +61,14 @@ const CreateTemplateModal = ({
                 randimals(),
                 compositionStreamID
             )
-            if (streamID) router.push(`/template/new/${streamID}`)
+
+            if (!streamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+
+            if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
+                router.push(`/profile/new/${streamID}?target=template`)
+            } else {
+                router.push(`/template/new/${streamID}`)
+            }
         } catch (e) {
             setIsCreatingTemplate(undefined)
             setErrorMessage(await cpLogger.push(e))
@@ -69,49 +84,75 @@ const CreateTemplateModal = ({
                     description="Please select or import the Composition on which this template should be based on."
                 />
                 <Box gap="medium">
-                    <Box height={{ min: 'auto' }}>
+                    <Box height={{ min: 'auto' }} gap="medium">
+                        {Object.keys(
+                            SUPPORTED_CHAINS[currentUser.chainId].compositions
+                        ).length > 0 && (
+                            <Box gap="medium">
+                                <Text color="dark-4" size="small">
+                                    Predefined Composition Solvers
+                                </Text>
+                                {Object.keys(
+                                    SUPPORTED_CHAINS[currentUser.chainId]
+                                        .compositions
+                                ).map((compositionTag) => (
+                                    <CompositionListItem
+                                        key={
+                                            SUPPORTED_CHAINS[
+                                                currentUser.chainId
+                                            ].compositions[compositionTag]
+                                        }
+                                        title={compositionTag}
+                                        isLoading={
+                                            isCreatingTemplate ===
+                                            SUPPORTED_CHAINS[
+                                                currentUser.chainId
+                                            ].compositions[compositionTag]
+                                        }
+                                        isDisabled={
+                                            isCreatingTemplate !== undefined
+                                        }
+                                        onSelectComposition={
+                                            onSelectComposition
+                                        }
+                                        compositionID={
+                                            SUPPORTED_CHAINS[
+                                                currentUser.chainId
+                                            ].compositions[compositionTag]
+                                        }
+                                    />
+                                ))}
+                            </Box>
+                        )}
+                        <PlainSectionDivider />
+                        <Text color="dark-4" size="small">
+                            User Compositions
+                        </Text>
                         {compositions ? (
                             <Box height={{ min: 'auto' }} gap="small">
                                 {Object.keys(compositions).map(
                                     (compositionTag) => {
                                         return (
-                                            <Box key={compositionTag} flex>
-                                                <Box
-                                                    pad="small"
-                                                    border
-                                                    round="xsmall"
-                                                    background={
-                                                        'background-contrast'
-                                                    }
-                                                    direction="row"
-                                                    align="center"
-                                                    justify="between"
-                                                >
-                                                    <Text>
-                                                        {compositionTag}
-                                                    </Text>
-                                                    <LoaderButton
-                                                        isLoading={
-                                                            isCreatingTemplate ===
-                                                            compositions[
-                                                                compositionTag
-                                                            ]
-                                                        }
-                                                        disabled={
-                                                            isCreatingTemplate !==
-                                                            undefined
-                                                        }
-                                                        icon={<FilePlus />}
-                                                        onClick={() =>
-                                                            onSelectComposition(
-                                                                compositions[
-                                                                    compositionTag
-                                                                ]
-                                                            )
-                                                        }
-                                                    />
-                                                </Box>
-                                            </Box>
+                                            <CompositionListItem
+                                                key={
+                                                    compositions[compositionTag]
+                                                }
+                                                title={compositionTag}
+                                                isLoading={
+                                                    isCreatingTemplate ===
+                                                    compositions[compositionTag]
+                                                }
+                                                isDisabled={
+                                                    isCreatingTemplate !==
+                                                    undefined
+                                                }
+                                                onSelectComposition={
+                                                    onSelectComposition
+                                                }
+                                                compositionID={
+                                                    compositions[compositionTag]
+                                                }
+                                            />
                                         )
                                     }
                                 )}
