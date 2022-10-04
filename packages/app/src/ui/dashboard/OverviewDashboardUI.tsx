@@ -2,6 +2,7 @@ import { Box, Text } from 'grommet'
 
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RecentSolverTile from './tiles/RecentSolverTile'
 import RedeemableTokenListWidget from './widgets/RedeemableTokenListWidget'
@@ -26,9 +27,9 @@ const OverviewDashboardUI = ({
                     <Text size="small" color="dark-4">
                         Recently viewed solvers
                     </Text>
-                    <Box direction="row" overflow={{ horizontal: 'auto' }}>
-                        {recents && recents.length > 0 ? (
-                            recents
+                    {recents && recents.length > 0 ? (
+                        <Box direction="row" overflow={{ horizontal: 'auto' }}>
+                            {recents
 
                                 .slice(0, 10)
                                 .map((recent) => (
@@ -38,11 +39,14 @@ const OverviewDashboardUI = ({
                                         currentUser={currentUser}
                                     />
                                 ))
-                                .reverse()
-                        ) : (
-                            <></>
-                        )}
-                    </Box>
+                                .reverse()}
+                        </Box>
+                    ) : (
+                        <ListSkeleton
+                            isFetching={false}
+                            subject="recently viewed solvers"
+                        />
+                    )}
                 </Box>
                 <PlainSectionDivider />
                 <Box gap="small">
