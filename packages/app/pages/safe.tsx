@@ -166,7 +166,7 @@ export default function Safe() {
     )
 }
 
-export async function getServerSideProps() {
+export async function getStaticProps() {
     return {
         props: { noWalletPrompt: true },
     }
