@@ -7,6 +7,25 @@
         "public": "out",
         "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
         "cleanUrls": true,
+        "headers": [
+            {
+                "source": "/(.*)?",
+                "headers": [
+                    {
+                        "key": "Access-Control-Allow-Origin",
+                        "value": "https://gnosis-safe.io"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Methods",
+                        "value": "GET,HEAD,PUT,PATCH,POST,DELETE"
+                    },
+                    {
+                        "key": "Access-Control-Allow-Headers",
+                        "value": "X-Requested-With, content-type, Authorization"
+                    }
+                ]
+            }
+        ],
         "rewrites": [
             {
                 "source": "/api/pinPinata",

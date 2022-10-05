@@ -39,6 +39,7 @@ const TemplatesDashboardUI = ({
 
     useEffect(() => {
         fetchTemplates()
+        console.log(templatesLib)
     }, [templatesLib])
 
     const fetchTemplates = async () => {
