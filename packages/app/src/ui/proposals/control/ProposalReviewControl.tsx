@@ -17,14 +17,19 @@ import { useState } from 'react'
 
 interface ProposalReviewControlProps {
     currentUser: UserType
+    isApproving: boolean
+    setIsApproving: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
+const ProposalReviewControl = ({
+    currentUser,
+    setIsApproving,
+    isApproving,
+}: ProposalReviewControlProps) => {
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const { stageStack } = useProposalContext()
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
-    const [isApproving, setIsApproving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onApproveProposal = async () => {
@@ -38,10 +43,10 @@ const ProposalReviewControl = ({ currentUser }: ProposalReviewControlProps) => {
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
             } catch (e) {
-                setIsApproving(false)
                 setErrorMessage(await cpLogger.push(e))
             }
         }
+        setIsApproving(false)
     }
 
     const onRequestChange = async () => {
