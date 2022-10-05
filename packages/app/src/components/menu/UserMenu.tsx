@@ -1,7 +1,6 @@
 import {
     Books,
     Question,
-    SignIn,
     SignOut,
     User,
     Wallet,
@@ -22,7 +21,11 @@ import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
-export default function UserMenu() {
+interface UserMenuProps {
+    injectedWalletAddress?: string
+}
+
+export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
     const router = useRouter()
     const { currentUser, disconnectWallet, connectWallet } =
         useCurrentUserContext()
@@ -67,17 +70,11 @@ export default function UserMenu() {
             },
         })
         menuItems.push({
-            label: (
-                <UserMenuItemLabel label={currentUser ? 'Logout' : 'Login'} />
-            ),
+            label: <UserMenuItemLabel label={'Logout'} />,
             onClick: disconnectWallet,
-            icon: (
-                <UserMenuItemIcon
-                    icon={currentUser ? <SignOut /> : <SignIn />}
-                />
-            ),
+            icon: <UserMenuItemIcon icon={<SignOut />} />,
         })
-    } else {
+    } else if (injectedWalletAddress === undefined) {
         menuItems.unshift({
             label: <UserMenuItemLabel label={'Connect Wallet'} />,
             onClick: connectWallet,
@@ -108,6 +105,8 @@ export default function UserMenu() {
                 ) : (
                     <BaseAvatar address={currentUser.address} />
                 )
+            ) : injectedWalletAddress ? (
+                <BaseAvatar address={injectedWalletAddress} />
             ) : (
                 <BaseAvatar icon={<Wallet />} />
             )}

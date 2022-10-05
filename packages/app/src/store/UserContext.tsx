@@ -333,7 +333,7 @@ export const UserContextProvider = ({
         >
             <PermissionProvider permissions={user ? user.permissions : []}>
                 {!user && router.pathname !== '/' && isUserLoaded ? (
-                    <ConnectWalletPage />
+                    <ConnectWalletPage connectWallet={connectWallet} />
                 ) : (
                     children
                 )}
