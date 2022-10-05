@@ -9,7 +9,11 @@ import UserMenu from '../menu/UserMenu'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-const Appbar = () => {
+interface AppbarProps {
+    injectedWalletAddress?: string
+}
+
+const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
     const { currentUser } = useCurrentUserContext()
 
     return (
@@ -38,16 +42,19 @@ const Appbar = () => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
-                            {currentUser && (
-                                <Box justify={'center'}>
-                                    <AppbarMenuItem
-                                        pathname="/dashboard"
-                                        label="Dashboard"
-                                        icon={<Layout />}
-                                    />
-                                </Box>
-                            )}
-                            <UserMenu />
+                            {currentUser &&
+                                injectedWalletAddress === undefined && (
+                                    <Box justify={'center'}>
+                                        <AppbarMenuItem
+                                            pathname="/dashboard"
+                                            label="Dashboard"
+                                            icon={<Layout />}
+                                        />
+                                    </Box>
+                                )}
+                            <UserMenu
+                                injectedWalletAddress={injectedWalletAddress}
+                            />
                         </Box>
                     </Header>
                 )

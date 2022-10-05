@@ -6,17 +6,16 @@ import BaseFooter from './footer/BaseFooter'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
-import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
-import WrongChainSection from '../sections/WrongChainSection'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import WrongChainBoundary from '../errors/WrongChainBoundary'
 
 export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle?: string
     kind?: 'narrow'
     plain?: boolean
+    injectedWalletAddress?: string
 }
 
 export const siteTitle = 'Cambrian Protocol'
@@ -26,9 +25,9 @@ const PageLayout = ({
     children,
     kind,
     plain,
+    injectedWalletAddress,
 }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
-    const { currentUser } = useCurrentUserContext()
 
     return (
         <>
@@ -67,23 +66,20 @@ const PageLayout = ({
                             }}
                         />
                     )}
-                    <Appbar />
+                    <Appbar injectedWalletAddress={injectedWalletAddress} />
                     <Box
                         align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
                     >
-                        {currentUser &&
-                        !SUPPORTED_CHAINS[currentUser.chainId] ? (
-                            <WrongChainSection />
-                        ) : (
+                        <WrongChainBoundary>
                             <Box
                                 width={kind === 'narrow' ? 'xlarge' : undefined}
                                 height={{ min: '90vh' }}
                             >
                                 {children}
                             </Box>
-                        )}
+                        </WrongChainBoundary>
                         <BaseFooter />
                     </Box>
                 </Page>

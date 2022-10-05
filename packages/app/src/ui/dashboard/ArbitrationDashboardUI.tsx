@@ -1,4 +1,3 @@
-import { ArrowsClockwise, Scales } from 'phosphor-react'
 import { Box, Button, Text } from 'grommet'
 import {
     CAMBRIAN_LIB_NAME,
@@ -12,7 +11,7 @@ import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHea
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { Scales } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -78,12 +77,6 @@ const ArbitrationDashboardUI = ({
                             label="New Arbitrator Contract"
                             icon={<Scales />}
                             onClick={toggleShowCreateArbitrator}
-                        />,
-                        <LoaderButton
-                            secondary
-                            isLoading={isFetching}
-                            icon={<ArrowsClockwise />}
-                            onClick={fetchArbitratorContracts}
                         />,
                     ]}
                 />

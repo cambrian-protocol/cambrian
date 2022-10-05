@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import ConnectWalletPage from '@cambrian/app/components/sections/ConnectWalletPage'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { INFURA_ID } from '../config'
+import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import RedeemableTokenListWidget from '@cambrian/app/ui/dashboard/widgets/RedeemableTokenListWidget'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
@@ -33,6 +35,7 @@ if (typeof window !== 'undefined') {
 }
 
 type ConnectedWallet = {
+    provider: any
     web3Provider: ethers.providers.Web3Provider
     signer: ethers.providers.JsonRpcSigner
     address: string
@@ -41,6 +44,7 @@ type ConnectedWallet = {
 
 export default function Safe() {
     const [connectedWallet, setConnectedWallet] = useState<ConnectedWallet>()
+    const [isLoaded, setIsLoaded] = useState(false)
 
     useEffect(() => {
         connectWallet()
@@ -55,6 +59,7 @@ export default function Safe() {
             const network = await web3Provider.getNetwork()
 
             setConnectedWallet({
+                provider: provider,
                 web3Provider: web3Provider,
                 signer: signer,
                 address: address,
@@ -64,23 +69,105 @@ export default function Safe() {
             console.log(e)
             cpLogger.push(e)
         }
+        setIsLoaded(true)
     }, [])
 
-    return (
-        <PageLayout kind="narrow">
-            <Box pad="large" gap="medium">
-                <DashboardHeader
-                    title="Redeem your token"
-                    description="Vivamus magna justo, lacinia eget consectetur sed, convallis at tellus. Donec rutrum congue leo eget malesuada. Vivamus suscipit tortor eget felis porttitor volutpat."
-                />
-                {connectedWallet && (
-                    <RedeemableTokenListWidget
-                        signerOrProvider={connectedWallet.signer}
-                        address={connectedWallet.address}
-                        chainId={connectedWallet.network.chainId}
-                    />
-                )}
-            </Box>
-        </PageLayout>
+    const disconnectWallet = useCallback(
+        async function () {
+            await web3Modal.clearCachedProvider()
+            if (
+                connectedWallet &&
+                connectedWallet.provider?.disconnect &&
+                typeof connectedWallet.provider.disconnect === 'function'
+            ) {
+                await connectedWallet.provider.disconnect()
+            }
+            setConnectedWallet(undefined)
+        },
+        [connectedWallet]
     )
+
+    // EIP-1193 Event Listener
+    useEffect(() => {
+        if (connectedWallet && connectedWallet.provider?.on) {
+            const handleAccountsChanged = async (accounts: string[]) => {
+                try {
+                    window.location.reload()
+                } catch (e) {
+                    disconnectWallet()
+                }
+            }
+
+            const handleChainChanged = (_hexChainId: string) => {
+                window.location.reload()
+            }
+
+            const handleDisconnect = (error: {
+                code: number
+                message: string
+            }) => {
+                disconnectWallet()
+            }
+
+            connectedWallet.provider.on(
+                'accountsChanged',
+                handleAccountsChanged
+            )
+            connectedWallet.provider.on('chainChanged', handleChainChanged)
+            connectedWallet.provider.on('disconnect', handleDisconnect)
+
+            //  Listener Cleanup
+            return () => {
+                if (connectedWallet.provider.removeListener) {
+                    connectedWallet.provider.removeListener(
+                        'accountsChanged',
+                        handleAccountsChanged
+                    )
+                    connectedWallet.provider.removeListener(
+                        'chainChanged',
+                        handleChainChanged
+                    )
+                    connectedWallet.provider.removeListener(
+                        'disconnect',
+                        handleDisconnect
+                    )
+                }
+            }
+        }
+    }, [connectedWallet, disconnectWallet])
+
+    return (
+        <>
+            {isLoaded ? (
+                connectedWallet ? (
+                    <PageLayout
+                        kind="narrow"
+                        injectedWalletAddress={connectedWallet?.address}
+                    >
+                        <Box pad="large" gap="medium">
+                            <DashboardHeader
+                                title="Your redeemable tokens"
+                                description="Connect to this site with your Gnosis Safe in order to redeem your tokens"
+                            />
+                            <RedeemableTokenListWidget
+                                signerOrProvider={connectedWallet.signer}
+                                address={connectedWallet.address}
+                                chainId={connectedWallet.network.chainId}
+                            />
+                        </Box>
+                    </PageLayout>
+                ) : (
+                    <ConnectWalletPage connectWallet={connectWallet} />
+                )
+            ) : (
+                <LoadingScreen context="Connecting Wallet" />
+            )}
+        </>
+    )
+}
+
+export async function getServerSideProps() {
+    return {
+        props: { noWalletPrompt: true },
+    }
 }

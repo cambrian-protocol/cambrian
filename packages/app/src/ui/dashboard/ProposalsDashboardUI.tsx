@@ -100,7 +100,7 @@ const ProposalsDashboardUI = ({
                         ) : (
                             <ListSkeleton
                                 isFetching={isFetching}
-                                subject="proposals"
+                                subject="Solver Proposals"
                             />
                         )}
                     </Box>

@@ -151,6 +151,12 @@ export default function Home() {
     )
 }
 
+export async function getServerSideProps() {
+    return {
+        props: { noWalletPrompt: true },
+    }
+}
+
 const solverCode = `// SPDX-License-Identifier: GPL-3.0
 
 pragma solidity ^0.8.13;

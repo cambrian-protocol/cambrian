@@ -150,30 +150,25 @@ export default class CeramicTemplateAPI {
         stageStack: StageStackType
     ) => {
         try {
-            if (await deploySolutionBase(currentUser, stageStack)) {
-                // Hit mailbox server
-                const res = await fetch(
-                    `${TRILOBOT_ENDPOINT}/approveProposal`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            id: stageStack.proposalStreamID,
-                            session: this.user.session.serialize(),
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                )
-                if (res.status === 200) {
-                    await this.updateProposalEntry(stageStack, {
-                        approved: true,
-                    })
-                    return true
-                } else {
-                    cpLogger.push(res.status)
-                    return false
-                }
+            // Hit mailbox server
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: stageStack.proposalStreamID,
+                    session: this.user.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if (res.status === 200) {
+                await this.updateProposalEntry(stageStack, {
+                    approved: true,
+                })
+                return await deploySolutionBase(currentUser, stageStack)
+            } else {
+                cpLogger.push(res.status)
+                return false
             }
         } catch (e) {
             throw e

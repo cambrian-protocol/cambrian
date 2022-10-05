@@ -111,7 +111,7 @@ const TemplatesDashboardUI = ({
                         ) : (
                             <ListSkeleton
                                 isFetching={isFetching}
-                                subject="templates"
+                                subject="Solver Templates"
                             />
                         )}
                     </Box>

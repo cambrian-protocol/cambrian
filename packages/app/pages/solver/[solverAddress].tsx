@@ -83,5 +83,17 @@ export default function SolverPage() {
         setIsLoaded(true)
     }
 
-    return <>{isLoaded ? ui ? ui : <Custom404Page /> : <LoadingScreen />}</>
+    return (
+        <>
+            {isLoaded ? (
+                ui ? (
+                    ui
+                ) : (
+                    <Custom404Page />
+                )
+            ) : (
+                <LoadingScreen context="Finding your Solver..." />
+            )}
+        </>
+    )
 }

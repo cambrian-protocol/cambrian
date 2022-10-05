@@ -4,10 +4,13 @@ import { ThemeContextProvider } from './ThemeContext'
 import { TopRefContextProvider } from './TopRefContext'
 import { UserContextProvider } from './UserContext'
 
-export const Store = ({ children }: PropsWithChildren<{}>) => {
+type StoreType = PropsWithChildren<{}> & {
+    pageProps: any
+}
+export const Store = ({ children, pageProps }: StoreType) => {
     return (
         <ThemeContextProvider>
-            <UserContextProvider>
+            <UserContextProvider noWalletPrompt={pageProps.noWalletPrompt}>
                 <TopRefContextProvider>{children}</TopRefContextProvider>
             </UserContextProvider>
         </ThemeContextProvider>

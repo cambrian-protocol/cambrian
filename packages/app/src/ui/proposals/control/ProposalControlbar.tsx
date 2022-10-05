@@ -10,11 +10,13 @@ import ProposalStartFundingControl from './ProposalStartFundingControl'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
+import { useState } from 'react'
 
 const ProposalControlbar = () => {
     const { currentUser } = useCurrentUserContext()
     const { stageStack, proposalStatus, proposalContract } =
         useProposalContext()
+    const [isApproving, setIsApproving] = useState(false) // state lift to pass into funding control
 
     const isProposalAuthor = currentUser?.did === stageStack?.proposal.author
     const isTemplateAuthor = currentUser?.did === stageStack?.template.author
@@ -25,7 +27,11 @@ const ProposalControlbar = () => {
                 return (
                     <>
                         {isTemplateAuthor && currentUser && (
-                            <ProposalReviewControl currentUser={currentUser} />
+                            <ProposalReviewControl
+                                currentUser={currentUser}
+                                setIsApproving={setIsApproving}
+                                isApproving={isApproving}
+                            />
                         )}
                     </>
                 )
@@ -51,7 +57,17 @@ const ProposalControlbar = () => {
                     </>
                 )
             case ProposalStatus.Approved:
-                return <ProposalStartFundingControl />
+                return (
+                    <>
+                        {currentUser && (
+                            <ProposalStartFundingControl
+                                currentUser={currentUser}
+                                setIsApproving={setIsApproving}
+                                isApproving={isApproving}
+                            />
+                        )}
+                    </>
+                )
             case ProposalStatus.Funding:
                 return (
                     <>
