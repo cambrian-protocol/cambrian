@@ -64,7 +64,7 @@ export default function Home() {
     }
 
     return (
-        <PageLayout contextTitle="Work is evolving" plain noWalletPrompt>
+        <PageLayout contextTitle="Work is evolving" plain>
             <Box style={{ position: 'relative' }} fill>
                 <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
                 <Box>
@@ -149,6 +149,12 @@ export default function Home() {
             </Box>
         </PageLayout>
     )
+}
+
+export async function getServerSideProps() {
+    return {
+        props: { noWalletPrompt: true },
+    }
 }
 
 const solverCode = `// SPDX-License-Identifier: GPL-3.0

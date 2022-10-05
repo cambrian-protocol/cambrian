@@ -7,7 +7,6 @@ import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { UserContextProvider } from '@cambrian/app/store/UserContext'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
 import WrongChainBoundary from '../errors/WrongChainBoundary'
@@ -16,7 +15,6 @@ export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle?: string
     kind?: 'narrow'
     plain?: boolean
-    noWalletPrompt?: boolean
 }
 
 export const siteTitle = 'Cambrian Protocol'
@@ -26,12 +24,11 @@ const PageLayout = ({
     children,
     kind,
     plain,
-    noWalletPrompt,
 }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
 
     return (
-        <UserContextProvider noWalletPrompt={noWalletPrompt}>
+        <>
             <Head>
                 <title>
                     {contextTitle && `${contextTitle} | `}
@@ -85,7 +82,7 @@ const PageLayout = ({
                     </Box>
                 </Page>
             </Box>
-        </UserContextProvider>
+        </>
     )
 }
 

@@ -67,7 +67,7 @@ export default function Safe() {
     }, [])
 
     return (
-        <PageLayout kind="narrow" noWalletPrompt>
+        <PageLayout kind="narrow">
             <Box pad="large" gap="medium">
                 <DashboardHeader
                     title="Redeem your token"
@@ -83,4 +83,10 @@ export default function Safe() {
             </Box>
         </PageLayout>
     )
+}
+
+export async function getServerSideProps() {
+    return {
+        props: { noWalletPrompt: true },
+    }
 }
