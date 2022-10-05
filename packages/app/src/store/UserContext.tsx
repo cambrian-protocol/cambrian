@@ -151,7 +151,14 @@ export const UserContext = React.createContext<UserContextType>({
     isUserLoaded: false,
 })
 
-export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
+type UserContextProviderProps = PropsWithChildren<{}> & {
+    noWalletPrompt?: boolean
+}
+
+export const UserContextProvider = ({
+    children,
+    noWalletPrompt,
+}: UserContextProviderProps) => {
     const [user, dispatch] = useReducer(userReducer, null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
     const router = useRouter()
@@ -213,7 +220,7 @@ export const UserContextProvider = ({ children }: PropsWithChildren<{}>) => {
     )
 
     useEffect(() => {
-        connectWallet()
+        if (noWalletPrompt !== true) connectWallet()
     }, [])
 
     // EIP-1193 Event Listener

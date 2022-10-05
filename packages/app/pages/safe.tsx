@@ -67,7 +67,7 @@ export default function Safe() {
     }, [])
 
     return (
-        <PageLayout kind="narrow">
+        <PageLayout kind="narrow" noWalletPrompt>
             <Box pad="large" gap="medium">
                 <DashboardHeader
                     title="Redeem your token"

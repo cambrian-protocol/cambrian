@@ -7,9 +7,7 @@ import { UserContextProvider } from './UserContext'
 export const Store = ({ children }: PropsWithChildren<{}>) => {
     return (
         <ThemeContextProvider>
-            <UserContextProvider>
-                <TopRefContextProvider>{children}</TopRefContextProvider>
-            </UserContextProvider>
+            <TopRefContextProvider>{children}</TopRefContextProvider>
         </ThemeContextProvider>
     )
 }

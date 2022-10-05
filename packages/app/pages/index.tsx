@@ -64,7 +64,7 @@ export default function Home() {
     }
 
     return (
-        <PageLayout contextTitle="Work is evolving" plain>
+        <PageLayout contextTitle="Work is evolving" plain noWalletPrompt>
             <Box style={{ position: 'relative' }} fill>
                 <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
                 <Box>
