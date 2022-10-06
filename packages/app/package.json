@@ -14,6 +14,7 @@
         "@ceramicnetwork/blockchain-utils-linking": "2.1.0",
         "@ceramicnetwork/http-client": "2.5.0",
         "@ceramicnetwork/stream-tile": "2.4.5",
+        "@didtools/pkh-ethereum": "^0.0.2",
         "@gnosis.pm/safe-apps-sdk": "^7.8.0",
         "@gnosis.pm/safe-apps-web3modal": "^17.0.1",
         "@typechain/ethers-v5": "^9.0.0",
