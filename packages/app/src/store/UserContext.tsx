@@ -1,4 +1,5 @@
 import { CERAMIC_NODE_ENDPOINT, INFURA_ID } from 'packages/app/config'
+import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 import React, {
     PropsWithChildren,
     useCallback,
@@ -9,7 +10,7 @@ import React, {
 
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import ConnectWalletPage from '../components/sections/ConnectWalletPage'
-import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
+import { DIDSession } from 'did-session'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
@@ -18,9 +19,6 @@ import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
-
-import { DIDSession } from 'did-session'
-import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 
 export type PermissionType = string
 
@@ -222,7 +220,7 @@ export const UserContextProvider = ({
     )
 
     useEffect(() => {
-        if (noWalletPrompt !== true) connectWallet()
+        if (noWalletPrompt !== true || web3Modal.cachedProvider) connectWallet()
     }, [])
 
     // EIP-1193 Event Listener
@@ -303,7 +301,7 @@ export const UserContextProvider = ({
             setIsUserLoaded(true)
             const accountId = await getAccountId(provider, accountAddress)
             const authMethod = await EthereumWebAuth.getAuthMethod(
-                new EthereumAuthProvider(provider, accountAddress),
+                provider,
                 accountId
             )
             session = await DIDSession.authorize(authMethod, {
