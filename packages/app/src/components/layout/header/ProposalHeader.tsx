@@ -1,15 +1,5 @@
-import {
-    BookOpen,
-    ClipboardText,
-    File,
-    IconContext,
-    Question,
-} from 'phosphor-react'
 import { Box, Heading, Text } from 'grommet'
-import {
-    SUPPORT_DISCORD_LINK,
-    WIKI_NOTION_LINK,
-} from 'packages/app/config/ExternalLinks'
+import { ClipboardText, File, IconContext, Question } from 'phosphor-react'
 
 import { Button } from 'grommet'
 import Link from 'next/link'
@@ -17,6 +7,7 @@ import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveContext } from 'grommet'
+import { SUPPORT_DISCORD_LINK } from 'packages/app/config/ExternalLinks'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
@@ -141,32 +132,6 @@ const ProposalHeader = ({
                                             />
                                         }
                                     /> */}
-                                    <Link href={WIKI_NOTION_LINK} passHref>
-                                        <a
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Button
-                                                color="dark-4"
-                                                size="small"
-                                                label={
-                                                    screenSize !== 'small'
-                                                        ? 'Wiki'
-                                                        : undefined
-                                                }
-                                                icon={
-                                                    <BookOpen
-                                                        color={
-                                                            cpTheme.global
-                                                                .colors[
-                                                                'dark-4'
-                                                            ]
-                                                        }
-                                                    />
-                                                }
-                                            />
-                                        </a>
-                                    </Link>
                                     <Link href={SUPPORT_DISCORD_LINK} passHref>
                                         <a
                                             target="_blank"

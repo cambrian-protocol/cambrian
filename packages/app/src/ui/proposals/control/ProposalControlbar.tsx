@@ -26,11 +26,12 @@ const ProposalControlbar = () => {
             case ProposalStatus.OnReview:
                 return (
                     <>
-                        {isTemplateAuthor && currentUser && (
+                        {isTemplateAuthor && currentUser && stageStack && (
                             <ProposalReviewControl
                                 currentUser={currentUser}
                                 setIsApproving={setIsApproving}
                                 isApproving={isApproving}
+                                stageStack={stageStack}
                             />
                         )}
                     </>

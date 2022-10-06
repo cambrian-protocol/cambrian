@@ -1,11 +1,5 @@
-import React, {
-    PropsWithChildren,
-    useCallback,
-    useEffect,
-    useState,
-} from 'react'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 import {
-    addRecentStage,
     ceramicInstance,
     loadCommitWorkaround,
     loadStageDoc,
@@ -31,7 +25,6 @@ import { UserType } from './UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
-import { solverSafetyCheck } from '../utils/helpers/safetyChecks'
 
 export type ProposalContextType = {
     stageStack?: StageStackType
@@ -66,7 +59,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
         useEffect(() => {
             init()
-            safetyCheckSolver(stageStack, currentUser)
         }, [])
 
         // Init offchain Listeners
@@ -115,15 +107,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 }
             }
         }, [proposalStatus, stageStack])
-
-        const safetyCheckSolver = useCallback(
-            async (stageStack?: StageStackType, currentUser?: UserType) => {
-                if (stageStack && currentUser) {
-                    solverSafetyCheck(stageStack, currentUser)
-                }
-            },
-            [stageStack]
-        )
 
         const initProposalsHubListener = async (
             proposalsHub: ProposalsHub,
