@@ -98,12 +98,28 @@ export const getRedeemablePositions = async (
                                 signerOrProvider
                             )
 
+                            const conditionResolutionLogs =
+                                await ctfContract.contract.queryFilter(
+                                    ctfContract.contract.filters.ConditionResolution(
+                                        latestCondition.conditionId
+                                    )
+                                )
+
+                            const ctfPayoutNumeratorsBN: BigNumber[] =
+                                conditionResolutionLogs[0].args
+                                    ?.payoutNumerators
+
+                            const ctfPayoutNumerators =
+                                ctfPayoutNumeratorsBN.map((numberator) =>
+                                    numberator.toNumber()
+                                )
+
                             const positionId = getPositionId(
                                 collateralToken.address,
                                 getCollectionId(
                                     latestCondition.conditionId,
                                     getIndexSetFromBinaryArray(
-                                        latestCondition.payouts
+                                        ctfPayoutNumerators
                                     )
                                 )
                             )
