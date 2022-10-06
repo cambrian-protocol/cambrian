@@ -87,7 +87,7 @@ const RecentSolverTile = ({ id, currentUser }: RecentSolverTileProps) => {
             width={{ min: 'small', max: 'small' }}
         >
             <Link href={`/solver/${id}`} passHref>
-                <Button hoverIndicator>
+                <Button hoverIndicator style={{ borderRadius: '5px' }}>
                     {solverInfo ? (
                         <Box
                             border
@@ -109,7 +109,9 @@ const RecentSolverTile = ({ id, currentUser }: RecentSolverTileProps) => {
                                 <Text size="small" color="dark-4">
                                     {solverInfo?.stage}
                                 </Text>
-                                <Text size="small">{solverInfo?.title}</Text>
+                                <Text size="small" truncate>
+                                    {solverInfo?.title}
+                                </Text>
                             </Box>
                         </Box>
                     ) : (
