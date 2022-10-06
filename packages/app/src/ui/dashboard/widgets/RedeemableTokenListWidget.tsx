@@ -50,12 +50,15 @@ const RedeemableTokenListWidget = ({
         try {
             setIsRedeeming(redeemablePosition.positionId)
             const ctfContract = new CTFContract(signerOrProvider, chainId)
-            await ctfContract.contract.redeemPositions(
-                redeemablePosition.collateralToken.address,
-                redeemablePosition.parentCollectionId,
-                redeemablePosition.conditionId,
-                redeemablePosition.partition
-            )
+            const tx: ethers.ContractTransaction =
+                await ctfContract.contract.redeemPositions(
+                    redeemablePosition.collateralToken.address,
+                    redeemablePosition.parentCollectionId,
+                    redeemablePosition.conditionId,
+                    redeemablePosition.partition
+                )
+            await tx.wait()
+            await init()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
