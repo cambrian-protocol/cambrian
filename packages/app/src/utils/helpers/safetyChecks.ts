@@ -1,11 +1,12 @@
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import _, { result } from 'lodash'
+
+import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { SlotType } from '@cambrian/app/models/SlotType'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
-import { getParsedSolvers } from './proposalHelper'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import _ from 'lodash'
-import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { getParsedSolvers } from './proposalHelper'
 
 /**
  * IMPORTANT
@@ -25,7 +26,7 @@ import CTFContract from '@cambrian/app/contracts/CTFContract'
 export const solverSafetyCheck = async (
     stageStack: StageStackType,
     currentUser: UserType
-) => {
+): Promise<boolean> => {
     const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
     if (parsedSolvers) {
         const configs = parsedSolvers.map((solver) => solver.config)
@@ -34,8 +35,16 @@ export const solverSafetyCheck = async (
                 checkConstantRecipients(config, currentUser)
             )
         )
+        let success = true
+        results.forEach((solverResult) =>
+            solverResult.forEach((result) => {
+                if (result.result === false) success = false
+            })
+        )
         console.log('Escrow Transfer Safety Check Results: ', results)
+        return success
     }
+    return false
 }
 
 export const checkConstantRecipients = async (
