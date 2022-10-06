@@ -9,7 +9,6 @@ import React, {
 
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import ConnectWalletPage from '../components/sections/ConnectWalletPage'
-import { DIDSession } from 'did-session'
 import { EthereumAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 import PermissionProvider from './PermissionContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
@@ -19,6 +18,9 @@ import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
+
+import { DIDSession } from 'did-session'
+import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 
 export type PermissionType = string
 
@@ -299,14 +301,16 @@ export const UserContextProvider = ({
 
         if (!session || (session.hasSession && session.expireInSecs < 3600)) {
             setIsUserLoaded(true)
-            session = await DIDSession.authorize(
+            const accountId = await getAccountId(provider, accountAddress)
+            const authMethod = await EthereumWebAuth.getAuthMethod(
                 new EthereumAuthProvider(provider, accountAddress),
-                {
-                    statement:
-                        'This signature allows Cambrian Protocol to update your account data. The permission expires in 24 hours.',
-                    resources: ['ceramic://*'],
-                }
+                accountId
             )
+            session = await DIDSession.authorize(authMethod, {
+                statement:
+                    'This signature allows Cambrian Protocol to update your account data. The permission expires in 24 hours.',
+                resources: ['ceramic://*'],
+            })
             localStorage.setItem(
                 `cambrian-session/${network.chainId}/${accountAddress}`,
                 session.serialize()
