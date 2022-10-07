@@ -2,8 +2,13 @@ import * as blockies from 'blockies-ts'
 
 import { Box, Image } from 'grommet'
 import { IconContext, User } from 'phosphor-react'
+import React, { useEffect, useState } from 'react'
 
-import React from 'react'
+import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
+import { CambrianProfileType } from '@cambrian/app/store/UserContext'
+import { CeramicClient } from '@ceramicnetwork/http-client'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface BaseAvatarProps {
     pfpPath?: string
@@ -20,7 +25,35 @@ const BaseAvatar = ({
     onClick,
     size,
 }: BaseAvatarProps) => {
+    const { currentUser } = useCurrentUserContext()
+    const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
     const iconSize = size === 'large' ? '64' : '24'
+    const [cambrianProfileAvatar, setCambrianProfileAvatar] = useState<string>()
+
+    useEffect(() => {
+        fetchCeramicProfile()
+    }, [currentUser])
+
+    const fetchCeramicProfile = async () => {
+        if (currentUser) {
+            const cambrianProfileDoc = (await TileDocument.deterministic(
+                ceramic,
+                {
+                    controllers: [
+                        `did:pkh:eip155:${currentUser.chainId}:${address}`,
+                    ],
+                    family: 'cambrian-profile',
+                },
+                { pin: true }
+            )) as TileDocument<CambrianProfileType>
+            if (
+                cambrianProfileDoc.content.avatar &&
+                cambrianProfileDoc.content.avatar !== ''
+            ) {
+                setCambrianProfileAvatar(cambrianProfileDoc.content.avatar)
+            }
+        }
+    }
 
     return (
         <Box
@@ -60,7 +93,9 @@ const BaseAvatar = ({
                         <Image
                             fit="cover"
                             src={
-                                pfpPath !== undefined && pfpPath !== ''
+                                cambrianProfileAvatar
+                                    ? cambrianProfileAvatar
+                                    : pfpPath !== undefined && pfpPath !== ''
                                     ? pfpPath
                                     : blockies
                                           .create({ seed: address })
