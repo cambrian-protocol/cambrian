@@ -211,8 +211,10 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken: GOERLI_ToyToken.address,
         },
         compositions: {
-            'Basic Content Marketing Freelancer':
-                'k2t6wyfsu4pfwvnb4khe97cey3z9p9loifmbvgj7vrf2h2imdpjfk44mrziir4',
+            'Basic Content Marketing Solver':
+                'k2t6wyfsu4pfydj61yn24bnw5rfgv8hlkgjyusw2i96c12w9ttu8994ru5cty4',
+            'Advanced Content Marketing Solver':
+                'k2t6wyfsu4pfwt5vtpi8e1yje5cxosyhe380rmq16eaeajkvmjqkhu5yiq8qq1',
         },
     },
     42161: {

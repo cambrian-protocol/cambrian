@@ -35,7 +35,7 @@ const PriceInfo = ({ label, amount, token }: PriceInfoProps) => {
             >
                 <ClipboardAddress
                     address={token?.address}
-                    label="Contract Address"
+                    label="ERC20 Token Address"
                 />
             </Box>
         </Box>

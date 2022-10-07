@@ -9,6 +9,10 @@ import {
     Vault,
 } from 'phosphor-react'
 import React, { useEffect, useState } from 'react'
+import {
+    getManualInputs,
+    getSolverRecipientSlots,
+} from '@cambrian/app/components/solver/SolverHelpers'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
 import { Box } from 'grommet'
@@ -21,7 +25,6 @@ import RecipientsModal from '../../ui/common/modals/RecipientsModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
-import { getSolverRecipientSlots } from '@cambrian/app/components/solver/SolverHelpers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -128,12 +131,14 @@ const SolverConfigInfo = ({
                     title="Outcomes"
                     onClick={toggleShowOutcomeModal}
                 />
-                <BaseListItemButton
-                    hideDivider
-                    icon={<ShieldCheck />}
-                    title="Keeper Inputs"
-                    onClick={toggleShowKeeperInputModal}
-                />
+                {getManualInputs(solverData, currentCondition).length > 0 && (
+                    <BaseListItemButton
+                        hideDivider
+                        icon={<ShieldCheck />}
+                        title="Keeper Inputs"
+                        onClick={toggleShowKeeperInputModal}
+                    />
+                )}
                 <BaseListItemButton
                     info={
                         solverData.slotTags
@@ -171,7 +176,8 @@ const SolverConfigInfo = ({
                     icon={<TokenAvatar token={solverData.collateralToken} />}
                     subTitle={solverData.collateralToken.address}
                 />
-                {solverData.config.arbitrator !== '' && (
+                {solverData.config.arbitrator !==
+                    ethers.constants.AddressZero && (
                     <BaseListItemButton
                         info={
                             solverData.slotTags

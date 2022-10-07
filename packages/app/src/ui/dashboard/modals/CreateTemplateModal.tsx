@@ -86,47 +86,42 @@ const CreateTemplateModal = ({
                     title="Create a Template"
                     description="Please select or import the Composition on which this template should be based on."
                 />
-                <Box gap="medium">
-                    <Box height={{ min: 'auto' }} gap="medium">
-                        {Object.keys(
-                            SUPPORTED_CHAINS[currentUser.chainId].compositions
-                        ).length > 0 && (
-                            <Box gap="medium" height={{ min: 'auto' }}>
-                                <Text color="dark-4" size="small">
-                                    Predefined Solver Compositions
-                                </Text>
-                                {Object.keys(
-                                    SUPPORTED_CHAINS[currentUser.chainId]
-                                        .compositions
-                                ).map((compositionTag) => (
-                                    <CompositionListItem
-                                        key={
-                                            SUPPORTED_CHAINS[
-                                                currentUser.chainId
-                                            ].compositions[compositionTag]
-                                        }
-                                        title={compositionTag}
-                                        isLoading={
-                                            isCreatingTemplate ===
-                                            SUPPORTED_CHAINS[
-                                                currentUser.chainId
-                                            ].compositions[compositionTag]
-                                        }
-                                        isDisabled={
-                                            isCreatingTemplate !== undefined
-                                        }
-                                        onSelectComposition={
-                                            onSelectComposition
-                                        }
-                                        compositionID={
-                                            SUPPORTED_CHAINS[
-                                                currentUser.chainId
-                                            ].compositions[compositionTag]
-                                        }
-                                    />
-                                ))}
-                            </Box>
-                        )}
+                <Box height={{ min: 'auto' }} gap="medium">
+                    {Object.keys(
+                        SUPPORTED_CHAINS[currentUser.chainId].compositions
+                    ).length > 0 && (
+                        <Box gap="small" height={{ min: 'auto' }}>
+                            <Text color="dark-4" size="small">
+                                Predefined Solver Compositions
+                            </Text>
+                            {Object.keys(
+                                SUPPORTED_CHAINS[currentUser.chainId]
+                                    .compositions
+                            ).map((compositionTag) => (
+                                <CompositionListItem
+                                    key={
+                                        SUPPORTED_CHAINS[currentUser.chainId]
+                                            .compositions[compositionTag]
+                                    }
+                                    title={compositionTag}
+                                    isLoading={
+                                        isCreatingTemplate ===
+                                        SUPPORTED_CHAINS[currentUser.chainId]
+                                            .compositions[compositionTag]
+                                    }
+                                    isDisabled={
+                                        isCreatingTemplate !== undefined
+                                    }
+                                    onSelectComposition={onSelectComposition}
+                                    compositionID={
+                                        SUPPORTED_CHAINS[currentUser.chainId]
+                                            .compositions[compositionTag]
+                                    }
+                                />
+                            ))}
+                        </Box>
+                    )}
+                    <Box gap="small">
                         <Text color="dark-4" size="small">
                             Your Solver Compositions
                         </Text>
@@ -166,8 +161,8 @@ const CreateTemplateModal = ({
                                 subject="Solver Compositions"
                             />
                         )}
-                        <Box pad="large" />
                     </Box>
+                    <Box pad="large" />
                 </Box>
             </BaseLayerModal>
             {errorMessage && (

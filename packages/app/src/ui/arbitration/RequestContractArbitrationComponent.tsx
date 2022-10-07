@@ -60,10 +60,11 @@ const RequestContractArbitrationComponent = ({
                     title="Request Arbitration"
                     description={`You may request arbitration if you believe this proposed
                         outcome is incorrect. ${
-                            !fee.isZero() &&
-                            `The initialized fee for an arbitration service is ${ethers.utils
-                                .formatEther(fee)
-                                .toString()} ETH  and is refundable if you win arbitration.`
+                            !fee.isZero()
+                                ? `The initialized fee for an arbitration service is ${ethers.utils
+                                      .formatEther(fee)
+                                      .toString()} ETH  and is refundable if you win arbitration.`
+                                : ''
                         }`}
                 >
                     <LoaderButton

@@ -58,7 +58,7 @@ const DuplicateCompositionComponent = ({
     return (
         <>
             <Box justify="center" align="center" fill>
-                <Box width={{ max: 'large', min: 'large' }}>
+                <Box width="large">
                     <ModalHeader
                         title="Duplicate Composition"
                         description="To use this Composition you must duplicate it"
