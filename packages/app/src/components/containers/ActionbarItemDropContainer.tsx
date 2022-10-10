@@ -2,10 +2,16 @@ import { Box } from 'grommet'
 import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
 
+export type ActionbarItemDropListType = {
+    icon: JSX.Element
+    label: string
+    description?: string | JSX.Element
+}[]
+
 interface ActionbarItemDropContainerProps {
     title: string
     description: string
-    list?: { icon: JSX.Element; label: string }[]
+    list?: ActionbarItemDropListType
 }
 
 const ActionbarItemDropContainer = ({
@@ -28,7 +34,10 @@ const ActionbarItemDropContainer = ({
                         <IconContext.Provider value={{ size: '24' }}>
                             <Box width={{ min: 'auto' }}>{item.icon}</Box>
                         </IconContext.Provider>
-                        <Text size="small">{item.label}</Text>
+                        <Box>
+                            <Text size="small">{item.label}</Text>
+                            {item.description}
+                        </Box>
                     </Box>
                 ))}
             </Box>

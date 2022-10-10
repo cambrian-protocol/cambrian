@@ -51,7 +51,6 @@ const ProposalInfoModal = ({ onClose, stageStack }: ProposalInfoModalProps) => {
                     <CambrianProfileInfo
                         cambrianProfileDoc={proposerProfile}
                         size={'small'}
-                        hideDetails
                     />
                     <PlainSectionDivider />
                     <ProposalContentInfo proposal={stageStack.proposal} />

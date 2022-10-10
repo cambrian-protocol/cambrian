@@ -58,12 +58,7 @@ export default function SolverPage() {
                         )
                     } else if (stage.content.composition) {
                         // Its a Template
-                        setUi(
-                            <TemplateUI
-                                currentUser={currentUser}
-                                templateStreamDoc={stage}
-                            />
-                        )
+                        setUi(<TemplateUI templateStreamDoc={stage} />)
                     } else if (stage.content.template) {
                         // Its a Proposal
                         setUi(

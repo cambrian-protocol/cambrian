@@ -6,13 +6,11 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 interface CambrianProfileInfoProps {
     cambrianProfileDoc?: TileDocument<CambrianProfileType>
-    hideDetails?: boolean
     size?: 'small'
 }
 
 const CambrianProfileInfo = ({
     cambrianProfileDoc,
-    hideDetails,
     size,
 }: CambrianProfileInfoProps) => {
     return (
@@ -30,23 +28,12 @@ const CambrianProfileInfo = ({
                         size={size ? undefined : 'medium'}
                     />
                 )}
-
                 <Box pad="small">
                     <Heading level={size === 'small' ? '4' : '3'} truncate>
                         {cambrianProfileDoc?.content.name || 'Anon'}
                     </Heading>
-                    {size !== 'small' && (
-                        <Text size="small" color="dark-4">
-                            {cambrianProfileDoc?.content.title as string}
-                        </Text>
-                    )}
                 </Box>
             </Box>
-            {!hideDetails && (
-                <Text color="dark-4" style={{ whiteSpace: 'pre-line' }}>
-                    {cambrianProfileDoc?.content.description}
-                </Text>
-            )}
         </Box>
     )
 }

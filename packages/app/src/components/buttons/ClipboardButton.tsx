@@ -1,13 +1,12 @@
+import { Button, ButtonExtendedProps } from 'grommet'
 import { Check, Copy } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-import { Button } from 'grommet'
-
-interface ClipboardButtonProps {
+type ClipboardButtonProps = ButtonExtendedProps & {
     value: string
 }
 
-const ClipboardButton = ({ value }: ClipboardButtonProps) => {
+const ClipboardButton = ({ value, ...rest }: ClipboardButtonProps) => {
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
     useEffect(() => {
@@ -22,6 +21,7 @@ const ClipboardButton = ({ value }: ClipboardButtonProps) => {
 
     return (
         <Button
+            {...rest}
             icon={isSavedToClipboard ? <Check /> : <Copy />}
             onClick={() => {
                 navigator.clipboard.writeText(value)
