@@ -12,6 +12,7 @@ export type ActionbarItemType = {
 
 interface ActionbarProps {
     primaryAction?: JSX.Element
+    secondaryAction?: JSX.Element
     info: ActionbarInfoType
 }
 
@@ -21,7 +22,11 @@ export type ActionbarInfoType = {
     subTitle: string
 }
 
-const BaseActionbar = ({ primaryAction, info }: ActionbarProps) => {
+const BaseActionbar = ({
+    primaryAction,
+    secondaryAction,
+    info,
+}: ActionbarProps) => {
     return (
         <Box fill="horizontal" height={{ min: 'auto' }}>
             <Box
@@ -64,6 +69,11 @@ const BaseActionbar = ({ primaryAction, info }: ActionbarProps) => {
                             </Text>
                         </Box>
                     </Box>
+                    {secondaryAction && (
+                        <Box width={{ min: 'auto' }} pad={{ left: 'small' }}>
+                            {secondaryAction}
+                        </Box>
+                    )}
                     {primaryAction && (
                         <Box width={{ min: 'auto' }} pad={{ left: 'small' }}>
                             {primaryAction}
