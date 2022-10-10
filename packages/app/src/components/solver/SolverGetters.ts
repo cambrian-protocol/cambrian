@@ -432,30 +432,32 @@ export const getSolverMetadata = async (
     signerOrProvider: ethers.Signer | ethers.providers.Provider,
     chainId: number
 ) => {
-    const proposalId = await solverContract.trackingId()
-    if (proposalId) {
-        const proposalsHub = new ProposalsHub(signerOrProvider, chainId)
-        const metadataURI = await proposalsHub.getMetadataCID(proposalId)
-
+    try {
+        const proposalId = await solverContract.trackingId()
         if (proposalId) {
-            const stageStack = await loadStageStackFromID(metadataURI)
-
-            if (stageStack) {
-                const solverIndex = (await solverContract.chainIndex()) as
-                    | number
-                    | undefined
-                if (solverIndex !== undefined) {
-                    return {
-                        slotTags:
-                            stageStack.composition.solvers[solverIndex]
-                                .slotTags,
-                        solverTag:
-                            stageStack.composition.solvers[solverIndex]
-                                .solverTag,
-                        stageStack: stageStack,
+            const proposalsHub = new ProposalsHub(signerOrProvider, chainId)
+            const metadataURI = await proposalsHub.getMetadataCID(proposalId)
+            if (proposalId) {
+                const stageStack = await loadStageStackFromID(metadataURI)
+                if (stageStack) {
+                    const solverIndex = (await solverContract.chainIndex()) as
+                        | number
+                        | undefined
+                    if (solverIndex !== undefined) {
+                        return {
+                            slotTags:
+                                stageStack.composition.solvers[solverIndex]
+                                    .slotTags,
+                            solverTag:
+                                stageStack.composition.solvers[solverIndex]
+                                    .solverTag,
+                            stageStack: stageStack,
+                        }
                     }
                 }
             }
         }
+    } catch (e) {
+        cpLogger.push(e)
     }
 }
