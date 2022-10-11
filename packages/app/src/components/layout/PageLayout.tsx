@@ -71,6 +71,7 @@ const PageLayout = ({
                         align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
+                        pad="large"
                     >
                         <WrongChainBoundary>
                             <Box

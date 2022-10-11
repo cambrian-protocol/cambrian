@@ -1,15 +1,17 @@
-import { Box, Heading, Text } from 'grommet'
+import { Box, Text } from 'grommet'
 
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 interface CambrianProfileInfoProps {
+    role?: string
     cambrianProfileDoc?: TileDocument<CambrianProfileType>
     size?: 'small'
 }
 
 const CambrianProfileInfo = ({
+    role,
     cambrianProfileDoc,
     size,
 }: CambrianProfileInfoProps) => {
@@ -29,9 +31,14 @@ const CambrianProfileInfo = ({
                     />
                 )}
                 <Box pad="small">
-                    <Heading level={size === 'small' ? '4' : '3'} truncate>
+                    {role && (
+                        <Text size="xsmall" color="dark-4">
+                            {role}
+                        </Text>
+                    )}
+                    <Text truncate>
                         {cambrianProfileDoc?.content.name || 'Anon'}
-                    </Heading>
+                    </Text>
                 </Box>
             </Box>
         </Box>

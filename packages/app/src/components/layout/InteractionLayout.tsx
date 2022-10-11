@@ -89,7 +89,6 @@ const InteractionLayout = ({
                                                     fill
                                                     gap="large"
                                                     height={{ min: '70vh' }}
-                                                    pad={{ top: 'medium' }}
                                                 >
                                                     {sidebar && (
                                                         <Box width="medium">

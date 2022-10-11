@@ -2,7 +2,9 @@ import { Button, ButtonExtendedProps } from 'grommet'
 import { Check, Copy } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
-type ClipboardButtonProps = ButtonExtendedProps & {
+import { cpTheme } from '@cambrian/app/theme/theme'
+
+export type ClipboardButtonProps = ButtonExtendedProps & {
     value: string
 }
 
@@ -22,7 +24,13 @@ const ClipboardButton = ({ value, ...rest }: ClipboardButtonProps) => {
     return (
         <Button
             {...rest}
-            icon={isSavedToClipboard ? <Check /> : <Copy />}
+            icon={
+                isSavedToClipboard ? (
+                    <Check color={cpTheme.global.colors['dark-4']} />
+                ) : (
+                    <Copy color={cpTheme.global.colors['dark-4']} />
+                )
+            }
             onClick={() => {
                 navigator.clipboard.writeText(value)
                 setIsSavedToClipboard(true)

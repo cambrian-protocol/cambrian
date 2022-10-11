@@ -1,17 +1,15 @@
-import { Box, Heading, Text } from 'grommet'
-import { ClipboardText, File, IconContext, Question } from 'phosphor-react'
+import { ClipboardText, File } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
-import { Button } from 'grommet'
-import Link from 'next/link'
+import BaseHeader from './BaseHeader'
 import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
-import { ResponsiveContext } from 'grommet'
-import { SUPPORT_DISCORD_LINK } from 'packages/app/config/ExternalLinks'
+import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
-import { useState } from 'react'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {
     stageStack?: StageStackType
@@ -26,6 +24,31 @@ const ProposalHeader = ({
 }: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
     const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>([])
+    const [proposalAuthor] = useCambrianProfile(stageStack?.proposal.author)
+
+    useEffect(() => {
+        let items: ResponsiveButtonProps[] = []
+        if (stageStack) {
+            items.push({
+                label: 'Template Details',
+                icon: <File color={cpTheme.global.colors['dark-4']} />,
+                onClick: toggleShowTemplateInfoModal,
+            })
+            if (showProposalDetails) {
+                items.push({
+                    label: 'Proposal Details',
+                    icon: (
+                        <ClipboardText
+                            color={cpTheme.global.colors['dark-4']}
+                        />
+                    ),
+                    onClick: toggleShowProposalInfoModal,
+                })
+            }
+        }
+        setHeaderItems(items)
+    }, [])
 
     const toggleShowProposalInfoModal = () =>
         setShowProposalInfoModal(!showProposalInfoModal)
@@ -35,135 +58,13 @@ const ProposalHeader = ({
 
     return (
         <>
-            <ResponsiveContext.Consumer>
-                {(screenSize) => {
-                    return (
-                        <Box
-                            fill="horizontal"
-                            height={{ min: 'auto' }}
-                            pad={{
-                                top: 'medium',
-                                bottom: 'xsmall',
-                            }}
-                            gap="medium"
-                        >
-                            <Box gap="small">
-                                <Box direction="row" gap="medium">
-                                    <Text color={'brand'}>Proposal</Text>
-                                    <ProposalStatusBadge
-                                        status={proposalStatus}
-                                    />
-                                </Box>
-                                <Heading>
-                                    {stageStack?.proposal.title ||
-                                        'Untitled Proposal'}
-                                </Heading>
-                            </Box>
-                            <Box
-                                direction="row"
-                                justify="end"
-                                gap="small"
-                                border={{ side: 'bottom' }}
-                                pad={{ bottom: 'xsmall' }}
-                            >
-                                <IconContext.Provider value={{ size: '18' }}>
-                                    {showProposalDetails && stageStack && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowProposalInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Proposal Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <ClipboardText
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {stageStack && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowTemplateInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Template Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <File
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {/* <Button
-                                        color="dark-4"
-                                        size="small"
-                                        disabled
-                                        label={
-                                            screenSize !== 'small'
-                                                ? 'Solver Overview'
-                                                : undefined
-                                        }
-                                        icon={
-                                            <TreeStructure
-                                                color={
-                                                    cpTheme.global.colors[
-                                                        'dark-4'
-                                                    ]
-                                                }
-                                            />
-                                        }
-                                    /> */}
-                                    <Link href={SUPPORT_DISCORD_LINK} passHref>
-                                        <a
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Button
-                                                color="dark-4"
-                                                size="small"
-                                                label={
-                                                    screenSize !== 'small'
-                                                        ? 'Support'
-                                                        : undefined
-                                                }
-                                                icon={
-                                                    <Question
-                                                        color={
-                                                            cpTheme.global
-                                                                .colors[
-                                                                'dark-4'
-                                                            ]
-                                                        }
-                                                    />
-                                                }
-                                            />
-                                        </a>
-                                    </Link>
-                                </IconContext.Provider>
-                            </Box>
-                        </Box>
-                    )
-                }}
-            </ResponsiveContext.Consumer>
+            <BaseHeader
+                title={stageStack?.proposal.title || 'Untitled Proposal'}
+                metaTitle="Proposal"
+                items={headerItems}
+                authorProfileDoc={proposalAuthor}
+                statusBadge={<ProposalStatusBadge status={proposalStatus} />}
+            />
             {showTemplateInfoModal && stageStack && (
                 <TemplateInfoModal
                     stageStack={stageStack}

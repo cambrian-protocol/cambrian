@@ -1,6 +1,7 @@
 import { Box, Heading, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import CambrianProfileAbout from '@cambrian/app/components/info/CambrianProfileAbout'
 import CambrianProfileInfo from '@cambrian/app/components/info/CambrianProfileInfo'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -35,12 +36,11 @@ const TemplatePreview = ({ template }: TemplatePreviewProps) => {
         <>
             {composition ? (
                 <Box gap="medium">
-                    <Heading level="2">{template.title}</Heading>
-                    <CambrianProfileInfo
-                        cambrianProfileDoc={templaterProfile}
-                        size="small"
+                    <BaseHeader
+                        title={template.title}
+                        metaTitle="Template"
+                        authorProfileDoc={templaterProfile}
                     />
-                    <PlainSectionDivider />
                     <Box gap="small">
                         <Heading level="3">Project details</Heading>
                         <Text style={{ whiteSpace: 'pre-line' }}>
