@@ -1,7 +1,9 @@
-import { Box, Text } from 'grommet'
+import { Box, DropButton, Text } from 'grommet'
 
+import ClipboardButton from '../buttons/ClipboardButton'
 import React from 'react'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 
 interface TokenAvatar {
     token?: TokenModel
@@ -9,19 +11,43 @@ interface TokenAvatar {
 
 const TokenAvatar = ({ token }: TokenAvatar) => {
     return (
-        <Box justify="center" height={{ min: 'auto' }}>
+        <DropButton
+            dropContent={
+                <Box
+                    direction="row"
+                    align="center"
+                    pad={{ vertical: 'xsmall', left: 'small', right: 'xsmall' }}
+                    gap="small"
+                >
+                    <Text size="xsmall" color="dark-4">
+                        {ellipseAddress(token?.address, 10)}
+                    </Text>
+                    <ClipboardButton
+                        value={token?.address || ''}
+                        size="xsmall"
+                    />
+                </Box>
+            }
+            dropAlign={{ left: 'right' }}
+        >
             <Box
-                width={{ min: 'xxsmall', max: 'xxsmall' }}
-                height={{ min: 'xxsmall', max: 'xxsmall' }}
-                border={{ color: 'brand', size: 'small' }}
                 justify="center"
-                align="center"
-                round="full"
-                elevation="small"
+                height={{ min: 'auto' }}
+                pad={{ right: 'xsmall' }}
             >
-                <Text size="small">{token?.symbol || '?'}</Text>
+                <Box
+                    width={{ min: 'xxsmall', max: 'xxsmall' }}
+                    height={{ min: 'xxsmall', max: 'xxsmall' }}
+                    border={{ color: 'brand', size: 'small' }}
+                    justify="center"
+                    align="center"
+                    round="full"
+                    elevation="small"
+                >
+                    <Text size="small">{token?.symbol || '?'}</Text>
+                </Box>
             </Box>
-        </Box>
+        </DropButton>
     )
 }
 
