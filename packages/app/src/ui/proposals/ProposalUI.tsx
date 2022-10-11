@@ -1,14 +1,13 @@
-import { Box, Stack } from 'grommet'
+import { Box, Heading, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import CambrianProfileInfo from '@cambrian/app/components/info/CambrianProfileInfo'
+import CambrianProfileAbout from '@cambrian/app/components/info/CambrianProfileAbout'
 import Custom404Page from 'packages/app/pages/404'
-import FlexInputInfo from '../common/FlexInputInfo'
+import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
-import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
-import ProposalContentInfo from './ProposalContentInfo'
+import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal/ProposalActionbar'
 import ProposalControlbar from './control/ProposalControlbar'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
@@ -52,63 +51,61 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
             {isLoaded && stageStack === undefined ? (
                 <Custom404Page />
             ) : (
-                <Stack anchor="bottom-right">
-                    <PageLayout
-                        contextTitle={stageStack?.proposal.title || 'Proposal'}
-                        kind="narrow"
-                    >
-                        {stageStack ? (
-                            <Box pad="large">
-                                <ProposalHeader
-                                    stageStack={stageStack}
-                                    proposalStatus={proposalStatus}
-                                />
-                                <Box
-                                    height={{ min: 'auto' }}
-                                    pad={{ top: 'large' }}
-                                    gap="medium"
-                                >
-                                    <ProposalContentInfo
-                                        hideTitle
-                                        proposal={stageStack.proposal}
-                                    />
-                                    <PlainSectionDivider />
-                                    <PriceInfo
-                                        amount={
-                                            stageStack.proposal.price.amount
-                                        }
-                                        label="Proposed Price"
-                                        token={collateralToken}
-                                    />
-                                    <FlexInputInfo
-                                        composition={stageStack.composition}
-                                        flexInputs={
-                                            stageStack.proposal.flexInputs
+                <InteractionLayout
+                    contextTitle={stageStack?.proposal.title || 'Proposal'}
+                    actionBar={
+                        <ProposalActionbar
+                            proposedPrice={{
+                                amount: stageStack?.proposal.price.amount,
+                                token: collateralToken,
+                            }}
+                            messenger={
+                                initMessenger && stageStack ? (
+                                    <Messenger
+                                        chatID={stageStack.proposalStreamID}
+                                        currentUser={currentUser}
+                                        participantDIDs={
+                                            currentUser.did ===
+                                            stageStack.template.author
+                                                ? [stageStack.proposal.author]
+                                                : [stageStack.template.author]
                                         }
                                     />
-                                    <PlainSectionDivider />
-                                    <CambrianProfileInfo
-                                        cambrianProfileDoc={proposerProfile}
-                                    />
-                                    <ProposalControlbar />
-                                </Box>
-                            </Box>
-                        ) : (
-                            <ProposalSkeleton />
-                        )}
-                    </PageLayout>
-                    {initMessenger && stageStack && (
-                        <Messenger
-                            chatID={stageStack.proposalStreamID}
-                            currentUser={currentUser}
-                            participantDIDs={
-                                currentUser.did === stageStack.template.author
-                                    ? [stageStack.proposal.author]
-                                    : [stageStack.template.author]
+                                ) : undefined
                             }
                         />
+                    }
+                >
+                    {stageStack ? (
+                        <Box gap="medium">
+                            <ProposalHeader
+                                stageStack={stageStack}
+                                proposalStatus={proposalStatus}
+                            />
+                            <Box gap="small">
+                                <Heading level="3">Project details</Heading>
+                                <Text style={{ whiteSpace: 'pre-line' }}>
+                                    {stageStack.proposal.description}
+                                </Text>
+                            </Box>
+                            <PlainSectionDivider />
+                            <PriceInfo
+                                label="Proposed Price"
+                                amount={stageStack.proposal.price.amount}
+                                token={collateralToken}
+                            />
+                            <PlainSectionDivider />
+                            {proposerProfile && (
+                                <CambrianProfileAbout
+                                    cambrianProfile={proposerProfile}
+                                />
+                            )}
+                            <ProposalControlbar />
+                        </Box>
+                    ) : (
+                        <ProposalSkeleton />
                     )}
-                </Stack>
+                </InteractionLayout>
             )}
         </>
     )

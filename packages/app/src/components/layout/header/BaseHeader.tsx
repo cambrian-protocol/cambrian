@@ -54,8 +54,12 @@ const BaseHeader = ({
                 />
                 <Box direction="row" gap="small" align="center">
                     <IconContext.Provider value={{ size: '18' }}>
-                        {items?.map((item) => (
-                            <ResponsiveButton {...item} color="dark-4" />
+                        {items?.map((item, idx) => (
+                            <ResponsiveButton
+                                key={idx}
+                                {...item}
+                                color="dark-4"
+                            />
                         ))}
                     </IconContext.Provider>
                 </Box>

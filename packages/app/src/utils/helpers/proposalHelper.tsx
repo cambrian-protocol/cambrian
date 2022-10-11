@@ -237,7 +237,7 @@ export const deployProposal = async (
     }
 }
 
-export const deploySolutionBase = async (
+export const createSolutionBase = async (
     currentUser: UserType,
     stageStack: StageStackType
 ) => {

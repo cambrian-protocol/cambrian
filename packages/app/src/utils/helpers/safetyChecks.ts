@@ -22,29 +22,21 @@ import { getParsedSolvers } from './proposalHelper'
  * We can put this check in other places throughout the app to try and prevent mistakes
  *
  */
+export type SolverSafetyCheckResponseType = { to: string; result: boolean }[][]
 
 export const solverSafetyCheck = async (
     stageStack: StageStackType,
     currentUser: UserType
-): Promise<boolean> => {
+): Promise<SolverSafetyCheckResponseType | undefined> => {
     const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
     if (parsedSolvers) {
         const configs = parsedSolvers.map((solver) => solver.config)
-        const results = await Promise.all(
+        return await Promise.all(
             configs.map((config) =>
                 checkConstantRecipients(config, currentUser)
             )
         )
-        let success = true
-        results.forEach((solverResult) =>
-            solverResult.forEach((result) => {
-                if (result.result === false) success = false
-            })
-        )
-        console.log('Escrow Transfer Safety Check Results: ', results)
-        return success
     }
-    return false
 }
 
 export const checkConstantRecipients = async (

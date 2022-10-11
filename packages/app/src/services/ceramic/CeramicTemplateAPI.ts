@@ -24,7 +24,7 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { deploySolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
+import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -165,7 +165,7 @@ export default class CeramicTemplateAPI {
                 await this.updateProposalEntry(stageStack, {
                     approved: true,
                 })
-                return await deploySolutionBase(currentUser, stageStack)
+                return await createSolutionBase(currentUser, stageStack)
             } else {
                 cpLogger.push(res.status)
                 return false

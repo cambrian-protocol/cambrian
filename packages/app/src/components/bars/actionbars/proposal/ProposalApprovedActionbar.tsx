@@ -1,34 +1,35 @@
-import { Coins, RocketLaunch } from 'phosphor-react'
 import {
+    createSolutionBase,
     deployProposal,
-    deploySolutionBase,
     getSolutionSafeBaseId,
 } from '@cambrian/app/utils/helpers/proposalHelper'
 import { useEffect, useState } from 'react'
 
-import { Box } from 'grommet'
+import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
+import BaseActionbar from '../BaseActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
-interface ProposalStartFundingControlProps {
+interface ProposalApprovedActionbarProps {
     currentUser: UserType
     isApproving: boolean
     setIsApproving: React.Dispatch<React.SetStateAction<boolean>>
+    messenger?: JSX.Element
 }
 
-const ProposalStartFundingControl = ({
+const ProposalApprovedActionbar = ({
     currentUser,
     isApproving,
     setIsApproving,
-}: ProposalStartFundingControlProps) => {
+    messenger,
+}: ProposalApprovedActionbarProps) => {
     const solutionsHub = new IPFSSolutionsHub(
         currentUser.signer,
         currentUser.chainId
@@ -51,21 +52,21 @@ const ProposalStartFundingControl = ({
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
+            setIsInTransaction(false)
         }
-        setIsInTransaction(false)
     }
 
-    const onDeploySolution = async () => {
+    const onCreateSolutionBase = async () => {
         setIsApproving(true)
         try {
             if (stageStack) {
-                await deploySolutionBase(currentUser, stageStack)
+                await createSolutionBase(currentUser, stageStack)
                 await fetchSolution()
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
+            setIsApproving(false)
         }
-        setIsApproving(false)
     }
 
     const fetchSolution = async () => {
@@ -86,34 +87,55 @@ const ProposalStartFundingControl = ({
         <>
             {isLoaded ? (
                 solutionBase ? (
-                    <Box gap="medium">
-                        <PlainSectionDivider />
-                        <LoaderButton
-                            isLoading={isInTransaction}
-                            label="Start funding"
-                            primary
-                            icon={<Coins />}
-                            size="small"
-                            onClick={onDeployProposal}
-                        />
-                    </Box>
+                    <BaseActionbar
+                        messenger={messenger}
+                        primaryAction={
+                            <LoaderButton
+                                isLoading={isInTransaction}
+                                primary
+                                size="small"
+                                onClick={onDeployProposal}
+                                label={'Start Funding'}
+                            />
+                        }
+                        info={{
+                            title: `Proposal has been approved`,
+                            subTitle: 'Start funding the Solver',
+                            dropContent: (
+                                <ActionbarItemDropContainer
+                                    title="Proposal has been approved"
+                                    description="Please hit the 'Start Funding'-Button in order to initiate the Solver and get it ready for funding."
+                                />
+                            ),
+                        }}
+                    />
                 ) : (
-                    <Box gap="medium">
-                        <PlainSectionDivider />
-                        <LoaderButton
-                            isLoading={isApproving}
-                            label="Deploy Solution"
-                            primary
-                            icon={<RocketLaunch />}
-                            size="small"
-                            onClick={onDeploySolution}
-                        />
-                    </Box>
+                    <BaseActionbar
+                        messenger={messenger}
+                        primaryAction={
+                            <LoaderButton
+                                isLoading={isApproving}
+                                primary
+                                size="small"
+                                onClick={onCreateSolutionBase}
+                                label={'Continue'}
+                            />
+                        }
+                        info={{
+                            title: `Proposal has been approved`,
+                            subTitle: 'Solver setup',
+                            dropContent: (
+                                <ActionbarItemDropContainer
+                                    title="Proposal has been approved"
+                                    description="To set up the Solver correctly please hit the 'Continue'-Button."
+                                />
+                            ),
+                        }}
+                    />
                 )
             ) : (
                 <></>
             )}
-
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}
@@ -124,4 +146,4 @@ const ProposalStartFundingControl = ({
     )
 }
 
-export default ProposalStartFundingControl
+export default ProposalApprovedActionbar
