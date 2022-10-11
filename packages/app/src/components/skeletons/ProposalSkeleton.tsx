@@ -4,7 +4,7 @@ import PlainSectionDivider from '../sections/PlainSectionDivider'
 
 const ProposalSkeleton = () => {
     return (
-        <Box height="large" pad="large" gap="medium">
+        <Box height="large" gap="medium">
             <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
             <BaseSkeletonBox height={'xsmall'} width={'100%'} />
             <PlainSectionDivider />
