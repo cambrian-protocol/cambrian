@@ -159,7 +159,7 @@ export const cpTheme = deepMerge(grommet, {
         color: 'status-arbitration',
     },
     layer: {
-        border: { radius: 'small' },
+        border: { radius: 'xsmall' },
         container: { elevation: 'large' },
     },
     checkBox: {

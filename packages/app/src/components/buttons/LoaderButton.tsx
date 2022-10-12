@@ -32,7 +32,7 @@ const LoaderButton = ({
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [children, windowSize])
+    }, [children, windowSize, props.disabled])
 
     useEffect(() => {
         if (isLoading) {
