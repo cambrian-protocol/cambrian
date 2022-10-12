@@ -71,10 +71,10 @@ const PageLayout = ({
                         align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}
                         height={{ min: 'auto' }}
-                        pad="large"
                     >
                         <WrongChainBoundary>
                             <Box
+                                pad="large"
                                 width={kind === 'narrow' ? 'xlarge' : undefined}
                                 height={{ min: '90vh' }}
                             >
