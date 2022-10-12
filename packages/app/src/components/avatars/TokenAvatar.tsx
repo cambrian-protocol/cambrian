@@ -19,7 +19,7 @@ const TokenAvatar = ({ token }: TokenAvatar) => {
                     pad={{ vertical: 'xsmall', left: 'small', right: 'xsmall' }}
                     gap="small"
                 >
-                    <Text size="xsmall" color="dark-4">
+                    <Text size="xsmall">
                         {ellipseAddress(token?.address, 10)}
                     </Text>
                     <ClipboardButton
