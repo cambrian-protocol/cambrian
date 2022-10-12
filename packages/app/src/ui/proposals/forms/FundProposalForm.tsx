@@ -1,27 +1,20 @@
 import { ArrowLineUp, CheckCircle, Info } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, FormField, Text } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import FundingSkeleton from '@cambrian/app/components/skeletons/FundingSkeleton'
-import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 
@@ -143,6 +136,7 @@ const FundProposalForm = ({
             currentUser.web3Provider
         )
         setCollateralToken(token)
+        await initAllowance()
         await updateUserFunding(proposalContract.id)
     }
 
@@ -154,8 +148,9 @@ const FundProposalForm = ({
                 null
             ),
             async (proposalId) => {
-                await updateUserFunding(proposalId)
                 setIsInPrimaryTransaction(false)
+                await initAllowance()
+                await updateUserFunding(proposalId)
             }
         )
 
@@ -166,26 +161,16 @@ const FundProposalForm = ({
                 null
             ),
             async (proposalId) => {
-                await updateUserFunding(proposalId)
+                // Can be both - Secondary or primary in case proposal is fully funded
+                setIsInPrimaryTransaction(false)
                 setIsInSecondaryTransaction(false)
-            }
-        )
-
-        proposalsHub.contract.on(
-            proposalsHub.contract.filters.ExecuteProposal(proposalContract.id),
-            async (proposalId) => {
-                const updatedProposal = await proposalsHub.getProposal(
-                    proposalId
-                )
-                if (updatedProposal && updatedProposal.isExecuted) {
-                    setIsInPrimaryTransaction(false)
-                }
+                await initAllowance()
+                await updateUserFunding(proposalId)
             }
         )
     }
 
     const updateUserFunding = async (proposalId: string) => {
-        await initAllowance()
         const userFunding = await proposalsHub.contract.funderAmountMap(
             proposalId,
             currentUser.address
@@ -226,58 +211,47 @@ const FundProposalForm = ({
     }
 
     const onDefundProposal = async () => {
-        safeTransactionCall(
-            () =>
-                proposalsHub.defundProposal(
-                    proposalContract.id,
-                    input.amount,
-                    collateralToken
-                ),
-            setIsInSecondaryTransaction
-        )
-    }
-
-    const onExecuteProposal = async () => {
-        safeTransactionCall(async () => {
-            if (currentUser.signer && currentUser.chainId) {
-                // Retrieving SolverConfigs from Solution
-                const solutionsHub = new IPFSSolutionsHub(
-                    currentUser.signer,
-                    currentUser.chainId
-                )
-                const solution = await solutionsHub.getSolution(
-                    proposalContract.solutionId
-                )
-
-                if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
-
-                if (solution.solverConfigsURI) {
-                    const solverConfigDoc = (await TileDocument.load(
-                        ceramicInstance(currentUser),
-                        solution.solverConfigsURI
-                    )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>
-
-                    if (
-                        solverConfigDoc.content !== null &&
-                        typeof solverConfigDoc.content === 'object'
-                    ) {
-                        await proposalsHub.executeProposal(
-                            proposalContract.id,
-                            solverConfigDoc.content.solverConfigs
-                        )
-                    }
-                }
-            }
-        }, setIsInPrimaryTransaction)
+        if (funding?.eq(proposalContract.fundingGoal)) {
+            safeTransactionCall(
+                () =>
+                    proposalsHub.defundProposal(
+                        proposalContract.id,
+                        input.amount,
+                        collateralToken
+                    ),
+                setIsInPrimaryTransaction
+            )
+        } else {
+            safeTransactionCall(
+                () =>
+                    proposalsHub.defundProposal(
+                        proposalContract.id,
+                        input.amount,
+                        collateralToken
+                    ),
+                setIsInSecondaryTransaction
+            )
+        }
     }
 
     const inputMaxAmount = () => {
-        const max = proposalContract.fundingGoal.sub(funding)
-        setInput({
-            amount: Number(
-                ethers.utils.formatUnits(max, collateralToken?.decimals)
-            ),
-        })
+        if (funding?.eq(proposalContract.fundingGoal)) {
+            setInput({
+                amount: Number(
+                    ethers.utils.formatUnits(
+                        currentUserFunding,
+                        collateralToken?.decimals
+                    )
+                ),
+            })
+        } else {
+            const max = proposalContract.fundingGoal.sub(funding)
+            setInput({
+                amount: Number(
+                    ethers.utils.formatUnits(max, collateralToken?.decimals)
+                ),
+            })
+        }
     }
 
     const isValidInput =
@@ -319,7 +293,7 @@ const FundProposalForm = ({
                                 value={input}
                                 onSubmit={
                                     funding.eq(proposalContract.fundingGoal)
-                                        ? onExecuteProposal
+                                        ? onDefundProposal
                                         : input.amount &&
                                           currentAllowance?.gte(
                                               ethers.utils.parseUnits(
@@ -439,10 +413,13 @@ const FundProposalForm = ({
                                                     isLoading={
                                                         isInPrimaryTransaction
                                                     }
-                                                    disabled={disableButtons}
-                                                    primary
-                                                    type="submit"
-                                                    label="Execute"
+                                                    disabled={
+                                                        !isValidInput ||
+                                                        disableButtons
+                                                    }
+                                                    secondary
+                                                    label="Defund"
+                                                    onClick={onDefundProposal}
                                                 />
                                             ) : input.amount &&
                                               currentAllowance?.gte(
@@ -479,18 +456,22 @@ const FundProposalForm = ({
                                             )
                                         }
                                         secondaryButton={
-                                            <LoaderButton
-                                                isLoading={
-                                                    isInSecondaryTransaction
-                                                }
-                                                disabled={
-                                                    !isValidInput ||
-                                                    disableButtons
-                                                }
-                                                secondary
-                                                label="Defund"
-                                                onClick={onDefundProposal}
-                                            />
+                                            funding.eq(
+                                                proposalContract.fundingGoal
+                                            ) ? undefined : (
+                                                <LoaderButton
+                                                    isLoading={
+                                                        isInSecondaryTransaction
+                                                    }
+                                                    disabled={
+                                                        !isValidInput ||
+                                                        disableButtons
+                                                    }
+                                                    secondary
+                                                    label="Defund"
+                                                    onClick={onDefundProposal}
+                                                />
+                                            )
                                         }
                                     />
                                 </Box>

@@ -1,12 +1,24 @@
 import { Box, Button, Text } from 'grommet'
 import { Coins, Swap, UsersFour } from 'phosphor-react'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import BaseActionbar from '../BaseActionbar'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from '@cambrian/app/ui/proposals/forms/FundProposalForm'
+import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 import { useState } from 'react'
@@ -26,9 +38,51 @@ const ProposalFundingActionbar = ({
         useProposalFunding(proposalContract.id)
     const [showProposalFundingModal, setShowProposalFundingModal] =
         useState(false)
+    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [isExecuting, setIsExecuting] = useState(false)
 
     const toggleShowProposalFundingModal = () =>
         setShowProposalFundingModal(!showProposalFundingModal)
+
+    const onExecuteProposal = async () => {
+        setIsExecuting(true)
+        try {
+            // Retrieving SolverConfigs from Solution
+            const solutionsHub = new IPFSSolutionsHub(
+                currentUser.signer,
+                currentUser.chainId
+            )
+            const solution = await solutionsHub.getSolution(
+                proposalContract.solutionId
+            )
+
+            if (!solution) throw GENERAL_ERROR['SOLUTION_FETCH_ERROR']
+
+            if (solution.solverConfigsURI) {
+                const solverConfigDoc = (await TileDocument.load(
+                    ceramicInstance(currentUser),
+                    solution.solverConfigsURI
+                )) as TileDocument<{ solverConfigs: SolverConfigModel[] }>
+
+                if (
+                    solverConfigDoc.content !== null &&
+                    typeof solverConfigDoc.content === 'object'
+                ) {
+                    const proposalsHub = new ProposalsHub(
+                        currentUser.signer,
+                        currentUser.chainId
+                    )
+                    await proposalsHub.executeProposal(
+                        proposalContract.id,
+                        solverConfigDoc.content.solverConfigs
+                    )
+                }
+            }
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
+            setIsExecuting(false)
+        }
+    }
 
     return (
         <>
@@ -36,12 +90,32 @@ const ProposalFundingActionbar = ({
                 <BaseActionbar
                     messenger={messenger}
                     primaryAction={
-                        <Button
-                            onClick={toggleShowProposalFundingModal}
-                            label="Fund Proposal"
-                            size="small"
-                            primary
-                        />
+                        fundingPercentage === 100 ? (
+                            <LoaderButton
+                                isLoading={isExecuting}
+                                onClick={onExecuteProposal}
+                                label="Execute"
+                                size="small"
+                                primary
+                            />
+                        ) : (
+                            <Button
+                                onClick={toggleShowProposalFundingModal}
+                                label="Fund Proposal"
+                                size="small"
+                                primary
+                            />
+                        )
+                    }
+                    secondaryAction={
+                        fundingPercentage === 100 ? (
+                            <Button
+                                onClick={toggleShowProposalFundingModal}
+                                label="Defund"
+                                size="small"
+                                secondary
+                            />
+                        ) : undefined
                     }
                     info={{
                         title: `${fundingPercentage}% funded`,
@@ -88,7 +162,7 @@ const ProposalFundingActionbar = ({
             {showProposalFundingModal && (
                 <BaseLayerModal onBack={toggleShowProposalFundingModal}>
                     <ModalHeader
-                        title="Fund this Proposal"
+                        title="Proposal funding"
                         icon={<Coins />}
                         description={
                             'Invested funds can be withdrawn until the Proposal has been executed'
@@ -101,6 +175,12 @@ const ProposalFundingActionbar = ({
                         />
                     </Box>
                 </BaseLayerModal>
+            )}
+            {errorMessage && (
+                <ErrorPopupModal
+                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={errorMessage}
+                />
             )}
         </>
     )
