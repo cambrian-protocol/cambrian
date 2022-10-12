@@ -45,6 +45,7 @@ export type ProposalInfoType = {
     title: string
     status: ProposalStatus
     template: TemplateModel
+    onChainProposalId?: string
 }
 
 const ProposalListItem = ({
@@ -140,6 +141,9 @@ const ProposalListItem = ({
                                 <Box pad="xsmall">
                                     <ProposalStatusBadge
                                         status={proposalInfo?.status}
+                                        onChainProposalId={
+                                            proposalInfo?.onChainProposalId
+                                        }
                                     />
                                 </Box>
                             </Box>

@@ -135,6 +135,9 @@ const ReceivedProposalListItem = ({
                                     <Box pad="xsmall">
                                         <ProposalStatusBadge
                                             status={proposalInfo?.status}
+                                            onChainProposalId={
+                                                proposalInfo?.onChainProposalId
+                                            }
                                         />
                                     </Box>
                                 </Box>

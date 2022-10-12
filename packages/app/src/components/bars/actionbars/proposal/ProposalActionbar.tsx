@@ -2,6 +2,7 @@ import ProposalReviewActionbar, { PriceModel } from './ProposalReviewActionbar'
 
 import ProposalApprovedActionbar from './ProposalApprovedActionbar'
 import ProposalEditActionbar from './ProposalEditActionbar'
+import ProposalFundingActionbar from './ProposalFundingActionbar'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
@@ -63,7 +64,6 @@ const ProposalActionbar = ({
                         )}
                     </>
                 )
-            /*TODO Integrate Funding
             case ProposalStatus.Funding:
                 return (
                     <>
@@ -76,6 +76,7 @@ const ProposalActionbar = ({
                         )}
                     </>
                 )
+            /*TODO Integrate Execution
             case ProposalStatus.Executed:
                 return <ProposalExecutedControl /> */
             default:

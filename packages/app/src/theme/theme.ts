@@ -156,7 +156,7 @@ export const cpTheme = deepMerge(grommet, {
         round: 'xsmall',
     },
     meter: {
-        color: 'brand',
+        color: 'status-arbitration',
     },
     layer: {
         border: { radius: 'small' },

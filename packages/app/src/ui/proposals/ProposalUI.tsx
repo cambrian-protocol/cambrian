@@ -90,7 +90,14 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                             </Box>
                             <PlainSectionDivider />
                             <PriceInfo
-                                label="Proposed Price"
+                                label={
+                                    proposalStatus === ProposalStatus.Funding
+                                        ? 'Goal'
+                                        : proposalStatus ===
+                                          ProposalStatus.Executed
+                                        ? 'Price'
+                                        : 'Proposed Price'
+                                }
                                 amount={stageStack.proposal.price.amount}
                                 token={collateralToken}
                             />

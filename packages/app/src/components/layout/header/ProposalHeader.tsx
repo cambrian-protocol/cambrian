@@ -9,6 +9,7 @@ import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { getOnChainProposalId } from '@cambrian/app/utils/helpers/proposalHelper'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {
@@ -63,7 +64,15 @@ const ProposalHeader = ({
                 metaTitle="Proposal"
                 items={headerItems}
                 authorProfileDoc={proposalAuthor}
-                statusBadge={<ProposalStatusBadge status={proposalStatus} />}
+                statusBadge={
+                    <ProposalStatusBadge
+                        status={proposalStatus}
+                        onChainProposalId={getOnChainProposalId(
+                            stageStack?.proposalCommitID || '',
+                            stageStack?.proposal.template.commitID || ''
+                        )}
+                    />
+                }
             />
             {showTemplateInfoModal && stageStack && (
                 <TemplateInfoModal
