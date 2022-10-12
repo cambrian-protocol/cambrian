@@ -1,5 +1,6 @@
 import BaseActionbar, { ActionbarInfoType } from '../BaseActionbar'
 import { Box, Text } from 'grommet'
+import { Chats, PencilLine, User } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -17,7 +18,6 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { StageStackType } from '../../../../ui/dashboard/ProposalsDashboardUI'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { User } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
@@ -49,6 +49,9 @@ const ProposalReviewActionbar = ({
         useState<SolverSafetyCheckResponseType>()
     const [passedSafetyChecks, setPassedSafetyChecks] = useState(false)
     const [isCheckingSolvers, setIsCheckingSolvers] = useState(true)
+
+    const isTemplateAuthor = currentUser?.did === stageStack?.template.author
+    const isProposalAuthor = currentUser?.did === stageStack?.proposal.author
 
     useEffect(() => {
         safetyCheckSolver()
@@ -135,47 +138,86 @@ const ProposalReviewActionbar = ({
 
     return (
         <>
-            <BaseActionbar
-                messenger={messenger}
-                primaryAction={
-                    <LoaderButton
-                        isLoading={isApproving}
-                        disabled={isRequestingChange || !passedSafetyChecks}
-                        primary
-                        size="small"
-                        onClick={onApproveProposal}
-                        label={'Approve Proposal'}
-                    />
-                }
-                secondaryAction={
-                    <LoaderButton
-                        secondary
-                        disabled={isApproving}
-                        isLoading={isRequestingChange}
-                        size="small"
-                        onClick={onRequestChange}
-                        label={'Request Change'}
-                    />
-                }
-                info={
-                    !isCheckingSolvers && !passedSafetyChecks
-                        ? invalidSolverConfigInfo
-                        : {
-                              title: `${
-                                  proposedPrice.amount === undefined
-                                      ? ''
-                                      : proposedPrice.amount
-                              } ${proposedPrice.token?.symbol || ''}`,
-                              subTitle: 'Proposed price',
-                              dropContent: (
-                                  <ActionbarItemDropContainer
-                                      title="Proposal review"
-                                      description="Approve this proposal by hitting the 'Approve Proposal'-Button at your right or request a change from the proposer at the 'Request Change'-Button. You can directly chat with the author of the Proposal and discuss any adjustments to the Proposal."
-                                  />
-                              ),
-                          }
-                }
-            />
+            {isTemplateAuthor ? (
+                <BaseActionbar
+                    messenger={messenger}
+                    primaryAction={
+                        <LoaderButton
+                            isLoading={isApproving}
+                            disabled={isRequestingChange || !passedSafetyChecks}
+                            primary
+                            size="small"
+                            onClick={onApproveProposal}
+                            label={'Approve Proposal'}
+                        />
+                    }
+                    secondaryAction={
+                        <LoaderButton
+                            secondary
+                            disabled={isApproving}
+                            isLoading={isRequestingChange}
+                            size="small"
+                            onClick={onRequestChange}
+                            label={'Request Change'}
+                        />
+                    }
+                    info={
+                        !isCheckingSolvers && !passedSafetyChecks
+                            ? invalidSolverConfigInfo
+                            : {
+                                  title: `${
+                                      proposedPrice.amount === undefined
+                                          ? ''
+                                          : proposedPrice.amount
+                                  } ${proposedPrice.token?.symbol || ''}`,
+                                  subTitle: 'Proposed price',
+                                  dropContent: (
+                                      <ActionbarItemDropContainer
+                                          title="Proposal review"
+                                          description="Approve this proposal by hitting the 'Approve Proposal'-Button at your right or request a change from the proposer at the 'Request Change'-Button."
+                                          list={[
+                                              {
+                                                  icon: <Chats />,
+                                                  label: 'Directly chat with the Proposal author',
+                                              },
+                                              {
+                                                  icon: <PencilLine />,
+                                                  label: 'Provide any desired changes via chat',
+                                              },
+                                          ]}
+                                      />
+                                  ),
+                              }
+                    }
+                />
+            ) : isProposalAuthor ? (
+                <BaseActionbar
+                    messenger={messenger}
+                    info={{
+                        title: `Proposal on review`,
+                        subTitle:
+                            'Please wait until the Proposal has been reviewed',
+                        dropContent: (
+                            <ActionbarItemDropContainer
+                                title="Proposal review"
+                                description="Please wait until the Proposal has been approved or a change is requested."
+                                list={[
+                                    {
+                                        icon: <Chats />,
+                                        label: 'Directly chat with the Template author',
+                                    },
+                                    {
+                                        icon: <PencilLine />,
+                                        label: 'Discuss adjustments to the Proposal via chat',
+                                    },
+                                ]}
+                            />
+                        ),
+                    }}
+                />
+            ) : (
+                <></>
+            )}
             {errorMessage && (
                 <ErrorPopupModal
                     errorMessage={errorMessage}

@@ -21,15 +21,12 @@ const ProposalActionbar = ({
         useProposalContext()
     const [isApproving, setIsApproving] = useState(false) // state lift to pass into approveActionbar
 
-    const isProposalAuthor = currentUser?.did === stageStack?.proposal.author
-    const isTemplateAuthor = currentUser?.did === stageStack?.template.author
-
     const renderControls = () => {
         switch (proposalStatus) {
             case ProposalStatus.OnReview:
                 return (
                     <>
-                        {isTemplateAuthor && currentUser && stageStack && (
+                        {currentUser && stageStack && (
                             <ProposalReviewActionbar
                                 proposedPrice={proposedPrice}
                                 messenger={messenger}
@@ -44,10 +41,11 @@ const ProposalActionbar = ({
             case ProposalStatus.ChangeRequested:
                 return (
                     <>
-                        {isProposalAuthor && stageStack && (
+                        {currentUser && stageStack && (
                             <ProposalEditActionbar
+                                stageStack={stageStack}
+                                currentUser={currentUser}
                                 messenger={messenger}
-                                proposalStreamID={stageStack.proposalStreamID}
                             />
                         )}
                     </>
@@ -65,14 +63,15 @@ const ProposalActionbar = ({
                         )}
                     </>
                 )
-            /*TODO Integrate Funding 
+            /*TODO Integrate Funding
             case ProposalStatus.Funding:
                 return (
                     <>
                         {currentUser && proposalContract && (
-                            <FundProposalForm
+                            <ProposalFundingActionbar
+                                messenger={messenger}
                                 currentUser={currentUser}
-                                proposal={proposalContract}
+                                proposalContract={proposalContract}
                             />
                         )}
                     </>

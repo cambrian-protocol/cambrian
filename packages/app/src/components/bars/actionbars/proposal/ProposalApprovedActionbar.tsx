@@ -13,6 +13,7 @@ import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { Users } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
@@ -42,7 +43,7 @@ const ProposalApprovedActionbar = ({
 
     useEffect(() => {
         fetchSolution()
-    }, [isApproving])
+    }, [isApproving, stageStack])
 
     const onDeployProposal = async () => {
         setIsInTransaction(true)
@@ -105,6 +106,12 @@ const ProposalApprovedActionbar = ({
                                 <ActionbarItemDropContainer
                                     title="Proposal has been approved"
                                     description="Please hit the 'Start Funding'-Button in order to initiate the Solver and get it ready for funding."
+                                    list={[
+                                        {
+                                            icon: <Users />,
+                                            label: 'This can be done by anyone',
+                                        },
+                                    ]}
                                 />
                             ),
                         }}
@@ -128,6 +135,12 @@ const ProposalApprovedActionbar = ({
                                 <ActionbarItemDropContainer
                                     title="Proposal has been approved"
                                     description="To set up the Solver correctly please hit the 'Continue'-Button."
+                                    list={[
+                                        {
+                                            icon: <Users />,
+                                            label: 'This can be done by anyone',
+                                        },
+                                    ]}
                                 />
                             ),
                         }}
