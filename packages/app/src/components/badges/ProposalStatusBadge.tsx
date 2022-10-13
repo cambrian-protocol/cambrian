@@ -56,7 +56,7 @@ const ProposalStatusBadge = ({
                             {PROPOSAL_STATUS_INFO[status].icon}
                             <Text size="small">
                                 {PROPOSAL_STATUS_INFO[status].name}
-                                {` ${fundingPercentage?.toFixed() || ''}%`}
+                                {` ${fundingPercentage?.toFixed() || '0'}%`}
                             </Text>
                         </Box>
                     </Box>
