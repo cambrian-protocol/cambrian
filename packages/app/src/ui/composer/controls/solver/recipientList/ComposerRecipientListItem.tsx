@@ -41,11 +41,7 @@ const ComposerRecipientListItem = ({
             <User size="24" />
         )
 
-    const currentTitle = getSlotTitle(
-        recipientSlot,
-        currentSolver.slotTags,
-        composer.solvers
-    )
+    const currentTitle = getSlotTitle(recipientSlot, currentSolver.slotTags)
     // TODO custom confirmation modal
     const handleDeleteRecipient = () => {
         if (window.confirm('Are you sure?')) {

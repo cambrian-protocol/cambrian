@@ -1,10 +1,7 @@
 import { ethers } from 'ethers'
 import _ from 'lodash'
 
-import {
-    ComposerSolverModel,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import {
     ComposerSolverConfigModel,
     SolverConfigModel,
@@ -23,9 +20,10 @@ import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 
 export async function parseComposerSolvers(
-    composerSolvers: ComposerSolverModel[],
+    composerSolvers: ComposerSolver[],
     provider: ethers.providers.Provider
 ): Promise<SolverModel[] | undefined> {
     if (composerSolvers.length === 0) {
@@ -80,7 +78,7 @@ export async function parseComposerSolvers(
 export function parseComposerSolverConfig(
     composerSolverConfig: ComposerSolverConfigModel,
     currentSolverIndex: number,
-    sortedSolvers: ComposerSolverModel[],
+    sortedSolvers: ComposerSolver[],
     chainId: number
 ): SolverConfigModel {
     const chainData = SUPPORTED_CHAINS[chainId]
@@ -156,7 +154,7 @@ export function parseModuleLoaders(
 
 export function parseComposerSlot(
     inSlot: ComposerSlotModel,
-    sortedSolvers: ComposerSolverModel[]
+    sortedSolvers: ComposerSolver[]
 ): SlotModel {
     const outSlot = <SlotModel>{
         executions: 0,
@@ -255,7 +253,7 @@ export function parseComposerSlot(
 export function parseComposerCondition(
     config: ComposerSolverConfigModel,
     currentSolverIndex: number,
-    sortedSolvers: ComposerSolverModel[]
+    sortedSolvers: ComposerSolver[]
 ): ConditionModel {
     const outCondition = <ConditionModel>{}
 

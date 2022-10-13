@@ -1,10 +1,10 @@
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 
 // Returns a sorted hierarchy containing the selected solver
 export function getSolverHierarchy(
-    currentSolver: ComposerSolverModel,
-    solvers: ComposerSolverModel[]
-): ComposerSolverModel[] {
+    currentSolver: ComposerSolver,
+    solvers: ComposerSolver[]
+): ComposerSolver[] {
     const parents = addParentsRecursive(currentSolver, solvers, [])
     const children = addChildrenRecursive(currentSolver, solvers, [])
     const hierarchy = parents.concat([currentSolver]).concat(children)
@@ -12,10 +12,10 @@ export function getSolverHierarchy(
 }
 
 function addParentsRecursive(
-    currentSolver: ComposerSolverModel,
-    solvers: ComposerSolverModel[],
-    parents: ComposerSolverModel[]
-): ComposerSolverModel[] {
+    currentSolver: ComposerSolver,
+    solvers: ComposerSolver[],
+    parents: ComposerSolver[]
+): ComposerSolver[] {
     const parent = solvers.find(
         (x) =>
             x.id === currentSolver.config.condition.parentCollection?.solverId
@@ -33,10 +33,10 @@ function addParentsRecursive(
 }
 
 function addChildrenRecursive(
-    currentSolver: ComposerSolverModel,
-    solvers: ComposerSolverModel[],
-    children: ComposerSolverModel[]
-): ComposerSolverModel[] {
+    currentSolver: ComposerSolver,
+    solvers: ComposerSolver[],
+    children: ComposerSolver[]
+): ComposerSolver[] {
     const child = solvers.find(
         (x) =>
             x.config.condition.parentCollection?.solverId === currentSolver.id

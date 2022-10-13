@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { Select } from 'grommet'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -90,9 +90,9 @@ export default SelectRecipient
  * Recursive function to retrieve all available addresses up the chain
  *  */
 const getAvailableAddresses = (
-    rootSolver: ComposerSolverModel,
-    currentSolver: ComposerSolverModel,
-    solvers: ComposerSolverModel[]
+    rootSolver: ComposerSolver,
+    currentSolver: ComposerSolver,
+    solvers: ComposerSolver[]
 ): SelectRecipientType[] => {
     let currentAvailableAddresses: SelectRecipientType[] = []
 
@@ -116,8 +116,7 @@ const getAvailableAddresses = (
             ) {
                 const currentTitle = getSlotTitle(
                     currentSolver.config.slots[slotId],
-                    currentSolver.slotTags,
-                    solvers
+                    currentSolver.slotTags
                 )
 
                 currentAvailableAddresses.push({

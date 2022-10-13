@@ -1,9 +1,9 @@
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 
 export const getFlexInputType = (
-    solvers: ComposerSolverModel[],
+    solvers: ComposerSolver[],
     tag: TaggedInput
 ) => {
     if (tag.id === 'data') {
