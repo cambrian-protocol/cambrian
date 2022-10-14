@@ -12,14 +12,11 @@ import {
     calculateCollectionId,
     calculatePositionId,
     getSolverIngestWithMetaData,
-} from './SolverHelpers'
+} from '@cambrian/app/utils/helpers/solverHelpers'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { CeramicClient } from '@ceramicnetwork/http-client'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'

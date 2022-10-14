@@ -11,7 +11,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { ethers } from 'ethers'
-import { getManualInputs } from '@cambrian/app/components/solver/SolverHelpers'
+import { getManualInputs } from '@cambrian/app/utils/helpers/solverHelpers'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
     solverData: SolverModel

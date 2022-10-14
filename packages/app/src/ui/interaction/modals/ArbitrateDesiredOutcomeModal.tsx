@@ -16,7 +16,7 @@ import { Text } from 'grommet'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getSolverRecipientAddressHashmap } from '../../../components/solver/SolverHelpers'
+import { getSolverRecipientAddressHashmap } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void

@@ -6,7 +6,10 @@ import {
     getSolverMetadata,
     getSolverOutcomes,
 } from './SolverGetters'
-import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
+import {
+    getSolverMethods,
+    getSolverRecipientSlots,
+} from '@cambrian/app/utils/helpers/solverHelpers'
 
 import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
