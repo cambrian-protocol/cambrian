@@ -7,6 +7,7 @@ import {
     FileX,
     PencilSimpleLine,
     Question,
+    RocketLaunch,
 } from 'phosphor-react'
 
 export enum ProposalStatus {
@@ -84,8 +85,8 @@ PROPOSAL_STATUS_INFO[ProposalStatus.Funding] = {
     color: 'status-arbitration',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Executed] = {
-    name: 'ACTIVE',
-    icon: <Activity />,
+    name: 'EXECUTED',
+    icon: <RocketLaunch />,
     description: 'Proposal is fully funded and currently ongoing.',
     color: 'status-reported',
 }

@@ -1,35 +1,53 @@
 import BaseSlotInputItem, { BaseSlotInputItemProps } from './BaseSlotInputItem'
-import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
 
+import { RecipientAllocationInfoType } from '../info/solver/BaseSolverInfo'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type RecipientAllocationItemProps = BaseSlotInputItemProps & {
-    amountPercentage: string
-    amount?: BigNumber
-    token: TokenModel
+    recipientAllocationInfo: RecipientAllocationInfoType
+    token?: TokenModel
 }
 
 const RecipientAllocationItem = ({
-    amountPercentage,
-    title,
-    address,
-    amount,
+    recipientAllocationInfo,
     token,
-}: RecipientAllocationItemProps) => (
-    <BaseSlotInputItem title={title} address={address}>
+}: RecipientAllocationItemProps) => {
+    const amountInfoContent = (
         <Box align="end">
-            <Text>{amountPercentage}%</Text>
+            <Text>{recipientAllocationInfo.allocation.percentage}%</Text>
             <Text size="small" color="dark-4" textAlign="end">
-                {amount &&
-                    `Minted: ${
-                        Number(
-                            ethers.utils.formatUnits(amount, token.decimals)
-                        ) / 10000
+                {recipientAllocationInfo.allocation.amount &&
+                    `${recipientAllocationInfo.allocation.amount} ${
+                        token?.symbol || '??'
                     }`}
             </Text>
         </Box>
-    </BaseSlotInputItem>
-)
+    )
+
+    return (
+        <>
+            {recipientAllocationInfo.recipient.address !== '' ? (
+                <BaseSlotInputItem
+                    title={recipientAllocationInfo.recipient.slotTag.label}
+                    address={
+                        recipientAllocationInfo.recipient.address !== ''
+                            ? recipientAllocationInfo.recipient.address
+                            : undefined
+                    }
+                >
+                    {amountInfoContent}
+                </BaseSlotInputItem>
+            ) : (
+                <BaseSlotInputItem
+                    title={recipientAllocationInfo.recipient.slotTag.label}
+                    subTitle={'To be defined'}
+                >
+                    {amountInfoContent}
+                </BaseSlotInputItem>
+            )}
+        </>
+    )
+}
 
 export default RecipientAllocationItem

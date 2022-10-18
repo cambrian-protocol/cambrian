@@ -34,7 +34,7 @@ const BaseHeader = ({
             gap="medium"
         >
             <Box gap="small">
-                <Box direction="row" gap="medium">
+                <Box direction="row" gap="medium" height={'2em'} align="center">
                     <Text color={'brand'}>{metaTitle}</Text>
                     {statusBadge}
                 </Box>
@@ -46,12 +46,18 @@ const BaseHeader = ({
                 gap="small"
                 border={{ side: 'bottom' }}
                 pad={{ bottom: 'xsmall' }}
+                align="end"
+                height={'5em'}
             >
-                <CambrianProfileInfo
-                    cambrianProfileDoc={authorProfileDoc}
-                    size="small"
-                    role="Author"
-                />
+                {authorProfileDoc ? (
+                    <CambrianProfileInfo
+                        cambrianProfileDoc={authorProfileDoc}
+                        size="small"
+                        role="Author"
+                    />
+                ) : (
+                    <Box />
+                )}
                 <Box direction="row" gap="small" align="center">
                     <IconContext.Provider value={{ size: '18' }}>
                         {items?.map((item, idx) => (

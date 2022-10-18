@@ -1,13 +1,11 @@
-import { Card, CardBody } from 'grommet'
 import React, { useState } from 'react'
 
-import BaseListItemButton from '../buttons/BaseListItemButton'
-import { Coins } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
+import OutcomeCollectionInfoCard from './OutcomeCollectionInfoCard'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import OutcomeListItem from '../list/OutcomeListItem'
 import RecipientAllocationModal from '@cambrian/app/ui/common/modals/RecipientAllocationModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 type OutcomeCollectionCardProps = {
     border?: boolean // To higlight report
@@ -31,6 +29,10 @@ const OutcomeCollectionCard = ({
     cardHeader,
     itemKey,
 }: OutcomeCollectionCardProps) => {
+    const outcomeCollectionInfo = getOutcomeCollectionInfoFromContractData(
+        outcomeCollection,
+        token
+    )
     const [showAllocationModal, setShowAllocationModal] = useState(false)
 
     const toggleShowAllocationModal = () =>
@@ -38,60 +40,48 @@ const OutcomeCollectionCard = ({
 
     return (
         <>
-            <Card background="background-contrast-hover" border={border}>
-                {cardHeader && cardHeader}
-                <CardBody
-                    pad={{ vertical: 'small', horizontal: 'medium' }}
-                    gap="small"
-                >
-                    {outcomeCollection.outcomes.map((outcome, idx) => (
-                        <OutcomeListItem key={idx} outcome={outcome} />
-                    ))}
-                    <BaseListItemButton
-                        hideDivider
-                        title="Allocation"
-                        icon={<Coins />}
-                        onClick={toggleShowAllocationModal}
+            <OutcomeCollectionInfoCard
+                border={border}
+                cardHeader={cardHeader}
+                outcomeCollection={outcomeCollectionInfo}
+                token={token}
+            >
+                {onPropose && (
+                    <LoaderButton
+                        primary
+                        disabled={proposedIndexSet !== undefined}
+                        isLoading={
+                            itemKey !== undefined
+                                ? itemKey === proposedIndexSet
+                                : proposedIndexSet ===
+                                  outcomeCollection.indexSet
+                        }
+                        onClick={() => onPropose(outcomeCollection.indexSet)}
+                        label="Propose Outcome"
                     />
-                    {onPropose && (
-                        <LoaderButton
-                            primary
-                            disabled={proposedIndexSet !== undefined}
-                            isLoading={
-                                itemKey !== undefined
-                                    ? itemKey === proposedIndexSet
-                                    : proposedIndexSet ===
-                                      outcomeCollection.indexSet
-                            }
-                            onClick={() =>
-                                onPropose(outcomeCollection.indexSet)
-                            }
-                            label="Propose Outcome"
-                        />
-                    )}
-                    {onArbitrate && (
-                        <LoaderButton
-                            primary
-                            disabled={proposedIndexSet !== undefined}
-                            isLoading={
-                                itemKey !== undefined
-                                    ? itemKey === proposedIndexSet
-                                    : proposedIndexSet ===
-                                      outcomeCollection.indexSet
-                            }
-                            onClick={() =>
-                                onArbitrate(outcomeCollection.indexSet)
-                            }
-                            label="Report Outcome"
-                        />
-                    )}
-                </CardBody>
-            </Card>
+                )}
+                {onArbitrate && (
+                    <LoaderButton
+                        primary
+                        disabled={proposedIndexSet !== undefined}
+                        isLoading={
+                            itemKey !== undefined
+                                ? itemKey === proposedIndexSet
+                                : proposedIndexSet ===
+                                  outcomeCollection.indexSet
+                        }
+                        onClick={() => onArbitrate(outcomeCollection.indexSet)}
+                        label="Arbitrate Outcome"
+                    />
+                )}
+            </OutcomeCollectionInfoCard>
             {showAllocationModal && (
                 <RecipientAllocationModal
                     token={token}
                     onClose={toggleShowAllocationModal}
-                    allocations={outcomeCollection.allocations}
+                    recipientAllocations={
+                        outcomeCollectionInfo.recipientAllocations
+                    }
                 />
             )}
         </>

@@ -12,8 +12,7 @@ import WarningBanner from '../containers/WarningBanner'
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar?: JSX.Element
     sidebar?: JSX.Element
-    proposalHeader?: JSX.Element
-    solverHeader?: JSX.Element
+    header?: JSX.Element
 }
 
 const InteractionLayout = ({
@@ -21,8 +20,7 @@ const InteractionLayout = ({
     children,
     actionBar,
     sidebar,
-    proposalHeader,
-    solverHeader,
+    header,
 }: InteractionLayoutProps) => {
     return (
         <>
@@ -73,17 +71,15 @@ const InteractionLayout = ({
                                     <>
                                         {screenSize === 'small' ? (
                                             <Box gap="medium" fill>
-                                                {proposalHeader}
-                                                {solverHeader}
+                                                {header}
                                                 {sidebar}
                                                 <Box height={{ min: '70vh' }}>
                                                     {children}
                                                 </Box>
                                             </Box>
                                         ) : (
-                                            <Box width={'xlarge'}>
-                                                {proposalHeader}
-                                                {solverHeader}
+                                            <Box width={'xlarge'} gap="medium">
+                                                {header}
                                                 <Box
                                                     direction="row"
                                                     fill

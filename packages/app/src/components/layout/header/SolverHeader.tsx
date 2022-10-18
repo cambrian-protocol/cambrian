@@ -1,10 +1,9 @@
-import { ArrowsClockwise, Faders, IconContext } from 'phosphor-react'
-import { Box, Button, Heading, ResponsiveContext, Stack, Text } from 'grommet'
+import { ClipboardText, Gear } from 'phosphor-react'
 
-import BaseLayerModal from '../../modals/BaseLayerModal'
-import { CONDITION_STATUS_INFO } from '@cambrian/app/models/ConditionStatus'
-import SolverConfigInfo from '../../info/SolverConfigInfo'
+import BaseHeader from './BaseHeader'
+import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import SolverStatusBadge from '../../badges/SolverStatusBadge'
@@ -22,123 +21,54 @@ const SolverHeader = ({
     solverData,
     currentCondition,
 }: SolverHeaderProps) => {
-    const [showSolverConfigModal, setShowSolverConfigModal] = useState(false)
+    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const [showSolverConfigInfoModal, setShowSolverConfigInfoModal] =
+        useState(false)
 
-    const toggleShowSolverConfigModal = () =>
-        setShowSolverConfigModal(!showSolverConfigModal)
+    const toggleShowSolverConfigInfoModal = () =>
+        setShowSolverConfigInfoModal(!showSolverConfigInfoModal)
+
+    const toggleShowProposalInfoModal = () =>
+        setShowProposalInfoModal(!showProposalInfoModal)
 
     return (
         <>
-            <IconContext.Provider value={{ size: '24' }}>
-                <ResponsiveContext.Consumer>
-                    {(screenSize) => {
-                        return (
-                            <Box height={{ min: 'auto' }}>
-                                <Stack anchor="top-right">
-                                    <Box pad={{ top: 'medium' }}>
-                                        <Box
-                                            direction="row"
-                                            justify="between"
-                                            align="center"
-                                            pad={{
-                                                vertical: 'small',
-                                                horizontal: 'medium',
-                                            }}
-                                            border
-                                            round="xsmall"
-                                        >
-                                            <Box>
-                                                <Text
-                                                    size="small"
-                                                    color="dark-4"
-                                                >
-                                                    Solver
-                                                </Text>
-                                                <Heading level="3">
-                                                    {metadata?.solverTag.title}
-                                                </Heading>
-                                            </Box>
-                                            <Box
-                                                direction="row"
-                                                gap="small"
-                                                alignSelf="end"
-                                                pad={{ top: 'large' }}
-                                            >
-                                                <Button
-                                                    color="dark-4"
-                                                    size="small"
-                                                    label={
-                                                        screenSize !== 'small'
-                                                            ? 'Configuration'
-                                                            : undefined
-                                                    }
-                                                    icon={
-                                                        <Faders
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                    onClick={
-                                                        toggleShowSolverConfigModal
-                                                    }
-                                                />
-                                                <Button
-                                                    disabled
-                                                    color="dark-4"
-                                                    size="small"
-                                                    label={
-                                                        screenSize !== 'small'
-                                                            ? ' Conditions'
-                                                            : undefined
-                                                    }
-                                                    icon={
-                                                        <ArrowsClockwise
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                            </Box>
-                                        </Box>
-                                    </Box>
-                                    <SolverStatusBadge
-                                        status={
-                                            CONDITION_STATUS_INFO[
-                                                currentCondition.status
-                                            ]?.name || 'Unknown Status'
-                                        }
-                                        background={
-                                            CONDITION_STATUS_INFO[
-                                                currentCondition.status
-                                            ]?.color || 'status-error'
-                                        }
-                                        tipContent={
-                                            CONDITION_STATUS_INFO[
-                                                currentCondition.status
-                                            ]?.description || undefined
-                                        }
-                                    />
-                                </Stack>
-                            </Box>
-                        )
-                    }}
-                </ResponsiveContext.Consumer>
-            </IconContext.Provider>
-            {showSolverConfigModal && (
-                <BaseLayerModal onClose={toggleShowSolverConfigModal}>
-                    <SolverConfigInfo
-                        solverData={solverData}
-                        currentCondition={currentCondition}
-                    />
-                </BaseLayerModal>
+            <BaseHeader
+                metaTitle="Work Solver"
+                title={metadata?.solverTag.title || 'Unnamed Solver'}
+                items={[
+                    {
+                        label: 'Proposal Details',
+                        icon: (
+                            <ClipboardText
+                                color={cpTheme.global.colors['dark-4']}
+                            />
+                        ),
+                        onClick: toggleShowProposalInfoModal,
+                    },
+                    {
+                        label: 'Configuration',
+                        icon: <Gear color={cpTheme.global.colors['dark-4']} />,
+                        onClick: toggleShowSolverConfigInfoModal,
+                    },
+                ]}
+                statusBadge={
+                    <SolverStatusBadge status={currentCondition.status} />
+                }
+            />
+            {showProposalInfoModal && metadata?.stageStack && (
+                <ProposalInfoModal
+                    collateralToken={solverData.collateralToken}
+                    stageStack={metadata?.stageStack}
+                    onClose={toggleShowProposalInfoModal}
+                />
+            )}
+            {showSolverConfigInfoModal && (
+                <SolverInfoModal
+                    contractCondition={currentCondition}
+                    contractSolverData={solverData}
+                    onClose={toggleShowSolverConfigInfoModal}
+                />
             )}
         </>
     )

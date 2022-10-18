@@ -1,37 +1,30 @@
-import { Box, Text, Tip } from 'grommet'
+import { Box, Text } from 'grommet'
+import {
+    CONDITION_STATUS_INFO,
+    ConditionStatus,
+} from '@cambrian/app/models/ConditionStatus'
 
 interface SolverStatusBadgeProps {
-    status: string
-    background: string
-    tipContent?: string
+    status: ConditionStatus
 }
 
-const SolverStatusBadge = ({
-    status,
-    background,
-    tipContent,
-}: SolverStatusBadgeProps) => {
+const SolverStatusBadge = ({ status }: SolverStatusBadgeProps) => {
     return (
-        <Box justify="center" pad="xsmall">
-            <Tip
-                content={
-                    <Box width={'medium'} pad="small">
-                        <Text size="small">{tipContent}</Text>
-                    </Box>
-                }
-                dropProps={{ align: { right: 'right', top: 'bottom' } }}
-            >
-                <Box
-                    direction="row"
-                    background={background}
-                    pad={{ vertical: 'xsmall', horizontal: 'medium' }}
-                    round="medium"
-                    align="center"
-                    gap="small"
-                >
-                    <Text weight={'bold'}>{status}</Text>
-                </Box>
-            </Tip>
+        <Box
+            direction="row"
+            pad={{ horizontal: 'small', vertical: 'xxsmall' }}
+            round="xsmall"
+            background={
+                status
+                    ? CONDITION_STATUS_INFO[status].color
+                    : 'background-skeleton'
+            }
+            align="center"
+            gap="xsmall"
+            height="2.5em"
+        >
+            {CONDITION_STATUS_INFO[status].icon}
+            <Text size="small">{CONDITION_STATUS_INFO[status].name}</Text>
         </Box>
     )
 }

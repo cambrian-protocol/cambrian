@@ -2,7 +2,7 @@ import {
     AsteriskSimple,
     EnvelopeSimple,
     Handshake,
-    RocketLaunch,
+    Play,
     Scales,
 } from 'phosphor-react'
 
@@ -27,16 +27,16 @@ type ConditionStatusDetailsType = {
 export const CONDITION_STATUS_INFO: ConditionStatusDetailsType = {}
 
 CONDITION_STATUS_INFO[ConditionStatus.Initiated] = {
-    name: 'Initiated',
+    name: 'INITIATED',
     description:
         'This Solver has just been initiated, if the Keeper has input all required data it can be progressed and the work can begin.',
     icon: <AsteriskSimple />,
     color: 'status-initiated',
 }
 CONDITION_STATUS_INFO[ConditionStatus.Executed] = {
-    name: 'Executed',
+    name: 'SOLVING',
     description: 'Work in progress',
-    icon: <RocketLaunch />,
+    icon: <Play />,
     color: 'status-executed',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeProposed] = {

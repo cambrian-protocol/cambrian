@@ -1,14 +1,25 @@
-import { RichSlotModel, SlotModel } from '@cambrian/app/models/SlotModel'
+import {
+    ComposerSlotPathType,
+    RichSlotModel,
+    SlotModel,
+} from '@cambrian/app/models/SlotModel'
+import {
+    OutcomeCollectionInfoType,
+    RecipientAllocationInfoType,
+} from '@cambrian/app/components/info/solver/BaseSolverInfo'
 
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
-import { RecipientInfoType } from '@cambrian/app/ui/common/modals/RecipientsModal'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import { PriceModel } from '@cambrian/app/components/bars/actionbars/proposal/ProposalReviewActionbar'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from './decodeData'
 import { ethers } from 'ethers'
 import { parseBytes32String } from 'ethers/lib/utils'
@@ -221,37 +232,156 @@ export const getSolverMethods = (
     return methods
 }
 
-export const getRecipientsFromComposerSolver = (
-    solver: ComposerSolver,
-    composition: CompositionModel
-): RecipientInfoType[] => {
-    return solver.config.condition.recipients.map((recipient) => {
-        const id = recipient.slotId
-        const tag = solver.slotTags[id]
-        const slot = solver.config.slots[id]
-        let data
-        if (slot.reference !== undefined) {
-            const referencedSolver = composition.solvers.find(
-                (solver) => solver.id === slot.reference?.solverId
-            )
-            if (referencedSolver) {
-                if (slot.reference.slotId === 'keeper') {
-                    data = referencedSolver.config.keeperAddress
-                } else if (slot.reference.slotId === 'arbitrator') {
-                    data = referencedSolver.config.arbitratorAddress
-                } else {
-                    data =
-                        referencedSolver.config.slots[slot.reference.slotId]
-                            .data[0]
+export const getOutcomeCollectionsInfoFromCeramicData = (
+    composerSolver: ComposerSolver,
+    composition: CompositionModel,
+    price: PriceModel
+): OutcomeCollectionInfoType[] => {
+    return composerSolver.config.condition.partition.map((p) => {
+        const recipientAmounts =
+            composerSolver.config.condition.recipientAmountSlots[p.id]
+
+        const _recipientAllocations: RecipientAllocationInfoType[] =
+            recipientAmounts.map((recipientAmount) => {
+                const recipientInfo = getRecipientInfoFromComposer(
+                    recipientAmount.recipient,
+                    composerSolver,
+                    composition
+                )
+
+                const allocation = getAmountInfoFromComposer(
+                    recipientAmount.amount,
+                    composerSolver,
+                    composition,
+                    price.amount
+                )
+
+                return {
+                    allocation: allocation,
+                    recipient: recipientInfo,
                 }
+            })
+
+        return {
+            outcomes: p.outcomes,
+            recipientAllocations: _recipientAllocations,
+        }
+    })
+}
+
+export const getRecipientInfoFromComposer = (
+    recipientSlotPath: ComposerSlotPathType,
+    currentComposerSolver: ComposerSolver,
+    composition: CompositionModel
+) => {
+    return {
+        slotTag: currentComposerSolver.slotTags[recipientSlotPath.slotId],
+        address: getComposerSlotData(
+            recipientSlotPath,
+            currentComposerSolver,
+            composition
+        ),
+    }
+}
+
+export const getAmountInfoFromComposer = (
+    amountSlotPath: ComposerSlotPathType,
+    currentComposerSolver: ComposerSolver,
+    composition: CompositionModel,
+    price?: number
+) => {
+    const percentage =
+        getComposerSlotData(
+            amountSlotPath,
+            currentComposerSolver,
+            composition
+        ) / 100
+    return {
+        percentage: percentage.toString(),
+        amount: price ? (price * percentage) / 100 : 0,
+    }
+}
+
+export const getComposerSlotData = (
+    slotPath: ComposerSlotPathType,
+    currentComposerSolver: ComposerSolver,
+    composition: CompositionModel
+) => {
+    try {
+        let currentSolver: ComposerSolver | undefined = currentComposerSolver
+        if (slotPath.solverId !== currentSolver.id) {
+            currentSolver = composition.solvers.find(
+                (solver) => solver.id === slotPath.solverId
+            )
+            if (!currentSolver) throw new Error('Solver ID not found!')
+        }
+        const slot = currentSolver.config.slots[slotPath.slotId]
+        let data
+        if (slot.reference) {
+            if (slot.reference.solverId !== currentSolver.id) {
+                currentSolver = composition.solvers.find(
+                    (solver) => solver.id === slot.reference?.solverId
+                )
+                if (!currentSolver) throw new Error('Solver ID not found!')
+            }
+            if (slot.reference.slotId === 'keeper') {
+                data = currentSolver.config.keeperAddress
+            } else if (slot.reference.slotId === 'arbitrator') {
+                data = currentSolver.config.arbitratorAddress
+            } else {
+                data = currentSolver.config.slots[slot.reference.slotId].data[0]
             }
         } else {
             data = slot.data[0]
         }
+        return data
+    } catch (e) {
+        cpLogger.push(e)
+    }
+}
 
-        return {
-            slotTag: tag,
-            address: data,
-        }
-    })
+export const getOutcomeCollectionsInfosFromContractData = (
+    conditionOutcomeCollections: OutcomeCollectionModel[],
+    collateralToken: TokenModel
+): OutcomeCollectionInfoType[] => {
+    return conditionOutcomeCollections.map((outcomeCollection) =>
+        getOutcomeCollectionInfoFromContractData(
+            outcomeCollection,
+            collateralToken
+        )
+    )
+}
+
+export const getOutcomeCollectionInfoFromContractData = (
+    contractOutcomeCollection: OutcomeCollectionModel,
+    collateralToken: TokenModel
+): OutcomeCollectionInfoType => {
+    const _recipientAllocations: RecipientAllocationInfoType[] =
+        contractOutcomeCollection.allocations.map((recipientAllocation) => {
+            return {
+                recipient: {
+                    address: decodeData(
+                        [SolidityDataTypes.Address],
+                        recipientAllocation.addressSlot.slot.data
+                    ),
+                    slotTag: recipientAllocation.addressSlot.tag,
+                },
+                allocation: {
+                    percentage: recipientAllocation.amountPercentage,
+                    amount: recipientAllocation.amount
+                        ? Number(
+                              ethers.utils.formatUnits(
+                                  recipientAllocation.amount,
+                                  collateralToken.decimals
+                              )
+                          ) / 10000
+                        : 0,
+                },
+            }
+        })
+
+    return {
+        outcomes: contractOutcomeCollection.outcomes,
+        recipientAllocations: _recipientAllocations,
+    }
 }
