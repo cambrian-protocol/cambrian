@@ -30,21 +30,17 @@ const TokenAvatar = ({ token }: TokenAvatar) => {
             }
             dropAlign={{ left: 'right' }}
         >
-            <Box
-                justify="center"
-                height={{ min: 'auto' }}
-                pad={{ right: 'xsmall' }}
-            >
+            <Box justify="center" height={{ min: 'auto' }}>
                 <Box
-                    width={{ min: 'xxsmall', max: 'xxsmall' }}
-                    height={{ min: 'xxsmall', max: 'xxsmall' }}
+                    width={{ min: '3em', max: '3em' }}
+                    height={{ min: '3em', max: '3em' }}
                     border={{ color: 'brand', size: 'small' }}
                     justify="center"
                     align="center"
                     round="full"
                     elevation="small"
                 >
-                    <Text size="small">{token?.symbol || '?'}</Text>
+                    <Text size="xsmall">{token?.symbol || '?'}</Text>
                 </Box>
             </Box>
         </DropButton>

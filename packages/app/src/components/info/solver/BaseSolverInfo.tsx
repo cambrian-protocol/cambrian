@@ -1,19 +1,35 @@
-import { Faders, TreeStructure, UsersThree } from 'phosphor-react'
+import { Box, Heading } from 'grommet'
+import {
+    Faders,
+    HourglassSimpleMedium,
+    TreeStructure,
+    UsersThree,
+} from 'phosphor-react'
 import { PropsWithChildren, useState } from 'react'
 import RecipientInfosModal, {
     RecipientInfoType,
 } from '@cambrian/app/ui/common/modals/RecipientInfosModal'
 
+import BaseAvatar from '../../avatars/BaseAvatar'
+import BaseInfoItem from '../BaseInfoItem'
 import BaseListItemButton from '../../buttons/BaseListItemButton'
 import ModalHeader from '../../layout/header/ModalHeader'
 import OutcomeCollectionInfosModal from '@cambrian/app/ui/common/modals/OutcomeCollectionInfosModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import RecipientInfoItem from '../RecipientInfo'
+import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
+import TokenAvatar from '../../avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
 type BaseSolverInfoProps = PropsWithChildren<{}> & {
     solverTag?: SolverTagModel
-    /*  keeper: RecipientInfoType */
+    slotTags?: SlotTagsHashMapType
+    keeper: string
+    timelockSeconds?: number
+    arbitrator?: string
     outcomeCollections?: OutcomeCollectionInfoType[]
     token?: TokenModel
 }
@@ -31,8 +47,11 @@ export type RecipientAllocationInfoType = {
 const BaseSolverInfo = ({
     solverTag,
     outcomeCollections,
-    children,
+    keeper,
+    arbitrator,
+    slotTags,
     token,
+    timelockSeconds,
 }: BaseSolverInfoProps) => {
     const [showRecipientsModal, setShowRecipientsModal] = useState(false)
     const [showOutcomeCollectionsModal, setShowOutcomeCollectionsModal] =
@@ -46,43 +65,85 @@ const BaseSolverInfo = ({
 
     return (
         <>
-            <ModalHeader
-                title={solverTag?.title || 'Untitled Solver'}
-                icon={<Faders />}
-                metaInfo={'Solver Configuration'}
-                description={solverTag?.description}
-            />
-            {outcomeCollections && (
-                <>
-                    <BaseListItemButton
-                        hideDivider
-                        icon={<UsersThree />}
-                        title="Recipients"
-                        onClick={toggleShowRecipientsModal}
+            <Box pad={{ horizontal: 'medium' }}>
+                <ModalHeader
+                    title={solverTag?.title || 'Untitled Solver'}
+                    icon={<Faders />}
+                    metaInfo={'Solver Configuration'}
+                    description={solverTag?.description}
+                />
+                <Box gap="medium" height={{ min: 'auto' }}>
+                    <SolverConfigItem
+                        id="keeper"
+                        slotTags={slotTags}
+                        value={<RecipientInfoItem address={keeper} />}
                     />
-                    <BaseListItemButton
-                        hideDivider
-                        icon={<TreeStructure />}
-                        title="Outcomes"
-                        onClick={toggleShowOutcomeCollectionsModal}
+                    {arbitrator && (
+                        <SolverConfigItem
+                            id="arbitrator"
+                            slotTags={slotTags}
+                            value={<RecipientInfoItem address={arbitrator} />}
+                        />
+                    )}
+                    <SolverConfigItem
+                        id="collateralToken"
+                        slotTags={slotTags}
+                        value={
+                            <BaseInfoItem
+                                icon={<TokenAvatar token={token} />}
+                                title={token?.name || 'Unknown'}
+                                subTitle={token?.symbol || 'Unknown'}
+                            />
+                        }
                     />
-                </>
-            )}
-            {/* <BaseListItemButton
-                info={
-                    composerSolver.slotTags
-                        ? composerSolver.slotTags['arbitrator']?.description
-                        : undefined
-                }
-                title="Arbitrator"
-                icon={
-                    <BaseAvatar
-                        address={composerSolver.config.arbitratorAddress}
+                    <SolverConfigItem
+                        id="timelockSeconds"
+                        slotTags={slotTags}
+                        value={
+                            <BaseInfoItem
+                                icon={
+                                    <BaseAvatar
+                                        icon={<HourglassSimpleMedium />}
+                                    />
+                                }
+                                title={
+                                    slotTags &&
+                                    slotTags['timelockSeconds'].isFlex
+                                        ? 'To be defined'
+                                        : parseSecondsToDisplay(
+                                              timelockSeconds || 0
+                                          )
+                                }
+                                subTitle={
+                                    slotTags &&
+                                    slotTags['timelockSeconds'].isFlex
+                                        ? undefined
+                                        : 'to raise a dispute'
+                                }
+                            />
+                        }
                     />
-                }
-                subTitle={composerSolver.config.arbitratorAddress}
-            /> */}
-            {children}
+                </Box>
+                <Box pad={{ top: 'medium' }}>
+                    <Heading level="4">Outcome Overview</Heading>
+                    {outcomeCollections && (
+                        <>
+                            <BaseListItemButton
+                                hideDivider
+                                icon={<UsersThree />}
+                                title="Recipients"
+                                onClick={toggleShowRecipientsModal}
+                            />
+                            <BaseListItemButton
+                                hideDivider
+                                icon={<TreeStructure />}
+                                title="Outcomes"
+                                onClick={toggleShowOutcomeCollectionsModal}
+                            />
+                        </>
+                    )}
+                </Box>
+            </Box>
             {showRecipientsModal && outcomeCollections && (
                 <RecipientInfosModal
                     onClose={toggleShowRecipientsModal}

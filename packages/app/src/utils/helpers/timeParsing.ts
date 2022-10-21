@@ -48,7 +48,7 @@ export const parseSecondsToDisplay = (seconds: number): string => {
         } `
 
     if (timelockDisplay === '') {
-        return 'No timelock set'
+        return 'No time set'
     } else {
         return timelockDisplay
     }

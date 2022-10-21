@@ -12,7 +12,7 @@ import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { getOnChainProposalId } from '@cambrian/app/utils/helpers/proposalHelper'
-import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
+import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {

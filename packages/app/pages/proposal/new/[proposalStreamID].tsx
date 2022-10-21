@@ -26,7 +26,7 @@ export default function NewProposalPage() {
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
             ) : proposalInput && stageStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
-                    <Box align="center" pad="large">
+                    <Box align="center">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
                                 proposalStreamID={proposalStreamID}

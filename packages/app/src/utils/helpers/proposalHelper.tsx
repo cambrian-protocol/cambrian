@@ -20,7 +20,7 @@ import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import { mergeFlexIntoComposition } from '../transformers/Composition'
+import { mergeFlexIntoComposition } from './flexInputHelpers'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
 
 export const getProposalStatus = (

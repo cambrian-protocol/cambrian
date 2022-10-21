@@ -14,7 +14,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { mergeFlexIntoComposition } from '@cambrian/app/utils/transformers/Composition'
+import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 

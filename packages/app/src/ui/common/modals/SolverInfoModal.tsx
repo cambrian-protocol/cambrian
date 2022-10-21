@@ -37,7 +37,7 @@ const SolverInfoModal = ({
     ...rest
 }: ContractOrCeramicSolverData) => {
     return (
-        <BaseLayerModal {...rest}>
+        <BaseLayerModal {...rest} width="xlarge">
             {contractSolverData && contractCondition ? (
                 <SolverContractInfo
                     contractSolverData={contractSolverData}
