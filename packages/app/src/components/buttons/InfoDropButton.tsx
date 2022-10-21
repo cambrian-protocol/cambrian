@@ -11,11 +11,7 @@ const InfoDropButton = ({ dropContent }: InfoDropButtonProps) => {
         <DropButton
             icon={<Info size={24} />}
             dropAlign={{ top: 'bottom', right: 'right' }}
-            dropContent={
-                <Box pad="medium" width={{ max: 'medium' }}>
-                    {dropContent}
-                </Box>
-            }
+            dropContent={<Box width={{ max: 'medium' }}>{dropContent}</Box>}
         />
     )
 }

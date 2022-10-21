@@ -56,7 +56,11 @@ const BaseListItemButton = ({
                 </Box>
                 {info && (
                     <InfoDropButton
-                        dropContent={<Text size="small">{info}</Text>}
+                        dropContent={
+                            <Box pad="medium">
+                                <Text size="small">{info}</Text>
+                            </Box>
+                        }
                     />
                 )}
                 {onClick && (

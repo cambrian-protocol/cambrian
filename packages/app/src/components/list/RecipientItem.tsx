@@ -54,7 +54,11 @@ const RecipientItem = ({
             {children}
             {info && (
                 <InfoDropButton
-                    dropContent={<Text size="small">{info}</Text>}
+                    dropContent={
+                        <Box pad="medium">
+                            <Text size="small">{info}</Text>
+                        </Box>
+                    }
                 />
             )}
         </Box>

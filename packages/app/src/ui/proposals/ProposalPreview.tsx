@@ -52,7 +52,10 @@ const ProposalPreview = ({
             />
             <PlainSectionDivider />
             {proposerProfile && (
-                <CambrianProfileAbout cambrianProfile={proposerProfile} />
+                <Box gap="small">
+                    <Heading level="4">About the author</Heading>
+                    <CambrianProfileAbout cambrianProfile={proposerProfile} />
+                </Box>
             )}
             <ProposalControlbar />
         </Box>

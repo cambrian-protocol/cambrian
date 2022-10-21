@@ -113,7 +113,12 @@ const TemplatePreview = ({
                 />
                 <PlainSectionDivider />
                 {templaterProfile && (
-                    <CambrianProfileAbout cambrianProfile={templaterProfile} />
+                    <Box gap="small">
+                        <Heading level="4">About the author</Heading>
+                        <CambrianProfileAbout
+                            cambrianProfile={templaterProfile}
+                        />
+                    </Box>
                 )}
             </Box>
             {showCompositionModal && composition && (
