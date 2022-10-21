@@ -20,7 +20,6 @@ const CambrianProfileAbout = ({
         style={{ position: 'relative' }}
         pad="medium"
         round="xsmall"
-        border
         background="background-popup"
     >
         <Box
