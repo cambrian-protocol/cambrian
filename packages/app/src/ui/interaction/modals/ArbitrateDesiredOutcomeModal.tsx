@@ -9,7 +9,6 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
-import { Scales } from 'phosphor-react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
@@ -63,7 +62,6 @@ const ArbitrateDesiredOutcomeModal = ({
         <>
             <BaseLayerModal onBack={onBack}>
                 <ModalHeader
-                    icon={<Scales />}
                     metaInfo="Arbitration"
                     title="Report an outcome"
                     description="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."

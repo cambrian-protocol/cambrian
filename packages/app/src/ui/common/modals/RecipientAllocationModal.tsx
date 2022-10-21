@@ -1,6 +1,5 @@
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { Coins } from 'phosphor-react'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { RecipientAllocationInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
 import RecipientAllocationItem from '../../../components/list/RecipientAllocationItem'
@@ -19,7 +18,6 @@ const RecipientAllocationModal = ({
 }: RecipientAllocationModalProps) => (
     <BaseLayerModal onClose={onClose}>
         <ModalHeader
-            icon={<Coins />}
             title="Recipients token allocation"
             description="Payouts when the selected outcome is confirmed."
         />

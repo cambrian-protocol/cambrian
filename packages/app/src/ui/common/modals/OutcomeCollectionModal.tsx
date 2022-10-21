@@ -3,11 +3,10 @@ import BaseLayerModal, {
 } from '../../../components/modals/BaseLayerModal'
 
 import { Box } from 'grommet'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { TreeStructure } from 'phosphor-react'
 
 type OutcomeCollectionModalProps = BaseLayerModalProps & {
     outcomeCollections: OutcomeCollectionModel[]
@@ -22,7 +21,6 @@ const OutcomeCollectionModal = ({
     return (
         <BaseLayerModal {...rest}>
             <ModalHeader
-                icon={<TreeStructure />}
                 title={'Outcomes'}
                 description="These outcomes are setup to occur at this Solver"
             />

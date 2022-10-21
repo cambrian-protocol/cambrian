@@ -9,7 +9,6 @@ import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import { FilePlus } from 'phosphor-react'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
@@ -82,7 +81,6 @@ const CreateTemplateModal = ({
         <>
             <BaseLayerModal onClose={onClose}>
                 <ModalHeader
-                    icon={<FilePlus />}
                     title="Create a Template"
                     description="Please select or import the Composition on which this template should be based on."
                 />

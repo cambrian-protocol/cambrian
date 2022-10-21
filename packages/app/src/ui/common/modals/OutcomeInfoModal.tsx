@@ -4,7 +4,6 @@ import { Box } from 'grommet'
 import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import { TreeStructure } from 'phosphor-react'
 
 interface OutcomeInfoModalProps {
     outcome: OutcomeModel
@@ -15,7 +14,6 @@ const OutcomeInfoModal = ({ onClose, outcome }: OutcomeInfoModalProps) => (
     <BaseLayerModal onClose={onClose}>
         <ModalHeader
             metaInfo="Outcome"
-            icon={<TreeStructure />}
             title={outcome.title}
             description={'Definition and context of this Outcome.'}
         />

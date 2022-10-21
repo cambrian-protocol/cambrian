@@ -8,14 +8,13 @@ import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { TreeStructure } from 'phosphor-react'
 
 interface ProposeOutcomeModalProps {
     proposedIndexSet?: number
@@ -61,7 +60,6 @@ const ProposeOutcomeModal = ({
         <>
             <BaseLayerModal onBack={onBack}>
                 <ModalHeader
-                    icon={<TreeStructure />}
                     title="Propose an outcome"
                     description="Select the outcome when solve conditions are met."
                 />

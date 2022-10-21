@@ -4,15 +4,8 @@ interface ModalHeaderProps {
     title: string
     metaInfo?: string
     description?: string
-    icon?: JSX.Element
 }
-
-const ModalHeader = ({
-    description,
-    title,
-    icon,
-    metaInfo,
-}: ModalHeaderProps) => {
+const ModalHeader = ({ description, title, metaInfo }: ModalHeaderProps) => {
     return (
         <Box pad={{ bottom: 'medium' }} height={{ min: 'auto' }}>
             <Box

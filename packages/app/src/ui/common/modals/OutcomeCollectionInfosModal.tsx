@@ -7,7 +7,6 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeCollectionInfoCard from '@cambrian/app/components/cards/OutcomeCollectionInfoCard'
 import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { TreeStructure } from 'phosphor-react'
 
 type OutcomeCollectionInfosModalProps = BaseLayerModalProps & {
     outcomeCollections: OutcomeCollectionInfoType[]
@@ -20,7 +19,6 @@ const OutcomeCollectionInfosModal = ({
 }: OutcomeCollectionInfosModalProps) => (
     <BaseLayerModal {...rest}>
         <ModalHeader
-            icon={<TreeStructure />}
             title={'Outcomes'}
             description="These outcomes are setup to occur at this Solver"
         />

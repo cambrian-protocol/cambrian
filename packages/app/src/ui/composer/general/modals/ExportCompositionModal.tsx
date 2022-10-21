@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
-import { FloppyDisk } from 'phosphor-react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -59,7 +58,6 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
             <ModalHeader
                 title={'Save Composition as...'}
                 description="Your composition will be saved to IPFS and is going to be accessible for anybody with the created link."
-                icon={<FloppyDisk />}
             />
             <Form onSubmit={onExport}>
                 <FormField

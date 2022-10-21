@@ -6,7 +6,6 @@ import { Box } from 'grommet'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import RecipientItem from '@cambrian/app/components/list/RecipientItem'
 import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
-import { UsersThree } from 'phosphor-react'
 
 export type RecipientInfoType = { address: string; slotTag: SlotTagModel }
 
@@ -20,7 +19,6 @@ const RecipientInfosModal = ({
 }: RecipientInfosModalProps) => (
     <BaseLayerModal {...rest}>
         <ModalHeader
-            icon={<UsersThree />}
             title="Recipients"
             description="The following addresses are eligible to collect tokens based on outcomes."
         />

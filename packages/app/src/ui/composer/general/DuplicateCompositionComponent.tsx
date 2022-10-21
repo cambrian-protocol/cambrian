@@ -3,7 +3,6 @@ import { SetStateAction, useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { Copy } from 'phosphor-react'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -62,7 +61,6 @@ const DuplicateCompositionComponent = ({
                     <ModalHeader
                         title="Duplicate Composition"
                         description="To use this Composition you must duplicate it"
-                        icon={<Copy />}
                     />
                     <Form onSubmit={onSubmit}>
                         <FormField

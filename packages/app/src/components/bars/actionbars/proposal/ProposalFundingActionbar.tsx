@@ -1,9 +1,9 @@
 import { Box, Button, Text } from 'grommet'
-import { Coins, Swap, UsersFour } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
+import { Swap, UsersFour } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import BaseActionbar from '../BaseActionbar'
@@ -163,7 +163,6 @@ const ProposalFundingActionbar = ({
                 <BaseLayerModal onBack={toggleShowProposalFundingModal}>
                     <ModalHeader
                         title="Proposal funding"
-                        icon={<Coins />}
                         description={
                             'Invested funds can be withdrawn until the Proposal has been executed'
                         }

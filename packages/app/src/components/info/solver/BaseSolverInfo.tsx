@@ -1,6 +1,5 @@
 import { Box, Heading } from 'grommet'
 import {
-    Faders,
     HourglassSimpleMedium,
     TreeStructure,
     UsersThree,
@@ -68,7 +67,6 @@ const BaseSolverInfo = ({
             <Box pad={{ horizontal: 'medium' }}>
                 <ModalHeader
                     title={solverTag?.title || 'Untitled Solver'}
-                    icon={<Faders />}
                     metaInfo={'Solver Configuration'}
                     description={solverTag?.description}
                 />

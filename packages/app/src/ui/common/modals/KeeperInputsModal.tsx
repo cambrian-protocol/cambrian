@@ -2,15 +2,13 @@ import BaseLayerModal, {
     BaseLayerModalProps,
 } from '../../../components/modals/BaseLayerModal'
 
-import BaseSlotInputItem from '../../../components/list/BaseSlotInputItem'
 import { Box } from 'grommet'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { ShieldCheck } from 'phosphor-react'
+import RecipientItem from '../../../components/list/RecipientItem'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { ethers } from 'ethers'
 import { getManualInputs } from '@cambrian/app/utils/helpers/solverHelpers'
 
 type KeeperInputsModalProps = BaseLayerModalProps & {
@@ -26,7 +24,6 @@ const KeeperInputsModal = ({
     return (
         <BaseLayerModal {...rest}>
             <ModalHeader
-                icon={<ShieldCheck />}
                 title="Keeper Inputs"
                 description="This Solver has received or needs to receive the following inputs before execution."
             />
@@ -38,25 +35,14 @@ const KeeperInputsModal = ({
                             [SolidityDataTypes.Address],
                             manualSlot.slot.data
                         )
-                        if (decodedAddress == ethers.constants.AddressZero) {
-                            return (
-                                <BaseSlotInputItem
-                                    key={manualSlot.slot.slot}
-                                    info={manualSlot.tag.description}
-                                    title={manualSlot.tag.label}
-                                    subTitle={'To be defined'}
-                                />
-                            )
-                        } else {
-                            return (
-                                <BaseSlotInputItem
-                                    key={manualSlot.slot.slot}
-                                    info={manualSlot.tag.description}
-                                    title={manualSlot.tag.label}
-                                    address={decodedAddress}
-                                />
-                            )
-                        }
+                        return (
+                            <RecipientItem
+                                key={manualSlot.slot.slot}
+                                info={manualSlot.tag.description}
+                                title={manualSlot.tag.label}
+                                address={decodedAddress}
+                            />
+                        )
                     }
                 )}
             </Box>

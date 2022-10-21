@@ -7,7 +7,6 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { TreeStructure } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
 import router from 'next/router'
@@ -48,7 +47,6 @@ const CreateCompositionModal = ({
                 <ModalHeader
                     title="Create Composition"
                     description="Provide a unique name for your composition"
-                    icon={<TreeStructure />}
                 />
                 <Form onSubmit={onSubmit}>
                     <FormField
