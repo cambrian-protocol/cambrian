@@ -39,7 +39,10 @@ const CompositionInfoModal = ({
             )}
             {showSolverConfigModal && (
                 <SolverInfoModal
-                    onClose={() => setShowSolverConfigModal(undefined)}
+                    onClose={() => {
+                        setShowSolverConfigModal(undefined)
+                        onClose()
+                    }}
                     composition={composition}
                     composerSolver={composition.solvers[showSolverConfigModal]}
                     price={price}
