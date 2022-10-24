@@ -1,9 +1,4 @@
-import { Box, Heading } from 'grommet'
-import {
-    HourglassSimpleMedium,
-    TreeStructure,
-    UsersThree,
-} from 'phosphor-react'
+import { Box, Heading, Text } from 'grommet'
 import { PropsWithChildren, useState } from 'react'
 import RecipientInfosModal, {
     RecipientInfoType,
@@ -11,10 +6,11 @@ import RecipientInfosModal, {
 
 import BaseAvatar from '../../avatars/BaseAvatar'
 import BaseInfoItem from '../BaseInfoItem'
-import BaseListItemButton from '../../buttons/BaseListItemButton'
+import { HourglassSimpleMedium } from 'phosphor-react'
 import ModalHeader from '../../layout/header/ModalHeader'
 import OutcomeCollectionInfosModal from '@cambrian/app/ui/common/modals/OutcomeCollectionInfosModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
 import RecipientInfoItem from '../RecipientInfo'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import SolverConfigItem from '../../list/SolverConfigItem'
@@ -43,6 +39,7 @@ export type RecipientAllocationInfoType = {
     allocation: { percentage: string; amount: number }
 }
 
+// TODO display if token is still flexible and preferred alternative tokens
 const BaseSolverInfo = ({
     solverTag,
     outcomeCollections,
@@ -122,23 +119,23 @@ const BaseSolverInfo = ({
                         }
                     />
                 </Box>
-                <Box pad={{ top: 'medium' }}>
-                    <Heading level="4">Outcome Overview</Heading>
+                <Box
+                    pad={{ top: 'medium', bottom: 'xlarge' }}
+                    height={{ min: 'auto' }}
+                    gap="medium"
+                >
+                    <Box width="medium">
+                        <Heading level="4">Outcome Overview</Heading>
+                        <Text color="dark-4" size="xsmall">
+                            Click on the outcome which can occur at this Solver
+                            and see the according allocation of the Tokens.
+                        </Text>
+                    </Box>
                     {outcomeCollections && (
-                        <>
-                            <BaseListItemButton
-                                hideDivider
-                                icon={<UsersThree />}
-                                title="Recipients"
-                                onClick={toggleShowRecipientsModal}
-                            />
-                            <BaseListItemButton
-                                hideDivider
-                                icon={<TreeStructure />}
-                                title="Outcomes"
-                                onClick={toggleShowOutcomeCollectionsModal}
-                            />
-                        </>
+                        <OutcomeOverview
+                            collateralToken={token}
+                            outcomeCollectionInfos={outcomeCollections}
+                        />
                     )}
                 </Box>
             </Box>

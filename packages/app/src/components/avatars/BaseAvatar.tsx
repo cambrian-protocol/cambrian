@@ -10,7 +10,7 @@ interface BaseAvatarProps {
     onClick?: () => void
     address?: string
     icon?: JSX.Element
-    size?: 'large' | 'medium'
+    size?: 'xsmall' | 'large' | 'medium'
 }
 
 const BaseAvatar = ({
@@ -20,7 +20,7 @@ const BaseAvatar = ({
     onClick,
     size,
 }: BaseAvatarProps) => {
-    const iconSize = size === 'large' ? '64' : '24'
+    const iconSize = size === 'large' ? '64' : size === 'xsmall' ? '12' : '24'
     return (
         <Box
             onClick={onClick}
@@ -37,6 +37,8 @@ const BaseAvatar = ({
                         ? { min: 'small', max: 'small' }
                         : size === 'medium'
                         ? { min: '6em', max: '6em' }
+                        : size === 'xsmall'
+                        ? { min: '2em', max: '2em' }
                         : { min: '3em', max: '3em' }
                 }
                 height={
@@ -44,6 +46,8 @@ const BaseAvatar = ({
                         ? { min: 'small', max: 'small' }
                         : size === 'medium'
                         ? { min: '6em', max: '6em' }
+                        : size === 'xsmall'
+                        ? { min: '2em', max: '2em' }
                         : { min: '3em', max: '3em' }
                 }
                 background="brand"

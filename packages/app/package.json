@@ -43,6 +43,7 @@
         "react": "17.0.2",
         "react-dom": "17.0.2",
         "react-flow-renderer": "9.6.11",
+        "react-svg-piechart": "^2.4.2",
         "shell-quote": "1.7.3",
         "styled-components": "^5.3.1",
         "tsconfig-paths": "^3.12.0",

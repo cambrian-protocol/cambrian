@@ -1,7 +1,6 @@
-import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import { Box, Heading, Text } from 'grommet'
+
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
-import { Box } from 'grommet'
-import HeaderTextSection from '../../../components/sections/HeaderTextSection'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 
@@ -13,20 +12,39 @@ interface OutcomeInfoModalProps {
 const OutcomeInfoModal = ({ onClose, outcome }: OutcomeInfoModalProps) => (
     <BaseLayerModal onClose={onClose}>
         <ModalHeader
-            metaInfo="Outcome"
+            metaInfo="Outcome details"
             title={outcome.title}
-            description={'Definition and context of this Outcome.'}
+            description={'Description and context of this Outcome.'}
         />
-        <Box gap="medium">
-            <BaseFormGroupContainer groupTitle="Description" border>
-                <HeaderTextSection
+        <Box gap="medium" height={{ min: 'auto' }}>
+            <Box gap="small" height={{ min: 'small' }}>
+                <Heading level="4">Description</Heading>
+                <Text
+                    color="dark-4"
                     size="small"
-                    paragraph={outcome.description}
-                />
-            </BaseFormGroupContainer>
-            <BaseFormGroupContainer groupTitle="Context">
-                <HeaderTextSection size="small" paragraph={outcome.context} />
-            </BaseFormGroupContainer>
+                    style={{
+                        whiteSpace: 'pre-line',
+                        wordBreak: 'break-word',
+                    }}
+                >
+                    {outcome.description}
+                </Text>
+            </Box>
+            {outcome.context.length > 0 && (
+                <Box gap="small">
+                    <Heading level="4">Context</Heading>
+                    <Text
+                        color="dark-4"
+                        size="xsmall"
+                        style={{
+                            whiteSpace: 'pre-line',
+                            wordBreak: 'break-word',
+                        }}
+                    >
+                        {outcome.context}
+                    </Text>
+                </Box>
+            )}
         </Box>
         <Box pad="small" />
     </BaseLayerModal>
