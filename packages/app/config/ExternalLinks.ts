@@ -12,4 +12,4 @@ export const SUPPORT_DISCORD_LINK =
 export const INVITE_DISCORD_LINK = 'https://discord.gg/pZP4HNYrZs'
 
 // Contact
-export const CONTACT_EMAIL_LINK = 'mailto:paul@cambrianprotocol.com'
+export const CONTACT_EMAIL_LINK = 'mailto:info@cambrianprotocol.com'

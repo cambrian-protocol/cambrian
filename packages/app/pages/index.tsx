@@ -81,9 +81,9 @@ export default function Home() {
                         {/* <BackgroundScroll sections={sections} /> */}
                         {/* <USPSection /> */}
                         <BaseContentSection
-                            title={'Quit a Boss'}
+                            title={'Own Your Work'}
                             subTitle={''}
-                            paragraph="Discover how you can bring your talents to web3 network for yourself or within a decentralized cooperative*"
+                            paragraph="Use your own smart contract that protects you and your work."
                             image={
                                 <Box
                                     round="xsmall"
@@ -104,7 +104,7 @@ export default function Home() {
                             align="right"
                             title={'Build a Solver'}
                             subTitle={''}
-                            paragraph="Learn how to build your own Solver, contribute to an Open Source Project in TypeScript and Solidity and create new opportunity for millions of people at a time. "
+                            paragraph="Design a novel smart contract that improves peoples’ jobs and earn a share of DAO revenue."
                             image={
                                 <Box
                                     round="xsmall"
@@ -127,8 +127,8 @@ export default function Home() {
                         />
                         <BaseContentSection
                             subTitle=""
-                            title={'Market a Solution'}
-                            paragraph="Create outcomes, load and connect Solvers, define allocations and compose complete business solutions powered by smart contracts with our intuitive no-code editor*"
+                            title={'Evolve Work'}
+                            paragraph="Create outcomes, load and connect Solvers, and define allocations to streamline or automate entire lines of business."
                             image={
                                 <Box
                                     round="xsmall"
