@@ -41,7 +41,7 @@ const ProposalHeader = ({
             items.push({
                 label: 'Template Details',
                 icon: <File color={cpTheme.global.colors['dark-4']} />,
-                onClick: toggleShowTemplateInfoModal,
+                onClick: () => setShowTemplateInfoModal(true),
             })
             if (showConfiguration) {
                 setMergedComposition(
@@ -56,7 +56,7 @@ const ProposalHeader = ({
                 items.push({
                     label: 'Configuration',
                     icon: <Gear color={cpTheme.global.colors['dark-4']} />,
-                    onClick: toggleShowSolverInfoModal,
+                    onClick: () => setShowSolverInfoModal(true),
                 })
             }
             setHeaderItems(items)
