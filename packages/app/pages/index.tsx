@@ -14,6 +14,7 @@ import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import RecommendedReadingsSection from '@cambrian/app/components/sections/RecommendedReadingsSection'
 import { Text } from 'grommet'
 import USPSection from '@cambrian/app/components/sections/USPSection'
+import { useRouter } from 'next/router'
 
 const sections: BackgroundScrollSection[] = [
     {
@@ -59,8 +60,10 @@ const sections: BackgroundScrollSection[] = [
 ]
 
 export default function Home() {
+    const router = useRouter()
+
     function handleClickHeaderCTA() {
-        document.getElementById('start')?.scrollIntoView({ behavior: 'smooth' })
+        router.push('dashboard?idx=5')
     }
 
     return (
@@ -75,12 +78,12 @@ export default function Home() {
                         bottom={'20%'}
                     />
                     <Box style={{ position: 'relative' }}>
-                        <BackgroundScroll sections={sections} />
-                        <USPSection />
+                        {/* <BackgroundScroll sections={sections} /> */}
+                        {/* <USPSection /> */}
                         <BaseContentSection
-                            title={'Quit a Boss'}
-                            subTitle={'Everyone'}
-                            paragraph="Discover how you can bring your talents to web3 network for yourself or within a decentralized cooperative*"
+                            title={'Own Your Work'}
+                            subTitle={''}
+                            paragraph="Use your own smart contract that protects you and your work."
                             image={
                                 <Box
                                     round="xsmall"
@@ -93,15 +96,15 @@ export default function Home() {
                             }
                             anchor={
                                 <Text size="small">
-                                    🟢 Live on Ropsten Test Network
+                                    🟢 Live on Goerli Test Network
                                 </Text>
                             }
                         />
                         <BaseContentSection
                             align="right"
                             title={'Build a Solver'}
-                            subTitle={'Developers'}
-                            paragraph="Learn how to build your own Solver, contribute to an Open Source Project in TypeScript and Solidity and create new opportunity for millions of people at a time. "
+                            subTitle={''}
+                            paragraph="Design a novel smart contract that improves peoples’ jobs and earn a share of DAO revenue."
                             image={
                                 <Box
                                     round="xsmall"
@@ -123,9 +126,9 @@ export default function Home() {
                             }
                         />
                         <BaseContentSection
-                            subTitle="Entrepreneurs"
-                            title={'Market a Solution'}
-                            paragraph="Create outcomes, load and connect Solvers, define allocations and compose complete business solutions powered by smart contracts with our intuitive no-code editor*"
+                            subTitle=""
+                            title={'Evolve Work'}
+                            paragraph="Create outcomes, load and connect Solvers, and define allocations to streamline or automate entire lines of business."
                             image={
                                 <Box
                                     round="xsmall"
@@ -143,7 +146,7 @@ export default function Home() {
                             }
                         />
                         <EnderSection />
-                        <RecommendedReadingsSection />
+                        {/* <RecommendedReadingsSection /> */}
                     </Box>
                 </Box>
             </Box>

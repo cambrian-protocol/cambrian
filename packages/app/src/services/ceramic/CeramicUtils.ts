@@ -89,30 +89,35 @@ export const archiveStage = async (
     tag: string,
     stageName: StageNames
 ) => {
-    const stagesLib = await loadStagesLib(currentUser)
+    try {
+        const stagesLib = await loadStagesLib(currentUser)
 
-    let updatedStagesLib = { ...stagesLib.content }
+        let updatedStagesLib = { ...stagesLib.content }
 
-    switch (stageName) {
-        case StageNames.composition:
-            updatedStagesLib.compositions.archive.lib[tag] =
-                updatedStagesLib.compositions.lib[tag]
-            delete updatedStagesLib.compositions.lib[tag]
-            break
-        case StageNames.template:
-            updatedStagesLib.templates.archive.lib[tag] =
-                updatedStagesLib.templates.lib[tag]
-            delete updatedStagesLib.templates.lib[tag]
-            break
-        case StageNames.proposal:
-            updatedStagesLib.proposals.archive.lib[tag] =
-                updatedStagesLib.proposals.lib[tag]
-            delete updatedStagesLib.proposals.lib[tag]
-            break
-        default:
-            break
+        switch (stageName) {
+            case StageNames.composition:
+                updatedStagesLib.compositions.archive.lib[tag] =
+                    updatedStagesLib.compositions.lib[tag]
+                delete updatedStagesLib.compositions.lib[tag]
+                break
+            case StageNames.template:
+                updatedStagesLib.templates.archive.lib[tag] =
+                    updatedStagesLib.templates.lib[tag]
+                delete updatedStagesLib.templates.lib[tag]
+                break
+            case StageNames.proposal:
+                updatedStagesLib.proposals.archive.lib[tag] =
+                    updatedStagesLib.proposals.lib[tag]
+                delete updatedStagesLib.proposals.lib[tag]
+                break
+            default:
+                break
+        }
+        await stagesLib.update(updatedStagesLib)
+    } catch (e) {
+        cpLogger.push(e)
+        throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
-    await stagesLib.update(updatedStagesLib)
 }
 
 /**
@@ -521,6 +526,7 @@ const findNextAnchor = (
     commitID: string,
     streamDoc: TileDocument<Record<string, any>>
 ) => {
+    console.log(streamDoc.allCommitIds)
     if (
         commitID ===
         streamDoc.anchorCommitIds[
