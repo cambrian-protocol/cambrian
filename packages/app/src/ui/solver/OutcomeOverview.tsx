@@ -25,8 +25,7 @@ const OutcomeOverview = ({
     outcomeCollectionInfos,
     collateralToken,
 }: OutcomeOverviewProps) => {
-    const [activeOutcomeCollection, setActiveOutcomeCollection] =
-        useState<number>(0)
+    const [activeOutcomeCollection, setActiveOutcomeCollection] = useState([0])
     const [showOutcomeDetailModal, setShowOutcomeDetailModal] =
         useState<OutcomeModel>()
 
@@ -35,16 +34,30 @@ const OutcomeOverview = ({
             <ResponsiveContext.Consumer>
                 {(screenSize) => {
                     return (
-                        <Box direction="row">
+                        <Box direction="row" justify="center">
                             <Box
-                                width={'medium'}
-                                pad={{ right: 'small' }}
+                                flex
+                                width={
+                                    screenSize !== 'small'
+                                        ? 'medium'
+                                        : undefined
+                                }
+                                pad={
+                                    screenSize !== 'small'
+                                        ? { right: 'small' }
+                                        : undefined
+                                }
                                 overflow={{ vertical: 'auto' }}
                             >
                                 <Accordion
                                     height={{ min: 'auto' }}
                                     gap="medium"
                                     activeIndex={activeOutcomeCollection}
+                                    onActive={(newActiveIndex) =>
+                                        setActiveOutcomeCollection(
+                                            newActiveIndex
+                                        )
+                                    }
                                 >
                                     {outcomeCollectionInfos.map(
                                         (outcomeCollection, idx) => {
@@ -52,18 +65,14 @@ const OutcomeOverview = ({
                                                 <Box
                                                     key={idx}
                                                     border={
-                                                        idx ===
-                                                        activeOutcomeCollection
+                                                        activeOutcomeCollection.includes(
+                                                            idx
+                                                        )
                                                             ? { color: 'brand' }
                                                             : false
                                                     }
                                                     round="xsmall"
                                                     background="background-popup"
-                                                    onClick={() =>
-                                                        setActiveOutcomeCollection(
-                                                            idx
-                                                        )
-                                                    }
                                                     focusIndicator={false}
                                                     overflow={'hidden'}
                                                 >
@@ -98,7 +107,18 @@ const OutcomeOverview = ({
                                                     >
                                                         {screenSize ===
                                                             'small' && (
-                                                            <Box flex></Box>
+                                                            <Box flex>
+                                                                <OutcomeChart
+                                                                    outcomeCollection={
+                                                                        outcomeCollectionInfos[
+                                                                            activeOutcomeCollection[0]
+                                                                        ]
+                                                                    }
+                                                                    collateralToken={
+                                                                        collateralToken
+                                                                    }
+                                                                />
+                                                            </Box>
                                                         )}
                                                         {outcomeCollection.outcomes.map(
                                                             (outcome, idx) => {
@@ -107,7 +127,12 @@ const OutcomeOverview = ({
                                                                         key={
                                                                             outcome.id
                                                                         }
-                                                                        pad="small"
+                                                                        pad={{
+                                                                            vertical:
+                                                                                'small',
+                                                                            horizontal:
+                                                                                'medium',
+                                                                        }}
                                                                         background="background-front"
                                                                         gap="medium"
                                                                     >
@@ -115,6 +140,7 @@ const OutcomeOverview = ({
                                                                             direction="row"
                                                                             justify="between"
                                                                             align="end"
+                                                                            gap="medium"
                                                                         >
                                                                             <Box>
                                                                                 <Text
@@ -175,7 +201,7 @@ const OutcomeOverview = ({
                                     <OutcomeChart
                                         outcomeCollection={
                                             outcomeCollectionInfos[
-                                                activeOutcomeCollection
+                                                activeOutcomeCollection[0]
                                             ]
                                         }
                                         collateralToken={collateralToken}

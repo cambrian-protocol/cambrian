@@ -9,16 +9,21 @@ import { CeramicClient } from '@ceramicnetwork/http-client'
 import InfoDropButton from '../components/buttons/InfoDropButton'
 import { RecipientAllocationInfoType } from '../components/info/solver/BaseSolverInfo'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { TokenModel } from '../models/TokenModel'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
 interface OutcomeChartRecipientLegendItemProps {
     recipientAllocation: RecipientAllocationInfoType
     active: boolean
+    collateralToken?: TokenModel
+    color: string
 }
 
 const OutcomeChartRecipientLegendItem = ({
     recipientAllocation,
     active,
+    collateralToken,
+    color,
 }: OutcomeChartRecipientLegendItemProps) => {
     const { currentUser } = useCurrentUserContext()
     const [cambrianProfile, setCambrianProfile] =
@@ -47,16 +52,27 @@ const OutcomeChartRecipientLegendItem = ({
     return (
         <Box
             direction="row"
-            gap="xsmall"
+            gap="small"
             align="center"
-            pad={{ horizontal: 'small', vertical: 'small' }}
+            pad={{ horizontal: 'small', vertical: 'xsmall' }}
             round="xsmall"
             background={active ? 'background-contrast' : undefined}
-            border={active ? { color: 'brand' } : undefined}
+            border={active ? { color: 'brand' } : { color: 'transparent' }}
         >
+            <Box
+                round="full"
+                height={{ min: '2em', max: '2em' }}
+                width={{ min: '2em', max: '2em' }}
+                background={color}
+                border={{ color: 'brand' }}
+            />
             <Box width={'xxsmall'}>
                 <Text weight={'bold'}>
                     {recipientAllocation.allocation.percentage}%
+                </Text>
+                <Text size="xsmall" color="dark-4">
+                    {recipientAllocation.allocation.amount}{' '}
+                    {collateralToken?.symbol || '??'}
                 </Text>
             </Box>
             <Box
@@ -83,20 +99,36 @@ const OutcomeChartRecipientLegendItem = ({
                             {recipientAllocation.recipient.slotTag.label}
                         </Text>
                         <Text size="xsmall" color="dark-4">
-                            {cambrianProfile?.content.name}
+                            {cambrianProfile?.content.name ||
+                                (recipientAllocation.recipient.address
+                                    .length === 0 &&
+                                    'To be defined')}
                         </Text>
                     </Box>
                 </Box>
                 {cambrianProfile &&
-                    recipientAllocation.recipient.address !== '' && (
-                        <InfoDropButton
-                            dropContent={
-                                <CambrianProfileAbout
-                                    cambrianProfile={cambrianProfile}
-                                />
-                            }
-                        />
-                    )}
+                recipientAllocation.recipient.address !== '' ? (
+                    <InfoDropButton
+                        dropContent={
+                            <CambrianProfileAbout
+                                cambrianProfile={cambrianProfile}
+                            />
+                        }
+                    />
+                ) : (
+                    <InfoDropButton
+                        dropContent={
+                            <Box pad="small">
+                                <Text size="small" color="dark-4">
+                                    {
+                                        recipientAllocation.recipient.slotTag
+                                            .description
+                                    }
+                                </Text>
+                            </Box>
+                        }
+                    />
+                )}
             </Box>
         </Box>
     )
