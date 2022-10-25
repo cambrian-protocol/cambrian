@@ -88,7 +88,10 @@ const OutcomeChart = ({
                 {outcomeCollection ? (
                     outcomeCollection.recipientAllocations.map((rc, idx) => {
                         return (
-                            <Box onMouseEnter={() => setCurrentHoverIndex(idx)}>
+                            <Box
+                                onMouseEnter={() => setCurrentHoverIndex(idx)}
+                                key={idx}
+                            >
                                 <OutcomeChartRecipientLegendItem
                                     color={COLORS[idx]}
                                     recipientAllocation={rc}
