@@ -2,7 +2,6 @@ import {
     Accordion,
     AccordionPanel,
     Box,
-    Button,
     Heading,
     ResponsiveContext,
     Text,
@@ -11,9 +10,7 @@ import {
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
 import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
-import OutcomeInfoModal from '../common/modals/OutcomeInfoModal'
-import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { useState } from 'react'
 
@@ -31,8 +28,6 @@ const OutcomeOverview = ({
     proposedIndexSet,
 }: OutcomeOverviewProps) => {
     const [activeOutcomeCollection, setActiveOutcomeCollection] = useState([0])
-    const [showOutcomeDetailModal, setShowOutcomeDetailModal] =
-        useState<OutcomeModel>()
 
     return (
         <>
@@ -125,74 +120,11 @@ const OutcomeOverview = ({
                                                                 />
                                                             </Box>
                                                         )}
-                                                        {outcomeCollection.outcomes.map(
-                                                            (outcome, idx) => {
-                                                                return (
-                                                                    <Box
-                                                                        key={
-                                                                            outcome.id
-                                                                        }
-                                                                        pad={{
-                                                                            vertical:
-                                                                                'small',
-                                                                            horizontal:
-                                                                                'medium',
-                                                                        }}
-                                                                        background="background-front"
-                                                                        gap="medium"
-                                                                    >
-                                                                        <Box
-                                                                            direction="row"
-                                                                            justify="between"
-                                                                            align="end"
-                                                                            gap="medium"
-                                                                        >
-                                                                            <Box>
-                                                                                <Text
-                                                                                    size="small"
-                                                                                    truncate
-                                                                                >
-                                                                                    {
-                                                                                        outcome.title
-                                                                                    }
-                                                                                </Text>
-                                                                                <Text
-                                                                                    size="xsmall"
-                                                                                    color={
-                                                                                        'dark-4'
-                                                                                    }
-                                                                                >
-                                                                                    {outcome.description.substring(
-                                                                                        0,
-                                                                                        80
-                                                                                    )}
-                                                                                    ...
-                                                                                </Text>
-                                                                            </Box>
-                                                                            <Button
-                                                                                size="xsmall"
-                                                                                secondary
-                                                                                label={
-                                                                                    'More...'
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    setShowOutcomeDetailModal(
-                                                                                        outcome
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        </Box>
-                                                                        {outcomeCollection
-                                                                            .outcomes
-                                                                            .length -
-                                                                            1 >
-                                                                            idx && (
-                                                                            <PlainSectionDivider />
-                                                                        )}
-                                                                    </Box>
-                                                                )
+                                                        <OutcomeDetailItem
+                                                            outcomeCollection={
+                                                                outcomeCollection
                                                             }
-                                                        )}
+                                                        />
                                                         {onProposeOutcome && (
                                                             <Box pad="small">
                                                                 <LoaderButton
@@ -242,12 +174,6 @@ const OutcomeOverview = ({
                     )
                 }}
             </ResponsiveContext.Consumer>
-            {showOutcomeDetailModal && (
-                <OutcomeInfoModal
-                    outcome={showOutcomeDetailModal}
-                    onClose={() => setShowOutcomeDetailModal(undefined)}
-                />
-            )}
         </>
     )
 }

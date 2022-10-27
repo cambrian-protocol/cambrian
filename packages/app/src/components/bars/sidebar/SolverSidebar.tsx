@@ -9,6 +9,8 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { ethers } from 'ethers'
+import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface SolverSidebarProps {
     currentCondition: SolverContractCondition
@@ -29,6 +31,20 @@ const SolverSidebar = ({
     currentUser,
     solverTimelock,
 }: SolverSidebarProps) => {
+    const outcomeInfo =
+        solverData.numMintedTokensByCondition &&
+        getOutcomeCollectionInfoFromContractData(
+            proposedOutcome,
+            Number(
+                ethers.utils.formatUnits(
+                    solverData.numMintedTokensByCondition[
+                        currentCondition.conditionId
+                    ],
+                    solverData.collateralToken.decimals
+                )
+            )
+        )
+
     return (
         <Box gap="medium">
             {currentCondition.status ===
@@ -39,17 +55,18 @@ const SolverSidebar = ({
                     solverData={solverData}
                 />
             )}
-            <PayoutInfoComponent
-                title={
-                    currentCondition.status === ConditionStatus.OutcomeReported
-                        ? 'Reported Outcome'
-                        : 'Proposed Outcome'
-                }
-                reporterOrProposer="Keeper"
-                keeperOrArbitratorAddress={solverData.config.keeper}
-                token={solverData.collateralToken}
-                outcome={proposedOutcome}
-            />
+            {outcomeInfo && (
+                <PayoutInfoComponent
+                    title={
+                        currentCondition.status ===
+                        ConditionStatus.OutcomeReported
+                            ? 'Confirmed Outcome'
+                            : 'Proposed Outcome'
+                    }
+                    token={solverData.collateralToken}
+                    outcome={outcomeInfo}
+                />
+            )}
             <ArbitrationUIManager
                 solverTimelock={solverTimelock}
                 currentCondition={currentCondition}
