@@ -58,6 +58,7 @@ const LoaderButton = ({
                     ? {
                           width: `${width}px`,
                           height: `${height}px`,
+                          maxWidth: '100%',
                       }
                     : {}
             }
