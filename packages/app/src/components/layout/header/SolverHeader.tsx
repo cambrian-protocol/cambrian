@@ -40,7 +40,7 @@ const SolverHeader = ({
 
     useEffect(() => {
         if (metadata) {
-            const updatedHeaderItems = { ...headerItems }
+            const updatedHeaderItems = [...headerItems]
             updatedHeaderItems.unshift({
                 label: 'Proposal Details',
                 icon: <ClipboardText color={cpTheme.global.colors['dark-4']} />,
