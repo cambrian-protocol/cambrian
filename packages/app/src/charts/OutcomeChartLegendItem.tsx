@@ -10,6 +10,7 @@ import InfoDropButton from '../components/buttons/InfoDropButton'
 import { RecipientAllocationInfoType } from '../components/info/solver/BaseSolverInfo'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenModel } from '../models/TokenModel'
+import { ethers } from 'ethers'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
 interface OutcomeChartRecipientLegendItemProps {
@@ -90,7 +91,14 @@ const OutcomeChartRecipientLegendItem = ({
                         />
                     ) : (
                         <BaseAvatar
-                            address={recipientAllocation.recipient.address}
+                            address={
+                                recipientAllocation.recipient.address.length >
+                                    0 &&
+                                recipientAllocation.recipient.address !==
+                                    ethers.constants.AddressZero
+                                    ? recipientAllocation.recipient.address
+                                    : undefined
+                            }
                             size="xsmall"
                         />
                     )}
@@ -100,8 +108,10 @@ const OutcomeChartRecipientLegendItem = ({
                         </Text>
                         <Text size="xsmall" color="dark-4">
                             {cambrianProfile?.content.name ||
-                                (recipientAllocation.recipient.address
-                                    .length === 0 &&
+                                recipientAllocation.recipient.address.length ===
+                                    0 ||
+                                (recipientAllocation.recipient.address ===
+                                    ethers.constants.AddressZero &&
                                     'To be defined')}
                         </Text>
                     </Box>
