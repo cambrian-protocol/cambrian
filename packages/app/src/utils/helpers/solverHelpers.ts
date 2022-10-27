@@ -1,4 +1,3 @@
-import { BigNumber, ethers } from 'ethers'
 import {
     ComposerSlotPathType,
     RichSlotModel,
@@ -19,9 +18,9 @@ import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from './decodeData'
+import { ethers } from 'ethers'
 import { parseBytes32String } from 'ethers/lib/utils'
 
 // Returns a sorted hierarchy containing the selected solver
@@ -346,17 +345,27 @@ export const getOutcomeCollectionsInfosFromContractData = (
 ): OutcomeCollectionInfoType[] => {
     return solverContractData.outcomeCollections[
         contractCondition.conditionId
-    ].map((outcomeCollection) =>
-        getOutcomeCollectionInfoFromContractData(
+    ].map((outcomeCollection) => {
+        const balance =
+            solverContractData.numMintedTokensByCondition &&
+            solverContractData.numMintedTokensByCondition[
+                contractCondition.conditionId
+            ]
+                ? solverContractData.numMintedTokensByCondition[
+                      contractCondition.conditionId
+                  ]
+                : solverContractData.collateralBalance
+
+        return getOutcomeCollectionInfoFromContractData(
             outcomeCollection,
             Number(
                 ethers.utils.formatUnits(
-                    solverContractData.collateralBalance,
+                    balance,
                     solverContractData.collateralToken.decimals
                 )
             )
         )
-    )
+    })
 }
 
 export const getOutcomeCollectionInfoFromContractData = (
