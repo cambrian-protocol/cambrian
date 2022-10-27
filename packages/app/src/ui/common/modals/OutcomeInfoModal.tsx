@@ -30,7 +30,7 @@ const OutcomeInfoModal = ({ onClose, outcome }: OutcomeInfoModalProps) => (
                     {outcome.description}
                 </Text>
             </Box>
-            {outcome.context.length > 0 && (
+            {outcome.context?.length > 0 && (
                 <Box gap="small">
                     <Heading level="4">Context</Heading>
                     <Text
