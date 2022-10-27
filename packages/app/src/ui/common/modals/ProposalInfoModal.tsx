@@ -15,7 +15,7 @@ const ProposalInfoModal = ({
     stageStack,
     collateralToken,
 }: ProposalInfoModalProps) => (
-    <BaseLayerModal onClose={onClose}>
+    <BaseLayerModal onClose={onClose} width="xlarge">
         <Box height={{ min: 'auto' }} gap="medium">
             <ProposalPreview
                 stageStack={stageStack}

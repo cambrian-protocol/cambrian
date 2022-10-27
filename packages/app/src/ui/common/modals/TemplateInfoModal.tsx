@@ -9,7 +9,7 @@ interface TemplateInfoModalProps {
 }
 
 const TemplateInfoModal = ({ stageStack, onClose }: TemplateInfoModalProps) => (
-    <BaseLayerModal onClose={onClose}>
+    <BaseLayerModal onClose={onClose} width="xlarge">
         <Box height={{ min: 'auto' }}>
             <TemplatePreview template={stageStack.template} />
         </Box>
