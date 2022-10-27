@@ -1,3 +1,4 @@
+import { BigNumber, ethers } from 'ethers'
 import {
     ComposerSlotPathType,
     RichSlotModel,
@@ -21,7 +22,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from './decodeData'
-import { ethers } from 'ethers'
 import { parseBytes32String } from 'ethers/lib/utils'
 
 // Returns a sorted hierarchy containing the selected solver
@@ -341,20 +341,27 @@ export const getComposerSlotData = (
 }
 
 export const getOutcomeCollectionsInfosFromContractData = (
-    conditionOutcomeCollections: OutcomeCollectionModel[],
-    collateralToken: TokenModel
+    solverContractData: SolverModel,
+    contractCondition: SolverContractCondition
 ): OutcomeCollectionInfoType[] => {
-    return conditionOutcomeCollections.map((outcomeCollection) =>
+    return solverContractData.outcomeCollections[
+        contractCondition.conditionId
+    ].map((outcomeCollection) =>
         getOutcomeCollectionInfoFromContractData(
             outcomeCollection,
-            collateralToken
+            Number(
+                ethers.utils.formatUnits(
+                    solverContractData.collateralBalance,
+                    solverContractData.collateralToken.decimals
+                )
+            )
         )
     )
 }
 
 export const getOutcomeCollectionInfoFromContractData = (
     contractOutcomeCollection: OutcomeCollectionModel,
-    collateralToken: TokenModel
+    balance: number
 ): OutcomeCollectionInfoType => {
     const _recipientAllocations: RecipientAllocationInfoType[] =
         contractOutcomeCollection.allocations.map((recipientAllocation) => {
@@ -368,14 +375,10 @@ export const getOutcomeCollectionInfoFromContractData = (
                 },
                 allocation: {
                     percentage: recipientAllocation.amountPercentage,
-                    amount: recipientAllocation.amount
-                        ? Number(
-                              ethers.utils.formatUnits(
-                                  recipientAllocation.amount,
-                                  collateralToken.decimals
-                              )
-                          ) / 10000
-                        : 0,
+                    amount:
+                        (balance *
+                            Number(recipientAllocation.amountPercentage)) /
+                        100,
                 },
             }
         })

@@ -4,9 +4,7 @@ import RecipientInfosModal, {
     RecipientInfoType,
 } from '@cambrian/app/ui/common/modals/RecipientInfosModal'
 
-import BaseAvatar from '../../avatars/BaseAvatar'
 import BaseInfoItem from '../BaseInfoItem'
-import { HourglassSimpleMedium } from 'phosphor-react'
 import ModalHeader from '../../layout/header/ModalHeader'
 import OutcomeCollectionInfosModal from '@cambrian/app/ui/common/modals/OutcomeCollectionInfosModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
@@ -17,13 +15,11 @@ import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import TokenAvatar from '../../avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
 type BaseSolverInfoProps = PropsWithChildren<{}> & {
     solverTag?: SolverTagModel
     slotTags?: SlotTagsHashMapType
     keeper: string
-    timelockSeconds?: number
     arbitrator?: string
     outcomeCollections?: OutcomeCollectionInfoType[]
     token?: TokenModel
@@ -47,7 +43,7 @@ const BaseSolverInfo = ({
     arbitrator,
     slotTags,
     token,
-    timelockSeconds,
+    children,
 }: BaseSolverInfoProps) => {
     const [showRecipientsModal, setShowRecipientsModal] = useState(false)
     const [showOutcomeCollectionsModal, setShowOutcomeCollectionsModal] =
@@ -91,33 +87,7 @@ const BaseSolverInfo = ({
                             />
                         }
                     />
-                    <SolverConfigItem
-                        id="timelockSeconds"
-                        slotTags={slotTags}
-                        value={
-                            <BaseInfoItem
-                                icon={
-                                    <BaseAvatar
-                                        icon={<HourglassSimpleMedium />}
-                                    />
-                                }
-                                title={
-                                    slotTags &&
-                                    slotTags['timelockSeconds'].isFlex
-                                        ? 'To be defined'
-                                        : parseSecondsToDisplay(
-                                              timelockSeconds || 0
-                                          )
-                                }
-                                subTitle={
-                                    slotTags &&
-                                    slotTags['timelockSeconds'].isFlex
-                                        ? undefined
-                                        : 'to raise a dispute'
-                                }
-                            />
-                        }
-                    />
+                    {children}
                 </Box>
                 <Box
                     pad={{ top: 'medium', bottom: 'xlarge' }}
