@@ -117,7 +117,9 @@ const OutcomeChartRecipientLegendItem = ({
                     </Box>
                 </Box>
                 {cambrianProfile &&
-                recipientAllocation.recipient.address !== '' ? (
+                recipientAllocation.recipient.address !== '' &&
+                recipientAllocation.recipient.address !==
+                    ethers.constants.AddressZero ? (
                     <InfoDropButton
                         dropContent={
                             <CambrianProfileAbout
