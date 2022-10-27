@@ -26,11 +26,11 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                 }
                             >
                                 <Heading level="4">
-                                    {(slotTags && slotTags[id].label) ||
+                                    {(slotTags && slotTags[id]?.label) ||
                                         DEFAULT_SLOT_TAGS[id].label}
                                 </Heading>
                                 <Text size="xsmall" color="dark-4">
-                                    {(slotTags && slotTags[id].description) ||
+                                    {(slotTags && slotTags[id]?.description) ||
                                         DEFAULT_SLOT_TAGS[id].description}
                                 </Text>
                             </Box>
