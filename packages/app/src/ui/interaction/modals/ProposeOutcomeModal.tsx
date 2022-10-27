@@ -9,12 +9,13 @@ import { Box } from 'grommet'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
+import OutcomeOverview from '../../solver/OutcomeOverview'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { getOutcomeCollectionsInfosFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ProposeOutcomeModalProps {
     proposedIndexSet?: number
@@ -64,19 +65,15 @@ const ProposeOutcomeModal = ({
                     description="Select the outcome when solve conditions are met."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {solverData.outcomeCollections[
-                        currentCondition.conditionId
-                    ].map((outcomeCollection) => {
-                        return (
-                            <OutcomeCollectionCard
-                                token={solverData.collateralToken}
-                                key={outcomeCollection.indexSet}
-                                outcomeCollection={outcomeCollection}
-                                onPropose={onProposeOutcome}
-                                proposedIndexSet={proposedIndexSet}
-                            />
-                        )
-                    })}
+                    <OutcomeOverview
+                        proposedIndexSet={proposedIndexSet}
+                        onProposeOutcome={onProposeOutcome}
+                        collateralToken={solverData.collateralToken}
+                        outcomeCollectionInfos={getOutcomeCollectionsInfosFromContractData(
+                            solverData,
+                            currentCondition
+                        )}
+                    />
                 </Box>
             </BaseLayerModal>
             {errMsg && (

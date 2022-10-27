@@ -8,6 +8,7 @@ import {
     Text,
 } from 'grommet'
 
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
 import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
 import OutcomeInfoModal from '../common/modals/OutcomeInfoModal'
@@ -19,11 +20,15 @@ import { useState } from 'react'
 interface OutcomeOverviewProps {
     outcomeCollectionInfos: OutcomeCollectionInfoType[]
     collateralToken?: TokenModel
+    onProposeOutcome?: (indexSet: number) => Promise<void>
+    proposedIndexSet?: number
 }
 
 const OutcomeOverview = ({
     outcomeCollectionInfos,
     collateralToken,
+    onProposeOutcome,
+    proposedIndexSet,
 }: OutcomeOverviewProps) => {
     const [activeOutcomeCollection, setActiveOutcomeCollection] = useState([0])
     const [showOutcomeDetailModal, setShowOutcomeDetailModal] =
@@ -187,6 +192,31 @@ const OutcomeOverview = ({
                                                                     </Box>
                                                                 )
                                                             }
+                                                        )}
+                                                        {onProposeOutcome && (
+                                                            <Box pad="small">
+                                                                <LoaderButton
+                                                                    isLoading={
+                                                                        outcomeCollection.indexSet ===
+                                                                        proposedIndexSet
+                                                                    }
+                                                                    disabled={
+                                                                        proposedIndexSet !==
+                                                                        undefined
+                                                                    }
+                                                                    label="Propose outcome"
+                                                                    primary
+                                                                    onClick={() => {
+                                                                        if (
+                                                                            outcomeCollection.indexSet
+                                                                        ) {
+                                                                            onProposeOutcome(
+                                                                                outcomeCollection.indexSet
+                                                                            )
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </Box>
                                                         )}
                                                     </AccordionPanel>
                                                 </Box>

@@ -356,15 +356,18 @@ export const getOutcomeCollectionsInfosFromContractData = (
                   ]
                 : solverContractData.collateralBalance
 
-        return getOutcomeCollectionInfoFromContractData(
-            outcomeCollection,
-            Number(
-                ethers.utils.formatUnits(
-                    balance,
-                    solverContractData.collateralToken.decimals
+        return {
+            ...getOutcomeCollectionInfoFromContractData(
+                outcomeCollection,
+                Number(
+                    ethers.utils.formatUnits(
+                        balance,
+                        solverContractData.collateralToken.decimals
+                    )
                 )
-            )
-        )
+            ),
+            indexSet: outcomeCollection.indexSet,
+        }
     })
 }
 

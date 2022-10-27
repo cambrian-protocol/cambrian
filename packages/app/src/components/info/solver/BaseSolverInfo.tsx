@@ -26,6 +26,7 @@ type BaseSolverInfoProps = PropsWithChildren<{}> & {
 }
 
 export type OutcomeCollectionInfoType = {
+    indexSet?: number
     outcomes: OutcomeModel[]
     recipientAllocations: RecipientAllocationInfoType[]
 }
