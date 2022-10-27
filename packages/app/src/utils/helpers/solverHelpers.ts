@@ -350,12 +350,14 @@ export const getOutcomeCollectionsInfosFromContractData = (
             solverContractData.numMintedTokensByCondition &&
             solverContractData.numMintedTokensByCondition[
                 contractCondition.conditionId
-            ]
+            ] &&
+            solverContractData.numMintedTokensByCondition[
+                contractCondition.conditionId
+            ].gt(0)
                 ? solverContractData.numMintedTokensByCondition[
                       contractCondition.conditionId
                   ]
                 : solverContractData.collateralBalance
-
         return {
             ...getOutcomeCollectionInfoFromContractData(
                 outcomeCollection,
