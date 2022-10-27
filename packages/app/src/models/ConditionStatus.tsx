@@ -58,7 +58,7 @@ CONDITION_STATUS_INFO[ConditionStatus.ArbitrationDelivered] = {
     color: 'status-reported',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeReported] = {
-    name: 'Outcome Reported',
+    name: 'Outcome Confirmed',
     description: 'An Outcome has been reported',
     icon: <Handshake />,
     color: 'status-reported',
