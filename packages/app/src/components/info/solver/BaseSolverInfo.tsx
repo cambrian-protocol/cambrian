@@ -1,14 +1,10 @@
 import { Box, Heading, Text } from 'grommet'
-import { PropsWithChildren, useState } from 'react'
-import RecipientInfosModal, {
-    RecipientInfoType,
-} from '@cambrian/app/ui/common/modals/RecipientInfosModal'
 
 import BaseInfoItem from '../BaseInfoItem'
 import ModalHeader from '../../layout/header/ModalHeader'
-import OutcomeCollectionInfosModal from '@cambrian/app/ui/common/modals/OutcomeCollectionInfosModal'
-import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
+import { PropsWithChildren } from 'react'
 import RecipientInfoItem from '../RecipientInfo'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import SolverConfigItem from '../../list/SolverConfigItem'
@@ -21,19 +17,8 @@ type BaseSolverInfoProps = PropsWithChildren<{}> & {
     slotTags?: SlotTagsHashMapType
     keeper: string
     arbitrator?: string
-    outcomeCollections?: OutcomeCollectionInfoType[]
+    outcomeCollections?: OutcomeCollectionModel[]
     token?: TokenModel
-}
-
-export type OutcomeCollectionInfoType = {
-    indexSet?: number
-    outcomes: OutcomeModel[]
-    recipientAllocations: RecipientAllocationInfoType[]
-}
-
-export type RecipientAllocationInfoType = {
-    recipient: RecipientInfoType
-    allocation: { percentage: string; amount: number }
 }
 
 // TODO display if token is still flexible and preferred alternative tokens
@@ -46,16 +31,6 @@ const BaseSolverInfo = ({
     token,
     children,
 }: BaseSolverInfoProps) => {
-    const [showRecipientsModal, setShowRecipientsModal] = useState(false)
-    const [showOutcomeCollectionsModal, setShowOutcomeCollectionsModal] =
-        useState(false)
-
-    const toggleShowOutcomeCollectionsModal = () =>
-        setShowOutcomeCollectionsModal(!showOutcomeCollectionsModal)
-
-    const toggleShowRecipientsModal = () =>
-        setShowRecipientsModal(!showRecipientsModal)
-
     return (
         <>
             <Box pad={{ horizontal: 'medium' }}>
@@ -105,26 +80,11 @@ const BaseSolverInfo = ({
                     {outcomeCollections && (
                         <OutcomeOverview
                             collateralToken={token}
-                            outcomeCollectionInfos={outcomeCollections}
+                            outcomeCollections={outcomeCollections}
                         />
                     )}
                 </Box>
             </Box>
-            {showRecipientsModal && outcomeCollections && (
-                <RecipientInfosModal
-                    onClose={toggleShowRecipientsModal}
-                    recipients={outcomeCollections[0]?.recipientAllocations.map(
-                        (allocation) => allocation.recipient
-                    )}
-                />
-            )}
-            {showOutcomeCollectionsModal && outcomeCollections && (
-                <OutcomeCollectionInfosModal
-                    token={token}
-                    onClose={toggleShowOutcomeCollectionsModal}
-                    outcomeCollections={outcomeCollections}
-                />
-            )}
         </>
     )
 }

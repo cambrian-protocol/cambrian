@@ -1,11 +1,11 @@
 import { Box } from 'grommet'
 import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
-import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface OutcomePreviewProps {
-    outcome: OutcomeCollectionInfoType
+    outcome: OutcomeCollectionModel
     collateralToken: TokenModel
 }
 

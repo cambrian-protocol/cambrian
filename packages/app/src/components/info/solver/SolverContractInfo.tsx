@@ -5,7 +5,6 @@ import { HourglassSimpleMedium } from 'phosphor-react'
 import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { getOutcomeCollectionsInfosFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
 interface SolverContractInfoProps {
@@ -24,10 +23,11 @@ const SolverContractInfo = ({
             keeper={contractSolverData.config.keeper}
             arbitrator={contractSolverData.config.arbitrator}
             token={contractSolverData.collateralToken}
-            outcomeCollections={getOutcomeCollectionsInfosFromContractData(
-                contractSolverData,
-                contractCondition
-            )}
+            outcomeCollections={
+                contractSolverData.outcomeCollections[
+                    contractCondition.conditionId
+                ]
+            }
         >
             <SolverConfigItem
                 id="timelockSeconds"
