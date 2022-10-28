@@ -4,7 +4,6 @@ import {
     Box,
     Heading,
     ResponsiveContext,
-    Text,
 } from 'grommet'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -14,18 +13,21 @@ import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { useState } from 'react'
 
-interface OutcomeOverviewProps {
+type OutcomeOverviewProps = {
     outcomeCollectionInfos: OutcomeCollectionInfoType[]
     collateralToken?: TokenModel
-    onProposeOutcome?: (indexSet: number) => Promise<void>
-    proposedIndexSet?: number
+    reportProps?: {
+        reportLabel: string
+        onReport: (indexSet: number) => Promise<void>
+        reportedIndexSet?: number
+        useChoiceIndex?: boolean // For arbitrate contract we report the choice-index instead of the indexSet
+    }
 }
 
 const OutcomeOverview = ({
     outcomeCollectionInfos,
     collateralToken,
-    onProposeOutcome,
-    proposedIndexSet,
+    reportProps,
 }: OutcomeOverviewProps) => {
     const [activeOutcomeCollection, setActiveOutcomeCollection] = useState([0])
 
@@ -125,24 +127,32 @@ const OutcomeOverview = ({
                                                                 outcomeCollection
                                                             }
                                                         />
-                                                        {onProposeOutcome && (
+                                                        {reportProps && (
                                                             <Box pad="small">
                                                                 <LoaderButton
                                                                     isLoading={
                                                                         outcomeCollection.indexSet ===
-                                                                        proposedIndexSet
+                                                                        reportProps.reportedIndexSet
                                                                     }
                                                                     disabled={
-                                                                        proposedIndexSet !==
+                                                                        reportProps.reportedIndexSet !==
                                                                         undefined
                                                                     }
-                                                                    label="Propose outcome"
+                                                                    label={
+                                                                        reportProps.reportLabel
+                                                                    }
                                                                     primary
                                                                     onClick={() => {
                                                                         if (
+                                                                            reportProps.useChoiceIndex
+                                                                        ) {
+                                                                            reportProps.onReport(
+                                                                                idx
+                                                                            )
+                                                                        } else if (
                                                                             outcomeCollection.indexSet
                                                                         ) {
-                                                                            onProposeOutcome(
+                                                                            reportProps.onReport(
                                                                                 outcomeCollection.indexSet
                                                                             )
                                                                         }

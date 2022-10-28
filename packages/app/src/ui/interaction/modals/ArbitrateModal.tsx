@@ -9,12 +9,13 @@ import { Box } from 'grommet'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
+import OutcomeOverview from '../../solver/OutcomeOverview'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { getOutcomeCollectionsInfosFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ArbitrateModalProps {
     solverMethods: GenericMethods
@@ -58,26 +59,25 @@ const ArbitrateModal = ({
 
     return (
         <>
-            <BaseLayerModal onBack={onBack}>
+            <BaseLayerModal onBack={onBack} width="xlarge">
                 <ModalHeader
                     metaInfo="Arbitration"
-                    title="Report an outcome"
-                    description="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
+                    title="Arbitrate an outcome"
+                    description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {solverData.outcomeCollections[
-                        currentCondition.conditionId
-                    ].map((outcomeCollection) => {
-                        return (
-                            <OutcomeCollectionCard
-                                token={solverData.collateralToken}
-                                key={outcomeCollection.indexSet}
-                                outcomeCollection={outcomeCollection}
-                                onArbitrate={onArbitrate}
-                                proposedIndexSet={isArbitrating}
-                            />
-                        )
-                    })}
+                    <OutcomeOverview
+                        reportProps={{
+                            onReport: onArbitrate,
+                            reportedIndexSet: isArbitrating,
+                            reportLabel: 'Arbitrate Outcome',
+                        }}
+                        collateralToken={solverData.collateralToken}
+                        outcomeCollectionInfos={getOutcomeCollectionsInfosFromContractData(
+                            solverData,
+                            currentCondition
+                        )}
+                    />
                 </Box>
             </BaseLayerModal>
             {errMsg && (

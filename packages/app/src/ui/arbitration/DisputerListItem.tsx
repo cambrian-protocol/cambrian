@@ -1,12 +1,16 @@
+import { AccordionPanel, Box } from 'grommet'
+import { useEffect, useState } from 'react'
+
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
-import { Box } from 'grommet'
-import { CardHeader } from 'grommet'
-import OutcomeCollectionCard from '@cambrian/app/components/cards/OutcomeCollectionCard'
+import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import OutcomePreview from '../solver/OutcomePreview'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { Text } from 'grommet'
+import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface DisputerListItemProps {
     choice: number[]
@@ -16,6 +20,7 @@ interface DisputerListItemProps {
     currentCondition: SolverContractCondition
 }
 
+// Currently not used, left here for Arbitration UX improvements
 const DisputerListItem = ({
     choice,
     recipient,
@@ -23,39 +28,58 @@ const DisputerListItem = ({
     solverData,
     currentCondition,
 }: DisputerListItemProps) => {
-    const indexSet = getIndexSetFromBinaryArray(choice)
+    const [outcomeCollectionInfo, setOutcomeCollectionInfo] =
+        useState<OutcomeCollectionInfoType>()
 
-    const outcomeCollection = solverData.outcomeCollections[
-        currentCondition.conditionId
-    ].find((outcomeCollection) => outcomeCollection.indexSet === indexSet)
+    useEffect(() => {
+        const indexSet = getIndexSetFromBinaryArray(choice)
+
+        const outcomeCollection = solverData.outcomeCollections[
+            currentCondition.conditionId
+        ].find((outcomeCollection) => outcomeCollection.indexSet === indexSet)
+
+        if (
+            outcomeCollection &&
+            solverData.numMintedTokensByCondition &&
+            solverData.numMintedTokensByCondition[currentCondition.conditionId]
+        ) {
+            const outcomeCollectionInfo =
+                getOutcomeCollectionInfoFromContractData(
+                    outcomeCollection,
+                    Number(
+                        ethers.utils.formatUnits(
+                            solverData.numMintedTokensByCondition[
+                                currentCondition.conditionId
+                            ],
+                            solverData.collateralToken.decimals
+                        )
+                    )
+                )
+
+            setOutcomeCollectionInfo(outcomeCollectionInfo)
+        }
+    }, [])
 
     return (
         <>
-            {outcomeCollection && (
-                <Box
-                    background={'background-contrast-hover'}
-                    round="xsmall"
-                    elevation="small"
+            {outcomeCollectionInfo && (
+                <AccordionPanel
+                    label={
+                        <Box direction="row" align="center" gap="small">
+                            <BaseAvatar address={address} />
+                            <Text truncate>
+                                {recipient?.tag.label}'s choice
+                            </Text>
+                        </Box>
+                    }
                 >
-                    <OutcomeCollectionCard
-                        cardHeader={
-                            <CardHeader
-                                pad="small"
-                                elevation="small"
-                                direction="row"
-                                gap="small"
-                                justify="start"
-                            >
-                                <BaseAvatar address={address} />
-                                <Text truncate>
-                                    {recipient?.tag.label}'s choice
-                                </Text>
-                            </CardHeader>
-                        }
-                        outcomeCollection={outcomeCollection}
-                        token={solverData.collateralToken}
-                    />
-                </Box>
+                    <Box pad={{ top: 'small' }}>
+                        <OutcomePreview
+                            outcome={outcomeCollectionInfo}
+                            collateralToken={solverData.collateralToken}
+                        />
+                    </Box>
+                </AccordionPanel>
             )}
         </>
     )

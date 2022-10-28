@@ -66,8 +66,11 @@ const ProposeOutcomeModal = ({
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     <OutcomeOverview
-                        proposedIndexSet={proposedIndexSet}
-                        onProposeOutcome={onProposeOutcome}
+                        reportProps={{
+                            onReport: onProposeOutcome,
+                            reportLabel: 'Propose Outcome',
+                            reportedIndexSet: proposedIndexSet,
+                        }}
                         collateralToken={solverData.collateralToken}
                         outcomeCollectionInfos={getOutcomeCollectionsInfosFromContractData(
                             solverData,

@@ -121,7 +121,7 @@ const ArbitrateActionbar = ({
                         disabled={isTimelockActive}
                         icon={isTimelockActive ? <Lock /> : undefined}
                         isLoading={false}
-                        label="Report Outcome"
+                        label="Arbitrate"
                         onClick={toggleShowArbitrateModal}
                         primary
                     />
