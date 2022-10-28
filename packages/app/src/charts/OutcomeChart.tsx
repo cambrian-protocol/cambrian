@@ -15,11 +15,11 @@ interface OutcomeChartProps {
 
 const COLORS = [
     cpTheme.global.colors['brand'].dark,
+    cpTheme.global.colors['status-reported'],
     cpTheme.global.colors['accent-1'],
+    cpTheme.global.colors['status-executed'],
     cpTheme.global.colors['accent-2'],
-    cpTheme.global.colors['accent-3'],
-    cpTheme.global.colors['accent-4'],
-    cpTheme.global.colors['accent-5'],
+    cpTheme.global.colors['status-arbitration'],
 ]
 
 const OutcomeChart = ({
