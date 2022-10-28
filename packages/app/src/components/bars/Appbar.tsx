@@ -1,10 +1,11 @@
 import { Box, Button, ResponsiveContext } from 'grommet'
-import { IconContext, Layout } from 'phosphor-react'
+import { IconContext, Layout, Question } from 'phosphor-react'
 
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
 import { Header } from 'grommet'
 import Link from 'next/link'
+import { SUPPORT_DISCORD_LINK } from 'packages/app/config/ExternalLinks'
 import UserMenu from '../menu/UserMenu'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -42,6 +43,13 @@ const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
+                            <Box justify={'center'}>
+                                <AppbarMenuItem
+                                    pathname={SUPPORT_DISCORD_LINK}
+                                    label="Support"
+                                    icon={<Question />}
+                                />
+                            </Box>
                             {currentUser &&
                                 injectedWalletAddress === undefined && (
                                     <Box justify={'center'}>

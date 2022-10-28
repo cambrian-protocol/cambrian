@@ -100,7 +100,7 @@ const TemplateWizard = ({
 
     return (
         <>
-            <Box height={{ min: '90vh' }} justify="center" pad="large">
+            <Box height={{ min: '80vh' }} justify="center">
                 {/* TODO Wizard Nav  */}
                 {renderCurrentFormStep()}
             </Box>

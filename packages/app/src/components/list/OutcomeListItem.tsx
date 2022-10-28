@@ -1,7 +1,7 @@
 import { TreeStructure, Warning } from 'phosphor-react'
 
 import BaseListItemButton from '../buttons/BaseListItemButton'
-import OutcomeDetailModal from '@cambrian/app/ui/common/modals/OutcomeDetailModal'
+import OutcomeInfoModal from '@cambrian/app/ui/common/modals/OutcomeInfoModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { useState } from 'react'
 
@@ -30,7 +30,7 @@ const OutcomeListItem = ({ outcome }: OutcomeListItemProps) => {
                 />
             )}
             {showOutcomeDetail && (
-                <OutcomeDetailModal
+                <OutcomeInfoModal
                     onClose={toggleShowOutcomeDetail}
                     outcome={outcome}
                 />

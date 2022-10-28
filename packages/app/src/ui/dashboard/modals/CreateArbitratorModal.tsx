@@ -3,7 +3,6 @@ import {
     CAMBRIAN_LIB_NAME,
     ceramicInstance,
 } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { CurrencyEth, Scales } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -11,6 +10,7 @@ import {
 
 import { ARBITRATOR_FACTORY_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import { CurrencyEth } from 'phosphor-react'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
@@ -130,7 +130,6 @@ const CreateArbitratorModal = ({
                 <ModalHeader
                     title="Create Arbitrator"
                     description="This Arbitration Smart Contract will be tied to your wallet"
-                    icon={<Scales />}
                 />
                 <Form onSubmit={onSubmit}>
                     <Box gap="medium">

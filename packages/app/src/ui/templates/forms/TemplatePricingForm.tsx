@@ -192,7 +192,7 @@ const TemplatePricingForm = ({
                                             />
                                         </FormField>
                                     </Box>
-                                    <Box pad={{ top: '2.2em' }}>
+                                    <Box pad={{ top: '2.8em' }}>
                                         <TokenAvatar token={collateralToken} />
                                     </Box>
                                 </Box>

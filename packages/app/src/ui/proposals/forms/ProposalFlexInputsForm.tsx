@@ -1,5 +1,10 @@
 import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
+import {
+    getFlexInputDescription,
+    getFlexInputLabel,
+    getFlexInputType,
+} from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -7,7 +12,6 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
-import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
 interface ProposalFlexInputsFormProps {
     proposalInput: ProposalModel
@@ -49,11 +53,14 @@ const ProposalFlexInputsForm = ({
                             composition.solvers,
                             flexInput
                         )
+                        const label = getFlexInputLabel(flexInput)
+                        const description = getFlexInputDescription(flexInput)
+
                         return (
                             <Box key={idx}>
                                 <FormField
                                     name={`flexInputs[${idx}].value`}
-                                    label={flexInput.label}
+                                    label={label}
                                     validate={[
                                         () =>
                                             isRequired(
@@ -88,13 +95,13 @@ const ProposalFlexInputsForm = ({
                                         }}
                                     />
                                 </FormField>
-                                {flexInput.description !== '' && (
+                                {description && (
                                     <Text
                                         size="small"
                                         color="dark-4"
                                         margin={{ bottom: 'small' }}
                                     >
-                                        {flexInput.description}
+                                        {description}
                                     </Text>
                                 )}
                             </Box>

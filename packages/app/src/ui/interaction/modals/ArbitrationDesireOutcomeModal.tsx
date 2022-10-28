@@ -4,14 +4,14 @@ import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
-import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
+import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
+import OutcomeOverview from '../../solver/OutcomeOverview'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { TreeStructure } from 'phosphor-react'
+import { getOutcomeCollectionsInfosFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ArbitrationDesireOutcomeModalProps {
     solverAddress: string
@@ -65,25 +65,23 @@ const ArbitrationDesireOutcomeModal = ({
         <>
             <BaseLayerModal onBack={onBack}>
                 <ModalHeader
-                    icon={<TreeStructure />}
                     metaInfo="Arbitration"
                     title="Propose an outcome"
                     description="Please select your desired outcome."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {solverData.outcomeCollections[
-                        currentCondition.conditionId
-                    ].map((outcomeCollection) => {
-                        return (
-                            <OutcomeCollectionCard
-                                token={solverData.collateralToken}
-                                key={outcomeCollection.indexSet}
-                                outcomeCollection={outcomeCollection}
-                                onPropose={onDesireOutcome}
-                                proposedIndexSet={desiredIndexSet}
-                            />
-                        )
-                    })}
+                    <OutcomeOverview
+                        reportProps={{
+                            onReport: onDesireOutcome,
+                            reportedIndexSet: desiredIndexSet,
+                            reportLabel: 'Request Outcome',
+                        }}
+                        collateralToken={solverData.collateralToken}
+                        outcomeCollectionInfos={getOutcomeCollectionsInfosFromContractData(
+                            solverData,
+                            currentCondition
+                        )}
+                    />
                 </Box>
             </BaseLayerModal>
             {errMsg && (

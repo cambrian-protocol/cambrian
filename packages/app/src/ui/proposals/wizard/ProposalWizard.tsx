@@ -90,7 +90,7 @@ const ProposalWizard = ({
 
     return (
         <>
-            <Box height={{ min: '90vh' }} justify="center" width={'xlarge'}>
+            <Box height={{ min: '80vh' }} justify="center" width={'xlarge'}>
                 {renderCurrentFormStep()}
             </Box>
         </>

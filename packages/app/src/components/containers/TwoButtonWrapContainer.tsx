@@ -2,7 +2,7 @@ import { Box } from 'grommet'
 
 interface TwoButtonWrapContainerProps {
     primaryButton: JSX.Element
-    secondaryButton: JSX.Element
+    secondaryButton?: JSX.Element
 }
 
 const TwoButtonWrapContainer = ({
@@ -10,11 +10,13 @@ const TwoButtonWrapContainer = ({
     secondaryButton,
 }: TwoButtonWrapContainerProps) => {
     return (
-        <Box direction="row" wrap justify="between">
-            <Box width={{ min: 'small' }} flex pad="xsmall">
-                {secondaryButton}
-            </Box>
-            <Box width={{ min: 'small' }} flex pad="xsmall">
+        <Box direction="row" justify="between">
+            {secondaryButton && (
+                <Box flex pad="xsmall">
+                    {secondaryButton}
+                </Box>
+            )}
+            <Box flex pad="xsmall">
                 {primaryButton}
             </Box>
         </Box>

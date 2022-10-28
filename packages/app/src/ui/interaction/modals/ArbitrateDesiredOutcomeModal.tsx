@@ -1,22 +1,19 @@
 import { SetStateAction, useState } from 'react'
 
-import BaseAvatar from '../../../components/avatars/BaseAvatar'
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { CardHeader } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import OutcomeCollectionCard from '../../../components/cards/OutcomeCollectionCard'
-import { Scales } from 'phosphor-react'
+import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import OutcomeOverview from '../../solver/OutcomeOverview'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { Text } from 'grommet'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getSolverRecipientAddressHashmap } from '../../../components/solver/SolverHelpers'
+import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void
@@ -40,12 +37,6 @@ const ArbitrateDesiredOutcomeModal = ({
     isArbitrating,
 }: ArbitrateDesiredOutcomeModalProps) => {
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
-
-    const recipientsHashmap = getSolverRecipientAddressHashmap(
-        solverData,
-        currentCondition
-    )
-
     const onArbitrate = async (choiceIndex: number) => {
         setIsArbitrating(choiceIndex)
         try {
@@ -61,56 +52,27 @@ const ArbitrateDesiredOutcomeModal = ({
 
     return (
         <>
-            <BaseLayerModal onBack={onBack}>
+            <BaseLayerModal onBack={onBack} width="xlarge">
                 <ModalHeader
-                    icon={<Scales />}
                     metaInfo="Arbitration"
-                    title="Report an outcome"
-                    description="This report will overwrite the Keepers proposed outcome and allocate tokens accordingly."
+                    title="Arbitrate an outcome"
+                    description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    {dispute.disputers.map((disputer, idx) => {
-                        const indexSet = getIndexSetFromBinaryArray(
-                            dispute.choices[idx]
-                        )
-
-                        const outcomeCollection = solverData.outcomeCollections[
-                            currentCondition.conditionId
-                        ].find(
-                            (outcomeCollection) =>
-                                outcomeCollection.indexSet === indexSet
-                        )
-                        if (outcomeCollection) {
-                            return (
-                                <OutcomeCollectionCard
-                                    token={solverData.collateralToken}
-                                    key={idx}
-                                    outcomeCollection={outcomeCollection}
-                                    itemKey={idx} // Index needs to be passed separately to set the right Loader
-                                    onArbitrate={(indexSet) => onArbitrate(idx)} // Use index of this choice rather than the indexSet
-                                    proposedIndexSet={isArbitrating}
-                                    cardHeader={
-                                        <CardHeader
-                                            pad="small"
-                                            elevation="small"
-                                            direction="row"
-                                            gap="small"
-                                            justify="start"
-                                        >
-                                            <BaseAvatar address={disputer} />
-                                            <Text truncate>
-                                                {
-                                                    recipientsHashmap[disputer]
-                                                        ?.tag.label
-                                                }
-                                                's choice
-                                            </Text>
-                                        </CardHeader>
-                                    }
-                                />
-                            )
-                        }
-                    })}
+                    <OutcomeOverview
+                        outcomeCollectionInfos={getOutcomeCollectionsToArbitrate(
+                            dispute,
+                            solverData,
+                            currentCondition
+                        )}
+                        collateralToken={solverData.collateralToken}
+                        reportProps={{
+                            onReport: onArbitrate,
+                            reportLabel: 'Arbitrate Outcome',
+                            reportedIndexSet: isArbitrating,
+                            useChoiceIndex: true,
+                        }}
+                    />
                 </Box>
             </BaseLayerModal>
             {errMsg && (
@@ -124,3 +86,42 @@ const ArbitrateDesiredOutcomeModal = ({
 }
 
 export default ArbitrateDesiredOutcomeModal
+
+// TODO Display disputer
+const getOutcomeCollectionsToArbitrate = (
+    dispute: DisputeModel,
+    solverData: SolverModel,
+    currentCondition: SolverContractCondition
+) => {
+    const outcomeCollections: OutcomeCollectionInfoType[] = []
+
+    dispute.disputers.forEach((disputer, idx) => {
+        const indexSet = getIndexSetFromBinaryArray(dispute.choices[idx])
+
+        const outcomeCollection = solverData.outcomeCollections[
+            currentCondition.conditionId
+        ].find((outcomeCollection) => outcomeCollection.indexSet === indexSet)
+
+        if (
+            outcomeCollection &&
+            solverData.numMintedTokensByCondition &&
+            solverData.numMintedTokensByCondition[currentCondition.conditionId]
+        ) {
+            outcomeCollections.push({
+                ...getOutcomeCollectionInfoFromContractData(
+                    outcomeCollection,
+                    Number(
+                        ethers.utils.formatUnits(
+                            solverData.numMintedTokensByCondition[
+                                currentCondition.conditionId
+                            ],
+                            solverData.collateralToken.decimals
+                        )
+                    )
+                ),
+                indexSet: indexSet,
+            })
+        }
+    })
+    return outcomeCollections
+}

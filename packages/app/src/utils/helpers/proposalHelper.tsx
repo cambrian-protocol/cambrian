@@ -20,7 +20,7 @@ import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import { mergeFlexIntoComposition } from '../transformers/Composition'
+import { mergeFlexIntoComposition } from './flexInputHelpers'
 import { parseComposerSolvers } from '../transformers/ComposerTransformer'
 
 export const getProposalStatus = (
@@ -93,10 +93,7 @@ export const getOnChainProposal = async (
     )
     const res = await proposalsHub.getProposal(proposalID)
 
-    if (
-        res.id !==
-        '0x0000000000000000000000000000000000000000000000000000000000000000'
-    ) {
+    if (res.id !== ethers.constants.HashZero) {
         return res
     }
 }
@@ -237,7 +234,7 @@ export const deployProposal = async (
     }
 }
 
-export const deploySolutionBase = async (
+export const createSolutionBase = async (
     currentUser: UserType,
     stageStack: StageStackType
 ) => {
@@ -345,6 +342,10 @@ export const fetchProposalInfo = async (
                     proposalStreamID
                 ]
             ),
+            onChainProposalId: getOnChainProposalId(
+                cambrianStageStack.proposalStack.proposalCommitID,
+                cambrianStageStack.proposalStack.proposal.template.commitID
+            ),
             template: cambrianStageStack.proposalStack.template,
         }
     } else {
@@ -401,6 +402,10 @@ export const fetchProposalInfo = async (
                 undefined,
                 onChainProposal,
                 templateStreamContent.receivedProposals[proposalStreamID]
+            ),
+            onChainProposalId: getOnChainProposalId(
+                proposalDoc.commitId.toString(),
+                proposalDoc.content.template.commitID
             ),
             template: templateCommitContent,
         }

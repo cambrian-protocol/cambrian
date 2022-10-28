@@ -47,7 +47,6 @@ const Messenger = ({
                             >
                                 <CambrianProfileInfo
                                     cambrianProfileDoc={counterPartProfile}
-                                    hideDetails
                                     size="small"
                                 />
                                 <IconContext.Provider value={{ size: '18' }}>

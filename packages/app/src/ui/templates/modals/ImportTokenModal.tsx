@@ -9,7 +9,6 @@ import {
 } from 'grommet'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import { Coin } from 'phosphor-react'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -44,7 +43,6 @@ const ImportTokenModal = ({ onClose, onAddToken }: ImportTokenModalProps) => {
         <BaseLayerModal onClose={onClose}>
             <ModalHeader
                 title="Import Token"
-                icon={<Coin />}
                 description="Please insert the ERC20 Contract Address you would like to import"
             />
             <Form onSubmit={onSubmit}>

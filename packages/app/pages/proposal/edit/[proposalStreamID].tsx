@@ -53,7 +53,7 @@ export default function EditProposalPage() {
             ) : proposalInput && isEditable && stageStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
-                        <Box pad="large" gap="medium">
+                        <Box gap="medium">
                             <ProposalHeader
                                 proposalStatus={proposalStatus}
                                 stageStack={stageStack}

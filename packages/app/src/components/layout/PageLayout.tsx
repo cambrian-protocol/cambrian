@@ -74,6 +74,7 @@ const PageLayout = ({
                     >
                         <WrongChainBoundary>
                             <Box
+                                pad="large"
                                 width={kind === 'narrow' ? 'xlarge' : undefined}
                                 height={{ min: '90vh' }}
                             >

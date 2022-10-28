@@ -6,7 +6,7 @@ import { GenericMethods } from '../../../solver/Solver'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { getManualSlots } from '../../../solver/SolverHelpers'
+import { getManualSlots } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface InitiatedActionbarProps {
     solverMethods: GenericMethods

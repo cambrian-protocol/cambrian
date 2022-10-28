@@ -9,13 +9,12 @@ import { Box, Heading, Text } from 'grommet'
 import { FlowElement, Handle, Position } from 'react-flow-renderer'
 import React, { memo, useEffect, useState } from 'react'
 
-import { ComposerSolverModel } from '@cambrian/app/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 export const SolverNode = memo((props: FlowElement) => {
     const { composer } = useComposerContext()
-    const [currentSolverNode, setCurrentSolverNode] =
-        useState<ComposerSolverModel>()
+    const [currentSolverNode, setCurrentSolverNode] = useState<ComposerSolver>()
 
     useEffect(() => {
         const idPathArr = props.id.split('/')

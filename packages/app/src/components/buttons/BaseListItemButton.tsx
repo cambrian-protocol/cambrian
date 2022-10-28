@@ -54,7 +54,15 @@ const BaseListItemButton = ({
                         </Text>
                     </Box>
                 </Box>
-                {info && <InfoDropButton info={info} />}
+                {info && (
+                    <InfoDropButton
+                        dropContent={
+                            <Box pad="medium">
+                                <Text size="small">{info}</Text>
+                            </Box>
+                        }
+                    />
+                )}
                 {onClick && (
                     <Box>
                         <CaretRight />

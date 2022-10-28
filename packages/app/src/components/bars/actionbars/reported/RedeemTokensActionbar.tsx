@@ -7,7 +7,7 @@ import { Coin, Confetti, Info } from 'phosphor-react'
 import {
     calculateCollectionId,
     calculatePositionId,
-} from '../../../solver/SolverHelpers'
+} from '@cambrian/app/utils/helpers/solverHelpers'
 import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'

@@ -12,7 +12,6 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { StageNames } from '@cambrian/app/models/StageModel'
-import { Textbox } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -64,10 +63,7 @@ const RenameCompositionModal = ({
     return (
         <>
             <BaseLayerModal onClose={onClose}>
-                <ModalHeader
-                    title="Rename your Composition"
-                    icon={<Textbox />}
-                />
+                <ModalHeader title="Rename your Composition" />
                 <Form onSubmit={onSubmit}>
                     <FormField
                         label="Composition Title"

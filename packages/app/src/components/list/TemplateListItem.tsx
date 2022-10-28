@@ -19,7 +19,7 @@ import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalHashmap } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
-import ResponsiveLinkButton from '../buttons/ResponsiveLinkButton'
+import ResponsiveButton from '../buttons/ResponsiveButton'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -221,7 +221,7 @@ const TemplateListItem = ({
                                                 gap="small"
                                                 pad={{ vertical: 'small' }}
                                             >
-                                                <ResponsiveLinkButton
+                                                <ResponsiveButton
                                                     href={`/solver/${templateStreamID}`}
                                                     label="View"
                                                     icon={
@@ -275,7 +275,7 @@ const TemplateListItem = ({
                                                             : undefined
                                                     }
                                                 />
-                                                <ResponsiveLinkButton
+                                                <ResponsiveButton
                                                     href={`/template/edit/${templateStreamID}`}
                                                     label="Edit"
                                                     icon={

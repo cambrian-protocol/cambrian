@@ -94,7 +94,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     return (
         <>
             <PageLayout contextTitle="Dashboard">
-                <Box pad="large" gap="medium">
+                <Box gap="medium">
                     <Heading>Dashboard</Heading>
                     <Text color="dark-4">
                         Welcome back, {userName || 'Anon'}!

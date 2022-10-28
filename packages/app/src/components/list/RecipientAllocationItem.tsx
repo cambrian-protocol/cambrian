@@ -1,35 +1,34 @@
-import BaseSlotInputItem, { BaseSlotInputItemProps } from './BaseSlotInputItem'
-import { BigNumber, ethers } from 'ethers'
 import { Box, Text } from 'grommet'
+import RecipientItem, { RecipientItemProps } from './RecipientItem'
 
+import { RecipientAllocationInfoType } from '../info/solver/BaseSolverInfo'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
-type RecipientAllocationItemProps = BaseSlotInputItemProps & {
-    amountPercentage: string
-    amount?: BigNumber
-    token: TokenModel
+type RecipientAllocationItemProps = RecipientItemProps & {
+    recipientAllocationInfo: RecipientAllocationInfoType
+    token?: TokenModel
 }
 
 const RecipientAllocationItem = ({
-    amountPercentage,
-    title,
-    address,
-    amount,
+    recipientAllocationInfo,
     token,
-}: RecipientAllocationItemProps) => (
-    <BaseSlotInputItem title={title} address={address}>
-        <Box align="end">
-            <Text>{amountPercentage}%</Text>
-            <Text size="small" color="dark-4" textAlign="end">
-                {amount &&
-                    `Minted: ${
-                        Number(
-                            ethers.utils.formatUnits(amount, token.decimals)
-                        ) / 10000
-                    }`}
-            </Text>
-        </Box>
-    </BaseSlotInputItem>
-)
+}: RecipientAllocationItemProps) => {
+    return (
+        <RecipientItem
+            title={recipientAllocationInfo.recipient.slotTag.label}
+            address={recipientAllocationInfo.recipient.address}
+        >
+            <Box align="end">
+                <Text>{recipientAllocationInfo.allocation.percentage}%</Text>
+                <Text size="small" color="dark-4" textAlign="end">
+                    {recipientAllocationInfo.allocation.amount &&
+                        `${recipientAllocationInfo.allocation.amount} ${
+                            token?.symbol || '??'
+                        }`}
+                </Text>
+            </Box>
+        </RecipientItem>
+    )
+}
 
 export default RecipientAllocationItem

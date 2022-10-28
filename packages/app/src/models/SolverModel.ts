@@ -47,11 +47,3 @@ export type SolverResponseModel = {
  **/
 
 export type ComposerIdPathType = { solverId?: string; ocId?: string }
-
-export type ComposerSolverModel = {
-    id: string
-    iface: ethers.utils.Interface
-    config: ComposerSolverConfigModel
-    slotTags: SlotTagsHashMapType
-    solverTag: SolverTagModel
-}

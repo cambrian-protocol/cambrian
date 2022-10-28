@@ -37,11 +37,7 @@ const ComposerSlotListItem = ({ slotModel }: ComposerSlotListItemProps) => {
         })
     }
 
-    const currentTitle = getSlotTitle(
-        slotModel,
-        currentSolver.slotTags,
-        composer.solvers
-    )
+    const currentTitle = getSlotTitle(slotModel, currentSolver.slotTags)
 
     return (
         <>

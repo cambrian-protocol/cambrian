@@ -2,6 +2,7 @@ import { Box, ResponsiveContext, WorldMap } from 'grommet'
 import { PageLayoutProps, siteTitle } from './PageLayout'
 
 import Appbar from '../bars/Appbar'
+import BaseFooter from './footer/BaseFooter'
 import Glow from '../branding/Glow'
 import Head from 'next/head'
 import { Page } from 'grommet'
@@ -11,8 +12,7 @@ import WarningBanner from '../containers/WarningBanner'
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar?: JSX.Element
     sidebar?: JSX.Element
-    proposalHeader: JSX.Element
-    solverHeader?: JSX.Element
+    header?: JSX.Element
 }
 
 const InteractionLayout = ({
@@ -20,8 +20,7 @@ const InteractionLayout = ({
     children,
     actionBar,
     sidebar,
-    proposalHeader,
-    solverHeader,
+    header,
 }: InteractionLayoutProps) => {
     return (
         <>
@@ -72,23 +71,20 @@ const InteractionLayout = ({
                                     <>
                                         {screenSize === 'small' ? (
                                             <Box gap="medium" fill>
-                                                {proposalHeader}
-                                                {solverHeader}
+                                                {header}
                                                 {sidebar}
                                                 <Box height={{ min: '70vh' }}>
                                                     {children}
                                                 </Box>
                                             </Box>
                                         ) : (
-                                            <Box width={'xlarge'}>
-                                                {proposalHeader}
-                                                {solverHeader}
+                                            <Box width={'xlarge'} gap="medium">
+                                                {header}
                                                 <Box
                                                     direction="row"
                                                     fill
                                                     gap="large"
                                                     height={{ min: '70vh' }}
-                                                    pad={{ top: 'medium' }}
                                                 >
                                                     {sidebar && (
                                                         <Box width="medium">
@@ -104,6 +100,7 @@ const InteractionLayout = ({
                             }}
                         </ResponsiveContext.Consumer>
                     </Box>
+                    <BaseFooter />
                 </Page>
                 {actionBar && actionBar}
             </Box>

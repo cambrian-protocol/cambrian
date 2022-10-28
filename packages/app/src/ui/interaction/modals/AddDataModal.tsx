@@ -8,7 +8,6 @@ import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import { GenericMethods } from '../../../components/solver/Solver'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
-import { ShieldCheck } from 'phosphor-react'
 import { ethers } from 'ethers'
 import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { isAddress } from '@cambrian/app/utils/helpers/validation'
@@ -102,7 +101,6 @@ const AddDataModal = ({
         <>
             <BaseLayerModal onBack={onBack}>
                 <ModalHeader
-                    icon={<ShieldCheck />}
                     title="Add solve data"
                     description='This Solver requires the following data. Fields marked "*" must be added before execution.'
                 />

@@ -1,179 +1,106 @@
-import { Box, Heading, Text } from 'grommet'
-import { ClipboardText, File, IconContext, Question } from 'phosphor-react'
+import { File, Gear } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
-import { Button } from 'grommet'
-import Link from 'next/link'
-import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
+import BaseHeader from './BaseHeader'
+import CompositionInfoModal from '@cambrian/app/ui/common/modals/CompositionInfoModal'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
-import { ResponsiveContext } from 'grommet'
-import { SUPPORT_DISCORD_LINK } from 'packages/app/config/ExternalLinks'
+import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
-import { useState } from 'react'
+import { getOnChainProposalId } from '@cambrian/app/utils/helpers/proposalHelper'
+import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {
-    stageStack?: StageStackType
+    stageStack: StageStackType
     proposalStatus?: ProposalStatus
-    showProposalDetails?: boolean
+    collateralToken?: TokenModel
+    showConfiguration?: boolean
 }
 
 const ProposalHeader = ({
     stageStack,
     proposalStatus,
-    showProposalDetails,
+    showConfiguration,
+    collateralToken,
 }: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
+    const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>([])
+    const [proposalAuthor] = useCambrianProfile(stageStack?.proposal.author)
+    const [mergedComposition, setMergedComposition] =
+        useState<CompositionModel>()
+    const [showSolverInfoModal, setShowSolverInfoModal] = useState(false)
 
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
+    useEffect(() => {
+        let items: ResponsiveButtonProps[] = []
+        if (stageStack) {
+            items.push({
+                label: 'Template Details',
+                icon: <File color={cpTheme.global.colors['dark-4']} />,
+                onClick: () => setShowTemplateInfoModal(true),
+            })
+            if (showConfiguration) {
+                setMergedComposition(
+                    mergeFlexIntoComposition(
+                        mergeFlexIntoComposition(
+                            stageStack.composition,
+                            stageStack.template.flexInputs
+                        ),
+                        stageStack.proposal.flexInputs
+                    )
+                )
+                items.push({
+                    label: 'Configuration',
+                    icon: <Gear color={cpTheme.global.colors['dark-4']} />,
+                    onClick: () => setShowSolverInfoModal(true),
+                })
+            }
+            setHeaderItems(items)
+        }
+    }, [stageStack])
 
+    const toggleShowSolverInfoModal = () =>
+        setShowSolverInfoModal(!showSolverInfoModal)
     const toggleShowTemplateInfoModal = () =>
         setShowTemplateInfoModal(!showTemplateInfoModal)
 
     return (
         <>
-            <ResponsiveContext.Consumer>
-                {(screenSize) => {
-                    return (
-                        <Box
-                            fill="horizontal"
-                            height={{ min: 'auto' }}
-                            pad={{
-                                top: 'medium',
-                                bottom: 'xsmall',
-                            }}
-                            gap="medium"
-                        >
-                            <Box gap="small">
-                                <Box direction="row" gap="medium">
-                                    <Text color={'brand'}>Proposal</Text>
-                                    <ProposalStatusBadge
-                                        status={proposalStatus}
-                                    />
-                                </Box>
-                                <Heading>
-                                    {stageStack?.proposal.title ||
-                                        'Untitled Proposal'}
-                                </Heading>
-                            </Box>
-                            <Box
-                                direction="row"
-                                justify="end"
-                                gap="small"
-                                border={{ side: 'bottom' }}
-                                pad={{ bottom: 'xsmall' }}
-                            >
-                                <IconContext.Provider value={{ size: '18' }}>
-                                    {showProposalDetails && stageStack && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowProposalInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Proposal Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <ClipboardText
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {stageStack && (
-                                        <Button
-                                            color="dark-4"
-                                            size="small"
-                                            onClick={
-                                                toggleShowTemplateInfoModal
-                                            }
-                                            label={
-                                                screenSize !== 'small'
-                                                    ? 'Template Details'
-                                                    : undefined
-                                            }
-                                            icon={
-                                                <File
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'dark-4'
-                                                        ]
-                                                    }
-                                                />
-                                            }
-                                        />
-                                    )}
-                                    {/* <Button
-                                        color="dark-4"
-                                        size="small"
-                                        disabled
-                                        label={
-                                            screenSize !== 'small'
-                                                ? 'Solver Overview'
-                                                : undefined
-                                        }
-                                        icon={
-                                            <TreeStructure
-                                                color={
-                                                    cpTheme.global.colors[
-                                                        'dark-4'
-                                                    ]
-                                                }
-                                            />
-                                        }
-                                    /> */}
-                                    <Link href={SUPPORT_DISCORD_LINK} passHref>
-                                        <a
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            <Button
-                                                color="dark-4"
-                                                size="small"
-                                                label={
-                                                    screenSize !== 'small'
-                                                        ? 'Support'
-                                                        : undefined
-                                                }
-                                                icon={
-                                                    <Question
-                                                        color={
-                                                            cpTheme.global
-                                                                .colors[
-                                                                'dark-4'
-                                                            ]
-                                                        }
-                                                    />
-                                                }
-                                            />
-                                        </a>
-                                    </Link>
-                                </IconContext.Provider>
-                            </Box>
-                        </Box>
-                    )
-                }}
-            </ResponsiveContext.Consumer>
+            <BaseHeader
+                title={stageStack?.proposal.title || 'Untitled Proposal'}
+                metaTitle="Proposal Solver"
+                items={headerItems}
+                authorProfileDoc={proposalAuthor}
+                statusBadge={
+                    proposalStatus ? (
+                        <ProposalStatusBadge
+                            status={proposalStatus}
+                            onChainProposalId={getOnChainProposalId(
+                                stageStack?.proposalCommitID || '',
+                                stageStack?.proposal.template.commitID || ''
+                            )}
+                        />
+                    ) : undefined
+                }
+            />
             {showTemplateInfoModal && stageStack && (
                 <TemplateInfoModal
                     stageStack={stageStack}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
-            {showProposalInfoModal && stageStack && (
-                <ProposalInfoModal
-                    stageStack={stageStack}
-                    onClose={toggleShowProposalInfoModal}
+            {showSolverInfoModal && mergedComposition && (
+                <CompositionInfoModal
+                    price={{
+                        amount: stageStack.proposal.price.amount,
+                        token: collateralToken,
+                    }}
+                    composition={mergedComposition}
+                    onClose={toggleShowSolverInfoModal}
                 />
             )}
         </>

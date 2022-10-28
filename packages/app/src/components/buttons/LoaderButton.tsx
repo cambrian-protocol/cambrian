@@ -6,6 +6,7 @@ import { ButtonExtendedProps } from 'grommet'
 import { IconContext } from 'phosphor-react'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
+import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
 
 export type LoaderButtonProps = ButtonExtendedProps & {
     isLoading: boolean
@@ -18,6 +19,7 @@ const LoaderButton = ({
     icon,
     ...props
 }: LoaderButtonProps) => {
+    const windowSize = useWindowSize()
     const [showLoader, setShowLoader] = useState(false)
     const [width, setWidth] = useState(0)
     const [height, setHeight] = useState(0)
@@ -30,7 +32,7 @@ const LoaderButton = ({
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [children])
+    }, [children, windowSize, props.disabled])
 
     useEffect(() => {
         if (isLoading) {
@@ -56,6 +58,7 @@ const LoaderButton = ({
                     ? {
                           width: `${width}px`,
                           height: `${height}px`,
+                          maxWidth: '100%',
                       }
                     : {}
             }

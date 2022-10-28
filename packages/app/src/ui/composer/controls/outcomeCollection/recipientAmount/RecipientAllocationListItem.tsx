@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import BaseComposerListItem from '@cambrian/app/components/list/BaseComposerListItem'
 import { ComposerAllocationType } from '@cambrian/app/models/AllocationModel'
 import { ComposerSlotPathType } from '@cambrian/app/src/models/SlotModel'
-import { ComposerSolverModel } from '@cambrian/app/src/models/SolverModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { SlotType } from '@cambrian/app/src/models/SlotType'
 import UpdateRecipientAllocationModal from './modals/UpdateRecipientAllocationModal'
 import UpdateRecipientModal from '../../solver/recipientList/modals/UpdateRecipientModal'
@@ -13,7 +13,7 @@ import { useComposerContext } from '@cambrian/app/store/composer/composer.contex
 
 type RecipientAllocationListItemProps = {
     recipientSlotPath: ComposerSlotPathType
-    currentSolver: ComposerSolverModel
+    currentSolver: ComposerSolver
     currentOcId: string
 }
 
@@ -22,7 +22,7 @@ const RecipientAllocationListItem = ({
     currentSolver,
     currentOcId,
 }: RecipientAllocationListItemProps) => {
-    const { composer, dispatch } = useComposerContext()
+    const { dispatch } = useComposerContext()
     const [showEditAmountModal, setShowEditAmountModal] = useState(false)
     const [showEditRecipientModal, setShowEditRecipientModal] = useState(false)
 
@@ -57,8 +57,7 @@ const RecipientAllocationListItem = ({
 
     const currentTitle = getSlotTitle(
         allocation.recipientModel,
-        currentSolver.slotTags,
-        composer.solvers
+        currentSolver.slotTags
     )
 
     const currentAllocation = allocation.amountModel?.data[0]
@@ -110,7 +109,7 @@ const RecipientAllocationListItem = ({
 export default RecipientAllocationListItem
 
 export const findAllocation = (
-    solver: ComposerSolverModel,
+    solver: ComposerSolver,
     ocId: string,
     recipientSlotPath: ComposerSlotPathType
 ): ComposerAllocationType | undefined => {

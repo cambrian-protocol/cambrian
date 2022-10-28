@@ -1,22 +1,17 @@
 import { Box } from 'grommet'
 import { DropButton } from 'grommet'
 import { Info } from 'phosphor-react'
-import { Text } from 'grommet'
 
 interface InfoDropButtonProps {
-    info: string
+    dropContent: JSX.Element
 }
 
-const InfoDropButton = ({ info }: InfoDropButtonProps) => {
+const InfoDropButton = ({ dropContent }: InfoDropButtonProps) => {
     return (
         <DropButton
             icon={<Info size={24} />}
             dropAlign={{ top: 'bottom', right: 'right' }}
-            dropContent={
-                <Box pad="medium" width={{ max: 'medium' }}>
-                    <Text size="small">{info}</Text>
-                </Box>
-            }
+            dropContent={<Box width={{ max: 'medium' }}>{dropContent}</Box>}
         />
     )
 }
