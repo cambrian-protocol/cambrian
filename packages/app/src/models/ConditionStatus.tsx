@@ -27,14 +27,14 @@ type ConditionStatusDetailsType = {
 export const CONDITION_STATUS_INFO: ConditionStatusDetailsType = {}
 
 CONDITION_STATUS_INFO[ConditionStatus.Initiated] = {
-    name: 'INITIATED',
+    name: 'Initiated',
     description:
         'This Solver has just been initiated, if the Keeper has input all required data it can be progressed and the work can begin.',
     icon: <AsteriskSimple />,
     color: 'status-initiated',
 }
 CONDITION_STATUS_INFO[ConditionStatus.Executed] = {
-    name: 'SOLVING',
+    name: 'Solving',
     description: 'Work in progress',
     icon: <Play />,
     color: 'status-executed',
