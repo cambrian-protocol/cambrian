@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import PayoutInfoComponent from '../../components/bars/sidebar/PayoutInfoComponent'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface DeliveredArbitrationInfoComponentProps {
     solverData: SolverModel
@@ -22,7 +20,7 @@ const DeliveredArbitrationInfoComponent = ({
     currentCondition,
 }: DeliveredArbitrationInfoComponentProps) => {
     const [reportedOutcome, setReportedOutcome] =
-        useState<OutcomeCollectionInfoType>()
+        useState<OutcomeCollectionModel>()
 
     useEffect(() => {
         fetchPayoutFromCTF()
@@ -51,20 +49,7 @@ const DeliveredArbitrationInfoComponent = ({
                 (outcomeCollection) => outcomeCollection.indexSet === indexSet
             )
             if (outcomeCollection) {
-                const outcomeInfo =
-                    solverData.numMintedTokensByCondition &&
-                    getOutcomeCollectionInfoFromContractData(
-                        outcomeCollection,
-                        Number(
-                            ethers.utils.formatUnits(
-                                solverData.numMintedTokensByCondition[
-                                    currentCondition.conditionId
-                                ],
-                                solverData.collateralToken.decimals
-                            )
-                        )
-                    )
-                setReportedOutcome(outcomeInfo)
+                setReportedOutcome(outcomeCollection)
             }
         }
     }

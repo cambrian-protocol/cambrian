@@ -3,11 +3,8 @@ import {
     RichSlotModel,
     SlotModel,
 } from '@cambrian/app/models/SlotModel'
-import {
-    OutcomeCollectionInfoType,
-    RecipientAllocationInfoType,
-} from '@cambrian/app/components/info/solver/BaseSolverInfo'
 
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
@@ -235,85 +232,74 @@ export const getOutcomeCollectionsInfoFromCeramicData = (
     composerSolver: ComposerSolver,
     composition: CompositionModel,
     price: PriceModel
-): OutcomeCollectionInfoType[] => {
+): OutcomeCollectionModel[] => {
     return composerSolver.config.condition.partition.map((p) => {
         const recipientAmounts =
             composerSolver.config.condition.recipientAmountSlots[p.id]
 
-        const _recipientAllocations: RecipientAllocationInfoType[] =
-            recipientAmounts.map((recipientAmount) => {
-                const recipientInfo = getRecipientInfoFromComposer(
-                    recipientAmount.recipient,
-                    composerSolver,
-                    composition
-                )
+        const _allocations: AllocationModel[] = []
 
-                const allocation = getAmountInfoFromComposer(
-                    recipientAmount.amount,
-                    composerSolver,
-                    composition,
-                    price.amount
-                )
+        recipientAmounts.forEach((recipientAmount) => {
+            const recipientRichSlot = getComposerRichSlot(
+                recipientAmount.recipient,
+                composition
+            )
 
-                return {
-                    allocation: allocation,
-                    recipient: recipientInfo,
-                }
-            })
+            const allocationAmount = getAmountInfoFromComposer(
+                recipientAmount.amount,
+                composition,
+                price
+            )
+            if (allocationAmount && recipientRichSlot) {
+                _allocations.push({
+                    amountPercentage: allocationAmount.percentage,
+                    amount: allocationAmount.amount,
+                    positionId: '', // Note: Not necessary for displaying ceramic data
+                    addressSlot: recipientRichSlot,
+                })
+            }
+        })
 
         return {
             outcomes: p.outcomes,
-            recipientAllocations: _recipientAllocations,
+            allocations: _allocations,
         }
     })
 }
 
-export const getRecipientInfoFromComposer = (
-    recipientSlotPath: ComposerSlotPathType,
-    currentComposerSolver: ComposerSolver,
-    composition: CompositionModel
-) => {
-    return {
-        slotTag: currentComposerSolver.slotTags[recipientSlotPath.slotId],
-        address: getComposerSlotData(
-            recipientSlotPath,
-            currentComposerSolver,
-            composition
-        ),
-    }
-}
-
 export const getAmountInfoFromComposer = (
     amountSlotPath: ComposerSlotPathType,
-    currentComposerSolver: ComposerSolver,
     composition: CompositionModel,
-    price?: number
+    price: PriceModel
 ) => {
-    const percentage =
-        getComposerSlotData(
-            amountSlotPath,
-            currentComposerSolver,
-            composition
-        ) / 100
-    return {
-        percentage: percentage.toString(),
-        amount: price ? (price * percentage) / 100 : 0,
+    const amountSlot = getComposerRichSlot(amountSlotPath, composition)
+
+    if (amountSlot) {
+        const percentage = Number(amountSlot.slot.data) / 100
+        // Parsing amount to match contract data
+        const amount = price.amount ? price.amount * percentage * 100 : 0
+        const parsedAmount = ethers.utils.parseUnits(
+            amount.toString(),
+            price.token?.decimals
+        )
+        return {
+            percentage: percentage.toString(),
+            amount: parsedAmount,
+        }
     }
 }
 
-export const getComposerSlotData = (
+export const getComposerRichSlot = (
     slotPath: ComposerSlotPathType,
-    currentComposerSolver: ComposerSolver,
     composition: CompositionModel
-) => {
+): RichSlotModel | undefined => {
     try {
-        let currentSolver: ComposerSolver | undefined = currentComposerSolver
-        if (slotPath.solverId !== currentSolver.id) {
-            currentSolver = composition.solvers.find(
-                (solver) => solver.id === slotPath.solverId
-            )
-            if (!currentSolver) throw new Error('Solver ID not found!')
-        }
+        const currentSolverIndex = composition.solvers.findIndex(
+            (solver) => solver.id === slotPath.solverId
+        )
+        if (currentSolverIndex < 0) throw new Error('Solver ID not found!')
+        let currentSolver: ComposerSolver | undefined =
+            composition.solvers[currentSolverIndex]
         const slot = currentSolver.config.slots[slotPath.slotId]
         let data
         if (slot.reference) {
@@ -333,72 +319,24 @@ export const getComposerSlotData = (
         } else {
             data = slot.data[0]
         }
-        return data
+        return {
+            tag: currentSolver.slotTags[slot.id],
+            slot: {
+                data:
+                    data !== '' &&
+                    data !== ethers.constants.AddressZero &&
+                    slot.dataTypes[0] === SolidityDataTypes.Address
+                        ? ethers.utils.defaultAbiCoder.encode(slot.dataTypes, [
+                              data,
+                          ])
+                        : data,
+                executions: 0,
+                ingestType: slot.slotType,
+                slot: slot.id,
+                solverIndex: currentSolverIndex,
+            },
+        }
     } catch (e) {
         cpLogger.push(e)
-    }
-}
-
-export const getOutcomeCollectionsInfosFromContractData = (
-    solverContractData: SolverModel,
-    contractCondition: SolverContractCondition
-): OutcomeCollectionInfoType[] => {
-    return solverContractData.outcomeCollections[
-        contractCondition.conditionId
-    ].map((outcomeCollection) => {
-        const balance =
-            solverContractData.numMintedTokensByCondition &&
-            solverContractData.numMintedTokensByCondition[
-                contractCondition.conditionId
-            ] &&
-            solverContractData.numMintedTokensByCondition[
-                contractCondition.conditionId
-            ].gt(0)
-                ? solverContractData.numMintedTokensByCondition[
-                      contractCondition.conditionId
-                  ]
-                : solverContractData.collateralBalance
-        return {
-            ...getOutcomeCollectionInfoFromContractData(
-                outcomeCollection,
-                Number(
-                    ethers.utils.formatUnits(
-                        balance,
-                        solverContractData.collateralToken.decimals
-                    )
-                )
-            ),
-            indexSet: outcomeCollection.indexSet,
-        }
-    })
-}
-
-export const getOutcomeCollectionInfoFromContractData = (
-    contractOutcomeCollection: OutcomeCollectionModel,
-    balance: number
-): OutcomeCollectionInfoType => {
-    const _recipientAllocations: RecipientAllocationInfoType[] =
-        contractOutcomeCollection.allocations.map((recipientAllocation) => {
-            return {
-                recipient: {
-                    address: decodeData(
-                        [SolidityDataTypes.Address],
-                        recipientAllocation.addressSlot.slot.data
-                    ),
-                    slotTag: recipientAllocation.addressSlot.tag,
-                },
-                allocation: {
-                    percentage: recipientAllocation.amountPercentage,
-                    amount:
-                        (balance *
-                            Number(recipientAllocation.amountPercentage)) /
-                        100,
-                },
-            }
-        })
-
-    return {
-        outcomes: contractOutcomeCollection.outcomes,
-        recipientAllocations: _recipientAllocations,
     }
 }

@@ -6,14 +6,13 @@ import { DisputeModel } from '@cambrian/app/models/DisputeModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '../../solver/OutcomeOverview'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { getOutcomeCollectionInfoFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void
@@ -60,7 +59,7 @@ const ArbitrateDesiredOutcomeModal = ({
                 />
                 <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
                     <OutcomeOverview
-                        outcomeCollectionInfos={getOutcomeCollectionsToArbitrate(
+                        outcomeCollections={getOutcomeCollectionsToArbitrate(
                             dispute,
                             solverData,
                             currentCondition
@@ -93,8 +92,7 @@ const getOutcomeCollectionsToArbitrate = (
     solverData: SolverModel,
     currentCondition: SolverContractCondition
 ) => {
-    const outcomeCollections: OutcomeCollectionInfoType[] = []
-
+    const outcomeCollections: OutcomeCollectionModel[] = []
     dispute.disputers.forEach((disputer, idx) => {
         const indexSet = getIndexSetFromBinaryArray(dispute.choices[idx])
 
@@ -102,25 +100,8 @@ const getOutcomeCollectionsToArbitrate = (
             currentCondition.conditionId
         ].find((outcomeCollection) => outcomeCollection.indexSet === indexSet)
 
-        if (
-            outcomeCollection &&
-            solverData.numMintedTokensByCondition &&
-            solverData.numMintedTokensByCondition[currentCondition.conditionId]
-        ) {
-            outcomeCollections.push({
-                ...getOutcomeCollectionInfoFromContractData(
-                    outcomeCollection,
-                    Number(
-                        ethers.utils.formatUnits(
-                            solverData.numMintedTokensByCondition[
-                                currentCondition.conditionId
-                            ],
-                            solverData.collateralToken.decimals
-                        )
-                    )
-                ),
-                indexSet: indexSet,
-            })
+        if (outcomeCollection) {
+            outcomeCollections.push(outcomeCollection)
         }
     })
     return outcomeCollections

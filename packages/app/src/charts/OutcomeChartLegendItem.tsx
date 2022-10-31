@@ -1,27 +1,29 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import { AllocationModel } from '../models/AllocationModel'
 import BaseAvatar from '../components/avatars/BaseAvatar'
 import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CambrianProfileAbout from '../components/info/CambrianProfileAbout'
 import { CambrianProfileType } from '../store/UserContext'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import InfoDropButton from '../components/buttons/InfoDropButton'
-import { RecipientAllocationInfoType } from '../components/info/solver/BaseSolverInfo'
+import { SolidityDataTypes } from '../models/SolidityDataTypes'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenModel } from '../models/TokenModel'
+import { decodeData } from '../utils/helpers/decodeData'
 import { ethers } from 'ethers'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
 interface OutcomeChartRecipientLegendItemProps {
-    recipientAllocation: RecipientAllocationInfoType
+    allocation: AllocationModel
     active: boolean
     collateralToken?: TokenModel
     color: string
 }
 
 const OutcomeChartRecipientLegendItem = ({
-    recipientAllocation,
+    allocation,
     active,
     collateralToken,
     color,
@@ -29,6 +31,7 @@ const OutcomeChartRecipientLegendItem = ({
     const { currentUser } = useCurrentUserContext()
     const [cambrianProfile, setCambrianProfile] =
         useState<TileDocument<CambrianProfileType>>()
+    const [decodedAddress, setDecodedAddress] = useState<string>()
 
     useEffect(() => {
         fetchCeramicProfile()
@@ -37,17 +40,28 @@ const OutcomeChartRecipientLegendItem = ({
     const fetchCeramicProfile = async () => {
         if (currentUser) {
             const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const cambrianProfileDoc = (await TileDocument.deterministic(
-                ceramic,
-                {
-                    controllers: [
-                        `did:pkh:eip155:${currentUser.chainId}:${recipientAllocation.recipient.address}`,
-                    ],
-                    family: 'cambrian-profile',
-                },
-                { pin: true }
-            )) as TileDocument<CambrianProfileType>
-            setCambrianProfile(cambrianProfileDoc)
+            if (
+                allocation.addressSlot.slot.data.length > 0 &&
+                allocation.addressSlot.slot.data !==
+                    ethers.constants.AddressZero
+            ) {
+                const _decodedAddress = decodeData(
+                    [SolidityDataTypes.Address],
+                    allocation.addressSlot.slot.data
+                )
+                const cambrianProfileDoc = (await TileDocument.deterministic(
+                    ceramic,
+                    {
+                        controllers: [
+                            `did:pkh:eip155:${currentUser.chainId}:${_decodedAddress}`,
+                        ],
+                        family: 'cambrian-profile',
+                    },
+                    { pin: true }
+                )) as TileDocument<CambrianProfileType>
+                setDecodedAddress(_decodedAddress)
+                setCambrianProfile(cambrianProfileDoc)
+            }
         }
     }
     return (
@@ -68,11 +82,14 @@ const OutcomeChartRecipientLegendItem = ({
                 border={{ color: 'brand' }}
             />
             <Box width={'xxsmall'}>
-                <Text weight={'bold'}>
-                    {recipientAllocation.allocation.percentage}%
-                </Text>
+                <Text weight={'bold'}>{allocation.amountPercentage}%</Text>
                 <Text size="xsmall" color="dark-4">
-                    {recipientAllocation.allocation.amount}{' '}
+                    {Number(
+                        ethers.utils.formatUnits(
+                            allocation.amount || 0,
+                            collateralToken?.decimals
+                        )
+                    ) / 10000}{' '}
                     {collateralToken?.symbol || '??'}
                 </Text>
             </Box>
@@ -90,36 +107,19 @@ const OutcomeChartRecipientLegendItem = ({
                             size="xsmall"
                         />
                     ) : (
-                        <BaseAvatar
-                            address={
-                                recipientAllocation.recipient.address.length >
-                                    0 &&
-                                recipientAllocation.recipient.address !==
-                                    ethers.constants.AddressZero
-                                    ? recipientAllocation.recipient.address
-                                    : undefined
-                            }
-                            size="xsmall"
-                        />
+                        <BaseAvatar address={decodedAddress} size="xsmall" />
                     )}
                     <Box>
                         <Text size="small">
-                            {recipientAllocation.recipient.slotTag.label}
+                            {allocation.addressSlot.tag.label}
                         </Text>
                         <Text size="xsmall" color="dark-4">
                             {cambrianProfile?.content.name ||
-                                recipientAllocation.recipient.address.length ===
-                                    0 ||
-                                (recipientAllocation.recipient.address ===
-                                    ethers.constants.AddressZero &&
-                                    'To be defined')}
+                                (!decodedAddress && 'To be defined')}
                         </Text>
                     </Box>
                 </Box>
-                {cambrianProfile &&
-                recipientAllocation.recipient.address !== '' &&
-                recipientAllocation.recipient.address !==
-                    ethers.constants.AddressZero ? (
+                {cambrianProfile && decodedAddress ? (
                     <InfoDropButton
                         dropContent={
                             <CambrianProfileAbout
@@ -132,10 +132,7 @@ const OutcomeChartRecipientLegendItem = ({
                         dropContent={
                             <Box pad="small">
                                 <Text size="small" color="dark-4">
-                                    {
-                                        recipientAllocation.recipient.slotTag
-                                            .description
-                                    }
+                                    {allocation.addressSlot.tag.description}
                                 </Text>
                             </Box>
                         }

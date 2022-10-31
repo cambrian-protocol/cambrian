@@ -3,23 +3,24 @@ import { useEffect, useState } from 'react'
 
 import { Cursor } from 'phosphor-react'
 import OutcomeChartRecipientLegendItem from './OutcomeChartLegendItem'
-import { OutcomeCollectionInfoType } from '../components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '../models/OutcomeCollectionModel'
 import ReactSvgPieChart from 'react-svg-piechart'
 import { TokenModel } from '../models/TokenModel'
 import { cpTheme } from '../theme/theme'
+import { ethers } from 'ethers'
 
 interface OutcomeChartProps {
-    outcomeCollection?: OutcomeCollectionInfoType
+    outcomeCollection?: OutcomeCollectionModel
     collateralToken?: TokenModel
 }
 
 const COLORS = [
     cpTheme.global.colors['brand'].dark,
+    cpTheme.global.colors['status-reported'],
     cpTheme.global.colors['accent-1'],
+    cpTheme.global.colors['status-executed'],
     cpTheme.global.colors['accent-2'],
-    cpTheme.global.colors['accent-3'],
-    cpTheme.global.colors['accent-4'],
-    cpTheme.global.colors['accent-5'],
+    cpTheme.global.colors['status-arbitration'],
 ]
 
 const OutcomeChart = ({
@@ -36,11 +37,16 @@ const OutcomeChart = ({
     >()
 
     useEffect(() => {
-        const activePieData = outcomeCollection?.recipientAllocations.map(
-            (rc, idx) => {
+        const activePieData = outcomeCollection?.allocations.map(
+            (allocation, idx) => {
                 return {
-                    title: `${rc.recipient.slotTag.label} (${rc.allocation.percentage}%)`,
-                    value: rc.allocation.amount,
+                    title: `${allocation.addressSlot.tag.label} (${allocation.amountPercentage}%)`,
+                    value: Number(
+                        ethers.utils.formatUnits(
+                            allocation.amount || 0,
+                            collateralToken?.decimals
+                        )
+                    ),
                     color: COLORS[idx],
                 }
             }
@@ -56,9 +62,9 @@ const OutcomeChart = ({
                         data={pieData}
                         expandOnHover={
                             currentHoverIndex !== undefined
-                                ? outcomeCollection?.recipientAllocations[
+                                ? !outcomeCollection?.allocations[
                                       currentHoverIndex
-                                  ].allocation.amount !== 0
+                                  ].amount?.isZero()
                                 : true
                         }
                         expandedIndex={currentHoverIndex}
@@ -86,7 +92,7 @@ const OutcomeChart = ({
             </Box>
             <Box gap="xsmall" pad={{ horizontal: 'small', bottom: 'large' }}>
                 {outcomeCollection ? (
-                    outcomeCollection.recipientAllocations.map((rc, idx) => {
+                    outcomeCollection.allocations.map((allocation, idx) => {
                         return (
                             <Box
                                 onMouseEnter={() => setCurrentHoverIndex(idx)}
@@ -94,7 +100,7 @@ const OutcomeChart = ({
                             >
                                 <OutcomeChartRecipientLegendItem
                                     color={COLORS[idx]}
-                                    recipientAllocation={rc}
+                                    allocation={allocation}
                                     active={currentHoverIndex === idx}
                                     collateralToken={collateralToken}
                                 />

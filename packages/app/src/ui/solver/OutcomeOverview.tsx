@@ -8,13 +8,13 @@ import {
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
-import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { useState } from 'react'
 
 type OutcomeOverviewProps = {
-    outcomeCollectionInfos: OutcomeCollectionInfoType[]
+    outcomeCollections: OutcomeCollectionModel[]
     collateralToken?: TokenModel
     reportProps?: {
         reportLabel: string
@@ -25,7 +25,7 @@ type OutcomeOverviewProps = {
 }
 
 const OutcomeOverview = ({
-    outcomeCollectionInfos,
+    outcomeCollections,
     collateralToken,
     reportProps,
 }: OutcomeOverviewProps) => {
@@ -61,7 +61,7 @@ const OutcomeOverview = ({
                                         )
                                     }
                                 >
-                                    {outcomeCollectionInfos.map(
+                                    {outcomeCollections.map(
                                         (outcomeCollection, idx) => {
                                             return (
                                                 <Box
@@ -112,7 +112,7 @@ const OutcomeOverview = ({
                                                             <Box flex>
                                                                 <OutcomeChart
                                                                     outcomeCollection={
-                                                                        outcomeCollectionInfos[
+                                                                        outcomeCollections[
                                                                             activeOutcomeCollection[0]
                                                                         ]
                                                                     }
@@ -172,7 +172,7 @@ const OutcomeOverview = ({
                                 <Box pad={{ left: 'small' }} flex>
                                     <OutcomeChart
                                         outcomeCollection={
-                                            outcomeCollectionInfos[
+                                            outcomeCollections[
                                                 activeOutcomeCollection[0]
                                             ]
                                         }

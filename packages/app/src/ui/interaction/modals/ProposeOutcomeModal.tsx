@@ -15,7 +15,6 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
-import { getOutcomeCollectionsInfosFromContractData } from '@cambrian/app/utils/helpers/solverHelpers'
 
 interface ProposeOutcomeModalProps {
     proposedIndexSet?: number
@@ -72,10 +71,11 @@ const ProposeOutcomeModal = ({
                             reportedIndexSet: proposedIndexSet,
                         }}
                         collateralToken={solverData.collateralToken}
-                        outcomeCollectionInfos={getOutcomeCollectionsInfosFromContractData(
-                            solverData,
-                            currentCondition
-                        )}
+                        outcomeCollections={
+                            solverData.outcomeCollections[
+                                currentCondition.conditionId
+                            ]
+                        }
                     />
                 </Box>
             </BaseLayerModal>

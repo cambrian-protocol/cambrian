@@ -1,13 +1,13 @@
 import { Box, Button, Text } from 'grommet'
 
-import { OutcomeCollectionInfoType } from '@cambrian/app/components/info/solver/BaseSolverInfo'
+import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeInfoModal from '../common/modals/OutcomeInfoModal'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import { useState } from 'react'
 
 interface OutcomeDetailItemProps {
-    outcomeCollection: OutcomeCollectionInfoType
+    outcomeCollection: OutcomeCollectionModel
 }
 
 const OutcomeDetailItem = ({ outcomeCollection }: OutcomeDetailItemProps) => {
@@ -19,7 +19,7 @@ const OutcomeDetailItem = ({ outcomeCollection }: OutcomeDetailItemProps) => {
             {outcomeCollection.outcomes.map((outcome, idx) => {
                 return (
                     <Box
-                        key={outcome.id}
+                        key={idx}
                         pad={{
                             vertical: 'small',
                             horizontal: 'medium',
