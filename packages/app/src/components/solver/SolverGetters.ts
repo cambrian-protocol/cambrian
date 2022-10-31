@@ -120,6 +120,7 @@ export const getSolverOutcomeCollections = async (
     config: SolverConfigModel,
     conditions: SolverContractCondition[],
     slotHistory: SlotsHistoryHashMapType,
+    collateralBalance: BigNumber,
     slotTags?: SlotTagsHashMapType,
     storedOutcomes?: OutcomeModel[],
     numMintedTokensByCondition?: {
@@ -166,19 +167,24 @@ export const getSolverOutcomeCollections = async (
                         let amountPercentage = amount.toNumber() / 100
                         if (amountPercentage % 1) amountPercentage.toFixed(2)
 
-                        let mintedAmountWei
-                        if (
-                            numMintedTokensByCondition &&
-                            numMintedTokensByCondition[condition.conditionId] &&
-                            !numMintedTokensByCondition[
-                                condition.conditionId
-                            ].isZero() &&
-                            !amount.isZero()
-                        ) {
-                            mintedAmountWei =
+                        let amountWei
+                        if (!amount.isZero()) {
+                            if (
+                                numMintedTokensByCondition &&
                                 numMintedTokensByCondition[
                                     condition.conditionId
-                                ].mul(amount)
+                                ] &&
+                                !numMintedTokensByCondition[
+                                    condition.conditionId
+                                ].isZero()
+                            ) {
+                                amountWei =
+                                    numMintedTokensByCondition[
+                                        condition.conditionId
+                                    ].mul(amount)
+                            } else {
+                                amountWei = collateralBalance.mul(amount)
+                            }
                         }
 
                         const positionId = calculatePositionId(
@@ -199,7 +205,7 @@ export const getSolverOutcomeCollections = async (
                                 ),
                             amountPercentage: amountPercentage.toString(),
                             positionId: positionId,
-                            amount: mintedAmountWei,
+                            amount: amountWei,
                         }
                     })
 
@@ -406,6 +412,7 @@ export const getSolverData = async (
         config,
         conditions,
         slotsHistory,
+        collateralBalance,
         storedMetadata?.slotTags,
         storedOutcomes,
         numMintedTokensByCondition
