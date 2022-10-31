@@ -6,6 +6,7 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
 import { PropsWithChildren } from 'react'
 import RecipientInfoItem from '../RecipientInfo'
+import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
@@ -31,6 +32,10 @@ const BaseSolverInfo = ({
     token,
     children,
 }: BaseSolverInfoProps) => {
+    const hasArbitrator =
+        (slotTags && slotTags['arbitrator'].isFlex) ||
+        (arbitrator && arbitrator.length > 0)
+
     return (
         <>
             <Box pad={{ horizontal: 'medium' }}>
@@ -45,7 +50,7 @@ const BaseSolverInfo = ({
                         slotTags={slotTags}
                         value={<RecipientInfoItem address={keeper} />}
                     />
-                    {arbitrator && (
+                    {hasArbitrator && (
                         <SolverConfigItem
                             id="arbitrator"
                             slotTags={slotTags}
