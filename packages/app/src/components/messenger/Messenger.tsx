@@ -18,7 +18,7 @@ const Messenger = ({
     chatID,
     participantDIDs,
 }: MessengerProps) => {
-    const [showMessenger, setShowMessenger] = useState(true)
+    const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
     // TODO Integrate Group chats
