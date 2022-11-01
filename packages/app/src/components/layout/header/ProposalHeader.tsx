@@ -1,12 +1,14 @@
-import { File, Gear } from 'phosphor-react'
+import { Box, Text } from 'grommet'
+import { File, FilmScript, ListNumbers } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseHeader from './BaseHeader'
-import CompositionInfoModal from '@cambrian/app/ui/common/modals/CompositionInfoModal'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import DropButtonListItem from '../../list/DropButtonListItem'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
+import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import TemplateInfoModal from '@cambrian/app/ui/common/modals/TemplateInfoModal'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -31,9 +33,9 @@ const ProposalHeader = ({
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
     const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>([])
     const [proposalAuthor] = useCambrianProfile(stageStack?.proposal.author)
-    const [mergedComposition, setMergedComposition] =
-        useState<CompositionModel>()
-    const [showSolverInfoModal, setShowSolverInfoModal] = useState(false)
+    const [composition, setComposition] = useState<CompositionModel>()
+    const [showSolverConfigModal, setShowSolverConfigModal] = useState<number>() // Solver index
+    const [onChainProposalId, setOnChainProposalId] = useState<string>()
 
     useEffect(() => {
         let items: ResponsiveButtonProps[] = []
@@ -44,27 +46,73 @@ const ProposalHeader = ({
                 onClick: () => setShowTemplateInfoModal(true),
             })
             if (showConfiguration) {
-                setMergedComposition(
+                const mergedComposition = mergeFlexIntoComposition(
                     mergeFlexIntoComposition(
-                        mergeFlexIntoComposition(
-                            stageStack.composition,
-                            stageStack.template.flexInputs
-                        ),
-                        stageStack.proposal.flexInputs
-                    )
+                        stageStack.composition,
+                        stageStack.template.flexInputs
+                    ),
+                    stageStack.proposal.flexInputs
                 )
+
+                setComposition(mergedComposition)
                 items.push({
-                    label: 'Configuration',
-                    icon: <Gear color={cpTheme.global.colors['dark-4']} />,
-                    onClick: () => setShowSolverInfoModal(true),
+                    label: 'Solver Configurations',
+                    dropContent: (
+                        <Box>
+                            {mergedComposition?.solvers.map((solver, idx) => (
+                                <DropButtonListItem
+                                    label={
+                                        <Box width="medium">
+                                            <Text>
+                                                {solver.solverTag.title}
+                                            </Text>
+                                            <Text
+                                                size="xsmall"
+                                                color="dark-4"
+                                                truncate
+                                            >
+                                                {solver.solverTag.description}
+                                            </Text>
+                                        </Box>
+                                    }
+                                    icon={<FilmScript />}
+                                    onClick={() =>
+                                        setShowSolverConfigModal(idx)
+                                    }
+                                />
+                            ))}
+                        </Box>
+                    ),
+                    dropAlign: {
+                        top: 'bottom',
+                        right: 'right',
+                    },
+                    dropProps: {
+                        round: {
+                            corner: 'bottom',
+                            size: 'xsmall',
+                        },
+                    },
+                    icon: (
+                        <ListNumbers color={cpTheme.global.colors['dark-4']} />
+                    ),
                 })
             }
             setHeaderItems(items)
         }
     }, [stageStack])
 
-    const toggleShowSolverInfoModal = () =>
-        setShowSolverInfoModal(!showSolverInfoModal)
+    useEffect(() => {
+        if (stageStack) {
+            setOnChainProposalId(
+                getOnChainProposalId(
+                    stageStack.proposalCommitID,
+                    stageStack.proposal.template.commitID
+                )
+            )
+        }
+    }, [proposalStatus])
+
     const toggleShowTemplateInfoModal = () =>
         setShowTemplateInfoModal(!showTemplateInfoModal)
 
@@ -79,10 +127,7 @@ const ProposalHeader = ({
                     proposalStatus ? (
                         <ProposalStatusBadge
                             status={proposalStatus}
-                            onChainProposalId={getOnChainProposalId(
-                                stageStack?.proposalCommitID || '',
-                                stageStack?.proposal.template.commitID || ''
-                            )}
+                            onChainProposalId={onChainProposalId}
                         />
                     ) : undefined
                 }
@@ -93,14 +138,15 @@ const ProposalHeader = ({
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
-            {showSolverInfoModal && mergedComposition && (
-                <CompositionInfoModal
+            {showSolverConfigModal !== undefined && composition && (
+                <SolverInfoModal
+                    onClose={() => setShowSolverConfigModal(undefined)}
+                    composition={composition}
+                    composerSolver={composition.solvers[showSolverConfigModal]}
                     price={{
                         amount: stageStack.proposal.price.amount,
                         token: collateralToken,
                     }}
-                    composition={mergedComposition}
-                    onClose={toggleShowSolverInfoModal}
                 />
             )}
         </>

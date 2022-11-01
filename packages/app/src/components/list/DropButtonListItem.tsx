@@ -4,7 +4,7 @@ import { IconContext } from 'phosphor-react'
 
 interface DropButtonListItemProps {
     onClick?: () => void
-    label: string
+    label: string | JSX.Element
     icon: JSX.Element
 }
 
@@ -25,7 +25,11 @@ const DropButtonListItem = ({
         <IconContext.Provider value={{ size: '24' }}>
             <Box pad="small">{icon}</Box>
         </IconContext.Provider>
-        <Text size="small">{label}</Text>
+        {typeof label === 'string' ? (
+            <Text size="small">{label}</Text>
+        ) : (
+            <>{label}</>
+        )}
     </Box>
 )
 
