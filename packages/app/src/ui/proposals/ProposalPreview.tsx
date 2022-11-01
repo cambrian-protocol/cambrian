@@ -3,7 +3,6 @@ import { Box, Heading, Text } from 'grommet'
 import CambrianProfileAbout from '@cambrian/app/components/info/CambrianProfileAbout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
-import ProposalControlbar from './control/ProposalControlbar'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { StageStackType } from '../dashboard/ProposalsDashboardUI'
@@ -57,7 +56,6 @@ const ProposalPreview = ({
                     <CambrianProfileAbout cambrianProfile={proposerProfile} />
                 </Box>
             )}
-            <ProposalControlbar />
         </Box>
     )
 }

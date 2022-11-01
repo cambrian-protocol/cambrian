@@ -2,6 +2,7 @@ import ProposalReviewActionbar, { PriceModel } from './ProposalReviewActionbar'
 
 import ProposalApprovedActionbar from './ProposalApprovedActionbar'
 import ProposalEditActionbar from './ProposalEditActionbar'
+import ProposalExecutedActionbar from './ProposalExecutedActionbar'
 import ProposalFundingActionbar from './ProposalFundingActionbar'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -76,9 +77,18 @@ const ProposalActionbar = ({
                         )}
                     </>
                 )
-            /*TODO Integrate Execution
             case ProposalStatus.Executed:
-                return <ProposalExecutedControl /> */
+                return (
+                    <>
+                        {currentUser && proposalContract && (
+                            <ProposalExecutedActionbar
+                                messenger={messenger}
+                                currentUser={currentUser}
+                                proposalContract={proposalContract}
+                            />
+                        )}
+                    </>
+                )
             default:
                 return <></>
         }
