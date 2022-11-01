@@ -1,20 +1,41 @@
-import { Button, ButtonExtendedProps, ResponsiveContext } from 'grommet'
+import {
+    Box,
+    Button,
+    ButtonExtendedProps,
+    DropButton,
+    DropProps,
+    ResponsiveContext,
+} from 'grommet'
 import ClipboardButton, { ClipboardButtonProps } from './ClipboardButton'
 
 import { ConditionalWrapper } from '../utils/ConditionalWrapper'
 import Link from 'next/link'
 
 export type ResponsiveButtonProps =
-    | (ButtonExtendedProps & {
-          href?: string
-      })
-    | ClipboardButtonProps
+    | (
+          | (ButtonExtendedProps & {
+                href?: string
+            })
+          | ClipboardButtonProps
+      ) & {
+          dropContent?: JSX.Element
+          dropAlign?: {
+              top?: 'top' | 'bottom'
+              bottom?: 'top' | 'bottom'
+              right?: 'left' | 'right'
+              left?: 'left' | 'right'
+          }
+          dropProps?: DropProps
+      }
 
 const ResponsiveButton = ({
     href,
     label,
     icon,
     value,
+    dropContent,
+    dropAlign,
+    dropProps,
     ...rest
 }: ResponsiveButtonProps) => {
     return (
@@ -29,7 +50,19 @@ const ResponsiveButton = ({
                             </Link>
                         )}
                     >
-                        {value !== undefined ? (
+                        {dropContent !== undefined ? (
+                            <DropButton
+                                dropContent={dropContent}
+                                dropAlign={dropAlign}
+                                dropProps={dropProps}
+                                icon={icon}
+                                size="small"
+                                color={'dark-4'}
+                                label={
+                                    screenSize !== 'small' ? label : undefined
+                                }
+                            />
+                        ) : value !== undefined ? (
                             <ClipboardButton
                                 {...rest}
                                 value={value as string}

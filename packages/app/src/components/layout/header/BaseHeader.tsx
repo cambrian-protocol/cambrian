@@ -45,7 +45,6 @@ const BaseHeader = ({
                 justify="between"
                 gap="small"
                 border={{ side: 'bottom' }}
-                pad={{ bottom: 'xsmall' }}
                 align="end"
                 height={'5em'}
             >

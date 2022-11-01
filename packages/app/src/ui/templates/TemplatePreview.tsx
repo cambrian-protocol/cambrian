@@ -1,13 +1,14 @@
 import { Box, Heading, Text } from 'grommet'
+import { FilmScript, ListNumbers } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import CambrianProfileAbout from '@cambrian/app/components/info/CambrianProfileAbout'
-import CompositionInfoModal from '../common/modals/CompositionInfoModal'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { Gear } from 'phosphor-react'
+import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
+import SolverInfoModal from '../common/modals/SolverInfoModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -31,10 +32,7 @@ const TemplatePreview = ({
     const [templaterProfile] = useCambrianProfile(template.author)
     const [composition, setComposition] = useState<CompositionModel>()
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
-    const [showCompositionModal, setShowCompositionModal] = useState(false)
-
-    const toggleShowCompositionModal = () =>
-        setShowCompositionModal(!showCompositionModal)
+    const [showSolverConfigModal, setShowSolverConfigModal] = useState<number>() // Solver Index
 
     useEffect(() => {
         if (currentUser) init(currentUser)
@@ -75,10 +73,57 @@ const TemplatePreview = ({
                         showConfiguration
                             ? [
                                   {
-                                      label: 'Configuration',
-                                      onClick: toggleShowCompositionModal,
+                                      label: 'Solver Configurations',
+                                      dropContent: (
+                                          <Box>
+                                              {composition?.solvers.map(
+                                                  (solver, idx) => (
+                                                      <DropButtonListItem
+                                                          label={
+                                                              <Box width="medium">
+                                                                  <Text>
+                                                                      {
+                                                                          solver
+                                                                              .solverTag
+                                                                              .title
+                                                                      }
+                                                                  </Text>
+                                                                  <Text
+                                                                      size="xsmall"
+                                                                      color="dark-4"
+                                                                      truncate
+                                                                  >
+                                                                      {
+                                                                          solver
+                                                                              .solverTag
+                                                                              .description
+                                                                      }
+                                                                  </Text>
+                                                              </Box>
+                                                          }
+                                                          icon={<FilmScript />}
+                                                          onClick={() =>
+                                                              setShowSolverConfigModal(
+                                                                  idx
+                                                              )
+                                                          }
+                                                      />
+                                                  )
+                                              )}
+                                          </Box>
+                                      ),
+                                      dropAlign: {
+                                          top: 'bottom',
+                                          right: 'right',
+                                      },
+                                      dropProps: {
+                                          round: {
+                                              corner: 'bottom',
+                                              size: 'xsmall',
+                                          },
+                                      },
                                       icon: (
-                                          <Gear
+                                          <ListNumbers
                                               color={
                                                   cpTheme.global.colors[
                                                       'dark-4'
@@ -121,14 +166,15 @@ const TemplatePreview = ({
                     </Box>
                 )}
             </Box>
-            {showCompositionModal && composition && (
-                <CompositionInfoModal
+            {showSolverConfigModal !== undefined && composition && (
+                <SolverInfoModal
+                    onClose={() => setShowSolverConfigModal(undefined)}
+                    composition={composition}
+                    composerSolver={composition.solvers[showSolverConfigModal]}
                     price={{
                         amount: template.price.amount,
                         token: denominationToken,
                     }}
-                    composition={composition}
-                    onClose={toggleShowCompositionModal}
                 />
             )}
         </>
