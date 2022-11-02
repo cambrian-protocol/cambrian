@@ -88,7 +88,7 @@ export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
             dropProps={{
                 round: {
                     corner: 'bottom',
-                    size: 'small',
+                    size: 'xsmall',
                 },
             }}
             dropBackground="background-popup"

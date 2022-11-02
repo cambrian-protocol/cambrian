@@ -228,22 +228,7 @@ export const UserContextProvider = ({
         if (user && user.provider?.on) {
             const handleAccountsChanged = async (accounts: string[]) => {
                 try {
-                    // TODO Account switch doesn't reconnect to Ceramic properly
-                    window.location.reload()
-                    /*  
-                    // Get the checksummed address to avoid Blockies seed differences
-                    const updatedSigner = user.web3Provider.getSigner()
-                    const updatedAddress = await updatedSigner.getAddress()
-
-                    await ceramicConnect(
-                        new EthereumAuthProvider(user.provider, updatedAddress)
-                    )
-
-                    dispatch({
-                        type: 'SET_SIGNER',
-                        address: updatedAddress,
-                        signer: updatedSigner,
-                    }) */
+                    connectWallet()
                 } catch (e) {
                     disconnectWallet()
                     console.warn(e)
@@ -251,14 +236,13 @@ export const UserContextProvider = ({
             }
 
             const handleChainChanged = (_hexChainId: string) => {
-                window.location.reload()
+                connectWallet()
             }
 
             const handleDisconnect = (error: {
                 code: number
                 message: string
             }) => {
-                console.warn('disconnect', error)
                 disconnectWallet()
             }
 
@@ -288,7 +272,6 @@ export const UserContextProvider = ({
         network: ethers.providers.Network,
         accountAddress: string
     ) => {
-        console.log(provider)
         let sessionStr = localStorage.getItem(
             `cambrian-session/${network.chainId}/${accountAddress}`
         )

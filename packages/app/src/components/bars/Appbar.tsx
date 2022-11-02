@@ -1,13 +1,12 @@
-import { Box, Button, ResponsiveContext } from 'grommet'
-import { IconContext, Layout, Question } from 'phosphor-react'
+import { Box, ResponsiveContext } from 'grommet'
 
+import AppbarMenuItem from './appbar/AppbarMenuItem'
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
+import ChainMenu from './appbar/ChainMenu'
 import { Header } from 'grommet'
-import Link from 'next/link'
-import { SUPPORT_DISCORD_LINK } from 'packages/app/config/ExternalLinks'
+import { Layout } from 'phosphor-react'
 import UserMenu from '../menu/UserMenu'
-import { cpTheme } from '@cambrian/app/theme/theme'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface AppbarProps {
@@ -43,21 +42,17 @@ const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
-                            <Box justify={'center'}>
-                                <AppbarMenuItem
-                                    pathname={SUPPORT_DISCORD_LINK}
-                                    label="Support"
-                                    icon={<Question />}
-                                />
-                            </Box>
                             {currentUser &&
                                 injectedWalletAddress === undefined && (
-                                    <Box justify={'center'}>
-                                        <AppbarMenuItem
-                                            pathname="/dashboard"
-                                            label="Dashboard"
-                                            icon={<Layout />}
-                                        />
+                                    <Box direction="row" gap="medium">
+                                        <Box justify="center">
+                                            <AppbarMenuItem
+                                                pathname="/dashboard"
+                                                label="Dashboard"
+                                                icon={<Layout />}
+                                            />
+                                        </Box>
+                                        <ChainMenu currentUser={currentUser} />
                                     </Box>
                                 )}
                             <UserMenu
@@ -72,33 +67,3 @@ const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
 }
 
 export default Appbar
-
-interface AppbarMenuItemProps {
-    pathname: string
-    label: string
-    icon: JSX.Element
-}
-
-const AppbarMenuItem = ({ icon, pathname, label }: AppbarMenuItemProps) => {
-    let isActive = false
-    if (typeof window !== 'undefined') {
-        isActive = window.location.pathname === pathname
-    }
-
-    return (
-        <IconContext.Provider
-            value={
-                isActive
-                    ? { size: '24' }
-                    : {
-                          size: '24',
-                          color: cpTheme.global.colors['dark-4'],
-                      }
-            }
-        >
-            <Link href={pathname} passHref>
-                <Button icon={icon} tip={label} active={isActive} />
-            </Link>
-        </IconContext.Provider>
-    )
-}
