@@ -17,7 +17,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
             const isSmallScreen = screenSize === 'small'
             return (
                 <Box
-                    height="90vh"
+                    height="80vh"
                     style={{ position: 'relative', overflow: 'hidden' }}
                 >
                     <WorldMap

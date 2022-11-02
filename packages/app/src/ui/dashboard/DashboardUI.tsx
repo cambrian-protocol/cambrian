@@ -36,13 +36,12 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
     const [isFetching, setIsFetching] = useState(false)
     const [activeIndex, setActiveIndex] = useState(0)
-    const [userName, setUserName] = useState(
-        currentUser.cambrianProfileDoc.content.name || 'Anon'
-    )
+    const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
+        setUserName(currentUser.cambrianProfileDoc.content.name || 'Anon')
         initDocSubsciption()
-    }, [])
+    }, [currentUser])
 
     useEffect(() => {
         if (query.idx !== activeIndex.toString()) {

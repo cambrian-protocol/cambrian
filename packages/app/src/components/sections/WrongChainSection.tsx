@@ -1,20 +1,24 @@
-import { Box, Heading, Text } from 'grommet'
-
-import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import { Box, Heading, Image, Text } from 'grommet'
 
 const WrongChainSection = () => (
-    <Box height={{ min: '90vh' }} justify="center" align="center" gap="small">
-        <Text size="small" color="dark-4">
-            You're connected to an unsupported chain
-        </Text>
-        <Heading level="2" textAlign="center">
-            Please connect your Wallet to one of our supported chains
-        </Heading>
-        {Object.keys(SUPPORTED_CHAINS).map((chain) => (
-            <Text key={chain}>
-                {SUPPORTED_CHAINS[Number(chain)].chainData.name}
+    <Box height={{ min: '90vh' }} justify="center" align="center">
+        <Box
+            style={{ position: 'absolute', top: 0, left: 0 }}
+            height={'100%'}
+            width={'100%'}
+        >
+            <Image src="/illustrations/wave.svg" opacity={'0.3'} />
+        </Box>
+        <Box style={{ position: 'relative' }} width="large" gap="small">
+            <Heading level="2">
+                Please connect your Wallet to one of our supported chains
+            </Heading>
+            <Text size="small" color="dark-4">
+                You're connected to an unsupported chain. Please hit the
+                'Unsupported'-Button at the top-right corner and select a
+                supported chain.
             </Text>
-        ))}
+        </Box>
     </Box>
 )
 

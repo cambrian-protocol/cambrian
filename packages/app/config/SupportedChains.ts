@@ -38,18 +38,8 @@ import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json
 import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
 import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
 import NOVA_ToyToken from '@cambrian/core/deployments/nova/ToyToken.json'
-import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
-import ROPSTEN_ArbitratorFactory from '@cambrian/core/deployments/ropsten/ArbitratorFactory.json'
-import ROPSTEN_BasicArbitrator from '@cambrian/core/deployments/ropsten/BasicArbitrator.json'
-import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
-import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
-import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
-import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHub.json'
-import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
-import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
-import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
 
-interface ChainInfo {
+export type ChainInfo = {
     name: string
     shortName: string
     chain: string
@@ -58,6 +48,8 @@ interface ChainInfo {
     networkId: number
     rpcUrl: string
     nativeCurrency: NativeCurrencyType
+    logoURI?: string
+    tokenListURI?: string
 }
 
 interface NativeCurrencyType {
@@ -97,6 +89,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/hardhat_logo.png',
         },
         contracts: {
             arbitratorFactory: LOCAL_ArbitratorFactory.address,
@@ -109,39 +102,6 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             solverFactory: LOCAL_SolverFactory.address,
             solverLib: LOCAL_SolverLib.address,
             toyToken: LOCAL_ToyToken.address,
-            defaultDenominationToken:
-                '0xc778417e063141139fce010982780140aa0cd5ab',
-        },
-        compositions: {},
-    },
-    3: {
-        chainData: {
-            name: 'Ropsten Test Network',
-            shortName: 'rop',
-            chain: 'ETH',
-            network: 'ropsten',
-            chainId: 3,
-            networkId: 3,
-            rpcUrl: 'https://ropsten.infura.io/v3/5e5e73b367364266b008aed15e5b3189',
-            nativeCurrency: {
-                symbol: 'ETH',
-                name: 'Ethereum',
-                decimals: '18',
-                contractAddress: '',
-                balance: '',
-            },
-        },
-        contracts: {
-            arbitratorFactory: ROPSTEN_ArbitratorFactory.address,
-            arbitrationDispatch: ROPSTEN_ArbitrationDispatch.address,
-            basicArbitrator: ROPSTEN_BasicArbitrator.address,
-            basicSolverV1: ROPSTEN_BasicSolverV1.address,
-            conditionalTokens: ROPSTEN_ConditionalTokens.address,
-            ipfsSolutionsHub: ROPSTEN_IPFSSolutionsHub.address,
-            proposalsHub: ROPSTEN_ProposalsHub.address,
-            solverFactory: ROPSTEN_SolverFactory.address,
-            solverLib: ROPSTEN_SolverLib.address,
-            toyToken: ROPSTEN_ToyToken.address,
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
@@ -163,6 +123,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/arbitrum_nova_logo.svg',
         },
         contracts: {
             arbitratorFactory: NOVA_ArbitratorFactory.address,
@@ -182,7 +143,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
     },
     5: {
         chainData: {
-            name: 'Goerli Test Network',
+            name: 'Görli',
             shortName: 'gor',
             chain: 'ETH',
             network: 'goerli',
@@ -196,6 +157,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/ethereum_logo.svg',
         },
         contracts: {
             arbitratorFactory: GOERLI_ArbitratorFactory.address,
@@ -223,7 +185,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             shortName: 'arb-one',
             chain: 'ETH',
             network: 'arbitrum-one',
-            chainId: 421761,
+            chainId: 42161,
             networkId: 42161,
             rpcUrl: 'https://arbitrum-mainnet.infura.io/v3/5e58480c71ad4bf3bb584550df349e01',
             nativeCurrency: {
@@ -233,6 +195,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/arbitrum_one_logo.svg',
         },
         contracts: {
             arbitratorFactory: ARBITRUM_ArbitratorFactory.address,
