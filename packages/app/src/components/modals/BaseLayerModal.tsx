@@ -45,6 +45,7 @@ const BaseLayerModal = ({
                 elevation="small"
                 height={{ max: 'xxsmall', min: 'xxsmall' }}
                 style={{ position: 'relative' }}
+                gap="medium"
             >
                 <IconContext.Provider value={{ size: '24' }}>
                     <Box onClick={onBack || onClose} focusIndicator={false}>

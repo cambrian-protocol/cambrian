@@ -49,7 +49,7 @@ export default class CeramicProposalAPI {
                 ),
                 author: this.user.did,
                 price: {
-                    amount: 0,
+                    amount: templateStreamDoc.content.price.amount || 0,
                     tokenAddress:
                         templateStreamDoc.content.price
                             .denominationTokenAddress,

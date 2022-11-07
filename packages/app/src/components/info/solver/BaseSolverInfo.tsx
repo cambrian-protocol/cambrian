@@ -1,16 +1,14 @@
 import { Box, Heading, Text } from 'grommet'
 
-import BaseInfoItem from '../BaseInfoItem'
+import BaseTokenItem from '../../token/BaseTokenItem'
 import ModalHeader from '../../layout/header/ModalHeader'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
 import { PropsWithChildren } from 'react'
 import RecipientInfoItem from '../RecipientInfo'
-import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
-import TokenAvatar from '../../avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 type BaseSolverInfoProps = PropsWithChildren<{}> & {
@@ -61,11 +59,9 @@ const BaseSolverInfo = ({
                         id="collateralToken"
                         slotTags={slotTags}
                         value={
-                            <BaseInfoItem
-                                icon={<TokenAvatar token={token} />}
-                                title={token?.name || 'Unknown'}
-                                subTitle={token?.symbol || 'Unknown'}
-                            />
+                            <Box align="start">
+                                <BaseTokenItem tokenAddress={token?.address} />
+                            </Box>
                         }
                     />
                     {children}

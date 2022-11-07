@@ -153,7 +153,7 @@ const TemplatePreview = ({
                 <PlainSectionDivider />
                 <PriceInfo
                     label="Price"
-                    amount={template.price.amount}
+                    amount={template.price.amount || 0}
                     token={denominationToken}
                 />
                 <PlainSectionDivider />

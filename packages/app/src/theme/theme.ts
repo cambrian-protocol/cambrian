@@ -2,6 +2,7 @@ import { deepMerge } from 'grommet/utils'
 import { grommet } from 'grommet'
 
 const colors: any = {
+    focus: 'brand',
     brand: {
         light: '#2d7dac',
         dark: '#2d7dac',
@@ -65,6 +66,27 @@ export const cpTheme = deepMerge(grommet, {
             background: 'background-front',
             border: { radius: '5px' },
         },
+    },
+    box: {
+        extend: `/* width */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #040f11; 
+    }
+     
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #012b39; 
+    }
+    
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555; 
+    }`,
     },
     paragraph: {
         small: {

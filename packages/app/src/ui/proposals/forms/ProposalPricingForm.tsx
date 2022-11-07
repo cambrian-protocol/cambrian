@@ -1,10 +1,11 @@
-import { Box, Button, Form, FormExtendedEvent, FormField, Text } from 'grommet'
+import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import TokenInput from '@cambrian/app/components/inputs/TokenInput'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
@@ -98,31 +99,48 @@ const ProposalPricingForm = ({
                                 </>
                             )}
                         </Box>
-                        <Box direction="row" gap="small">
-                            <FormField
-                                label="Amount"
-                                type="number"
-                                step={0.000000001}
-                                min={0}
-                                value={proposalInput.price.amount}
-                                onChange={(e) =>
+                        <Box
+                            border
+                            round="xsmall"
+                            pad="small"
+                            direction="row"
+                            align="center"
+                            gap="small"
+                            justify="between"
+                        >
+                            <Box flex>
+                                <NumberInput
+                                    name="amount"
+                                    value={proposalInput.price.amount}
+                                    onChange={(e) =>
+                                        setProposalInput({
+                                            ...proposalInput,
+                                            price: {
+                                                ...proposalInput.price,
+                                                amount: Number(e.target.value),
+                                            },
+                                        })
+                                    }
+                                />
+                            </Box>
+                            <SelectTokenItem
+                                allowAnyPaymentToken={
+                                    template.price.allowAnyPaymentToken
+                                }
+                                preferredTokenList={template.price.preferredTokens.concat(
+                                    [template.price.denominationTokenAddress]
+                                )}
+                                tokenAddress={proposalInput.price.tokenAddress}
+                                onSelect={(newSelectedToken) => {
                                     setProposalInput({
                                         ...proposalInput,
                                         price: {
                                             ...proposalInput.price,
-                                            amount: Number(e.target.value),
+                                            tokenAddress: newSelectedToken,
                                         },
                                     })
-                                }
+                                }}
                             />
-                            {denominationToken && (
-                                <TokenInput
-                                    template={template}
-                                    denominationToken={denominationToken}
-                                    proposalInput={proposalInput}
-                                    setProposalInput={setProposalInput}
-                                />
-                            )}
                         </Box>
                     </Box>
                 </Box>
