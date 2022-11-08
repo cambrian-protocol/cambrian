@@ -8,9 +8,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log: true,
   });
 
-  const solverFactory = await deploy("SolverFactory", {
+  const erc1155Rescue = await deploy("ERC1155Rescue", {
     from: deployer,
     args: [conditionalTokens.address],
+  });
+
+  const solverFactory = await deploy("SolverFactory", {
+    from: deployer,
+    args: [conditionalTokens.address, erc1155Rescue.address],
     log: true,
   });
 
@@ -24,6 +29,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     from: deployer,
     args: [],
     log: true,
+  });
+
+  await deploy("ERC1155Unsafe", {
+    from: deployer,
+    args: [erc1155Rescue.address],
   });
 
   await deploy("BasicSolverV1", {
@@ -91,6 +101,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
 module.exports.tags = [
   "ConditionalTokens",
+  "ERC1155Rescue",
   "SolverFactory",
   "ProposalsHub",
   "SolverLib",

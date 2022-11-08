@@ -2,11 +2,13 @@
 
 pragma solidity ^0.8.14;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IConditionalTokens.sol";
+import "../interfaces/ISolverFactory.sol";
 import "../interfaces/ISolver.sol";
 import "../interfaces/IModule.sol";
 
@@ -15,9 +17,10 @@ import "./SolverLib.sol";
 import "../modules/Modulated.sol";
 
 abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
-    address private factoryAddress; // Factory which creates Solver proxies
-    address private ctfAddress; // Conditional token framework
-    address private deployerAddress; // Address which called SolverFactory to deploy this Solver
+    using SafeERC20 for IERC20;
+
+    ISolverFactory public solverFactory; // Factory which creates Solver proxies
+    address public deployerAddress; // Address which called SolverFactory to deploy this Solver
 
     SolverLib.Config public config; // Primary config of the Solver
     SolverLib.Condition[] public conditions; // Array of conditions
@@ -56,15 +59,13 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
     */
     function init(
         address _deployer,
-        address _ctfAddress,
         address _chainParent,
         uint256 _chainIndex,
         SolverLib.Config calldata _solverConfig
     ) external initializer {
         require(_solverConfig.keeper != address(0), "Keeper invalid");
         deployerAddress = _deployer;
-        factoryAddress = msg.sender;
-        ctfAddress = _ctfAddress;
+        solverFactory = ISolverFactory(msg.sender);
         chainParent = _chainParent;
         chainIndex = _chainIndex;
         config = _solverConfig;
@@ -100,7 +101,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
 
         conditions.push(
             SolverLib.createCondition(
-                ctfAddress,
+                solverFactory.ctf(),
                 config.conditionBase,
                 chainParent,
                 conditions.length
@@ -134,7 +135,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
         require(chainChild == address(0), "Has child");
 
         chainChild = SolverLib.deployChild(
-            factoryAddress,
+            solverFactory,
             _config,
             chainIndex,
             trackingId
@@ -157,7 +158,8 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
 
         SolverLib.executeSolve(
             _index,
-            ctfAddress,
+            solverFactory.ctf(),
+            solverFactory.erc1155Rescue(),
             conditions[_index],
             config.conditionBase,
             datas,
@@ -452,7 +454,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
             conditions[_index].status == SolverLib.Status.OutcomeProposed,
             "Not proposed"
         );
-        SolverLib.confirmPayouts(ctfAddress, conditions[_index]);
+        SolverLib.confirmPayouts(solverFactory.ctf(), conditions[_index]);
     }
 
     // ********************************************************************************** //
@@ -500,7 +502,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
             payouts.length == config.conditionBase.outcomeSlots,
             "length must match outcomeSlots"
         );
-        SolverLib.arbitrate(ctfAddress, conditions[_index], payouts);
+        SolverLib.arbitrate(solverFactory.ctf(), conditions[_index], payouts);
     }
 
     /**
@@ -681,7 +683,7 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
 
     /**
         @notice Redeems CTs held by this Solver. See ConditionalTokens contract for more info.
-        @dev only Keeper
+        @dev only Keeper or module
      */
     function redeemPosition(
         IERC20 _collateralToken,
@@ -694,12 +696,21 @@ abstract contract Solver is Modulated, Initializable, ERC1155Receiver {
                 isPermittedModule(this.redeemPosition.selector),
             "Only Keeper"
         );
-        IConditionalTokens(ctfAddress).redeemPositions(
+        IConditionalTokens(solverFactory.ctf()).redeemPositions(
             _collateralToken,
             _parentCollectionId,
             _conditionId,
             _indexSets
         );
+    }
+
+    function transferERC20(
+        IERC20 token,
+        address recipient,
+        uint256 amount
+    ) public {
+        require(isPermittedModule(this.transferERC20.selector), "Only module");
+        IERC20(token).safeTransfer(recipient, amount);
     }
 
     function onERC1155Received(
