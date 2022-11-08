@@ -1,6 +1,7 @@
 import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
 import { SetStateAction, useEffect, useState } from 'react'
 
+import BaseTokenItem from '@cambrian/app/components/token/BaseTokenItem'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -123,24 +124,38 @@ const ProposalPricingForm = ({
                                     }
                                 />
                             </Box>
-                            <SelectTokenItem
-                                allowAnyPaymentToken={
-                                    template.price.allowAnyPaymentToken
-                                }
-                                preferredTokenList={template.price.preferredTokens.concat(
-                                    [template.price.denominationTokenAddress]
-                                )}
-                                tokenAddress={proposalInput.price.tokenAddress}
-                                onSelect={(newSelectedToken) => {
-                                    setProposalInput({
-                                        ...proposalInput,
-                                        price: {
-                                            ...proposalInput.price,
-                                            tokenAddress: newSelectedToken,
-                                        },
-                                    })
-                                }}
-                            />
+                            {template.price.allowAnyPaymentToken ||
+                            template.price.preferredTokens.length > 0 ? (
+                                <SelectTokenItem
+                                    allowAnyPaymentToken={
+                                        template.price.allowAnyPaymentToken
+                                    }
+                                    preferredTokenList={template.price.preferredTokens.concat(
+                                        [
+                                            template.price
+                                                .denominationTokenAddress,
+                                        ]
+                                    )}
+                                    tokenAddress={
+                                        proposalInput.price.tokenAddress
+                                    }
+                                    onSelect={(newSelectedToken) => {
+                                        setProposalInput({
+                                            ...proposalInput,
+                                            price: {
+                                                ...proposalInput.price,
+                                                tokenAddress: newSelectedToken,
+                                            },
+                                        })
+                                    }}
+                                />
+                            ) : (
+                                <BaseTokenItem
+                                    tokenAddress={
+                                        template.price.denominationTokenAddress
+                                    }
+                                />
+                            )}
                         </Box>
                     </Box>
                 </Box>
