@@ -155,6 +155,8 @@ const TemplatePreview = ({
                     label="Price"
                     amount={template.price.amount || 0}
                     token={denominationToken}
+                    allowAnyPaymentToken={template.price.allowAnyPaymentToken}
+                    preferredTokens={template.price.preferredTokens}
                 />
                 <PlainSectionDivider />
                 {templaterProfile && (
