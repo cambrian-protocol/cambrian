@@ -85,7 +85,7 @@ export const cpTheme = deepMerge(grommet, {
     
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-      background: #555; 
+      background: #012e3d; 
     }`,
     },
     paragraph: {

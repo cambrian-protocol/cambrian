@@ -1,12 +1,4 @@
-import {
-    Box,
-    Button,
-    CheckBox,
-    Form,
-    FormExtendedEvent,
-    Text,
-    TextInput,
-} from 'grommet'
+import { Box, Button, CheckBox, Form, FormExtendedEvent, Text } from 'grommet'
 import { SetStateAction, useState } from 'react'
 import {
     TemplateModel,
@@ -125,6 +117,7 @@ const TemplatePricingForm = ({
                                 {templateInput.price.preferredTokens.map(
                                     (preferredToken) => (
                                         <RemoveTokenItem
+                                            key={preferredToken}
                                             tokenAddress={preferredToken}
                                             onRemove={(removedToken) => {
                                                 const filteredTokens = [
