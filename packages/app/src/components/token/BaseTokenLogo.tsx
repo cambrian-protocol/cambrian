@@ -27,7 +27,17 @@ const BaseTokenLogo = ({ token, size }: BaseTokenLogoProps) => {
             overflow="hidden"
         >
             {token?.logoURI ? (
-                <Image src={token.logoURI} height="32" />
+                token.logoURI.startsWith('ipfs') ? (
+                    <Image
+                        src={token.logoURI.replace(
+                            'ipfs://',
+                            'https://ipfs.io/ipfs/'
+                        )}
+                        height="32"
+                    />
+                ) : (
+                    <Image src={token.logoURI} height="32" />
+                )
             ) : (
                 <Text size="small">
                     {token?.symbol.substring(0, 3) || '???'}
