@@ -16,21 +16,7 @@ describe("ERC1155Rescue", function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "ERC1155Rescue",
-      "SolverFactory",
-      "ProposalsHub",
-      "SolverLib",
-      "BasicSolverV1",
-      "ToyToken",
-      "ArbitrationDispatch",
-      "IPFSSolutionsHub",
-      "ArbitratorFactory",
-      "IPFSTextSubmitter",
-      "Unanimity",
-      "BasicArbitrator",
-    ]);
+    await deployments.fixture(["test"]);
 
     this.ConditionalTokens = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
@@ -137,27 +123,27 @@ describe("ERC1155Rescue", function () {
     const { id, recipient, tokenIds, amounts } = events[0].args;
 
     expect(id).to.equal(
-      "0x915c3a41eff6c6651dab3cb6aabe090947ed04e1b6a5cd55a169e57fe26ae866"
+      "0x6dfef5a9e9d2089f5a05978b7ce051ba5a0f1c43bbfc24152289db749d02ca25"
     );
     expect(recipient).to.equal(this.ERC1155Unsafe.address);
     expect(tokenIds.map((x) => x.toString())).to.eql([
-      "77938140218948654259611968937405271933334375696408009724830815842632365247142",
-      "28536468595443586233488213088512607795543238751908872673568337479961797102193",
+      "23511325211889549261937147619644442942599707999653846572582715585738850008381",
+      "8349861763218502496239274050397800199519357925837744840033266719806426701526",
     ]);
     expect(amounts.map((x) => x.toString())).to.eql(["0", "10000"]);
   });
 
   it("Allows intended recipient of a failed transfer to call ERC1155Rescue-rescueBag", async function () {
     await this.ERC1155Unsafe.connect(this.keeper).rescueBag(
-      "0x915c3a41eff6c6651dab3cb6aabe090947ed04e1b6a5cd55a169e57fe26ae866",
+      "0x6dfef5a9e9d2089f5a05978b7ce051ba5a0f1c43bbfc24152289db749d02ca25",
       this.keeper.address
     );
 
     const balances = await this.ConditionalTokens.balanceOfBatch(
       [this.keeper.address, this.keeper.address],
       [
-        "77938140218948654259611968937405271933334375696408009724830815842632365247142",
-        "28536468595443586233488213088512607795543238751908872673568337479961797102193",
+        "23511325211889549261937147619644442942599707999653846572582715585738850008381",
+        "8349861763218502496239274050397800199519357925837744840033266719806426701526",
       ]
     );
 
@@ -167,7 +153,7 @@ describe("ERC1155Rescue", function () {
   it("Reverts on unintended recipient calling ERC1155Rescue-rescueBag", async function () {
     await expectRevert(
       this.ERC1155Rescue.connect(this.keeper).rescueBag(
-        "0x915c3a41eff6c6651dab3cb6aabe090947ed04e1b6a5cd55a169e57fe26ae866",
+        "0x6dfef5a9e9d2089f5a05978b7ce051ba5a0f1c43bbfc24152289db749d02ca25",
         this.keeper.address
       ),
       "ERC1155Rescue::Only OG recipient"
@@ -176,13 +162,13 @@ describe("ERC1155Rescue", function () {
 
   it("Reverts when calling ERC1155Rescue-rescueBag on previously rescued bag", async function () {
     await this.ERC1155Unsafe.connect(this.keeper).rescueBag(
-      "0x915c3a41eff6c6651dab3cb6aabe090947ed04e1b6a5cd55a169e57fe26ae866",
+      "0x6dfef5a9e9d2089f5a05978b7ce051ba5a0f1c43bbfc24152289db749d02ca25",
       this.keeper.address
     );
 
     await expectRevert(
       this.ERC1155Unsafe.connect(this.keeper).rescueBag(
-        "0x915c3a41eff6c6651dab3cb6aabe090947ed04e1b6a5cd55a169e57fe26ae866",
+        "0x6dfef5a9e9d2089f5a05978b7ce051ba5a0f1c43bbfc24152289db749d02ca25",
         this.keeper.address
       ),
       "ERC1155Rescue::Rescued"

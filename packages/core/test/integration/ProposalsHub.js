@@ -26,14 +26,8 @@ describe("ProposalsHub", function () {
     this.arbitrator = arbitrator;
     this.amount = 1000;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "SolverFactory",
-      "ProposalsHub",
-      "ToyToken",
-      "BasicSolverV1",
-      "IPFSSolutionsHub",
-    ]);
+    await deployments.fixture(["test"]);
+
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
