@@ -243,4 +243,6 @@ interface ISolver {
     function setState(bytes32 key, bytes calldata data) external;
 
     function getState(bytes32 key) external view returns (bytes memory data);
+
+    function ctfAddress() external view returns (address);
 }

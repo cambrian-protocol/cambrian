@@ -14,7 +14,7 @@ describe("ArbitratorFactory", function () {
     this.owner = owner;
     this.user = user;
 
-    await deployments.fixture(["ArbitratorFactory", "BasicArbitrator"]);
+    await deployments.fixture(["arbitration"]);
 
     this.ArbitratorFactory = await ethers.getContract("ArbitratorFactory");
     this.BasicArbitrator = await ethers.getContract("BasicArbitrator");

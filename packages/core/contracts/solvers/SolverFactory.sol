@@ -4,18 +4,20 @@ pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../conditionalTokens/ConditionalTokens.sol";
 import "./Solver.sol";
 import "./SolverLib.sol";
 
 contract SolverFactory {
-    address immutable ctfAddress; // Conditional token framework address
+    address public immutable ctf;
+    address public immutable erc1155Rescue;
+
     address[] public solvers;
 
     event SolverCreated(address newSolverAddress);
 
-    constructor(address _ctfAddress) {
-        ctfAddress = _ctfAddress;
+    constructor(address _ctf, address _erc1155Rescue) {
+        ctf = _ctf;
+        erc1155Rescue = _erc1155Rescue;
     }
 
     /**
@@ -41,13 +43,7 @@ contract SolverFactory {
 
         address clone = Clones.clone(address(solverConfig.implementation));
 
-        Solver(clone).init(
-            msg.sender,
-            ctfAddress,
-            chainParent,
-            chainIndex,
-            solverConfig
-        );
+        Solver(clone).init(msg.sender, chainParent, chainIndex, solverConfig);
 
         solvers.push(clone);
 
