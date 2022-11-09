@@ -33,6 +33,7 @@ export const config = {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
       // blockGasLimit: 4000000,
+      tags: ["arbitration", "core", "ctf", "hubs", "modules", "solver", "toy"],
     },
     nova: {
       url: "https://nova.arbitrum.io/rpc",
