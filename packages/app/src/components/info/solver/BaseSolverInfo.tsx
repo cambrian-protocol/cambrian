@@ -31,7 +31,7 @@ const BaseSolverInfo = ({
     children,
 }: BaseSolverInfoProps) => {
     const hasArbitrator =
-        (slotTags && slotTags['arbitrator'].isFlex) ||
+        (slotTags && slotTags['arbitrator']?.isFlex) ||
         (arbitrator && arbitrator.length > 0)
 
     return (
