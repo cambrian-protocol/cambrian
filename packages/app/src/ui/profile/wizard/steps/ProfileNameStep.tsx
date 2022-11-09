@@ -12,6 +12,7 @@ import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButto
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import router from 'next/router'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProfileNameStepProps {
     profileInput: CambrianProfileType
@@ -26,6 +27,7 @@ const ProfileNameStep = ({
     stepperCallback,
     onSaveProfile,
 }: ProfileNameStepProps) => {
+    const { currentUser } = useCurrentUserContext()
     const [isSaving, setIsSaving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -54,7 +56,7 @@ const ProfileNameStep = ({
                         <Box height={{ min: 'auto' }} pad="xsmall">
                             <FormField
                                 name="name"
-                                label="Name"
+                                label="Your Name"
                                 validate={[() => isRequired(profileInput.name)]}
                             >
                                 <TextInput
@@ -65,13 +67,22 @@ const ProfileNameStep = ({
                                             name: e.target.value,
                                         })
                                     }
+                                    placeholder="Anon"
                                 />
                             </FormField>
                             <Box direction="row" gap="medium">
-                                <BaseAvatar
-                                    size="medium"
-                                    pfpPath={profileInput.avatar}
-                                />
+                                {profileInput.avatar.trim() === '' ? (
+                                    <BaseAvatar
+                                        size="medium"
+                                        address={currentUser?.address}
+                                    />
+                                ) : (
+                                    <BaseAvatar
+                                        size="medium"
+                                        pfpPath={profileInput.avatar}
+                                    />
+                                )}
+
                                 <Box flex>
                                     <FormField
                                         name="avatar"
@@ -85,6 +96,7 @@ const ProfileNameStep = ({
                                                     avatar: e.target.value,
                                                 })
                                             }
+                                            placeholder="https://your.profile.picture"
                                         />
                                     </FormField>
                                 </Box>

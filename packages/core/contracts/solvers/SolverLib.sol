@@ -95,6 +95,7 @@ library SolverLib {
     function executeSolve(
         uint256 index,
         address ctfAddress,
+        address erc1155Rescue,
         Condition storage condition,
         ConditionBase storage base,
         Datas storage datas,
@@ -118,6 +119,7 @@ library SolverLib {
         allocatePartition(
             index,
             ctfAddress,
+            erc1155Rescue,
             condition,
             base,
             datas,
@@ -169,16 +171,12 @@ library SolverLib {
     }
 
     function deployChild(
-        address factoryAddress,
+        ISolverFactory factory,
         Config calldata config,
         uint256 solverIndex,
         bytes32 trackingId
     ) public returns (address child) {
-        child = ISolverFactory(factoryAddress).createSolver(
-            address(this),
-            solverIndex + 1,
-            config
-        );
+        child = factory.createSolver(address(this), solverIndex + 1, config);
 
         if (trackingId != bytes32("")) {
             ISolver(child).setTrackingId(trackingId);
@@ -320,6 +318,7 @@ library SolverLib {
     function allocatePartition(
         uint256 conditionVer,
         address ctfAddress,
+        address erc1155Rescue,
         Condition storage condition,
         ConditionBase storage base,
         Datas storage data,
@@ -365,18 +364,30 @@ library SolverLib {
                 }
             }
 
-            IConditionalTokens(ctfAddress).safeBatchTransferFrom(
-                address(this),
-                abi.decode(
-                    data.slots[base.allocations[i].recipientAddressSlot][
-                        conditionVer
-                    ],
-                    (address)
-                ),
-                _tokens,
-                _amounts,
-                abi.encode(trackingId)
+            address recipient = abi.decode(
+                data.slots[base.allocations[i].recipientAddressSlot][
+                    conditionVer
+                ],
+                (address)
             );
+
+            try
+                IConditionalTokens(ctfAddress).safeBatchTransferFrom(
+                    address(this),
+                    recipient,
+                    _tokens,
+                    _amounts,
+                    abi.encode(trackingId)
+                )
+            {} catch {
+                IConditionalTokens(ctfAddress).safeBatchTransferFrom(
+                    address(this),
+                    erc1155Rescue,
+                    _tokens,
+                    _amounts,
+                    abi.encode(recipient, trackingId)
+                );
+            }
         }
     }
 

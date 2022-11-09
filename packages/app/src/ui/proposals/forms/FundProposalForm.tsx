@@ -1,17 +1,18 @@
 import { ArrowLineUp, CheckCircle, Info } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
-import { Box, Button, Form, FormField, Text } from 'grommet'
+import { Box, Button, Form, Text } from 'grommet'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
+import BaseTokenItem from '@cambrian/app/components/token/BaseTokenItem'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundingProgressMeter from '@cambrian/app/components/progressMeters/FundingProgressMeter'
 import FundingSkeleton from '@cambrian/app/components/skeletons/FundingSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import TokenAvatar from '@cambrian/app/components/avatars/TokenAvatar'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -311,28 +312,20 @@ const FundProposalForm = ({
                                             <Box
                                                 direction="row"
                                                 justify="between"
-                                                pad={{
-                                                    bottom: 'small',
-                                                }}
-                                                align="end"
+                                                align="center"
                                                 gap="small"
+                                                background="background-contrast"
+                                                pad="small"
+                                                round="xsmall"
                                             >
                                                 <Button
                                                     disabled={disableButtons}
                                                     icon={<ArrowLineUp />}
                                                     onClick={inputMaxAmount}
-                                                    label="Max"
-                                                    size="small"
-                                                    secondary
                                                 />
                                                 <Box flex>
-                                                    <FormField
-                                                        margin={{
-                                                            bottom: 'none',
-                                                        }}
+                                                    <NumberInput
                                                         name="amount"
-                                                        label="Amount"
-                                                        type="number"
                                                         required={
                                                             !funding.eq(
                                                                 proposalContract.fundingGoal
@@ -343,8 +336,10 @@ const FundProposalForm = ({
                                                         }
                                                     />
                                                 </Box>
-                                                <TokenAvatar
-                                                    token={collateralToken}
+                                                <BaseTokenItem
+                                                    tokenAddress={
+                                                        collateralToken.address
+                                                    }
                                                 />
                                             </Box>
                                         </>

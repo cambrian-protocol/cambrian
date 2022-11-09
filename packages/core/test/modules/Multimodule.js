@@ -20,16 +20,7 @@ describe("Multiple modules", function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "SolverFactory",
-      "ProposalsHub",
-      "ToyToken",
-      "BasicSolverV1",
-      "IPFSSolutionsHub",
-      "IPFSTextSubmitter",
-      "Unanimity",
-    ]);
+    await deployments.fixture(["test"]);
 
     this.Unanimity = await ethers.getContract("Unanimity");
     this.IPFSTextSubmitter = await ethers.getContract("IPFSTextSubmitter");

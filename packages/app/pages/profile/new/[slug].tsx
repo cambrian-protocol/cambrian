@@ -11,7 +11,7 @@ export default function NewProfilePage() {
     return (
         <>
             {currentUser && (
-                <PageLayout kind="narrow">
+                <PageLayout kind="narrow" contextTitle="Profile">
                     <ProfileWizard
                         currentUser={currentUser}
                         successRoute={

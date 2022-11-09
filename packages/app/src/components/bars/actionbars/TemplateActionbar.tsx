@@ -74,24 +74,6 @@ const TemplateActionbar = ({
                 },
             ]
 
-            if (price.allowAnyPaymentToken) {
-                infos.push({
-                    icon: <CurrencyEth />,
-                    label: 'Seller accepts any ERC20 Token',
-                })
-            }
-
-            if (price.preferredTokens.length > 0) {
-                infos.push({
-                    icon: <Coins />,
-                    label: `${
-                        price.allowAnyPaymentToken ? 'Preferred' : 'Alternative'
-                    } tokens the Seller accepts`,
-                    description: `${price.preferredTokens.map(
-                        (pt) => ' ' + pt.symbol
-                    )}`,
-                })
-            }
             setInfoList(infos)
         }
     }

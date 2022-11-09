@@ -20,15 +20,7 @@ describe("IPFSTextSubmitter", function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "SolverFactory",
-      "ProposalsHub",
-      "ToyToken",
-      "BasicSolverV1",
-      "IPFSSolutionsHub",
-      "IPFSTextSubmitter",
-    ]);
+    await deployments.fixture(["test"]);
 
     this.IPFSTextSubmitter = await ethers.getContract("IPFSTextSubmitter");
     this.SolverFactory = await ethers.getContract("SolverFactory");
