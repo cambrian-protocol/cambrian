@@ -42,6 +42,7 @@ export const config = {
     arbitrum: {
       url: `https://arbitrum-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: process.env.PRIVATE_KEY ? [`${process.env.PRIVATE_KEY}`] : [],
+      tags: ["arbitration", "ctf", "hubs", "modules", "solver", "toy"],
     },
   },
   etherscan: {
