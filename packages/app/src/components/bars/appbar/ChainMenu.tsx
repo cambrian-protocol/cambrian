@@ -61,17 +61,6 @@ const ChainMenu = ({ currentUser }: ChainMenuProps) => {
                                 ),
                                 onClick: () => switchChain(42161),
                             },
-                            {
-                                label: (
-                                    <ChainMenuItem
-                                        chainData={
-                                            SUPPORTED_CHAINS[42170].chainData
-                                        }
-                                        connectedChain={currentUser.chainId}
-                                    />
-                                ),
-                                onClick: () => switchChain(42170),
-                            },
                         ]}
                         dropAlign={{
                             top: 'bottom',

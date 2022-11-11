@@ -67,8 +67,8 @@ const ImportCompositionModal = ({
         <>
             <BaseLayerModal onClose={onClose}>
                 <ModalHeader
-                    title="Import a Composition"
-                    description="Please provide us with your Composition CID"
+                    title="Import Composition from IPFS"
+                    description="Composition CID"
                 />
                 <Form<ImportCompositionFormType>
                     onChange={(nextValue: ImportCompositionFormType) =>
