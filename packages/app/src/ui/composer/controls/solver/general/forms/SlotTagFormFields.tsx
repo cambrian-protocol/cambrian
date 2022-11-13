@@ -10,7 +10,7 @@ export const initialSlotTagInput: SlotTagFormFieldsType = {
     label: '',
     description: '',
     instruction: '',
-    isFlex: false,
+    isFlex: 'None',
 }
 const SlotTagFormFields = () => {
     return (
@@ -25,7 +25,7 @@ const SlotTagFormFields = () => {
                 </FormField>
                 <RadioButtonGroup
                     name="isFlex"
-                    options={[true, 'template', 'proposal']}
+                    options={['None', 'Both', 'Template', 'Proposal']}
                 />
             </Box>
         </BaseFormGroupContainer>

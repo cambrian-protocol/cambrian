@@ -315,6 +315,7 @@ export const getSolverSlots = async (
                               label: '',
                               isFlex: false,
                               description: '',
+                              instruction: '',
                           },
                 }
             }

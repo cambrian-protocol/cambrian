@@ -172,6 +172,7 @@ export default class ComposerSolver {
         if (slotTagToUpdate) {
             slotTagToUpdate.label = label
             slotTagToUpdate.description = description
+            slotTagToUpdate.instruction = instruction
             slotTagToUpdate.isFlex = isFlex
         } else {
             this.addSlotTag({

@@ -206,6 +206,7 @@ export const mapSlotFormTypeToSlotActionPayload = (
     const slotPayload: CreateSlotActionPayload = {
         label: slotConfigFormInput.label,
         description: slotConfigFormInput.description,
+        instruction: slotConfigFormInput.instruction,
         isFlex: slotConfigFormInput.isFlex,
         slotType: slotConfigFormInput.slotType,
         dataTypes: dataTypes,

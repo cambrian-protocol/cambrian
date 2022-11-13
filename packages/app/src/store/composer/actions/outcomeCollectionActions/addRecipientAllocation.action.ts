@@ -34,6 +34,7 @@ const addRecipientAllocationAction = (
             slotId: newRecipientSlot.id,
             label: payload.label,
             description: payload.description,
+            instruction: payload.instruction,
             isFlex: payload.isFlex,
         })
 
