@@ -105,7 +105,7 @@ const SolverActionbar = ({
                         currentCondition={currentCondition}
                     />
                 )
-            } else if (allowedForRecipients) {
+            } else if (allowedForRecipients || allowedForArbitrator) {
                 return <DefaultRecipientActionbar messenger={messenger} />
             }
             break
@@ -136,7 +136,7 @@ const SolverActionbar = ({
             }
         case ConditionStatus.ArbitrationDelivered:
         case ConditionStatus.OutcomeReported:
-            if (allowedForRecipients) {
+            if (allowedForRecipients || allowedForArbitrator) {
                 return (
                     <RedeemTokensActionbar
                         messenger={messenger}

@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import DefaultRecipientActionbar from '../solver/DefaultRecipientActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import LoaderButton from '../../../buttons/LoaderButton'
@@ -331,7 +332,7 @@ const RedeemTokensActionbar = ({
                     }
                 />
             ) : (
-                <></>
+                <DefaultRecipientActionbar messenger={messenger} />
             )}
             {errMsg && (
                 <ErrorPopupModal
