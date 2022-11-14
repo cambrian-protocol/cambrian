@@ -29,6 +29,7 @@ export type SolverInfoType = { address: string; data: SolverModel }
 const ProposalExecutedActionbar = ({
     currentUser,
     proposalContract,
+    messenger,
 }: ProposalExecutedActionbarProps) => {
     const [solvers, setSolvers] = useState<SolverInfoType[]>([])
     const [showSolverListModal, setShowSolverListModal] = useState(false)
@@ -98,6 +99,7 @@ const ProposalExecutedActionbar = ({
     return (
         <>
             <BaseActionbar
+                messenger={messenger}
                 primaryAction={
                     <Button
                         primary

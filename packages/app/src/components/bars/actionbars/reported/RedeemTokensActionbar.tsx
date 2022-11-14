@@ -28,12 +28,14 @@ interface RedeemTokensActionbarProps {
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
+    messenger?: JSX.Element
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
     currentUser,
+    messenger,
 }: RedeemTokensActionbarProps) => {
     // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
     const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
@@ -292,6 +294,7 @@ const RedeemTokensActionbar = ({
         <>
             {redeemedAmount ? (
                 <BaseActionbar
+                    messenger={messenger}
                     info={actionbarInfo}
                     primaryAction={
                         <Box>
@@ -309,6 +312,7 @@ const RedeemTokensActionbar = ({
                 />
             ) : payoutAmount ? (
                 <BaseActionbar
+                    messenger={messenger}
                     info={actionbarInfo}
                     primaryAction={
                         <LoaderButton

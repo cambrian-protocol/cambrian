@@ -1,11 +1,12 @@
 import { Box, ResponsiveContext } from 'grommet'
+import { CambrianProfileType, UserType } from '@cambrian/app/store/UserContext'
 import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
+import { useEffect, useState } from 'react'
 
-import CambrianProfileInfo from '../info/CambrianProfileInfo'
+import AvatarGroup from '../avatars/AvatarGroup'
 import CoreMessenger from './CoreMessenger'
-import { UserType } from '@cambrian/app/store/UserContext'
-import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
-import { useState } from 'react'
+import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { getCambrianProfiles } from '@cambrian/app/utils/helpers/cambrianProfile'
 
 interface MessengerProps {
     currentUser: UserType
@@ -21,9 +22,22 @@ const Messenger = ({
     const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
-    // TODO Integrate Group chats
-    const [counterPartProfile] = useCambrianProfile(participantDIDs[0])
+    const [cambrianProfiles, setCambrianProfiles] = useState<
+        TileDocument<CambrianProfileType>[]
+    >([])
 
+    useEffect(() => {
+        fetchCambrianProfiles()
+    }, [])
+
+    const fetchCambrianProfiles = async () => {
+        setCambrianProfiles(
+            await getCambrianProfiles(
+                participantDIDs.filter((p) => p !== currentUser.did),
+                currentUser
+            )
+        )
+    }
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {
@@ -45,10 +59,7 @@ const Messenger = ({
                                 onClick={toggleShowMessenger}
                                 focusIndicator={false}
                             >
-                                <CambrianProfileInfo
-                                    cambrianProfileDoc={counterPartProfile}
-                                    size="small"
-                                />
+                                <AvatarGroup participants={cambrianProfiles} />
                                 <IconContext.Provider value={{ size: '18' }}>
                                     <Box pad="small">
                                         {showMessenger ? (

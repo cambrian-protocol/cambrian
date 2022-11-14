@@ -7,6 +7,7 @@ import CambrianProfileAbout from './CambrianProfileAbout'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { getDIDfromAddress } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface RecipientInfoItemProps {
@@ -23,13 +24,13 @@ const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
     }, [currentUser])
 
     const fetchCeramicProfile = async () => {
-        if (currentUser) {
+        if (currentUser && address) {
             const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const cambrianProfileDoc = (await TileDocument.deterministic(
                 ceramic,
                 {
                     controllers: [
-                        `did:pkh:eip155:${currentUser.chainId}:${address}`,
+                        getDIDfromAddress(address, currentUser.chainId),
                     ],
                     family: 'cambrian-profile',
                 },

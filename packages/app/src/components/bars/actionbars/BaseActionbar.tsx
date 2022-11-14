@@ -16,7 +16,7 @@ export type ActionbarItemType = {
 interface ActionbarProps {
     primaryAction?: JSX.Element
     secondaryAction?: JSX.Element
-    info: ActionbarInfoType
+    info?: ActionbarInfoType
     messenger?: JSX.Element
 }
 
@@ -61,34 +61,36 @@ const BaseActionbar = ({
                         align="center"
                         justify="between"
                     >
-                        <Box direction="row" align="center" gap="small">
-                            <DropButton
-                                plain
-                                label={
-                                    <Box pad="small" justify="center">
-                                        <Info size="32" />
-                                        <Text
-                                            size="xsmall"
-                                            textAlign="center"
-                                            color={'dark-4'}
-                                        >
-                                            More
-                                        </Text>
-                                    </Box>
-                                }
-                                dropContent={<>{info.dropContent}</>}
-                                dropAlign={{
-                                    bottom: 'top',
-                                    left: 'left',
-                                }}
-                            />
-                            <Box>
-                                <Text truncate>{info.title}</Text>
-                                <Text size="small" color="dark-4" truncate>
-                                    {info.subTitle}
-                                </Text>
+                        {info && (
+                            <Box direction="row" align="center" gap="small">
+                                <DropButton
+                                    plain
+                                    label={
+                                        <Box pad="small" justify="center">
+                                            <Info size="32" />
+                                            <Text
+                                                size="xsmall"
+                                                textAlign="center"
+                                                color={'dark-4'}
+                                            >
+                                                More
+                                            </Text>
+                                        </Box>
+                                    }
+                                    dropContent={<>{info.dropContent}</>}
+                                    dropAlign={{
+                                        bottom: 'top',
+                                        left: 'left',
+                                    }}
+                                />
+                                <Box>
+                                    <Text truncate>{info.title}</Text>
+                                    <Text size="small" color="dark-4" truncate>
+                                        {info.subTitle}
+                                    </Text>
+                                </Box>
                             </Box>
-                        </Box>
+                        )}
                         <Box flex />
                         {secondaryAction && (
                             <Box

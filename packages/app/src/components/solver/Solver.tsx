@@ -25,7 +25,7 @@ import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionMo
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
+import SolverActionbar from '@cambrian/app/components/bars/actionbars/solver/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverMetadataModel } from '../../models/SolverMetadataModel'
@@ -36,6 +36,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -163,22 +164,12 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     const initArbitratorPermission = async () => {
         if (solverData) {
-            const arbitratorCode = await currentUser.signer.provider?.getCode(
-                solverData.config.arbitrator
-            )
-            const isContract = arbitratorCode !== '0x'
-
-            if (isContract) {
-                const arbitratorContract = new ethers.Contract(
-                    solverData.config.arbitrator,
-                    BASIC_ARBITRATOR_IFACE,
-                    currentUser.signer
-                )
-                const owner = await arbitratorContract.owner()
-                if (owner && currentUser.address === owner)
-                    addPermission('Arbitrator')
-            } else if (currentUser.address === solverData.config.arbitrator)
+            if (
+                (await getArbitratorAddressOrOwner(solverData, currentUser)) ===
+                currentUser.address
+            ) {
                 addPermission('Arbitrator')
+            }
         }
     }
 
