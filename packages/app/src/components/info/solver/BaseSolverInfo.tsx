@@ -20,7 +20,6 @@ type BaseSolverInfoProps = PropsWithChildren<{}> & {
     token?: TokenModel
 }
 
-// TODO display if token is still flexible and preferred alternative tokens
 const BaseSolverInfo = ({
     solverTag,
     outcomeCollections,
