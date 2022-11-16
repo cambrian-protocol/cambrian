@@ -291,6 +291,7 @@ export const UserContextProvider = ({
                 statement:
                     'This signature allows Cambrian Protocol to update your account data. The permission expires in 24 hours.',
                 resources: ['ceramic://*'],
+                expiresInSecs: 604800, // One week
             })
             localStorage.setItem(
                 `cambrian-session/${network.chainId}/${accountAddress}`,
