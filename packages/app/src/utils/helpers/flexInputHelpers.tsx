@@ -54,6 +54,17 @@ export const getFlexInputDescription = (flexInput: FlexInputFormType) => {
     return label
 }
 
+export const getFlexInputInstruction = (flexInput: FlexInputFormType) => {
+    console.log(flexInput)
+    const label =
+        flexInput.instruction && flexInput.instruction.trim() !== ''
+            ? flexInput.instruction
+            : DEFAULT_SLOT_TAGS[flexInput.id]
+            ? DEFAULT_SLOT_TAGS[flexInput.id].instruction
+            : undefined
+    return label
+}
+
 export const mergeFlexIntoComposition = (
     oldComposition: CompositionModel,
     flexInputs: FlexInputFormType[]

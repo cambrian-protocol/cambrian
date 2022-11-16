@@ -25,6 +25,7 @@ const updateSlotTagAction = (
             slotId: payload.slotIdToUpdate,
             label: payload.slotTag.label,
             description: payload.slotTag.description,
+            instruction: payload.slotTag.instruction,
             isFlex: payload.slotTag.isFlex,
         })
 

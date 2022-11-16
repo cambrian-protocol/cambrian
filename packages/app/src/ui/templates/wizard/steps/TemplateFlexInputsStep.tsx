@@ -30,7 +30,7 @@ const TemplateFlexInputsStep = ({
             <Box pad="xsmall">
                 <HeaderTextSection
                     title="Solver Config"
-                    paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
+                    paragraph="Configure the Solver by completing these fields as instructed."
                 />
             </Box>
             <TemplateFlexInputsForm

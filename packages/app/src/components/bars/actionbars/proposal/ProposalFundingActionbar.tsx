@@ -164,7 +164,7 @@ const ProposalFundingActionbar = ({
                     <ModalHeader
                         title="Proposal funding"
                         description={
-                            'Invested funds can be withdrawn until the Proposal has been executed'
+                            'Your funding can be withdrawn until the Proposal has been executed'
                         }
                     />
                     <Box height={{ min: 'auto' }}>

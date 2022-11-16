@@ -47,6 +47,7 @@ const UpdateRecipientForm = ({
                 address: recipient.data[0].toString(),
                 label: (slotTag && slotTag.label) || '',
                 description: (slotTag && slotTag.description) || '',
+                instruction: (slotTag && slotTag.instruction) || '',
                 isFlex: (slotTag && slotTag.isFlex) || false,
                 reference: recipient.reference,
             })

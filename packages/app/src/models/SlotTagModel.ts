@@ -5,9 +5,10 @@ export type SlotTagsHashMapType = {
 // TODO Add icon
 export type SlotTagModel = {
     id: string
-    isFlex: boolean
+    isFlex: boolean | 'None' | 'Both' | 'Template' | 'Proposal'
     label: string
     description: string
+    instruction?: string
 }
 
 export type TaggedInput = SlotTagModel & {

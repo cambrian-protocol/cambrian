@@ -124,7 +124,7 @@ const SubmissionForm = ({
             >
                 <TextArea
                     disabled={isSubmitting}
-                    placeholder="Type your article here..."
+                    placeholder="Submit your work here..."
                     fill
                     size="medium"
                     resize={false}

@@ -35,6 +35,7 @@ const updateSlotAction = (
             slotId: payload.slotIdToUpdate,
             label: payload.updatedSlot.label,
             description: payload.updatedSlot.description,
+            instruction: payload.updatedSlot.instruction,
             isFlex: payload.updatedSlot.isFlex,
         })
 

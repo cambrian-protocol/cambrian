@@ -30,6 +30,7 @@ const updateRecipientAction = (
             slotId: payload.slotId,
             label: payload.recipientData.label,
             description: payload.recipientData.description,
+            instruction: payload.recipientData.instruction,
             isFlex: payload.recipientData.isFlex,
         })
 

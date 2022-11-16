@@ -200,9 +200,8 @@ const SelectToken = ({
                             </Text>
                         </Box>
                         <Text size="small" textAlign="center">
-                            This token isn't traded on leading U.S. centralized
-                            exchanges. Always conduct your own research before
-                            working with this token.
+                            We don't have any information on this token. Custom
+                            tokens may carry greater risks.
                         </Text>
                         <Box width={'100%'}>
                             <Button

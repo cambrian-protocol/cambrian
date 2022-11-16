@@ -67,7 +67,7 @@ const FundingProgressMeter = ({
                     {Number(formattedFundingGoal) - Number(formattedFunding)}
                 </Text>
                 <Text size="small" color="dark-4" textAlign="center">
-                    Your funds: {Number(formattedUserFunding)}
+                    Your pledge: {Number(formattedUserFunding)}
                 </Text>
             </>
         </Box>

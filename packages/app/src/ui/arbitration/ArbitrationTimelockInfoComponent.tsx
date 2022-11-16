@@ -12,9 +12,8 @@ const ArbitrationTimelockInfoComponent = ({
 }: ArbitrationTimelockInfoComponentProps) => {
     return (
         <SidebarComponentContainer
-            title="Timeframe"
-            description="  Be aware - A dispute can just be raised during the active
-        timelock until:"
+            title="Timelock Active"
+            description="Arbitration may be requested by participants until:"
         >
             <Box direction="row" gap="small" align="center">
                 <Box width={{ min: 'auto' }}>

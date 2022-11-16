@@ -1,5 +1,5 @@
 import { SolverTagModel } from './../models/SolverTagModel'
-import { SlotTagsHashMapType } from './../models/SlotTagModel'
+import { SlotTagModel, SlotTagsHashMapType } from './../models/SlotTagModel'
 import { ethers } from 'ethers'
 import { ulid } from 'ulid'
 
@@ -43,11 +43,8 @@ type UpdateRecipientPropsType = {
     address: string
 }
 
-type AddSlotTagProps = {
+interface AddSlotTagProps extends Omit<SlotTagModel, 'id'> {
     slotId: string
-    label: string
-    description: string
-    isFlex: boolean
 }
 
 const MAX_BASIS_POINTS = 10000
@@ -148,26 +145,41 @@ export default class ComposerSolver {
 
     /*********************************** Tags *************************************/
 
-    addSlotTag({ slotId, description, label, isFlex }: AddSlotTagProps) {
+    addSlotTag({
+        slotId,
+        description,
+        instruction,
+        label,
+        isFlex,
+    }: AddSlotTagProps) {
         this.slotTags[slotId] = {
             id: slotId,
             label: label,
             description: description,
+            instruction: instruction,
             isFlex: isFlex,
         }
     }
 
-    updateSlotTag({ slotId, description, label, isFlex }: AddSlotTagProps) {
+    updateSlotTag({
+        slotId,
+        description,
+        instruction,
+        label,
+        isFlex,
+    }: AddSlotTagProps) {
         const slotTagToUpdate = this.slotTags[slotId]
         if (slotTagToUpdate) {
             slotTagToUpdate.label = label
             slotTagToUpdate.description = description
+            slotTagToUpdate.instruction = instruction
             slotTagToUpdate.isFlex = isFlex
         } else {
             this.addSlotTag({
                 slotId: slotId,
                 label: label,
                 description: description,
+                instruction: instruction,
                 isFlex: isFlex,
             })
         }

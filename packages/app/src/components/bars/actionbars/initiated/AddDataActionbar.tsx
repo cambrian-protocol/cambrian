@@ -40,7 +40,7 @@ const AddDataActionbar = ({
                         info={{
                             title: 'Additional data required',
                             subTitle:
-                                'In order to interact with the Solver we need some data',
+                                'As the Keeper, you must submit more data to proceed',
                             dropContent: (
                                 <ActionbarItemDropContainer
                                     title="Additional data required"

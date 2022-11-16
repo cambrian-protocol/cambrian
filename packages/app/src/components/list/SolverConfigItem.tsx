@@ -8,9 +8,17 @@ interface SolverConfigItemProps {
     id: string
     value: JSX.Element
     slotTags?: SlotTagsHashMapType
+    hideDescription?: boolean
+    hideInstruction?: boolean
 }
 
-const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
+const SolverConfigItem = ({
+    id,
+    value,
+    slotTags,
+    hideDescription,
+    hideInstruction,
+}: SolverConfigItemProps) => {
     return (
         <Box gap="medium">
             <ResponsiveContext.Consumer>
@@ -29,10 +37,20 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                     {(slotTags && slotTags[id]?.label) ||
                                         DEFAULT_SLOT_TAGS[id].label}
                                 </Heading>
-                                <Text size="xsmall" color="dark-4">
-                                    {(slotTags && slotTags[id]?.description) ||
-                                        DEFAULT_SLOT_TAGS[id].description}
-                                </Text>
+                                {!hideDescription && (
+                                    <Text size="xsmall" color="dark-4">
+                                        {(slotTags &&
+                                            slotTags[id]?.description) ||
+                                            DEFAULT_SLOT_TAGS[id].description}
+                                    </Text>
+                                )}
+                                {!hideInstruction && (
+                                    <Text size="xsmall" color="dark-4">
+                                        {(slotTags &&
+                                            slotTags[id]?.instruction) ||
+                                            DEFAULT_SLOT_TAGS[id].instruction}
+                                    </Text>
+                                )}
                             </Box>
                             <Box
                                 width={{ min: 'auto' }}

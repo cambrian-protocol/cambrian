@@ -116,6 +116,7 @@ export const getSolverIngestWithMetaData = (
                       label: '',
                       isFlex: false,
                       description: '',
+                      instruction: '',
                   }
 
         return {

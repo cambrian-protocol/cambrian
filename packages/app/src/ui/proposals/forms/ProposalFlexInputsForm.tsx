@@ -2,6 +2,7 @@ import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
 import {
     getFlexInputDescription,
+    getFlexInputInstruction,
     getFlexInputLabel,
     getFlexInputType,
 } from '@cambrian/app/utils/helpers/flexInputHelpers'
@@ -55,6 +56,7 @@ const ProposalFlexInputsForm = ({
                         )
                         const label = getFlexInputLabel(flexInput)
                         const description = getFlexInputDescription(flexInput)
+                        const instruction = getFlexInputInstruction(flexInput)
 
                         return (
                             <Box key={idx}>
@@ -102,6 +104,15 @@ const ProposalFlexInputsForm = ({
                                         margin={{ bottom: 'small' }}
                                     >
                                         {description}
+                                    </Text>
+                                )}
+                                {instruction && (
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {instruction}
                                     </Text>
                                 )}
                             </Box>
