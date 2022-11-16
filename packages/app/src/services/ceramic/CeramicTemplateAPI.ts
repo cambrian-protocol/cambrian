@@ -141,14 +141,10 @@ export default class CeramicTemplateAPI {
     /**
      * Deploys a SolutionBase from the ProposalCommitID and the TemplateCommitID, hits mailbox server and sets the approved flag in the template.receivedProposals to true
      *
-     * @param currentUser
      * @param stageStack
      * @auth must be done by the Templater
      */
-    approveProposal = async (
-        currentUser: UserType,
-        stageStack: StageStackType
-    ) => {
+    approveProposal = async (stageStack: StageStackType) => {
         try {
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
@@ -165,7 +161,7 @@ export default class CeramicTemplateAPI {
                 await this.updateProposalEntry(stageStack, {
                     approved: true,
                 })
-                return await createSolutionBase(currentUser, stageStack)
+                return await createSolutionBase(this.user, stageStack)
             } else {
                 cpLogger.push(res.status)
                 return false
