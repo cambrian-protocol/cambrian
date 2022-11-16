@@ -21,7 +21,7 @@ const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
 
     useEffect(() => {
         fetchCeramicProfile()
-    }, [currentUser])
+    }, [currentUser, address])
 
     const fetchCeramicProfile = async () => {
         if (currentUser && address) {

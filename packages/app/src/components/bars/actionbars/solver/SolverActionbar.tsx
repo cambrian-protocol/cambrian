@@ -65,7 +65,7 @@ const SolverActionbar = ({
 
         // Add arbitrator address
         const arbitratorAdddress = await getArbitratorAddressOrOwner(
-            solverData,
+            solverData.config.arbitrator,
             currentUser
         )
         recipientDIDs.push(

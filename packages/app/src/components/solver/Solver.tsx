@@ -165,8 +165,10 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     const initArbitratorPermission = async () => {
         if (solverData) {
             if (
-                (await getArbitratorAddressOrOwner(solverData, currentUser)) ===
-                currentUser.address
+                (await getArbitratorAddressOrOwner(
+                    solverData.config.arbitrator,
+                    currentUser
+                )) === currentUser.address
             ) {
                 addPermission('Arbitrator')
             }
