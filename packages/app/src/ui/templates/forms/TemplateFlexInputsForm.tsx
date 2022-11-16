@@ -10,6 +10,7 @@ import {
 import { SetStateAction, useEffect, useState } from 'react'
 import {
     getFlexInputDescription,
+    getFlexInputInstruction,
     getFlexInputLabel,
     getFlexInputType,
 } from '@cambrian/app/utils/helpers/flexInputHelpers'
@@ -61,11 +62,16 @@ const TemplateFlexInputsForm = ({
         setIsSubmitting(false)
     }
 
+    const templateFlexInputs = templateInput.flexInputs.filter(
+        (f) =>
+            f.isFlex === true || f.isFlex === 'Both' || f.isFlex === 'Template'
+    )
+
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
-                    {templateInput.flexInputs.map((flexInput, idx) => {
+                    {templateFlexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
@@ -73,6 +79,7 @@ const TemplateFlexInputsForm = ({
 
                         const label = getFlexInputLabel(flexInput)
                         const description = getFlexInputDescription(flexInput)
+                        const instruction = getFlexInputInstruction(flexInput)
 
                         return (
                             <Box key={idx}>
@@ -123,6 +130,15 @@ const TemplateFlexInputsForm = ({
                                         margin={{ bottom: 'small' }}
                                     >
                                         {description}
+                                    </Text>
+                                )}
+                                {instruction && (
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {instruction}
                                     </Text>
                                 )}
                             </Box>

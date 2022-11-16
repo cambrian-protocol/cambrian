@@ -46,6 +46,8 @@ export default function EditProposalPage() {
         await onSaveProposal()
     }
 
+    console.log(stageStack)
+
     return (
         <>
             {!isLoaded ? (

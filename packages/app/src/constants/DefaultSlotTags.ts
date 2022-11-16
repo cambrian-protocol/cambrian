@@ -14,7 +14,7 @@ export const DEFAULT_SLOT_TAGS: SlotTagsHashMapType = {
         description:
             'The Arbitrator may overrule a proposed outcome after a participant raises a dispute during the timelock window.',
         instruction:
-            'Optionally input the account or smart contract address which will act as an arbitrator.',
+            'Input the account or smart contract address which will act as an arbitrator.',
         isFlex: false,
         label: 'Arbitrator',
     },

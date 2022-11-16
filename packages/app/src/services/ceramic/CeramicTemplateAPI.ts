@@ -58,10 +58,15 @@ export default class CeramicTemplateAPI {
             const formFlexInputs: FlexInputFormType[] = []
             composition.content.solvers.forEach((solver) => {
                 Object.keys(solver.slotTags).forEach((tagId) => {
-                    if (solver.slotTags[tagId].isFlex === true) {
+                    console.log(solver.slotTags[tagId])
+                    if (
+                        solver.slotTags[tagId].isFlex &&
+                        solver.slotTags[tagId].isFlex !== 'None'
+                    ) {
                         if (tagId === 'collateralToken') {
                             isCollateralFlex = true
                         } else {
+                            console.log('Adding')
                             formFlexInputs.push({
                                 ...solver.slotTags[tagId],
                                 solverId: solver.id,

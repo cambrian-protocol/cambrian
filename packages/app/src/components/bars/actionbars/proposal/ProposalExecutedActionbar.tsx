@@ -17,6 +17,7 @@ import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { getSolverMethods } from '@cambrian/app/utils/helpers/solverHelpers'
+import { useRouter } from 'next/router'
 
 interface ProposalExecutedActionbarProps {
     messenger?: JSX.Element
@@ -30,8 +31,17 @@ const ProposalExecutedActionbar = ({
     currentUser,
     proposalContract,
 }: ProposalExecutedActionbarProps) => {
+    const router = useRouter()
     const [solvers, setSolvers] = useState<SolverInfoType[]>([])
     const [showSolverListModal, setShowSolverListModal] = useState(false)
+
+    const viewSolvers = () => {
+        if (solvers.length == 1) {
+            router.push(`/solver/${solvers[0].address}`)
+        } else {
+            toggleShowSolverListModal()
+        }
+    }
 
     const toggleShowSolverListModal = () =>
         setShowSolverListModal(!showSolverListModal)
@@ -102,21 +112,21 @@ const ProposalExecutedActionbar = ({
                     <Button
                         primary
                         size="small"
-                        label="Work Solvers"
-                        onClick={toggleShowSolverListModal}
+                        label="View Solver"
+                        onClick={viewSolvers}
                     />
                 }
                 info={{
-                    title: 'Inspect Solvers',
-                    subTitle: 'Check out the containing Solvers',
+                    title: 'View Solver',
+                    subTitle: 'View the Solver(s) created by this Proposal',
                     dropContent: (
                         <ActionbarItemDropContainer
-                            title="Containing Work Solvers"
-                            description='Hit the "Work Solvers"-Button at your right to inspect the Solvers created by this Proposal.'
+                            title="Solver"
+                            description='Hit the "View Solver"-Button on the right to inspect the Solver(s) created by this Proposal.'
                             list={[
                                 {
                                     icon: <Cursor />,
-                                    label: 'Select a Solver you want to inspect',
+                                    label: 'Select a Solver',
                                 },
                             ]}
                         />

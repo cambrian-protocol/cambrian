@@ -16,8 +16,10 @@ const SolverListModal = ({ solverInfos, onClose }: SolverListModalProps) => {
     return (
         <BaseLayerModal onClose={onClose}>
             <ModalHeader
-                title="Work Solvers"
-                description="The following Solvers are deployed by this Proposal."
+                title="Solvers"
+                description={`This Proposal created ${
+                    solverInfos.length
+                } Solver${solverInfos.length > 1 ? 's' : ''}`}
             />
             {solverInfos.map((solverInfo) => (
                 <Link

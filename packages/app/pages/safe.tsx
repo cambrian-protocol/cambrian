@@ -146,8 +146,8 @@ export default function Safe() {
                     >
                         <Box pad="large" gap="medium">
                             <DashboardHeader
-                                title="Your redeemable tokens"
-                                description="Connect to this site with your Gnosis Safe in order to redeem your tokens"
+                                title="Redeemable funds"
+                                description="Redeem Solver funds sent to a Gnosis Safe"
                             />
                             <RedeemableTokenListWidget
                                 signerOrProvider={connectedWallet.signer}

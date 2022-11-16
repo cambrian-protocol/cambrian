@@ -7,6 +7,13 @@ import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { getParsedSolvers } from './proposalHelper'
+import PROPOSALSHUB_GOERLI from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import PROPOSALSHUB_ARBITRUM from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
+
+const PROPOSALHUBS = [
+    PROPOSALSHUB_GOERLI.address,
+    PROPOSALSHUB_ARBITRUM.address,
+]
 
 /**
  * IMPORTANT
@@ -81,6 +88,12 @@ export const tryTransferCT = async (
     CTF: CTFContract
 ) => {
     try {
+        if (PROPOSALHUBS.includes(to)) {
+            return {
+                to: to,
+                result: true,
+            }
+        }
         await CTF.contract.callStatic.safeBatchTransferFrom(
             from, // from
             to, // to

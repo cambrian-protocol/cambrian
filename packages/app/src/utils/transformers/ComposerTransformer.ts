@@ -206,10 +206,14 @@ export function parseComposerSlot(
             }
 
             outSlot.solverIndex = 0
-            outSlot.data = ethers.utils.defaultAbiCoder.encode(
-                [inSlot.dataTypes[0]],
-                [dataToAdd]
-            )
+            try {
+                outSlot.data = ethers.utils.defaultAbiCoder.encode(
+                    [inSlot.dataTypes[0]],
+                    [dataToAdd]
+                )
+            } catch (e) {
+                console.error(inSlot, dataToAdd)
+            }
             break
         case 2: // Function slot
             if (inSlot.data.length != inSlot.dataTypes.length) {
