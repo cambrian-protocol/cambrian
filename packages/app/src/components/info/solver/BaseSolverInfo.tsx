@@ -1,15 +1,18 @@
 import { Box, Heading, Text } from 'grommet'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import BaseTokenItem from '../../token/BaseTokenItem'
 import ModalHeader from '../../layout/header/ModalHeader'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
-import { PropsWithChildren } from 'react'
 import RecipientInfoItem from '../RecipientInfo'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import SolverConfigItem from '../../list/SolverConfigItem'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { UserType } from '@cambrian/app/store/UserContext'
+import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 type BaseSolverInfoProps = PropsWithChildren<{}> & {
     solverTag?: SolverTagModel
@@ -20,7 +23,6 @@ type BaseSolverInfoProps = PropsWithChildren<{}> & {
     token?: TokenModel
 }
 
-// TODO display if token is still flexible and preferred alternative tokens
 const BaseSolverInfo = ({
     solverTag,
     outcomeCollections,
@@ -30,11 +32,26 @@ const BaseSolverInfo = ({
     token,
     children,
 }: BaseSolverInfoProps) => {
+    const { currentUser } = useCurrentUserContext()
+    const [arbitratorAddress, setArbitratorAddress] = useState()
+
     const hasArbitrator =
         (slotTags &&
             slotTags['arbitrator']?.isFlex &&
             slotTags['arbitrator'].isFlex != 'None') ||
         (arbitrator && arbitrator.length > 0)
+
+    useEffect(() => {
+        if (currentUser && hasArbitrator) initArbitrator(currentUser)
+    }, [currentUser])
+
+    const initArbitrator = async (user: UserType) => {
+        if (arbitrator) {
+            setArbitratorAddress(
+                await getArbitratorAddressOrOwner(arbitrator, user)
+            )
+        }
+    }
 
     return (
         <>
@@ -54,7 +71,11 @@ const BaseSolverInfo = ({
                         <SolverConfigItem
                             id="arbitrator"
                             slotTags={slotTags}
-                            value={<RecipientInfoItem address={arbitrator} />}
+                            value={
+                                <RecipientInfoItem
+                                    address={arbitratorAddress}
+                                />
+                            }
                         />
                     )}
                     <SolverConfigItem

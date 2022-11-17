@@ -57,12 +57,10 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                                     <Messenger
                                         chatID={stageStack.proposalStreamID}
                                         currentUser={currentUser}
-                                        participantDIDs={
-                                            currentUser.did ===
-                                            stageStack.template.author
-                                                ? [stageStack.proposal.author]
-                                                : [stageStack.template.author]
-                                        }
+                                        participantDIDs={[
+                                            stageStack.proposal.author,
+                                            stageStack.template.author,
+                                        ]}
                                     />
                                 ) : undefined
                             }

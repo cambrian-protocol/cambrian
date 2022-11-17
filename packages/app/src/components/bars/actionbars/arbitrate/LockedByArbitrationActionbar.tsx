@@ -2,8 +2,15 @@ import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropCon
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
 import { Scales } from 'phosphor-react'
 
-const LockedByArbitrationActionbar = () => (
+interface LockedByArbitrationActionbarProps {
+    messenger?: JSX.Element
+}
+
+const LockedByArbitrationActionbar = ({
+    messenger,
+}: LockedByArbitrationActionbarProps) => (
     <BaseActionbar
+        messenger={messenger}
         info={{
             title: 'Arbitration in Progress',
             subTitle:
@@ -23,5 +30,4 @@ const LockedByArbitrationActionbar = () => (
         }}
     />
 )
-
 export default LockedByArbitrationActionbar

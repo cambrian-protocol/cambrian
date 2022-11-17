@@ -1,18 +1,14 @@
 import { Box, Button, Text } from 'grommet'
-import {
-    CAMBRIAN_LIB_NAME,
-    ceramicInstance,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem'
+import CeramicArbitratorAPI from '@cambrian/app/services/ceramic/CeramicArbitratorAPI'
 import CreateArbitratorModal from './modals/CreateArbitratorModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import { Scales } from 'phosphor-react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
@@ -45,18 +41,10 @@ const ArbitrationDashboardUI = ({
         setIsFetching(true)
         if (currentUser) {
             try {
-                const arbitratorLib = (await TileDocument.deterministic(
-                    ceramicInstance(currentUser),
-                    {
-                        controllers: [currentUser.did],
-                        family: CAMBRIAN_LIB_NAME,
-                        tags: ['arbitrators'],
-                    },
-                    { pin: true }
-                )) as TileDocument<{ [address: string]: number }>
-                if (arbitratorLib.content) {
-                    setArbitratorContracts(arbitratorLib.content)
-                }
+                const arbitratorAPI = new CeramicArbitratorAPI(currentUser)
+                setArbitratorContracts(
+                    await arbitratorAPI.getArbitratorContracts()
+                )
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))
             }

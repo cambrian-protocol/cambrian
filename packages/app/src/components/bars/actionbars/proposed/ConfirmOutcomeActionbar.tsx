@@ -17,12 +17,14 @@ interface ConfirmOutcomeActionbarProps {
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
     solverTimelock: TimelockModel
+    messenger?: JSX.Element
 }
 
 const ConfirmOutcomeActionbar = ({
     solverMethods,
     currentCondition,
     solverTimelock,
+    messenger,
 }: ConfirmOutcomeActionbarProps) => {
     const [isConfirming, setIsConfirming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
@@ -91,6 +93,7 @@ const ConfirmOutcomeActionbar = ({
     return (
         <>
             <BaseActionbar
+                messenger={messenger}
                 info={actionbarInfo}
                 primaryAction={
                     <LoaderButton

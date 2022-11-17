@@ -12,12 +12,14 @@ interface InitiatedActionbarProps {
     solverMethods: GenericMethods
     solverData: SolverModel
     currentCondition: SolverContractCondition
+    messenger?: JSX.Element
 }
 
 const InitiatedActionbar = ({
     solverData,
     solverMethods,
     currentCondition,
+    messenger,
 }: InitiatedActionbarProps) => {
     const [emptyManualSlots, setEmptyManualSlots] = useState<RichSlotModel[]>(
         []
@@ -43,11 +45,13 @@ const InitiatedActionbar = ({
         <>
             {emptyManualSlots.length === 0 ? (
                 <ExecuteSolveActionbar
+                    messenger={messenger}
                     solverMethods={solverMethods}
                     currentCondition={currentCondition}
                 />
             ) : (
                 <AddDataActionbar
+                    messenger={messenger}
                     solverMethods={solverMethods}
                     manualSlots={emptyManualSlots}
                 />
