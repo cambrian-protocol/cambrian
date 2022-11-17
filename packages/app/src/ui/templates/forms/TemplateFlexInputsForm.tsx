@@ -62,16 +62,11 @@ const TemplateFlexInputsForm = ({
         setIsSubmitting(false)
     }
 
-    const templateFlexInputs = templateInput.flexInputs.filter(
-        (f) =>
-            f.isFlex === true || f.isFlex === 'Both' || f.isFlex === 'Template'
-    )
-
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
-                    {templateFlexInputs.map((flexInput, idx) => {
+                    {templateInput.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
@@ -81,68 +76,78 @@ const TemplateFlexInputsForm = ({
                         const description = getFlexInputDescription(flexInput)
                         const instruction = getFlexInputInstruction(flexInput)
 
-                        return (
-                            <Box key={idx}>
-                                <FormField
-                                    name={`flexInput[${idx}].value`}
-                                    label={label}
-                                    validate={[
-                                        () => {
-                                            if (
-                                                templateInput.flexInputs[
-                                                    idx
-                                                ].value.trim().length === 0
-                                            ) {
-                                                return undefined
-                                            } else if (
-                                                type === 'address' &&
-                                                !isAddress(
+                        if (
+                            !flexInput.isFlex ||
+                            flexInput.isFlex === 'None' ||
+                            flexInput.isFlex === 'Proposal'
+                        ) {
+                            return null
+                        } else {
+                            return (
+                                <Box key={idx}>
+                                    <FormField
+                                        name={`flexInput[${idx}].value`}
+                                        label={label}
+                                        validate={[
+                                            () => {
+                                                if (
                                                     templateInput.flexInputs[
                                                         idx
-                                                    ].value
-                                                )
-                                            ) {
-                                                return 'Invalid Address'
+                                                    ].value.trim().length === 0
+                                                ) {
+                                                    return undefined
+                                                } else if (
+                                                    type === 'address' &&
+                                                    !isAddress(
+                                                        templateInput
+                                                            .flexInputs[idx]
+                                                            .value
+                                                    )
+                                                ) {
+                                                    return 'Invalid Address'
+                                                }
+                                            },
+                                        ]}
+                                    >
+                                        <TextInput
+                                            type={type}
+                                            value={
+                                                templateInput.flexInputs[idx]
+                                                    .value
                                             }
-                                        },
-                                    ]}
-                                >
-                                    <TextInput
-                                        type={type}
-                                        value={
-                                            templateInput.flexInputs[idx].value
-                                        }
-                                        onChange={(e) => {
-                                            const inputsClone =
-                                                _.cloneDeep(templateInput)
+                                            onChange={(e) => {
+                                                const inputsClone =
+                                                    _.cloneDeep(templateInput)
 
-                                            inputsClone.flexInputs[idx].value =
-                                                e.target.value
+                                                inputsClone.flexInputs[
+                                                    idx
+                                                ].value = e.target.value
 
-                                            setTemplateInput(inputsClone)
-                                        }}
-                                    />
-                                </FormField>
-                                {description && (
-                                    <Text
-                                        size="small"
-                                        color="dark-4"
-                                        margin={{ bottom: 'small' }}
-                                    >
-                                        {description}
-                                    </Text>
-                                )}
-                                {instruction && (
-                                    <Text
-                                        size="small"
-                                        color="dark-4"
-                                        margin={{ bottom: 'small' }}
-                                    >
-                                        {instruction}
-                                    </Text>
-                                )}
-                            </Box>
-                        )
+                                                setTemplateInput(inputsClone)
+                                            }}
+                                        />
+                                    </FormField>
+                                    {description && (
+                                        <Text
+                                            size="small"
+                                            color="dark-4"
+                                            margin={{ bottom: 'small' }}
+                                        >
+                                            {description}
+                                        </Text>
+                                    )}
+                                    {instruction && (
+                                        <Text
+                                            size="small"
+                                            color="dark-4"
+                                            margin={{ bottom: 'small' }}
+                                        >
+                                            {instruction}
+                                        </Text>
+                                    )}
+                                </Box>
+                            )
+                        }
                     })}
                 </Box>
                 <TwoButtonWrapContainer

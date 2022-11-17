@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import DefaultRecipientActionbar from '../solver/DefaultRecipientActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import LoaderButton from '../../../buttons/LoaderButton'
@@ -28,12 +29,14 @@ interface RedeemTokensActionbarProps {
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
+    messenger?: JSX.Element
 }
 
 const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
     currentUser,
+    messenger,
 }: RedeemTokensActionbarProps) => {
     // Note: Can just be here if a permission was set, permission can just be set on a user with signer and chainId
     const ctf = new CTFContract(currentUser.signer!!, currentUser.chainId!!)
@@ -292,6 +295,7 @@ const RedeemTokensActionbar = ({
         <>
             {redeemedAmount ? (
                 <BaseActionbar
+                    messenger={messenger}
                     info={actionbarInfo}
                     primaryAction={
                         <Box>
@@ -309,6 +313,7 @@ const RedeemTokensActionbar = ({
                 />
             ) : payoutAmount ? (
                 <BaseActionbar
+                    messenger={messenger}
                     info={actionbarInfo}
                     primaryAction={
                         <LoaderButton
@@ -327,7 +332,7 @@ const RedeemTokensActionbar = ({
                     }
                 />
             ) : (
-                <></>
+                <DefaultRecipientActionbar messenger={messenger} />
             )}
             {errMsg && (
                 <ErrorPopupModal

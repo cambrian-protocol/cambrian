@@ -61,6 +61,7 @@ const ProposalHeader = ({
                         <Box>
                             {mergedComposition?.solvers.map((solver, idx) => (
                                 <DropButtonListItem
+                                    key={idx}
                                     label={
                                         <Box width="medium">
                                             <Text>

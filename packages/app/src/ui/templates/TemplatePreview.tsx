@@ -79,6 +79,7 @@ const TemplatePreview = ({
                                               {composition?.solvers.map(
                                                   (solver, idx) => (
                                                       <DropButtonListItem
+                                                          key={idx}
                                                           label={
                                                               <Box width="medium">
                                                                   <Text>

@@ -78,7 +78,11 @@ export default function CoreMessenger({
 
     // Subscribe to Messages TileDocuments
     const initSubscriptions = async () => {
-        const messagesDocs = await fetchMessagesDocs()
+        const messagesDocs = await fetchMessagesDocs(
+            participants.filter(
+                (participant) => participant !== currentUser.did
+            )
+        )
         const subscriptions = messagesDocs.map((doc) =>
             doc.subscribe(() => {
                 if (outbox.length === 0) {
@@ -91,10 +95,10 @@ export default function CoreMessenger({
         }
     }
 
-    const fetchMessagesDocs = async () => {
+    const fetchMessagesDocs = async (dids: string[]) => {
         return (
             await Promise.allSettled(
-                participants.concat(currentUser.did).map(
+                dids.map(
                     async (DID) =>
                         await TileDocument.deterministic(
                             ceramicInstance(currentUser),
@@ -116,7 +120,7 @@ export default function CoreMessenger({
     // Load chat
     const loadChat = async () => {
         try {
-            const messagesDocs = await fetchMessagesDocs()
+            const messagesDocs = await fetchMessagesDocs(participants)
             // Get message content
             const messages: ChatMessageType[][] = messagesDocs
                 .filter((doc) => doc.content?.messages?.length > 0)

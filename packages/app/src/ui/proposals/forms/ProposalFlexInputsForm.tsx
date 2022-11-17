@@ -58,65 +58,75 @@ const ProposalFlexInputsForm = ({
                         const description = getFlexInputDescription(flexInput)
                         const instruction = getFlexInputInstruction(flexInput)
 
-                        return (
-                            <Box key={idx}>
-                                <FormField
-                                    name={`flexInputs[${idx}].value`}
-                                    label={label}
-                                    validate={[
-                                        () =>
-                                            isRequired(
-                                                proposalInput.flexInputs[idx]
-                                                    .value
-                                            ),
-                                        () => {
-                                            if (
-                                                type === 'address' &&
-                                                !isAddress(
+                        if (
+                            !flexInput.isFlex ||
+                            flexInput.isFlex === 'None' ||
+                            flexInput.isFlex === 'Template'
+                        ) {
+                            return null
+                        } else {
+                            return (
+                                <Box key={idx}>
+                                    <FormField
+                                        name={`flexInputs[${idx}].value`}
+                                        label={label}
+                                        validate={[
+                                            () =>
+                                                isRequired(
                                                     proposalInput.flexInputs[
                                                         idx
                                                     ].value
-                                                )
-                                            ) {
-                                                return 'Invalid Address'
-                                            }
-                                        },
-                                    ]}
-                                >
-                                    <TextInput
-                                        type={type}
-                                        value={flexInput.value}
-                                        onChange={(e) => {
-                                            const inputsClone =
-                                                _.cloneDeep(proposalInput)
-
-                                            inputsClone.flexInputs[idx].value =
-                                                e.target.value
-
-                                            setProposalInput(inputsClone)
-                                        }}
-                                    />
-                                </FormField>
-                                {description && (
-                                    <Text
-                                        size="small"
-                                        color="dark-4"
-                                        margin={{ bottom: 'small' }}
+                                                ),
+                                            () => {
+                                                if (
+                                                    type === 'address' &&
+                                                    !isAddress(
+                                                        proposalInput
+                                                            .flexInputs[idx]
+                                                            .value
+                                                    )
+                                                ) {
+                                                    return 'Invalid Address'
+                                                }
+                                            },
+                                        ]}
                                     >
-                                        {description}
-                                    </Text>
-                                )}
-                                {instruction && (
-                                    <Text
-                                        size="small"
-                                        color="dark-4"
-                                        margin={{ bottom: 'small' }}
-                                    >
-                                        {instruction}
-                                    </Text>
-                                )}
-                            </Box>
-                        )
+                                        <TextInput
+                                            type={type}
+                                            value={flexInput.value}
+                                            onChange={(e) => {
+                                                const inputsClone =
+                                                    _.cloneDeep(proposalInput)
+
+                                                inputsClone.flexInputs[
+                                                    idx
+                                                ].value = e.target.value
+
+                                                setProposalInput(inputsClone)
+                                            }}
+                                        />
+                                    </FormField>
+                                    {description && (
+                                        <Text
+                                            size="small"
+                                            color="dark-4"
+                                            margin={{ bottom: 'small' }}
+                                        >
+                                            {description}
+                                        </Text>
+                                    )}
+                                    {instruction && (
+                                        <Text
+                                            size="small"
+                                            color="dark-4"
+                                            margin={{ bottom: 'small' }}
+                                        >
+                                            {instruction}
+                                        </Text>
+                                    )}
+                                </Box>
+                            )
+                        }
                     })}
                 </Box>
                 <TwoButtonWrapContainer

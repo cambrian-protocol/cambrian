@@ -76,10 +76,7 @@ const ProposalReviewActionbar = ({
         setIsApproving(true)
         if (stageStack) {
             try {
-                const res = await ceramicTemplateAPI.approveProposal(
-                    currentUser,
-                    stageStack
-                )
+                const res = await ceramicTemplateAPI.approveProposal(stageStack)
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
             } catch (e) {
