@@ -54,10 +54,6 @@ const ProposalFlexInputsForm = ({
                             composition.solvers,
                             flexInput
                         )
-                        const label = getFlexInputLabel(flexInput)
-                        const description = getFlexInputDescription(flexInput)
-                        const instruction = getFlexInputInstruction(flexInput)
-
                         if (
                             !flexInput.isFlex ||
                             flexInput.isFlex === 'None' ||
@@ -69,7 +65,7 @@ const ProposalFlexInputsForm = ({
                                 <Box key={idx}>
                                     <FormField
                                         name={`flexInputs[${idx}].value`}
-                                        label={label}
+                                        label={flexInput.label}
                                         validate={[
                                             () =>
                                                 isRequired(
@@ -106,24 +102,20 @@ const ProposalFlexInputsForm = ({
                                             }}
                                         />
                                     </FormField>
-                                    {description && (
-                                        <Text
-                                            size="small"
-                                            color="dark-4"
-                                            margin={{ bottom: 'small' }}
-                                        >
-                                            {description}
-                                        </Text>
-                                    )}
-                                    {instruction && (
-                                        <Text
-                                            size="small"
-                                            color="dark-4"
-                                            margin={{ bottom: 'small' }}
-                                        >
-                                            {instruction}
-                                        </Text>
-                                    )}
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {flexInput.description}
+                                    </Text>
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {flexInput.instruction}
+                                    </Text>
                                 </Box>
                             )
                         }

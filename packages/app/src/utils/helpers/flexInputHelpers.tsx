@@ -10,20 +10,20 @@ export const getFlexInputType = (
     solvers: ComposerSolver[],
     tag: TaggedInput
 ) => {
-    if (tag.id === 'data') {
+    if (tag.slotId === 'data') {
         return 'string'
     } else if (
-        tag.id === 'keeper' ||
-        tag.id === 'arbitrator' ||
-        tag.id === 'collateralToken'
+        tag.slotId === 'keeper' ||
+        tag.slotId === 'arbitrator' ||
+        tag.slotId === 'collateralToken'
     ) {
         return 'address'
-    } else if (tag.id === 'timelockSeconds') {
+    } else if (tag.slotId === 'timelockSeconds') {
         return 'number'
     } else {
         // Slot ID
-        const slot = solvers.find((solver) => solver.config.slots[tag.id])
-            ?.config.slots[tag.id]
+        const slot = solvers.find((solver) => solver.config.slots[tag.slotId])
+            ?.config.slots[tag.slotId]
         if (slot?.dataTypes[0] === SolidityDataTypes.Uint256) {
             return 'number'
         } else if (slot?.dataTypes[0] === SolidityDataTypes.Address) {
@@ -38,8 +38,8 @@ export const getFlexInputLabel = (flexInput: FlexInputFormType) => {
     const label =
         flexInput.label.trim() !== ''
             ? flexInput.label
-            : DEFAULT_SLOT_TAGS[flexInput.id]
-            ? DEFAULT_SLOT_TAGS[flexInput.id].label
+            : DEFAULT_SLOT_TAGS[flexInput.slotId]
+            ? DEFAULT_SLOT_TAGS[flexInput.slotId].label
             : 'Unknown'
     return label
 }
@@ -48,8 +48,8 @@ export const getFlexInputDescription = (flexInput: FlexInputFormType) => {
     const label =
         flexInput.description.trim() !== ''
             ? flexInput.description
-            : DEFAULT_SLOT_TAGS[flexInput.id]
-            ? DEFAULT_SLOT_TAGS[flexInput.id].description
+            : DEFAULT_SLOT_TAGS[flexInput.slotId]
+            ? DEFAULT_SLOT_TAGS[flexInput.slotId].description
             : undefined
     return label
 }
@@ -59,29 +59,27 @@ export const getFlexInputInstruction = (flexInput: FlexInputFormType) => {
     const label =
         flexInput.instruction && flexInput.instruction.trim() !== ''
             ? flexInput.instruction
-            : DEFAULT_SLOT_TAGS[flexInput.id]
-            ? DEFAULT_SLOT_TAGS[flexInput.id].instruction
+            : DEFAULT_SLOT_TAGS[flexInput.slotId]
+            ? DEFAULT_SLOT_TAGS[flexInput.slotId].instruction
             : undefined
     return label
 }
 
 export const mergeFlexIntoComposition = (
-    oldComposition: CompositionModel,
+    composition: CompositionModel,
     flexInputs: FlexInputFormType[]
 ): CompositionModel => {
-    const updatedComposerSolvers = _.cloneDeep(oldComposition.solvers)
-
     // Update our composition with new flexInput values
     if (flexInputs.length > 0) {
-        updatedComposerSolvers.forEach((solver: ComposerSolver, i: number) => {
+        composition.solvers.forEach((solver: ComposerSolver, i: number) => {
             const filteredFlexInputs = flexInputs.filter(
                 (flexInput) => flexInput.solverId === solver.id
             )
             filteredFlexInputs.forEach((filteredFlexInput) => {
-                solver.slotTags[filteredFlexInput.tagId] = {
-                    ...solver.slotTags[filteredFlexInput.tagId],
+                solver.slotTags[filteredFlexInput.tagId].update({
+                    ...solver.slotTags[filteredFlexInput.tagId].metadata,
                     isFlex: filteredFlexInput.isFlex,
-                }
+                })
 
                 if (
                     typeof filteredFlexInput.value !== 'undefined' &&
@@ -89,25 +87,23 @@ export const mergeFlexIntoComposition = (
                 ) {
                     switch (filteredFlexInput.tagId) {
                         case 'keeper':
-                            solver.slotTags['keeper'] = {
-                                ...solver.slotTags['keeper'],
-                                isFlex: false,
-                            }
-                            solver.config['keeperAddress'] =
-                                filteredFlexInput.value
+                            solver.slotTags['keeper'].update({
+                                ...solver.slotTags['keeper'].metadata,
+                                isFlex: 'None',
+                            })
+                            solver.updateKeeper(filteredFlexInput.value)
                             break
 
                         case 'arbitrator':
-                            solver.slotTags['arbitrator'] = {
-                                ...solver.slotTags['arbitrator'],
-                                isFlex: false,
-                            }
-                            solver.config['arbitratorAddress'] =
-                                filteredFlexInput.value
+                            solver.slotTags['arbitrator'].update({
+                                ...solver.slotTags['arbitrator'].metadata,
+                                isFlex: 'None',
+                            })
+                            solver.updateArbitrator(filteredFlexInput.value)
                             break
 
                         // case 'data':
-                        //     updatedComposerSolvers[i].config['data'] =
+                        //     composerSolvers[i].config['data'] =
                         //         taggedInput.value
                         //     break
 
@@ -117,20 +113,21 @@ export const mergeFlexIntoComposition = (
                                 break */
 
                         case 'timelockSeconds':
-                            solver.slotTags['timelockSeconds'] = {
-                                ...solver.slotTags['timelockSeconds'],
-                                isFlex: false,
-                            }
-                            solver.config['timelockSeconds'] = parseInt(
-                                filteredFlexInput.value
+                            solver.slotTags['timelockSeconds'].update({
+                                ...solver.slotTags['timelockSeconds'].metadata,
+                                isFlex: 'None',
+                            })
+                            solver.updateTimelock(
+                                parseInt(filteredFlexInput.value)
                             )
                             break
 
                         default:
-                            solver.slotTags[filteredFlexInput.tagId] = {
-                                ...solver.slotTags[filteredFlexInput.tagId],
-                                isFlex: false,
-                            }
+                            solver.slotTags[filteredFlexInput.tagId].update({
+                                ...solver.slotTags[filteredFlexInput.tagId]
+                                    .metadata,
+                                isFlex: 'None',
+                            })
                             // SlotID
                             solver.config.slots[filteredFlexInput.tagId].data =
                                 [filteredFlexInput.value]
@@ -140,8 +137,5 @@ export const mergeFlexIntoComposition = (
         })
     }
 
-    return {
-        ...oldComposition,
-        solvers: updatedComposerSolvers,
-    }
+    return composition
 }

@@ -24,6 +24,8 @@ import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ComposerModuleModel } from '../models/ModuleModel'
 import { ComposerOutcomeCollectionModel } from '../models/OutcomeCollectionModel'
+import SlotTag from './Tags/SlotTag'
+import { SCHEMA_VER } from 'packages/app/config'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -49,10 +51,11 @@ interface AddSlotTagProps extends Omit<SlotTagModel, 'id'> {
 
 const MAX_BASIS_POINTS = 10000
 export default class ComposerSolver {
+    schemaVer?: number = SCHEMA_VER['composerSolver']
     id: string
     iface: ethers.utils.Interface
     config: ComposerSolverConfigModel
-    slotTags: SlotTagsHashMapType
+    slotTags: SlotTagsHashMapType = {}
     solverTag: SolverTagModel
 
     constructor(
@@ -66,7 +69,11 @@ export default class ComposerSolver {
         this.id = id ? id : newId
         this.iface = iface
         this.config = config ? config : this.getDefaultConfig()
-        this.slotTags = slotTags || {}
+        if (slotTags) {
+            Object.keys(slotTags).forEach((slotId) =>
+                this.addSlotTag(slotTags[slotId])
+            )
+        }
         this.solverTag = solverTag || {
             title: id ? id : newId,
             description: '',
@@ -102,8 +109,12 @@ export default class ComposerSolver {
         this.config.arbitratorAddress = address
     }
 
-    updateTimelock(duration: number) {
-        this.config.timelockSeconds = duration
+    updateTimelock(duration: number | string) {
+        if (typeof duration === 'string') {
+            this.config.timelockSeconds = parseInt(duration)
+        } else {
+            this.config.timelockSeconds = duration
+        }
     }
 
     updateCollateralToken(tokenAddress: string) {
@@ -152,36 +163,20 @@ export default class ComposerSolver {
         label,
         isFlex,
     }: AddSlotTagProps) {
-        this.slotTags[slotId] = {
-            id: slotId,
+        this.slotTags[slotId] = new SlotTag(this, {
+            slotId: slotId,
             label: label,
             description: description,
             instruction: instruction,
             isFlex: isFlex,
-        }
+        })
     }
 
-    updateSlotTag({
-        slotId,
-        description,
-        instruction,
-        label,
-        isFlex,
-    }: AddSlotTagProps) {
-        const slotTagToUpdate = this.slotTags[slotId]
-        if (slotTagToUpdate) {
-            slotTagToUpdate.label = label
-            slotTagToUpdate.description = description
-            slotTagToUpdate.instruction = instruction
-            slotTagToUpdate.isFlex = isFlex
+    updateSlotTag(slotTagObj: AddSlotTagProps) {
+        if (this.slotTags[slotTagObj.slotId]) {
+            this.slotTags[slotTagObj.slotId]
         } else {
-            this.addSlotTag({
-                slotId: slotId,
-                label: label,
-                description: description,
-                instruction: instruction,
-                isFlex: isFlex,
-            })
+            this.addSlotTag(slotTagObj)
         }
     }
 

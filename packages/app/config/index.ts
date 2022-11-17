@@ -28,3 +28,9 @@ export const ERROR_LOG_API_ENDPOINT =
 
 // Trilobot
 export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com'
+
+// SCHEMA
+export const SCHEMA_VER = {
+    composition: 1,
+    composerSolver: 1,
+}

@@ -1,14 +1,16 @@
+import { SlotTag } from '../classes/Tags/SlotTag'
+
 export type SlotTagsHashMapType = {
-    [slotId: string]: SlotTagModel
+    [slotId: string]: SlotTag
 }
 
 // TODO Add icon
 export type SlotTagModel = {
-    id: string
-    isFlex: boolean | 'None' | 'Both' | 'Template' | 'Proposal'
+    slotId: string
+    isFlex: 'None' | 'Both' | 'Template' | 'Proposal'
     label: string
     description: string
-    instruction?: string
+    instruction: string
 }
 
 export type TaggedInput = SlotTagModel & {
