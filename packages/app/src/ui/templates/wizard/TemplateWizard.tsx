@@ -12,8 +12,8 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface TemplateWizardProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    template: TemplateModel
+    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     templateStreamID: string
     onSaveTemplate: () => Promise<boolean>
     composition: CompositionModel
@@ -34,8 +34,8 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
 const TemplateWizard = ({
-    templateInput,
-    setTemplateInput,
+    template,
+    setTemplate,
     templateStreamID,
     onSaveTemplate,
     composition,
@@ -55,8 +55,8 @@ const TemplateWizard = ({
             case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <TemplateDescriptionStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        template={template}
+                        setTemplate={setTemplate}
                         stepperCallback={setCurrentStep}
                         onSaveTemplate={onSaveTemplate}
                     />
@@ -64,8 +64,8 @@ const TemplateWizard = ({
             case TEMPLATE_WIZARD_STEPS.PRICING:
                 return (
                     <TemplatePricingStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        template={template}
+                        setTemplate={setTemplate}
                         stepperCallback={setCurrentStep}
                         onSaveTemplate={onSaveTemplate}
                     />
@@ -73,8 +73,8 @@ const TemplateWizard = ({
             case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
                     <TemplateFlexInputsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        template={template}
+                        setTemplate={setTemplate}
                         stepperCallback={setCurrentStep}
                         composition={composition}
                         onSaveTemplate={onSaveTemplate}
@@ -83,8 +83,8 @@ const TemplateWizard = ({
             case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
                     <TemplateRequirementsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        template={template}
+                        setTemplate={setTemplate}
                         stepperCallback={setCurrentStep}
                         onSaveTemplate={onSaveTemplate}
                     />

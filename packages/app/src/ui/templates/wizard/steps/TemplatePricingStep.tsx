@@ -11,15 +11,15 @@ import TemplatePricingForm from '../../forms/TemplatePricingForm'
 
 interface TemplatePricingStepProps {
     stepperCallback: (step: TemplateWizardStepsType) => void
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    template: TemplateModel
+    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplatePricingStep = ({
     stepperCallback,
-    templateInput,
-    setTemplateInput,
+    template,
+    setTemplate,
     onSaveTemplate,
 }: TemplatePricingStepProps) => {
     return (
@@ -31,11 +31,11 @@ const TemplatePricingStep = ({
                 />
             </Box>
             <TemplatePricingForm
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                template={template}
+                setTemplate={setTemplate}
                 onSubmit={async () => {
                     if (await onSaveTemplate()) {
-                        if (templateInput.flexInputs.length > 0) {
+                        if (template.flexInputs.length > 0) {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
                         } else {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)

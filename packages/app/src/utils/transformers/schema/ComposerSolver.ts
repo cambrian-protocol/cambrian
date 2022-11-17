@@ -1,6 +1,4 @@
-import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 
 /**
  * Start of some functions to update things from previous versions

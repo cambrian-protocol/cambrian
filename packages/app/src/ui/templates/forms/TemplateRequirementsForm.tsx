@@ -9,15 +9,11 @@ import {
 import { SetStateAction, useEffect, useState } from 'react'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateRequirementsFormProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
@@ -26,13 +22,12 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    templateInput,
-    setTemplateInput,
-    onSubmit,
     submitLabel,
-    onCancel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
+    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
+        useEditTemplate()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -44,8 +39,12 @@ const TemplateRequirementsForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template) {
+        return null
     }
 
     return (
@@ -54,12 +53,12 @@ const TemplateRequirementsForm = ({
                 <Box pad="xsmall">
                     <FormField label="Requirements" name="requirements">
                         <TextArea
-                            value={templateInput.requirements}
+                            value={template.requirements}
                             resize={false}
                             rows={10}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setTemplate({
+                                    ...template,
                                     requirements: e.target.value,
                                 })
                             }
@@ -81,7 +80,7 @@ const TemplateRequirementsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onResetTemplate}
                         />
                     }
                 />

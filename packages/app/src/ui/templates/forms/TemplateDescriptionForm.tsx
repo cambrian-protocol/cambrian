@@ -13,29 +13,24 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
-
-interface TemplateDescriptionFormProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
-    submitLabel?: string
-    onCancel: () => void
-    cancelLabel?: string
-}
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export type TemplateDescriptionFormType = {
     title: string
     description: string
 }
+interface TemplateDescriptionFormProps {
+    submitLabel?: string
+    cancelLabel?: string
+}
 
 const TemplateDescriptionForm = ({
-    templateInput,
-    setTemplateInput,
-    onSubmit,
     submitLabel,
-    onCancel,
     cancelLabel,
 }: TemplateDescriptionFormProps) => {
+    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
+        useEditTemplate()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -47,8 +42,12 @@ const TemplateDescriptionForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template) {
+        return null
     }
 
     return (
@@ -58,14 +57,14 @@ const TemplateDescriptionForm = ({
                     <FormField
                         name="title"
                         label="Title"
-                        validate={[() => isRequired(templateInput.title)]}
+                        validate={[() => isRequired(template.title)]}
                     >
                         <TextInput
                             placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
-                            value={templateInput.title}
+                            value={template.title}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setTemplate({
+                                    ...template,
                                     title: e.target.value,
                                 })
                             }
@@ -74,16 +73,16 @@ const TemplateDescriptionForm = ({
                     <FormField
                         name="description"
                         label="Description"
-                        validate={[() => isRequired(templateInput.description)]}
+                        validate={[() => isRequired(template.description)]}
                     >
                         <TextArea
                             placeholder="Describe your service at length. Communicate your unique value, details of your service, and the format and content of information you need from customers. Customers will send proposals in response to this description."
                             rows={15}
                             resize={false}
-                            value={templateInput.description}
+                            value={template.description}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setTemplate({
+                                    ...template,
                                     description: e.target.value,
                                 })
                             }
@@ -105,7 +104,7 @@ const TemplateDescriptionForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onResetTemplate}
                         />
                     }
                 />

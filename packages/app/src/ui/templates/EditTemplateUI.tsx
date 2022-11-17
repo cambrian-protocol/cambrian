@@ -3,38 +3,25 @@ import { Clipboard, Eye } from 'phosphor-react'
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
-interface EditTemplateUIProps {
-    cachedTemplateTitle: string
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    templateStreamID: string
-    onSaveTemplate: () => Promise<boolean>
-    onResetTemplate: () => void
-    composition: CompositionModel
-}
+const EditTemplateUI = () => {
+    const { template, templateStreamID, cachedTemplate } = useEditTemplate()
 
-const EditTemplateUI = ({
-    cachedTemplateTitle,
-    templateInput,
-    setTemplateInput,
-    onSaveTemplate,
-    onResetTemplate,
-    composition,
-    templateStreamID,
-}: EditTemplateUIProps) => {
+    if (!template) {
+        return null
+    }
+
     const [activeIndex, setActiveIndex] = useState(0)
-    const [authorProfile] = useCambrianProfile(templateInput.author)
+    const [authorProfile] = useCambrianProfile(template?.author)
 
     // Scroll up when step changes
     const topRefContext = useContext(TopRefContext)
@@ -43,14 +30,11 @@ const EditTemplateUI = ({
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
-    const onSubmit = async () => {
-        await onSaveTemplate()
-    }
     return (
         <Box gap="medium">
             <BaseHeader
                 authorProfileDoc={authorProfile}
-                title={cachedTemplateTitle}
+                title={cachedTemplate?.title || 'Untitled'}
                 metaTitle="Edit Template"
                 items={[
                     {
@@ -82,12 +66,7 @@ const EditTemplateUI = ({
                             paragraph="Let the world know how you can help."
                         />
                     </Box>
-                    <TemplateDescriptionForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
-                    />
+                    <TemplateDescriptionForm />
                 </Tab>
                 <Tab title="Pricing">
                     <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
@@ -97,14 +76,9 @@ const EditTemplateUI = ({
                             paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                         />
                     </Box>
-                    <TemplatePricingForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
-                    />
+                    <TemplatePricingForm />
                 </Tab>
-                {templateInput.flexInputs.length > 0 && (
+                {template.flexInputs.length > 0 && (
                     <Tab title="Solver Config">
                         <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
                             <HeaderTextSection
@@ -113,13 +87,7 @@ const EditTemplateUI = ({
                                 paragraph="Configure the Solver by completing these fields as instructed."
                             />
                         </Box>
-                        <TemplateFlexInputsForm
-                            composition={composition}
-                            templateInput={templateInput}
-                            setTemplateInput={setTemplateInput}
-                            onSubmit={onSubmit}
-                            onCancel={onResetTemplate}
-                        />
+                        <TemplateFlexInputsForm />
                     </Tab>
                 )}
                 <Tab title="Requirements">
@@ -130,12 +98,7 @@ const EditTemplateUI = ({
                             paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
                         />
                     </Box>
-                    <TemplateRequirementsForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
-                    />
+                    <TemplateRequirementsForm />
                 </Tab>
             </Tabs>
         </Box>

@@ -22,14 +22,10 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { isAddress } from 'ethers/lib/utils'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateFlexInputsFormProps {
-    composition: CompositionModel
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
@@ -39,14 +35,17 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
-    composition,
-    onSubmit,
-    templateInput,
-    setTemplateInput,
     submitLabel,
-    onCancel,
     cancelLabel,
 }: TemplateFlexInputsFormProps) => {
+    const {
+        template,
+        composition,
+        setTemplate,
+        onSaveTemplate,
+        onResetTemplate,
+    } = useEditTemplate()
+
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -58,40 +57,36 @@ const TemplateFlexInputsForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template || !composition) {
+        return null
     }
 
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
-                    {templateInput.flexInputs.map((flexInput, idx) => {
+                    {template.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
                         )
 
-                        const label = getFlexInputLabel(flexInput)
-                        const description = getFlexInputDescription(flexInput)
-                        const instruction = getFlexInputInstruction(flexInput)
-
-                        if (
-                            !flexInput.isFlex ||
-                            flexInput.isFlex === 'None' ||
-                            flexInput.isFlex === 'Proposal'
-                        ) {
+                        if (flexInput.isFlex == 'None' || 'Proposal') {
                             return null
                         } else {
                             return (
                                 <Box key={idx}>
                                     <FormField
                                         name={`flexInput[${idx}].value`}
-                                        label={label}
+                                        label={flexInput.label}
                                         validate={[
                                             () => {
                                                 if (
-                                                    templateInput.flexInputs[
+                                                    template.flexInputs[
                                                         idx
                                                     ].value.trim().length === 0
                                                 ) {
@@ -99,8 +94,7 @@ const TemplateFlexInputsForm = ({
                                                 } else if (
                                                     type === 'address' &&
                                                     !isAddress(
-                                                        templateInput
-                                                            .flexInputs[idx]
+                                                        template.flexInputs[idx]
                                                             .value
                                                     )
                                                 ) {
@@ -112,37 +106,36 @@ const TemplateFlexInputsForm = ({
                                         <TextInput
                                             type={type}
                                             value={
-                                                templateInput.flexInputs[idx]
-                                                    .value
+                                                template.flexInputs[idx].value
                                             }
                                             onChange={(e) => {
-                                                const inputsClone =
-                                                    _.cloneDeep(templateInput)
+                                                const templateClone =
+                                                    _.cloneDeep(template)
 
-                                                inputsClone.flexInputs[
+                                                templateClone.flexInputs[
                                                     idx
                                                 ].value = e.target.value
 
-                                                setTemplateInput(inputsClone)
+                                                setTemplate(templateClone)
                                             }}
                                         />
                                     </FormField>
-                                    {description && (
+                                    {flexInput.description && (
                                         <Text
                                             size="small"
                                             color="dark-4"
                                             margin={{ bottom: 'small' }}
                                         >
-                                            {description}
+                                            {flexInput.description}
                                         </Text>
                                     )}
-                                    {instruction && (
+                                    {flexInput.instruction && (
                                         <Text
                                             size="small"
                                             color="dark-4"
                                             margin={{ bottom: 'small' }}
                                         >
-                                            {instruction}
+                                            {flexInput.instruction}
                                         </Text>
                                     )}
                                 </Box>
@@ -165,7 +158,7 @@ const TemplateFlexInputsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onResetTemplate}
                         />
                     }
                 />

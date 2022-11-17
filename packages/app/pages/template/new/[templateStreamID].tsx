@@ -10,9 +10,9 @@ import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 export default function NewTemplatePage() {
     const {
         show404NotFound,
-        templateInput,
+        template,
         composition,
-        setTemplateInput,
+        setTemplate,
         templateStreamID,
         onSaveTemplate,
         errorMessage,
@@ -23,12 +23,12 @@ export default function NewTemplatePage() {
         <>
             {show404NotFound ? (
                 <Custom404Page />
-            ) : templateInput && composition ? (
+            ) : template && composition ? (
                 <PageLayout contextTitle="New Template" kind="narrow">
                     <TemplateWizard
                         composition={composition}
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        template={template}
+                        setTemplate={setTemplate}
                         templateStreamID={templateStreamID as string}
                         onSaveTemplate={onSaveTemplate}
                     />

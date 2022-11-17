@@ -11,8 +11,8 @@ import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface TemplateFlexInputsStepProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    template: TemplateModel
+    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     stepperCallback: (step: TemplateWizardStepsType) => void
     composition: CompositionModel
     onSaveTemplate: () => Promise<boolean>
@@ -20,8 +20,8 @@ interface TemplateFlexInputsStepProps {
 
 const TemplateFlexInputsStep = ({
     stepperCallback,
-    templateInput,
-    setTemplateInput,
+    template,
+    setTemplate,
     onSaveTemplate,
     composition,
 }: TemplateFlexInputsStepProps) => {
@@ -35,8 +35,8 @@ const TemplateFlexInputsStep = ({
             </Box>
             <TemplateFlexInputsForm
                 composition={composition}
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                template={template}
+                setTemplate={setTemplate}
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)

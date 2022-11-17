@@ -11,16 +11,16 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import router from 'next/router'
 
 interface TemplateDescriptionStepProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    template: TemplateModel
+    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     stepperCallback: (step: TemplateWizardStepsType) => void
     onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateDescriptionStep = ({
     stepperCallback,
-    templateInput,
-    setTemplateInput,
+    template,
+    setTemplate,
     onSaveTemplate,
 }: TemplateDescriptionStepProps) => {
     return (
@@ -32,8 +32,8 @@ const TemplateDescriptionStep = ({
                 />
             </Box>
             <TemplateDescriptionForm
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                template={template}
+                setTemplate={setTemplate}
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)

@@ -10,15 +10,15 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
 
 interface TemplateRequirementsStepProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    template: TemplateModel
+    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     stepperCallback: (step: TemplateWizardStepsType) => void
     onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateRequirementsStep = ({
-    templateInput,
-    setTemplateInput,
+    template,
+    setTemplate,
     stepperCallback,
     onSaveTemplate,
 }: TemplateRequirementsStepProps) => {
@@ -31,8 +31,8 @@ const TemplateRequirementsStep = ({
                 />
             </Box>
             <TemplateRequirementsForm
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                template={template}
+                setTemplate={setTemplate}
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
                     if (await onSaveTemplate())
@@ -40,7 +40,7 @@ const TemplateRequirementsStep = ({
                 }}
                 cancelLabel={'Back'}
                 onCancel={() => {
-                    if (templateInput.flexInputs.length > 0) {
+                    if (template.flexInputs.length > 0) {
                         stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
                     } else {
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
