@@ -40,9 +40,7 @@ const SolverCeramicInfo = ({
                     icon={<BaseAvatar icon={<HourglassSimpleMedium />} />}
                     title={
                         composerSolver.slotTags &&
-                        composerSolver.slotTags['timelockSeconds']?.isFlex &&
-                        composerSolver.slotTags['timelockSeconds'].isFlex !=
-                            'None'
+                        composerSolver.slotTags['timelockSeconds']?.isFlex
                             ? 'To be defined'
                             : parseSecondsToDisplay(
                                   composerSolver.config.timelockSeconds || 0
