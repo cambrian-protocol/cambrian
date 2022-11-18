@@ -8,6 +8,7 @@ import Head from 'next/head'
 import { Page } from 'grommet'
 import { WARNING_MESSAGE } from '@cambrian/app/constants/WarningMessages'
 import WarningBanner from '../containers/WarningBanner'
+import { useNotificationCountContext } from '@cambrian/app/hooks/useNotifcationCountContext'
 
 type InteractionLayoutProps = PageLayoutProps & {
     actionBar?: JSX.Element
@@ -22,10 +23,13 @@ const InteractionLayout = ({
     sidebar,
     header,
 }: InteractionLayoutProps) => {
+    const { notificationCounter } = useNotificationCountContext()
+
     return (
         <>
             <Head>
                 <title>
+                    {notificationCounter > 0 ? `(${notificationCounter}) ` : ''}
                     {contextTitle} | {siteTitle}
                 </title>
                 <meta name="description" content={siteTitle} />

@@ -1,12 +1,13 @@
-import { Box, ResponsiveContext } from 'grommet'
+import { Box, ResponsiveContext, Text } from 'grommet'
 import { CambrianProfileType, UserType } from '@cambrian/app/store/UserContext'
-import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
+import { CaretDown, CaretUp, Envelope, IconContext } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import AvatarGroup from '../avatars/AvatarGroup'
 import CoreMessenger from './CoreMessenger'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { getCambrianProfiles } from '@cambrian/app/utils/helpers/cambrianProfile'
+import { useNotificationCountContext } from '@cambrian/app/hooks/useNotifcationCountContext'
 
 interface MessengerProps {
     currentUser: UserType
@@ -19,6 +20,7 @@ const Messenger = ({
     chatID,
     participantDIDs,
 }: MessengerProps) => {
+    const { notificationCounter } = useNotificationCountContext()
     const [showMessenger, setShowMessenger] = useState(false)
     const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
@@ -51,6 +53,18 @@ const Messenger = ({
                             width="medium"
                             background="background-contrast-hover"
                             round={{ corner: 'top', size: 'xsmall' }}
+                            style={{ position: 'relative' }}
+                            border={
+                                notificationCounter > 0
+                                    ? [
+                                          { color: 'brand', side: 'top' },
+                                          {
+                                              color: 'brand',
+                                              side: 'vertical',
+                                          },
+                                      ]
+                                    : false
+                            }
                         >
                             <Box
                                 direction="row"
@@ -76,6 +90,25 @@ const Messenger = ({
                                 chatID={chatID}
                                 participants={participantDIDs}
                             />
+                            {notificationCounter > 0 && (
+                                <Box
+                                    style={{
+                                        position: 'absolute',
+                                        top: '-1em',
+                                        right: '1em',
+                                    }}
+                                    height={{ min: '2em', max: '2em' }}
+                                    width={{ min: '2em', max: '2em' }}
+                                    round="full"
+                                    background="brand"
+                                    justify="center"
+                                    align="center"
+                                >
+                                    <Text size="xsmall">
+                                        {notificationCounter}
+                                    </Text>
+                                </Box>
+                            )}
                         </Box>
                     </Box>
                 )
