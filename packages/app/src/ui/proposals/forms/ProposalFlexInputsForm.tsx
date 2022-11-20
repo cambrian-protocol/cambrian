@@ -15,6 +15,11 @@ import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButto
 import _ from 'lodash'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import {
+    parseInputToSeconds,
+    parseSecondsToForm,
+} from '@cambrian/app/utils/helpers/timeParsing'
+import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 
 interface ProposalFlexInputsFormProps {
     onSubmit?: () => Promise<void>
@@ -38,14 +43,129 @@ const ProposalFlexInputsForm = ({
     } = useEditProposal()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        return () => {}
-    }, [])
+    const [timelock, setTimelock] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+    })
+
+    const onChangeTime = ({
+        days,
+        hours,
+        minutes,
+    }: {
+        days?: number
+        hours?: number
+        minutes?: number
+    }) => {
+        const newTime = parseSecondsToForm(
+            (days !== undefined ? days : timelock.days) * 24 * 60 * 60 +
+                (hours !== undefined ? hours : timelock.hours) * 60 * 60 +
+                (minutes !== undefined ? minutes : timelock.minutes) * 60
+        )
+
+        setTimelock(newTime)
+        return newTime
+    }
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
         onSubmit ? await onSubmit() : await onSaveProposal()
         setIsSubmitting(false)
+    }
+
+    const updateFlexInput = (idx: number, value: string) => {
+        const proposalClone = _.cloneDeep(proposal)
+        proposalClone!.flexInputs[idx].value = value
+        setProposal(proposalClone)
+    }
+
+    const renderTimelockSecondsForm = (
+        flexInput: FlexInputFormType,
+        idx: number
+    ) => {
+        return (
+            <Box key={idx} pad={{ bottom: 'medium' }}>
+                <Box direction="row" gap="small" align="center">
+                    <FormField
+                        label="Timelock Days"
+                        margin={{ bottom: 'small' }}
+                    >
+                        <TextInput
+                            type="number"
+                            name="timelockDays"
+                            value={timelock.days}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        days: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Hours" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockHours"
+                            value={timelock.hours}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        hours: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Minutes" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockMinutes"
+                            value={timelock.minutes}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        minutes: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                </Box>
+
+                {flexInput.description && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.description}
+                    </Text>
+                )}
+                {flexInput.instruction && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.instruction}
+                    </Text>
+                )}
+            </Box>
+        )
     }
 
     if (!proposal || !stageStack) {
@@ -68,15 +188,16 @@ const ProposalFlexInputsForm = ({
                             flexInput
                         )
                         if (
-                            flexInput.isFlex === 'None' ||
-                            flexInput.isFlex === 'Template'
+                            flexInput.isFlex === 'Proposal' ||
+                            flexInput.isFlex === 'Both'
                         ) {
-                            return null
-                        } else {
+                            if (flexInput.slotId === 'timelockSeconds') {
+                                return renderTimelockSecondsForm(flexInput, idx)
+                            }
                             return (
                                 <Box key={idx}>
                                     <FormField
-                                        name={`flexInputs[${idx}].value`}
+                                        name={`${flexInput.slotId}`}
                                         label={flexInput.label}
                                         validate={[
                                             () =>
@@ -100,16 +221,12 @@ const ProposalFlexInputsForm = ({
                                         <TextInput
                                             type={type}
                                             value={flexInput.value}
-                                            onChange={(e) => {
-                                                const inputsClone =
-                                                    _.cloneDeep(proposal)
-
-                                                inputsClone.flexInputs[
-                                                    idx
-                                                ].value = e.target.value
-
-                                                setProposal(inputsClone)
-                                            }}
+                                            onChange={(e) =>
+                                                updateFlexInput(
+                                                    idx,
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </FormField>
                                     <Text
@@ -128,6 +245,8 @@ const ProposalFlexInputsForm = ({
                                     </Text>
                                 </Box>
                             )
+                        } else {
+                            return null
                         }
                     })}
                 </Box>

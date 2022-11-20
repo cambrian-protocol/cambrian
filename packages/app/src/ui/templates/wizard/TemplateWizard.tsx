@@ -27,8 +27,6 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
 const TemplateWizard = () => {
-    const { templateStreamID } = useEditTemplate()
-
     const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
         TEMPLATE_WIZARD_STEPS.DESCRIPTION
     )
