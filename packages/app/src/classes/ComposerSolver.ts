@@ -24,8 +24,13 @@ import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ComposerModuleModel } from '../models/ModuleModel'
 import { ComposerOutcomeCollectionModel } from '../models/OutcomeCollectionModel'
-import SlotTag from './Tags/SlotTag'
+import SlotTag, { defaultSlotTagValues } from './Tags/SlotTag'
 import { SCHEMA_VER } from 'packages/app/config'
+import { KeeperTag } from './Tags/KeeperTag'
+import { ArbitratorTag } from './Tags/ArbitratorTag'
+import { CollateralTokenTag } from './Tags/CollateralTokenTag'
+import { DataTag } from './Tags/DataTag'
+import TimelockSecondsTag from './Tags/TimelockSecondsTag'
 
 type AddSlotProps = {
     data: string[] | number[]
@@ -45,9 +50,7 @@ type UpdateRecipientPropsType = {
     address: string
 }
 
-interface AddSlotTagProps extends Omit<SlotTagModel, 'id'> {
-    slotId: string
-}
+interface AddSlotTagProps extends Omit<SlotTagModel, 'solverId'> {}
 
 const MAX_BASIS_POINTS = 10000
 export default class ComposerSolver {
@@ -69,10 +72,11 @@ export default class ComposerSolver {
         this.id = id ? id : newId
         this.iface = iface
         this.config = config ? config : this.getDefaultConfig()
+        this.addDefaultSlots()
         if (slotTags) {
-            Object.keys(slotTags).forEach((slotId) =>
-                this.addSlotTag(slotTags[slotId])
-            )
+            Object.keys(slotTags).forEach((slotId) => {
+                this.updateSlotTag(slotTags[slotId])
+            })
         }
         this.solverTag = solverTag || {
             title: id ? id : newId,
@@ -81,6 +85,8 @@ export default class ComposerSolver {
             banner: '',
             avatar: '',
         }
+
+        console.log(this)
     }
 
     /*************************** Title & Keeper & Arbitrator & Timelock & "Core" Data ***************************/
@@ -156,25 +162,58 @@ export default class ComposerSolver {
 
     /*********************************** Tags *************************************/
 
-    addSlotTag({
-        slotId,
-        description,
-        instruction,
-        label,
-        isFlex,
-    }: AddSlotTagProps) {
-        this.slotTags[slotId] = new SlotTag(this, {
-            slotId: slotId,
-            label: label,
-            description: description,
-            instruction: instruction,
-            isFlex: isFlex,
-        })
+    addSlotTag(slotTag: AddSlotTagProps) {
+        switch (slotTag.slotId) {
+            case 'keeper':
+                this.slotTags[slotTag.slotId] = new KeeperTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+
+            case 'arbitrator':
+                this.slotTags[slotTag.slotId] = new ArbitratorTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+
+            case 'collateralToken':
+                this.slotTags[slotTag.slotId] = new CollateralTokenTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+
+            case 'timelockSeconds':
+                this.slotTags[slotTag.slotId] = new TimelockSecondsTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+
+            case 'data':
+                this.slotTags[slotTag.slotId] = new DataTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+
+            default:
+                this.slotTags[slotTag.slotId] = new SlotTag({
+                    ...slotTag,
+                    solverId: this.id,
+                })
+                break
+        }
     }
 
     updateSlotTag(slotTagObj: AddSlotTagProps) {
         if (this.slotTags[slotTagObj.slotId]) {
-            this.slotTags[slotTagObj.slotId]
+            this.slotTags[slotTagObj.slotId].update({
+                ...slotTagObj,
+                solverId: this.id,
+            })
         } else {
             this.addSlotTag(slotTagObj)
         }
@@ -618,5 +657,32 @@ export default class ComposerSolver {
         defaultCondition.recipientAmountSlots[defaultOC.id] =
             [] as ComposerAllocationPathsType[]
         return defaultCondition
+    }
+
+    addDefaultSlots() {
+        this.updateSlotTag({
+            ...defaultSlotTagValues,
+            slotId: 'keeper',
+        })
+
+        this.updateSlotTag({
+            ...defaultSlotTagValues,
+            slotId: 'arbitrator',
+        })
+
+        this.updateSlotTag({
+            ...defaultSlotTagValues,
+            slotId: 'collateralToken',
+        })
+
+        this.updateSlotTag({
+            ...defaultSlotTagValues,
+            slotId: 'timelockSeconds',
+        })
+
+        this.updateSlotTag({
+            ...defaultSlotTagValues,
+            slotId: 'data',
+        })
     }
 }

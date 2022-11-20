@@ -13,13 +13,18 @@ import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplatePricingFormProps {
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
     cancelLabel?: string
 }
 
 const TemplatePricingForm = ({
+    onSubmit,
+    onCancel,
     submitLabel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
@@ -32,12 +37,17 @@ const TemplatePricingForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSaveTemplate()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
     }
 
     if (!template) {
-        return null
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -214,7 +224,7 @@ const TemplatePricingForm = ({
                                 size="small"
                                 secondary
                                 label={cancelLabel || 'Reset all changes'}
-                                onClick={onResetTemplate}
+                                onClick={onCancel ? onCancel : onResetTemplate}
                             />
                         }
                     />

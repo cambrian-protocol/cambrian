@@ -11,8 +11,11 @@ import { SetStateAction, useEffect, useState } from 'react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplateRequirementsFormProps {
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
     cancelLabel?: string
 }
@@ -22,6 +25,8 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
+    onSubmit,
+    onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
@@ -30,21 +35,21 @@ const TemplateRequirementsForm = ({
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        return () => {}
-    }, [])
-
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateRequirementsFormType, Element>
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSaveTemplate()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
     }
 
     if (!template) {
-        return null
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -80,7 +85,7 @@ const TemplateRequirementsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onResetTemplate}
+                            onClick={onCancel ? onCancel : onResetTemplate}
                         />
                     }
                 />

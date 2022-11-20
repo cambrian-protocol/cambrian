@@ -12,9 +12,6 @@ export default function NewTemplatePage() {
         show404NotFound,
         template,
         composition,
-        setTemplate,
-        templateStreamID,
-        onSaveTemplate,
         errorMessage,
         setErrorMessage,
     } = useEditTemplate()
@@ -25,13 +22,7 @@ export default function NewTemplatePage() {
                 <Custom404Page />
             ) : template && composition ? (
                 <PageLayout contextTitle="New Template" kind="narrow">
-                    <TemplateWizard
-                        composition={composition}
-                        template={template}
-                        setTemplate={setTemplate}
-                        templateStreamID={templateStreamID as string}
-                        onSaveTemplate={onSaveTemplate}
-                    />
+                    <TemplateWizard />
                 </PageLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />

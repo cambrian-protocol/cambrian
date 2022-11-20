@@ -1,5 +1,5 @@
 import SlotTagFormFields, {
-    SlotTagFormFieldsType,
+    SlotTagModel,
     initialSlotTagInput,
 } from './SlotTagFormFields'
 import { useEffect, useState } from 'react'
@@ -18,19 +18,16 @@ interface SlotTagFormProps {
 const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
     const { currentSolver, dispatch } = useComposerContext()
 
-    const [input, setInput] =
-        useState<SlotTagFormFieldsType>(initialSlotTagInput)
+    const [input, setInput] = useState<SlotTagModel>(initialSlotTagInput)
 
     //Init
     useEffect(() => {
         if (currentSolver && currentSolver.slotTags[slotId]) {
-            setInput(currentSolver.slotTags[slotId])
+            setInput(currentSolver.slotTags[slotId].metadata)
         }
     }, [])
 
-    const onSubmit = (
-        event: FormExtendedEvent<SlotTagFormFieldsType, Element>
-    ) => {
+    const onSubmit = (event: FormExtendedEvent<SlotTagModel, Element>) => {
         event.preventDefault()
         dispatch({
             type: 'UPDATE_SLOT_TAG',
@@ -40,10 +37,10 @@ const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
     }
 
     return (
-        <Form<SlotTagFormFieldsType>
+        <Form<SlotTagModel>
             value={input}
             onSubmit={(event) => onSubmit(event)}
-            onChange={(nextValue: SlotTagFormFieldsType) => {
+            onChange={(nextValue: SlotTagModel) => {
                 setInput(nextValue)
             }}
         >

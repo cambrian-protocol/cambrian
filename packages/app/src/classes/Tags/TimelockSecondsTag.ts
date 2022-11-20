@@ -1,16 +1,15 @@
 import { SlotTagModel } from '../../models/SlotTagModel'
 import SlotTag from './SlotTag'
-import ComposerSolver from '../ComposerSolver'
 
 export default class TimelockSecondsTag extends SlotTag {
-    constructor(solver: string | ComposerSolver, tagObj: SlotTagModel) {
+    constructor(tagObj: SlotTagModel) {
         if (tagObj.slotId !== 'timelockSeconds') {
             throw new Error(
                 `Tried to create TimelockSecondsTag for slotId ${tagObj.slotId}`
             )
         }
         tagObj.label = 'Timelock'
-        super(solver, tagObj)
+        super(tagObj)
     }
 
     public override get description() {
@@ -20,8 +19,8 @@ export default class TimelockSecondsTag extends SlotTag {
     }
 
     public override get instruction() {
-        return this._instruction.length > 0
+        return this._instruction?.length > 0
             ? this._instruction
-            : 'Input the duration of time, in seconds, that must pass without an arbitration requset before a proposed outcome can be confirmed.'
+            : 'Input the duration of time, in seconds, that must pass without an arbitration request before a proposed outcome can be confirmed.'
     }
 }

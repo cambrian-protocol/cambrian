@@ -60,8 +60,6 @@ const useEditTemplate = () => {
                             ).content
                         )
 
-                        console.log(_composition)
-
                         if (_composition) {
                             setComposition(_composition)
                             setCachedTemplate(_.cloneDeep(templateDoc.content))

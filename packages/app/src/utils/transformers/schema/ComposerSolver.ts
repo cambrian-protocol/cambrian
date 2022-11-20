@@ -12,7 +12,9 @@ export function updateToSchema(
     schemaVer: number,
     composition: CompositionModel
 ) {
+    console.log('Loaded Composition with schemaVer ', composition.schemaVer)
     if (!composition.schemaVer || composition.schemaVer < schemaVer) {
+        console.log('updateToSchema')
         composition = updaters[schemaVer - 1](composition)
     }
 
@@ -23,10 +25,17 @@ export function updateToSchema(
  * This update changes 'id' to 'slotId' in SlotTags
  */
 export function updateFromVersion0(composition: CompositionModel) {
+    console.log('updateFromVersion0')
     composition.solvers.forEach((solver) => {
         Object.keys(solver.slotTags).forEach((id) => {
-            solver.slotTags[id]['slotId'] = id
-            delete solver.slotTags[id]['id']
+            try {
+                //@ts-ignore
+                solver.slotTags[id]['slotId'] = id
+                //@ts-ignore
+                delete solver.slotTags[id]['id']
+            } catch (e) {
+                console.warn(e)
+            }
         })
     })
     return composition

@@ -1,18 +1,23 @@
-import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SlotTagModel } from '../../models/SlotTagModel'
-import ComposerSolver from '../ComposerSolver'
 
+export const defaultSlotTagValues: SlotTagModel = {
+    solverId: '',
+    slotId: '',
+    label: '',
+    description: '',
+    instruction: '',
+    isFlex: 'None',
+}
 export default class SlotTag {
-    _solverId: string
-    _slotId = ''
-    _isFlex: 'None' | 'Both' | 'Template' | 'Proposal' = 'None'
-    _label = ''
-    _description = ''
-    _instruction = ''
+    protected _solverId = defaultSlotTagValues.solverId
+    protected _slotId = defaultSlotTagValues.slotId
+    protected _isFlex = defaultSlotTagValues.isFlex
+    protected _label = defaultSlotTagValues.label
+    protected _description = defaultSlotTagValues.description
+    protected _instruction = defaultSlotTagValues.instruction
 
-    constructor(solver: string | ComposerSolver, tagObj: SlotTagModel) {
-        this._solverId = typeof solver === 'string' ? solver : solver.id
-        this.update(tagObj)
+    constructor(slotTag: SlotTagModel) {
+        this.update(slotTag)
     }
 
     public get solverId() {
@@ -49,19 +54,28 @@ export default class SlotTag {
 
     public get metadata() {
         return {
-            slotId: this._slotId,
-            isFlex: this._isFlex,
-            label: this._label,
-            description: this._description,
-            instruction: this._instruction,
+            solverId: this.solverId,
+            slotId: this.slotId,
+            isFlex: this.isFlex,
+            label: this.label,
+            description: this.description,
+            instruction: this.instruction,
         }
     }
 
-    public update(tagObj: SlotTagModel) {
-        this._slotId = tagObj.slotId
-        this._isFlex = tagObj.isFlex
-        this._label = tagObj.label
-        this._description = tagObj.description
-        this._instruction = tagObj.instruction
+    public update(slotTag: SlotTagModel) {
+        if (Object.values(slotTag).find((v) => v === undefined)) {
+            throw new Error(`Attempted to update slotTag with undefined value`)
+        }
+        this._solverId = slotTag.solverId
+        this._slotId = slotTag.slotId
+        this._isFlex = slotTag.isFlex
+        this._label = slotTag.label
+        this._description = slotTag.description
+        this._instruction = slotTag.instruction
+    }
+
+    toJSON() {
+        return this.metadata
     }
 }

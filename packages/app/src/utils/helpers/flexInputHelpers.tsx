@@ -5,6 +5,7 @@ import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlex
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import _ from 'lodash'
+import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 
 export const getFlexInputType = (
     solvers: ComposerSolver[],
@@ -55,7 +56,6 @@ export const getFlexInputDescription = (flexInput: FlexInputFormType) => {
 }
 
 export const getFlexInputInstruction = (flexInput: FlexInputFormType) => {
-    console.log(flexInput)
     const label =
         flexInput.instruction && flexInput.instruction.trim() !== ''
             ? flexInput.instruction
@@ -72,10 +72,18 @@ export const mergeFlexIntoComposition = (
     // Update our composition with new flexInput values
     if (flexInputs.length > 0) {
         composition.solvers.forEach((solver: ComposerSolver, i: number) => {
+            solver = new ComposerSolver(
+                BASE_SOLVER_IFACE,
+                solver.id,
+                solver.config,
+                solver.slotTags,
+                solver.solverTag
+            )
             const filteredFlexInputs = flexInputs.filter(
                 (flexInput) => flexInput.solverId === solver.id
             )
             filteredFlexInputs.forEach((filteredFlexInput) => {
+                console.log(solver.slotTags[filteredFlexInput.tagId])
                 solver.slotTags[filteredFlexInput.tagId].update({
                     ...solver.slotTags[filteredFlexInput.tagId].metadata,
                     isFlex: filteredFlexInput.isFlex,

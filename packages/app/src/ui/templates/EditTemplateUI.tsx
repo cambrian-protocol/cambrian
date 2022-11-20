@@ -15,11 +15,6 @@ import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 const EditTemplateUI = () => {
     const { template, templateStreamID, cachedTemplate } = useEditTemplate()
-
-    if (!template) {
-        return null
-    }
-
     const [activeIndex, setActiveIndex] = useState(0)
     const [authorProfile] = useCambrianProfile(template?.author)
 
@@ -29,6 +24,10 @@ const EditTemplateUI = () => {
         if (topRefContext)
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
+
+    if (!template) {
+        return null
+    }
 
     return (
         <Box gap="medium">

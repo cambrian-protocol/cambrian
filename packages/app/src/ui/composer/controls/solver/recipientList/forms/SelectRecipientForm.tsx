@@ -3,7 +3,7 @@ import SelectRecipient, {
     SelectRecipientType,
 } from '@cambrian/app/components/selects/SelectRecipient'
 import SlotTagFormFields, {
-    SlotTagFormFieldsType,
+    SlotTagModel,
     initialSlotTagInput,
 } from '../../general/forms/SlotTagFormFields'
 
@@ -16,8 +16,7 @@ type SelectRecipientFormProps = {
     onClose: () => void
 }
 
-export type SelectedRecipientFormType = SlotTagFormFieldsType &
-    SelectRecipientType
+export type SelectedRecipientFormType = SlotTagModel & SelectRecipientType
 
 const initialSelectedRecipientFormInput = {
     ...initialSlotTagInput,
@@ -31,9 +30,7 @@ const SelectRecipientForm = ({ onClose }: SelectRecipientFormProps) => {
         initialSelectedRecipientFormInput
     )
 
-    const onSubmit = (
-        event: FormExtendedEvent<SlotTagFormFieldsType, Element>
-    ) => {
+    const onSubmit = (event: FormExtendedEvent<SlotTagModel, Element>) => {
         event.preventDefault()
         dispatch({
             type: 'ADD_RECIPIENT',

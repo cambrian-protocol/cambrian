@@ -5,34 +5,39 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalDescriptionFormProps {
-    proposalInput: ProposalModel
-    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
-    onSubmit: () => Promise<void>
-    submitLabel?: string
+    onSubmit?: () => Promise<void>
     onCancel?: () => void
+    submitLabel?: string
     cancelLabel?: string
 }
 
 const ProposalDescriptionForm = ({
-    proposalInput,
-    setProposalInput,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
+    const { proposal, setProposal, onSaveProposal, onResetProposal } =
+        useEditProposal()
     const [isSubmitting, setIsSubmitting] = useState(false)
-
-    useEffect(() => {
-        return () => {}
-    }, [])
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveProposal()
         setIsSubmitting(false)
+    }
+
+    if (!proposal) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
     return (
         <Form onSubmit={handleSubmit}>
@@ -41,14 +46,14 @@ const ProposalDescriptionForm = ({
                     <FormField
                         name="title"
                         label="Title"
-                        validate={[() => isRequired(proposalInput.title)]}
+                        validate={[() => isRequired(proposal.title)]}
                     >
                         <TextInput
                             placeholder={'Type your proposal title here...'}
-                            value={proposalInput.title}
+                            value={proposal.title}
                             onChange={(e) => {
-                                setProposalInput({
-                                    ...proposalInput,
+                                setProposal({
+                                    ...proposal,
                                     title: e.target.value,
                                 })
                             }}
@@ -57,7 +62,7 @@ const ProposalDescriptionForm = ({
                     <FormField
                         name="description"
                         label="Description"
-                        validate={[() => isRequired(proposalInput.description)]}
+                        validate={[() => isRequired(proposal.description)]}
                     >
                         <TextArea
                             placeholder={
@@ -65,10 +70,10 @@ const ProposalDescriptionForm = ({
                             }
                             rows={15}
                             resize={false}
-                            value={proposalInput.description}
+                            value={proposal.description}
                             onChange={(e) =>
-                                setProposalInput({
-                                    ...proposalInput,
+                                setProposal({
+                                    ...proposal,
                                     description: e.target.value,
                                 })
                             }
@@ -90,7 +95,7 @@ const ProposalDescriptionForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetProposal}
                         />
                     }
                 />

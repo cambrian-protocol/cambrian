@@ -1,5 +1,4 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
-import { TokenModel } from './TokenModel'
 
 export type TemplateModel = {
     title: string

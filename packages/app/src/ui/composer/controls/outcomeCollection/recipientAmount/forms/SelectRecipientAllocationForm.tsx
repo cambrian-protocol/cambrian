@@ -8,7 +8,7 @@ import SelectRecipient, {
     initialSelectRecipientInput,
 } from '@cambrian/app/components/selects/SelectRecipient'
 import SlotTagFormFields, {
-    SlotTagFormFieldsType,
+    SlotTagModel,
     initialSlotTagInput,
 } from '../../../solver/general/forms/SlotTagFormFields'
 
@@ -21,7 +21,7 @@ import { useState } from 'react'
 type SelectRecipientAllocationFormProps = {
     onClose: () => void
 }
-export type SelectRecipientAllocationFormType = SlotTagFormFieldsType &
+export type SelectRecipientAllocationFormType = SlotTagModel &
     SelectRecipientType & {
         selectedAmount: SelectAmountDataType
     }

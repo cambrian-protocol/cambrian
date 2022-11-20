@@ -9,32 +9,18 @@ import _ from 'lodash'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function NewProposalPage() {
-    const {
-        isLoaded,
-        proposalInput,
-        setProposalInput,
-        stageStack,
-        onSaveProposal,
-        proposalStreamID,
-        errorMessage,
-        setErrorMessage,
-    } = useEditProposal()
+    const { isLoaded, proposal, stageStack, errorMessage, setErrorMessage } =
+        useEditProposal()
 
     return (
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && stageStack ? (
+            ) : proposal && stageStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center">
                         <Box width={'xlarge'} gap="large">
-                            <ProposalWizard
-                                proposalStreamID={proposalStreamID}
-                                onSaveProposal={onSaveProposal}
-                                stageStack={stageStack}
-                                proposalInput={proposalInput}
-                                setProposalInput={setProposalInput}
-                            />
+                            <ProposalWizard />
                         </Box>
                     </Box>
                 </PageLayout>

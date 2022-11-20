@@ -1,4 +1,4 @@
-import { SlotTag } from '../classes/Tags/SlotTag'
+import SlotTag from '../classes/Tags/SlotTag'
 
 export type SlotTagsHashMapType = {
     [slotId: string]: SlotTag
@@ -6,6 +6,7 @@ export type SlotTagsHashMapType = {
 
 // TODO Add icon
 export type SlotTagModel = {
+    solverId: string
     slotId: string
     isFlex: 'None' | 'Both' | 'Template' | 'Proposal'
     label: string

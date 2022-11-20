@@ -14,17 +14,23 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 
 export type TemplateDescriptionFormType = {
     title: string
     description: string
 }
 interface TemplateDescriptionFormProps {
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
     cancelLabel?: string
 }
 
 const TemplateDescriptionForm = ({
+    onSubmit,
+    onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateDescriptionFormProps) => {
@@ -33,21 +39,22 @@ const TemplateDescriptionForm = ({
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        return () => {}
-    }, [])
-
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateDescriptionFormType, Element>
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSaveTemplate()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
     }
 
     if (!template) {
-        return null
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -104,7 +111,7 @@ const TemplateDescriptionForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onResetTemplate}
+                            onClick={onCancel ? onCancel : onResetTemplate}
                         />
                     }
                 />

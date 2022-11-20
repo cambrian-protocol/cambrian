@@ -8,20 +8,20 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import { SetStateAction } from 'react'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateRequirementsStepProps {
-    template: TemplateModel
-    setTemplate: React.Dispatch<SetStateAction<TemplateModel | undefined>>
     stepperCallback: (step: TemplateWizardStepsType) => void
-    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateRequirementsStep = ({
-    template,
-    setTemplate,
     stepperCallback,
-    onSaveTemplate,
 }: TemplateRequirementsStepProps) => {
+    const { template, onSaveTemplate } = useEditTemplate()
+
+    if (!template) {
+        return null
+    }
     return (
         <Box>
             <Box pad="xsmall">
@@ -31,12 +31,14 @@ const TemplateRequirementsStep = ({
                 />
             </Box>
             <TemplateRequirementsForm
-                template={template}
-                setTemplate={setTemplate}
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
-                    if (await onSaveTemplate())
+                    if ((await onSaveTemplate()) == true) {
+                        console.log('calling back')
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
+                    } else {
+                        console.log('nope')
+                    }
                 }}
                 cancelLabel={'Back'}
                 onCancel={() => {

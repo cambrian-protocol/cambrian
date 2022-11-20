@@ -121,7 +121,7 @@ const ProposalHeader = ({
         <>
             <BaseHeader
                 title={stageStack?.proposal.title || 'Untitled Proposal'}
-                metaTitle="Proposal Solver"
+                metaTitle="Proposal"
                 items={headerItems}
                 authorProfileDoc={proposalAuthor}
                 statusBadge={

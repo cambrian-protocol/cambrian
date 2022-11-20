@@ -13,26 +13,29 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalFlexInputsFormProps {
-    proposalInput: ProposalModel
-    composition: CompositionModel
-    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
-    onSubmit: () => Promise<void>
-    submitLabel?: string
+    onSubmit?: () => Promise<void>
     onCancel?: () => void
+    submitLabel?: string
     cancelLabel?: string
 }
 
 const ProposalFlexInputsForm = ({
-    proposalInput,
-    setProposalInput,
-    composition,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: ProposalFlexInputsFormProps) => {
+    const {
+        stageStack,
+        proposal,
+        setProposal,
+        onSaveProposal,
+        onResetProposal,
+    } = useEditProposal()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
@@ -41,21 +44,30 @@ const ProposalFlexInputsForm = ({
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveProposal()
         setIsSubmitting(false)
     }
 
+    if (!proposal || !stageStack) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
+    }
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box height={{ min: 'auto' }} pad="xsmall">
-                    {proposalInput.flexInputs.map((flexInput, idx) => {
+                    {proposal.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
-                            composition.solvers,
+                            stageStack.composition.solvers,
                             flexInput
                         )
                         if (
-                            !flexInput.isFlex ||
                             flexInput.isFlex === 'None' ||
                             flexInput.isFlex === 'Template'
                         ) {
@@ -69,16 +81,14 @@ const ProposalFlexInputsForm = ({
                                         validate={[
                                             () =>
                                                 isRequired(
-                                                    proposalInput.flexInputs[
-                                                        idx
-                                                    ].value
+                                                    proposal.flexInputs[idx]
+                                                        .value
                                                 ),
                                             () => {
                                                 if (
                                                     type === 'address' &&
                                                     !isAddress(
-                                                        proposalInput
-                                                            .flexInputs[idx]
+                                                        proposal.flexInputs[idx]
                                                             .value
                                                     )
                                                 ) {
@@ -92,13 +102,13 @@ const ProposalFlexInputsForm = ({
                                             value={flexInput.value}
                                             onChange={(e) => {
                                                 const inputsClone =
-                                                    _.cloneDeep(proposalInput)
+                                                    _.cloneDeep(proposal)
 
                                                 inputsClone.flexInputs[
                                                     idx
                                                 ].value = e.target.value
 
-                                                setProposalInput(inputsClone)
+                                                setProposal(inputsClone)
                                             }}
                                         />
                                     </FormField>
@@ -136,7 +146,7 @@ const ProposalFlexInputsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetProposal}
                         />
                     }
                 />

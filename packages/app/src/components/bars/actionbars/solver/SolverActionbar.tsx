@@ -73,6 +73,7 @@ const SolverActionbar = ({
         )
 
         const uniqueParticipants = [...new Set(recipientDIDs)]
+        console.log(uniqueParticipants)
         setMessenger(
             <Messenger
                 chatID={solverAddress}

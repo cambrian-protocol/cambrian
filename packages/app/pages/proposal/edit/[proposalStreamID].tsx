@@ -24,10 +24,10 @@ export default function EditProposalPage() {
     const {
         stageStack,
         proposalStatus,
-        proposalInput,
-        setProposalInput,
+        proposal,
+        setProposal,
         onSaveProposal,
-        onResetProposalInput,
+        onResetProposal,
         proposalStreamID,
         isValidProposal,
         errorMessage,
@@ -42,17 +42,11 @@ export default function EditProposalPage() {
         proposalStatus === ProposalStatus.ChangeRequested ||
         proposalStatus === ProposalStatus.Modified
 
-    const handleSave = async () => {
-        await onSaveProposal()
-    }
-
-    console.log(stageStack)
-
     return (
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && isEditable && stageStack ? (
+            ) : proposal && isEditable && stageStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box gap="medium">
@@ -98,12 +92,7 @@ export default function EditProposalPage() {
                                                 </Box>
                                             )}
                                         </Box>
-                                        <ProposalDescriptionForm
-                                            proposalInput={proposalInput}
-                                            setProposalInput={setProposalInput}
-                                            onSubmit={handleSave}
-                                            onCancel={onResetProposalInput}
-                                        />
+                                        <ProposalDescriptionForm />
                                     </Box>
                                 </Tab>
                                 <Tab title="Pricing">
@@ -114,16 +103,10 @@ export default function EditProposalPage() {
                                                 title="How much are you willing to pay?"
                                             />
                                         </Box>
-                                        <ProposalPricingForm
-                                            template={stageStack.template}
-                                            proposalInput={proposalInput}
-                                            setProposalInput={setProposalInput}
-                                            onSubmit={handleSave}
-                                            onCancel={onResetProposalInput}
-                                        />
+                                        <ProposalPricingForm />
                                     </Box>
                                 </Tab>
-                                {proposalInput.flexInputs.length > 0 && (
+                                {proposal.flexInputs.length > 0 && (
                                     <Tab title="Solver Config">
                                         <Box pad={{ top: 'medium' }}>
                                             <Box pad="xsmall">
@@ -133,27 +116,13 @@ export default function EditProposalPage() {
                                                     size="small"
                                                 />
                                             </Box>
-                                            <ProposalFlexInputsForm
-                                                composition={
-                                                    stageStack.composition
-                                                }
-                                                proposalInput={proposalInput}
-                                                setProposalInput={
-                                                    setProposalInput
-                                                }
-                                                onSubmit={handleSave}
-                                                onCancel={onResetProposalInput}
-                                            />
+                                            <ProposalFlexInputsForm />
                                         </Box>
                                     </Tab>
                                 )}
                             </Tabs>
                             <PlainSectionDivider />
-                            <ProposalSubmitControl
-                                onSave={onSaveProposal}
-                                proposalStreamID={proposalStreamID}
-                                isValidProposal={isValidProposal}
-                            />
+                            <ProposalSubmitControl />
                         </Box>
                     </PageLayout>
                     {proposalStatus !== ProposalStatus.Draft && currentUser && (
