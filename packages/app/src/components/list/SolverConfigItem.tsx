@@ -1,6 +1,5 @@
 import { Box, Heading, ResponsiveContext, Text } from 'grommet'
 
-import { DEFAULT_SLOT_TAGS } from '@cambrian/app/constants/DefaultSlotTags'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 
@@ -8,17 +7,9 @@ interface SolverConfigItemProps {
     id: string
     value: JSX.Element
     slotTags?: SlotTagsHashMapType
-    hideDescription?: boolean
-    hideInstruction?: boolean
 }
 
-const SolverConfigItem = ({
-    id,
-    value,
-    slotTags,
-    hideDescription,
-    hideInstruction,
-}: SolverConfigItemProps) => {
+const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
     return (
         <Box gap="medium">
             <ResponsiveContext.Consumer>
@@ -34,23 +25,14 @@ const SolverConfigItem = ({
                                 }
                             >
                                 <Heading level="4">
-                                    {(slotTags && slotTags[id]?.label) ||
-                                        DEFAULT_SLOT_TAGS[id].label}
+                                    {slotTags && slotTags[id]?.label}
                                 </Heading>
-                                {!hideDescription && (
-                                    <Text size="xsmall" color="dark-4">
-                                        {(slotTags &&
-                                            slotTags[id]?.description) ||
-                                            DEFAULT_SLOT_TAGS[id].description}
-                                    </Text>
-                                )}
-                                {!hideInstruction && (
-                                    <Text size="xsmall" color="dark-4">
-                                        {(slotTags &&
-                                            slotTags[id]?.instruction) ||
-                                            DEFAULT_SLOT_TAGS[id].instruction}
-                                    </Text>
-                                )}
+                                <Text size="xsmall" color="dark-4">
+                                    {slotTags && slotTags[id]?.description}
+                                </Text>
+                                <Text size="xsmall" color="dark-4">
+                                    {slotTags && slotTags[id]?.instruction}
+                                </Text>
                             </Box>
                             <Box
                                 width={{ min: 'auto' }}

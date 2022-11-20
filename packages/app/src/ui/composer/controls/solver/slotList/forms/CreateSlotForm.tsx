@@ -1,6 +1,6 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
 import SlotTagFormFields, {
-    SlotTagFormFieldsType,
+    SlotTagModel,
     initialSlotTagInput,
 } from '../../general/forms/SlotTagFormFields'
 
@@ -24,7 +24,7 @@ type SlotConfigFormProps = {
     onClose: () => void
 }
 
-export type CreateSlotFormType = SlotTagFormFieldsType & {
+export type CreateSlotFormType = SlotTagModel & {
     slotType: SlotType
     dataInputFields: SlotDataInputType[]
     solverFunction?: ethers.utils.FunctionFragment

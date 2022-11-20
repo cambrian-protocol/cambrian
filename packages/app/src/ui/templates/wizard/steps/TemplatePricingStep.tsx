@@ -8,20 +8,18 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import { SetStateAction } from 'react'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from '../../forms/TemplatePricingForm'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplatePricingStepProps {
     stepperCallback: (step: TemplateWizardStepsType) => void
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSaveTemplate: () => Promise<boolean>
 }
 
-const TemplatePricingStep = ({
-    stepperCallback,
-    templateInput,
-    setTemplateInput,
-    onSaveTemplate,
-}: TemplatePricingStepProps) => {
+const TemplatePricingStep = ({ stepperCallback }: TemplatePricingStepProps) => {
+    const { template, onSaveTemplate } = useEditTemplate()
+
+    if (!template) {
+        return null
+    }
     return (
         <Box>
             <Box pad="xsmall">
@@ -31,11 +29,9 @@ const TemplatePricingStep = ({
                 />
             </Box>
             <TemplatePricingForm
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
                 onSubmit={async () => {
                     if (await onSaveTemplate()) {
-                        if (templateInput.flexInputs.length > 0) {
+                        if (template.flexInputs.length > 0) {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
                         } else {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)

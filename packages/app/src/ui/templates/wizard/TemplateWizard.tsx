@@ -10,14 +10,7 @@ import TemplatePublishStep from './steps/TemplatePublishStep'
 import TemplateRequirementsStep from './steps/TemplateRequirementsStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { UserType } from '@cambrian/app/store/UserContext'
-
-interface TemplateWizardProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    templateStreamID: string
-    onSaveTemplate: () => Promise<boolean>
-    composition: CompositionModel
-}
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export enum TEMPLATE_WIZARD_STEPS {
     DESCRIPTION,
@@ -33,13 +26,9 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.REQUIREMENTS
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
-const TemplateWizard = ({
-    templateInput,
-    setTemplateInput,
-    templateStreamID,
-    onSaveTemplate,
-    composition,
-}: TemplateWizardProps) => {
+const TemplateWizard = () => {
+    const { templateStreamID } = useEditTemplate()
+
     const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
         TEMPLATE_WIZARD_STEPS.DESCRIPTION
     )
@@ -54,45 +43,22 @@ const TemplateWizard = ({
         switch (currentStep) {
             case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
-                    <TemplateDescriptionStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
-                    />
+                    <TemplateDescriptionStep stepperCallback={setCurrentStep} />
                 )
             case TEMPLATE_WIZARD_STEPS.PRICING:
-                return (
-                    <TemplatePricingStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
-                    />
-                )
+                return <TemplatePricingStep stepperCallback={setCurrentStep} />
             case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
-                    <TemplateFlexInputsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        stepperCallback={setCurrentStep}
-                        composition={composition}
-                        onSaveTemplate={onSaveTemplate}
-                    />
+                    <TemplateFlexInputsStep stepperCallback={setCurrentStep} />
                 )
             case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
                     <TemplateRequirementsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
                         stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PUBLISH:
-                return (
-                    <TemplatePublishStep templateStreamID={templateStreamID} />
-                )
+                return <TemplatePublishStep />
             default:
                 return <></>
         }

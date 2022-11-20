@@ -25,6 +25,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -58,21 +59,16 @@ export default class CeramicTemplateAPI {
             const formFlexInputs: FlexInputFormType[] = []
             composition.content.solvers.forEach((solver) => {
                 Object.keys(solver.slotTags).forEach((tagId) => {
-                    console.log(solver.slotTags[tagId])
-                    if (
-                        solver.slotTags[tagId].isFlex &&
-                        solver.slotTags[tagId].isFlex !== 'None'
-                    ) {
+                    if (solver.slotTags[tagId].isFlex !== 'None') {
                         if (tagId === 'collateralToken') {
                             isCollateralFlex = true
                         } else {
-                            console.log('Adding')
                             formFlexInputs.push({
-                                ...solver.slotTags[tagId],
-                                solverId: solver.id,
+                                ...(solver.slotTags[tagId] as SlotTagModel),
                                 tagId: tagId,
                                 value: '',
                             })
+                            formFlexInputs.push()
                         }
                     }
                 })

@@ -14,14 +14,10 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
-interface ProposalPublishStepProps {
-    proposalStreamID: string
-}
-
-const ProposalPublishStep = ({
-    proposalStreamID,
-}: ProposalPublishStepProps) => {
+const ProposalPublishStep = () => {
+    const { proposalStreamID } = useEditProposal()
     const { currentUser } = useCurrentUserContext()
 
     const router = useRouter()
@@ -46,8 +42,8 @@ const ProposalPublishStep = ({
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
                     <HeaderTextSection
-                        title="Proposal ready to submit"
-                        paragraph="You can submit your Proposal to the Seller or keep it as a draft and send it as soon as it is good to go."
+                        title="Ready to submit proposal"
+                        paragraph="Your proposal has been saved. You may submit it now or leave it as a draft."
                     />
                 </Box>
                 <TwoButtonWrapContainer

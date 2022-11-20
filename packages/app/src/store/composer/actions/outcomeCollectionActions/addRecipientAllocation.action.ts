@@ -1,14 +1,14 @@
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
-import { SlotTagFormFieldsType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagFormFields'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
 
 const addRecipientAllocationAction = (
     state: CompositionModel,
-    payload: SlotTagFormFieldsType &
+    payload: SlotTagModel &
         SelectRecipientType & { amount: ComposerSlotModel | number }
 ): CompositionModel => {
     if (

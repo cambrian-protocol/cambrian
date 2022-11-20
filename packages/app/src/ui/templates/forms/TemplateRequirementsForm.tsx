@@ -9,15 +9,14 @@ import {
 import { SetStateAction, useEffect, useState } from 'react'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplateRequirementsFormProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
@@ -26,26 +25,31 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    templateInput,
-    setTemplateInput,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
+        useEditTemplate()
 
-    useEffect(() => {
-        return () => {}
-    }, [])
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateRequirementsFormType, Element>
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -54,12 +58,12 @@ const TemplateRequirementsForm = ({
                 <Box pad="xsmall">
                     <FormField label="Requirements" name="requirements">
                         <TextArea
-                            value={templateInput.requirements}
+                            value={template.requirements}
                             resize={false}
                             rows={10}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setTemplate({
+                                    ...template,
                                     requirements: e.target.value,
                                 })
                             }
@@ -81,7 +85,7 @@ const TemplateRequirementsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetTemplate}
                         />
                     }
                 />

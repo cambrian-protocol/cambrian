@@ -12,25 +12,24 @@ import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplatePricingFormProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
 const TemplatePricingForm = ({
     onSubmit,
-    templateInput,
-    setTemplateInput,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
-    console.log(templateInput.price)
+    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
+        useEditTemplate()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
@@ -38,8 +37,17 @@ const TemplatePricingForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -63,12 +71,12 @@ const TemplatePricingForm = ({
                             <Box flex>
                                 <NumberInput
                                     name="amount"
-                                    value={templateInput.price.amount}
+                                    value={template.price.amount}
                                     onChange={(e) =>
-                                        setTemplateInput({
-                                            ...templateInput,
+                                        setTemplate({
+                                            ...template,
                                             price: {
-                                                ...templateInput.price,
+                                                ...template.price,
                                                 amount:
                                                     e.target.value === ''
                                                         ? undefined
@@ -80,25 +88,23 @@ const TemplatePricingForm = ({
                                     }
                                 />
                             </Box>
-                            {templateInput.price.isCollateralFlex ? (
+                            {template.price.isCollateralFlex ? (
                                 <SelectTokenItem
                                     allowAnyPaymentToken
                                     tokenAddress={
-                                        templateInput.price
-                                            .denominationTokenAddress
+                                        template.price.denominationTokenAddress
                                     }
                                     onSelect={(newSelectedToken) => {
                                         const filteredTokens = [
-                                            ...templateInput.price
-                                                .preferredTokens,
+                                            ...template.price.preferredTokens,
                                         ].filter(
                                             (token) =>
                                                 token !== newSelectedToken
                                         )
-                                        setTemplateInput({
-                                            ...templateInput,
+                                        setTemplate({
+                                            ...template,
                                             price: {
-                                                ...templateInput.price,
+                                                ...template.price,
                                                 denominationTokenAddress:
                                                     newSelectedToken,
                                                 preferredTokens: filteredTokens,
@@ -109,17 +115,16 @@ const TemplatePricingForm = ({
                             ) : (
                                 <BaseTokenItem
                                     tokenAddress={
-                                        templateInput.price
-                                            .denominationTokenAddress
+                                        template.price.denominationTokenAddress
                                     }
                                 />
                             )}
                         </Box>
-                        {templateInput.price.isCollateralFlex && (
+                        {template.price.isCollateralFlex && (
                             <Box gap="small">
                                 <Box gap="xsmall">
                                     <Text size="small" color="dark-4">{`${
-                                        templateInput.price.allowAnyPaymentToken
+                                        template.price.allowAnyPaymentToken
                                             ? 'Preferred '
                                             : 'Alternative '
                                     }tokens which can be used for payment`}</Text>
@@ -130,7 +135,7 @@ const TemplatePricingForm = ({
                                         direction="row"
                                         wrap
                                     >
-                                        {templateInput.price.preferredTokens.map(
+                                        {template.price.preferredTokens.map(
                                             (preferredToken) => (
                                                 <RemoveTokenItem
                                                     key={preferredToken}
@@ -141,18 +146,17 @@ const TemplatePricingForm = ({
                                                         removedToken
                                                     ) => {
                                                         const filteredTokens = [
-                                                            ...templateInput
-                                                                .price
+                                                            ...template.price
                                                                 .preferredTokens,
                                                         ].filter(
                                                             (token) =>
                                                                 token !==
                                                                 removedToken
                                                         )
-                                                        setTemplateInput({
-                                                            ...templateInput,
+                                                        setTemplate({
+                                                            ...template,
                                                             price: {
-                                                                ...templateInput.price,
+                                                                ...template.price,
                                                                 preferredTokens:
                                                                     filteredTokens,
                                                             },
@@ -162,22 +166,22 @@ const TemplatePricingForm = ({
                                             )
                                         )}
                                         <AddTokenItem
-                                            addedTokens={templateInput.price.preferredTokens.concat(
-                                                templateInput.price
+                                            addedTokens={template.price.preferredTokens.concat(
+                                                template.price
                                                     .denominationTokenAddress
                                             )}
                                             onAddToken={(newToken) => {
                                                 const updatedPreferredTokens = [
-                                                    ...templateInput.price
+                                                    ...template.price
                                                         .preferredTokens,
                                                 ]
                                                 updatedPreferredTokens.push(
                                                     newToken
                                                 )
-                                                setTemplateInput({
-                                                    ...templateInput,
+                                                setTemplate({
+                                                    ...template,
                                                     price: {
-                                                        ...templateInput.price,
+                                                        ...template.price,
                                                         preferredTokens:
                                                             updatedPreferredTokens,
                                                     },
@@ -188,13 +192,13 @@ const TemplatePricingForm = ({
                                 </Box>
                                 <CheckBox
                                     checked={
-                                        templateInput.price.allowAnyPaymentToken
+                                        template.price.allowAnyPaymentToken
                                     }
                                     onChange={(e) => {
-                                        setTemplateInput({
-                                            ...templateInput,
+                                        setTemplate({
+                                            ...template,
                                             price: {
-                                                ...templateInput.price,
+                                                ...template.price,
                                                 allowAnyPaymentToken:
                                                     e.target.checked,
                                             },
@@ -220,7 +224,7 @@ const TemplatePricingForm = ({
                                 size="small"
                                 secondary
                                 label={cancelLabel || 'Reset all changes'}
-                                onClick={onCancel}
+                                onClick={onCancel ? onCancel : onResetTemplate}
                             />
                         }
                     />

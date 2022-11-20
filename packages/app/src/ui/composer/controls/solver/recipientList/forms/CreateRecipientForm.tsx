@@ -1,6 +1,6 @@
 import { Button, Form, FormExtendedEvent, FormField } from 'grommet'
 import SlotTagFormFields, {
-    SlotTagFormFieldsType,
+    SlotTagModel,
     initialSlotTagInput,
 } from '../../general/forms/SlotTagFormFields'
 
@@ -18,7 +18,7 @@ export const initialCreateRecipientFormInput = {
     address: '',
 }
 
-export type CreateRecipientFormType = SlotTagFormFieldsType & {
+export type CreateRecipientFormType = SlotTagModel & {
     address: string
 }
 
