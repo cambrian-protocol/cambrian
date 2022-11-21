@@ -16,11 +16,30 @@ import { cpLogger } from './../services/api/Logger.api'
 import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
+import usePrevious from './usePrevious'
+
+export type EditProposalContextType = {
+    proposalStreamID: string
+    isValidProposal: boolean
+    stageStack: StageStackType | undefined
+    onResetProposal: () => void
+    onSaveProposal: () => Promise<boolean>
+    proposal: ProposalModel | undefined
+    setProposal: React.Dispatch<React.SetStateAction<ProposalModel | undefined>>
+    proposalStatus: ProposalStatus
+    isLoaded: boolean
+    errorMessage: ErrorMessageType | undefined
+    setErrorMessage: React.Dispatch<
+        React.SetStateAction<ErrorMessageType | undefined>
+    >
+}
 
 const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
+    const prevProposalStreamID = usePrevious(proposalStreamID)
+
     const [proposal, setProposal] = useState<ProposalModel>()
     const [stageStack, setStageStack] = useState<StageStackType>()
 
@@ -32,11 +51,18 @@ const useEditProposal = () => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        console.log(proposal)
+        console.log(prevProposalStreamID, proposalStreamID)
+    }, [prevProposalStreamID])
+
+    useEffect(() => {
+        console.log('Description: ', proposal?.description)
     }, [proposal])
 
     useEffect(() => {
-        if (router.isReady) fetchProposal()
+        if (router.isReady) {
+            console.log('Fetching proposal')
+            fetchProposal()
+        }
     }, [router, currentUser])
 
     const fetchProposal = async () => {

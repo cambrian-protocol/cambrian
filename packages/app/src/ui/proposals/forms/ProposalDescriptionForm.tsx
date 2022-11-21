@@ -5,10 +5,13 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalDescriptionFormProps {
+    editProposalContext: EditProposalContextType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -16,13 +19,14 @@ interface ProposalDescriptionFormProps {
 }
 
 const ProposalDescriptionForm = ({
+    editProposalContext,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
     const { proposal, setProposal, onSaveProposal, onResetProposal } =
-        useEditProposal()
+        editProposalContext
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async () => {

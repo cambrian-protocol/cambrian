@@ -11,10 +11,11 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalPricingFormProps {
+    editProposalContext: EditProposalContextType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -22,6 +23,7 @@ interface ProposalPricingFormProps {
 }
 
 const ProposalPricingForm = ({
+    editProposalContext,
     onSubmit,
     onCancel,
     submitLabel,
@@ -33,7 +35,8 @@ const ProposalPricingForm = ({
         setProposal,
         onSaveProposal,
         onResetProposal,
-    } = useEditProposal()
+    } = editProposalContext
+
     const { currentUser } = useCurrentUserContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()

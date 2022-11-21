@@ -9,16 +9,20 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import ProposalFlexInputsForm from '../../forms/ProposalFlexInputsForm'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { SetStateAction } from 'react'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalFlexInputsStepProps {
+    editProposalContext: EditProposalContextType
     stepperCallback: (step: ProposalWizardStepsType) => void
 }
 
 const ProposalFlexInputsStep = ({
+    editProposalContext,
     stepperCallback,
 }: ProposalFlexInputsStepProps) => {
-    const { onSaveProposal } = useEditProposal()
+    const { onSaveProposal } = editProposalContext
     return (
         <Box height={{ min: '60vh' }}>
             <Box gap="medium">
@@ -29,6 +33,7 @@ const ProposalFlexInputsStep = ({
                     />
                 </Box>
                 <ProposalFlexInputsForm
+                    editProposalContext={editProposalContext}
                     onSubmit={async () => {
                         if (await onSaveProposal())
                             stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)

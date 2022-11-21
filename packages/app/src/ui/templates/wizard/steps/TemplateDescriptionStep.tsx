@@ -5,9 +5,7 @@ import {
 
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
 import TemplateDescriptionForm from '../../forms/TemplateDescriptionForm'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import router from 'next/router'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
@@ -19,6 +17,7 @@ const TemplateDescriptionStep = ({
     stepperCallback,
 }: TemplateDescriptionStepProps) => {
     const { onSaveTemplate } = useEditTemplate()
+
     return (
         <Box>
             <Box pad="xsmall">

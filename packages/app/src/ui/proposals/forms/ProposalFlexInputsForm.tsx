@@ -12,9 +12,12 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalFlexInputsFormProps {
+    editProposalContext: EditProposalContextType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -22,6 +25,7 @@ interface ProposalFlexInputsFormProps {
 }
 
 const ProposalFlexInputsForm = ({
+    editProposalContext,
     onSubmit,
     onCancel,
     submitLabel,
@@ -33,7 +37,7 @@ const ProposalFlexInputsForm = ({
         setProposal,
         onSaveProposal,
         onResetProposal,
-    } = useEditProposal()
+    } = editProposalContext
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [timelock, setTimelock] = useState({

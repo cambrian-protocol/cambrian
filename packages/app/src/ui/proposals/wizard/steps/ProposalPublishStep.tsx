@@ -14,10 +14,16 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
-const ProposalPublishStep = () => {
-    const { proposalStreamID } = useEditProposal()
+const ProposalPublishStep = ({
+    editProposalContext,
+}: {
+    editProposalContext: EditProposalContextType
+}) => {
+    const { proposalStreamID } = editProposalContext
     const { currentUser } = useCurrentUserContext()
 
     const router = useRouter()
