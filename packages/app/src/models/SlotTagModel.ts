@@ -17,9 +17,3 @@ export type SlotTagModel = {
 export type TaggedInput = SlotTagModel & {
     value: string
 }
-
-export type FlexInputs = {
-    [solverId: string]: {
-        [tagId: string]: TaggedInput
-    }
-}

@@ -8,7 +8,7 @@ import { CreateSlotActionPayload } from './actions/solverActions/createSlot.acti
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
-import { SlotTagModel } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'

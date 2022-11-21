@@ -1,25 +1,18 @@
 import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
-import {
-    getFlexInputDescription,
-    getFlexInputInstruction,
-    getFlexInputLabel,
-    getFlexInputType,
-} from '@cambrian/app/utils/helpers/flexInputHelpers'
+import React, { useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
-
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import _ from 'lodash'
-import useEditProposal from '@cambrian/app/hooks/useEditProposal'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import {
     parseInputToSeconds,
     parseSecondsToForm,
 } from '@cambrian/app/utils/helpers/timeParsing'
+
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import _ from 'lodash'
+import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalFlexInputsFormProps {
     onSubmit?: () => Promise<void>

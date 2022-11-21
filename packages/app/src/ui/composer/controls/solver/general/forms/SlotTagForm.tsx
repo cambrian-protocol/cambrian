@@ -1,13 +1,12 @@
-import SlotTagFormFields, {
-    SlotTagModel,
-    initialSlotTagInput,
-} from './SlotTagFormFields'
 import { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
 import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
+import SlotTagFormFields from './SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface SlotTagFormProps {
@@ -18,7 +17,7 @@ interface SlotTagFormProps {
 const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
     const { currentSolver, dispatch } = useComposerContext()
 
-    const [input, setInput] = useState<SlotTagModel>(initialSlotTagInput)
+    const [input, setInput] = useState<SlotTagModel>(defaultSlotTagValues)
 
     //Init
     useEffect(() => {

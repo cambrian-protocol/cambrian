@@ -7,27 +7,20 @@ import {
     Text,
     TextInput,
 } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
-import {
-    getFlexInputDescription,
-    getFlexInputInstruction,
-    getFlexInputLabel,
-    getFlexInputType,
-} from '@cambrian/app/utils/helpers/flexInputHelpers'
-
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import _ from 'lodash'
-import { isAddress } from 'ethers/lib/utils'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 import {
     parseInputToSeconds,
     parseSecondsToForm,
 } from '@cambrian/app/utils/helpers/timeParsing'
+
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import _ from 'lodash'
+import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import { isAddress } from 'ethers/lib/utils'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
     onSubmit?: () => void

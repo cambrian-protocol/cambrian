@@ -3,6 +3,10 @@ import {
     RichSlotModel,
     SlotModel,
 } from '@cambrian/app/models/SlotModel'
+import {
+    SlotTagModel,
+    SlotTagsHashMapType,
+} from '@cambrian/app/models/SlotTagModel'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
@@ -10,7 +14,6 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { PriceModel } from '@cambrian/app/components/bars/actionbars/proposal/ProposalReviewActionbar'
-import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
@@ -108,15 +111,15 @@ export const getSolverIngestWithMetaData = (
         const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
 
         // Fallback empty Slot
-        const tag =
+        const tag: SlotTagModel =
             slotTags && slotTags[ulid]
                 ? slotTags[ulid]
                 : {
-                      id: ulid,
                       label: '',
-                      isFlex: false,
+                      isFlex: 'None',
                       description: '',
                       instruction: '',
+                      slotId: ulid,
                   }
 
         return {

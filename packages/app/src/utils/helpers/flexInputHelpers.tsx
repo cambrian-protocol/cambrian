@@ -1,11 +1,10 @@
+import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { DEFAULT_SLOT_TAGS } from '@cambrian/app/constants/DefaultSlotTags'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
 import _ from 'lodash'
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 
 export const getFlexInputType = (
     solvers: ComposerSolver[],
@@ -33,36 +32,6 @@ export const getFlexInputType = (
             return 'string'
         }
     }
-}
-
-export const getFlexInputLabel = (flexInput: FlexInputFormType) => {
-    const label =
-        flexInput.label.trim() !== ''
-            ? flexInput.label
-            : DEFAULT_SLOT_TAGS[flexInput.slotId]
-            ? DEFAULT_SLOT_TAGS[flexInput.slotId].label
-            : 'Unknown'
-    return label
-}
-
-export const getFlexInputDescription = (flexInput: FlexInputFormType) => {
-    const label =
-        flexInput.description.trim() !== ''
-            ? flexInput.description
-            : DEFAULT_SLOT_TAGS[flexInput.slotId]
-            ? DEFAULT_SLOT_TAGS[flexInput.slotId].description
-            : undefined
-    return label
-}
-
-export const getFlexInputInstruction = (flexInput: FlexInputFormType) => {
-    const label =
-        flexInput.instruction && flexInput.instruction.trim() !== ''
-            ? flexInput.instruction
-            : DEFAULT_SLOT_TAGS[flexInput.slotId]
-            ? DEFAULT_SLOT_TAGS[flexInput.slotId].instruction
-            : undefined
-    return label
 }
 
 export const mergeFlexIntoComposition = (

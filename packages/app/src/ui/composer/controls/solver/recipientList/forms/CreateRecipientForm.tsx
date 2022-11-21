@@ -1,11 +1,10 @@
 import { Button, Form, FormExtendedEvent, FormField } from 'grommet'
-import SlotTagFormFields, {
-    SlotTagModel,
-    initialSlotTagInput,
-} from '../../general/forms/SlotTagFormFields'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
+import SlotTagFormFields from '../../general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
 
@@ -14,7 +13,7 @@ interface RecipientConfigFormProps {
 }
 
 export const initialCreateRecipientFormInput = {
-    ...initialSlotTagInput,
+    ...defaultSlotTagValues,
     address: '',
 }
 
