@@ -311,9 +311,9 @@ export const getSolverSlots = async (
                     tag: slotTags
                         ? slotTags[ulid]
                         : {
-                              id: ulid,
+                              slotId: ulid,
                               label: '',
-                              isFlex: false,
+                              isFlex: 'None',
                               description: '',
                               instruction: '',
                           },

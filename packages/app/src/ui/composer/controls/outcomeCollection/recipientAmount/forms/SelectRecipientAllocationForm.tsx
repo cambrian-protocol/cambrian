@@ -7,21 +7,20 @@ import SelectRecipient, {
     SelectRecipientType,
     initialSelectRecipientInput,
 } from '@cambrian/app/components/selects/SelectRecipient'
-import SlotTagFormFields, {
-    SlotTagFormFieldsType,
-    initialSlotTagInput,
-} from '../../../solver/general/forms/SlotTagFormFields'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
+import SlotTagFormFields from '../../../solver/general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'
 
 type SelectRecipientAllocationFormProps = {
     onClose: () => void
 }
-export type SelectRecipientAllocationFormType = SlotTagFormFieldsType &
+export type SelectRecipientAllocationFormType = SlotTagModel &
     SelectRecipientType & {
         selectedAmount: SelectAmountDataType
     }
@@ -29,7 +28,7 @@ export type SelectRecipientAllocationFormType = SlotTagFormFieldsType &
 export const initialSelectRecipientAllocationFormInput: SelectRecipientAllocationFormType =
     {
         ...initialSelectRecipientInput,
-        ...initialSlotTagInput,
+        ...defaultSlotTagValues,
         selectedAmount: initialSelectAmountInput,
     }
 

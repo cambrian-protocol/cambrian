@@ -7,29 +7,28 @@ import {
     Text,
     TextInput,
 } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
 import {
-    getFlexInputDescription,
-    getFlexInputInstruction,
-    getFlexInputLabel,
-    getFlexInputType,
-} from '@cambrian/app/utils/helpers/flexInputHelpers'
+    parseInputToSeconds,
+    parseSecondsToForm,
+} from '@cambrian/app/utils/helpers/timeParsing'
 
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
+import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress } from 'ethers/lib/utils'
+import useEditTemplate, {
+    EditTemplateContextType,
+} from '@cambrian/app/hooks/useEditTemplate'
+import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
-    composition: CompositionModel
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
+    editTemplateContext: EditTemplateContextType
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
@@ -39,59 +38,191 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
-    composition,
+    editTemplateContext,
     onSubmit,
-    templateInput,
-    setTemplateInput,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: TemplateFlexInputsFormProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const {
+        template,
+        composition,
+        setTemplate,
+        onSaveTemplate,
+        onResetTemplate,
+    } = editTemplateContext
 
-    useEffect(() => {
-        return () => {}
-    }, [])
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [timelock, setTimelock] = useState(
+        parseSecondsToForm(
+            parseInt(
+                template?.flexInputs.find(
+                    (fi) => fi.slotId === 'timelockSeconds'
+                )?.value || '0'
+            )
+        )
+    )
+
+    const onChangeTime = ({
+        days,
+        hours,
+        minutes,
+    }: {
+        days?: number
+        hours?: number
+        minutes?: number
+    }) => {
+        const newTime = parseSecondsToForm(
+            (days !== undefined ? days : timelock.days) * 24 * 60 * 60 +
+                (hours !== undefined ? hours : timelock.hours) * 60 * 60 +
+                (minutes !== undefined ? minutes : timelock.minutes) * 60
+        )
+
+        setTimelock(newTime)
+        return newTime
+    }
 
     const handleSubmit = async (
         event: FormExtendedEvent<FlexInputFormType[], Element>
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    const updateFlexInput = (idx: number, value: string) => {
+        const templateClone = _.cloneDeep(template)
+        templateClone!.flexInputs[idx].value = value
+        setTemplate(templateClone)
+    }
+
+    const renderTimelockSecondsForm = (
+        flexInput: FlexInputFormType,
+        idx: number
+    ) => {
+        return (
+            <Box key={idx} pad={{ bottom: 'medium' }}>
+                <Box direction="row" gap="small" align="center">
+                    <FormField
+                        label="Timelock Days"
+                        margin={{ bottom: 'small' }}
+                    >
+                        <TextInput
+                            type="number"
+                            name="timelockDays"
+                            value={timelock.days}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        days: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Hours" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockHours"
+                            value={timelock.hours}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        hours: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Minutes" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockMinutes"
+                            value={timelock.minutes}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        minutes: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                </Box>
+
+                {flexInput.description && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.description}
+                    </Text>
+                )}
+                {flexInput.instruction && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.instruction}
+                    </Text>
+                )}
+            </Box>
+        )
+    }
+
+    if (!template || !composition) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
-                    {templateInput.flexInputs.map((flexInput, idx) => {
+                    {template.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             composition.solvers,
                             flexInput
                         )
 
-                        const label = getFlexInputLabel(flexInput)
-                        const description = getFlexInputDescription(flexInput)
-                        const instruction = getFlexInputInstruction(flexInput)
-
                         if (
-                            !flexInput.isFlex ||
-                            flexInput.isFlex === 'None' ||
-                            flexInput.isFlex === 'Proposal'
+                            flexInput.isFlex === 'Template' ||
+                            flexInput.isFlex === 'Both'
                         ) {
-                            return null
-                        } else {
+                            if (flexInput.slotId === 'timelockSeconds') {
+                                return renderTimelockSecondsForm(flexInput, idx)
+                            }
+
                             return (
-                                <Box key={idx}>
+                                <Box key={idx} pad={{ bottom: 'medium' }}>
                                     <FormField
-                                        name={`flexInput[${idx}].value`}
-                                        label={label}
+                                        name={`${flexInput.slotId}`}
+                                        label={flexInput.label}
                                         validate={[
                                             () => {
                                                 if (
-                                                    templateInput.flexInputs[
+                                                    template.flexInputs[
                                                         idx
                                                     ].value.trim().length === 0
                                                 ) {
@@ -99,8 +230,7 @@ const TemplateFlexInputsForm = ({
                                                 } else if (
                                                     type === 'address' &&
                                                     !isAddress(
-                                                        templateInput
-                                                            .flexInputs[idx]
+                                                        template.flexInputs[idx]
                                                             .value
                                                     )
                                                 ) {
@@ -112,41 +242,38 @@ const TemplateFlexInputsForm = ({
                                         <TextInput
                                             type={type}
                                             value={
-                                                templateInput.flexInputs[idx]
-                                                    .value
+                                                template.flexInputs[idx].value
                                             }
-                                            onChange={(e) => {
-                                                const inputsClone =
-                                                    _.cloneDeep(templateInput)
-
-                                                inputsClone.flexInputs[
-                                                    idx
-                                                ].value = e.target.value
-
-                                                setTemplateInput(inputsClone)
-                                            }}
+                                            onChange={(e) =>
+                                                updateFlexInput(
+                                                    idx,
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </FormField>
-                                    {description && (
+                                    {flexInput.description && (
                                         <Text
                                             size="small"
                                             color="dark-4"
                                             margin={{ bottom: 'small' }}
                                         >
-                                            {description}
+                                            {flexInput.description}
                                         </Text>
                                     )}
-                                    {instruction && (
+                                    {flexInput.instruction && (
                                         <Text
                                             size="small"
                                             color="dark-4"
                                             margin={{ bottom: 'small' }}
                                         >
-                                            {instruction}
+                                            {flexInput.instruction}
                                         </Text>
                                     )}
                                 </Box>
                             )
+                        } else {
+                            return null
                         }
                     })}
                 </Box>
@@ -165,7 +292,7 @@ const TemplateFlexInputsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetTemplate}
                         />
                     }
                 />

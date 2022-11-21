@@ -11,37 +11,43 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalPricingFormProps {
-    proposalInput: ProposalModel
-    template: TemplateModel
-    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
-    onSubmit: () => Promise<void>
-    submitLabel?: string
+    editProposalContext: EditProposalContextType
+    onSubmit?: () => Promise<void>
     onCancel?: () => void
+    submitLabel?: string
     cancelLabel?: string
 }
 
 const ProposalPricingForm = ({
-    proposalInput,
-    template,
-    setProposalInput,
+    editProposalContext,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: ProposalPricingFormProps) => {
+    const {
+        stageStack,
+        proposal,
+        setProposal,
+        onSaveProposal,
+        onResetProposal,
+    } = editProposalContext
+
     const { currentUser } = useCurrentUserContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
 
     useEffect(() => {
-        return () => {}
-    }, [])
-
-    useEffect(() => {
-        initDenominationToken(template.price.denominationTokenAddress)
-    }, [])
+        if (stageStack && !denominationToken) {
+            initDenominationToken(
+                stageStack.template.price.denominationTokenAddress
+            )
+        }
+    }, [stageStack])
 
     const initDenominationToken = async (address: string) => {
         if (currentUser) {
@@ -56,8 +62,17 @@ const ProposalPricingForm = ({
     const handleSubmit = async (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveProposal()
         setIsSubmitting(false)
+    }
+
+    if (!stageStack || !proposal) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'xsmall'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -72,13 +87,14 @@ const ProposalPricingForm = ({
                             border
                             elevation="small"
                         >
-                            {template.price.allowAnyPaymentToken ||
-                            (template.price.preferredTokens &&
-                                template.price.preferredTokens.length > 0) ? (
+                            {stageStack.template.price.allowAnyPaymentToken ||
+                            (stageStack.template.price.preferredTokens &&
+                                stageStack.template.price.preferredTokens
+                                    .length > 0) ? (
                                 <>
                                     <Text>
                                         The seller quotes an equivalent of{' '}
-                                        {template.price?.amount}{' '}
+                                        {stageStack.template.price?.amount}{' '}
                                         {denominationToken?.symbol}
                                     </Text>
                                     <Text color="dark-4" size="small">
@@ -90,7 +106,7 @@ const ProposalPricingForm = ({
                                 <>
                                     <Text>
                                         The seller quotes{' '}
-                                        {template.price?.amount}{' '}
+                                        {stageStack.template.price?.amount}{' '}
                                         {denominationToken?.symbol}
                                     </Text>
                                     <Text color="dark-4" size="small">
@@ -112,38 +128,38 @@ const ProposalPricingForm = ({
                             <Box flex>
                                 <NumberInput
                                     name="amount"
-                                    value={proposalInput.price.amount}
+                                    value={proposal.price.amount}
                                     onChange={(e) =>
-                                        setProposalInput({
-                                            ...proposalInput,
+                                        setProposal({
+                                            ...proposal,
                                             price: {
-                                                ...proposalInput.price,
+                                                ...proposal.price,
                                                 amount: Number(e.target.value),
                                             },
                                         })
                                     }
                                 />
                             </Box>
-                            {template.price.allowAnyPaymentToken ||
-                            template.price.preferredTokens.length > 0 ? (
+                            {stageStack.template.price.allowAnyPaymentToken ||
+                            stageStack.template.price.preferredTokens.length >
+                                0 ? (
                                 <SelectTokenItem
                                     allowAnyPaymentToken={
-                                        template.price.allowAnyPaymentToken
+                                        stageStack.template.price
+                                            .allowAnyPaymentToken
                                     }
-                                    preferredTokenList={template.price.preferredTokens.concat(
+                                    preferredTokenList={stageStack.template.price.preferredTokens.concat(
                                         [
-                                            template.price
+                                            stageStack.template.price
                                                 .denominationTokenAddress,
                                         ]
                                     )}
-                                    tokenAddress={
-                                        proposalInput.price.tokenAddress
-                                    }
+                                    tokenAddress={proposal.price.tokenAddress}
                                     onSelect={(newSelectedToken) => {
-                                        setProposalInput({
-                                            ...proposalInput,
+                                        setProposal({
+                                            ...proposal,
                                             price: {
-                                                ...proposalInput.price,
+                                                ...proposal.price,
                                                 tokenAddress: newSelectedToken,
                                             },
                                         })
@@ -152,7 +168,8 @@ const ProposalPricingForm = ({
                             ) : (
                                 <BaseTokenItem
                                     tokenAddress={
-                                        template.price.denominationTokenAddress
+                                        stageStack.template.price
+                                            .denominationTokenAddress
                                     }
                                 />
                             )}
@@ -174,7 +191,7 @@ const ProposalPricingForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetProposal}
                         />
                     }
                 />

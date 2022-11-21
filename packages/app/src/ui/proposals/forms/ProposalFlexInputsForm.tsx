@@ -1,88 +1,216 @@
 import { Box, Button, Form, FormField, Text, TextInput } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
-import {
-    getFlexInputDescription,
-    getFlexInputInstruction,
-    getFlexInputLabel,
-    getFlexInputType,
-} from '@cambrian/app/utils/helpers/flexInputHelpers'
+import React, { useState } from 'react'
 import { isAddress, isRequired } from '@cambrian/app/utils/helpers/validation'
+import {
+    parseInputToSeconds,
+    parseSecondsToForm,
+} from '@cambrian/app/utils/helpers/timeParsing'
 
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
+import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalFlexInputsFormProps {
-    proposalInput: ProposalModel
-    composition: CompositionModel
-    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
-    onSubmit: () => Promise<void>
-    submitLabel?: string
+    editProposalContext: EditProposalContextType
+    onSubmit?: () => Promise<void>
     onCancel?: () => void
+    submitLabel?: string
     cancelLabel?: string
 }
 
 const ProposalFlexInputsForm = ({
-    proposalInput,
-    setProposalInput,
-    composition,
+    editProposalContext,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: ProposalFlexInputsFormProps) => {
+    const {
+        stageStack,
+        proposal,
+        setProposal,
+        onSaveProposal,
+        onResetProposal,
+    } = editProposalContext
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        return () => {}
-    }, [])
+    const [timelock, setTimelock] = useState(
+        parseSecondsToForm(
+            parseInt(
+                proposal?.flexInputs.find(
+                    (fi) => fi.slotId === 'timelockSeconds'
+                )?.value || '0'
+            )
+        )
+    )
+
+    const onChangeTime = ({
+        days,
+        hours,
+        minutes,
+    }: {
+        days?: number
+        hours?: number
+        minutes?: number
+    }) => {
+        const newTime = parseSecondsToForm(
+            (days !== undefined ? days : timelock.days) * 24 * 60 * 60 +
+                (hours !== undefined ? hours : timelock.hours) * 60 * 60 +
+                (minutes !== undefined ? minutes : timelock.minutes) * 60
+        )
+
+        setTimelock(newTime)
+        return newTime
+    }
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveProposal()
         setIsSubmitting(false)
     }
 
+    const updateFlexInput = (idx: number, value: string) => {
+        const proposalClone = _.cloneDeep(proposal)
+        proposalClone!.flexInputs[idx].value = value
+        setProposal(proposalClone)
+    }
+
+    const renderTimelockSecondsForm = (
+        flexInput: FlexInputFormType,
+        idx: number
+    ) => {
+        return (
+            <Box key={idx} pad={{ bottom: 'medium' }}>
+                <Box direction="row" gap="small" align="center">
+                    <FormField
+                        label="Timelock Days"
+                        margin={{ bottom: 'small' }}
+                    >
+                        <TextInput
+                            type="number"
+                            name="timelockDays"
+                            value={timelock.days}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        days: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Hours" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockHours"
+                            value={timelock.hours}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        hours: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                    <FormField label="Minutes" margin={{ bottom: 'small' }}>
+                        <TextInput
+                            type="number"
+                            name="timelockMinutes"
+                            value={timelock.minutes}
+                            onChange={(e) => {
+                                if (parseInt(e.target.value) >= 0) {
+                                    const newTime = onChangeTime({
+                                        minutes: parseInt(e.target.value),
+                                    })
+                                    updateFlexInput(
+                                        idx,
+                                        parseInputToSeconds(newTime).toString()
+                                    )
+                                }
+                            }}
+                        />
+                    </FormField>
+                </Box>
+
+                {flexInput.description && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.description}
+                    </Text>
+                )}
+                {flexInput.instruction && (
+                    <Text
+                        size="small"
+                        color="dark-4"
+                        margin={{ bottom: 'small' }}
+                    >
+                        {flexInput.instruction}
+                    </Text>
+                )}
+            </Box>
+        )
+    }
+
+    if (!proposal || !stageStack) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
+    }
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box height={{ min: 'auto' }} pad="xsmall">
-                    {proposalInput.flexInputs.map((flexInput, idx) => {
+                    {proposal.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
-                            composition.solvers,
+                            stageStack.composition.solvers,
                             flexInput
                         )
-                        const label = getFlexInputLabel(flexInput)
-                        const description = getFlexInputDescription(flexInput)
-                        const instruction = getFlexInputInstruction(flexInput)
-
                         if (
-                            !flexInput.isFlex ||
-                            flexInput.isFlex === 'None' ||
-                            flexInput.isFlex === 'Template'
+                            flexInput.isFlex === 'Proposal' ||
+                            flexInput.isFlex === 'Both'
                         ) {
-                            return null
-                        } else {
+                            if (flexInput.slotId === 'timelockSeconds') {
+                                return renderTimelockSecondsForm(flexInput, idx)
+                            }
                             return (
                                 <Box key={idx}>
                                     <FormField
-                                        name={`flexInputs[${idx}].value`}
-                                        label={label}
+                                        name={`${flexInput.slotId}`}
+                                        label={flexInput.label}
                                         validate={[
                                             () =>
                                                 isRequired(
-                                                    proposalInput.flexInputs[
-                                                        idx
-                                                    ].value
+                                                    proposal.flexInputs[idx]
+                                                        .value
                                                 ),
                                             () => {
                                                 if (
                                                     type === 'address' &&
                                                     !isAddress(
-                                                        proposalInput
-                                                            .flexInputs[idx]
+                                                        proposal.flexInputs[idx]
                                                             .value
                                                     )
                                                 ) {
@@ -94,38 +222,32 @@ const ProposalFlexInputsForm = ({
                                         <TextInput
                                             type={type}
                                             value={flexInput.value}
-                                            onChange={(e) => {
-                                                const inputsClone =
-                                                    _.cloneDeep(proposalInput)
-
-                                                inputsClone.flexInputs[
-                                                    idx
-                                                ].value = e.target.value
-
-                                                setProposalInput(inputsClone)
-                                            }}
+                                            onChange={(e) =>
+                                                updateFlexInput(
+                                                    idx,
+                                                    e.target.value
+                                                )
+                                            }
                                         />
                                     </FormField>
-                                    {description && (
-                                        <Text
-                                            size="small"
-                                            color="dark-4"
-                                            margin={{ bottom: 'small' }}
-                                        >
-                                            {description}
-                                        </Text>
-                                    )}
-                                    {instruction && (
-                                        <Text
-                                            size="small"
-                                            color="dark-4"
-                                            margin={{ bottom: 'small' }}
-                                        >
-                                            {instruction}
-                                        </Text>
-                                    )}
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {flexInput.description}
+                                    </Text>
+                                    <Text
+                                        size="small"
+                                        color="dark-4"
+                                        margin={{ bottom: 'small' }}
+                                    >
+                                        {flexInput.instruction}
+                                    </Text>
                                 </Box>
                             )
+                        } else {
+                            return null
                         }
                     })}
                 </Box>
@@ -144,7 +266,7 @@ const ProposalFlexInputsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetProposal}
                         />
                     }
                 />

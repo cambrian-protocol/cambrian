@@ -1,5 +1,6 @@
 import React, { PropsWithChildren } from 'react'
 
+import { NotificationCountProvider } from './NotificationCountContext'
 import { ThemeContextProvider } from './ThemeContext'
 import { TopRefContextProvider } from './TopRefContext'
 import { UserContextProvider } from './UserContext'
@@ -10,9 +11,11 @@ type StoreType = PropsWithChildren<{}> & {
 export const Store = ({ children, pageProps }: StoreType) => {
     return (
         <ThemeContextProvider>
-            <UserContextProvider noWalletPrompt={pageProps.noWalletPrompt}>
-                <TopRefContextProvider>{children}</TopRefContextProvider>
-            </UserContextProvider>
+            <NotificationCountProvider>
+                <UserContextProvider noWalletPrompt={pageProps.noWalletPrompt}>
+                    <TopRefContextProvider>{children}</TopRefContextProvider>
+                </UserContextProvider>
+            </NotificationCountProvider>
         </ThemeContextProvider>
     )
 }

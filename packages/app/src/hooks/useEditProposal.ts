@@ -16,12 +16,30 @@ import { cpLogger } from './../services/api/Logger.api'
 import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
+import usePrevious from './usePrevious'
+
+export type EditProposalContextType = {
+    proposalStreamID: string
+    isValidProposal: boolean
+    stageStack: StageStackType | undefined
+    onResetProposal: () => void
+    onSaveProposal: () => Promise<boolean>
+    proposal: ProposalModel | undefined
+    setProposal: React.Dispatch<React.SetStateAction<ProposalModel | undefined>>
+    proposalStatus: ProposalStatus
+    isLoaded: boolean
+    errorMessage: ErrorMessageType | undefined
+    setErrorMessage: React.Dispatch<
+        React.SetStateAction<ErrorMessageType | undefined>
+    >
+}
 
 const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
-    const [proposalInput, setProposalInput] = useState<ProposalModel>()
+
+    const [proposal, setProposal] = useState<ProposalModel>()
     const [stageStack, setStageStack] = useState<StageStackType>()
 
     const [proposalStatus, setProposalStatus] = useState<ProposalStatus>(
@@ -32,7 +50,9 @@ const useEditProposal = () => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        if (router.isReady) fetchProposal()
+        if (router.isReady) {
+            fetchProposal()
+        }
     }, [router, currentUser])
 
     const fetchProposal = async () => {
@@ -82,7 +102,7 @@ const useEditProposal = () => {
                         )
                         validateProposal(_stageStack.proposal)
                         setStageStack(_stageStack)
-                        setProposalInput(_.cloneDeep(_stageStack.proposal))
+                        setProposal(_.cloneDeep(_stageStack.proposal))
                     }
                 }
                 setIsLoaded(true)
@@ -93,22 +113,22 @@ const useEditProposal = () => {
     }
 
     const saveProposal = async (): Promise<boolean> => {
-        if (proposalInput && stageStack && currentUser) {
-            if (!_.isEqual(proposalInput, stageStack.proposal)) {
+        if (proposal && stageStack && currentUser) {
+            if (!_.isEqual(proposal, stageStack.proposal)) {
                 try {
                     const title = await updateStage(
                         proposalStreamID as string,
-                        { ...proposalInput, isSubmitted: false },
+                        { ...proposal, isSubmitted: false },
                         StageNames.proposal,
                         currentUser
                     )
                     const proposalWithUniqueTitle = {
-                        ...proposalInput,
+                        ...proposal,
                         title: title,
                         isSubmitted: false,
                     }
                     validateProposal(proposalWithUniqueTitle)
-                    setProposalInput(proposalWithUniqueTitle)
+                    setProposal(proposalWithUniqueTitle)
 
                     setStageStack(
                         await loadStageStackFromID(proposalStreamID as string)
@@ -127,9 +147,9 @@ const useEditProposal = () => {
         return false
     }
 
-    const resetProposalInput = () => {
+    const resetProposal = () => {
         if (stageStack) {
-            setProposalInput(_.cloneDeep(stageStack.proposal))
+            setProposal(_.cloneDeep(stageStack.proposal))
         }
     }
 
@@ -148,10 +168,10 @@ const useEditProposal = () => {
         proposalStreamID: proposalStreamID as string,
         isValidProposal: isValidProposal,
         stageStack: stageStack,
-        onResetProposalInput: resetProposalInput,
+        onResetProposal: resetProposal,
         onSaveProposal: saveProposal,
-        proposalInput: proposalInput,
-        setProposalInput: setProposalInput,
+        proposal: proposal,
+        setProposal: setProposal,
         proposalStatus: proposalStatus,
         isLoaded: isLoaded,
         errorMessage: errorMessage,

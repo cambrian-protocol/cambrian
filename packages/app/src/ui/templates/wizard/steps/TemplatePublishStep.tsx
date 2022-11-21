@@ -5,14 +5,14 @@ import { useEffect, useState } from 'react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-
-interface TemplatePublishStepProps {
-    templateStreamID: string
-}
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 const TemplatePublishStep = ({
-    templateStreamID,
-}: TemplatePublishStepProps) => {
+    editTemplateContext,
+}: {
+    editTemplateContext: EditTemplateContextType
+}) => {
+    const { templateStreamID } = editTemplateContext
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
     useEffect(() => {

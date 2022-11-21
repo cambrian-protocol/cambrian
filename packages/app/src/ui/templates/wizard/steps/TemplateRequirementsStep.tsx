@@ -5,23 +5,23 @@ import {
 
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateRequirementsStepProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    editTemplateContext: EditTemplateContextType
     stepperCallback: (step: TemplateWizardStepsType) => void
-    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateRequirementsStep = ({
-    templateInput,
-    setTemplateInput,
+    editTemplateContext,
     stepperCallback,
-    onSaveTemplate,
 }: TemplateRequirementsStepProps) => {
+    const { template, onSaveTemplate } = editTemplateContext
+
+    if (!template) {
+        return null
+    }
     return (
         <Box>
             <Box pad="xsmall">
@@ -31,16 +31,17 @@ const TemplateRequirementsStep = ({
                 />
             </Box>
             <TemplateRequirementsForm
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                editTemplateContext={editTemplateContext}
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
-                    if (await onSaveTemplate())
+                    if ((await onSaveTemplate()) == true) {
+                        console.log('calling back')
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
+                    }
                 }}
                 cancelLabel={'Back'}
                 onCancel={() => {
-                    if (templateInput.flexInputs.length > 0) {
+                    if (template.flexInputs.length > 0) {
                         stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
                     } else {
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)

@@ -3,12 +3,15 @@ import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
 
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import MESSAGE from '../../../public/sounds/new-message.mp3'
 import { PaperPlaneRight } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '../../services/api/Logger.api'
+import { useNotificationCountContext } from '@cambrian/app/hooks/useNotifcationCountContext'
+import useSound from 'use-sound'
 
 /**
  * Messages are stored for a user in:
@@ -25,7 +28,10 @@ import { cpLogger } from '../../services/api/Logger.api'
  *  Proposal => <proposalStreamID>
  */
 
-type ChatMessagesType = { messages: ChatMessageType[] }
+type UserChatTileDocumentType = {
+    messages: ChatMessageType[]
+    readMessagesCounter: number
+}
 
 export default function CoreMessenger({
     currentUser,
@@ -38,6 +44,11 @@ export default function CoreMessenger({
     participants: string[] // For 'Other'
     showMessenger?: boolean // to prevent reinit on hide
 }) {
+    const [playNotificationSound] = useSound(MESSAGE)
+    const playNotificationSoundCallback = useRef(playNotificationSound)
+
+    const { setNotificationCounter, notificationCounter } =
+        useNotificationCountContext()
     // useRef for publishing messages in outbox, otherwise setInterval has stale state
     const outboxCallback = useRef(async () => {})
 
@@ -74,6 +85,10 @@ export default function CoreMessenger({
     // Set useRef callback
     useEffect(() => {
         outboxCallback.current = publishOutbox
+    })
+
+    useEffect(() => {
+        playNotificationSoundCallback.current = playNotificationSound
     })
 
     // Subscribe to Messages TileDocuments
@@ -114,21 +129,52 @@ export default function CoreMessenger({
             .map((res) => {
                 return res.status === 'fulfilled' && res.value
             })
-            .filter(Boolean) as TileDocument<ChatMessagesType>[]
+            .filter(Boolean) as TileDocument<UserChatTileDocumentType>[]
     }
 
     // Load chat
     const loadChat = async () => {
         try {
             const messagesDocs = await fetchMessagesDocs(participants)
-            // Get message content
-            const messages: ChatMessageType[][] = messagesDocs
+            const fetchedMessages: ChatMessageType[][] = messagesDocs
                 .filter((doc) => doc.content?.messages?.length > 0)
                 .map((doc) => doc.content.messages)
-            setMessages(mergeMessages(messages))
+
+            const usersReadMessagesCounter = messagesDocs.find(
+                (m) => m.controllers[0] === currentUser.did
+            )?.content.readMessagesCounter
+
+            const fetchedMergedMessages = mergeMessages(fetchedMessages)
+            if (
+                usersReadMessagesCounter === undefined ||
+                fetchedMergedMessages.length >= usersReadMessagesCounter
+            ) {
+                setMessages(fetchedMergedMessages)
+                updateMessageNotification(
+                    fetchedMergedMessages.length,
+                    usersReadMessagesCounter
+                )
+            }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    const updateMessageNotification = (
+        allMessagesCounter: number,
+        readMessagesCounter?: number
+    ) => {
+        let unreadMessages = 0
+        if (readMessagesCounter === undefined) {
+            unreadMessages = allMessagesCounter
+        } else if (readMessagesCounter < allMessagesCounter) {
+            unreadMessages = allMessagesCounter - readMessagesCounter
+        }
+
+        if (unreadMessages !== notificationCounter) {
+            playNotificationSoundCallback.current()
+            setNotificationCounter(unreadMessages)
         }
     }
 
@@ -163,7 +209,7 @@ export default function CoreMessenger({
     // Publish an array of messages (append to existing)
     const publishMessages = async (messages: ChatMessageType[]) => {
         try {
-            const messagesDoc: TileDocument<{ messages: ChatMessageType[] }> =
+            const messagesDoc: TileDocument<UserChatTileDocumentType> =
                 await TileDocument.deterministic(
                     ceramicInstance(currentUser),
                     {
@@ -174,9 +220,13 @@ export default function CoreMessenger({
                     { pin: true }
                 )
 
+            const updatedReadMessagesCounter =
+                messagesDoc.content.readMessagesCounter + messages.length
+
             if (Array.isArray(messagesDoc.content?.messages)) {
                 await messagesDoc.update(
                     {
+                        readMessagesCounter: updatedReadMessagesCounter,
                         messages: [
                             ...messagesDoc.content.messages,
                             ...messages,
@@ -187,7 +237,10 @@ export default function CoreMessenger({
                 )
             } else {
                 await messagesDoc.update(
-                    { messages: [...messages] },
+                    {
+                        readMessagesCounter: updatedReadMessagesCounter,
+                        messages: [...messages],
+                    },
                     undefined,
                     {
                         pin: true,
@@ -211,6 +264,37 @@ export default function CoreMessenger({
             .sort((a, b) => a.timestamp - b.timestamp) /// ...and sort by timestamp
 
         return mergedMessages
+    }
+
+    const updateReadMessagesCounter = async (
+        updatedReadMessagesCounter: number
+    ) => {
+        const messagesDoc: TileDocument<UserChatTileDocumentType> =
+            await TileDocument.deterministic(
+                ceramicInstance(currentUser),
+                {
+                    controllers: [currentUser.did],
+                    family: 'cambrian-chat',
+                    tags: [chatID],
+                },
+                { pin: true }
+            )
+
+        if (
+            messagesDoc.content.readMessagesCounter !==
+            updatedReadMessagesCounter
+        ) {
+            await messagesDoc.update(
+                {
+                    ...messagesDoc.content,
+                    readMessagesCounter: updatedReadMessagesCounter,
+                },
+                undefined,
+                {
+                    pin: true,
+                }
+            )
+        }
     }
 
     return (
@@ -260,6 +344,12 @@ export default function CoreMessenger({
                                     onChange={(e) =>
                                         setMessageInput(e.target.value)
                                     }
+                                    onFocus={() => {
+                                        updateReadMessagesCounter(
+                                            messages.length
+                                        )
+                                        setNotificationCounter(0)
+                                    }}
                                 />
                             </Box>
                             <Button

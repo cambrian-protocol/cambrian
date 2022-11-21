@@ -68,8 +68,7 @@ const ConfirmOutcomeActionbar = ({
     } else {
         actionbarInfo = {
             title: 'Confirm the outcome',
-            subTitle:
-                'After confirmation the tokens will be allocated accordingly',
+            subTitle: 'Funds can be claimed after confirmation',
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Confirming an outcome"

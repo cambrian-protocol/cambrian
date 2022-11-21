@@ -12,18 +12,11 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
-interface ProposalSubmitControlProps {
-    onSave: () => Promise<boolean>
-    proposalStreamID: string
-    isValidProposal: boolean
-}
-
-const ProposalSubmitControl = ({
-    onSave,
-    isValidProposal,
-    proposalStreamID,
-}: ProposalSubmitControlProps) => {
+const ProposalSubmitControl = () => {
+    const { proposalStreamID, isValidProposal, onSaveProposal } =
+        useEditProposal()
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
 
@@ -34,7 +27,7 @@ const ProposalSubmitControl = ({
         setIsSubmitting(true)
         try {
             if (currentUser) {
-                if (await onSave()) {
+                if (await onSaveProposal()) {
                     const ceramicProposalAPI = new CeramicProposalAPI(
                         currentUser
                     )

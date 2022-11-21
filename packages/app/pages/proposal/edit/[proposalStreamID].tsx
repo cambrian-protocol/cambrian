@@ -20,20 +20,17 @@ import { useState } from 'react'
 
 export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
+    const editProposalContext = useEditProposal()
 
     const {
         stageStack,
         proposalStatus,
-        proposalInput,
-        setProposalInput,
-        onSaveProposal,
-        onResetProposalInput,
+        proposal,
         proposalStreamID,
-        isValidProposal,
         errorMessage,
         setErrorMessage,
         isLoaded,
-    } = useEditProposal()
+    } = editProposalContext
 
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -42,17 +39,11 @@ export default function EditProposalPage() {
         proposalStatus === ProposalStatus.ChangeRequested ||
         proposalStatus === ProposalStatus.Modified
 
-    const handleSave = async () => {
-        await onSaveProposal()
-    }
-
-    console.log(stageStack)
-
     return (
         <>
             {!isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && isEditable && stageStack ? (
+            ) : proposal && isEditable && stageStack ? (
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box gap="medium">
@@ -99,10 +90,9 @@ export default function EditProposalPage() {
                                             )}
                                         </Box>
                                         <ProposalDescriptionForm
-                                            proposalInput={proposalInput}
-                                            setProposalInput={setProposalInput}
-                                            onSubmit={handleSave}
-                                            onCancel={onResetProposalInput}
+                                            editProposalContext={
+                                                editProposalContext
+                                            }
                                         />
                                     </Box>
                                 </Tab>
@@ -115,15 +105,13 @@ export default function EditProposalPage() {
                                             />
                                         </Box>
                                         <ProposalPricingForm
-                                            template={stageStack.template}
-                                            proposalInput={proposalInput}
-                                            setProposalInput={setProposalInput}
-                                            onSubmit={handleSave}
-                                            onCancel={onResetProposalInput}
+                                            editProposalContext={
+                                                editProposalContext
+                                            }
                                         />
                                     </Box>
                                 </Tab>
-                                {proposalInput.flexInputs.length > 0 && (
+                                {proposal.flexInputs.length > 0 && (
                                     <Tab title="Solver Config">
                                         <Box pad={{ top: 'medium' }}>
                                             <Box pad="xsmall">
@@ -134,26 +122,16 @@ export default function EditProposalPage() {
                                                 />
                                             </Box>
                                             <ProposalFlexInputsForm
-                                                composition={
-                                                    stageStack.composition
+                                                editProposalContext={
+                                                    editProposalContext
                                                 }
-                                                proposalInput={proposalInput}
-                                                setProposalInput={
-                                                    setProposalInput
-                                                }
-                                                onSubmit={handleSave}
-                                                onCancel={onResetProposalInput}
                                             />
                                         </Box>
                                     </Tab>
                                 )}
                             </Tabs>
                             <PlainSectionDivider />
-                            <ProposalSubmitControl
-                                onSave={onSaveProposal}
-                                proposalStreamID={proposalStreamID}
-                                isValidProposal={isValidProposal}
-                            />
+                            <ProposalSubmitControl />
                         </Box>
                     </PageLayout>
                     {proposalStatus !== ProposalStatus.Draft && currentUser && (

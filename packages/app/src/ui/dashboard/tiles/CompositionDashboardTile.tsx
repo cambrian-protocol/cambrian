@@ -32,6 +32,7 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import RenameCompositionModal from '../modals/RenameCompositionModal'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -79,9 +80,13 @@ const CompositionDashboardTile = ({
                     randimals(),
                     compositionStreamID
                 )
-                router.push(
-                    `${window.location.origin}/template/new/${streamID}`
-                )
+                if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
+                    router.push(`/profile/new/${streamID}?target=template`)
+                } else {
+                    router.push(
+                        `${window.location.origin}/template/new/${streamID}`
+                    )
+                }
             }
         } catch (e) {
             setIsCreatingTemplate(false)

@@ -8,30 +8,22 @@ import _ from 'lodash'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 export default function NewTemplatePage() {
+    const editTemplateContext = useEditTemplate()
     const {
         show404NotFound,
-        templateInput,
+        template,
         composition,
-        setTemplateInput,
-        templateStreamID,
-        onSaveTemplate,
         errorMessage,
         setErrorMessage,
-    } = useEditTemplate()
+    } = editTemplateContext
 
     return (
         <>
             {show404NotFound ? (
                 <Custom404Page />
-            ) : templateInput && composition ? (
+            ) : template && composition ? (
                 <PageLayout contextTitle="New Template" kind="narrow">
-                    <TemplateWizard
-                        composition={composition}
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        templateStreamID={templateStreamID as string}
-                        onSaveTemplate={onSaveTemplate}
-                    />
+                    <TemplateWizard editTemplateContext={editTemplateContext} />
                 </PageLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />
