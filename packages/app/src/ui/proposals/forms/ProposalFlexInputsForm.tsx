@@ -40,11 +40,15 @@ const ProposalFlexInputsForm = ({
     } = editProposalContext
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const [timelock, setTimelock] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-    })
+    const [timelock, setTimelock] = useState(
+        parseSecondsToForm(
+            parseInt(
+                proposal?.flexInputs.find(
+                    (fi) => fi.slotId === 'timelockSeconds'
+                )?.value || '0'
+            )
+        )
+    )
 
     const onChangeTime = ({
         days,

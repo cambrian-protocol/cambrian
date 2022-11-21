@@ -5,19 +5,19 @@ import {
 
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateRequirementsStepProps {
+    editTemplateContext: EditTemplateContextType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
 const TemplateRequirementsStep = ({
+    editTemplateContext,
     stepperCallback,
 }: TemplateRequirementsStepProps) => {
-    const { template, onSaveTemplate } = useEditTemplate()
+    const { template, onSaveTemplate } = editTemplateContext
 
     if (!template) {
         return null
@@ -31,13 +31,12 @@ const TemplateRequirementsStep = ({
                 />
             </Box>
             <TemplateRequirementsForm
+                editTemplateContext={editTemplateContext}
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
                     if ((await onSaveTemplate()) == true) {
                         console.log('calling back')
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
-                    } else {
-                        console.log('nope')
                     }
                 }}
                 cancelLabel={'Back'}

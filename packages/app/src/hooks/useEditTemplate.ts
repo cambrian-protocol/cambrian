@@ -15,6 +15,21 @@ import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
+export type EditTemplateContextType = {
+    template: TemplateModel | undefined
+    templateStreamID: string
+    cachedTemplate: TemplateModel | undefined
+    setTemplate: React.Dispatch<React.SetStateAction<TemplateModel | undefined>>
+    show404NotFound: boolean
+    composition: CompositionModel | undefined
+    onResetTemplate: () => void
+    onSaveTemplate: () => Promise<boolean>
+    errorMessage: ErrorMessageType | undefined
+    setErrorMessage: React.Dispatch<
+        React.SetStateAction<ErrorMessageType | undefined>
+    >
+}
+
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()

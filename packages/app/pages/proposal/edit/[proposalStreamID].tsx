@@ -20,20 +20,17 @@ import { useState } from 'react'
 
 export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
+    const editProposalContext = useEditProposal()
 
     const {
         stageStack,
         proposalStatus,
         proposal,
-        setProposal,
-        onSaveProposal,
-        onResetProposal,
         proposalStreamID,
-        isValidProposal,
         errorMessage,
         setErrorMessage,
         isLoaded,
-    } = useEditProposal()
+    } = editProposalContext
 
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -92,7 +89,11 @@ export default function EditProposalPage() {
                                                 </Box>
                                             )}
                                         </Box>
-                                        <ProposalDescriptionForm />
+                                        <ProposalDescriptionForm
+                                            editProposalContext={
+                                                editProposalContext
+                                            }
+                                        />
                                     </Box>
                                 </Tab>
                                 <Tab title="Pricing">
@@ -103,7 +104,11 @@ export default function EditProposalPage() {
                                                 title="How much are you willing to pay?"
                                             />
                                         </Box>
-                                        <ProposalPricingForm />
+                                        <ProposalPricingForm
+                                            editProposalContext={
+                                                editProposalContext
+                                            }
+                                        />
                                     </Box>
                                 </Tab>
                                 {proposal.flexInputs.length > 0 && (
@@ -116,7 +121,11 @@ export default function EditProposalPage() {
                                                     size="small"
                                                 />
                                             </Box>
-                                            <ProposalFlexInputsForm />
+                                            <ProposalFlexInputsForm
+                                                editProposalContext={
+                                                    editProposalContext
+                                                }
+                                            />
                                         </Box>
                                     </Tab>
                                 )}

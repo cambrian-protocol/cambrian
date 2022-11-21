@@ -12,10 +12,11 @@ import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplatePricingFormProps {
+    editTemplateContext: EditTemplateContextType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -23,13 +24,14 @@ interface TemplatePricingFormProps {
 }
 
 const TemplatePricingForm = ({
+    editTemplateContext,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        useEditTemplate()
+        editTemplateContext
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (

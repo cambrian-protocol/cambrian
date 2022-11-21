@@ -14,7 +14,8 @@ import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
 const EditTemplateUI = () => {
-    const { template, templateStreamID, cachedTemplate } = useEditTemplate()
+    const editTemplateContext = useEditTemplate()
+    const { template, templateStreamID, cachedTemplate } = editTemplateContext
     const [activeIndex, setActiveIndex] = useState(0)
     const [authorProfile] = useCambrianProfile(template?.author)
 
@@ -65,7 +66,9 @@ const EditTemplateUI = () => {
                             paragraph="Let the world know how you can help."
                         />
                     </Box>
-                    <TemplateDescriptionForm />
+                    <TemplateDescriptionForm
+                        editTemplateContext={editTemplateContext}
+                    />
                 </Tab>
                 <Tab title="Pricing">
                     <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
@@ -75,7 +78,9 @@ const EditTemplateUI = () => {
                             paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                         />
                     </Box>
-                    <TemplatePricingForm />
+                    <TemplatePricingForm
+                        editTemplateContext={editTemplateContext}
+                    />
                 </Tab>
                 {template.flexInputs.length > 0 && (
                     <Tab title="Solver Config">
@@ -86,7 +91,9 @@ const EditTemplateUI = () => {
                                 paragraph="Configure the Solver by completing these fields as instructed."
                             />
                         </Box>
-                        <TemplateFlexInputsForm />
+                        <TemplateFlexInputsForm
+                            editTemplateContext={editTemplateContext}
+                        />
                     </Tab>
                 )}
                 <Tab title="Requirements">
@@ -97,7 +104,9 @@ const EditTemplateUI = () => {
                             paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
                         />
                     </Box>
-                    <TemplateRequirementsForm />
+                    <TemplateRequirementsForm
+                        editTemplateContext={editTemplateContext}
+                    />
                 </Tab>
             </Tabs>
         </Box>

@@ -6,14 +6,15 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface TemplateRequirementsFormProps {
+    editTemplateContext: EditTemplateContextType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -25,13 +26,14 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
+    editTemplateContext,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        useEditTemplate()
+        editTemplateContext
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 

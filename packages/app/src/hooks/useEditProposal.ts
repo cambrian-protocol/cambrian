@@ -38,7 +38,6 @@ const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
-    const prevProposalStreamID = usePrevious(proposalStreamID)
 
     const [proposal, setProposal] = useState<ProposalModel>()
     const [stageStack, setStageStack] = useState<StageStackType>()
@@ -51,16 +50,7 @@ const useEditProposal = () => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
-        console.log(prevProposalStreamID, proposalStreamID)
-    }, [prevProposalStreamID])
-
-    useEffect(() => {
-        console.log('Description: ', proposal?.description)
-    }, [proposal])
-
-    useEffect(() => {
         if (router.isReady) {
-            console.log('Fetching proposal')
             fetchProposal()
         }
     }, [router, currentUser])

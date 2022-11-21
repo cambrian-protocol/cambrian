@@ -19,10 +19,13 @@ import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButto
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress } from 'ethers/lib/utils'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import useEditTemplate, {
+    EditTemplateContextType,
+} from '@cambrian/app/hooks/useEditTemplate'
 import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
+    editTemplateContext: EditTemplateContextType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -35,6 +38,7 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
+    editTemplateContext,
     onSubmit,
     onCancel,
     submitLabel,
@@ -46,14 +50,18 @@ const TemplateFlexInputsForm = ({
         setTemplate,
         onSaveTemplate,
         onResetTemplate,
-    } = useEditTemplate()
+    } = editTemplateContext
 
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [timelock, setTimelock] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-    })
+    const [timelock, setTimelock] = useState(
+        parseSecondsToForm(
+            parseInt(
+                template?.flexInputs.find(
+                    (fi) => fi.slotId === 'timelockSeconds'
+                )?.value || '0'
+            )
+        )
+    )
 
     const onChangeTime = ({
         days,

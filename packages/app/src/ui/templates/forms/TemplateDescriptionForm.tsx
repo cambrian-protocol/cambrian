@@ -13,7 +13,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 
@@ -22,6 +22,7 @@ export type TemplateDescriptionFormType = {
     description: string
 }
 interface TemplateDescriptionFormProps {
+    editTemplateContext: EditTemplateContextType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -29,13 +30,14 @@ interface TemplateDescriptionFormProps {
 }
 
 const TemplateDescriptionForm = ({
+    editTemplateContext,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateDescriptionFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        useEditTemplate()
+        editTemplateContext
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 

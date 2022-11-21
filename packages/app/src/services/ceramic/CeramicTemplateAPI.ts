@@ -26,6 +26,7 @@ import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -66,7 +67,11 @@ export default class CeramicTemplateAPI {
                             formFlexInputs.push({
                                 ...(solver.slotTags[tagId] as SlotTagModel),
                                 tagId: tagId,
-                                value: '',
+                                value:
+                                    tagId === 'timelockSeconds'
+                                        ? solver.config.timelockSeconds?.toString() ||
+                                          ''
+                                        : '', // TODO this is stupid
                             })
                             formFlexInputs.push()
                         }
