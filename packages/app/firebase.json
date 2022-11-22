@@ -13,10 +13,7 @@
                 "headers": [
                     {
                         "key": "Access-Control-Allow-Origin",
-                        "value": [
-                            "https://gnosis-safe.io",
-                            "https://app.cambrianprotocol.com/api/pinPinata"
-                        ]
+                        "value": "*"
                     },
                     {
                         "key": "Access-Control-Allow-Methods",
