@@ -7,11 +7,11 @@ import { SlotResponseType, SlotsHistoryHashMapType } from './SlotModel'
 import { BigNumber } from 'ethers'
 import { ModuleLoaderModel } from './ModuleModel'
 import { OutcomeCollectionsHashMapType } from './OutcomeCollectionModel'
-import { SlotTagsHashMapType } from './SlotTagModel'
 import { SolverConfigModel } from './SolverConfigModel'
 import { SolverTagModel } from './SolverTagModel'
 import { TimeLocksHashMapType } from './TimeLocksHashMapType'
 import { TokenModel } from './TokenModel'
+import { SlotTagsHashMapType } from '../classes/Tags/SlotTag'
 
 export type SolverModel = {
     config: SolverConfigModel

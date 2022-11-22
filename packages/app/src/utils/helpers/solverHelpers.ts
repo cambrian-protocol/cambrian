@@ -111,7 +111,7 @@ export const getSolverIngestWithMetaData = (
         const ulid = ethers.utils.parseBytes32String(ingestSlot.slot)
 
         // Fallback empty Slot
-        const tag: SlotTagModel =
+        const tag: Omit<SlotTagModel, 'solverId'> =
             slotTags && slotTags[ulid]
                 ? slotTags[ulid]
                 : {
