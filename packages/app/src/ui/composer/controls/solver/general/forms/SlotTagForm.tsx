@@ -5,7 +5,7 @@ import { Button } from 'grommet'
 import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
 import SlotTagFormFields from './SlotTagFormFields'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 

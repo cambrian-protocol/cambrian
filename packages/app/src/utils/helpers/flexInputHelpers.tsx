@@ -3,7 +3,7 @@ import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '@cambrian/app/ui/templates/forms/TemplateFlexInputsForm'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import _ from 'lodash'
 
 export const getFlexInputType = (

@@ -6,7 +6,7 @@ import SelectRecipient, {
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import SlotTagFormFields from '../../general/forms/SlotTagFormFields'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'

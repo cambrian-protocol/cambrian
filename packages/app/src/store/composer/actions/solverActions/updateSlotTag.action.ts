@@ -1,5 +1,5 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 
 const updateSlotTagAction = (
     state: CompositionModel,

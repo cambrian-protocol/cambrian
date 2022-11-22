@@ -1,5 +1,8 @@
 import { SolverTagModel } from './../models/SolverTagModel'
-import { SlotTagModel, SlotTagsHashMapType } from './../models/SlotTagModel'
+import {
+    SlotTagModel,
+    SlotTagsHashMapType,
+} from '@cambrian/app/src/classes/Tags/SlotTag'
 import { ethers } from 'ethers'
 import { ulid } from 'ulid'
 

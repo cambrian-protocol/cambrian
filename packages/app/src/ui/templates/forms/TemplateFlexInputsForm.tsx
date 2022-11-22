@@ -14,7 +14,7 @@ import {
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TaggedInput } from '@cambrian/app/models/SlotTagModel'
+import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'

@@ -1,7 +1,7 @@
 import { Box, Heading, ResponsiveContext, Text } from 'grommet'
 
 import PlainSectionDivider from '../sections/PlainSectionDivider'
-import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
 
 interface SolverConfigItemProps {
     id: string

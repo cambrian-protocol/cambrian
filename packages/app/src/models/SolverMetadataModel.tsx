@@ -1,4 +1,4 @@
-import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 

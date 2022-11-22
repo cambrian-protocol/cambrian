@@ -6,7 +6,7 @@ import {
 import {
     SlotTagModel,
     SlotTagsHashMapType,
-} from '@cambrian/app/models/SlotTagModel'
+} from '@cambrian/app/src/classes/Tags/SlotTag'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'

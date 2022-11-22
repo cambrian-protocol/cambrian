@@ -12,7 +12,7 @@ import BaseFormContainer from '@cambrian/app/components/containers/BaseFormConta
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import SlotTagFormFields from '../../../solver/general/forms/SlotTagFormFields'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
 import { useState } from 'react'

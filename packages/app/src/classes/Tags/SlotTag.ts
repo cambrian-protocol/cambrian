@@ -1,4 +1,20 @@
-import { SlotTagModel } from '../../models/SlotTagModel'
+export type SlotTagsHashMapType = {
+    [slotId: string]: SlotTag
+}
+
+// TODO Add icon
+export type SlotTagModel = {
+    solverId: string
+    slotId: string
+    isFlex: 'None' | 'Both' | 'Template' | 'Proposal'
+    label: string
+    description: string
+    instruction: string
+}
+
+export type TaggedInput = SlotTagModel & {
+    value: string
+}
 
 export const defaultSlotTagValues: SlotTagModel = {
     solverId: '',

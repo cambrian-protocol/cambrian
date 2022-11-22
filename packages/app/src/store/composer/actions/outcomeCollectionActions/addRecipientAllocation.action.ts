@@ -4,7 +4,7 @@ import { SelectRecipientType } from '@cambrian/app/components/selects/SelectReci
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { isSlot } from '@cambrian/app/utils/helpers/slotHelpers'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 
 const addRecipientAllocationAction = (
     state: CompositionModel,

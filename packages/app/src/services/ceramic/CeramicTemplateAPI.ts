@@ -25,7 +25,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
-import { SlotTagModel } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 
 /** 

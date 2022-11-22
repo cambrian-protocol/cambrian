@@ -2,7 +2,7 @@ import { Box, Text } from 'grommet'
 
 import { ComposerSlotModel } from '@cambrian/app/models/SlotModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
-import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { WarningCircle } from 'phosphor-react'
