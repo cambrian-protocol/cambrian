@@ -1,4 +1,4 @@
-import { SlotTagModel } from '../../models/SlotTagModel'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import SlotTag from './SlotTag'
 
 export default class TimelockSecondsTag extends SlotTag {
