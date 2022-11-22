@@ -344,25 +344,18 @@ export const updateStage = async (
                 }
             }
 
-            console.log(currentStage.commitId.toString())
-
             await currentStage.update(
                 { ...updatedStage, title: uniqueTitle },
                 { ...currentStage.metadata, tags: [uniqueTitle] },
                 { pin: true }
             )
 
-            console.log(currentStage.commitId.toString())
-
             cleanedUserTitle = uniqueTitle
         } else {
-            console.log(currentStage.commitId.toString())
-
             await currentStage.update({
                 ...updatedStage,
                 title: cleanedUserTitle,
             })
-            console.log(currentStage.commitId.toString())
         }
 
         // NOTE: Workaround until Ceramics load commitID Bugfix is merged
@@ -534,7 +527,6 @@ const findNextAnchor = (
     commitID: string,
     streamDoc: TileDocument<Record<string, any>>
 ) => {
-    console.log(streamDoc.allCommitIds)
     if (
         commitID ===
         streamDoc.anchorCommitIds[

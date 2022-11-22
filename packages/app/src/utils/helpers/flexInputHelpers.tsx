@@ -52,7 +52,6 @@ export const mergeFlexIntoComposition = (
                 (flexInput) => flexInput.solverId === solver.id
             )
             filteredFlexInputs.forEach((filteredFlexInput) => {
-                console.log(solver.slotTags[filteredFlexInput.tagId])
                 solver.slotTags[filteredFlexInput.tagId].update({
                     ...solver.slotTags[filteredFlexInput.tagId].metadata,
                     isFlex: filteredFlexInput.isFlex,

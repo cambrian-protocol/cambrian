@@ -35,7 +35,6 @@ const TemplateRequirementsStep = ({
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
                     if ((await onSaveTemplate()) == true) {
-                        console.log('calling back')
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
                     }
                 }}
