@@ -98,10 +98,10 @@ const providerOptions = {
     },
 }
 
-let web3Modal: any
+let web3Modal: Web3Modal
 if (typeof window !== 'undefined') {
     web3Modal = new Web3Modal({
-        network: 'mainnet',
+        // network: 'mainnet',
         cacheProvider: true,
         providerOptions,
         theme: 'dark',
@@ -170,6 +170,11 @@ export const UserContextProvider = ({
             const signer = web3Provider.getSigner()
             const address = await signer.getAddress()
             const network = await web3Provider.getNetwork()
+
+            if (network.chainId == 42161) {
+                web3Provider._maxFilterBlockRange = 300
+                web3Provider.pollingInterval = 1000
+            }
 
             const session = await loadSession(provider, network, address)
 
