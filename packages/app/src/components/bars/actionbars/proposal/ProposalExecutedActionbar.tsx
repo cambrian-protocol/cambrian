@@ -1,4 +1,8 @@
 import {
+    ReclaimableTokensType,
+    getAllReclaimableTokensFromProposal,
+} from '@cambrian/app/utils/helpers/redeemHelper'
+import {
     getSolverConfig,
     getSolverData,
     getSolverMetadata,
@@ -12,6 +16,8 @@ import BaseActionbar from '../BaseActionbar'
 import { Button } from 'grommet'
 import { Cursor } from 'phosphor-react'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import ReclaimTokensModal from '@cambrian/app/ui/common/modals/ReclaimTokensModal'
 import SolverListModal from '@cambrian/app/ui/common/modals/SolverListModal'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -33,76 +39,92 @@ const ProposalExecutedActionbar = ({
     messenger,
 }: ProposalExecutedActionbarProps) => {
     const router = useRouter()
-    const [solvers, setSolvers] = useState<SolverInfoType[]>([])
+    const [solvers, setSolvers] = useState<SolverInfoType[]>()
     const [showSolverListModal, setShowSolverListModal] = useState(false)
+    const [reclaimableTokens, setReclaimableTokens] =
+        useState<ReclaimableTokensType>()
+    const [showReclaimTokensModal, setShowReclaimTokensModal] = useState(false)
 
-    const viewSolvers = () => {
-        if (solvers.length == 1) {
-            router.push(`/solver/${solvers[0].address}`)
-        } else {
-            toggleShowSolverListModal()
-        }
-    }
+    const toggleShowReclaimTokensModal = () =>
+        setShowReclaimTokensModal(!showReclaimTokensModal)
 
     const toggleShowSolverListModal = () =>
         setShowSolverListModal(!showSolverListModal)
 
     useEffect(() => {
         initSolverAddress()
-    }, [currentUser])
+        initReclaimableTokens()
+    }, [])
+
+    const initReclaimableTokens = async () => {
+        setReclaimableTokens(
+            await getAllReclaimableTokensFromProposal(
+                proposalContract,
+                currentUser
+            )
+        )
+    }
+
+    const viewSolvers = () => {
+        if (solvers) {
+            if (solvers.length > 1) {
+                toggleShowSolverListModal()
+            } else {
+                router.push(`/solver/${solvers[0].address}`)
+            }
+        }
+    }
 
     const initSolverAddress = async () => {
-        if (currentUser && proposalContract) {
-            const ipfsSolutionsHub = new IPFSSolutionsHub(
-                currentUser.signer,
-                currentUser.chainId
+        const ipfsSolutionsHub = new IPFSSolutionsHub(
+            currentUser.signer,
+            currentUser.chainId
+        )
+        const solverAddresses = await ipfsSolutionsHub.getSolvers(
+            proposalContract.solutionId
+        )
+        if (solverAddresses && solverAddresses.length > 0) {
+            const solvers = await Promise.all(
+                solverAddresses.map(async (solverAddress) => {
+                    const solverContract = new ethers.Contract(
+                        solverAddress,
+                        BASE_SOLVER_IFACE,
+                        currentUser.signer
+                    )
+                    const solverMethods = getSolverMethods(
+                        solverContract.interface,
+                        async (method: string, ...args: any[]) =>
+                            await solverContract[method](...args)
+                    )
+                    const fetchedMetadata = await getSolverMetadata(
+                        solverContract,
+                        currentUser.signer,
+                        currentUser.chainId
+                    )
+
+                    const fetchedSolverConfig = await getSolverConfig(
+                        solverContract
+                    )
+                    const fetchedOutcomes = await getSolverOutcomes(
+                        fetchedSolverConfig
+                    )
+
+                    const solverData = await getSolverData(
+                        solverContract,
+                        solverMethods,
+                        currentUser,
+                        fetchedOutcomes,
+                        fetchedMetadata,
+                        fetchedSolverConfig
+                    )
+
+                    return {
+                        address: solverAddress,
+                        data: solverData,
+                    }
+                })
             )
-            const solverAddresses = await ipfsSolutionsHub.getSolvers(
-                proposalContract.solutionId
-            )
-            if (solverAddresses && solverAddresses.length > 0) {
-                const solvers = await Promise.all(
-                    solverAddresses.map(async (solverAddress) => {
-                        const solverContract = new ethers.Contract(
-                            solverAddress,
-                            BASE_SOLVER_IFACE,
-                            currentUser.signer
-                        )
-                        const solverMethods = getSolverMethods(
-                            solverContract.interface,
-                            async (method: string, ...args: any[]) =>
-                                await solverContract[method](...args)
-                        )
-                        const fetchedMetadata = await getSolverMetadata(
-                            solverContract,
-                            currentUser.signer,
-                            currentUser.chainId
-                        )
-
-                        const fetchedSolverConfig = await getSolverConfig(
-                            solverContract
-                        )
-                        const fetchedOutcomes = await getSolverOutcomes(
-                            fetchedSolverConfig
-                        )
-
-                        const solverData = await getSolverData(
-                            solverContract,
-                            solverMethods,
-                            currentUser,
-                            fetchedOutcomes,
-                            fetchedMetadata,
-                            fetchedSolverConfig
-                        )
-
-                        return {
-                            address: solverAddress,
-                            data: solverData,
-                        }
-                    })
-                )
-                setSolvers(solvers)
-            }
+            setSolvers(solvers)
         }
     }
 
@@ -110,13 +132,34 @@ const ProposalExecutedActionbar = ({
         <>
             <BaseActionbar
                 messenger={messenger}
+                secondaryAction={
+                    reclaimableTokens && (
+                        <LoaderButton
+                            isLoading={solvers === undefined}
+                            secondary
+                            size="small"
+                            label="View Solver"
+                            onClick={viewSolvers}
+                        />
+                    )
+                }
                 primaryAction={
-                    <Button
-                        primary
-                        size="small"
-                        label="View Solver"
-                        onClick={viewSolvers}
-                    />
+                    reclaimableTokens ? (
+                        <Button
+                            size="small"
+                            primary
+                            label={'Reclaim'}
+                            onClick={toggleShowReclaimTokensModal}
+                        />
+                    ) : (
+                        <LoaderButton
+                            isLoading={solvers === undefined}
+                            primary
+                            size="small"
+                            label="View Solver"
+                            onClick={viewSolvers}
+                        />
+                    )
                 }
                 info={{
                     title: 'View Solver',
@@ -135,10 +178,19 @@ const ProposalExecutedActionbar = ({
                     ),
                 }}
             />
-            {showSolverListModal && (
+            {showSolverListModal && solvers && (
                 <SolverListModal
                     solverInfos={solvers}
                     onClose={toggleShowSolverListModal}
+                />
+            )}
+            {showReclaimTokensModal && reclaimableTokens && (
+                <ReclaimTokensModal
+                    currentUser={currentUser}
+                    collateralTokenAddress={proposalContract.collateralToken}
+                    reclaimableTokens={reclaimableTokens}
+                    onClose={toggleShowReclaimTokensModal}
+                    initReclaimableTokens={initReclaimableTokens}
                 />
             )}
         </>
