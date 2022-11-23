@@ -88,8 +88,6 @@ export default class ComposerSolver {
             banner: '',
             avatar: '',
         }
-
-        console.log(this)
     }
 
     /*************************** Title & Keeper & Arbitrator & Timelock & "Core" Data ***************************/
