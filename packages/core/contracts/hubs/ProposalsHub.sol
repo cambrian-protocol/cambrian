@@ -306,32 +306,32 @@ contract ProposalsHub is ERC1155Receiver {
             "ProposalsHub::msg.sender has no claim"
         );
 
-        uint256 _claimAmount = ABDKMath64x64.toUInt(
-            ABDKMath64x64.div(
-                ABDKMath64x64.fromUInt(reclaimableTokens[proposalId][tokenId]),
-                ABDKMath64x64.div(
-                    ABDKMath64x64.fromUInt(proposals[proposalId].funding),
-                    ABDKMath64x64.fromUInt(
-                        funderAmountMap[proposalId][msg.sender]
-                    )
-                )
-            )
+        int128 _coefficient = ABDKMath64x64.divu(
+            funderAmountMap[proposalId][msg.sender],
+            proposals[proposalId].funding
+        );
+
+        uint256 _claimAmount = ABDKMath64x64.mulu(
+            _coefficient,
+            reclaimableTokens[proposalId][tokenId]
         ) - reclaimedTokens[tokenId][msg.sender];
 
-        require(_claimAmount > 0, "ProposalsHub::Claim is 0");
-        require(
-            _claimAmount <= reclaimableTokens[proposalId][tokenId],
-            "ProposalsHub::Claim is too large"
-        );
-        reclaimedTokens[tokenId][msg.sender] += _claimAmount;
+        if (_claimAmount > 0) {
+            // require(_claimAmount > 0, "ProposalsHub::Claim is 0");
+            require(
+                _claimAmount <= reclaimableTokens[proposalId][tokenId],
+                "ProposalsHub::Claim is too large"
+            );
+            reclaimedTokens[tokenId][msg.sender] += _claimAmount;
 
-        conditionalTokens.safeTransferFrom(
-            address(this),
-            msg.sender,
-            tokenId,
-            _claimAmount,
-            abi.encode(proposalId)
-        );
+            conditionalTokens.safeTransferFrom(
+                address(this),
+                msg.sender,
+                tokenId,
+                _claimAmount,
+                abi.encode(proposalId)
+            );
+        }
     }
 
     /** 
