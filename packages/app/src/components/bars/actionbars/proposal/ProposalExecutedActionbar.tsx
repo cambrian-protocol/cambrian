@@ -17,11 +17,13 @@ import { Button } from 'grommet'
 import { Cursor } from 'phosphor-react'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { PriceModel } from './ProposalReviewActionbar'
 import ReclaimTokensModal from '@cambrian/app/ui/common/modals/ReclaimTokensModal'
 import SolverListModal from '@cambrian/app/ui/common/modals/SolverListModal'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
+import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { getSolverMethods } from '@cambrian/app/utils/helpers/solverHelpers'
 import { useRouter } from 'next/router'
 
@@ -44,6 +46,7 @@ const ProposalExecutedActionbar = ({
     const [reclaimableTokens, setReclaimableTokens] =
         useState<ReclaimableTokensType>()
     const [showReclaimTokensModal, setShowReclaimTokensModal] = useState(false)
+    const [proposalPriceInfo, setProposalPriceInfo] = useState<PriceModel>()
 
     const toggleShowReclaimTokensModal = () =>
         setShowReclaimTokensModal(!showReclaimTokensModal)
@@ -54,7 +57,23 @@ const ProposalExecutedActionbar = ({
     useEffect(() => {
         initSolverAddress()
         initReclaimableTokens()
+        initCollateralToken()
     }, [])
+
+    // To be refactored and put to proposalContext
+    const initCollateralToken = async () => {
+        const fundingGoal = ethers.utils.formatUnits(
+            proposalContract.fundingGoal
+        )
+        const collateralToken = await fetchTokenInfo(
+            proposalContract.collateralToken,
+            currentUser.signer
+        )
+        setProposalPriceInfo({
+            amount: Number(fundingGoal),
+            token: collateralToken,
+        })
+    }
 
     const initReclaimableTokens = async () => {
         setReclaimableTokens(
@@ -184,15 +203,16 @@ const ProposalExecutedActionbar = ({
                     onClose={toggleShowSolverListModal}
                 />
             )}
-            {showReclaimTokensModal && reclaimableTokens && (
-                <ReclaimTokensModal
-                    currentUser={currentUser}
-                    collateralTokenAddress={proposalContract.collateralToken}
-                    reclaimableTokens={reclaimableTokens}
-                    onClose={toggleShowReclaimTokensModal}
-                    initReclaimableTokens={initReclaimableTokens}
-                />
-            )}
+            {showReclaimTokensModal &&
+                reclaimableTokens &&
+                proposalPriceInfo && (
+                    <ReclaimTokensModal
+                        proposalPriceInfo={proposalPriceInfo}
+                        reclaimableTokens={reclaimableTokens}
+                        onClose={toggleShowReclaimTokensModal}
+                        updateReclaimableTokens={initReclaimableTokens}
+                    />
+                )}
         </>
     )
 }
