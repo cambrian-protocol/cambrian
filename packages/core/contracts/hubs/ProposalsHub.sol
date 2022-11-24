@@ -11,6 +11,8 @@ import "../interfaces/IConditionalTokens.sol";
 
 import "../solvers/SolverLib.sol";
 
+import "../ABDKMath64x64.sol";
+
 contract ProposalsHub is ERC1155Receiver {
     using SafeERC20 for IERC20;
 
@@ -303,11 +305,19 @@ contract ProposalsHub is ERC1155Receiver {
             funderAmountMap[proposalId][msg.sender] > 0,
             "ProposalsHub::msg.sender has no claim"
         );
-        uint256 _claimDenominator = proposals[proposalId].funding /
-            funderAmountMap[proposalId][msg.sender];
 
-        uint256 _claimAmount = (reclaimableTokens[proposalId][tokenId] /
-            _claimDenominator) - reclaimedTokens[tokenId][msg.sender];
+        uint256 _claimAmount = ABDKMath64x64.toUInt(
+            ABDKMath64x64.div(
+                ABDKMath64x64.fromUInt(reclaimableTokens[proposalId][tokenId]),
+                ABDKMath64x64.div(
+                    ABDKMath64x64.fromUInt(proposals[proposalId].funding),
+                    ABDKMath64x64.fromUInt(
+                        funderAmountMap[proposalId][msg.sender]
+                    )
+                )
+            )
+        ) - reclaimedTokens[tokenId][msg.sender];
+
         require(_claimAmount > 0, "ProposalsHub::Claim is 0");
         require(
             _claimAmount <= reclaimableTokens[proposalId][tokenId],
