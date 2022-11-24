@@ -1,18 +1,20 @@
 import _, { result } from 'lodash'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
+import PROPOSALSHUB_ARBITRUM from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
+import PROPOSALSHUB_GOERLI from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import PROPOSALSHUB_LOCAL from '@cambrian/core/deployments/localhost/ProposalsHub.json'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
 import { getParsedSolvers } from './proposalHelper'
-import PROPOSALSHUB_GOERLI from '@cambrian/core/deployments/goerli/ProposalsHub.json'
-import PROPOSALSHUB_ARBITRUM from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
 
 const PROPOSALHUBS = [
     PROPOSALSHUB_GOERLI.address,
     PROPOSALSHUB_ARBITRUM.address,
+    PROPOSALSHUB_LOCAL.address,
 ]
 
 /**
