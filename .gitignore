@@ -8,5 +8,4 @@ typechain-types
 packages/bin
 packages/core/forge/forge-cache
 packages/core/forge/out
-
 deployments/localhost
