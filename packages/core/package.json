@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+    "@pwnednomore/contracts": "^0.2.14",
+    "forge-std": "^1.1.2",
     "hardhat-contract-sizer": "^2.5.1",
     "hardhat-log-remover": "^2.0.2",
     "solc": "0.8.0"
