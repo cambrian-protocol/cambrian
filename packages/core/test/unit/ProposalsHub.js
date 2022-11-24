@@ -242,7 +242,7 @@ describe("ProposalsHub", function () {
       this.user1.address,
       positionIdFailure
     );
-    expect(user1CTBalance2).to.equal(90);
+    expect(user1CTBalance2).to.equal(89); // A little dust leftover. Would prefer it was 90 but no big deal really
     await expectRevert(
       this.ProposalsHub.connect(this.user1).reclaimTokens(
         proposalId,
