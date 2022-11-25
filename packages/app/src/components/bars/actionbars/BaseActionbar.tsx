@@ -40,7 +40,7 @@ const BaseActionbar = ({
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [windowSize])
+    }, [windowSize, info, secondaryAction, primaryAction])
 
     return (
         <Box
