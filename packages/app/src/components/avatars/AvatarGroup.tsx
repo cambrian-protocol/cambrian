@@ -40,7 +40,7 @@ const AvatarGroup = ({ participants }: AvatarGroupProps) => (
                 <Text truncate>
                     {participants.map(
                         (p, idx) =>
-                            `${p.content.name}${
+                            `${p.content.name || 'Anon'}${
                                 participants.length > idx + 1 ? ', ' : ''
                             }`
                     )}
