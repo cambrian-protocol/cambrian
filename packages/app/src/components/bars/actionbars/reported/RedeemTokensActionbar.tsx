@@ -315,11 +315,11 @@ const RedeemTokensActionbar = ({
 
     const reclaimInfo = {
         title: 'Reclaim tokens',
-        subTitle: '',
+        subTitle: 'You have tokens to reclaim',
         dropContent: (
             <ActionbarItemDropContainer
                 title="Reclaim tokens"
-                description='Hit the "Reclaim Tokens"-Button and confirm the transaction to receive your share.'
+                description='Hit the "Reclaim Tokens"-Button, reclaim and redeem your invested fundings.'
                 list={[]}
             />
         ),
@@ -347,7 +347,7 @@ const RedeemTokensActionbar = ({
                     secondaryAction={
                         reclaimableTokens ? (
                             <Button
-                                label="Reclaim"
+                                label="Reclaims"
                                 secondary
                                 size="small"
                                 onClick={toggleShowReclaimTokenModal}
@@ -377,7 +377,7 @@ const RedeemTokensActionbar = ({
                     secondaryAction={
                         reclaimableTokens ? (
                             <Button
-                                label="Reclaim"
+                                label="Reclaims"
                                 secondary
                                 size="small"
                                 onClick={toggleShowReclaimTokenModal}
