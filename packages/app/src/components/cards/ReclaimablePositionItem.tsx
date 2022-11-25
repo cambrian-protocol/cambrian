@@ -1,3 +1,4 @@
+import { BigNumber, ethers } from 'ethers'
 import { Box, Heading, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
@@ -6,17 +7,17 @@ import BaseTokenItem from '../token/BaseTokenItem'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CheckCircle } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
-import { PriceModel } from '../bars/actionbars/proposal/ProposalReviewActionbar'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { ReclaimablePositionType } from '@cambrian/app/utils/helpers/redeemHelper'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ethers } from 'ethers'
 
 interface ReclaimablePositionItemProps {
     proposalId: string
+    collateralToken: TokenModel
+    fundingGoal: BigNumber
     reclaimablePosition: ReclaimablePositionType
-    proposalPriceInfo: PriceModel
     solverAddress: string
     currentUser: UserType
     updateReclaimableTokens: () => Promise<void>
@@ -24,10 +25,11 @@ interface ReclaimablePositionItemProps {
 
 const ReclaimablePositionItem = ({
     reclaimablePosition,
-    proposalPriceInfo,
     proposalId,
     solverAddress,
     currentUser,
+    collateralToken,
+    fundingGoal,
     updateReclaimableTokens,
 }: ReclaimablePositionItemProps) => {
     const proposalsHub = new ProposalsHub(
@@ -35,12 +37,12 @@ const ReclaimablePositionItem = ({
         currentUser.chainId
     )
     const ctf = new CTFContract(currentUser.signer, currentUser.chainId)
+    const solverContract = new ethers.Contract(
+        solverAddress,
+        BASE_SOLVER_IFACE,
+        currentUser.signer
+    )
     const hasReclaimed = !reclaimablePosition.funderReclaimed.eq(0)
-    const funderPercentage = proposalPriceInfo.amount
-        ? (Number(ethers.utils.formatUnits(reclaimablePosition.funderAmount)) *
-              100) /
-          proposalPriceInfo.amount
-        : 0
 
     const [isReclaiming, setIsReclaiming] = useState<string>()
     const [hasRedeemed, setHasRedeemed] = useState(false)
@@ -50,11 +52,6 @@ const ReclaimablePositionItem = ({
     }, [])
 
     const init = async () => {
-        const solverContract = new ethers.Contract(
-            solverAddress,
-            BASE_SOLVER_IFACE,
-            currentUser.signer
-        )
         const conditions: SolverContractCondition[] =
             await solverContract.getConditions()
         if (conditions && conditions.length > 0) {
@@ -65,7 +62,7 @@ const ReclaimablePositionItem = ({
                 const payoutRedemptionFilter =
                     ctf.contract.filters.PayoutRedemption(
                         currentUser.address,
-                        proposalPriceInfo.token?.address,
+                        collateralToken.address,
                         null,
                         null,
                         null
@@ -87,11 +84,6 @@ const ReclaimablePositionItem = ({
     const redeemTokens = async (conditionId: string) => {
         setIsReclaiming(solverAddress)
         try {
-            const solverContract = new ethers.Contract(
-                solverAddress,
-                BASE_SOLVER_IFACE,
-                currentUser.signer
-            )
             const conditions: SolverContractCondition[] =
                 await solverContract.getConditions()
             if (conditions && conditions.length > 0) {
@@ -102,7 +94,7 @@ const ReclaimablePositionItem = ({
                     const solverConfig = await solverContract.getConfig()
                     const tx: ethers.ContractTransaction =
                         await ctf.contract.redeemPositions(
-                            proposalPriceInfo.token?.address,
+                            collateralToken.address,
                             condition.parentCollectionId,
                             conditionId,
                             solverConfig.conditionBase.partition
@@ -147,32 +139,33 @@ const ReclaimablePositionItem = ({
                     <Box direction="row" align="end">
                         <Box flex gap="xsmall">
                             <Text color="dark-4" size="small">
-                                Total funding: {proposalPriceInfo.amount}{' '}
-                                {proposalPriceInfo.token?.name}
+                                Total funding:{' '}
+                                {ethers.utils.formatUnits(fundingGoal)}{' '}
+                                {collateralToken.name}
                             </Text>
                             <Text color="dark-4" size="small">
                                 Total reclaimable:{' '}
                                 {ethers.utils.formatUnits(
                                     reclaimablePosition.totalReclaimable
                                 )}{' '}
-                                {proposalPriceInfo.token?.name}
+                                {collateralToken.name}
                             </Text>
                             <Text color="dark-4" size="small">
                                 Your invested funds:{' '}
                                 {ethers.utils.formatUnits(
                                     reclaimablePosition.funderAmount
                                 )}{' '}
-                                {proposalPriceInfo.token?.name} (
-                                {funderPercentage}%)
+                                {collateralToken.name} (
+                                {reclaimablePosition.percentage}%)
                             </Text>
                         </Box>
                         <Box>
                             <Text size="xsmall" color="dark-4">
-                                {funderPercentage}% of{' '}
+                                {reclaimablePosition.percentage}% of{' '}
                                 {ethers.utils.formatUnits(
                                     reclaimablePosition.totalReclaimable
                                 )}{' '}
-                                {proposalPriceInfo.token?.symbol}
+                                {collateralToken.name}
                             </Text>
                             <Box direction="row" gap="small" align="center">
                                 <Box width={{ min: 'xsmall' }}>
@@ -183,9 +176,7 @@ const ReclaimablePositionItem = ({
                                     </Text>
                                 </Box>
                                 <BaseTokenItem
-                                    tokenAddress={
-                                        proposalPriceInfo.token?.address
-                                    }
+                                    tokenAddress={collateralToken.address}
                                 />
                             </Box>
                         </Box>
@@ -220,7 +211,7 @@ const ReclaimablePositionItem = ({
                         hasRedeemed
                             ? 'Succesfully redeemed your'
                             : 'Redeem your'
-                    } ${proposalPriceInfo.token?.symbol}`}
+                    } ${collateralToken.name}`}
                     onClick={() => {
                         redeemTokens(reclaimablePosition.conditionId)
                     }}

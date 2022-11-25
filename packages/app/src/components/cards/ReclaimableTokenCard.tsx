@@ -1,13 +1,15 @@
+import { BigNumber } from 'ethers'
 import { Box } from 'grommet'
-import { PriceModel } from '../bars/actionbars/proposal/ProposalReviewActionbar'
 import ReclaimablePositionItem from './ReclaimablePositionItem'
 import { ReclaimablePositionType } from '@cambrian/app/utils/helpers/redeemHelper'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ReclaimableTokenCardProps {
     proposalId: string
     solverAddress: string
-    proposalPriceInfo: PriceModel
+    collateralToken: TokenModel
+    fundingGoal: BigNumber
     reclaimablePositions: ReclaimablePositionType[]
     updateReclaimableTokens: () => Promise<void>
 }
@@ -15,7 +17,8 @@ interface ReclaimableTokenCardProps {
 const ReclaimableTokenCard = ({
     proposalId,
     reclaimablePositions,
-    proposalPriceInfo,
+    collateralToken,
+    fundingGoal,
     solverAddress,
     updateReclaimableTokens,
 }: ReclaimableTokenCardProps) => {
@@ -34,9 +37,10 @@ const ReclaimableTokenCard = ({
                         <ReclaimablePositionItem
                             proposalId={proposalId}
                             solverAddress={solverAddress}
+                            fundingGoal={fundingGoal}
+                            collateralToken={collateralToken}
                             currentUser={currentUser}
                             reclaimablePosition={reclaimablePosition}
-                            proposalPriceInfo={proposalPriceInfo}
                             updateReclaimableTokens={updateReclaimableTokens}
                         />
                     )

@@ -2,8 +2,12 @@ import BaseActionbar, {
     ActionbarInfoType,
 } from '@cambrian/app/components/bars/actionbars/BaseActionbar'
 import { BigNumber, ethers } from 'ethers'
-import { Box, Text } from 'grommet'
+import { Box, Button, Text } from 'grommet'
 import { Coin, Confetti, Info } from 'phosphor-react'
+import {
+    ReclaimableTokensType,
+    getReclaimableTokensFromSolver,
+} from '@cambrian/app/utils/helpers/redeemHelper'
 import {
     calculateCollectionId,
     calculatePositionId,
@@ -13,10 +17,10 @@ import { useEffect, useState } from 'react'
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import DefaultRecipientActionbar from '../solver/DefaultRecipientActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import LoaderButton from '../../../buttons/LoaderButton'
+import ReclaimTokensModal from '@cambrian/app/ui/common/modals/ReclaimTokensModal'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -26,6 +30,7 @@ import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 interface RedeemTokensActionbarProps {
+    solverAddress: string
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
@@ -33,6 +38,7 @@ interface RedeemTokensActionbarProps {
 }
 
 const RedeemTokensActionbar = ({
+    solverAddress,
     currentCondition,
     solverData,
     currentUser,
@@ -45,6 +51,11 @@ const RedeemTokensActionbar = ({
     const [redeemedAmount, setRedeemedAmount] = useState<number>()
     const [isRedeeming, setIsRedeeming] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const [reclaimableTokens, setReclaimableTokens] =
+        useState<ReclaimableTokensType>()
+    const [showReclaimTokenModal, setShowReclaimTokenModal] = useState(false)
+    const toggleShowReclaimTokenModal = () =>
+        setShowReclaimTokenModal(!showReclaimTokenModal)
 
     const payoutRedemptionFilter = ctf.contract.filters.PayoutRedemption(
         currentUser.address,
@@ -57,6 +68,7 @@ const RedeemTokensActionbar = ({
 
     useEffect(() => {
         init()
+        initReclaimableTokens()
         return () => {
             ctf.contract.removeListener(
                 payoutRedemptionFilter,
@@ -64,6 +76,16 @@ const RedeemTokensActionbar = ({
             )
         }
     }, [currentUser])
+
+    const initReclaimableTokens = async () => {
+        setReclaimableTokens(
+            await getReclaimableTokensFromSolver(
+                solverAddress,
+                currentCondition.conditionId,
+                currentUser
+            )
+        )
+    }
 
     const init = async () => {
         try {
@@ -291,6 +313,18 @@ const RedeemTokensActionbar = ({
         }
     }
 
+    const reclaimInfo = {
+        title: 'Reclaim tokens',
+        subTitle: '',
+        dropContent: (
+            <ActionbarItemDropContainer
+                title="Reclaim tokens"
+                description='Hit the "Reclaim Tokens"-Button and confirm the transaction to receive your share.'
+                list={[]}
+            />
+        ),
+    }
+
     return (
         <>
             {redeemedAmount ? (
@@ -309,6 +343,16 @@ const RedeemTokensActionbar = ({
                                     : 'Tokens'
                             }`}</Text>
                         </Box>
+                    }
+                    secondaryAction={
+                        reclaimableTokens ? (
+                            <Button
+                                label="Reclaim"
+                                secondary
+                                size="small"
+                                onClick={toggleShowReclaimTokenModal}
+                            />
+                        ) : undefined
                     }
                 />
             ) : payoutAmount ? (
@@ -330,9 +374,39 @@ const RedeemTokensActionbar = ({
                             }`}
                         />
                     }
+                    secondaryAction={
+                        reclaimableTokens ? (
+                            <Button
+                                label="Reclaim"
+                                secondary
+                                size="small"
+                                onClick={toggleShowReclaimTokenModal}
+                            />
+                        ) : undefined
+                    }
                 />
             ) : (
-                <DefaultRecipientActionbar messenger={messenger} />
+                <BaseActionbar
+                    messenger={messenger}
+                    info={reclaimableTokens ? reclaimInfo : undefined}
+                    primaryAction={
+                        reclaimableTokens ? (
+                            <Button
+                                label="Reclaim"
+                                primary
+                                size="small"
+                                onClick={toggleShowReclaimTokenModal}
+                            />
+                        ) : undefined
+                    }
+                />
+            )}
+            {showReclaimTokenModal && reclaimableTokens && (
+                <ReclaimTokensModal
+                    onClose={toggleShowReclaimTokenModal}
+                    reclaimableTokens={reclaimableTokens}
+                    updateReclaimableTokens={initReclaimableTokens}
+                />
             )}
             {errMsg && (
                 <ErrorPopupModal

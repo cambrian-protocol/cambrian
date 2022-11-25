@@ -1,13 +1,11 @@
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { PriceModel } from '@cambrian/app/components/bars/actionbars/proposal/ProposalReviewActionbar'
 import ReclaimableTokenCard from '@cambrian/app/components/cards/ReclaimableTokenCard'
 import { ReclaimableTokensType } from '@cambrian/app/utils/helpers/redeemHelper'
 
 interface ReclaimTokensModalProps {
     reclaimableTokens: ReclaimableTokensType
-    proposalPriceInfo: PriceModel
     onClose: () => void
     updateReclaimableTokens: () => Promise<void>
 }
@@ -15,7 +13,6 @@ interface ReclaimTokensModalProps {
 const ReclaimTokensModal = ({
     onClose,
     reclaimableTokens,
-    proposalPriceInfo,
     updateReclaimableTokens,
 }: ReclaimTokensModalProps) => {
     return (
@@ -28,7 +25,9 @@ const ReclaimTokensModal = ({
                 {Object.keys(reclaimableTokens.reclaimableSolvers).map(
                     (solverAddress) => (
                         <ReclaimableTokenCard
-                            proposalPriceInfo={proposalPriceInfo}
+                            key={solverAddress}
+                            fundingGoal={reclaimableTokens.totalFunding}
+                            collateralToken={reclaimableTokens.collateralToken}
                             proposalId={reclaimableTokens.proposalId}
                             solverAddress={solverAddress}
                             reclaimablePositions={
