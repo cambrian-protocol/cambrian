@@ -7,9 +7,9 @@ import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal
 import ProposalPreview from './ProposalPreview'
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalUIProps {
@@ -26,10 +26,12 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
 
     const initCollateralToken = async () => {
         if (stageStack && currentUser) {
-            const ct = await fetchTokenInfo(
+            const ct = await TokenAPI.getTokenInfo(
                 stageStack.proposal.price.tokenAddress,
-                currentUser.web3Provider
+                currentUser.web3Provider,
+                currentUser.chainId
             )
+
             if (ct) setCollateralToken(ct)
         }
     }

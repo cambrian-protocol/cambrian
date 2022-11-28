@@ -2,9 +2,8 @@ import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseTokenLogo from './BaseTokenLogo'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
-import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 type BaseTokenBadgeProps =
@@ -33,23 +32,19 @@ const BaseTokenBadge = ({
     useEffect(() => {
         if (token) {
             setToken(token)
-        } else if (tokenAddress) {
+        } else if (tokenAddress && currentUser) {
             initTokenAddress(tokenAddress)
         }
-    }, [tokenAddress, token])
+    }, [tokenAddress, token, currentUser])
 
     const initTokenAddress = async (tokenAddress: string) => {
-        const _token = tokenList.tokens.find(
-            (token) =>
-                token.address === tokenAddress &&
-                token.chainId === currentUser?.chainId
-        )
-
-        if (_token) {
-            setToken(_token)
-        } else if (currentUser) {
+        if (currentUser) {
             setToken(
-                await fetchTokenInfo(tokenAddress, currentUser.web3Provider)
+                await TokenAPI.getTokenInfo(
+                    tokenAddress,
+                    currentUser.web3Provider,
+                    currentUser.chainId
+                )
             )
         }
     }

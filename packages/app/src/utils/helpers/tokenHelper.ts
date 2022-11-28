@@ -1,26 +1,6 @@
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ethers } from 'ethers'
-
-export const fetchTokenInfo = async (
-    address: string,
-    provider: ethers.providers.Provider
-) => {
-    if (address && address.length === 42) {
-        const token = await TokenAPI.getTokenInfo(address, provider)
-        if (token) {
-            return token
-        }
-    }
-    const network = await provider.getNetwork()
-    return <TokenModel>{
-        chainId: network.chainId,
-        symbol: '??',
-        address: address,
-        decimals: 18,
-    }
-}
 
 export const getAllTokenInfoList = async (
     selectedTokenAddresses: string[],
@@ -45,9 +25,10 @@ export const getAllTokenInfoList = async (
                     )
                 ) {
                     _tokenList.unshift(
-                        await fetchTokenInfo(
+                        await TokenAPI.getTokenInfo(
                             selectedTokenAddress,
-                            currentUser.web3Provider
+                            currentUser.web3Provider,
+                            currentUser.chainId
                         )
                     )
                 }
@@ -76,9 +57,10 @@ export const getTokenInfoListFromAddresses = async (
                     ) === -1
                 ) {
                     _tokenList.unshift(
-                        await fetchTokenInfo(
+                        await TokenAPI.getTokenInfo(
                             tokenAddress,
-                            currentUser.web3Provider
+                            currentUser.web3Provider,
+                            currentUser.chainId
                         )
                     )
                 }
@@ -112,7 +94,13 @@ export const findTokenWithAddress = async (
     if (filteredListByAddress.length === 1) {
         return filteredListByAddress
     } else if (filteredListByAddress.length === 0 && fetchForeignToken) {
-        return [await fetchTokenInfo(addressQuery, currentUser.web3Provider)]
+        return [
+            await TokenAPI.getTokenInfo(
+                addressQuery,
+                currentUser.web3Provider,
+                currentUser.chainId
+            ),
+        ]
     }
     return []
 }

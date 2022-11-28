@@ -39,7 +39,8 @@ export async function parseComposerSolvers(
 
     const collateralToken = await TokenAPI.getTokenInfo(
         composerSolvers[0].config.collateralToken,
-        currentUser.web3Provider
+        currentUser.web3Provider,
+        currentUser.chainId
     )
 
     const sortedSolvers = getSolverHierarchy(

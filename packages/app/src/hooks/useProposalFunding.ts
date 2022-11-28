@@ -2,9 +2,9 @@ import { BigNumber, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import ProposalsHub from '../hubs/ProposalsHub'
+import { TokenAPI } from '../services/api/Token.api'
 import { TokenModel } from '../models/TokenModel'
 import { UserType } from '../store/UserContext'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export const useProposalFunding = (onChainProposalId?: string) => {
@@ -39,9 +39,10 @@ export const useProposalFunding = (onChainProposalId?: string) => {
             const funding = await proposalsHub.getProposalFunding(
                 onChainProposal.id
             )
-            const token = await fetchTokenInfo(
+            const token = await TokenAPI.getTokenInfo(
                 onChainProposal.collateralToken,
-                user.web3Provider
+                user.web3Provider,
+                user.chainId
             )
             if (funding) setFunding(funding)
 

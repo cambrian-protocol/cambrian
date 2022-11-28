@@ -399,7 +399,8 @@ export const getSolverData = async (
 
     const collateralToken = await TokenAPI.getTokenInfo(
         config.conditionBase.collateralToken,
-        currentUser.web3Provider
+        currentUser.web3Provider,
+        currentUser.chainId
     )
 
     const timelocksHistory = await getSolverTimelocks(

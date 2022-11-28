@@ -7,55 +7,67 @@ import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 export const TokenAPI = {
     getTokenInfo: async (
         address: string,
-        provider: ethers.providers.Provider
+        provider: ethers.providers.Provider,
+        chainId: number
     ): Promise<TokenModel> => {
-        let erc20Contract
-        try {
-            erc20Contract = new ethers.Contract(address, ERC20_IFACE, provider)
-        } catch (e) {
-            cpLogger.push(e)
-        }
-
-        const network = await provider.getNetwork()
-        if (erc20Contract) {
-            const [name, decimals, symbol, totalSupply] =
-                await Promise.allSettled([
-                    erc20Contract.name(),
-                    erc20Contract.decimals(),
-                    erc20Contract.symbol(),
-                    erc20Contract.totalSupply(),
-                ])
-
-            const tokenListTokenInfo: TokenModel | undefined =
-                tokenList.tokens.find(
-                    (token) =>
-                        token.chainId === network.chainId &&
-                        token.address === address
-                )
-
+        if (address && address.length === 42) {
+            let erc20Contract
             try {
-                const token = <TokenModel>{
-                    chainId: network.chainId,
-                    address: address,
-                    decimals:
-                        decimals.status === 'fulfilled' ? decimals.value : 18,
-                    name: name.status === 'fulfilled' ? name.value : undefined,
-                    symbol: symbol.status === 'fulfilled' ? symbol.value : '??',
-                    totalSupply:
-                        totalSupply.status === 'fulfilled'
-                            ? totalSupply.value
-                            : undefined,
-                    logoURI: tokenListTokenInfo?.logoURI,
-                }
-
-                return token
+                erc20Contract = new ethers.Contract(
+                    address,
+                    ERC20_IFACE,
+                    provider
+                )
             } catch (e) {
                 cpLogger.push(e)
+            }
+
+            if (erc20Contract) {
+                const [name, decimals, symbol, totalSupply] =
+                    await Promise.allSettled([
+                        erc20Contract.name(),
+                        erc20Contract.decimals(),
+                        erc20Contract.symbol(),
+                        erc20Contract.totalSupply(),
+                    ])
+
+                const tokenListTokenInfo: TokenModel | undefined =
+                    tokenList.tokens.find(
+                        (token) =>
+                            token.chainId === chainId &&
+                            token.address === address
+                    )
+
+                try {
+                    const token = <TokenModel>{
+                        chainId: chainId,
+                        address: address,
+                        decimals:
+                            decimals.status === 'fulfilled'
+                                ? decimals.value
+                                : 18,
+                        name:
+                            name.status === 'fulfilled'
+                                ? name.value
+                                : undefined,
+                        symbol:
+                            symbol.status === 'fulfilled' ? symbol.value : '??',
+                        totalSupply:
+                            totalSupply.status === 'fulfilled'
+                                ? totalSupply.value
+                                : undefined,
+                        logoURI: tokenListTokenInfo?.logoURI,
+                    }
+
+                    return token
+                } catch (e) {
+                    cpLogger.push(e)
+                }
             }
         }
 
         return <TokenModel>{
-            chainId: network.chainId,
+            chainId: chainId,
             address: address,
             symbol: '??',
             decimals: 18,

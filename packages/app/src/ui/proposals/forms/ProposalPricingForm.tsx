@@ -7,9 +7,9 @@ import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface ProposalPricingFormProps {
@@ -49,9 +49,10 @@ const ProposalPricingForm = ({
 
     const initDenominationToken = async (address: string) => {
         if (currentUser) {
-            const token = await fetchTokenInfo(
+            const token = await TokenAPI.getTokenInfo(
                 address,
-                currentUser.web3Provider
+                currentUser.web3Provider,
+                currentUser.chainId
             )
             setDenominationToken(token)
         }

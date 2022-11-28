@@ -134,7 +134,8 @@ const FundProposalForm = ({
     const init = async () => {
         const token = await TokenAPI.getTokenInfo(
             proposalContract.collateralToken,
-            currentUser.web3Provider
+            currentUser.web3Provider,
+            currentUser.chainId
         )
         setCollateralToken(token)
         await initAllowance()

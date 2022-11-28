@@ -6,7 +6,7 @@ import {
     getAllTokenInfoList,
     getTokenInfoListFromAddresses,
     isForeignToken,
-} from '@cambrian/app/utils/helpers/tokens'
+} from '@cambrian/app/utils/helpers/tokenHelper'
 import { useEffect, useState } from 'react'
 
 import BasePopupModal from '../modals/BasePopupModal'

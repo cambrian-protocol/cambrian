@@ -8,9 +8,9 @@ import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { fetchTokenInfo } from './tokens'
 import { getIndexSetFromBinaryArray } from '../transformers/ComposerTransformer'
 import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
 
@@ -119,9 +119,10 @@ export const getRedeemablePositions = async (
                             solverStatus ===
                                 ConditionStatus.ArbitrationDelivered
                         ) {
-                            const collateralToken = await fetchTokenInfo(
+                            const collateralToken = await TokenAPI.getTokenInfo(
                                 solverConfig.conditionBase.collateralToken,
-                                provider
+                                provider,
+                                chainId
                             )
 
                             const positionId =
@@ -215,9 +216,10 @@ export const getReclaimableTokensFromSolver = async (
         return {
             proposalId: proposalId,
             totalFunding: proposalContract.fundingGoal,
-            collateralToken: await fetchTokenInfo(
+            collateralToken: await TokenAPI.getTokenInfo(
                 proposalContract.collateralToken,
-                currentUser.web3Provider
+                currentUser.web3Provider,
+                currentUser.chainId
             ),
             reclaimableSolvers: { [fromSolverAddress]: reclaimablePositions },
         }
@@ -281,9 +283,10 @@ export const getAllReclaimableTokensFromProposal = async (
         return {
             proposalId: proposalContract.id,
             totalFunding: proposalContract.fundingGoal,
-            collateralToken: await fetchTokenInfo(
+            collateralToken: await TokenAPI.getTokenInfo(
                 proposalContract.collateralToken,
-                currentUser.web3Provider
+                currentUser.web3Provider,
+                currentUser.chainId
             ),
             reclaimableSolvers: reclaimableSolvers,
         }
