@@ -75,7 +75,7 @@ export const loadStagesLib = async (currentUser: UserType) => {
             {
                 controllers: [currentUser.did],
                 family: CAMBRIAN_LIB_NAME,
-                tags: ['stages'],
+                tags: ['stages', currentUser.chainId.toString()],
             },
             { pin: true }
         )) as TileDocument<CambrianStagesLibType>
