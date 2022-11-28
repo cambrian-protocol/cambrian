@@ -1,5 +1,4 @@
 import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
-import { useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
@@ -8,7 +7,7 @@ import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useState } from 'react'
 
 interface ProposalPricingFormProps {
     editProposalContext: EditProposalContextType
@@ -143,12 +142,7 @@ const ProposalPricingForm = ({
                                     }}
                                 />
                             ) : (
-                                <BaseTokenBadge
-                                    tokenAddress={
-                                        stageStack.template.price
-                                            .denominationTokenAddress
-                                    }
-                                />
+                                <BaseTokenBadge token={collateralToken} />
                             )}
                         </Box>
                     </Box>

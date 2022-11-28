@@ -1,6 +1,7 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import BaseTokenLogo from './BaseTokenLogo'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
@@ -28,10 +29,13 @@ const BaseTokenBadge = ({
 }: BaseTokenBadgeProps) => {
     const { currentUser } = useCurrentUserContext()
     const [_token, setToken] = useState<TokenModel>()
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
+        setIsInitialized(false)
         if (token) {
             setToken(token)
+            setIsInitialized(true)
         } else if (tokenAddress && currentUser) {
             initTokenAddress(tokenAddress)
         }
@@ -47,29 +51,39 @@ const BaseTokenBadge = ({
                 )
             )
         }
+        setIsInitialized(true)
     }
 
     return (
         <Box pad={{ right: 'xsmall', vertical: 'xsmall' }}>
-            <Box
-                round="xsmall"
-                pad={{ vertical: 'xsmall', horizontal: 'small' }}
-                background={'background-front'}
-                onClick={onClick}
-                hoverIndicator
-                focusIndicator={false}
-                elevation="small"
-            >
-                <Box
-                    height={{ min: '32px', max: '32px' }}
-                    direction="row"
-                    align="center"
-                    gap="xsmall"
-                >
-                    <BaseTokenLogo token={_token} />
-                    {_token && <Text weight="bold">{_token.symbol}</Text>}
-                    {icon}
-                </Box>
+            <Box onClick={onClick} hoverIndicator focusIndicator={false}>
+                {isInitialized ? (
+                    <Box
+                        direction="row"
+                        align="center"
+                        gap="xsmall"
+                        pad={{ vertical: 'xsmall', horizontal: 'small' }}
+                        background={'background-front'}
+                        round="xsmall"
+                        elevation="small"
+                    >
+                        <BaseTokenLogo token={_token} />
+                        {_token && <Text weight="bold">{_token.symbol}</Text>}
+                        {icon}
+                    </Box>
+                ) : (
+                    <BaseSkeletonBox
+                        pad={{ vertical: 'xsmall', horizontal: 'small' }}
+                        width="xsmall"
+                    >
+                        <Box
+                            direction="row"
+                            align="center"
+                            gap="xsmall"
+                            height={{ max: '3.6em', min: '3.6em' }}
+                        ></Box>
+                    </BaseSkeletonBox>
+                )}
             </Box>
         </Box>
     )
