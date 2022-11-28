@@ -1,9 +1,9 @@
 import { Box, Image, Text } from 'grommet'
 
-import { TokenInfo } from '@uniswap/token-lists'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface BaseTokenLogoProps {
-    token?: TokenInfo
+    token?: TokenModel
     size?: 'medium'
 }
 
@@ -39,9 +39,7 @@ const BaseTokenLogo = ({ token, size }: BaseTokenLogoProps) => {
                     <Image src={token.logoURI} height="32" />
                 )
             ) : (
-                <Text size="small">
-                    {token?.symbol.substring(0, 3) || '???'}
-                </Text>
+                <Text size="small">{token?.symbol.substring(0, 3)}</Text>
             )}
         </Box>
     )

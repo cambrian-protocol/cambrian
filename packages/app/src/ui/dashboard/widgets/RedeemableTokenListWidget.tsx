@@ -17,13 +17,13 @@ import { ethers } from 'ethers'
 
 interface RedeemableTokensWidgetProps {
     address: string
-    signerOrProvider: ethers.Signer | ethers.providers.Provider
+    provider: ethers.providers.Provider
     chainId: number
 }
 
 const RedeemableTokenListWidget = ({
     address,
-    signerOrProvider,
+    provider,
     chainId,
 }: RedeemableTokensWidgetProps) => {
     const [redeemablePositions, setRedeemablePositions] =
@@ -40,7 +40,7 @@ const RedeemableTokenListWidget = ({
         try {
             setIsLoading(true)
             setRedeemablePositions(
-                await getRedeemablePositions(address, signerOrProvider, chainId)
+                await getRedeemablePositions(address, provider, chainId)
             )
         } catch (e) {}
         setIsLoading(false)
@@ -49,7 +49,7 @@ const RedeemableTokenListWidget = ({
     const onRedeem = async (redeemablePosition: RedeemablePosition) => {
         try {
             setIsRedeeming(redeemablePosition.positionId)
-            const ctfContract = new CTFContract(signerOrProvider, chainId)
+            const ctfContract = new CTFContract(provider, chainId)
             const tx: ethers.ContractTransaction =
                 await ctfContract.contract.redeemPositions(
                     redeemablePosition.collateralToken.address,

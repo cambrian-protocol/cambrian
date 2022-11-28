@@ -1,4 +1,4 @@
-import BaseTokenItem from './BaseTokenItem'
+import BaseTokenBadge from './BaseTokenBadge'
 import { CaretDown } from 'phosphor-react'
 import SelectTokenModal from '@cambrian/app/ui/common/modals/SelectTokenModal'
 import { useState } from 'react'
@@ -22,7 +22,7 @@ const SelectTokenItem = ({
 
     return (
         <>
-            <BaseTokenItem
+            <BaseTokenBadge
                 icon={<CaretDown />}
                 tokenAddress={tokenAddress}
                 onClick={toggleShowSelectTokenModal}

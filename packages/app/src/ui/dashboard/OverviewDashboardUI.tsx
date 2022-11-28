@@ -56,7 +56,7 @@ const OverviewDashboardUI = ({
                     <RedeemableTokenListWidget
                         address={currentUser.address}
                         chainId={currentUser.chainId}
-                        signerOrProvider={currentUser.signer}
+                        provider={currentUser.web3Provider}
                     />
                 </Box>
                 <Box pad="large" />

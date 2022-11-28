@@ -192,7 +192,7 @@ export const getParsedSolvers = async (
 
     const _parsedSolvers = await parseComposerSolvers(
         _compositionWithFlexInputs.solvers,
-        currentUser.web3Provider
+        currentUser
     )
 
     return _parsedSolvers

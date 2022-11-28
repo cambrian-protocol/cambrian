@@ -150,7 +150,7 @@ export default function Safe() {
                                 description="Redeem Solver funds sent to a Gnosis Safe"
                             />
                             <RedeemableTokenListWidget
-                                signerOrProvider={connectedWallet.signer}
+                                provider={connectedWallet.web3Provider}
                                 address={connectedWallet.address}
                                 chainId={connectedWallet.network.chainId}
                             />

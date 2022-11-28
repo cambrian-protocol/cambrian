@@ -183,8 +183,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
         try {
             const fetchedMetadata = await getSolverMetadata(
                 solverContract,
-                currentUser.signer,
-                currentUser.chainId
+                currentUser.web3Provider
             )
 
             const fetchedSolverConfig = await getSolverConfig(solverContract)

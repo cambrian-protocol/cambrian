@@ -435,13 +435,13 @@ export const getSolverData = async (
 
 export const getSolverMetadata = async (
     solverContract: ethers.Contract,
-    signerOrProvider: ethers.Signer | ethers.providers.Provider,
-    chainId: number
+    provider: ethers.providers.Provider
 ) => {
     try {
         const proposalId = await solverContract.trackingId()
         if (proposalId) {
-            const proposalsHub = new ProposalsHub(signerOrProvider, chainId)
+            const network = await provider.getNetwork()
+            const proposalsHub = new ProposalsHub(provider, network.chainId)
             const metadataURI = await proposalsHub.getMetadataCID(proposalId)
             if (proposalId) {
                 const stageStack = await loadStageStackFromID(metadataURI)

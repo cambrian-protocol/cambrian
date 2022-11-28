@@ -1,6 +1,6 @@
 import { Box, Heading, Text } from 'grommet'
 
-import BaseTokenItem from '../token/BaseTokenItem'
+import BaseTokenBadge from '../token/BaseTokenBadge'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface PriceInfoProps {
@@ -28,7 +28,7 @@ const PriceInfo = ({
                 <Heading level="4">{label}</Heading>
                 <Box direction="row" gap="small" align="center">
                     <Heading level={'2'}>{amount}</Heading>
-                    <BaseTokenItem tokenAddress={token?.address} />
+                    <BaseTokenBadge tokenAddress={token?.address} />
                 </Box>
             </Box>
             {hasAlternativePaymentOptions && (
@@ -38,7 +38,7 @@ const PriceInfo = ({
                     </Heading>
                     <Box direction="row" gap="small" align="center">
                         {preferredTokens?.map((preferredToken, idx) => (
-                            <BaseTokenItem
+                            <BaseTokenBadge
                                 key={idx}
                                 tokenAddress={preferredToken}
                             />

@@ -57,7 +57,7 @@ const TemplatePreview = ({
         setDenominationToken(
             await fetchTokenInfo(
                 template.price.denominationTokenAddress,
-                currentUser.signer
+                currentUser.web3Provider
             )
         )
     }

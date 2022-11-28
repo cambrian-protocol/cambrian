@@ -1,31 +1,22 @@
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { cpLogger } from './Logger.api'
-
-export type TokenResponseType = {
-    address: string
-    decimals: BigNumber
-    name?: string
-    symbol?: string
-    totalSupply: BigNumber
-}
+import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 
 export const TokenAPI = {
     getTokenInfo: async (
         address: string,
-        signerOrProvider: ethers.Signer | ethers.providers.Provider
-    ): Promise<TokenResponseType> => {
+        provider: ethers.providers.Provider
+    ): Promise<TokenModel> => {
         let erc20Contract
         try {
-            erc20Contract = new ethers.Contract(
-                address,
-                ERC20_IFACE,
-                signerOrProvider
-            )
+            erc20Contract = new ethers.Contract(address, ERC20_IFACE, provider)
         } catch (e) {
             cpLogger.push(e)
         }
+
+        const network = await provider.getNetwork()
         if (erc20Contract) {
             const [name, decimals, symbol, totalSupply] =
                 await Promise.allSettled([
@@ -35,19 +26,26 @@ export const TokenAPI = {
                     erc20Contract.totalSupply(),
                 ])
 
+            const tokenListTokenInfo: TokenModel | undefined =
+                tokenList.tokens.find(
+                    (token) =>
+                        token.chainId === network.chainId &&
+                        token.address === address
+                )
+
             try {
                 const token = <TokenModel>{
+                    chainId: network.chainId,
                     address: address,
                     decimals:
-                        decimals.status === 'fulfilled'
-                            ? decimals.value
-                            : BigNumber.from(18),
+                        decimals.status === 'fulfilled' ? decimals.value : 18,
                     name: name.status === 'fulfilled' ? name.value : undefined,
                     symbol: symbol.status === 'fulfilled' ? symbol.value : '??',
                     totalSupply:
                         totalSupply.status === 'fulfilled'
                             ? totalSupply.value
                             : undefined,
+                    logoURI: tokenListTokenInfo?.logoURI,
                 }
 
                 return token
@@ -57,8 +55,10 @@ export const TokenAPI = {
         }
 
         return <TokenModel>{
+            chainId: network.chainId,
             address: address,
-            decimals: BigNumber.from(18),
+            symbol: '??',
+            decimals: 18,
         }
     },
 }

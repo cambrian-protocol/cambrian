@@ -1,18 +1,16 @@
 import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import BaseTokenItem from '@cambrian/app/components/token/BaseTokenItem'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
-import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalPricingFormProps {
     editProposalContext: EditProposalContextType
@@ -166,7 +164,7 @@ const ProposalPricingForm = ({
                                     }}
                                 />
                             ) : (
-                                <BaseTokenItem
+                                <BaseTokenBadge
                                     tokenAddress={
                                         stageStack.template.price
                                             .denominationTokenAddress

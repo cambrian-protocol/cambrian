@@ -44,8 +44,7 @@ const RecentSolverTile = ({ id, currentUser }: RecentSolverTileProps) => {
             )
             const solverMetadata = await getSolverMetadata(
                 solverContract,
-                currentUser.signer,
-                currentUser.chainId
+                currentUser.web3Provider
             )
 
             setSolverInfo({

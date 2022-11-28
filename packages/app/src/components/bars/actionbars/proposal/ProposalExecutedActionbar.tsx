@@ -98,8 +98,7 @@ const ProposalExecutedActionbar = ({
                     )
                     const fetchedMetadata = await getSolverMetadata(
                         solverContract,
-                        currentUser.signer,
-                        currentUser.chainId
+                        currentUser.web3Provider
                     )
 
                     const fetchedSolverConfig = await getSolverConfig(

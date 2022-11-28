@@ -55,10 +55,10 @@ type ReclaimableSolversMap = {
 
 export const getRedeemablePositions = async (
     address: string,
-    signerOrProvider: ethers.Signer | ethers.providers.Provider,
+    provider: ethers.providers.Provider,
     chainId: number
 ): Promise<RedeemablePositionsHash> => {
-    const ctfContract = new CTFContract(signerOrProvider, chainId)
+    const ctfContract = new CTFContract(provider, chainId)
 
     const redemptionCache: { [conditionId: string]: boolean } = {}
     const solverCache: {
@@ -102,7 +102,7 @@ export const getRedeemablePositions = async (
                     const solverContract = new ethers.Contract(
                         solverAddress,
                         BASE_SOLVER_IFACE,
-                        signerOrProvider
+                        provider
                     )
                     const solverConfig = await solverContract.getConfig()
                     const allConditions = await solverContract.getConditions()
@@ -121,7 +121,7 @@ export const getRedeemablePositions = async (
                         ) {
                             const collateralToken = await fetchTokenInfo(
                                 solverConfig.conditionBase.collateralToken,
-                                signerOrProvider
+                                provider
                             )
 
                             const positionId =
@@ -134,8 +134,7 @@ export const getRedeemablePositions = async (
                             if (positionId) {
                                 const solverMetadata = await getSolverMetadata(
                                     solverContract,
-                                    signerOrProvider,
-                                    chainId
+                                    provider
                                 )
 
                                 solverCache[solverAddress] = {
@@ -218,7 +217,7 @@ export const getReclaimableTokensFromSolver = async (
             totalFunding: proposalContract.fundingGoal,
             collateralToken: await fetchTokenInfo(
                 proposalContract.collateralToken,
-                currentUser.signer
+                currentUser.web3Provider
             ),
             reclaimableSolvers: { [fromSolverAddress]: reclaimablePositions },
         }
@@ -284,7 +283,7 @@ export const getAllReclaimableTokensFromProposal = async (
             totalFunding: proposalContract.fundingGoal,
             collateralToken: await fetchTokenInfo(
                 proposalContract.collateralToken,
-                currentUser.signer
+                currentUser.web3Provider
             ),
             reclaimableSolvers: reclaimableSolvers,
         }

@@ -3,7 +3,7 @@ import { Box, Heading, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import BaseTokenItem from '../token/BaseTokenItem'
+import BaseTokenBadge from '../token/BaseTokenBadge'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { CheckCircle } from 'phosphor-react'
 import LoaderButton from '../buttons/LoaderButton'
@@ -175,7 +175,7 @@ const ReclaimablePositionItem = ({
                                         )}
                                     </Text>
                                 </Box>
-                                <BaseTokenItem
+                                <BaseTokenBadge
                                     tokenAddress={collateralToken.address}
                                 />
                             </Box>

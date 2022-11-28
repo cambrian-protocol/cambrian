@@ -1,19 +1,16 @@
 import { Box, Button, CheckBox, Form, FormExtendedEvent, Text } from 'grommet'
-import { SetStateAction, useState } from 'react'
-import {
-    TemplateModel,
-    TemplatePriceModel,
-} from '@cambrian/app/models/TemplateModel'
 
 import AddTokenItem from '@cambrian/app/components/token/AddTokenItem'
-import BaseTokenItem from '@cambrian/app/components/token/BaseTokenItem'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
+import { TemplatePriceModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { useState } from 'react'
 
 interface TemplatePricingFormProps {
     editTemplateContext: EditTemplateContextType
@@ -115,7 +112,7 @@ const TemplatePricingForm = ({
                                     }}
                                 />
                             ) : (
-                                <BaseTokenItem
+                                <BaseTokenBadge
                                     tokenAddress={
                                         template.price.denominationTokenAddress
                                     }

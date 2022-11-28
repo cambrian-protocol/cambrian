@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, Text } from 'grommet'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
-import BaseTokenItem from '@cambrian/app/components/token/BaseTokenItem'
+import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -336,7 +336,7 @@ const FundProposalForm = ({
                                                         }
                                                     />
                                                 </Box>
-                                                <BaseTokenItem
+                                                <BaseTokenBadge
                                                     tokenAddress={
                                                         collateralToken.address
                                                     }

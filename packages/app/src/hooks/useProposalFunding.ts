@@ -41,7 +41,7 @@ export const useProposalFunding = (onChainProposalId?: string) => {
             )
             const token = await fetchTokenInfo(
                 onChainProposal.collateralToken,
-                user.signer
+                user.web3Provider
             )
             if (funding) setFunding(funding)
 

@@ -1,7 +1,7 @@
 import { Box, Heading, Text } from 'grommet'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import BaseTokenItem from '../../token/BaseTokenItem'
+import BaseTokenBadge from '../../token/BaseTokenBadge'
 import ModalHeader from '../../layout/header/ModalHeader'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
@@ -83,7 +83,7 @@ const BaseSolverInfo = ({
                         slotTags={slotTags}
                         value={
                             <Box align="start">
-                                <BaseTokenItem tokenAddress={token?.address} />
+                                <BaseTokenBadge tokenAddress={token?.address} />
                             </Box>
                         }
                     />

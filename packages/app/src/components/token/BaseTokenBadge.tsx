@@ -1,45 +1,42 @@
 import { Box, Text } from 'grommet'
-import {
-    fetchTokenInfo,
-    parseTokenContractInfo,
-} from '@cambrian/app/utils/helpers/tokens'
 import { useEffect, useState } from 'react'
 
 import BaseTokenLogo from './BaseTokenLogo'
-import { TokenInfo } from '@uniswap/token-lists'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-type BaseTokenItemProps =
+type BaseTokenBadgeProps =
     | {
           tokenAddress?: string
-          tokenInfo?: never
+          token?: never
           onClick?: () => void
           icon?: JSX.Element
       }
     | {
           tokenAddress?: never
-          tokenInfo?: TokenInfo
+          token?: TokenModel
           onClick?: () => void
           icon?: JSX.Element
       }
 
-const BaseTokenItem = ({
+const BaseTokenBadge = ({
     tokenAddress,
-    tokenInfo,
+    token,
     onClick,
     icon,
-}: BaseTokenItemProps) => {
+}: BaseTokenBadgeProps) => {
     const { currentUser } = useCurrentUserContext()
-    const [token, setToken] = useState<TokenInfo>()
+    const [_token, setToken] = useState<TokenModel>()
 
     useEffect(() => {
-        if (tokenInfo) {
-            setToken(tokenInfo)
+        if (token) {
+            setToken(token)
         } else if (tokenAddress) {
             initTokenAddress(tokenAddress)
         }
-    }, [tokenAddress, tokenInfo])
+    }, [tokenAddress, token])
 
     const initTokenAddress = async (tokenAddress: string) => {
         const _token = tokenList.tokens.find(
@@ -52,10 +49,7 @@ const BaseTokenItem = ({
             setToken(_token)
         } else if (currentUser) {
             setToken(
-                parseTokenContractInfo(
-                    await fetchTokenInfo(tokenAddress, currentUser.signer),
-                    currentUser.chainId
-                )
+                await fetchTokenInfo(tokenAddress, currentUser.web3Provider)
             )
         }
     }
@@ -77,12 +71,8 @@ const BaseTokenItem = ({
                     align="center"
                     gap="xsmall"
                 >
-                    <BaseTokenLogo token={token} />
-                    {token ? (
-                        <Text weight="bold">{token.symbol}</Text>
-                    ) : (
-                        <Text color="dark-4">???</Text>
-                    )}
+                    <BaseTokenLogo token={_token} />
+                    {_token && <Text weight="bold">{_token.symbol}</Text>}
                     {icon}
                 </Box>
             </Box>
@@ -90,4 +80,4 @@ const BaseTokenItem = ({
     )
 }
 
-export default BaseTokenItem
+export default BaseTokenBadge

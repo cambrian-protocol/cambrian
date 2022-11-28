@@ -14,10 +14,10 @@ import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import StackedIcon from '../icons/StackedIcon'
 import { StageNames } from '@cambrian/app/models/StageModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { updateStage } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
-import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 
 interface ComposerToolbarProps {
     disabled: boolean
@@ -67,7 +67,7 @@ const ComposerToolbar = ({
         if (currentUser?.signer.provider) {
             const solvers = await parseComposerSolvers(
                 currentComposition.solvers,
-                currentUser.signer.provider
+                currentUser
             )
             console.log(solvers)
         }
