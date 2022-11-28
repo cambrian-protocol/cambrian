@@ -7,8 +7,6 @@ import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -33,30 +31,10 @@ const ProposalPricingForm = ({
         setProposal,
         onSaveProposal,
         onResetProposal,
+        collateralToken,
     } = editProposalContext
 
-    const { currentUser } = useCurrentUserContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [denominationToken, setDenominationToken] = useState<TokenModel>()
-
-    useEffect(() => {
-        if (stageStack && !denominationToken) {
-            initDenominationToken(
-                stageStack.template.price.denominationTokenAddress
-            )
-        }
-    }, [stageStack])
-
-    const initDenominationToken = async (address: string) => {
-        if (currentUser) {
-            const token = await TokenAPI.getTokenInfo(
-                address,
-                currentUser.web3Provider,
-                currentUser.chainId
-            )
-            setDenominationToken(token)
-        }
-    }
 
     const handleSubmit = async (event: FormExtendedEvent<{}, Element>) => {
         event.preventDefault()
@@ -94,7 +72,7 @@ const ProposalPricingForm = ({
                                     <Text>
                                         The seller quotes an equivalent of{' '}
                                         {stageStack.template.price?.amount}{' '}
-                                        {denominationToken?.symbol}
+                                        {collateralToken?.symbol}
                                     </Text>
                                     <Text color="dark-4" size="small">
                                         Please make sure you match the value if
@@ -106,7 +84,7 @@ const ProposalPricingForm = ({
                                     <Text>
                                         The seller quotes{' '}
                                         {stageStack.template.price?.amount}{' '}
-                                        {denominationToken?.symbol}
+                                        {collateralToken?.symbol}
                                     </Text>
                                     <Text color="dark-4" size="small">
                                         Feel free to make a counter offer, if

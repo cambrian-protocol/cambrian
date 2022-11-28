@@ -12,7 +12,6 @@ import FundingSkeleton from '@cambrian/app/components/skeletons/FundingSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -22,6 +21,7 @@ import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 interface FundProposalFormProps {
     proposalContract: ethers.Contract
     currentUser: UserType
+    collateralToken: TokenModel
 }
 
 type FundProposalFormType = {
@@ -35,6 +35,7 @@ const initialInput = {
 const FundProposalForm = ({
     proposalContract,
     currentUser,
+    collateralToken,
 }: FundProposalFormProps) => {
     const { funding } = useProposalFunding(proposalContract.id)
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
@@ -51,7 +52,6 @@ const FundProposalForm = ({
         currentUser.chainId
     )
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
-    const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [isInPrimaryTransaction, setIsInPrimaryTransaction] = useState(false)
     const [isInSecondaryTransaction, setIsInSecondaryTransaction] =
         useState(false)
@@ -132,12 +132,6 @@ const FundProposalForm = ({
     }
 
     const init = async () => {
-        const token = await TokenAPI.getTokenInfo(
-            proposalContract.collateralToken,
-            currentUser.web3Provider,
-            currentUser.chainId
-        )
-        setCollateralToken(token)
         await initAllowance()
         await updateUserFunding(proposalContract.id)
     }

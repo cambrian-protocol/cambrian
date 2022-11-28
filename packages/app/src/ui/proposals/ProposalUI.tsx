@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import Custom404Page from 'packages/app/pages/404'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
@@ -7,8 +5,6 @@ import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal
 import ProposalPreview from './ProposalPreview'
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
@@ -17,24 +13,8 @@ interface ProposalUIProps {
 }
 
 const ProposalUI = ({ currentUser }: ProposalUIProps) => {
-    const { isLoaded, stageStack, proposalStatus } = useProposalContext()
-    const [collateralToken, setCollateralToken] = useState<TokenModel>()
-
-    useEffect(() => {
-        initCollateralToken()
-    }, [currentUser, stageStack])
-
-    const initCollateralToken = async () => {
-        if (stageStack && currentUser) {
-            const ct = await TokenAPI.getTokenInfo(
-                stageStack.proposal.price.tokenAddress,
-                currentUser.web3Provider,
-                currentUser.chainId
-            )
-
-            if (ct) setCollateralToken(ct)
-        }
-    }
+    const { isLoaded, stageStack, proposalStatus, collateralToken } =
+        useProposalContext()
 
     const initMessenger =
         (currentUser.did === stageStack?.template.author ||

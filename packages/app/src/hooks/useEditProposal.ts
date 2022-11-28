@@ -11,12 +11,13 @@ import { ProposalStatus } from '../models/ProposalStatus'
 import { StageNames } from '../models/StageModel'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { TemplateModel } from '../models/TemplateModel'
+import { TokenAPI } from '../services/api/Token.api'
+import { TokenModel } from '../models/TokenModel'
 import _ from 'lodash'
 import { cpLogger } from './../services/api/Logger.api'
 import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
-import usePrevious from './usePrevious'
 
 export type EditProposalContextType = {
     proposalStreamID: string
@@ -32,6 +33,7 @@ export type EditProposalContextType = {
     setErrorMessage: React.Dispatch<
         React.SetStateAction<ErrorMessageType | undefined>
     >
+    collateralToken?: TokenModel
 }
 
 const useEditProposal = () => {
@@ -48,6 +50,7 @@ const useEditProposal = () => {
     const [isLoaded, setIsLoaded] = useState(false)
     const [isValidProposal, setIsValidProposal] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {
         if (router.isReady) {
@@ -102,6 +105,13 @@ const useEditProposal = () => {
                         )
                         validateProposal(_stageStack.proposal)
                         setStageStack(_stageStack)
+                        setCollateralToken(
+                            await TokenAPI.getTokenInfo(
+                                _stageStack.proposal.price.tokenAddress,
+                                currentUser.web3Provider,
+                                currentUser.chainId
+                            )
+                        )
                         setProposal(_.cloneDeep(_stageStack.proposal))
                     }
                 }
@@ -129,7 +139,13 @@ const useEditProposal = () => {
                     }
                     validateProposal(proposalWithUniqueTitle)
                     setProposal(proposalWithUniqueTitle)
-
+                    setCollateralToken(
+                        await TokenAPI.getTokenInfo(
+                            proposalWithUniqueTitle.price.tokenAddress,
+                            currentUser.web3Provider,
+                            currentUser.chainId
+                        )
+                    )
                     setStageStack(
                         await loadStageStackFromID(proposalStreamID as string)
                     )
@@ -176,6 +192,7 @@ const useEditProposal = () => {
         isLoaded: isLoaded,
         errorMessage: errorMessage,
         setErrorMessage: setErrorMessage,
+        collateralToken: collateralToken,
     }
 }
 
