@@ -39,6 +39,7 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                         ? { left: 'large' }
                                         : undefined
                                 }
+                                height={'100%'}
                             >
                                 {value}
                             </Box>

@@ -28,7 +28,7 @@ const PriceInfo = ({
                 <Heading level="4">{label}</Heading>
                 <Box direction="row" gap="small" align="center">
                     <Heading level={'2'}>{amount}</Heading>
-                    <BaseTokenBadge tokenAddress={token?.address} />
+                    <BaseTokenBadge token={token} />
                 </Box>
             </Box>
             {hasAlternativePaymentOptions && (

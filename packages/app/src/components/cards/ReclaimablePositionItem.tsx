@@ -175,9 +175,7 @@ const ReclaimablePositionItem = ({
                                         )}
                                     </Text>
                                 </Box>
-                                <BaseTokenBadge
-                                    tokenAddress={collateralToken.address}
-                                />
+                                <BaseTokenBadge token={collateralToken} />
                             </Box>
                         </Box>
                     </Box>

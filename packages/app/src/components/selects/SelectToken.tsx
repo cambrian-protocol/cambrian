@@ -119,7 +119,7 @@ const SelectToken = ({
                                   return (
                                       <BaseTokenBadge
                                           key={token.address}
-                                          tokenAddress={token.address}
+                                          token={token}
                                           onClick={() =>
                                               onSelect(token.address)
                                           }

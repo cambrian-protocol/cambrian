@@ -332,9 +332,7 @@ const FundProposalForm = ({
                                                     />
                                                 </Box>
                                                 <BaseTokenBadge
-                                                    tokenAddress={
-                                                        collateralToken.address
-                                                    }
+                                                    token={collateralToken}
                                                 />
                                             </Box>
                                         </>
