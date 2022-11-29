@@ -56,19 +56,19 @@ export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
             icon: <UserMenuItemIcon icon={<User />} />,
             onClick: () => router.push('/dashboard?idx=5'),
         })
-        menuItems.push({
-            label: <UserMenuItemLabel label="Reset Account" />,
-            icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
-            onClick: async () => {
-                if (
-                    window.confirm(
-                        'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
-                    )
-                ) {
-                    await clearStagesLib(currentUser)
-                }
-            },
-        })
+        // menuItems.push({
+        //     label: <UserMenuItemLabel label="Reset Account" />,
+        //     icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
+        //     onClick: async () => {
+        //         if (
+        //             window.confirm(
+        //                 'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
+        //             )
+        //         ) {
+        //             await clearStagesLib(currentUser)
+        //         }
+        //     },
+        // })
         menuItems.push({
             label: <UserMenuItemLabel label={'Logout'} />,
             onClick: disconnectWallet,
