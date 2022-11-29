@@ -19,7 +19,7 @@ const ReclaimTokensModal = ({
         <BaseLayerModal onClose={onClose}>
             <ModalHeader
                 title="You have tokens to reclaim"
-                description="Hit the reclaim button to receive your ERC1155 Tokens with which you can redeem your tokens."
+                description="Claim your escrow tokens to redeem them for payment."
             />
             <Box height={{ min: 'auto' }}>
                 {Object.keys(reclaimableTokens.reclaimableSolvers).map(

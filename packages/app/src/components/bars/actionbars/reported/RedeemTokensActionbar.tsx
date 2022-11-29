@@ -347,7 +347,7 @@ const RedeemTokensActionbar = ({
                     secondaryAction={
                         reclaimableTokens ? (
                             <Button
-                                label="Reclaims"
+                                label="Claim Refund"
                                 secondary
                                 size="small"
                                 onClick={toggleShowReclaimTokenModal}
@@ -377,7 +377,7 @@ const RedeemTokensActionbar = ({
                     secondaryAction={
                         reclaimableTokens ? (
                             <Button
-                                label="Reclaims"
+                                label="Claim Refund"
                                 secondary
                                 size="small"
                                 onClick={toggleShowReclaimTokenModal}
