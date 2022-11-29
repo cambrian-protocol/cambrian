@@ -42,8 +42,7 @@ export default class CeramicArbitratorAPI {
                 await arbitratorsLib.update(
                     {
                         ...arbitratorsLib.content,
-                        [`${this.user.chainId}:${arbitratorContractAddress}`]:
-                            fee,
+                        [`${arbitratorContractAddress}`]: fee,
                     },
                     undefined,
                     { pin: true }
@@ -51,8 +50,7 @@ export default class CeramicArbitratorAPI {
             } else {
                 await arbitratorsLib.update(
                     {
-                        [`${this.user.chainId}:${arbitratorContractAddress}`]:
-                            fee,
+                        [`${arbitratorContractAddress}`]: fee,
                     },
                     undefined,
                     { pin: true }
@@ -82,18 +80,7 @@ export default class CeramicArbitratorAPI {
                     { pin: true }
                 )) as TileDocument<ArbitratorContractFeeHashmap>
                 if (arbitratorLib.content) {
-                    Object.keys(arbitratorLib.content).forEach((a) => {
-                        const split = a.split(':')
-                        const arbitratorChainId = split[0]
-                        const arbitratorAddress = split[1]
-                        if (
-                            arbitratorChainId === this.user.chainId.toString()
-                        ) {
-                            arbitratorContractsOnConnectedChain[
-                                arbitratorAddress
-                            ] = arbitratorLib.content[a]
-                        }
-                    })
+                    return arbitratorLib.content
                 }
                 return arbitratorContractsOnConnectedChain
             } catch (e) {
