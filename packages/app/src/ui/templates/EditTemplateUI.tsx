@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs } from 'grommet'
+import { Box, Button, Tab, Tabs } from 'grommet'
 import { Clipboard, Eye } from 'phosphor-react'
 import { SetStateAction, useContext, useEffect, useState } from 'react'
 
@@ -12,6 +12,10 @@ import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import TemplateUpdateFromComposition from './TemplateUpdateFromComposition'
 
 const EditTemplateUI = () => {
     const editTemplateContext = useEditTemplate()
@@ -107,6 +111,19 @@ const EditTemplateUI = () => {
                     <TemplateRequirementsForm
                         editTemplateContext={editTemplateContext}
                     />
+                </Tab>
+                <Tab title="Advanced">
+                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                        <HeaderTextSection
+                            size="small"
+                            title="Update Template from Composition"
+                            paragraph="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
+                        />
+
+                        <TemplateUpdateFromComposition
+                            editTemplateContext={editTemplateContext}
+                        />
+                    </Box>
                 </Tab>
             </Tabs>
         </Box>

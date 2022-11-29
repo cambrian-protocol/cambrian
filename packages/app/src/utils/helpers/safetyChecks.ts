@@ -37,14 +37,21 @@ export const solverSafetyCheck = async (
     stageStack: StageStackType,
     currentUser: UserType
 ): Promise<SolverSafetyCheckResponseType | undefined> => {
-    const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
-    if (parsedSolvers) {
-        const configs = parsedSolvers.map((solver) => solver.config)
-        return await Promise.all(
-            configs.map((config) =>
-                checkConstantRecipients(config, currentUser)
+    try {
+        const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
+        if (parsedSolvers) {
+            const configs = parsedSolvers.map((solver) => solver.config)
+            return await Promise.all(
+                configs.map((config) =>
+                    checkConstantRecipients(config, currentUser)
+                )
             )
-        )
+        }
+    } catch (e) {
+        console.error(e)
+        return [
+            [{ to: 'internal error: Likely a missing address', result: false }],
+        ]
     }
 }
 

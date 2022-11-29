@@ -38,6 +38,36 @@ export default class CeramicTemplateAPI {
         this.user = currentUser
     }
 
+    getFormFlexInputs = (composition: CompositionModel) => {
+        let isCollateralFlex = false
+        const formFlexInputs: FlexInputFormType[] = []
+        composition.solvers.forEach((solver) => {
+            Object.keys(solver.slotTags).forEach((tagId) => {
+                if (solver.slotTags[tagId].isFlex !== 'None') {
+                    if (tagId === 'collateralToken') {
+                        isCollateralFlex = true
+                    } else {
+                        formFlexInputs.push({
+                            ...(solver.slotTags[tagId] as SlotTagModel),
+                            tagId: tagId,
+                            value:
+                                tagId === 'timelockSeconds'
+                                    ? solver.config.timelockSeconds?.toString() ||
+                                      ''
+                                    : '', // TODO this is stupid
+                        })
+                        formFlexInputs.push()
+                    }
+                }
+            })
+        })
+
+        return {
+            formFlexInputs: formFlexInputs,
+            isCollateralFlex: isCollateralFlex,
+        }
+    }
+
     /**
      * Creates a template from the passed compositionStreamID and adds it to the users template-lib.
      *
@@ -56,28 +86,9 @@ export default class CeramicTemplateAPI {
                     compositionStreamID
                 )
 
-            let isCollateralFlex = false
-            const formFlexInputs: FlexInputFormType[] = []
-            composition.content.solvers.forEach((solver) => {
-                Object.keys(solver.slotTags).forEach((tagId) => {
-                    if (solver.slotTags[tagId].isFlex !== 'None') {
-                        if (tagId === 'collateralToken') {
-                            isCollateralFlex = true
-                        } else {
-                            formFlexInputs.push({
-                                ...(solver.slotTags[tagId] as SlotTagModel),
-                                tagId: tagId,
-                                value:
-                                    tagId === 'timelockSeconds'
-                                        ? solver.config.timelockSeconds?.toString() ||
-                                          ''
-                                        : '', // TODO this is stupid
-                            })
-                            formFlexInputs.push()
-                        }
-                    }
-                })
-            })
+            const { formFlexInputs, isCollateralFlex } = this.getFormFlexInputs(
+                composition.content
+            )
 
             const template: TemplateModel = {
                 title: title,
