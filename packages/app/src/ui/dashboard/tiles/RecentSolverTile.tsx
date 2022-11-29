@@ -5,6 +5,7 @@ import {
     IconContext,
     PuzzlePiece,
     TreeStructure,
+    FileX,
 } from 'phosphor-react'
 import {
     isComposition,
@@ -25,10 +26,15 @@ import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters
 interface RecentSolverTileProps {
     id: string
     currentUser: UserType
+    onDeleteRecent: (streamId: string) => Promise<void>
 }
 type RecentSolverInfoType = { title: string; stage: string; icon: JSX.Element }
 
-const RecentSolverTile = ({ id, currentUser }: RecentSolverTileProps) => {
+const RecentSolverTile = ({
+    id,
+    currentUser,
+    onDeleteRecent,
+}: RecentSolverTileProps) => {
     const [solverInfo, setSolverInfo] = useState<RecentSolverInfoType>()
 
     useEffect(() => {
@@ -94,6 +100,15 @@ const RecentSolverTile = ({ id, currentUser }: RecentSolverTileProps) => {
                             pad="small"
                             height={{ min: 'small', max: 'small' }}
                         >
+                            <Button
+                                icon={<FileX />}
+                                hoverIndicator
+                                alignSelf="end"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    onDeleteRecent(id)
+                                }}
+                            />
                             <Box
                                 flex
                                 justify="center"
