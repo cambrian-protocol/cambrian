@@ -12,39 +12,40 @@ import { useState } from 'react'
 interface OverviewDashboardUIProps {
     currentUser: UserType
     recents?: string[]
+    onDeleteRecent: (streamId: string) => Promise<void>
 }
 
 const OverviewDashboardUI = ({
     currentUser,
     recents,
+    onDeleteRecent,
 }: OverviewDashboardUIProps) => {
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+
+    const recentSolvers = recents ? recents.slice(0, 10).reverse() : undefined
 
     return (
         <>
             <Box fill gap="medium" pad={{ top: 'medium' }}>
                 <Box pad={{ top: 'medium' }} gap="small">
                     <Text size="small" color="dark-4">
-                        Recently viewed solvers
+                        Recently viewed
                     </Text>
-                    {recents && recents.length > 0 ? (
+                    {recentSolvers && recentSolvers.length > 0 ? (
                         <Box direction="row" overflow={{ horizontal: 'auto' }}>
-                            {recents
-
-                                .slice(0, 10)
-                                .map((recent) => (
-                                    <RecentSolverTile
-                                        key={recent}
-                                        id={recent}
-                                        currentUser={currentUser}
-                                    />
-                                ))
-                                .reverse()}
+                            {recentSolvers.map((recent) => (
+                                <RecentSolverTile
+                                    key={recent}
+                                    id={recent}
+                                    currentUser={currentUser}
+                                    onDeleteRecent={onDeleteRecent}
+                                />
+                            ))}
                         </Box>
                     ) : (
                         <ListSkeleton
                             isFetching={false}
-                            subject="recently viewed Solvers"
+                            subject="recently viewed"
                         />
                     )}
                 </Box>
@@ -56,7 +57,7 @@ const OverviewDashboardUI = ({
                     <RedeemableTokenListWidget
                         address={currentUser.address}
                         chainId={currentUser.chainId}
-                        signerOrProvider={currentUser.signer}
+                        provider={currentUser.web3Provider}
                     />
                 </Box>
                 <Box pad="large" />

@@ -10,10 +10,10 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import SolverInfoModal from '../common/modals/SolverInfoModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
@@ -55,9 +55,10 @@ const TemplatePreview = ({
         }
 
         setDenominationToken(
-            await fetchTokenInfo(
+            await TokenAPI.getTokenInfo(
                 template.price.denominationTokenAddress,
-                currentUser.signer
+                currentUser.web3Provider,
+                currentUser.chainId
             )
         )
     }

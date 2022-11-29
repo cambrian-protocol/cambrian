@@ -30,9 +30,6 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                 <Text size="xsmall" color="dark-4">
                                     {slotTags && slotTags[id]?.description}
                                 </Text>
-                                <Text size="xsmall" color="dark-4">
-                                    {slotTags && slotTags[id]?.instruction}
-                                </Text>
                             </Box>
                             <Box
                                 width={{ min: 'auto' }}
@@ -42,6 +39,7 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                         ? { left: 'large' }
                                         : undefined
                                 }
+                                height={'100%'}
                             >
                                 {value}
                             </Box>

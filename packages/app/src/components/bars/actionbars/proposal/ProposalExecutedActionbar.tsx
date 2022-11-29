@@ -98,8 +98,7 @@ const ProposalExecutedActionbar = ({
                     )
                     const fetchedMetadata = await getSolverMetadata(
                         solverContract,
-                        currentUser.signer,
-                        currentUser.chainId
+                        currentUser.web3Provider
                     )
 
                     const fetchedSolverConfig = await getSolverConfig(
@@ -186,11 +185,9 @@ const ProposalExecutedActionbar = ({
             )}
             {showReclaimTokensModal && reclaimableTokens && (
                 <ReclaimTokensModal
-                    currentUser={currentUser}
-                    collateralTokenAddress={proposalContract.collateralToken}
                     reclaimableTokens={reclaimableTokens}
                     onClose={toggleShowReclaimTokensModal}
-                    initReclaimableTokens={initReclaimableTokens}
+                    updateReclaimableTokens={initReclaimableTokens}
                 />
             )}
         </>

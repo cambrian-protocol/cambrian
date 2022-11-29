@@ -24,6 +24,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useRouter } from 'next/router'
+import _ from 'lodash'
 
 interface DashboardUIProps {
     currentUser: UserType
@@ -60,6 +61,19 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const onActive = (nextActiveIndex: number) => {
         router.push(`?idx=${nextActiveIndex}`)
         setActiveIndex(nextActiveIndex)
+    }
+
+    const onDeleteRecent = async (streamId: string) => {
+        const newStagesLib = _.cloneDeep(stagesLib)
+        if (newStagesLib?.recents) {
+            const index = newStagesLib.recents.indexOf(streamId)
+            if (index > -1) {
+                newStagesLib.recents.splice(index, 1)
+            }
+        }
+        const stagesLibDoc = await loadStagesLib(currentUser)
+        await stagesLibDoc.update(newStagesLib)
+        setStagesLib(newStagesLib)
     }
 
     const initDocSubsciption = async () => {
@@ -108,6 +122,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                                 <OverviewDashboardUI
                                     currentUser={currentUser}
                                     recents={stagesLib?.recents}
+                                    onDeleteRecent={onDeleteRecent}
                                 />
                             </Tab>
                             <Tab title="Templates" icon={<File />}>

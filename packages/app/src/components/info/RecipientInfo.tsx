@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import BaseAvatar from '../avatars/BaseAvatar'
 import BaseInfoItem from './BaseInfoItem'
+import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CambrianProfileAbout from './CambrianProfileAbout'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
@@ -18,12 +19,14 @@ const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
     const { currentUser } = useCurrentUserContext()
     const [cambrianProfile, setCambrianProfile] =
         useState<TileDocument<CambrianProfileType>>()
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
         fetchCeramicProfile()
     }, [currentUser, address])
 
     const fetchCeramicProfile = async () => {
+        setIsInitialized(false)
         if (currentUser && address) {
             const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const cambrianProfileDoc = (await TileDocument.deterministic(
@@ -38,28 +41,39 @@ const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
             )) as TileDocument<CambrianProfileType>
             setCambrianProfile(cambrianProfileDoc)
         }
+        setIsInitialized(true)
     }
     return (
-        <BaseInfoItem
-            title={
-                address
-                    ? cambrianProfile?.content.name || 'Anon'
-                    : 'To be defined'
-            }
-            subTitle={address && cambrianProfile?.content.title}
-            dropContent={
-                address && cambrianProfile ? (
-                    <CambrianProfileAbout cambrianProfile={cambrianProfile} />
-                ) : undefined
-            }
-            icon={
-                cambrianProfile?.content.avatar ? (
-                    <BaseAvatar pfpPath={cambrianProfile.content.avatar} />
-                ) : (
-                    <BaseAvatar address={address} />
-                )
-            }
-        />
+        <>
+            {isInitialized ? (
+                <BaseInfoItem
+                    title={
+                        address
+                            ? cambrianProfile?.content.name || 'Anon'
+                            : 'To be defined'
+                    }
+                    subTitle={address && cambrianProfile?.content.title}
+                    dropContent={
+                        address && cambrianProfile ? (
+                            <CambrianProfileAbout
+                                cambrianProfile={cambrianProfile}
+                            />
+                        ) : undefined
+                    }
+                    icon={
+                        cambrianProfile?.content.avatar ? (
+                            <BaseAvatar
+                                pfpPath={cambrianProfile.content.avatar}
+                            />
+                        ) : (
+                            <BaseAvatar address={address} />
+                        )
+                    }
+                />
+            ) : (
+                <BaseSkeletonBox height="100%" />
+            )}
+        </>
     )
 }
 

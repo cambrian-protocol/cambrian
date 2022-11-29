@@ -1,46 +1,14 @@
-import { Provider } from '@ethersproject/providers'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { BigNumber, ethers } from 'ethers'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { TokenInfo } from '@uniswap/token-lists'
 import { UserType } from '@cambrian/app/store/UserContext'
-
-export const fetchTokenInfo = async (
-    address: string,
-    signerOrProvider: ethers.Signer | ethers.providers.Provider
-) => {
-    if (address && address.length === 42) {
-        const token = await TokenAPI.getTokenInfo(address, signerOrProvider)
-        if (token) {
-            return token
-        }
-    }
-    return <TokenModel>{
-        address: address,
-        decimals: BigNumber.from(18),
-    }
-}
-
-export const parseTokenContractInfo = (
-    token: TokenModel,
-    chainId: number
-): TokenInfo => {
-    return {
-        name: token.name || 'Unknown',
-        symbol: token.symbol || '???',
-        address: token.address,
-        chainId: chainId,
-        decimals: Number(token.decimals),
-    }
-}
 
 export const getAllTokenInfoList = async (
     selectedTokenAddresses: string[],
-    baseTokenInfoList: TokenInfo[],
+    baseTokenInfoList: TokenModel[],
     currentUser: UserType
 ) => {
     const existentSelectedTokenAddesses: string[] = []
-    const _tokenList: TokenInfo[] = baseTokenInfoList.filter((token) => {
+    const _tokenList: TokenModel[] = baseTokenInfoList.filter((token) => {
         if (token.chainId === currentUser.chainId) {
             if (selectedTokenAddresses.includes(token.address))
                 existentSelectedTokenAddesses.push(token.address)
@@ -57,11 +25,9 @@ export const getAllTokenInfoList = async (
                     )
                 ) {
                     _tokenList.unshift(
-                        parseTokenContractInfo(
-                            await fetchTokenInfo(
-                                selectedTokenAddress,
-                                currentUser.signer
-                            ),
+                        await TokenAPI.getTokenInfo(
+                            selectedTokenAddress,
+                            currentUser.web3Provider,
                             currentUser.chainId
                         )
                     )
@@ -74,10 +40,10 @@ export const getAllTokenInfoList = async (
 
 export const getTokenInfoListFromAddresses = async (
     tokenAddresses: string[],
-    baseTokenInfoList: TokenInfo[],
+    baseTokenInfoList: TokenModel[],
     currentUser: UserType
 ) => {
-    const _tokenList: TokenInfo[] = baseTokenInfoList.filter(
+    const _tokenList: TokenModel[] = baseTokenInfoList.filter(
         (token) =>
             token.chainId === currentUser.chainId &&
             tokenAddresses.includes(token.address)
@@ -91,11 +57,9 @@ export const getTokenInfoListFromAddresses = async (
                     ) === -1
                 ) {
                     _tokenList.unshift(
-                        parseTokenContractInfo(
-                            await fetchTokenInfo(
-                                tokenAddress,
-                                currentUser.signer
-                            ),
+                        await TokenAPI.getTokenInfo(
+                            tokenAddress,
+                            currentUser.web3Provider,
                             currentUser.chainId
                         )
                     )
@@ -108,7 +72,7 @@ export const getTokenInfoListFromAddresses = async (
 
 export const findTokensWithName = (
     query: string,
-    baseTokenInfoList: TokenInfo[]
+    baseTokenInfoList: TokenModel[]
 ) => {
     return [...baseTokenInfoList].filter(
         (token) =>
@@ -119,7 +83,7 @@ export const findTokensWithName = (
 
 export const findTokenWithAddress = async (
     addressQuery: string,
-    baseTokenInfoList: TokenInfo[],
+    baseTokenInfoList: TokenModel[],
     fetchForeignToken: boolean,
     currentUser: UserType
 ) => {
@@ -131,8 +95,9 @@ export const findTokenWithAddress = async (
         return filteredListByAddress
     } else if (filteredListByAddress.length === 0 && fetchForeignToken) {
         return [
-            parseTokenContractInfo(
-                await fetchTokenInfo(addressQuery, currentUser.signer),
+            await TokenAPI.getTokenInfo(
+                addressQuery,
+                currentUser.web3Provider,
                 currentUser.chainId
             ),
         ]
@@ -140,5 +105,7 @@ export const findTokenWithAddress = async (
     return []
 }
 
-export const isForeignToken = (token: TokenInfo, tokenInfoList: TokenInfo[]) =>
-    tokenInfoList.findIndex((t) => t.address === token.address) === -1
+export const isForeignToken = (
+    token: TokenModel,
+    tokenInfoList: TokenModel[]
+) => tokenInfoList.findIndex((t) => t.address === token.address) === -1

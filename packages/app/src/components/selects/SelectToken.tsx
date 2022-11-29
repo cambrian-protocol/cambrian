@@ -6,13 +6,13 @@ import {
     getAllTokenInfoList,
     getTokenInfoListFromAddresses,
     isForeignToken,
-} from '@cambrian/app/utils/helpers/tokens'
+} from '@cambrian/app/utils/helpers/tokenHelper'
 import { useEffect, useState } from 'react'
 
 import BasePopupModal from '../modals/BasePopupModal'
-import BaseTokenItem from '../token/BaseTokenItem'
+import BaseTokenBadge from '../token/BaseTokenBadge'
 import BaseTokenLogo from '../token/BaseTokenLogo'
-import { TokenInfo } from '@uniswap/token-lists'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -32,17 +32,17 @@ const SelectToken = ({
 }: SelectTokenProps) => {
     const { currentUser } = useCurrentUserContext()
     const [searchQuery, setSearchQuery] = useState('')
-    const [initialTokenList, setInitialTokenList] = useState<TokenInfo[]>([])
-    const [filteredTokenList, setFilteredTokenList] = useState<TokenInfo[]>([])
+    const [initialTokenList, setInitialTokenList] = useState<TokenModel[]>([])
+    const [filteredTokenList, setFilteredTokenList] = useState<TokenModel[]>([])
     const [showConfirmForeignTokenModal, setShowConfirmForeignTokenModal] =
-        useState<TokenInfo>() // Selected foreign token
+        useState<TokenModel>() // Selected foreign token
 
     useEffect(() => {
         if (currentUser) initTokenList(currentUser)
     }, [currentUser])
 
     const initTokenList = async (user: UserType) => {
-        const _tokenList: TokenInfo[] = allowAnyPaymentToken
+        const _tokenList: TokenModel[] = allowAnyPaymentToken
             ? await getAllTokenInfoList(
                   selectedTokenAddresses,
                   tokenList.tokens,
@@ -61,7 +61,7 @@ const SelectToken = ({
     }
     const onChangeSearchQuery = async (query: string) => {
         if (query.length > 0 && currentUser) {
-            const _tokenList: TokenInfo[] =
+            const _tokenList: TokenModel[] =
                 query.length === 42
                     ? await findTokenWithAddress(
                           query,
@@ -77,7 +77,7 @@ const SelectToken = ({
         }
     }
 
-    const handleSelect = (tokenInfo: TokenInfo) => {
+    const handleSelect = (tokenInfo: TokenModel) => {
         if (isForeignToken(tokenInfo, initialTokenList)) {
             setShowConfirmForeignTokenModal(tokenInfo)
         } else {
@@ -108,7 +108,7 @@ const SelectToken = ({
                     preferredTokenList &&
                     preferredTokenList.length > 0
                         ? preferredTokenList.map((preferredToken) => (
-                              <BaseTokenItem
+                              <BaseTokenBadge
                                   key={preferredToken}
                                   tokenAddress={preferredToken}
                                   onClick={() => onSelect(preferredToken)}
@@ -117,9 +117,9 @@ const SelectToken = ({
                         : initialTokenList.map((token) => {
                               if (token.tags?.includes('popular')) {
                                   return (
-                                      <BaseTokenItem
+                                      <BaseTokenBadge
                                           key={token.address}
-                                          tokenAddress={token.address}
+                                          token={token}
                                           onClick={() =>
                                               onSelect(token.address)
                                           }

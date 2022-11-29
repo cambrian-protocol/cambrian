@@ -73,7 +73,6 @@ const SolverActionbar = ({
         )
 
         const uniqueParticipants = [...new Set(recipientDIDs)]
-        console.log(uniqueParticipants)
         setMessenger(
             <Messenger
                 chatID={solverAddress}
@@ -137,16 +136,15 @@ const SolverActionbar = ({
             }
         case ConditionStatus.ArbitrationDelivered:
         case ConditionStatus.OutcomeReported:
-            if (allowedForRecipients || allowedForArbitrator) {
-                return (
-                    <RedeemTokensActionbar
-                        messenger={messenger}
-                        currentUser={currentUser}
-                        currentCondition={currentCondition}
-                        solverData={solverData}
-                    />
-                )
-            }
+            return (
+                <RedeemTokensActionbar
+                    solverAddress={solverAddress}
+                    messenger={messenger}
+                    currentUser={currentUser}
+                    currentCondition={currentCondition}
+                    solverData={solverData}
+                />
+            )
             break
     }
 

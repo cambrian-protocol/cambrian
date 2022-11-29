@@ -21,10 +21,11 @@ import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export async function parseComposerSolvers(
     composerSolvers: ComposerSolver[],
-    provider: ethers.providers.Provider
+    currentUser: UserType
 ): Promise<SolverModel[] | undefined> {
     if (composerSolvers.length === 0) {
         console.error('No Solver existent.')
@@ -38,7 +39,8 @@ export async function parseComposerSolvers(
 
     const collateralToken = await TokenAPI.getTokenInfo(
         composerSolvers[0].config.collateralToken,
-        provider
+        currentUser.web3Provider,
+        currentUser.chainId
     )
 
     const sortedSolvers = getSolverHierarchy(
@@ -52,8 +54,6 @@ export async function parseComposerSolvers(
         ) // Todo error context?
         return undefined
     }
-
-    const { chainId } = await provider.getNetwork()
 
     return sortedSolvers.map((solver, index) => {
         return {
@@ -69,7 +69,7 @@ export async function parseComposerSolvers(
                 solver.config,
                 index,
                 sortedSolvers,
-                chainId
+                currentUser.chainId
             ),
         }
     })

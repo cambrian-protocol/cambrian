@@ -1,7 +1,13 @@
 import { Box, BoxProps } from 'grommet'
 import styled, { keyframes } from 'styled-components'
 
-const BaseSkeletonBox = ({ height, width }: BoxProps) => {
+import { PropsWithChildren } from 'react'
+
+const BaseSkeletonBox = ({
+    height,
+    width,
+    children,
+}: BoxProps & PropsWithChildren<{}>) => {
     return (
         <SkeletonBox
             height={height}
@@ -9,7 +15,9 @@ const BaseSkeletonBox = ({ height, width }: BoxProps) => {
             round="xsmall"
             justify="center"
             align="center"
-        ></SkeletonBox>
+        >
+            {children}
+        </SkeletonBox>
     )
 }
 

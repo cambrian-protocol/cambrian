@@ -1,4 +1,4 @@
-import BaseTokenItem from './BaseTokenItem'
+import BaseTokenBadge from './BaseTokenBadge'
 import { X } from 'phosphor-react'
 
 interface RemoveTokenItemProps {
@@ -8,7 +8,7 @@ interface RemoveTokenItemProps {
 
 const RemoveTokenItem = ({ tokenAddress, onRemove }: RemoveTokenItemProps) => {
     return (
-        <BaseTokenItem
+        <BaseTokenBadge
             icon={<X />}
             tokenAddress={tokenAddress}
             onClick={() => onRemove(tokenAddress)}

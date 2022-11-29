@@ -159,7 +159,7 @@ const ProposalFundingActionbar = ({
                     }}
                 />
             )}
-            {showProposalFundingModal && (
+            {showProposalFundingModal && collateralToken && (
                 <BaseLayerModal onBack={toggleShowProposalFundingModal}>
                     <ModalHeader
                         title="Proposal funding"
@@ -169,6 +169,7 @@ const ProposalFundingActionbar = ({
                     />
                     <Box height={{ min: 'auto' }}>
                         <FundProposalForm
+                            collateralToken={collateralToken}
                             currentUser={currentUser}
                             proposalContract={proposalContract}
                         />

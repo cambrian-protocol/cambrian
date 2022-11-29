@@ -6,10 +6,11 @@ import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { fetchTokenInfo } from './tokens'
 import { getIndexSetFromBinaryArray } from '../transformers/ComposerTransformer'
 import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
 
@@ -37,10 +38,14 @@ export type ReclaimablePositionType = {
     funderAmount: BigNumber
     funderReclaimed: BigNumber
     funderReclaimableAmount: BigNumber
+    percentage: string
+    conditionId: string
 }
 
 export type ReclaimableTokensType = {
     proposalId: string
+    totalFunding: BigNumber
+    collateralToken: TokenModel
     reclaimableSolvers: ReclaimableSolversMap
 }
 
@@ -50,10 +55,10 @@ type ReclaimableSolversMap = {
 
 export const getRedeemablePositions = async (
     address: string,
-    signerOrProvider: ethers.Signer | ethers.providers.Provider,
+    provider: ethers.providers.Provider,
     chainId: number
 ): Promise<RedeemablePositionsHash> => {
-    const ctfContract = new CTFContract(signerOrProvider, chainId)
+    const ctfContract = new CTFContract(provider, chainId)
 
     const redemptionCache: { [conditionId: string]: boolean } = {}
     const solverCache: {
@@ -97,10 +102,11 @@ export const getRedeemablePositions = async (
                     const solverContract = new ethers.Contract(
                         solverAddress,
                         BASE_SOLVER_IFACE,
-                        signerOrProvider
+                        provider
                     )
                     const solverConfig = await solverContract.getConfig()
                     const allConditions = await solverContract.getConditions()
+                    // TODO map all conditions
                     const latestCondition =
                         allConditions[allConditions.length - 1]
                     // Check if already redeemed
@@ -113,51 +119,35 @@ export const getRedeemablePositions = async (
                             solverStatus ===
                                 ConditionStatus.ArbitrationDelivered
                         ) {
-                            const collateralToken = await fetchTokenInfo(
+                            const collateralToken = await TokenAPI.getTokenInfo(
                                 solverConfig.conditionBase.collateralToken,
-                                signerOrProvider
-                            )
-
-                            const conditionResolutionLogs =
-                                await ctfContract.contract.queryFilter(
-                                    ctfContract.contract.filters.ConditionResolution(
-                                        latestCondition.conditionId
-                                    )
-                                )
-
-                            const ctfPayoutNumeratorsBN: BigNumber[] =
-                                conditionResolutionLogs[0].args
-                                    ?.payoutNumerators
-
-                            const ctfPayoutNumerators =
-                                ctfPayoutNumeratorsBN.map((numberator) =>
-                                    numberator.toNumber()
-                                )
-
-                            const positionId = getPositionId(
-                                collateralToken.address,
-                                getCollectionId(
-                                    latestCondition.conditionId,
-                                    getIndexSetFromBinaryArray(
-                                        ctfPayoutNumerators
-                                    )
-                                )
-                            )
-
-                            const solverMetadata = await getSolverMetadata(
-                                solverContract,
-                                signerOrProvider,
+                                provider,
                                 chainId
                             )
 
-                            solverCache[solverAddress] = {
-                                collateralToken: collateralToken,
-                                partition: solverConfig.conditionBase.partition,
-                                conditionId: latestCondition.conditionId,
-                                parentCollectionId:
-                                    latestCondition.parentCollectionId,
-                                solverMetadata: solverMetadata,
-                                positionId: positionId,
+                            const positionId =
+                                await getPositionIdFromConditionResolution(
+                                    ctfContract.contract,
+                                    latestCondition.conditionId,
+                                    solverConfig.conditionBase.collateralToken
+                                )
+
+                            if (positionId) {
+                                const solverMetadata = await getSolverMetadata(
+                                    solverContract,
+                                    provider
+                                )
+
+                                solverCache[solverAddress] = {
+                                    collateralToken: collateralToken,
+                                    partition:
+                                        solverConfig.conditionBase.partition,
+                                    conditionId: latestCondition.conditionId,
+                                    parentCollectionId:
+                                        latestCondition.parentCollectionId,
+                                    solverMetadata: solverMetadata,
+                                    positionId: positionId,
+                                }
                             }
                         }
                     }
@@ -199,8 +189,9 @@ export const getRedeemablePositions = async (
 
 export const getReclaimableTokensFromSolver = async (
     fromSolverAddress: string,
+    conditionId: string,
     currentUser: UserType
-) => {
+): Promise<ReclaimableTokensType | undefined> => {
     const ctf = new CTFContract(currentUser.signer, currentUser.chainId)
     const proposalsHub = new ProposalsHub(
         currentUser.signer,
@@ -213,14 +204,26 @@ export const getReclaimableTokensFromSolver = async (
     )
     const proposalId = await solverContract.trackingId()
     const proposalContract = await proposalsHub.getProposal(proposalId)
-
-    return await getReclaimablePositions(
+    const reclaimablePositions = await getReclaimablePositions(
         ctf.contract,
         proposalsHub.contract,
         proposalContract,
         fromSolverAddress,
-        currentUser.address
+        currentUser.address,
+        conditionId
     )
+    if (reclaimablePositions) {
+        return {
+            proposalId: proposalId,
+            totalFunding: proposalContract.fundingGoal,
+            collateralToken: await TokenAPI.getTokenInfo(
+                proposalContract.collateralToken,
+                currentUser.web3Provider,
+                currentUser.chainId
+            ),
+            reclaimableSolvers: { [fromSolverAddress]: reclaimablePositions },
+        }
+    }
 }
 
 export const getAllReclaimableTokensFromProposal = async (
@@ -245,15 +248,32 @@ export const getAllReclaimableTokensFromProposal = async (
     if (solverAddresses) {
         await Promise.all(
             solverAddresses.map(async (solverAddress) => {
-                const reclaimablePositions = await getReclaimablePositions(
-                    ctf.contract,
-                    proposalsHub.contract,
-                    proposalContract,
+                const solverContract = new ethers.Contract(
                     solverAddress,
-                    currentUser.address
+                    BASE_SOLVER_IFACE,
+                    currentUser.signer
                 )
-                if (reclaimablePositions) {
-                    reclaimableSolvers[solverAddress] = reclaimablePositions
+                const conditions: SolverContractCondition[] =
+                    await solverContract.getConditions()
+
+                if (conditions && conditions.length > 0) {
+                    await Promise.all(
+                        conditions.map(async (condition) => {
+                            const reclaimablePositions =
+                                await getReclaimablePositions(
+                                    ctf.contract,
+                                    proposalsHub.contract,
+                                    proposalContract,
+                                    solverAddress,
+                                    currentUser.address,
+                                    condition.conditionId
+                                )
+                            if (reclaimablePositions) {
+                                reclaimableSolvers[solverAddress] =
+                                    reclaimablePositions
+                            }
+                        })
+                    )
                 }
             })
         )
@@ -262,6 +282,12 @@ export const getAllReclaimableTokensFromProposal = async (
     if (Object.keys(reclaimableSolvers).length > 0) {
         return {
             proposalId: proposalContract.id,
+            totalFunding: proposalContract.fundingGoal,
+            collateralToken: await TokenAPI.getTokenInfo(
+                proposalContract.collateralToken,
+                currentUser.web3Provider,
+                currentUser.chainId
+            ),
             reclaimableSolvers: reclaimableSolvers,
         }
     }
@@ -272,7 +298,8 @@ const getReclaimablePositions = async (
     proposalsHubContract: ethers.Contract,
     proposalContract: ethers.Contract,
     fromSolverAddress: string,
-    userAddress: string
+    userAddress: string,
+    conditionId: string
 ): Promise<ReclaimablePositionType[] | undefined> => {
     const transferBatchFilter = conditionalTokenContract.filters.TransferBatch(
         null, // operator
@@ -282,6 +309,7 @@ const getReclaimablePositions = async (
     const transferBatchLogs = await conditionalTokenContract.queryFilter(
         transferBatchFilter
     )
+
     const reclaimablePositions: ReclaimablePositionType[] = []
     await Promise.all(
         transferBatchLogs.map(async (l: any) => {
@@ -289,7 +317,17 @@ const getReclaimablePositions = async (
             const values: BigNumber[] = l.args![4]
             await Promise.all(
                 values.map(async (value, idx) => {
-                    if (value.gt(0)) {
+                    const positionIdFromConditionId =
+                        await getPositionIdFromConditionResolution(
+                            conditionalTokenContract,
+                            conditionId,
+                            proposalContract.collateralToken
+                        )
+                    if (
+                        value.gt(0) &&
+                        positionIds[idx].toHexString() ===
+                            positionIdFromConditionId
+                    ) {
                         const funderAmount =
                             await proposalsHubContract.funderAmountMap(
                                 proposalContract.id,
@@ -319,7 +357,9 @@ const getReclaimablePositions = async (
                                 funderReclaimed: reclaimedTokens,
                                 positionId: positionIds[idx].toHexString(),
                                 funderReclaimableAmount:
-                                    funderReclaimableAmount,
+                                    funderReclaimableAmount.reclaimableTokens,
+                                percentage: funderReclaimableAmount.percentage,
+                                conditionId: conditionId,
                             })
                         }
                     }
@@ -337,6 +377,47 @@ const calculateReclaimableTokens = (
     funderAmount: BigNumber,
     totalReclaimable: BigNumber
 ) => {
-    const funderPercentage = funderAmount.mul(100).div(totalFunding)
-    return funderPercentage.mul(totalReclaimable).div(100)
+    const formattedFunderAmount = Number(ethers.utils.formatUnits(funderAmount))
+    const formattedTotalFunding = Number(ethers.utils.formatUnits(totalFunding))
+    const funderPercentageNumber =
+        (formattedFunderAmount * 100) / formattedTotalFunding
+    const formattedTotalReclaimable = Number(
+        ethers.utils.formatUnits(totalReclaimable)
+    )
+
+    const reclaimableTokens =
+        (funderPercentageNumber * formattedTotalReclaimable) / 100
+
+    return {
+        percentage: funderPercentageNumber.toFixed(2),
+        reclaimableTokens: ethers.utils.parseUnits(
+            reclaimableTokens.toString()
+        ),
+    }
+}
+
+const getPositionIdFromConditionResolution = async (
+    ctfContract: ethers.Contract,
+    conditionId: string,
+    collateralTokenAddress: string
+) => {
+    const conditionResolutionLogs = await ctfContract.queryFilter(
+        ctfContract.filters.ConditionResolution(conditionId)
+    )
+    if (conditionResolutionLogs.length > 0) {
+        const ctfPayoutNumeratorsBN: BigNumber[] =
+            conditionResolutionLogs[0].args?.payoutNumerators
+
+        const ctfPayoutNumerators = ctfPayoutNumeratorsBN.map((numberator) =>
+            numberator.toNumber()
+        )
+
+        return getPositionId(
+            collateralTokenAddress,
+            getCollectionId(
+                conditionId,
+                getIndexSetFromBinaryArray(ctfPayoutNumerators)
+            )
+        )
+    }
 }

@@ -1,7 +1,8 @@
 import { Box, Heading, Text } from 'grommet'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
-import BaseTokenItem from '../../token/BaseTokenItem'
+import BaseSkeletonBox from '../../skeletons/BaseSkeletonBox'
+import BaseTokenBadge from '../../token/BaseTokenBadge'
 import ModalHeader from '../../layout/header/ModalHeader'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '@cambrian/app/ui/solver/OutcomeOverview'
@@ -34,6 +35,7 @@ const BaseSolverInfo = ({
 }: BaseSolverInfoProps) => {
     const { currentUser } = useCurrentUserContext()
     const [arbitratorAddress, setArbitratorAddress] = useState()
+    const [isInitialized, setIsInitialized] = useState(false)
 
     const hasArbitrator =
         (slotTags &&
@@ -51,6 +53,7 @@ const BaseSolverInfo = ({
                 await getArbitratorAddressOrOwner(arbitrator, user)
             )
         }
+        setIsInitialized(true)
     }
 
     return (
@@ -72,9 +75,13 @@ const BaseSolverInfo = ({
                             id="arbitrator"
                             slotTags={slotTags}
                             value={
-                                <RecipientInfoItem
-                                    address={arbitratorAddress}
-                                />
+                                isInitialized ? (
+                                    <RecipientInfoItem
+                                        address={arbitratorAddress}
+                                    />
+                                ) : (
+                                    <BaseSkeletonBox height={'100%'} />
+                                )
                             }
                         />
                     )}
@@ -83,7 +90,7 @@ const BaseSolverInfo = ({
                         slotTags={slotTags}
                         value={
                             <Box align="start">
-                                <BaseTokenItem tokenAddress={token?.address} />
+                                <BaseTokenBadge token={token} />
                             </Box>
                         }
                     />

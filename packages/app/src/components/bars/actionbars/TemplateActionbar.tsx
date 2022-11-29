@@ -2,7 +2,6 @@ import ActionbarItemDropContainer, {
     ActionbarItemDropListType,
 } from '../../containers/ActionbarItemDropContainer'
 import { Box, Text } from 'grommet'
-import { Coin, Coins, CurrencyEth } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -12,13 +11,14 @@ import { useEffect, useState } from 'react'
 import BaseActionbar from './BaseActionbar'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ClipboardButton from '../../buttons/ClipboardButton'
+import { Coin } from 'phosphor-react'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoaderButton from '../../buttons/LoaderButton'
 import { TemplatePriceModel } from '@cambrian/app/models/TemplateModel'
+import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { fetchTokenInfo } from '@cambrian/app/utils/helpers/tokens'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -48,9 +48,10 @@ const TemplateActionbar = ({
 
     const init = async () => {
         if (price.denominationTokenAddress && currentUser) {
-            const ct = await fetchTokenInfo(
+            const ct = await TokenAPI.getTokenInfo(
                 price.denominationTokenAddress,
-                currentUser.web3Provider
+                currentUser.web3Provider,
+                currentUser.chainId
             )
             if (ct) setCollateralToken(ct)
             const infos: ActionbarItemDropListType = [
