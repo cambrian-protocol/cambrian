@@ -32,7 +32,17 @@ export default function UserMenu() {
     ]
 
     if (currentUser) {
-        if (currentUser.session) {
+        if (currentUser.isSafeApp) {
+            menuItems.unshift({
+                label: (
+                    <UserMenuItemLabel
+                        subTitle={'Connected with Gnosis Safe App'}
+                        label={ellipseAddress(currentUser.address, 7)}
+                    />
+                ),
+                icon: <UserMenuItemIcon icon={<User />} />,
+            })
+        } else {
             menuItems.unshift({
                 label: (
                     <UserMenuItemLabel
@@ -45,16 +55,6 @@ export default function UserMenu() {
                 ),
                 icon: <UserMenuItemIcon icon={<User />} />,
                 onClick: () => router.push('/dashboard?idx=5'),
-            })
-        } else {
-            menuItems.unshift({
-                label: (
-                    <UserMenuItemLabel
-                        subTitle={'Connected with Gnosis Safe App'}
-                        label={ellipseAddress(currentUser.address, 7)}
-                    />
-                ),
-                icon: <UserMenuItemIcon icon={<User />} />,
             })
         }
         menuItems.push({

@@ -1,11 +1,11 @@
 import { Box, ResponsiveContext } from 'grommet'
-import { House, Layout, Vault } from 'phosphor-react'
 
 import AppbarMenuItem from './appbar/AppbarMenuItem'
 import CambrianLogo from '../branding/CambrianLogo'
 import CambrianLogoMark from '../branding/CambrianLogoMark'
 import ChainMenu from './appbar/ChainMenu'
 import { Header } from 'grommet'
+import { Layout } from 'phosphor-react'
 import UserMenu from '../menu/UserMenu'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -41,7 +41,7 @@ const Appbar = () => {
                             {currentUser && (
                                 <Box direction="row" gap="medium">
                                     <Box justify="center">
-                                        {currentUser.session && (
+                                        {!currentUser.isSafeApp && (
                                             <AppbarMenuItem
                                                 pathname="/dashboard"
                                                 label="Dashboard"

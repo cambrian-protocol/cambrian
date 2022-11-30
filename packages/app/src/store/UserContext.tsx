@@ -60,6 +60,7 @@ export type UserType = {
     signer: ethers.Signer
     address: string
     chainId: number
+    isSafeApp: boolean
     permissions: PermissionType[]
     cambrianProfileDoc?: TileDocument<CambrianProfileType>
     session?: DIDSession
@@ -74,6 +75,7 @@ type UserActionType =
           signer: UserType['signer']
           address: UserType['address']
           chainId: UserType['chainId']
+          isSafeApp: UserType['isSafeApp']
           cambrianProfileDoc?: TileDocument<CambrianProfileType>
           session?: UserType['session']
           did?: UserType['did']
@@ -121,6 +123,7 @@ function userReducer(
                 signer: action.signer,
                 address: action.address,
                 chainId: action.chainId,
+                isSafeApp: action.isSafeApp,
                 cambrianProfileDoc: action.cambrianProfileDoc,
                 permissions: [],
                 session: action.session,
@@ -184,6 +187,7 @@ export const UserContextProvider = ({
                 dispatch({
                     type: 'SET_USER',
                     provider: provider,
+                    isSafeApp: true,
                     web3Provider: web3Provider,
                     signer: signer,
                     address: address,
@@ -206,6 +210,7 @@ export const UserContextProvider = ({
                     type: 'SET_USER',
                     provider: provider,
                     web3Provider: web3Provider,
+                    isSafeApp: false,
                     signer: signer,
                     address: address,
                     chainId: network.chainId,

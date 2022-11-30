@@ -1,5 +1,6 @@
 import { Box } from 'grommet'
 import { Image } from 'grommet'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 interface CambrianLogoMarkProps {
@@ -7,10 +8,15 @@ interface CambrianLogoMarkProps {
 }
 
 const CambrianLogoMark = ({ size }: CambrianLogoMarkProps) => {
+    const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     return (
         <Box
-            onClick={() => router.push('/')}
+            onClick={
+                currentUser?.isSafeApp
+                    ? () => router.push('/safe')
+                    : () => router.push('/')
+            }
             focusIndicator={false}
             width={{
                 min: size ? size : 'xxsmall',
