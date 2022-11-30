@@ -35,6 +35,7 @@ const ReclaimableTokenCard = ({
                 reclaimablePositions.map((reclaimablePosition) => {
                     return (
                         <ReclaimablePositionItem
+                            key={reclaimablePosition.positionId}
                             proposalId={proposalId}
                             solverAddress={solverAddress}
                             fundingGoal={fundingGoal}
