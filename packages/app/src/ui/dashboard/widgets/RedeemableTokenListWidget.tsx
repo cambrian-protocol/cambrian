@@ -25,7 +25,7 @@ const RedeemableTokenListWidget = ({
 }: RedeemableTokensWidgetProps) => {
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [isRedeeming, setIsRedeeming] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -35,7 +35,10 @@ const RedeemableTokenListWidget = ({
 
     const init = async () => {
         try {
-            setRedeemablePositions(await getRedeemablePositions(currentUser))
+            const redeemablePositions = await getRedeemablePositions(
+                currentUser
+            )
+            setRedeemablePositions(redeemablePositions)
         } catch (e) {}
         setIsLoading(false)
     }
