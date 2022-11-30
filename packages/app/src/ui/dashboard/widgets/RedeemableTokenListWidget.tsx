@@ -12,19 +12,16 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import Link from 'next/link'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface RedeemableTokensWidgetProps {
-    address: string
-    provider: ethers.providers.Provider
-    chainId: number
+    currentUser: UserType
 }
 
 const RedeemableTokenListWidget = ({
-    address,
-    provider,
-    chainId,
+    currentUser,
 }: RedeemableTokensWidgetProps) => {
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
@@ -38,10 +35,7 @@ const RedeemableTokenListWidget = ({
 
     const init = async () => {
         try {
-            setIsLoading(true)
-            setRedeemablePositions(
-                await getRedeemablePositions(address, provider, chainId)
-            )
+            setRedeemablePositions(await getRedeemablePositions(currentUser))
         } catch (e) {}
         setIsLoading(false)
     }
@@ -49,7 +43,10 @@ const RedeemableTokenListWidget = ({
     const onRedeem = async (redeemablePosition: RedeemablePosition) => {
         try {
             setIsRedeeming(redeemablePosition.positionId)
-            const ctfContract = new CTFContract(provider, chainId)
+            const ctfContract = new CTFContract(
+                currentUser.signer,
+                currentUser.chainId
+            )
             const tx: ethers.ContractTransaction =
                 await ctfContract.contract.redeemPositions(
                     redeemablePosition.collateralToken.address,

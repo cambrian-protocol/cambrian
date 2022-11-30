@@ -18,11 +18,7 @@ export default function Safe() {
                             title="Redeemable funds"
                             description="Redeem Solver funds sent to a Gnosis Safe"
                         />
-                        <RedeemableTokenListWidget
-                            provider={currentUser.web3Provider}
-                            address={currentUser.address}
-                            chainId={currentUser.chainId}
-                        />
+                        <RedeemableTokenListWidget currentUser={currentUser} />
                         <FindSolverWidget currentUser={currentUser} />
                     </Box>
                 </PageLayout>

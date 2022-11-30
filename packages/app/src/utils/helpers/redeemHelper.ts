@@ -54,11 +54,9 @@ type ReclaimableSolversMap = {
 }
 
 export const getRedeemablePositions = async (
-    address: string,
-    provider: ethers.providers.Provider,
-    chainId: number
+    currentUser: UserType
 ): Promise<RedeemablePositionsHash> => {
-    const ctfContract = new CTFContract(provider, chainId)
+    const ctfContract = new CTFContract(currentUser.signer, currentUser.chainId)
 
     const redemptionCache: { [conditionId: string]: boolean } = {}
     const solverCache: {
@@ -69,7 +67,7 @@ export const getRedeemablePositions = async (
     // For getting payouts the user has already redeemed
     const payoutRedemptionLogs = await ctfContract.contract.queryFilter(
         ctfContract.contract.filters.PayoutRedemption(
-            address, // redeemer
+            currentUser.address, // redeemer
             null, // collateralToken
             null // parentCollectionID
         )
@@ -84,7 +82,7 @@ export const getRedeemablePositions = async (
     const transferBatchFilter = ctfContract.contract.filters.TransferBatch(
         null, // operator
         null, // from
-        address // to
+        currentUser.address // to
     )
 
     const transferBatchLogs = await ctfContract.contract.queryFilter(
@@ -102,7 +100,7 @@ export const getRedeemablePositions = async (
                     const solverContract = new ethers.Contract(
                         solverAddress,
                         BASE_SOLVER_IFACE,
-                        provider
+                        currentUser.signer
                     )
                     const solverConfig = await solverContract.getConfig()
                     const allConditions = await solverContract.getConditions()
@@ -121,8 +119,8 @@ export const getRedeemablePositions = async (
                         ) {
                             const collateralToken = await TokenAPI.getTokenInfo(
                                 solverConfig.conditionBase.collateralToken,
-                                provider,
-                                chainId
+                                currentUser.web3Provider,
+                                currentUser.chainId
                             )
 
                             const positionId =
@@ -135,7 +133,7 @@ export const getRedeemablePositions = async (
                             if (positionId) {
                                 const solverMetadata = await getSolverMetadata(
                                     solverContract,
-                                    provider
+                                    currentUser.web3Provider
                                 )
 
                                 solverCache[solverAddress] = {
