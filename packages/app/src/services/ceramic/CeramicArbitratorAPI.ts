@@ -25,6 +25,9 @@ export default class CeramicArbitratorAPI {
         fee: number
     ) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const arbitratorsLib = await TileDocument.deterministic(
                 ceramicInstance(this.user),
                 {
@@ -68,6 +71,9 @@ export default class CeramicArbitratorAPI {
     getArbitratorContracts =
         async (): Promise<ArbitratorContractFeeHashmap> => {
             try {
+                if (!this.user.did || !this.user.session)
+                    throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
                 const arbitratorContractsOnConnectedChain: ArbitratorContractFeeHashmap =
                     {}
                 const arbitratorLib = (await TileDocument.deterministic(

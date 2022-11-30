@@ -32,6 +32,9 @@ export default class CeramicProposalAPI {
         templateStreamID: string
     ): Promise<string> => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const templateStreamDoc: TileDocument<TemplateModel> =
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
@@ -71,6 +74,9 @@ export default class CeramicProposalAPI {
      */
     submitProposal = async (proposalStreamID: string) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',

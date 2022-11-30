@@ -284,6 +284,9 @@ export const createSolverConfigs = async (
     currentUser: UserType
 ) => {
     try {
+        if (!currentUser.did || !currentUser.session)
+            throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
         const solverConfigsDoc = await TileDocument.deterministic(
             ceramicInstance(currentUser),
             {

@@ -209,6 +209,9 @@ export default function CoreMessenger({
     // Publish an array of messages (append to existing)
     const publishMessages = async (messages: ChatMessageType[]) => {
         try {
+            if (!currentUser.did || !currentUser.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const messagesDoc: TileDocument<UserChatTileDocumentType> =
                 await TileDocument.deterministic(
                     ceramicInstance(currentUser),
@@ -269,6 +272,9 @@ export default function CoreMessenger({
     const updateReadMessagesCounter = async (
         updatedReadMessagesCounter: number
     ) => {
+        if (!currentUser.did || !currentUser.session)
+            throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
         const messagesDoc: TileDocument<UserChatTileDocumentType> =
             await TileDocument.deterministic(
                 ceramicInstance(currentUser),
@@ -323,23 +329,31 @@ export default function CoreMessenger({
                         <div id="chat-end" />
                     </Box>
                     <Form
-                        onSubmit={() =>
-                            sendMessage({
-                                text: messageInput,
-                                author: {
-                                    name:
-                                        currentUser.cambrianProfileDoc.content
-                                            ?.name || 'Anon',
-                                    did: currentUser.did,
-                                },
-                                timestamp: new Date().getTime(),
-                            })
+                        onSubmit={
+                            currentUser.did
+                                ? () =>
+                                      sendMessage({
+                                          text: messageInput,
+                                          author: {
+                                              name:
+                                                  currentUser.cambrianProfileDoc
+                                                      ?.content?.name || 'Anon',
+                                              did: currentUser.did!,
+                                          },
+                                          timestamp: new Date().getTime(),
+                                      })
+                                : undefined
                         }
                     >
                         <Box direction="row" align="center" gap="small">
                             <Box flex>
                                 <TextInput
-                                    placeholder="Write a message here"
+                                    disabled={!currentUser.session}
+                                    placeholder={
+                                        currentUser.session
+                                            ? 'Write a message here'
+                                            : 'Missing Ceramic Connection'
+                                    }
                                     value={messageInput}
                                     onChange={(e) =>
                                         setMessageInput(e.target.value)
