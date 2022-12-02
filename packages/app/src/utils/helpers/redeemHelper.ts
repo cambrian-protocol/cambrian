@@ -1,16 +1,21 @@
 import { BigNumber, ethers } from 'ethers'
+import { calculateCollectionId, calculatePositionId } from './solverHelpers'
 import { getCollectionId, getPositionId } from './ctHelpers'
 
+import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { decodeData } from './decodeData'
 import { getIndexSetFromBinaryArray } from '../transformers/ComposerTransformer'
 import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
 
@@ -53,7 +58,64 @@ type ReclaimableSolversMap = {
     [solverAddress: string]: ReclaimablePositionType[]
 }
 
-export const getRedeemablePositions = async (
+export type PayoutInfo = { amount: BigNumber; percentage: BigNumber }
+
+export const getRedeemableAmount = async (
+    currentUser: UserType,
+    solverData: SolverModel,
+    currentCondition: SolverContractCondition,
+    ctf: ethers.Contract
+): Promise<PayoutInfo | undefined> => {
+    const allocs: AllocationModel[] = []
+    solverData.outcomeCollections[currentCondition.conditionId].forEach(
+        (oc) => {
+            oc.allocations.forEach((allocation) => {
+                const decodedAddress = decodeData(
+                    [SolidityDataTypes.Address],
+                    allocation.addressSlot.slot.data
+                )
+                if (decodedAddress === currentUser.address) {
+                    allocs.push(allocation)
+                }
+            })
+        }
+    )
+
+    const conditionResolutionLogs = await ctf.queryFilter(
+        ctf.filters.ConditionResolution(currentCondition.conditionId)
+    )
+
+    const ctfPayoutNumeratorsBN: BigNumber[] =
+        conditionResolutionLogs[0].args?.payoutNumerators
+
+    const ctfPayoutNumerators = ctfPayoutNumeratorsBN.map((numerator) =>
+        numerator.toNumber()
+    )
+
+    const payoutPercentage = getTotalPayoutPct(
+        allocs,
+        ctfPayoutNumerators,
+        solverData,
+        currentCondition
+    )
+    if (
+        payoutPercentage &&
+        solverData.numMintedTokensByCondition?.[currentCondition.conditionId]
+    ) {
+        return {
+            amount: payoutPercentage
+                .mul(
+                    solverData.numMintedTokensByCondition[
+                        currentCondition.conditionId
+                    ]
+                )
+                .div(100),
+            percentage: payoutPercentage,
+        }
+    }
+}
+
+export const getAllRedeemablePositions = async (
     currentUser: UserType
 ): Promise<RedeemablePositionsHash> => {
     const ctfContract = new CTFContract(currentUser.signer, currentUser.chainId)
@@ -418,4 +480,70 @@ const getPositionIdFromConditionResolution = async (
             )
         )
     }
+}
+
+/**
+ * Mostly mimics calculation from ConditionalToken.sol
+ */
+const getTotalPayoutPct = (
+    allocations: AllocationModel[],
+    payoutNumerators: number[],
+    solverData: SolverModel,
+    currentCondition: SolverContractCondition
+) => {
+    const indexSets = solverData.config.conditionBase.partition
+    const outcomeSlotCount = solverData.config.conditionBase.outcomeSlots
+
+    const indexSet = getIndexSetFromBinaryArray(payoutNumerators)
+    const oc = solverData.outcomeCollections[currentCondition.conditionId].find(
+        (outcomeCollection) => outcomeCollection.indexSet === indexSet
+    )
+
+    let den = currentCondition.payouts.reduce((total, next) => {
+        return total + next
+    })
+
+    let payout = BigNumber.from(0)
+    if (oc) {
+        for (let i = 0; i < indexSets.length; i++) {
+            const indexSet = indexSets[i]
+
+            let payoutNumerator = 0
+
+            for (let j = 0; j < outcomeSlotCount; j++) {
+                if ((indexSet & (1 << j)) != 0) {
+                    payoutNumerator = payoutNumerator + payoutNumerators[j]
+                }
+            }
+
+            let payoutStake = '0'
+            const positionId = calculatePositionId(
+                currentCondition.collateralToken,
+                calculateCollectionId(currentCondition.conditionId, indexSet)
+            )
+            allocations.forEach((alloc) => {
+                if (alloc.positionId === positionId) {
+                    payoutStake = (
+                        BigInt(payoutStake) + BigInt(alloc.amountPercentage)
+                    ).toString()
+                }
+            })
+
+            if (payoutStake && BigNumber.from(payoutStake).gt(0)) {
+                payout = payout
+                    .add(BigNumber.from(payoutStake).mul(payoutNumerator))
+                    .div(den)
+            }
+        }
+    }
+
+    return payout
+}
+
+export const truncateAmount = (amount: string) => {
+    const splitAmount = amount.split('.')
+    if (splitAmount.length > 1)
+        return splitAmount[0] + '.' + splitAmount[1].substring(0, 3)
+
+    return splitAmount[0]
 }

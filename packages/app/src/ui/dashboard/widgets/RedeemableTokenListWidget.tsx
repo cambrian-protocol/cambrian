@@ -2,7 +2,7 @@ import { Box, Button, Text } from 'grommet'
 import {
     RedeemablePosition,
     RedeemablePositionsHash,
-    getRedeemablePositions,
+    getAllRedeemablePositions,
 } from '@cambrian/app/utils/helpers/redeemHelper'
 import { useEffect, useState } from 'react'
 
@@ -35,7 +35,7 @@ const RedeemableTokenListWidget = ({
 
     const init = async () => {
         try {
-            const redeemablePositions = await getRedeemablePositions(
+            const redeemablePositions = await getAllRedeemablePositions(
                 currentUser
             )
             setRedeemablePositions(redeemablePositions)
