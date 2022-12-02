@@ -40,7 +40,7 @@ export const GENERAL_ERROR: ErrorMessagesType = {
         message: 'Please try again later...',
         logLevel: 1,
     },
-    NO_SELF_ID: {
+    NO_CERAMIC_CONNECTION: {
         title: 'Ceramic connection necessary',
         message: 'Please connect your wallet to ceramic.',
         logLevel: 0,

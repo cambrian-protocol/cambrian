@@ -12,9 +12,9 @@ import { CeramicClient } from '@ceramicnetwork/http-client'
 import ConnectWalletPage from '../components/sections/ConnectWalletPage'
 import { DIDSession } from 'did-session'
 import PermissionProvider from './PermissionContext'
+import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import Web3Modal from 'web3modal'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -61,9 +61,9 @@ export type UserType = {
     address: string
     chainId: number
     permissions: PermissionType[]
-    cambrianProfileDoc: TileDocument<CambrianProfileType>
-    session: DIDSession
-    did: string // did:pkh
+    cambrianProfileDoc?: TileDocument<CambrianProfileType>
+    session?: DIDSession
+    did?: string // did:pkh
 }
 
 type UserActionType =
@@ -74,9 +74,9 @@ type UserActionType =
           signer: UserType['signer']
           address: UserType['address']
           chainId: UserType['chainId']
-          cambrianProfileDoc: TileDocument<CambrianProfileType>
-          session: UserType['session']
-          did: UserType['did']
+          cambrianProfileDoc?: TileDocument<CambrianProfileType>
+          session?: UserType['session']
+          did?: UserType['did']
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -98,9 +98,9 @@ const providerOptions = {
     },
 }
 
-let web3Modal: Web3Modal
+let web3Modal: SafeAppWeb3Modal
 if (typeof window !== 'undefined') {
-    web3Modal = new Web3Modal({
+    web3Modal = new SafeAppWeb3Modal({
         // network: 'mainnet',
         cacheProvider: true,
         providerOptions,
@@ -166,7 +166,11 @@ export const UserContextProvider = ({
     const connectWallet = useCallback(async function () {
         try {
             const provider = await web3Modal.connect()
-            const web3Provider = new ethers.providers.Web3Provider(provider)
+
+            const isSafeApp = await web3Modal.isSafeApp()
+            const web3Provider = new ethers.providers.Web3Provider(
+                isSafeApp ? await web3Modal.getProvider() : provider
+            )
             const signer = web3Provider.getSigner()
             const address = await signer.getAddress()
             const network = await web3Provider.getNetwork()
@@ -176,30 +180,40 @@ export const UserContextProvider = ({
                 web3Provider.pollingInterval = 1000
             }
 
-            const session = await loadSession(provider, network, address)
+            if (isSafeApp) {
+                dispatch({
+                    type: 'SET_USER',
+                    provider: provider,
+                    web3Provider: web3Provider,
+                    signer: signer,
+                    address: address,
+                    chainId: network.chainId,
+                })
+            } else {
+                const session = await loadSession(provider, network, address)
+                const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+                ceramic.did = session.did
+                const cambrianProfileDoc = (await TileDocument.deterministic(
+                    ceramic,
+                    {
+                        controllers: [ceramic.did.parent],
+                        family: 'cambrian-profile',
+                    },
+                    { pin: true }
+                )) as TileDocument<CambrianProfileType>
 
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            ceramic.did = session.did
-            const cambrianProfileDoc = (await TileDocument.deterministic(
-                ceramic,
-                {
-                    controllers: [ceramic.did.parent],
-                    family: 'cambrian-profile',
-                },
-                { pin: true }
-            )) as TileDocument<CambrianProfileType>
-
-            dispatch({
-                type: 'SET_USER',
-                provider: provider,
-                web3Provider: web3Provider,
-                signer: signer,
-                address: address,
-                chainId: network.chainId,
-                cambrianProfileDoc: cambrianProfileDoc,
-                session: session,
-                did: ceramic.did.parent,
-            })
+                dispatch({
+                    type: 'SET_USER',
+                    provider: provider,
+                    web3Provider: web3Provider,
+                    signer: signer,
+                    address: address,
+                    chainId: network.chainId,
+                    cambrianProfileDoc: cambrianProfileDoc,
+                    session: session,
+                    did: ceramic.did.parent,
+                })
+            }
             setIsUserLoaded(true)
         } catch (e) {
             cpLogger.push(e)
@@ -209,7 +223,7 @@ export const UserContextProvider = ({
 
     const disconnectWallet = useCallback(
         async function () {
-            await web3Modal.clearCachedProvider()
+            web3Modal.clearCachedProvider()
             if (
                 user &&
                 user.provider?.disconnect &&
@@ -294,7 +308,7 @@ export const UserContextProvider = ({
             )
             session = await DIDSession.authorize(authMethod, {
                 statement:
-                    'This signature allows Cambrian Protocol to update your account data. The permission expires in 24 hours.',
+                    'This signature allows Cambrian Protocol to update your account data. The permission expires in one week.',
                 resources: ['ceramic://*'],
                 expiresInSecs: 604800, // One week
             })

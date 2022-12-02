@@ -44,12 +44,12 @@ const ProfileWizard = ({ currentUser, successRoute }: ProfileWizardProps) => {
     useEffect(() => {
         setInput({
             ...initialCambrianProfile,
-            ...currentUser.cambrianProfileDoc.content,
+            ...currentUser.cambrianProfileDoc?.content,
         })
     }, [])
 
     const onSave = async () => {
-        await currentUser.cambrianProfileDoc.update(input)
+        await currentUser.cambrianProfileDoc?.update(input)
     }
 
     const renderCurrentFormStep = () => {

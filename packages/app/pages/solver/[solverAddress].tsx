@@ -33,7 +33,8 @@ export default function SolverPage() {
     const determineQuery = async (currentUser: UserType) => {
         if (solverAddress !== undefined && typeof solverAddress === 'string') {
             try {
-                await addRecentStage(currentUser, solverAddress as string)
+                if (currentUser.session)
+                    await addRecentStage(currentUser, solverAddress as string)
                 if (solverAddress.startsWith('0x')) {
                     setUi(
                         <SolverUI
@@ -45,7 +46,6 @@ export default function SolverPage() {
                     const stage = (await ceramicInstance(
                         currentUser
                     ).loadStream(solverAddress)) as TileDocument<any>
-
                     if (stage.content.solvers) {
                         // Its a Composition
                         setUi(

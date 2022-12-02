@@ -26,7 +26,6 @@ import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -80,6 +79,9 @@ export default class CeramicTemplateAPI {
         compositionStreamID: string
     ): Promise<string> => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const composition: TileDocument<CompositionModel> =
                 await TileDocument.load(
                     ceramicInstance(this.user),
@@ -128,6 +130,9 @@ export default class CeramicTemplateAPI {
      */
     requestProposalChange = async (stageStack: StageStackType) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
                 method: 'POST',
@@ -163,6 +168,9 @@ export default class CeramicTemplateAPI {
      */
     approveProposal = async (stageStack: StageStackType) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
                 method: 'POST',

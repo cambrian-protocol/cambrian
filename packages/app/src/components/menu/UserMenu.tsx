@@ -1,11 +1,4 @@
-import {
-    Books,
-    Question,
-    SignOut,
-    User,
-    Wallet,
-    WarningOctagon,
-} from 'phosphor-react'
+import { Books, Question, SignOut, User, Wallet } from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -16,16 +9,11 @@ import { Menu } from 'grommet'
 import React from 'react'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
-import { clearStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
-interface UserMenuProps {
-    injectedWalletAddress?: string
-}
-
-export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
+export default function UserMenu() {
     const router = useRouter()
     const { currentUser, disconnectWallet, connectWallet } =
         useCurrentUserContext()
@@ -44,37 +32,37 @@ export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
     ]
 
     if (currentUser) {
-        menuItems.unshift({
-            label: (
-                <UserMenuItemLabel
-                    subTitle={ellipseAddress(currentUser.address, 9)}
-                    label={
-                        currentUser.cambrianProfileDoc.content?.name || 'Anon'
-                    }
-                />
-            ),
-            icon: <UserMenuItemIcon icon={<User />} />,
-            onClick: () => router.push('/dashboard?idx=5'),
-        })
-        // menuItems.push({
-        //     label: <UserMenuItemLabel label="Reset Account" />,
-        //     icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
-        //     onClick: async () => {
-        //         if (
-        //             window.confirm(
-        //                 'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
-        //             )
-        //         ) {
-        //             await clearStagesLib(currentUser)
-        //         }
-        //     },
-        // })
+        if (currentUser.session) {
+            menuItems.unshift({
+                label: (
+                    <UserMenuItemLabel
+                        subTitle={ellipseAddress(currentUser.address, 9)}
+                        label={
+                            currentUser.cambrianProfileDoc?.content?.name ||
+                            'Anon'
+                        }
+                    />
+                ),
+                icon: <UserMenuItemIcon icon={<User />} />,
+                onClick: () => router.push('/dashboard?idx=5'),
+            })
+        } else {
+            menuItems.unshift({
+                label: (
+                    <UserMenuItemLabel
+                        subTitle={'Connected with Gnosis Safe App'}
+                        label={ellipseAddress(currentUser.address, 7)}
+                    />
+                ),
+                icon: <UserMenuItemIcon icon={<User />} />,
+            })
+        }
         menuItems.push({
             label: <UserMenuItemLabel label={'Logout'} />,
             onClick: disconnectWallet,
             icon: <UserMenuItemIcon icon={<SignOut />} />,
         })
-    } else if (injectedWalletAddress === undefined) {
+    } else {
         menuItems.unshift({
             label: <UserMenuItemLabel label={'Connect Wallet'} />,
             onClick: connectWallet,
@@ -95,7 +83,7 @@ export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
             items={menuItems}
         >
             {currentUser ? (
-                currentUser.cambrianProfileDoc.content?.avatar ? (
+                currentUser.cambrianProfileDoc?.content?.avatar ? (
                     <BaseAvatar
                         pfpPath={
                             currentUser.cambrianProfileDoc.content
@@ -105,8 +93,6 @@ export default function UserMenu({ injectedWalletAddress }: UserMenuProps) {
                 ) : (
                     <BaseAvatar address={currentUser.address} />
                 )
-            ) : injectedWalletAddress ? (
-                <BaseAvatar address={injectedWalletAddress} />
             ) : (
                 <BaseAvatar icon={<Wallet />} />
             )}
