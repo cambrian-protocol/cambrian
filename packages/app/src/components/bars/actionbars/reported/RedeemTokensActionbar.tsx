@@ -180,7 +180,7 @@ const RedeemTokensActionbar = ({
                             </Box>
                         }
                     />
-                ) : payoutInfo ? (
+                ) : payoutInfo?.amount.gt(0) ? (
                     <BaseActionbar
                         messenger={messenger}
                         info={actionbarInfo}
