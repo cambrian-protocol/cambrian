@@ -115,6 +115,28 @@ const RedeemTokensActionbar = ({
                 />
             ),
         }
+    } else if (reclaimablePosition?.funderReclaimed.eq(0)) {
+        actionbarInfo = {
+            title: 'Reclaim tokens',
+            subTitle: `You have ${truncateAmount(
+                ethers.utils.formatUnits(
+                    reclaimablePosition?.funderReclaimableAmount || 0,
+                    solverData.collateralToken.decimals
+                )
+            )} ${solverData.collateralToken.symbol} to claim`,
+            dropContent: (
+                <ActionbarItemDropContainer
+                    title="Reclaim tokens"
+                    description='Hit the "Reclaim Tokens"-Button, reclaim and redeem your funds.'
+                    list={[
+                        {
+                            icon: <Info />,
+                            label: 'You can redeem your tokens after you have claimed your refunds.',
+                        },
+                    ]}
+                />
+            ),
+        }
     } else {
         actionbarInfo = {
             title: 'Redeem tokens',
@@ -140,18 +162,6 @@ const RedeemTokensActionbar = ({
                 />
             ),
         }
-    }
-
-    const reclaimInfo = {
-        title: 'Reclaim tokens',
-        subTitle: 'You have tokens to reclaim',
-        dropContent: (
-            <ActionbarItemDropContainer
-                title="Reclaim tokens"
-                description='Hit the "Reclaim Tokens"-Button, reclaim and redeem your invested fundings.'
-                list={[]}
-            />
-        ),
     }
 
     return (
@@ -180,60 +190,55 @@ const RedeemTokensActionbar = ({
                             </Box>
                         }
                     />
-                ) : payoutInfo?.amount.gt(0) ? (
+                ) : payoutInfo?.amount.gt(0) ||
+                  reclaimablePosition?.funderReclaimed.gt(0) ? (
                     <BaseActionbar
                         messenger={messenger}
                         info={actionbarInfo}
                         primaryAction={
-                            reclaimableTokens &&
-                            reclaimablePosition?.funderReclaimed.eq(0) ? (
-                                <Button
-                                    label="Claim Refund"
-                                    primary
-                                    size="small"
-                                    onClick={toggleShowReclaimTokenModal}
-                                />
-                            ) : (
-                                <LoaderButton
-                                    primary
-                                    isLoading={isRedeeming}
-                                    onClick={redeemCondition}
-                                    label={`Redeem ${truncateAmount(
-                                        ethers.utils.formatUnits(
-                                            payoutInfo.amount.add(
-                                                reclaimablePosition?.funderReclaimableAmount ||
-                                                    0
-                                            )
-                                        )
-                                    )}
+                            <LoaderButton
+                                primary
+                                isLoading={isRedeeming}
+                                onClick={redeemCondition}
+                                label={`Redeem ${truncateAmount(
+                                    ethers.utils.formatUnits(
+                                        payoutInfo
+                                            ? payoutInfo.amount.add(
+                                                  reclaimablePosition?.funderReclaimableAmount ||
+                                                      0
+                                              )
+                                            : reclaimablePosition?.funderReclaimableAmount ||
+                                                  0,
+                                        solverData.collateralToken.decimals
+                                    )
+                                )}
                                  ${
                                      solverData.collateralToken
                                          ? solverData.collateralToken.symbol ||
                                            solverData.collateralToken.name
                                          : 'Tokens'
                                  }`}
-                                />
-                            )
+                            />
+                        }
+                    />
+                ) : reclaimablePosition?.funderReclaimed.eq(0) ? (
+                    <BaseActionbar
+                        messenger={messenger}
+                        info={actionbarInfo}
+                        primaryAction={
+                            <Button
+                                label="Claim Refund"
+                                primary
+                                size="small"
+                                onClick={toggleShowReclaimTokenModal}
+                            />
                         }
                     />
                 ) : (
-                    <BaseActionbar
-                        messenger={messenger}
-                        info={reclaimableTokens ? reclaimInfo : undefined}
-                        primaryAction={
-                            reclaimableTokens ? (
-                                <Button
-                                    label="Claim Refund"
-                                    primary
-                                    size="small"
-                                    onClick={toggleShowReclaimTokenModal}
-                                />
-                            ) : undefined
-                        }
-                    />
+                    <BaseActionbar messenger={messenger} />
                 )
             ) : (
-                <></>
+                <BaseActionbar messenger={messenger} />
             )}
             {showReclaimTokenModal &&
                 reclaimableTokens &&
