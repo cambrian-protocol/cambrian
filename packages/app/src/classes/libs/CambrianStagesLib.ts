@@ -66,7 +66,13 @@ export default class CambrianStagesLib {
         this._compositions.update(cambrianStagesLib.compositions)
     }
 
-    public addRecents(streamID: string) {
-        this._recents.push(streamID)
+    public addRecent(streamID: string) {
+        const updatedItems: string[] = [...this._recents]
+        const idx = updatedItems.findIndex((s) => s === streamID)
+        if (idx !== -1) {
+            updatedItems.splice(idx, 1)
+        }
+        updatedItems.push(streamID)
+        this._recents = updatedItems
     }
 }

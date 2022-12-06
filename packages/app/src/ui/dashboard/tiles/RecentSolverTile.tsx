@@ -5,7 +5,7 @@ import {
     IconContext,
     PuzzlePiece,
     TreeStructure,
-    FileX,
+    X,
 } from 'phosphor-react'
 import {
     isComposition,
@@ -91,48 +91,53 @@ const RecentSolverTile = ({
             pad={{ right: 'small', bottom: 'small' }}
             width={{ min: 'small', max: 'small' }}
         >
-            <Link href={`/solver/${id}`} passHref>
-                <Button hoverIndicator style={{ borderRadius: '5px' }}>
-                    {solverInfo ? (
-                        <Box
-                            border
-                            round="xsmall"
-                            pad="small"
-                            height={{ min: 'small', max: 'small' }}
-                        >
-                            <Button
-                                icon={<FileX />}
-                                hoverIndicator
-                                alignSelf="end"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    onDeleteRecent(id)
-                                }}
-                            />
-                            <Box
-                                flex
-                                justify="center"
-                                align="center"
-                                border={{ side: 'bottom' }}
-                            >
-                                <IconContext.Provider value={{ size: '48' }}>
-                                    {solverInfo?.icon}
-                                </IconContext.Provider>
+            <Box
+                border
+                round="xsmall"
+                height={{ min: 'small', max: 'small' }}
+                focusIndicator={false}
+                pad="small"
+            >
+                <Button
+                    style={{ borderRadius: '5px', padding: '5px' }}
+                    hoverIndicator
+                    plain
+                    icon={<X size="18" />}
+                    alignSelf="end"
+                    onClick={(e) => {
+                        e.preventDefault()
+                        onDeleteRecent(id)
+                    }}
+                />
+                <Link href={`/solver/${id}`} passHref>
+                    <Button style={{ borderRadius: '5px', height: '100%' }}>
+                        {solverInfo ? (
+                            <Box height="100%" justify="between">
+                                <Box justify="center" align="center" flex>
+                                    <IconContext.Provider
+                                        value={{ size: '48' }}
+                                    >
+                                        {solverInfo?.icon}
+                                    </IconContext.Provider>
+                                </Box>
+                                <Box
+                                    pad={{ top: 'xsmall' }}
+                                    border={{ side: 'top' }}
+                                >
+                                    <Text size="small" color="dark-4">
+                                        {solverInfo?.stage}
+                                    </Text>
+                                    <Text size="small" truncate>
+                                        {solverInfo?.title}
+                                    </Text>
+                                </Box>
                             </Box>
-                            <Box pad={{ top: 'xsmall' }}>
-                                <Text size="small" color="dark-4">
-                                    {solverInfo?.stage}
-                                </Text>
-                                <Text size="small" truncate>
-                                    {solverInfo?.title}
-                                </Text>
-                            </Box>
-                        </Box>
-                    ) : (
-                        <BaseSkeletonBox height={'small'} width={'small'} />
-                    )}
-                </Button>
-            </Link>
+                        ) : (
+                            <BaseSkeletonBox height={'100%'} width={'100%'} />
+                        )}
+                    </Button>
+                </Link>
+            </Box>
         </Box>
     )
 }

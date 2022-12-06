@@ -15,7 +15,6 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
 
 import { CommitID } from '@ceramicnetwork/streamid'
 import CambrianStagesLib, {
@@ -276,24 +275,10 @@ export const addRecentStage = async (
 ) => {
     try {
         const stagesLibDoc = await loadStagesLib(currentUser)
-
-        let updatedStagesLib: CambrianStagesLibType = defaultCambrianStagesLib
-
-        if (
-            stagesLibDoc.content !== null &&
-            typeof stagesLibDoc.content === 'object'
-        ) {
-            updatedStagesLib = { ...updatedStagesLib, ...stagesLibDoc.content }
-        }
-
-        if (
-            updatedStagesLib.recents[updatedStagesLib.recents.length - 1] !==
-            streamID
-        ) {
-            await stagesLibDoc.update({
-                ...updatedStagesLib,
-                recents: pushUnique(streamID, updatedStagesLib.recents),
-            })
+        const stagesLib = new CambrianStagesLib(stagesLibDoc.content)
+        if (stagesLib.recents[stagesLib.recents.length - 1] !== streamID) {
+            stagesLib.addRecent(streamID)
+            await stagesLibDoc.update(stagesLib.lib)
         }
     } catch (e) {
         cpLogger.push(e)
