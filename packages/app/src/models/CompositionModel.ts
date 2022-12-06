@@ -4,6 +4,7 @@ import { ComposerIdPathType } from '@cambrian/app/models/SolverModel'
 import ComposerSolver from '../classes/ComposerSolver'
 
 export type CompositionModel = {
+    id: string
     schemaVer?: number
     title: string
     description: string

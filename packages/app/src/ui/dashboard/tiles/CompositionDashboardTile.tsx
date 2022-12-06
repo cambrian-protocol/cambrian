@@ -153,7 +153,7 @@ const CompositionDashboardTile = ({
                                                     ? undefined
                                                     : () =>
                                                           onRemove(
-                                                              compositionTag
+                                                              compositionStreamID
                                                           )
                                             }
                                         />

@@ -9,6 +9,7 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
+import { ulid } from 'ulid'
 
 /** 
  API functions to maintain proposals and the users proposal-lib. 
@@ -36,6 +37,7 @@ export default class CeramicProposalAPI {
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
             const proposal: ProposalModel = {
+                id: ulid(),
                 title: title,
                 description: '',
                 template: {
@@ -108,12 +110,11 @@ export default class CeramicProposalAPI {
     /**
      * Removes proposal from proposal-lib doc, and either sets the deleted flag or adds it to the proposal-archive.
      *
-     * @param tag Proposal title / Unique tag
+     * @param proposalStreamID
      * @param type 'CANCEL' or 'ARCHIVE' (Before approval proposal can be safely deleted, after approval proposal must be archived)
      * @auth Done by proposer
      */
     removeProposal = async (
-        tag: string,
         proposalStreamID: string,
         type: 'CANCEL' | 'ARCHIVE'
     ) => {
@@ -131,7 +132,7 @@ export default class CeramicProposalAPI {
                 })
             }
 
-            await archiveStage(this.user, tag, StageNames.proposal)
+            await archiveStage(this.user, proposalStreamID, StageNames.proposal)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

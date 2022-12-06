@@ -12,6 +12,7 @@ import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { composerReducer } from './composer.reducer'
 import initialComposer from './composer.init'
+import { ulid } from 'ulid'
 
 type ComposerContextOptions = {
     composer: CompositionModel
@@ -23,6 +24,7 @@ type ComposerContextOptions = {
 
 const ComposerContext = React.createContext<ComposerContextOptions>({
     composer: {
+        id: ulid(),
         title: '',
         description: '',
         flowElements: [],

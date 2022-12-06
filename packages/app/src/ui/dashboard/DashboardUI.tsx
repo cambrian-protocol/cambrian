@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
-import { CambrianStagesLibType } from '@cambrian/app/models/StageModel'
+import { CambrianStagesLibType } from '@cambrian/app/classes/libs/CambrianStagesLib'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -21,10 +21,10 @@ import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useRouter } from 'next/router'
-import _ from 'lodash'
 
 interface DashboardUIProps {
     currentUser: UserType

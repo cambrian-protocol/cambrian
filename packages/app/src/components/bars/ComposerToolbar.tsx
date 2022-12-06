@@ -1,13 +1,10 @@
 import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
@@ -48,6 +45,7 @@ const ComposerToolbar = ({
                 await updateStage(
                     compositionStreamID,
                     {
+                        id: currentComposition.id,
                         title: currentComposition.title,
                         description: '',
                         solvers: currentComposition.solvers,

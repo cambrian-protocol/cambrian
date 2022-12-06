@@ -1,7 +1,7 @@
 import { ArrowSquareIn, Plus } from 'phosphor-react'
 import { Box, Button, Text } from 'grommet'
 
-import { BaseStagesLibType } from '@cambrian/app/models/StageModel'
+import { BaseStageLibType } from '@cambrian/app/classes/libs/BaseStageLib'
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
@@ -15,7 +15,7 @@ import { useState } from 'react'
 
 interface CompositionsDashboardUIProps {
     currentUser: UserType
-    compositionsLib?: BaseStagesLibType
+    compositionsLib?: BaseStageLibType
     isFetching: boolean
 }
 
@@ -64,27 +64,30 @@ const CompositionsDashboardUI = ({
                     <Text color={'dark-4'}>
                         Your Compositions (
                         {compositionsLib
-                            ? Object.keys(compositionsLib.lib).length
+                            ? Object.keys(compositionsLib.streamIDs).length
                             : 0}
                         )
                     </Text>
                     <Box pad={{ top: 'medium' }}>
-                        {compositionsLib?.lib &&
-                        Object.keys(compositionsLib.lib).length > 0 ? (
+                        {compositionsLib?.streamIDs &&
+                        Object.keys(compositionsLib.streamIDs).length > 0 ? (
                             <Box direction="row" wrap>
-                                {Object.keys(compositionsLib.lib).map((tag) => {
-                                    const streamID = compositionsLib.lib[tag]
-                                    return (
-                                        <CompositionDashboardTile
-                                            key={tag}
-                                            compositionTag={tag}
-                                            compositionStreamID={streamID}
-                                            ceramicCompositionAPI={
-                                                ceramicCompositionAPI
-                                            }
-                                        />
-                                    )
-                                })}
+                                {Object.keys(compositionsLib.streamIDs).map(
+                                    (streamID) => {
+                                        const title =
+                                            compositionsLib.streamIDs[streamID]
+                                        return (
+                                            <CompositionDashboardTile
+                                                key={streamID}
+                                                compositionTag={title}
+                                                compositionStreamID={streamID}
+                                                ceramicCompositionAPI={
+                                                    ceramicCompositionAPI
+                                                }
+                                            />
+                                        )
+                                    }
+                                )}
                             </Box>
                         ) : (
                             <ListSkeleton

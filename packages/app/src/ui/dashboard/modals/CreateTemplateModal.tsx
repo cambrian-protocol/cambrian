@@ -43,12 +43,8 @@ const CreateTemplateModal = ({
         try {
             setIsFetching(true)
             const stagesLib = await loadStagesLib(currentUser)
-            if (
-                stagesLib &&
-                stagesLib.content.compositions &&
-                stagesLib.content.compositions.lib
-            ) {
-                setCompositions(stagesLib.content.compositions.lib)
+            if (stagesLib && stagesLib.content.compositions) {
+                setCompositions(stagesLib.content.compositions.streamIDs)
             }
         } catch (e) {
             await cpLogger.push(e)
@@ -126,32 +122,24 @@ const CreateTemplateModal = ({
                         {compositions &&
                         Object.keys(compositions).length > 0 ? (
                             <Box height={{ min: 'auto' }} gap="small">
-                                {Object.keys(compositions).map(
-                                    (compositionTag) => {
-                                        return (
-                                            <CompositionListItem
-                                                key={
-                                                    compositions[compositionTag]
-                                                }
-                                                title={compositionTag}
-                                                isLoading={
-                                                    isCreatingTemplate ===
-                                                    compositions[compositionTag]
-                                                }
-                                                isDisabled={
-                                                    isCreatingTemplate !==
-                                                    undefined
-                                                }
-                                                onSelectComposition={
-                                                    onSelectComposition
-                                                }
-                                                compositionID={
-                                                    compositions[compositionTag]
-                                                }
-                                            />
-                                        )
-                                    }
-                                )}
+                                {Object.keys(compositions).map((streamId) => {
+                                    return (
+                                        <CompositionListItem
+                                            key={streamId}
+                                            title={compositions[streamId]}
+                                            isLoading={
+                                                isCreatingTemplate === streamId
+                                            }
+                                            isDisabled={
+                                                isCreatingTemplate !== undefined
+                                            }
+                                            onSelectComposition={
+                                                onSelectComposition
+                                            }
+                                            compositionID={streamId}
+                                        />
+                                    )
+                                })}
                             </Box>
                         ) : (
                             <ListSkeleton

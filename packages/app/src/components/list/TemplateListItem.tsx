@@ -31,7 +31,7 @@ interface TemplateListItemProps {
     currentUser: UserType
     templateStreamID: string
     template: TemplateModel
-    receivedProposalsArchive?: StringHashmap
+    receivedProposalsArchive?: string[]
 }
 
 const TemplateListItem = ({
@@ -102,16 +102,10 @@ const TemplateListItem = ({
         setIsTogglingActive(false)
     }
 
-    const onArchiveTemplate = async (
-        templateTag: string,
-        templateStreamID: string
-    ) => {
+    const onArchiveTemplate = async (templateStreamID: string) => {
         try {
             setIsLoading(true)
-            await ceramicTemplateAPI.archiveTemplate(
-                templateTag,
-                templateStreamID
-            )
+            await ceramicTemplateAPI.archiveTemplate(templateStreamID)
         } catch (e) {
             setIsLoading(false)
             setErrorMessage(await cpLogger.push(e))
@@ -296,7 +290,6 @@ const TemplateListItem = ({
                                                                 color="dark-4"
                                                                 onClick={() => {
                                                                     onArchiveTemplate(
-                                                                        template.title,
                                                                         templateStreamID
                                                                     )
                                                                 }}

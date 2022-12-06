@@ -63,11 +63,10 @@ export const ComposerUI = ({
 
             if (stagesLib.content && stagesLib.content.compositions) {
                 const key = Object.keys(
-                    stagesLib.content.compositions.lib
+                    stagesLib.content.compositions.streamIDs
                 ).find(
-                    (streamKey) =>
-                        stagesLib.content.compositions.lib[streamKey] ===
-                        compositionStreamDoc.id.toString()
+                    (streamID) =>
+                        streamID === compositionStreamDoc.id.toString()
                 )
                 if (!key) {
                     setShowDuplicateCompositionCTA(true)
