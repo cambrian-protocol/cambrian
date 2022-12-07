@@ -397,7 +397,6 @@ export default class CeramicTemplateAPI {
         type: 'DECLINE' | 'ARCHIVE'
     ) => {
         try {
-            console.log('was here')
             const stagesLib = await loadStagesLib(this.user)
 
             const updatedStages = new CambrianStagesLib(stagesLib.content)
