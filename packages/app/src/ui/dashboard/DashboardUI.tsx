@@ -1,4 +1,7 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
+import CambrianStagesLib, {
+    CambrianStagesLibType,
+} from '@cambrian/app/classes/libs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -11,7 +14,6 @@ import {
 import { useEffect, useState } from 'react'
 
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
-import { CambrianStagesLibType } from '@cambrian/app/classes/libs/CambrianStagesLib'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -97,7 +99,9 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const initStagesLib = async () => {
         setIsFetching(true)
         try {
-            setStagesLib((await loadStagesLib(currentUser)).content)
+            const stagesLib = await loadStagesLib(currentUser)
+            const cambrianStagesLib = new CambrianStagesLib(stagesLib.content)
+            setStagesLib(cambrianStagesLib.lib)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

@@ -34,9 +34,33 @@ export default class BaseStageLib {
         return { streamIDs: this._streamIDs, archive: this._archive }
     }
 
-    public update(baseStageLib: BaseStageLibType) {
-        this._streamIDs = baseStageLib.streamIDs
-        this._archive = baseStageLib.archive
+    public update(baseLib: BaseStageLibType) {
+        if (baseLib.lib) {
+            const flippedDeprecatedLib: StringHashmap = {}
+            // Flipping keys with values
+            Object.keys(baseLib.lib).forEach((key) => {
+                if (baseLib.lib && baseLib.lib[key])
+                    flippedDeprecatedLib[baseLib.lib[key]] = key
+            })
+
+            const deprecatedArchiveLibStreamIDs: string[] = []
+            if (
+                baseLib.archive.lib &&
+                Object.values(baseLib.archive.lib).length > 0
+            ) {
+                deprecatedArchiveLibStreamIDs.push(
+                    ...Object.values(baseLib.archive.lib)
+                )
+            }
+
+            this._streamIDs = flippedDeprecatedLib
+            this._archive = {
+                streamIDs: [...deprecatedArchiveLibStreamIDs],
+            }
+        } else {
+            this._streamIDs = baseLib.streamIDs
+            this._archive = baseLib.archive
+        }
     }
 
     public addStageWithUniqueTitle(streamID: string, title: string): string {

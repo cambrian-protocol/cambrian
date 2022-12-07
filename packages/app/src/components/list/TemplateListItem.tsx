@@ -70,12 +70,9 @@ const TemplateListItem = ({
             let filteredReceivedProposals = Object.keys(
                 template.receivedProposals
             )
-            // Filter agains archive
             if (receivedProposalsArchive) {
                 filteredReceivedProposals = filteredReceivedProposals.filter(
-                    (rp) =>
-                        Object.values(receivedProposalsArchive).indexOf(rp) ===
-                        -1
+                    (rp) => receivedProposalsArchive.indexOf(rp) === -1
                 )
             }
             setReceivedProposals(
