@@ -87,14 +87,10 @@ export default class CeramicProposalAPI {
                     this.user
                 ).loadStream(proposalStreamID)) as TileDocument<ProposalModel>
 
-                await proposalStreamDoc.update(
-                    {
-                        ...(proposalStreamDoc.content as ProposalModel),
-                        isSubmitted: true,
-                    },
-                    { ...proposalStreamDoc.metadata },
-                    { pin: true }
-                )
+                await proposalStreamDoc.update({
+                    ...(proposalStreamDoc.content as ProposalModel),
+                    isSubmitted: true,
+                })
                 return true
             } else {
                 cpLogger.push(res.status)
