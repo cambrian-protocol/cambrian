@@ -20,9 +20,6 @@ module.exports = {
             },
         ]
     },
-}
-
-module.exports = {
     webpack(config, options) {
         const { isServer } = options
         config.module.rules.push({

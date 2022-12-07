@@ -101,7 +101,7 @@ const TemplateUpdateFromComposition = ({
                                     x.isFlex == flexInput.isFlex)
                         )
                         if (preExisting) {
-                            mergedFormFlexInputs[idx] = preExisting
+                            mergedFormFlexInputs[idx].value = preExisting.value
                         }
                     })
 
