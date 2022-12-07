@@ -26,7 +26,7 @@ import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
-import CambrianStagesLib from '@cambrian/app/classes/libs/CambrianStagesLib'
+import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -407,7 +407,7 @@ export default class CeramicTemplateAPI {
 
             updatedStages.templates.archiveReceivedProposal(proposalStreamID)
 
-            await stagesLib.update(updatedStages.lib)
+            await stagesLib.update(updatedStages.data)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

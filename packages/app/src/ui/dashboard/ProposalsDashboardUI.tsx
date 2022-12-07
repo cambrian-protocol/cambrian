@@ -1,7 +1,7 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import { BaseStageLibType } from '@cambrian/app/classes/libs/BaseStageLib'
+import { BaseStageLibType } from '@cambrian/app/classes/stageLibs/BaseStageLib'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -54,7 +54,7 @@ const ProposalsDashboardUI = ({
             if (proposalsLib) {
                 setProposals(
                     (await ceramicInstance(currentUser).multiQuery(
-                        Object.keys(proposalsLib.streamIDs).map((p) => {
+                        Object.keys(proposalsLib.lib).map((p) => {
                             return { streamId: p }
                         })
                     )) as ProposalHashmap

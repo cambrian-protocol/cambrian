@@ -1,3 +1,5 @@
+import { updateTemplateStagesLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/TemplateStageLibTransformer'
+import { SCHEMA_VER } from 'packages/app/config'
 import BaseStageLib, {
     BaseStageLibType,
     defaultBaseStagesLib,
@@ -15,6 +17,7 @@ export const defaultTemplateStagesLib: TemplateStagesLibType = {
 }
 
 export default class TemplateStageLib extends BaseStageLib {
+    protected _schemaVer?: number = SCHEMA_VER['templateStageLib']
     protected _archive = defaultTemplateStagesLib.archive
 
     constructor(templateLib: TemplateStagesLibType) {
@@ -26,32 +29,26 @@ export default class TemplateStageLib extends BaseStageLib {
         return this._archive
     }
 
+    public override get data() {
+        return {
+            _schemaVer: this._schemaVer,
+            lib: this._lib,
+            archive: this._archive,
+        }
+    }
+
     public archiveReceivedProposal(proposalStreamID: string) {
         this._archive.receivedProposals.push(proposalStreamID)
     }
 
     public override update(templateLib: TemplateStagesLibType) {
-        if (typeof templateLib.archive.receivedProposals === 'object') {
-            const receivedProposalsArray: string[] = []
-            if (Object.keys(templateLib.archive.receivedProposals).length > 0) {
-                receivedProposalsArray.push(
-                    ...Object.values(templateLib.archive.receivedProposals)
-                )
-            }
+        const updatedTemplateLib = updateTemplateStagesLibToSchema(
+            SCHEMA_VER['templateStageLib'],
+            templateLib
+        )
 
-            this._archive = {
-                ...templateLib.archive,
-                receivedProposals: receivedProposalsArray,
-            }
-        } else {
-            this._archive = { ...templateLib.archive }
-        }
-    }
-
-    public override get lib(): TemplateStagesLibType {
-        return {
-            streamIDs: this._streamIDs,
-            archive: this._archive,
-        }
+        this._schemaVer = updatedTemplateLib._schemaVer
+        this._lib = updatedTemplateLib.lib
+        this._archive = updatedTemplateLib.archive
     }
 }

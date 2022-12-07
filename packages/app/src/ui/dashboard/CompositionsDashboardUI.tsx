@@ -1,7 +1,7 @@
 import { ArrowSquareIn, Plus } from 'phosphor-react'
 import { Box, Button, Text } from 'grommet'
 
-import { BaseStageLibType } from '@cambrian/app/classes/libs/BaseStageLib'
+import { BaseStageLibType } from '@cambrian/app/classes/stageLibs/BaseStageLib'
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
@@ -64,18 +64,18 @@ const CompositionsDashboardUI = ({
                     <Text color={'dark-4'}>
                         Your Compositions (
                         {compositionsLib
-                            ? Object.keys(compositionsLib.streamIDs).length
+                            ? Object.keys(compositionsLib.lib).length
                             : 0}
                         )
                     </Text>
                     <Box pad={{ top: 'medium' }}>
-                        {compositionsLib?.streamIDs &&
-                        Object.keys(compositionsLib.streamIDs).length > 0 ? (
+                        {compositionsLib?.lib &&
+                        Object.keys(compositionsLib.lib).length > 0 ? (
                             <Box direction="row" wrap>
-                                {Object.keys(compositionsLib.streamIDs).map(
+                                {Object.keys(compositionsLib.lib).map(
                                     (streamID) => {
                                         const title =
-                                            compositionsLib.streamIDs[streamID]
+                                            compositionsLib.lib[streamID]
                                         return (
                                             <CompositionDashboardTile
                                                 key={streamID}

@@ -33,4 +33,7 @@ export const TRILOBOT_ENDPOINT = 'https://trilobot.cambrianprotocol.com'
 export const SCHEMA_VER = {
     composition: 1,
     composerSolver: 1,
+    cambrianStagesLib: 1,
+    baseStageLib: 1,
+    templateStageLib: 1,
 }

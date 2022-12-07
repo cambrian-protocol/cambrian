@@ -7,7 +7,11 @@ import TemplateStageLib, {
     defaultTemplateStagesLib,
 } from './TemplateStageLib'
 
+import { SCHEMA_VER } from 'packages/app/config'
+import { updateCambrianStagesLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/CambrianStagesLibTransformer'
+
 export type CambrianStagesLibType = {
+    _schemaVer?: number
     recents: string[]
     proposals: BaseStageLibType
     templates: TemplateStagesLibType
@@ -15,6 +19,7 @@ export type CambrianStagesLibType = {
 }
 
 export const defaultCambrianStagesLib: CambrianStagesLibType = {
+    _schemaVer: SCHEMA_VER['cambrianStagesLib'],
     recents: [],
     proposals: { ...defaultBaseStagesLib },
     templates: { ...defaultTemplateStagesLib },
@@ -22,6 +27,7 @@ export const defaultCambrianStagesLib: CambrianStagesLibType = {
 }
 
 export default class CambrianStagesLib {
+    protected _schemaVer?: number = defaultCambrianStagesLib._schemaVer
     protected _recents: string[] = defaultCambrianStagesLib.recents
     protected _proposals = new BaseStageLib(defaultCambrianStagesLib.proposals)
     protected _templates = new TemplateStageLib(
@@ -50,20 +56,26 @@ export default class CambrianStagesLib {
         return this._proposals
     }
 
-    public get lib(): CambrianStagesLibType {
+    public get data(): CambrianStagesLibType {
         return {
+            _schemaVer: this._schemaVer,
             recents: this._recents,
-            compositions: this._compositions.lib,
-            proposals: this._proposals.lib,
-            templates: this._templates.lib,
+            compositions: this._compositions.data,
+            proposals: this._proposals.data,
+            templates: this._templates.data,
         }
     }
 
     public update(cambrianStagesLib: CambrianStagesLibType) {
-        this._recents = cambrianStagesLib.recents
-        this._proposals.update(cambrianStagesLib.proposals)
-        this._templates.update(cambrianStagesLib.templates)
-        this._compositions.update(cambrianStagesLib.compositions)
+        const updatedCambrianStagesLib = updateCambrianStagesLibToSchema(
+            SCHEMA_VER['cambrianStagesLib'],
+            cambrianStagesLib
+        )
+        this._schemaVer = updatedCambrianStagesLib._schemaVer
+        this._recents = updatedCambrianStagesLib.recents
+        this._proposals.update(updatedCambrianStagesLib.proposals)
+        this._templates.update(updatedCambrianStagesLib.templates)
+        this._compositions.update(updatedCambrianStagesLib.compositions)
     }
 
     public addRecent(streamID: string) {

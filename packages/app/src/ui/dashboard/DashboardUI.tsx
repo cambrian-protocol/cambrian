@@ -1,7 +1,7 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
 import CambrianStagesLib, {
     CambrianStagesLibType,
-} from '@cambrian/app/classes/libs/CambrianStagesLib'
+} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -101,7 +101,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         try {
             const stagesLib = await loadStagesLib(currentUser)
             const cambrianStagesLib = new CambrianStagesLib(stagesLib.content)
-            setStagesLib(cambrianStagesLib.lib)
+            setStagesLib(cambrianStagesLib.data)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

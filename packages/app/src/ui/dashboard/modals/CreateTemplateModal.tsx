@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -42,9 +43,10 @@ const CreateTemplateModal = ({
     const fetchCompositions = async () => {
         try {
             setIsFetching(true)
-            const stagesLib = await loadStagesLib(currentUser)
-            if (stagesLib && stagesLib.content.compositions) {
-                setCompositions(stagesLib.content.compositions.streamIDs)
+            const stagesLibDoc = await loadStagesLib(currentUser)
+            const stagesLib = new CambrianStagesLib(stagesLibDoc.content)
+            if (stagesLib && stagesLib.compositions) {
+                setCompositions(stagesLib.compositions.lib)
             }
         } catch (e) {
             await cpLogger.push(e)

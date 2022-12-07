@@ -20,7 +20,7 @@ import { CommitID } from '@ceramicnetwork/streamid'
 import CambrianStagesLib, {
     CambrianStagesLibType,
     defaultCambrianStagesLib,
-} from '@cambrian/app/classes/libs/CambrianStagesLib'
+} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
@@ -104,7 +104,7 @@ export const archiveStage = async (
             default:
                 break
         }
-        await stagesLib.update(updatedStagesLib.lib)
+        await stagesLib.update(updatedStagesLib.data)
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -194,7 +194,7 @@ export const createStage = async (
         }
 
         await stageStreamDoc.update({ ...stage, title: uniqueTitle })
-        await stagesLibDoc.update(updatedStages.lib)
+        await stagesLibDoc.update(updatedStages.data)
         return stageStreamID
     } catch (e) {
         cpLogger.push(e)
@@ -241,7 +241,7 @@ export const updateStage = async (
                 default:
                     break
             }
-            await stagesLibDoc.update(updatedStages.lib)
+            await stagesLibDoc.update(updatedStages.data)
         }
 
         await currentStage.update({
@@ -277,7 +277,7 @@ export const addRecentStage = async (
         const stagesLib = new CambrianStagesLib(stagesLibDoc.content)
         if (stagesLib.recents[stagesLib.recents.length - 1] !== streamID) {
             stagesLib.addRecent(streamID)
-            await stagesLibDoc.update(stagesLib.lib)
+            await stagesLibDoc.update(stagesLib.data)
         }
     } catch (e) {
         cpLogger.push(e)
