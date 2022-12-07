@@ -158,14 +158,13 @@ export const createStage = async (
         const stagesLibDoc = await loadStagesLib(currentUser)
         const updatedStages = new CambrianStagesLib(stagesLibDoc.content)
 
-        const stageStreamDoc = await TileDocument.deterministic(
+        const stageStreamDoc = await TileDocument.create(
             ceramicInstance(currentUser),
+            {},
             {
                 controllers: [currentUser.did],
                 family: `cambrian-${stageName}`,
-                tags: [stage.id],
-            },
-            { pin: true }
+            }
         )
 
         const stageStreamID = stageStreamDoc.id.toString()

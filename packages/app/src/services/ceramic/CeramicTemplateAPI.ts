@@ -26,7 +26,6 @@ import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
-import { ulid } from 'ulid'
 import CambrianStagesLib from '@cambrian/app/classes/libs/CambrianStagesLib'
 
 /** 
@@ -92,7 +91,6 @@ export default class CeramicTemplateAPI {
             )
 
             const template: TemplateModel = {
-                id: ulid(),
                 title: title,
                 description: '',
                 requirements: '',

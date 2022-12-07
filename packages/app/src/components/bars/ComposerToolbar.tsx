@@ -45,7 +45,6 @@ const ComposerToolbar = ({
                 await updateStage(
                     compositionStreamID,
                     {
-                        id: currentComposition.id,
                         title: currentComposition.title,
                         description: '',
                         solvers: currentComposition.solvers,

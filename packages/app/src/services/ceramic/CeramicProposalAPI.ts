@@ -9,7 +9,6 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { ulid } from 'ulid'
 
 /** 
  API functions to maintain proposals and the users proposal-lib. 
@@ -37,7 +36,6 @@ export default class CeramicProposalAPI {
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
             const proposal: ProposalModel = {
-                id: ulid(),
                 title: title,
                 description: '',
                 template: {
