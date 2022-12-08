@@ -89,17 +89,12 @@ const ProposalListItem = ({
     }
 
     const onRemove = async (
-        proposalTag: string,
         proposalStreamID: string,
         type: 'CANCEL' | 'ARCHIVE'
     ) => {
         try {
             setIsRemoving(true)
-            await ceramicProposalAPI.removeProposal(
-                proposalTag,
-                proposalStreamID,
-                type
-            )
+            await ceramicProposalAPI.removeProposal(proposalStreamID, type)
         } catch (e) {
             setIsRemoving(false)
             setErrorMessage(await cpLogger.push(e))
@@ -233,7 +228,6 @@ const ProposalListItem = ({
                                             ? undefined
                                             : () =>
                                                   onRemove(
-                                                      proposal.title,
                                                       proposalStreamID,
                                                       isDeletable
                                                           ? 'CANCEL'

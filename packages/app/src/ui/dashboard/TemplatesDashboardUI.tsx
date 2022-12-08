@@ -9,7 +9,7 @@ import { FilePlus } from 'phosphor-react'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { TemplateStagesLibType } from '@cambrian/app/models/StageModel'
+import { TemplateStagesLibType } from '@cambrian/app/classes/stageLibs/TemplateStageLib'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
@@ -39,7 +39,6 @@ const TemplatesDashboardUI = ({
 
     useEffect(() => {
         fetchTemplates()
-        console.log(templatesLib)
     }, [templatesLib])
 
     const fetchTemplates = async () => {
@@ -48,7 +47,7 @@ const TemplatesDashboardUI = ({
             if (templatesLib) {
                 setTemplates(
                     (await ceramicInstance(currentUser).multiQuery(
-                        Object.values(templatesLib.lib).map((t) => {
+                        Object.keys(templatesLib.lib).map((t) => {
                             return { streamId: t }
                         })
                     )) as TemplateHashmap

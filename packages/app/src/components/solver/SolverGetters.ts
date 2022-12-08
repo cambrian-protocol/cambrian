@@ -444,7 +444,7 @@ export const getSolverMetadata = async (
             const network = await provider.getNetwork()
             const proposalsHub = new ProposalsHub(provider, network.chainId)
             const metadataURI = await proposalsHub.getMetadataCID(proposalId)
-            if (proposalId) {
+            if (proposalId && metadataURI !== '') {
                 const stageStack = await loadStageStackFromID(metadataURI)
                 if (stageStack) {
                     const solverIndex = (await solverContract.chainIndex()) as
