@@ -51,6 +51,7 @@ export type ChainInfo = {
     nativeCurrency: NativeCurrencyType
     logoURI?: string
     tokenListURI?: string
+    bridgeURI?: string
 }
 
 interface NativeCurrencyType {
@@ -192,6 +193,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 balance: '',
             },
             logoURI: '/images/logo/arbitrum_one_logo.svg',
+            bridgeURI: 'https://bridge.arbitrum.io/',
         },
         contracts: {
             arbitratorFactory: ARBITRUM_ArbitratorFactory.address,
