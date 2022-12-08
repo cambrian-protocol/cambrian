@@ -20,6 +20,7 @@ const ProposalInfoModal = ({
             <ProposalPreview
                 stageStack={stageStack}
                 collateralToken={collateralToken}
+                showProposalLink
             />
         </Box>
     </BaseLayerModal>

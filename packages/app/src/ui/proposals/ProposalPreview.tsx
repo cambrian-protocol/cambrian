@@ -14,6 +14,7 @@ interface ProposalPreviewProps {
     proposalStatus?: ProposalStatus
     collateralToken?: TokenModel
     showConfiguration?: boolean
+    showProposalLink?: boolean
 }
 
 const ProposalPreview = ({
@@ -21,6 +22,7 @@ const ProposalPreview = ({
     proposalStatus,
     collateralToken,
     showConfiguration,
+    showProposalLink,
 }: ProposalPreviewProps) => {
     const [proposerProfile] = useCambrianProfile(stageStack.proposal.author)
     return (
@@ -30,6 +32,7 @@ const ProposalPreview = ({
                 stageStack={stageStack}
                 proposalStatus={proposalStatus}
                 showConfiguration={showConfiguration}
+                showProposalLink={showProposalLink}
             />
             <Box gap="small">
                 <Heading level="3">Project details</Heading>

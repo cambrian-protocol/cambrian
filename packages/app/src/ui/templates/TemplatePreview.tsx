@@ -1,5 +1,5 @@
+import { ArrowUpRight, FilmScript, ListNumbers } from 'phosphor-react'
 import { Box, Heading, Text } from 'grommet'
-import { FilmScript, ListNumbers } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
@@ -8,6 +8,7 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
+import { ResponsiveButtonProps } from '@cambrian/app/components/buttons/ResponsiveButton'
 import SolverInfoModal from '../common/modals/SolverInfoModal'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { TokenAPI } from '@cambrian/app/services/api/Token.api'
@@ -22,23 +23,27 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 interface TemplatePreviewProps {
     template: TemplateModel
     showConfiguration?: boolean
+    templateStreamID?: string
 }
 
 const TemplatePreview = ({
     template,
     showConfiguration,
+    templateStreamID,
 }: TemplatePreviewProps) => {
     const { currentUser } = useCurrentUserContext()
     const [templaterProfile] = useCambrianProfile(template.author)
     const [composition, setComposition] = useState<CompositionModel>()
     const [denominationToken, setDenominationToken] = useState<TokenModel>()
     const [showSolverConfigModal, setShowSolverConfigModal] = useState<number>() // Solver Index
+    const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>()
 
     useEffect(() => {
         if (currentUser) init(currentUser)
     }, [currentUser])
 
     const init = async (currentUser: UserType) => {
+        let items: ResponsiveButtonProps[] = []
         if (showConfiguration) {
             const _compositionDoc =
                 await loadCommitWorkaround<CompositionModel>(
@@ -50,9 +55,62 @@ const TemplatePreview = ({
                     template.flexInputs
                 )
 
+                items.push({
+                    label: 'Solver Configurations',
+                    dropContent: (
+                        <Box>
+                            {mergedComposition?.solvers.map((solver, idx) => (
+                                <DropButtonListItem
+                                    key={idx}
+                                    label={
+                                        <Box width="medium">
+                                            <Text>
+                                                {solver.solverTag.title}
+                                            </Text>
+                                            <Text
+                                                size="xsmall"
+                                                color="dark-4"
+                                                truncate
+                                            >
+                                                {solver.solverTag.description}
+                                            </Text>
+                                        </Box>
+                                    }
+                                    icon={<FilmScript />}
+                                    onClick={() =>
+                                        setShowSolverConfigModal(idx)
+                                    }
+                                />
+                            ))}
+                        </Box>
+                    ),
+                    dropAlign: {
+                        top: 'bottom',
+                        right: 'right',
+                    },
+                    dropProps: {
+                        round: {
+                            corner: 'bottom',
+                            size: 'xsmall',
+                        },
+                    },
+                    icon: (
+                        <ListNumbers color={cpTheme.global.colors['dark-4']} />
+                    ),
+                })
                 setComposition(mergedComposition)
             }
         }
+
+        if (templateStreamID) {
+            items.push({
+                label: 'Open Template',
+                icon: <ArrowUpRight color={cpTheme.global.colors['dark-4']} />,
+                href: `/solver/${templateStreamID}`,
+            })
+        }
+
+        setHeaderItems(items)
 
         setDenominationToken(
             await TokenAPI.getTokenInfo(
@@ -70,73 +128,7 @@ const TemplatePreview = ({
                     title={template.title}
                     metaTitle="Template Solver"
                     authorProfileDoc={templaterProfile}
-                    items={
-                        showConfiguration
-                            ? [
-                                  {
-                                      label: 'Solver Configurations',
-                                      dropContent: (
-                                          <Box>
-                                              {composition?.solvers.map(
-                                                  (solver, idx) => (
-                                                      <DropButtonListItem
-                                                          key={idx}
-                                                          label={
-                                                              <Box width="medium">
-                                                                  <Text>
-                                                                      {
-                                                                          solver
-                                                                              .solverTag
-                                                                              .title
-                                                                      }
-                                                                  </Text>
-                                                                  <Text
-                                                                      size="xsmall"
-                                                                      color="dark-4"
-                                                                      truncate
-                                                                  >
-                                                                      {
-                                                                          solver
-                                                                              .solverTag
-                                                                              .description
-                                                                      }
-                                                                  </Text>
-                                                              </Box>
-                                                          }
-                                                          icon={<FilmScript />}
-                                                          onClick={() =>
-                                                              setShowSolverConfigModal(
-                                                                  idx
-                                                              )
-                                                          }
-                                                      />
-                                                  )
-                                              )}
-                                          </Box>
-                                      ),
-                                      dropAlign: {
-                                          top: 'bottom',
-                                          right: 'right',
-                                      },
-                                      dropProps: {
-                                          round: {
-                                              corner: 'bottom',
-                                              size: 'xsmall',
-                                          },
-                                      },
-                                      icon: (
-                                          <ListNumbers
-                                              color={
-                                                  cpTheme.global.colors[
-                                                      'dark-4'
-                                                  ]
-                                              }
-                                          />
-                                      ),
-                                  },
-                              ]
-                            : []
-                    }
+                    items={headerItems}
                 />
                 <Box gap="small">
                     <Heading level="3">Project details</Heading>
