@@ -1,6 +1,7 @@
 import {
     CAMBRIAN_DID,
     CERAMIC_NODE_ENDPOINT,
+    SCHEMA_VER,
     TRILOBOT_ENDPOINT,
 } from 'packages/app/config'
 import { StageModel, StageNames } from '../../models/StageModel'
@@ -61,7 +62,7 @@ export const getAddressFromDID = (did: string) => {
  */
 export const loadStagesLib = async (currentUser: UserType) => {
     try {
-        return (await TileDocument.deterministic(
+        const stagesLibDoc = (await TileDocument.deterministic(
             ceramicInstance(currentUser),
             {
                 controllers: [currentUser.did],
@@ -70,6 +71,18 @@ export const loadStagesLib = async (currentUser: UserType) => {
             },
             { pin: true }
         )) as TileDocument<CambrianStagesLibType>
+
+        // Update Schema Version
+        const updatedStagesLib = new CambrianStagesLib(stagesLibDoc.content)
+        if (!_.isEqual(updatedStagesLib.data, stagesLibDoc.content)) {
+            console.log(
+                'Updating stagesLib to schema version: ',
+                SCHEMA_VER['cambrianStagesLib']
+            )
+            await stagesLibDoc.update(updatedStagesLib.data)
+        }
+
+        return stagesLibDoc
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

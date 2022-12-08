@@ -100,8 +100,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         setIsFetching(true)
         try {
             const stagesLib = await loadStagesLib(currentUser)
-            const cambrianStagesLib = new CambrianStagesLib(stagesLib.content)
-            setStagesLib(cambrianStagesLib.data)
+            setStagesLib(stagesLib.content)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

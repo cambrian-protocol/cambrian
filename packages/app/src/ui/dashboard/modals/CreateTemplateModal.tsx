@@ -44,9 +44,12 @@ const CreateTemplateModal = ({
         try {
             setIsFetching(true)
             const stagesLibDoc = await loadStagesLib(currentUser)
-            const stagesLib = new CambrianStagesLib(stagesLibDoc.content)
-            if (stagesLib && stagesLib.compositions) {
-                setCompositions(stagesLib.compositions.lib)
+            if (
+                stagesLibDoc &&
+                stagesLibDoc.content &&
+                stagesLibDoc.content.compositions
+            ) {
+                setCompositions(stagesLibDoc.content.compositions.lib)
             }
         } catch (e) {
             await cpLogger.push(e)

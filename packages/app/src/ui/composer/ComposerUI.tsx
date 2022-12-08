@@ -63,7 +63,7 @@ export const ComposerUI = ({
 
             if (stagesLib.content && stagesLib.content.compositions) {
                 const key = Object.keys(
-                    stagesLib.content.compositions.streamIDs
+                    stagesLib.content.compositions.lib
                 ).find(
                     (streamID) =>
                         streamID === compositionStreamDoc.id.toString()
