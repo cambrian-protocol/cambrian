@@ -7,7 +7,7 @@ interface ComposerToolbarButtonProps {
     icon: JSX.Element
     label: string
     onClick: () => void
-    disabled: boolean
+    disabled?: boolean
 }
 
 const ComposerToolbarButton = ({

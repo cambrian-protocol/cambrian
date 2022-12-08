@@ -17,13 +17,11 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 import { useState } from 'react'
 
 interface ComposerToolbarProps {
-    disabled: boolean
     currentComposition: CompositionModel
     compositionStreamID: string
 }
 
 const ComposerToolbar = ({
-    disabled,
     currentComposition,
     compositionStreamID,
 }: ComposerToolbarProps) => {
@@ -88,13 +86,11 @@ const ComposerToolbar = ({
                     onClick={onTestLog}
                     label="Test Log"
                     icon={<Bug />}
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowConfig}
                     label="Solution"
                     icon={<Gear />}
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowExportCompositionModal}
@@ -105,13 +101,12 @@ const ComposerToolbar = ({
                             stackedIcon={<Pen />}
                         />
                     }
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={onSaveComposition}
                     label="Save"
                     icon={<FloppyDisk />}
-                    disabled={disabled || isSaving}
+                    disabled={isSaving}
                 />
             </Box>
             {showExportCompositionModal && (

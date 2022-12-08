@@ -113,7 +113,8 @@ export default class CeramicTemplateAPI {
                 isActive: true,
             }
 
-            return createStage(template, StageNames.template, this.user)
+            return (await createStage(template, StageNames.template, this.user))
+                .streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

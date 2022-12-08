@@ -8,7 +8,6 @@ import {
     DropButton,
     Heading,
     Spinner,
-    Text,
 } from 'grommet'
 import {
     Check,
@@ -116,9 +115,6 @@ const CompositionDashboardTile = ({
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>
                             <Box pad={{ left: 'medium' }}>
                                 <Heading level="4">{currentTag}</Heading>
-                                <Text truncate size="small" color="dark-4">
-                                    {compositionStreamID}
-                                </Text>
                             </Box>
                             <DropButton
                                 size="small"

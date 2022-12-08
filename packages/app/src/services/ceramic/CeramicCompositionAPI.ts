@@ -27,7 +27,7 @@ export default class CeramicCompositionAPI {
     createComposition = async (
         title: string,
         composition?: CompositionModel
-    ): Promise<string> => {
+    ): Promise<{ streamID: string; title: string }> => {
         try {
             return await createStage(
                 composition

@@ -57,7 +57,8 @@ export default class CeramicProposalAPI {
                 isSubmitted: false,
             }
 
-            return await createStage(proposal, StageNames.proposal, this.user)
+            return (await createStage(proposal, StageNames.proposal, this.user))
+                .streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

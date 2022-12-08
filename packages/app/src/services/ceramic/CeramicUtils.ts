@@ -180,7 +180,7 @@ export const createStage = async (
     stage: StageModel,
     stageName: StageNames,
     currentUser: UserType
-): Promise<string> => {
+): Promise<{ streamID: string; title: string }> => {
     try {
         const stagesLibDoc = await loadStagesLib(currentUser)
         const updatedStages = new CambrianStagesLib(stagesLibDoc.content)
@@ -222,7 +222,7 @@ export const createStage = async (
 
         await stageStreamDoc.update({ ...stage, title: uniqueTitle })
         await stagesLibDoc.update(updatedStages.data)
-        return stageStreamID
+        return { streamID: stageStreamID, title: uniqueTitle }
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
