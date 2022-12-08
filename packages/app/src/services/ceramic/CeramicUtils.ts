@@ -72,9 +72,23 @@ export const loadStagesLib = async (currentUser: UserType) => {
             { pin: true }
         )) as TileDocument<CambrianStagesLibType>
 
-        // Update Schema Version
         const updatedStagesLib = new CambrianStagesLib(stagesLibDoc.content)
         if (!_.isEqual(updatedStagesLib.data, stagesLibDoc.content)) {
+            // Backup stagesLib and update Schema Version
+            console.log(
+                'Backing up stagesLib schema version:',
+                stagesLibDoc.content._schemaVer?.toString() || '0'
+            )
+            const backupDoc = await TileDocument.deterministic(
+                ceramicInstance(currentUser),
+                {
+                    controllers: [currentUser.did],
+                    family: 'cambrianStagesLibBackup',
+                    tags: [stagesLibDoc.content._schemaVer?.toString() || '0'],
+                },
+                { pin: true }
+            )
+            await backupDoc.update(stagesLibDoc.content)
             console.log(
                 'Updating stagesLib to schema version: ',
                 SCHEMA_VER['cambrianStagesLib']
