@@ -27,7 +27,9 @@ export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
 
 export const ceramicInstance = (currentUser: UserType) => {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-    ceramicClient.did = currentUser.session.did
+    if (currentUser.session) {
+        ceramicClient.did = currentUser.session.did
+    }
     return ceramicClient
 }
 
@@ -62,6 +64,9 @@ export const getAddressFromDID = (did: string) => {
  */
 export const loadStagesLib = async (currentUser: UserType) => {
     try {
+        if (!currentUser.session || !currentUser.did)
+            throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
         const stagesLibDoc = (await TileDocument.deterministic(
             ceramicInstance(currentUser),
             {
@@ -182,6 +187,9 @@ export const createStage = async (
     currentUser: UserType
 ): Promise<{ streamID: string; title: string }> => {
     try {
+        if (!currentUser.session || !currentUser.did)
+            throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
         const stagesLibDoc = await loadStagesLib(currentUser)
         const updatedStages = new CambrianStagesLib(stagesLibDoc.content)
 
@@ -323,6 +331,9 @@ export const saveCambrianCommitData = async (
     commitID: string
 ) => {
     try {
+        if (!currentUser.session || !currentUser.did)
+            throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
         const res = await fetch(`${TRILOBOT_ENDPOINT}/saveCommit`, {
             method: 'POST',
             body: JSON.stringify({

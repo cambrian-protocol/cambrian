@@ -16,8 +16,7 @@ import BaseActionbar from '../BaseActionbar'
 import { Button } from 'grommet'
 import { Cursor } from 'phosphor-react'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import ReclaimTokensModal from '@cambrian/app/ui/common/modals/ReclaimTokensModal'
+import ReclaimAndRedeemTokensModal from '@cambrian/app/ui/common/modals/ReclaimAndRedeemTokensModal'
 import SolverListModal from '@cambrian/app/ui/common/modals/SolverListModal'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -131,32 +130,22 @@ const ProposalExecutedActionbar = ({
         <>
             <BaseActionbar
                 messenger={messenger}
+                primaryAction={
+                    <Button
+                        disabled={solvers === undefined}
+                        primary
+                        size="small"
+                        label="View Solver"
+                        onClick={viewSolvers}
+                    />
+                }
                 secondaryAction={
                     reclaimableTokens && (
-                        <LoaderButton
-                            isLoading={solvers === undefined}
-                            secondary
-                            size="small"
-                            label="View Solver"
-                            onClick={viewSolvers}
-                        />
-                    )
-                }
-                primaryAction={
-                    reclaimableTokens ? (
                         <Button
                             size="small"
-                            primary
-                            label={'Reclaim'}
+                            secondary
+                            label={'Refunds'}
                             onClick={toggleShowReclaimTokensModal}
-                        />
-                    ) : (
-                        <LoaderButton
-                            isLoading={solvers === undefined}
-                            primary
-                            size="small"
-                            label="View Solver"
-                            onClick={viewSolvers}
                         />
                     )
                 }
@@ -183,8 +172,10 @@ const ProposalExecutedActionbar = ({
                     onClose={toggleShowSolverListModal}
                 />
             )}
-            {showReclaimTokensModal && reclaimableTokens && (
-                <ReclaimTokensModal
+            {showReclaimTokensModal && reclaimableTokens && solvers && (
+                <ReclaimAndRedeemTokensModal
+                    currentUser={currentUser}
+                    solverInfos={solvers}
                     reclaimableTokens={reclaimableTokens}
                     onClose={toggleShowReclaimTokensModal}
                     updateReclaimableTokens={initReclaimableTokens}

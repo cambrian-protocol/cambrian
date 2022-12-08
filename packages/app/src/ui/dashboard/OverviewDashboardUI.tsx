@@ -54,11 +54,7 @@ const OverviewDashboardUI = ({
                     <Text size="small" color="dark-4">
                         Token to redeem
                     </Text>
-                    <RedeemableTokenListWidget
-                        address={currentUser.address}
-                        chainId={currentUser.chainId}
-                        provider={currentUser.web3Provider}
-                    />
+                    <RedeemableTokenListWidget currentUser={currentUser} />
                 </Box>
                 <Box pad="large" />
             </Box>

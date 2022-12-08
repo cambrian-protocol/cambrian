@@ -1,3 +1,7 @@
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
 import {
     ceramicInstance,
@@ -6,7 +10,6 @@ import {
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
@@ -46,17 +49,19 @@ const SubmissionForm = ({
     }, [])
 
     const init = async () => {
-        const submissionDoc = (await TileDocument.deterministic(
-            ceramicInstance(currentUser),
-            {
-                controllers: [currentUser.did],
-                family: 'cambrian-ipfs-text-submitter',
-                tags: [solverAddress],
-            },
-            { pin: true }
-        )) as TileDocument<SubmissionModel>
-        setInput(submissionDoc.content)
-        setSubmissionsTileDocument(submissionDoc)
+        if (currentUser.did) {
+            const submissionDoc = (await TileDocument.deterministic(
+                ceramicInstance(currentUser),
+                {
+                    controllers: [currentUser.did],
+                    family: 'cambrian-ipfs-text-submitter',
+                    tags: [solverAddress],
+                },
+                { pin: true }
+            )) as TileDocument<SubmissionModel>
+            setInput(submissionDoc.content)
+            setSubmissionsTileDocument(submissionDoc)
+        }
     }
 
     const onSubmit = async (): Promise<void> => {
@@ -92,6 +97,9 @@ const SubmissionForm = ({
     const onSave = async () => {
         setIsSaving(true)
         try {
+            if (!currentUser.did || !currentUser.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             if (submissionsTileDocument) {
                 await submissionsTileDocument.update(
                     {

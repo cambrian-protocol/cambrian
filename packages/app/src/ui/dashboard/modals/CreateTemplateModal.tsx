@@ -60,6 +60,9 @@ const CreateTemplateModal = ({
     const onSelectComposition = async (compositionStreamID: string) => {
         setIsCreatingTemplate(compositionStreamID)
         try {
+            if (!currentUser.did || !currentUser.cambrianProfileDoc)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const streamID = await ceramicTemplateAPI.createTemplate(
                 randimals(),
                 compositionStreamID

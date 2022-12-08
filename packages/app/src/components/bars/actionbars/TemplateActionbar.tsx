@@ -82,7 +82,9 @@ const TemplateActionbar = ({
     const onCreateProposal = async () => {
         setIsCreatingProposal(true)
         try {
-            if (!currentUser) throw GENERAL_ERROR['NO_WALLET_CONNECTION']
+            if (!currentUser || !currentUser.cambrianProfileDoc)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
             const streamID = await ceramicProposalAPI.createProposal(
                 randimals(),

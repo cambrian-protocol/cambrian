@@ -42,7 +42,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
-        setUserName(currentUser.cambrianProfileDoc.content.name || 'Anon')
+        setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
         initDocSubsciption()
     }, [currentUser])
 
@@ -83,16 +83,16 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         const cambrianStagesLibSub = stagesLib.subscribe(() => {
             initStagesLib()
         })
-        const cambrianProfileSub = currentUser.cambrianProfileDoc.subscribe(
+        const cambrianProfileSub = currentUser.cambrianProfileDoc?.subscribe(
             () => {
-                if (userName !== currentUser.cambrianProfileDoc.content.name) {
-                    setUserName(currentUser.cambrianProfileDoc.content.name)
+                if (userName !== currentUser.cambrianProfileDoc?.content.name) {
+                    setUserName(currentUser.cambrianProfileDoc?.content.name)
                 }
             }
         )
         return () => {
             cambrianStagesLibSub.unsubscribe()
-            cambrianProfileSub.unsubscribe()
+            cambrianProfileSub?.unsubscribe()
         }
     }
 
