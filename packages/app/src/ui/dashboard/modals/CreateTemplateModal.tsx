@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -42,13 +43,13 @@ const CreateTemplateModal = ({
     const fetchCompositions = async () => {
         try {
             setIsFetching(true)
-            const stagesLib = await loadStagesLib(currentUser)
+            const stagesLibDoc = await loadStagesLib(currentUser)
             if (
-                stagesLib &&
-                stagesLib.content.compositions &&
-                stagesLib.content.compositions.lib
+                stagesLibDoc &&
+                stagesLibDoc.content &&
+                stagesLibDoc.content.compositions
             ) {
-                setCompositions(stagesLib.content.compositions.lib)
+                setCompositions(stagesLibDoc.content.compositions.lib)
             }
         } catch (e) {
             await cpLogger.push(e)
@@ -129,32 +130,24 @@ const CreateTemplateModal = ({
                         {compositions &&
                         Object.keys(compositions).length > 0 ? (
                             <Box height={{ min: 'auto' }} gap="small">
-                                {Object.keys(compositions).map(
-                                    (compositionTag) => {
-                                        return (
-                                            <CompositionListItem
-                                                key={
-                                                    compositions[compositionTag]
-                                                }
-                                                title={compositionTag}
-                                                isLoading={
-                                                    isCreatingTemplate ===
-                                                    compositions[compositionTag]
-                                                }
-                                                isDisabled={
-                                                    isCreatingTemplate !==
-                                                    undefined
-                                                }
-                                                onSelectComposition={
-                                                    onSelectComposition
-                                                }
-                                                compositionID={
-                                                    compositions[compositionTag]
-                                                }
-                                            />
-                                        )
-                                    }
-                                )}
+                                {Object.keys(compositions).map((streamId) => {
+                                    return (
+                                        <CompositionListItem
+                                            key={streamId}
+                                            title={compositions[streamId]}
+                                            isLoading={
+                                                isCreatingTemplate === streamId
+                                            }
+                                            isDisabled={
+                                                isCreatingTemplate !== undefined
+                                            }
+                                            onSelectComposition={
+                                                onSelectComposition
+                                            }
+                                            compositionID={streamId}
+                                        />
+                                    )
+                                })}
                             </Box>
                         ) : (
                             <ListSkeleton

@@ -26,6 +26,7 @@ import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
 import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
 import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
+import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -115,7 +116,8 @@ export default class CeramicTemplateAPI {
                 isActive: true,
             }
 
-            return createStage(template, StageNames.template, this.user)
+            return (await createStage(template, StageNames.template, this.user))
+                .streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -337,10 +339,10 @@ export default class CeramicTemplateAPI {
     /**
      * Removes template from template-lib doc and sets isActive flag to false.
      *
-     * @param tag Template Title / Unique tag
+     * @param templateStreamID Template Title / Unique tag
      * @auth Done by Templater
      */
-    archiveTemplate = async (tag: string, templateStreamID: string) => {
+    archiveTemplate = async (templateStreamID: string) => {
         try {
             const templateStreamDoc = await loadStageDoc<TemplateModel>(
                 this.user,
@@ -351,7 +353,7 @@ export default class CeramicTemplateAPI {
                 isActive: false,
             })
 
-            await archiveStage(this.user, tag, StageNames.template)
+            await archiveStage(this.user, templateStreamID, StageNames.template)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -405,9 +407,7 @@ export default class CeramicTemplateAPI {
         try {
             const stagesLib = await loadStagesLib(this.user)
 
-            const updatedStagesLib = {
-                ...stagesLib.content,
-            }
+            const updatedStages = new CambrianStagesLib(stagesLib.content)
 
             const stageStack = await loadStageStackFromID(proposalStreamID)
             // Set isDeclined if proposal is before approved
@@ -415,11 +415,9 @@ export default class CeramicTemplateAPI {
                 await this.updateProposalEntry(stageStack, { isDeclined: true })
             }
 
-            updatedStagesLib.templates.archive.receivedProposals[
-                stageStack.proposal.title
-            ] = proposalStreamID
+            updatedStages.templates.archiveReceivedProposal(proposalStreamID)
 
-            await stagesLib.update(updatedStagesLib)
+            await stagesLib.update(updatedStages.data)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

@@ -1,15 +1,11 @@
 import {
     CAMBRIAN_DID,
     CERAMIC_NODE_ENDPOINT,
+    SCHEMA_VER,
     TRILOBOT_ENDPOINT,
 } from 'packages/app/config'
 import { StageModel, StageNames } from '../../models/StageModel'
-import {
-    getUniqueTag,
-    updateKeyFromValue,
-} from '@cambrian/app/utils/helpers/hashmapHelper'
 
-import { CambrianStagesLibType } from './../../models/StageModel'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
@@ -20,18 +16,14 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { pushUnique } from '@cambrian/app/utils/helpers/arrayHelper'
 
 import { CommitID } from '@ceramicnetwork/streamid'
+import CambrianStagesLib, {
+    CambrianStagesLibType,
+    defaultCambrianStagesLib,
+} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 
 export const CAMBRIAN_LIB_NAME = 'cambrian-lib'
-
-export const initialStagesLib = {
-    recents: [],
-    compositions: { lib: {}, archive: { lib: {} } },
-    templates: { lib: {}, archive: { lib: {}, receivedProposals: {} } },
-    proposals: { lib: {}, archive: { lib: {} } },
-}
 
 export const ceramicInstance = (currentUser: UserType) => {
     const ceramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
@@ -75,7 +67,7 @@ export const loadStagesLib = async (currentUser: UserType) => {
         if (!currentUser.session || !currentUser.did)
             throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-        return (await TileDocument.deterministic(
+        const stagesLibDoc = (await TileDocument.deterministic(
             ceramicInstance(currentUser),
             {
                 controllers: [currentUser.did],
@@ -84,6 +76,32 @@ export const loadStagesLib = async (currentUser: UserType) => {
             },
             { pin: true }
         )) as TileDocument<CambrianStagesLibType>
+
+        const updatedStagesLib = new CambrianStagesLib(stagesLibDoc.content)
+        if (!_.isEqual(updatedStagesLib.data, stagesLibDoc.content)) {
+            // Backup stagesLib and update Schema Version
+            console.log(
+                'Backing up stagesLib schema version:',
+                stagesLibDoc.content._schemaVer?.toString() || '0'
+            )
+            const backupDoc = await TileDocument.deterministic(
+                ceramicInstance(currentUser),
+                {
+                    controllers: [currentUser.did],
+                    family: 'cambrianStagesLibBackup',
+                    tags: [stagesLibDoc.content._schemaVer?.toString() || '0'],
+                },
+                { pin: true }
+            )
+            await backupDoc.update(stagesLibDoc.content)
+            console.log(
+                'Updating stagesLib to schema version: ',
+                SCHEMA_VER['cambrianStagesLib']
+            )
+            await stagesLibDoc.update(updatedStagesLib.data)
+        }
+
+        return stagesLibDoc
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -94,39 +112,31 @@ export const loadStagesLib = async (currentUser: UserType) => {
  * Moves stage from provided stagesLib to its archive.
  *
  * @param currentUser
- * @param tag
+ * @param streamID
  * @param stageName
  */
 export const archiveStage = async (
     currentUser: UserType,
-    tag: string,
+    streamID: string,
     stageName: StageNames
 ) => {
     try {
         const stagesLib = await loadStagesLib(currentUser)
-
-        let updatedStagesLib = { ...stagesLib.content }
-
+        const updatedStagesLib = new CambrianStagesLib(stagesLib.content)
         switch (stageName) {
             case StageNames.composition:
-                updatedStagesLib.compositions.archive.lib[tag] =
-                    updatedStagesLib.compositions.lib[tag]
-                delete updatedStagesLib.compositions.lib[tag]
+                updatedStagesLib.compositions.archiveStage(streamID)
                 break
             case StageNames.template:
-                updatedStagesLib.templates.archive.lib[tag] =
-                    updatedStagesLib.templates.lib[tag]
-                delete updatedStagesLib.templates.lib[tag]
+                updatedStagesLib.templates.archiveStage(streamID)
                 break
             case StageNames.proposal:
-                updatedStagesLib.proposals.archive.lib[tag] =
-                    updatedStagesLib.proposals.lib[tag]
-                delete updatedStagesLib.proposals.lib[tag]
+                updatedStagesLib.proposals.archiveStage(streamID)
                 break
             default:
                 break
         }
-        await stagesLib.update(updatedStagesLib)
+        await stagesLib.update(updatedStagesLib.data)
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -175,106 +185,52 @@ export const createStage = async (
     stage: StageModel,
     stageName: StageNames,
     currentUser: UserType
-): Promise<string> => {
+): Promise<{ streamID: string; title: string }> => {
     try {
         if (!currentUser.session || !currentUser.did)
             throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
         const stagesLibDoc = await loadStagesLib(currentUser)
+        const updatedStages = new CambrianStagesLib(stagesLibDoc.content)
 
-        let updatedStagesLib: CambrianStagesLibType = initialStagesLib
-
-        if (
-            stagesLibDoc.content !== null &&
-            typeof stagesLibDoc.content === 'object'
-        ) {
-            updatedStagesLib = { ...updatedStagesLib, ...stagesLibDoc.content }
-        }
-
-        // Get unique Tag, checks inside lib and archive for existant tags.
-        let uniqueTitle = stage.title.trim()
-        switch (stageName) {
-            case StageNames.composition:
-                uniqueTitle = getUniqueTag(
-                    {
-                        ...updatedStagesLib.compositions.lib,
-                        ...updatedStagesLib.compositions.archive.lib,
-                    },
-                    stage.title
-                )
-                break
-            case StageNames.template:
-                uniqueTitle = getUniqueTag(
-                    {
-                        ...updatedStagesLib.templates.lib,
-                        ...updatedStagesLib.templates.archive.lib,
-                    },
-                    stage.title
-                )
-                break
-            case StageNames.proposal:
-                uniqueTitle = getUniqueTag(
-                    {
-                        ...updatedStagesLib.proposals.lib,
-                        ...updatedStagesLib.proposals.archive.lib,
-                    },
-                    stage.title
-                )
-                break
-            default:
-                break
-        }
-
-        // Overwrite title if tag wasn't unique
-        if (uniqueTitle !== stage.title.trim()) {
-            stage = { ...stage, title: uniqueTitle }
-        }
-        const stageStreamDoc = await TileDocument.deterministic(
+        const stageStreamDoc = await TileDocument.create(
             ceramicInstance(currentUser),
+            {},
             {
                 controllers: [currentUser.did],
                 family: `cambrian-${stageName}`,
-                tags: [uniqueTitle],
-            },
-            { pin: true }
-        )
-
-        await stageStreamDoc.update(stage)
-
-        // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-        await saveCambrianCommitData(
-            currentUser,
-            stageStreamDoc.commitId.toString()
+            }
         )
 
         const stageStreamID = stageStreamDoc.id.toString()
-
-        // Updating StagesLib
+        let uniqueTitle = stage.title
         switch (stageName) {
             case StageNames.composition:
-                updatedStagesLib.compositions.lib = {
-                    ...updatedStagesLib.compositions.lib,
-                    [uniqueTitle]: stageStreamID,
-                }
+                uniqueTitle =
+                    updatedStages.compositions.addStageWithUniqueTitle(
+                        stageStreamID,
+                        uniqueTitle
+                    )
                 break
             case StageNames.template:
-                updatedStagesLib.templates.lib = {
-                    ...updatedStagesLib.templates.lib,
-                    [uniqueTitle]: stageStreamID,
-                }
+                uniqueTitle = updatedStages.templates.addStageWithUniqueTitle(
+                    stageStreamID,
+                    uniqueTitle
+                )
                 break
             case StageNames.proposal:
-                updatedStagesLib.proposals.lib = {
-                    ...updatedStagesLib.proposals.lib,
-                    [uniqueTitle]: stageStreamID,
-                }
+                uniqueTitle = updatedStages.proposals.addStageWithUniqueTitle(
+                    stageStreamID,
+                    uniqueTitle
+                )
                 break
             default:
                 break
         }
 
-        await stagesLibDoc.update(updatedStagesLib)
-        return stageStreamID
+        await stageStreamDoc.update({ ...stage, title: uniqueTitle })
+        await stagesLibDoc.update(updatedStages.data)
+        return { streamID: stageStreamID, title: uniqueTitle }
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -292,79 +248,41 @@ export const updateStage = async (
             ceramicInstance(currentUser),
             streamID
         )
-        let cleanedUserTitle = updatedStage.title.trim()
 
-        // Title has changed - stagesLib and metaTag must be updated
-        if (currentStage.content.title !== cleanedUserTitle) {
+        let uniqueTitle = updatedStage.title
+        if (currentStage.content.title !== uniqueTitle) {
             const stagesLibDoc = await loadStagesLib(currentUser)
-            let uniqueTitle = cleanedUserTitle
-
-            if (
-                stagesLibDoc.content !== null &&
-                typeof stagesLibDoc.content === 'object'
-            ) {
-                let updatedStagesLib: CambrianStagesLibType = {
-                    ...stagesLibDoc.content,
-                }
-                // Updating StagesLib
-                switch (stageName) {
-                    case StageNames.composition:
-                        {
-                            const { key, map } = updateKeyFromValue(
-                                streamID,
-                                cleanedUserTitle,
-                                updatedStagesLib.compositions.lib,
-                                updatedStagesLib.compositions.archive.lib
-                            )
-                            uniqueTitle = key
-                            updatedStagesLib.compositions.lib = { ...map }
-                            await stagesLibDoc.update(updatedStagesLib)
-                        }
-                        break
-                    case StageNames.template:
-                        {
-                            const { key, map } = updateKeyFromValue(
-                                streamID,
-                                cleanedUserTitle,
-                                updatedStagesLib.templates.lib,
-                                updatedStagesLib.templates.archive.lib
-                            )
-                            uniqueTitle = key
-                            updatedStagesLib.templates.lib = { ...map }
-                            await stagesLibDoc.update(updatedStagesLib)
-                        }
-                        break
-                    case StageNames.proposal:
-                        {
-                            const { key, map } = updateKeyFromValue(
-                                streamID,
-                                cleanedUserTitle,
-                                updatedStagesLib.proposals.lib,
-                                updatedStagesLib.proposals.archive.lib
-                            )
-                            uniqueTitle = key
-                            updatedStagesLib.proposals.lib = { ...map }
-                            await stagesLibDoc.update(updatedStagesLib)
-                        }
-                        break
-                    default:
-                        break
-                }
+            const updatedStages = new CambrianStagesLib(stagesLibDoc.content)
+            // Updating StagesLib
+            switch (stageName) {
+                case StageNames.composition:
+                    uniqueTitle = updatedStages.compositions.updateTitle(
+                        streamID,
+                        uniqueTitle
+                    )
+                    break
+                case StageNames.template:
+                    uniqueTitle = updatedStages.templates.updateTitle(
+                        streamID,
+                        uniqueTitle
+                    )
+                    break
+                case StageNames.proposal:
+                    uniqueTitle = updatedStages.proposals.updateTitle(
+                        streamID,
+                        uniqueTitle
+                    )
+                    break
+                default:
+                    break
             }
-
-            await currentStage.update(
-                { ...updatedStage, title: uniqueTitle },
-                { ...currentStage.metadata, tags: [uniqueTitle] },
-                { pin: true }
-            )
-
-            cleanedUserTitle = uniqueTitle
-        } else {
-            await currentStage.update({
-                ...updatedStage,
-                title: cleanedUserTitle,
-            })
+            await stagesLibDoc.update(updatedStages.data)
         }
+
+        await currentStage.update({
+            ...updatedStage,
+            title: uniqueTitle,
+        })
 
         // NOTE: Workaround until Ceramics load commitID Bugfix is merged
         await saveCambrianCommitData(
@@ -372,7 +290,7 @@ export const updateStage = async (
             currentStage.commitId.toString()
         )
 
-        return cleanedUserTitle
+        return uniqueTitle
     } catch (e) {
         cpLogger.push(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -391,24 +309,10 @@ export const addRecentStage = async (
 ) => {
     try {
         const stagesLibDoc = await loadStagesLib(currentUser)
-
-        let updatedStagesLib: CambrianStagesLibType = initialStagesLib
-
-        if (
-            stagesLibDoc.content !== null &&
-            typeof stagesLibDoc.content === 'object'
-        ) {
-            updatedStagesLib = { ...updatedStagesLib, ...stagesLibDoc.content }
-        }
-
-        if (
-            updatedStagesLib.recents[updatedStagesLib.recents.length - 1] !==
-            streamID
-        ) {
-            await stagesLibDoc.update({
-                ...updatedStagesLib,
-                recents: pushUnique(streamID, updatedStagesLib.recents),
-            })
+        const stagesLib = new CambrianStagesLib(stagesLibDoc.content)
+        if (stagesLib.recents[stagesLib.recents.length - 1] !== streamID) {
+            stagesLib.addRecent(streamID)
+            await stagesLibDoc.update(stagesLib.data)
         }
     } catch (e) {
         cpLogger.push(e)
@@ -418,7 +322,7 @@ export const addRecentStage = async (
 
 export const clearStagesLib = async (currentUser: UserType) => {
     const stagesLib = await loadStagesLib(currentUser)
-    await stagesLib.update(initialStagesLib)
+    await stagesLib.update(defaultCambrianStagesLib)
 }
 
 // NOTE: Temporary workaround until Cermics Bugfix is merged.

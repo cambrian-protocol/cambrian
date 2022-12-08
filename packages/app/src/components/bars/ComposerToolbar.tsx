@@ -1,13 +1,10 @@
 import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
@@ -20,13 +17,11 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 import { useState } from 'react'
 
 interface ComposerToolbarProps {
-    disabled: boolean
     currentComposition: CompositionModel
     compositionStreamID: string
 }
 
 const ComposerToolbar = ({
-    disabled,
     currentComposition,
     compositionStreamID,
 }: ComposerToolbarProps) => {
@@ -91,13 +86,11 @@ const ComposerToolbar = ({
                     onClick={onTestLog}
                     label="Test Log"
                     icon={<Bug />}
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowConfig}
                     label="Solution"
                     icon={<Gear />}
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowExportCompositionModal}
@@ -108,13 +101,12 @@ const ComposerToolbar = ({
                             stackedIcon={<Pen />}
                         />
                     }
-                    disabled={disabled}
                 />
                 <ComposerToolbarButton
                     onClick={onSaveComposition}
                     label="Save"
                     icon={<FloppyDisk />}
-                    disabled={disabled || isSaving}
+                    disabled={isSaving}
                 />
             </Box>
             {showExportCompositionModal && (
