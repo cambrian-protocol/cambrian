@@ -4,6 +4,8 @@ import BaseAvatar from './BaseAvatar'
 import CambrianProfileInfo from '../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
+import { getAddressFromDID } from '@cambrian/app/services/ceramic/CeramicUtils'
 
 interface AvatarGroupProps {
     participants: TileDocument<CambrianProfileType>[]
@@ -40,9 +42,13 @@ const AvatarGroup = ({ participants }: AvatarGroupProps) => (
                 <Text truncate>
                     {participants.map(
                         (p, idx) =>
-                            `${p.content.name || 'Anon'}${
-                                participants.length > idx + 1 ? ', ' : ''
-                            }`
+                            `${
+                                p.content.name ||
+                                ellipseAddress(
+                                    getAddressFromDID(p.controllers[0]),
+                                    4
+                                )
+                            }${participants.length > idx + 1 ? ', ' : ''}`
                     )}
                 </Text>
             </Box>
