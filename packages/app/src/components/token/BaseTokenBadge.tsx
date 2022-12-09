@@ -56,14 +56,19 @@ const BaseTokenBadge = ({
 
     return (
         <Box pad={{ right: 'xsmall', vertical: 'xsmall' }}>
-            <Box onClick={onClick} hoverIndicator focusIndicator={false}>
+            <Box
+                onClick={onClick}
+                hoverIndicator
+                round="xsmall"
+                background={'background-front'}
+                focusIndicator={false}
+            >
                 {isInitialized ? (
                     <Box
                         direction="row"
                         align="center"
                         gap="xsmall"
                         pad={{ vertical: 'xsmall', horizontal: 'small' }}
-                        background={'background-front'}
                         round="xsmall"
                         elevation="small"
                     >
