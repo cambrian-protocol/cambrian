@@ -78,7 +78,7 @@ const TemplatePricingForm = ({
                                                 ...template.price,
                                                 amount:
                                                     e.target.value === ''
-                                                        ? undefined
+                                                        ? ''
                                                         : Number(
                                                               e.target.value
                                                           ),
