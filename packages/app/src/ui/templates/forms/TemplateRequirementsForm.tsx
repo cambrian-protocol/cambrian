@@ -6,12 +6,12 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { useState } from 'react'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { useState } from 'react'
 
 interface TemplateRequirementsFormProps {
     editTemplateContext: EditTemplateContextType
@@ -60,6 +60,11 @@ const TemplateRequirementsForm = ({
                 <Box pad="xsmall">
                     <FormField label="Requirements" name="requirements">
                         <TextArea
+                            placeholder="Example:
+                        1. A clear understanding of the purpose of the article
+                        2. A list of topics to cover in the article
+                        3. An outline of the structure and flow of the article
+                        4. Access to relevant research and data to support the article"
                             value={template.requirements}
                             resize={false}
                             rows={10}
