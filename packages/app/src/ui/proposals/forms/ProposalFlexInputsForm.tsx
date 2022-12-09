@@ -7,14 +7,12 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalFlexInputsFormProps {
     editProposalContext: EditProposalContextType
@@ -228,6 +226,7 @@ const ProposalFlexInputsForm = ({
                                                     e.target.value
                                                 )
                                             }
+                                            placeholder={flexInput.instruction}
                                         />
                                     </FormField>
                                     <Text
@@ -236,13 +235,6 @@ const ProposalFlexInputsForm = ({
                                         margin={{ bottom: 'small' }}
                                     >
                                         {flexInput.description}
-                                    </Text>
-                                    <Text
-                                        size="small"
-                                        color="dark-4"
-                                        margin={{ bottom: 'small' }}
-                                    >
-                                        {flexInput.instruction}
                                     </Text>
                                 </Box>
                             )
