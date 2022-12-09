@@ -72,94 +72,90 @@ export default function Home() {
 
     return (
         <>
-            {isUserLoaded && !currentUser?.isSafeApp ? (
-                <PageLayout contextTitle="Work is evolving" plain>
-                    <Box style={{ position: 'relative' }} fill>
-                        <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
-                        <Box>
-                            <Glow
-                                height="1000px"
-                                width="1000px"
-                                left={'-20%'}
-                                bottom={'20%'}
+            <PageLayout contextTitle="Work is evolving" plain>
+                <Box style={{ position: 'relative' }} fill>
+                    <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
+                    <Box>
+                        <Glow
+                            height="1000px"
+                            width="1000px"
+                            left={'-20%'}
+                            bottom={'20%'}
+                        />
+                        <Box style={{ position: 'relative' }}>
+                            {/* <BackgroundScroll sections={sections} /> */}
+                            {/* <USPSection /> */}
+                            <BaseContentSection
+                                title={'Own Your Work'}
+                                subTitle={''}
+                                paragraph="Use your own smart contract that protects you and your work."
+                                image={
+                                    <Box
+                                        round="xsmall"
+                                        elevation="large"
+                                        border
+                                        overflow="hidden"
+                                    >
+                                        <Image src="/images/template.png" />
+                                    </Box>
+                                }
+                                anchor={
+                                    <Text size="small">
+                                        🟢 Live on Goerli Test Network
+                                    </Text>
+                                }
                             />
-                            <Box style={{ position: 'relative' }}>
-                                {/* <BackgroundScroll sections={sections} /> */}
-                                {/* <USPSection /> */}
-                                <BaseContentSection
-                                    title={'Own Your Work'}
-                                    subTitle={''}
-                                    paragraph="Use your own smart contract that protects you and your work."
-                                    image={
-                                        <Box
-                                            round="xsmall"
-                                            elevation="large"
-                                            border
-                                            overflow="hidden"
-                                        >
-                                            <Image src="/images/template.png" />
-                                        </Box>
-                                    }
-                                    anchor={
-                                        <Text size="small">
-                                            🟢 Live on Goerli Test Network
-                                        </Text>
-                                    }
-                                />
-                                <BaseContentSection
-                                    align="right"
-                                    title={'Build a Solver'}
-                                    subTitle={''}
-                                    paragraph="Design a novel smart contract that improves peoples’ jobs and earn a share of DAO revenue."
-                                    image={
-                                        <Box
-                                            round="xsmall"
-                                            width={'large'}
-                                            height={'large'}
-                                            elevation="large"
-                                            overflow={{ vertical: 'auto' }}
-                                        >
-                                            <CodeMirror
-                                                theme={'dark'}
-                                                value={solverCode}
-                                            />
-                                        </Box>
-                                    }
-                                    anchor={
-                                        <Text color="dark-4" size="small">
-                                            *Open Source launch Q4 2022
-                                        </Text>
-                                    }
-                                />
-                                <BaseContentSection
-                                    subTitle=""
-                                    title={'Evolve Work'}
-                                    paragraph="Create outcomes, load and connect Solvers, and define allocations to streamline or automate entire lines of business."
-                                    image={
-                                        <Box
-                                            round="xsmall"
-                                            elevation="large"
-                                            border
-                                            overflow="hidden"
-                                        >
-                                            <Image src="/images/composer_preview.png" />
-                                        </Box>
-                                    }
-                                    anchor={
-                                        <Text color="dark-4" size="small">
-                                            *Composer official launch Q4 2022
-                                        </Text>
-                                    }
-                                />
-                                <EnderSection />
-                                {/* <RecommendedReadingsSection /> */}
-                            </Box>
+                            <BaseContentSection
+                                align="right"
+                                title={'Build a Solver'}
+                                subTitle={''}
+                                paragraph="Design a novel smart contract that improves peoples’ jobs and earn a share of DAO revenue."
+                                image={
+                                    <Box
+                                        round="xsmall"
+                                        width={'large'}
+                                        height={'large'}
+                                        elevation="large"
+                                        overflow={{ vertical: 'auto' }}
+                                    >
+                                        <CodeMirror
+                                            theme={'dark'}
+                                            value={solverCode}
+                                        />
+                                    </Box>
+                                }
+                                anchor={
+                                    <Text color="dark-4" size="small">
+                                        *Open Source launch Q4 2022
+                                    </Text>
+                                }
+                            />
+                            <BaseContentSection
+                                subTitle=""
+                                title={'Evolve Work'}
+                                paragraph="Create outcomes, load and connect Solvers, and define allocations to streamline or automate entire lines of business."
+                                image={
+                                    <Box
+                                        round="xsmall"
+                                        elevation="large"
+                                        border
+                                        overflow="hidden"
+                                    >
+                                        <Image src="/images/composer_preview.png" />
+                                    </Box>
+                                }
+                                anchor={
+                                    <Text color="dark-4" size="small">
+                                        *Composer official launch Q4 2022
+                                    </Text>
+                                }
+                            />
+                            <EnderSection />
+                            {/* <RecommendedReadingsSection /> */}
                         </Box>
                     </Box>
-                </PageLayout>
-            ) : (
-                <LoadingScreen />
-            )}
+                </Box>
+            </PageLayout>
         </>
     )
 }
