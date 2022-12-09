@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 
@@ -17,7 +18,7 @@ interface ProfileDashboardUIProps {
 }
 
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
-    const cambrianProfile = currentUser.cambrianProfileDoc.content
+    const cambrianProfile = currentUser.cambrianProfileDoc?.content
     const [input, setInput] = useState<CambrianProfileType>(
         initialCambrianProfile
     )
@@ -26,13 +27,16 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
     useEffect(() => {
         setInput({
             ...initialCambrianProfile,
-            ...currentUser.cambrianProfileDoc.content,
+            ...currentUser.cambrianProfileDoc?.content,
         })
     }, [currentUser])
 
     const onSave = async () => {
         setIsSaving(true)
         try {
+            if (!currentUser.cambrianProfileDoc || !currentUser.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             await currentUser.cambrianProfileDoc.update(input)
         } catch (e) {}
         setIsSaving(false)
@@ -73,14 +77,14 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 gap="medium"
                 pad={{ top: 'medium' }}
             >
-                {cambrianProfile.avatar ? (
+                {cambrianProfile?.avatar ? (
                     <BaseAvatar size="large" pfpPath={cambrianProfile.avatar} />
                 ) : (
                     <BaseAvatar size="large" address={currentUser.address} />
                 )}
                 <Box gap="small" pad={{ top: 'medium' }}>
-                    <Heading>{cambrianProfile.name || 'Anon'}</Heading>
-                    <Text>{cambrianProfile.title || 'Unknown'}</Text>
+                    <Heading>{cambrianProfile?.name || 'Anon'}</Heading>
+                    <Text>{cambrianProfile?.title || 'Unknown'}</Text>
                     <Text color="dark-4">
                         {ellipseAddress(currentUser.address, 10)}
                     </Text>
@@ -117,7 +121,6 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                     <FormField label="Company" name="company" />
                     <FormField label="Website" name="website" />
                     <FormField label="Twitter" name="twitter" />
-                    <FormField label="Discord Webhook" name="discordWebhook" />
                 </Box>
             </Form>
 

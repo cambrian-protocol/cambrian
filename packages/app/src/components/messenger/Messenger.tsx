@@ -1,6 +1,6 @@
 import { Box, ResponsiveContext, Text } from 'grommet'
 import { CambrianProfileType, UserType } from '@cambrian/app/store/UserContext'
-import { CaretDown, CaretUp, Envelope, IconContext } from 'phosphor-react'
+import { CaretDown, CaretUp, IconContext } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import AvatarGroup from '../avatars/AvatarGroup'

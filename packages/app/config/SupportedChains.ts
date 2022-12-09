@@ -28,6 +28,7 @@ import LOCAL_ProposalsHub from '@cambrian/core/deployments/localhost/ProposalsHu
 import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFactory.json'
 import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
 import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
+
 // import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
 // import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
 // import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
@@ -50,6 +51,7 @@ export type ChainInfo = {
     nativeCurrency: NativeCurrencyType
     logoURI?: string
     tokenListURI?: string
+    bridgeURI?: string
 }
 
 interface NativeCurrencyType {
@@ -172,12 +174,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             toyToken: GOERLI_ToyToken.address,
             defaultDenominationToken: GOERLI_ToyToken.address,
         },
-        compositions: {
-            'Basic Content Marketing Solver':
-                'k2t6wyfsu4pfydj61yn24bnw5rfgv8hlkgjyusw2i96c12w9ttu8994ru5cty4',
-            'Advanced Content Marketing Solver':
-                'k2t6wyfsu4pfwt5vtpi8e1yje5cxosyhe380rmq16eaeajkvmjqkhu5yiq8qq1',
-        },
+        compositions: {},
     },
     42161: {
         chainData: {
@@ -196,6 +193,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 balance: '',
             },
             logoURI: '/images/logo/arbitrum_one_logo.svg',
+            bridgeURI: 'https://bridge.arbitrum.io/',
         },
         contracts: {
             arbitratorFactory: ARBITRUM_ArbitratorFactory.address,

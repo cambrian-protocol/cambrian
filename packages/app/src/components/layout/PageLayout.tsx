@@ -15,7 +15,6 @@ export type PageLayoutProps = PropsWithChildren<{}> & {
     contextTitle?: string
     kind?: 'narrow'
     plain?: boolean
-    injectedWalletAddress?: string
 }
 
 export const siteTitle = 'Cambrian Protocol'
@@ -25,7 +24,6 @@ const PageLayout = ({
     children,
     kind,
     plain,
-    injectedWalletAddress,
 }: PageLayoutProps) => {
     const topRef = useContext(TopRefContext)
 
@@ -66,7 +64,7 @@ const PageLayout = ({
                             }}
                         />
                     )}
-                    <Appbar injectedWalletAddress={injectedWalletAddress} />
+                    <Appbar />
                     <Box
                         align={kind === 'narrow' ? 'center' : undefined}
                         style={{ position: 'relative' }}

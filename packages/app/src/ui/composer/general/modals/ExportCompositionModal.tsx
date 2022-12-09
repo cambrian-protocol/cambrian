@@ -18,7 +18,7 @@ interface ExportCompositionModalProps {
 const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
     const router = useRouter()
     const { currentUser } = useCurrentUserContext()
-    const { composer } = useComposerContext()
+    const { composer, dispatch } = useComposerContext()
     const [isExporting, setIsExporting] = useState(false)
 
     const [compositionTitleInput, setCompositionTitleInput] =
@@ -36,15 +36,27 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
                 const ceramicCompositionAPI = new CeramicCompositionAPI(
                     currentUser
                 )
-                const streamID = await ceramicCompositionAPI.createComposition(
-                    compositionTitleInput,
-                    {
-                        ...composer,
-                        title: compositionTitleInput,
-                        description: '',
-                    }
-                )
-                if (streamID) router.push(`/solver/${streamID}`)
+                const newComposition =
+                    await ceramicCompositionAPI.createComposition(
+                        compositionTitleInput,
+                        {
+                            ...composer,
+                            title: compositionTitleInput,
+                            description: '',
+                        }
+                    )
+
+                if (newComposition) {
+                    dispatch({
+                        type: 'LOAD_COMPOSITION',
+                        payload: {
+                            ...composer,
+                            title: newComposition.title,
+                        },
+                    })
+
+                    router.push(`/solver/${newComposition.streamID}`)
+                }
                 onBack()
             }
         } catch (e) {

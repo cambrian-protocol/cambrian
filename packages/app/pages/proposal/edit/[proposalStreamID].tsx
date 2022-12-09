@@ -131,7 +131,9 @@ export default function EditProposalPage() {
                                 )}
                             </Tabs>
                             <PlainSectionDivider />
-                            <ProposalSubmitControl />
+                            <ProposalSubmitControl
+                                editProposalContext={editProposalContext}
+                            />
                         </Box>
                     </PageLayout>
                     {proposalStatus !== ProposalStatus.Draft && currentUser && (

@@ -11,7 +11,10 @@ interface TemplateInfoModalProps {
 const TemplateInfoModal = ({ stageStack, onClose }: TemplateInfoModalProps) => (
     <BaseLayerModal onClose={onClose} width="xlarge">
         <Box height={{ min: 'auto' }}>
-            <TemplatePreview template={stageStack.template} />
+            <TemplatePreview
+                template={stageStack.template}
+                templateStreamID={stageStack.proposal.template.streamID}
+            />
         </Box>
     </BaseLayerModal>
 )

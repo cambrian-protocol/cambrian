@@ -27,11 +27,11 @@ export default class CeramicCompositionAPI {
     createComposition = async (
         title: string,
         composition?: CompositionModel
-    ): Promise<string> => {
+    ): Promise<{ streamID: string; title: string }> => {
         try {
             return await createStage(
                 composition
-                    ? composition
+                    ? { ...composition }
                     : {
                           title: title,
                           description: '',
@@ -50,11 +50,11 @@ export default class CeramicCompositionAPI {
     /**
      * Removes composition from composition-lib doc, and adds it to the composition-archive
      *
-     * @param tag Composition Title / Unique tag
+     * @param streamId
      */
-    archiveComposition = async (tag: string) => {
+    archiveComposition = async (streamId: string) => {
         try {
-            await archiveStage(this.user, tag, StageNames.composition)
+            await archiveStage(this.user, streamId, StageNames.composition)
             return true
         } catch (e) {
             cpLogger.push(e)

@@ -1,4 +1,7 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
+import CambrianStagesLib, {
+    CambrianStagesLibType,
+} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -11,7 +14,6 @@ import {
 import { useEffect, useState } from 'react'
 
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
-import { CambrianStagesLibType } from '@cambrian/app/models/StageModel'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -21,10 +23,10 @@ import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useRouter } from 'next/router'
-import _ from 'lodash'
 
 interface DashboardUIProps {
     currentUser: UserType
@@ -40,7 +42,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
-        setUserName(currentUser.cambrianProfileDoc.content.name || 'Anon')
+        setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
         initDocSubsciption()
     }, [currentUser])
 
@@ -81,23 +83,24 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         const cambrianStagesLibSub = stagesLib.subscribe(() => {
             initStagesLib()
         })
-        const cambrianProfileSub = currentUser.cambrianProfileDoc.subscribe(
+        const cambrianProfileSub = currentUser.cambrianProfileDoc?.subscribe(
             () => {
-                if (userName !== currentUser.cambrianProfileDoc.content.name) {
-                    setUserName(currentUser.cambrianProfileDoc.content.name)
+                if (userName !== currentUser.cambrianProfileDoc?.content.name) {
+                    setUserName(currentUser.cambrianProfileDoc?.content.name)
                 }
             }
         )
         return () => {
             cambrianStagesLibSub.unsubscribe()
-            cambrianProfileSub.unsubscribe()
+            cambrianProfileSub?.unsubscribe()
         }
     }
 
     const initStagesLib = async () => {
         setIsFetching(true)
         try {
-            setStagesLib((await loadStagesLib(currentUser)).content)
+            const stagesLib = await loadStagesLib(currentUser)
+            setStagesLib(stagesLib.content)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

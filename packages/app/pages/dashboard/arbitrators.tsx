@@ -38,7 +38,7 @@ export default function ArbitratorsDashboardPage() {
 
     const fetchArbitratorContracts = async () => {
         setIsFetching(true)
-        if (currentUser) {
+        if (currentUser?.did) {
             try {
                 const arbitratorLib = (await TileDocument.deterministic(
                     ceramicInstance(currentUser),

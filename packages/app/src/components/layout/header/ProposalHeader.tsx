@@ -1,5 +1,5 @@
+import { ArrowUpRight, File, FilmScript, ListNumbers } from 'phosphor-react'
 import { Box, Text } from 'grommet'
-import { File, FilmScript, ListNumbers } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseHeader from './BaseHeader'
@@ -22,6 +22,7 @@ interface ProposalHeaderProps {
     proposalStatus?: ProposalStatus
     collateralToken?: TokenModel
     showConfiguration?: boolean
+    showProposalLink?: boolean
 }
 
 const ProposalHeader = ({
@@ -29,6 +30,7 @@ const ProposalHeader = ({
     proposalStatus,
     showConfiguration,
     collateralToken,
+    showProposalLink,
 }: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
     const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>([])
@@ -45,6 +47,16 @@ const ProposalHeader = ({
                 icon: <File color={cpTheme.global.colors['dark-4']} />,
                 onClick: () => setShowTemplateInfoModal(true),
             })
+            if (showProposalLink) {
+                items.push({
+                    label: 'Open Proposal',
+                    icon: (
+                        <ArrowUpRight color={cpTheme.global.colors['dark-4']} />
+                    ),
+                    href: `/solver/${stageStack.proposalStreamID}`,
+                })
+            }
+
             if (showConfiguration) {
                 const mergedComposition = mergeFlexIntoComposition(
                     mergeFlexIntoComposition(

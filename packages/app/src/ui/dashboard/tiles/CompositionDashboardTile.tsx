@@ -8,7 +8,6 @@ import {
     DropButton,
     Heading,
     Spinner,
-    Text,
 } from 'grommet'
 import {
     Check,
@@ -20,12 +19,15 @@ import {
     Trash,
     TreeStructure,
 } from 'phosphor-react'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -75,6 +77,9 @@ const CompositionDashboardTile = ({
         setIsCreatingTemplate(true)
         try {
             if (currentUser) {
+                if (!currentUser.did || !currentUser.cambrianProfileDoc)
+                    throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
                 const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
                 const streamID = await ceramicTemplateAPI.createTemplate(
                     randimals(),
@@ -116,9 +121,6 @@ const CompositionDashboardTile = ({
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>
                             <Box pad={{ left: 'medium' }}>
                                 <Heading level="4">{currentTag}</Heading>
-                                <Text truncate size="small" color="dark-4">
-                                    {compositionStreamID}
-                                </Text>
                             </Box>
                             <DropButton
                                 size="small"
@@ -153,7 +155,7 @@ const CompositionDashboardTile = ({
                                                     ? undefined
                                                     : () =>
                                                           onRemove(
-                                                              compositionTag
+                                                              compositionStreamID
                                                           )
                                             }
                                         />

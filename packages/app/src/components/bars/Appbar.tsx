@@ -9,11 +9,7 @@ import { Layout } from 'phosphor-react'
 import UserMenu from '../menu/UserMenu'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-interface AppbarProps {
-    injectedWalletAddress?: string
-}
-
-const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
+const Appbar = () => {
     const { currentUser } = useCurrentUserContext()
 
     return (
@@ -42,22 +38,21 @@ const Appbar = ({ injectedWalletAddress }: AppbarProps) => {
                                 <CambrianLogo />
                             )}
                             <Box flex />
-                            {currentUser &&
-                                injectedWalletAddress === undefined && (
-                                    <Box direction="row" gap="medium">
-                                        <Box justify="center">
+                            {currentUser && (
+                                <Box direction="row" gap="medium">
+                                    <Box justify="center">
+                                        {!currentUser.isSafeApp && (
                                             <AppbarMenuItem
                                                 pathname="/dashboard"
                                                 label="Dashboard"
                                                 icon={<Layout />}
                                             />
-                                        </Box>
-                                        <ChainMenu currentUser={currentUser} />
+                                        )}
                                     </Box>
-                                )}
-                            <UserMenu
-                                injectedWalletAddress={injectedWalletAddress}
-                            />
+                                    <ChainMenu currentUser={currentUser} />
+                                </Box>
+                            )}
+                            <UserMenu />
                         </Box>
                     </Header>
                 )

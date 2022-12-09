@@ -12,6 +12,8 @@ import FundingSkeleton from '@cambrian/app/components/skeletons/FundingSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
+import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
+import TokenBridgeButton from '@cambrian/app/components/buttons/TokenBridgeButton'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -462,6 +464,14 @@ const FundProposalForm = ({
                                             )
                                         }
                                     />
+                                    {SUPPORTED_CHAINS[currentUser.chainId]
+                                        .chainData.bridgeURI && (
+                                        <Box pad="xsmall">
+                                            <TokenBridgeButton
+                                                chainId={currentUser.chainId}
+                                            />
+                                        </Box>
+                                    )}
                                 </Box>
                             </Form>
                         </Box>
