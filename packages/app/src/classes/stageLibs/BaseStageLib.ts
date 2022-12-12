@@ -70,7 +70,6 @@ export default class BaseStageLib {
             (key) => (titleHasmap[this._lib[key]] = key)
         )
 
-        // To o(1) check if title exists
         while (titleHasmap[uniqueValue]) {
             uniqueValue = title + ` (${counter++})`
         }
