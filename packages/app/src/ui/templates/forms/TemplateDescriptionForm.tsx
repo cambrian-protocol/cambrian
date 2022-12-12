@@ -7,22 +7,20 @@ import {
     TextArea,
     TextInput,
 } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
+import { useState } from 'react'
 
 export type TemplateDescriptionFormType = {
     title: string
     description: string
 }
 interface TemplateDescriptionFormProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -30,14 +28,14 @@ interface TemplateDescriptionFormProps {
 }
 
 const TemplateDescriptionForm = ({
-    editTemplateContext,
+    editTemplateProps,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateDescriptionFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        editTemplateContext
+        editTemplateProps
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 

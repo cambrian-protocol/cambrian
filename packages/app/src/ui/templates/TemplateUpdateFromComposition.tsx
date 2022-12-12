@@ -1,26 +1,18 @@
-import {
-    Box,
-    Button,
-    Form,
-    FormExtendedEvent,
-    FormField,
-    TextArea,
-} from 'grommet'
+import { Box, Button } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { merge } from 'lodash'
+import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplateUpdateFromCompositionProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
 }
 
 export type TemplateUpdateFromCompositionType = {
@@ -28,7 +20,7 @@ export type TemplateUpdateFromCompositionType = {
 }
 
 const TemplateUpdateFromComposition = ({
-    editTemplateContext,
+    editTemplateProps,
 }: TemplateUpdateFromCompositionProps) => {
     const {
         template,
@@ -36,7 +28,7 @@ const TemplateUpdateFromComposition = ({
         cachedTemplate,
         onSaveTemplate,
         onResetTemplate,
-    } = editTemplateContext
+    } = editTemplateProps
     const { currentUser } = useCurrentUserContext()
     const [isUpdating, setIsUpdating] = useState(false)
     const [isUpdated, setIsUpdated] = useState<boolean>()

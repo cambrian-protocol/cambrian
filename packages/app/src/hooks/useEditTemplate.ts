@@ -15,7 +15,7 @@ import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
-export type EditTemplateContextType = {
+export type EditTemplatePropsType = {
     template: TemplateModel | undefined
     templateStreamID: string
     cachedTemplate: TemplateModel | undefined

@@ -4,25 +4,20 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
 import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import useEditTemplate, {
-    EditTemplateContextType,
-} from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateFlexInputsStepProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
 const TemplateFlexInputsStep = ({
-    editTemplateContext,
+    editTemplateProps,
     stepperCallback,
 }: TemplateFlexInputsStepProps) => {
-    const { onSaveTemplate } = editTemplateContext
+    const { onSaveTemplate } = editTemplateProps
 
     return (
         <Box>
@@ -33,7 +28,7 @@ const TemplateFlexInputsStep = ({
                 />
             </Box>
             <TemplateFlexInputsForm
-                editTemplateContext={editTemplateContext}
+                editTemplateProps={editTemplateProps}
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)

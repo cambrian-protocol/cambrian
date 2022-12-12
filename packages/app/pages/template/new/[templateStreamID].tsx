@@ -23,7 +23,7 @@ export default function NewTemplatePage() {
                 <Custom404Page />
             ) : template && composition ? (
                 <PageLayout contextTitle="New Template" kind="narrow">
-                    <TemplateWizard editTemplateContext={editTemplateContext} />
+                    <TemplateWizard editTemplateProps={editTemplateContext} />
                 </PageLayout>
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['TEMPLATE']} />

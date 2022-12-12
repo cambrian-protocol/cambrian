@@ -8,13 +8,13 @@ import {
 } from 'grommet'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { useState } from 'react'
 
 interface TemplateRequirementsFormProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -26,14 +26,14 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    editTemplateContext,
+    editTemplateProps,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        editTemplateContext
+        editTemplateProps
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 

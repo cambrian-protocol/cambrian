@@ -13,7 +13,7 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
@@ -23,7 +23,7 @@ import { isAddress } from 'ethers/lib/utils'
 import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -36,7 +36,7 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
-    editTemplateContext,
+    editTemplateProps,
     onSubmit,
     onCancel,
     submitLabel,
@@ -48,7 +48,7 @@ const TemplateFlexInputsForm = ({
         setTemplate,
         onSaveTemplate,
         onResetTemplate,
-    } = editTemplateContext
+    } = editTemplateProps
 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [timelock, setTimelock] = useState(
