@@ -12,9 +12,11 @@ export function updateToSchema(
     schemaVer: number,
     composition: CompositionModel
 ) {
-    console.log('Loaded Composition with schemaVer ', composition.schemaVer)
+    console.log(
+        'Loaded Composition with schema version: ',
+        composition.schemaVer
+    )
     if (!composition.schemaVer || composition.schemaVer < schemaVer) {
-        console.log('updateToSchema')
         composition = updaters[schemaVer - 1](composition)
     }
 
@@ -25,7 +27,7 @@ export function updateToSchema(
  * This update changes 'id' to 'slotId' in SlotTags
  */
 export function updateFromVersion0(composition: CompositionModel) {
-    console.log('updateFromVersion0')
+    console.log('Updated composition schema from version 0 to version 1')
     composition.solvers.forEach((solver) => {
         Object.keys(solver.slotTags).forEach((id) => {
             try {
