@@ -150,18 +150,12 @@ const ProposalExecutedActionbar = ({
                     )
                 }
                 info={{
-                    title: 'View Solver',
-                    subTitle: 'View the Solver(s) created by this Proposal',
+                    title: 'Solver successfully deployed',
+                    subTitle: 'Start interacting!',
                     dropContent: (
                         <ActionbarItemDropContainer
-                            title="Solver"
-                            description='Hit the "View Solver"-Button on the right to inspect the Solver(s) created by this Proposal.'
-                            list={[
-                                {
-                                    icon: <Cursor />,
-                                    label: 'Select a Solver',
-                                },
-                            ]}
+                            title="Inspect the Projects Solver"
+                            description="Inspect the Solver which are deployed from this Project."
                         />
                     ),
                 }}

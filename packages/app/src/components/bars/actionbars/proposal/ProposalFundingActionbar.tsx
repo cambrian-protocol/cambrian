@@ -131,7 +131,7 @@ const ProposalFundingActionbar = ({
                         dropContent: (
                             <ActionbarItemDropContainer
                                 title="Proposal funding"
-                                description="Back the Project with your funds"
+                                description="Invest in this Project and back it with your funds."
                                 list={[
                                     {
                                         icon: <UsersFour />,

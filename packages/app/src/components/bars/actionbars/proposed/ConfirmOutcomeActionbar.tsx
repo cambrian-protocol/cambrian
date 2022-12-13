@@ -1,7 +1,7 @@
 import BaseActionbar, {
     ActionbarInfoType,
 } from '@cambrian/app/components/bars/actionbars/BaseActionbar'
-import { Coins, Lock, Timer, UsersThree } from 'phosphor-react'
+import { Lock, Timer, UsersThree } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -72,16 +72,11 @@ const ConfirmOutcomeActionbar = ({
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Confirming an outcome"
-                    description='Please hit the "Confirm Outcome"-Button at your
-            right to confirm the proposed outcome.'
+                    description='Hit the "Confirm Outcome"-Button and sign the transaction. Recipients will be able to redeem their tokens after the confirmation.'
                     list={[
                         {
                             icon: <UsersThree />,
                             label: 'This can be done by anyone',
-                        },
-                        {
-                            icon: <Coins />,
-                            label: 'Final token allocation ahead',
                         },
                     ]}
                 />

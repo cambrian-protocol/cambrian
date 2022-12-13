@@ -171,11 +171,11 @@ const ProposalReviewActionbar = ({
                                   dropContent: (
                                       <ActionbarItemDropContainer
                                           title="Proposal review"
-                                          description="Approve this proposal by hitting the 'Approve Proposal'-Button at your right or request a change from the proposer at the 'Request Change'-Button."
+                                          description="Approve this proposal or request a change from the proposer."
                                           list={[
                                               {
                                                   icon: <Chats />,
-                                                  label: 'Directly chat with the Proposal author',
+                                                  label: 'Chat directly with the Proposal author',
                                               },
                                               {
                                                   icon: <PencilLine />,
@@ -192,16 +192,15 @@ const ProposalReviewActionbar = ({
                     messenger={messenger}
                     info={{
                         title: `Proposal on review`,
-                        subTitle:
-                            'Please wait until the Proposal has been reviewed',
+                        subTitle: 'Review in progress',
                         dropContent: (
                             <ActionbarItemDropContainer
-                                title="Proposal review"
+                                title="Reviewal by the Template author"
                                 description="Please wait until the Proposal has been approved or a change is requested."
                                 list={[
                                     {
                                         icon: <Chats />,
-                                        label: 'Directly chat with the Template author',
+                                        label: 'Chat directly with the Template author',
                                     },
                                     {
                                         icon: <PencilLine />,

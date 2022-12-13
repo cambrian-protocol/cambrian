@@ -2,6 +2,7 @@ import Custom404Page from 'packages/app/pages/404'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
 import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal/ProposalActionbar'
+import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import ProposalPreview from './ProposalPreview'
 import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
@@ -16,10 +17,12 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
     const { isLoaded, stageStack, proposalStatus, collateralToken } =
         useProposalContext()
 
+    const isTemplateOrProposalAuthor =
+        currentUser.did === stageStack?.template.author ||
+        currentUser.did === stageStack?.proposal.author
+
     const initMessenger =
-        (currentUser.did === stageStack?.template.author ||
-            currentUser.did === stageStack?.proposal.author) &&
-        proposalStatus !== ProposalStatus.Draft
+        isTemplateOrProposalAuthor && proposalStatus !== ProposalStatus.Draft
 
     return (
         <>
@@ -28,6 +31,16 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
             ) : (
                 <InteractionLayout
                     contextTitle={stageStack?.proposal.title || 'Proposal'}
+                    header={
+                        stageStack && (
+                            <ProposalHeader
+                                collateralToken={collateralToken}
+                                stageStack={stageStack}
+                                proposalStatus={proposalStatus}
+                                showConfiguration
+                            />
+                        )
+                    }
                     actionBar={
                         <ProposalActionbar
                             proposedPrice={{

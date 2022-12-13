@@ -78,7 +78,10 @@ const Messenger = ({
                                     <Box
                                         direction="row"
                                         justify="between"
-                                        pad={'small'}
+                                        pad={{
+                                            horizontal: 'small',
+                                            vertical: 'xsmall',
+                                        }}
                                         onClick={toggleShowMessenger}
                                         focusIndicator={false}
                                     >

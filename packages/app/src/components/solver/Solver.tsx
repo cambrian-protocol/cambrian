@@ -298,13 +298,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             currentUser.chainId ? (
                 <InteractionLayout
                     contextTitle={metadata?.solverTag?.title || 'Solver'}
-                    header={
-                        <SolverHeader
-                            currentCondition={currentCondition}
-                            solverData={solverData}
-                            metadata={metadata}
-                        />
-                    }
                     actionBar={
                         <SolverActionbar
                             solverData={solverData}
@@ -313,6 +306,13 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                             solverMethods={solverMethods}
                             currentUser={currentUser}
                             currentCondition={currentCondition}
+                        />
+                    }
+                    header={
+                        <SolverHeader
+                            currentCondition={currentCondition}
+                            solverData={solverData}
+                            metadata={metadata}
                         />
                     }
                     sidebar={

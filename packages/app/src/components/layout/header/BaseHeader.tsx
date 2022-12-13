@@ -46,7 +46,6 @@ const BaseHeader = ({
                 gap="small"
                 border={{ side: 'bottom' }}
                 align="end"
-                height={'5em'}
             >
                 {authorProfileDoc ? (
                     <CambrianProfileInfo

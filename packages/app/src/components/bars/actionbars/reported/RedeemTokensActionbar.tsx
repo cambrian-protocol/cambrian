@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
+import ClipboardButton from '@cambrian/app/components/buttons/ClipboardButton'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import LoaderButton from '../../../buttons/LoaderButton'
@@ -20,6 +21,7 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { ethers } from 'ethers'
 import useRedeem from '@cambrian/app/hooks/useRedeem'
 
@@ -109,7 +111,23 @@ const RedeemTokensActionbar = ({
                         },
                         {
                             icon: <Coin />,
-                            label: `Token address: ${solverData.collateralToken.address}`,
+                            label: 'Token address:',
+                            description: (
+                                <Box direction="row" gap="small" align="center">
+                                    <Text size="small" color="dark-4">
+                                        {ellipseAddress(
+                                            solverData.collateralToken.address,
+                                            10
+                                        )}
+                                    </Text>
+                                    <ClipboardButton
+                                        size="xsmall"
+                                        value={
+                                            solverData.collateralToken.address
+                                        }
+                                    />
+                                </Box>
+                            ),
                         },
                     ]}
                 />

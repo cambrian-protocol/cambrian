@@ -100,12 +100,12 @@ const ProposalApprovedActionbar = ({
                             />
                         }
                         info={{
-                            title: `Proposal has been approved`,
+                            title: `Approved Proposal`,
                             subTitle: 'Start funding the Solver',
                             dropContent: (
                                 <ActionbarItemDropContainer
-                                    title="Proposal has been approved"
-                                    description="Please hit the 'Start Funding'-Button in order to initiate the Solver and get it ready for funding."
+                                    title="Secure financial resources"
+                                    description="This transaction initiates the Solver to secure funding."
                                     list={[
                                         {
                                             icon: <Users />,
@@ -129,12 +129,12 @@ const ProposalApprovedActionbar = ({
                             />
                         }
                         info={{
-                            title: `Proposal has been approved`,
+                            title: `Approved Proposal`,
                             subTitle: 'Solver setup',
                             dropContent: (
                                 <ActionbarItemDropContainer
-                                    title="Proposal has been approved"
-                                    description="To set up the Solver correctly please hit the 'Continue'-Button."
+                                    title="Start solving"
+                                    description="This transaction will initialize the approved Proposal and anchors it to the Blockchain."
                                     list={[
                                         {
                                             icon: <Users />,

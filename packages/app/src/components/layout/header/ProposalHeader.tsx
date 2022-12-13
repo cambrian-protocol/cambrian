@@ -149,6 +149,7 @@ const ProposalHeader = ({
                 <TemplateInfoModal
                     stageStack={stageStack}
                     onClose={toggleShowTemplateInfoModal}
+                    collateralToken={collateralToken}
                 />
             )}
             {showSolverConfigModal !== undefined && composition && (

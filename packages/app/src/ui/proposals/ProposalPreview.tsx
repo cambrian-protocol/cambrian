@@ -27,15 +27,8 @@ const ProposalPreview = ({
     const [proposerProfile] = useCambrianProfile(stageStack.proposal.author)
     return (
         <Box gap="medium">
-            <ProposalHeader
-                collateralToken={collateralToken}
-                stageStack={stageStack}
-                proposalStatus={proposalStatus}
-                showConfiguration={showConfiguration}
-                showProposalLink={showProposalLink}
-            />
             <Box gap="small">
-                <Heading level="3">Project details</Heading>
+                <Heading level="3">Description</Heading>
                 <Text style={{ whiteSpace: 'pre-line' }}>
                     {stageStack.proposal.description}
                 </Text>

@@ -40,11 +40,11 @@ const ProposalEditActionbar = ({
                     }
                     info={{
                         title: `Change requested`,
-                        subTitle: 'Please check out the chat for details',
+                        subTitle: 'Check out the chat for details',
                         dropContent: (
                             <ActionbarItemDropContainer
                                 title="Proposal change requested"
-                                description="A change at your Proposal has been requested by the Template author. Receive details for a new Proposal version via chat."
+                                description="Get more information about the requested changes to your Proposal through the chat with the Template author."
                                 list={[
                                     {
                                         icon: <Chats />,
@@ -63,12 +63,12 @@ const ProposalEditActionbar = ({
                 <BaseActionbar
                     messenger={messenger}
                     info={{
-                        title: `You have requested a change`,
+                        title: `Change requested`,
                         subTitle: 'Please provide details via chat',
                         dropContent: (
                             <ActionbarItemDropContainer
-                                title="Proposal change requested"
-                                description="You have requested a change at the Proposal. The author of the Proposal is now able to edit its Proposal an resubmit it."
+                                title="Revised proposal requested"
+                                description="You have requested an alteration to the Proposal. The author of the Proposal is now able to revise it and resubmit it."
                                 list={[
                                     {
                                         icon: <Chats />,
@@ -80,7 +80,7 @@ const ProposalEditActionbar = ({
                                     },
                                     {
                                         icon: <BellRinging />,
-                                        label: 'You will get notified once the Proposal has been resubmitted',
+                                        label: 'You will get notified via Email once the Proposal has been resubmitted',
                                     },
                                 ]}
                             />

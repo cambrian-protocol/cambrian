@@ -48,7 +48,7 @@ const ProposeOutcomeActionbar = ({
                     dropContent: (
                         <ActionbarItemDropContainer
                             title="Propose an outcome"
-                            description='Please hit the "Propose Outcome"-Button at your right, select the outcome when solve conditions are met and confirm the transaction.'
+                            description='Please hit the "Propose Outcome"-Button, select the outcome when solve conditions are met and confirm the transaction.'
                             list={[
                                 {
                                     icon: <Shield />,

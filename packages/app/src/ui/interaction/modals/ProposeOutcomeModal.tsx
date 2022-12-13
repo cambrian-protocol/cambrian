@@ -58,7 +58,7 @@ const ProposeOutcomeModal = ({
 
     return (
         <>
-            <BaseLayerModal onBack={onBack}>
+            <BaseLayerModal onBack={onBack} width="xlarge">
                 <ModalHeader
                     title="Propose an outcome"
                     description="Select the outcome when solve conditions are met."

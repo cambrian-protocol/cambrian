@@ -36,78 +36,78 @@ const InteractionLayout = ({
                 <meta name="og:title" content={siteTitle} />
                 <meta name="twitter:card" content="summary_large_image" />
             </Head>
-            <Box height="100vh">
-                <WarningBanner message={WARNING_MESSAGE['BETA_WARNING']} />
-                <Page
-                    style={{ position: 'relative' }}
-                    overflow={{
-                        vertical: 'auto',
-                        horizontal: 'hidden',
-                    }}
-                >
-                    <WorldMap
-                        color="brand"
-                        style={{
-                            position: 'absolute',
-                            top: '10%',
-                            left: '20%',
-                            opacity: 0.03,
-                            height: '70vh',
-                        }}
-                    />
-                    <Glow
-                        height="800px"
-                        width="1000px"
-                        left={'5%'}
-                        top={'-200px'}
-                    />
-                    <Appbar />
-                    <Box
-                        align="center"
-                        pad="large"
-                        height={{ min: 'auto' }}
-                        style={{ position: 'relative' }}
-                        gap="small"
-                    >
-                        <ResponsiveContext.Consumer>
-                            {(screenSize) => {
-                                return (
-                                    <>
-                                        {screenSize === 'small' ? (
-                                            <Box gap="medium" fill>
-                                                {header}
-                                                {sidebar}
-                                                <Box height={{ min: '70vh' }}>
-                                                    {children}
-                                                </Box>
+            <ResponsiveContext.Consumer>
+                {(screenSize) => {
+                    return (
+                        <Box height="100vh">
+                            <WarningBanner
+                                message={WARNING_MESSAGE['BETA_WARNING']}
+                            />
+                            <Page
+                                style={{ position: 'relative' }}
+                                overflow={{
+                                    vertical: 'auto',
+                                    horizontal: 'hidden',
+                                }}
+                            >
+                                <WorldMap
+                                    color="brand"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '10%',
+                                        left: '20%',
+                                        opacity: 0.03,
+                                        height: '70vh',
+                                    }}
+                                />
+                                <Glow
+                                    height="800px"
+                                    width="1000px"
+                                    left={'5%'}
+                                    top={'-200px'}
+                                />
+                                <Appbar />
+                                <Box
+                                    align="center"
+                                    pad="large"
+                                    height={{ min: 'auto' }}
+                                    style={{ position: 'relative' }}
+                                    gap="small"
+                                >
+                                    {screenSize === 'small' ? (
+                                        <Box gap="medium" fill>
+                                            {header}
+                                            {sidebar}
+                                            <Box height={{ min: '70vh' }}>
+                                                {children}
                                             </Box>
-                                        ) : (
-                                            <Box width={'xlarge'} gap="medium">
-                                                {header}
-                                                <Box
-                                                    direction="row"
-                                                    fill
-                                                    gap="large"
-                                                    height={{ min: '70vh' }}
-                                                >
-                                                    {sidebar && (
-                                                        <Box width="medium">
-                                                            {sidebar}
-                                                        </Box>
-                                                    )}
-                                                    <Box flex>{children}</Box>
-                                                </Box>
+                                        </Box>
+                                    ) : (
+                                        <Box width={'xxlarge'} gap="medium">
+                                            {header}
+                                            <Box
+                                                direction="row"
+                                                fill
+                                                height={{ min: '70vh' }}
+                                            >
+                                                <Box flex>{children}</Box>
+                                                {screenSize !== 'small' && (
+                                                    <Box width={'auto'}>
+                                                        {actionBar}
+                                                        {sidebar}
+                                                    </Box>
+                                                )}
                                             </Box>
-                                        )}
-                                    </>
-                                )
-                            }}
-                        </ResponsiveContext.Consumer>
-                    </Box>
-                    <BaseFooter />
-                </Page>
-                {actionBar && actionBar}
-            </Box>
+                                        </Box>
+                                    )}
+                                </Box>
+                                <BaseFooter />
+                            </Page>
+                            {screenSize === 'small' && actionBar && actionBar}
+                        </Box>
+                    )
+                }}
+            </ResponsiveContext.Consumer>
         </>
     )
 }
