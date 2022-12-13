@@ -49,6 +49,16 @@ export const config = {
     apiKey: {
       goerli: "2M5WQBZ8XMJSZW9HVIUAXKAAJW2ZCZEWQW",
     },
+    customChains: [
+      {
+        network: "goerli",
+        chainId: 5,
+        urls: {
+          apiURL: "https://api-goerli.etherscan.io/api",
+          browserURL: "https://goerli.etherscan.io",
+        },
+      },
+    ],
   },
   solidity: {
     compilers: [

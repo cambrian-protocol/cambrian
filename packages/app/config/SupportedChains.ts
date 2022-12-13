@@ -209,6 +209,11 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
-        compositions: {},
+        compositions: {
+            'Basic Freelance/Bounty':
+                'kjzl6cwe1jw145m83mnankqlsgypt2dawkuu0reuo31dm7sr9qi09t0pkw9ym7r', // owned by zkTRUTH
+            'Foundation Grants':
+                'k2t6wyfsu4pg2uu816phdx67e643et1sxpa8y3mfby27czk2fucbtlua0fn3iv', // owned by zkTRUTH
+        },
     },
 }
