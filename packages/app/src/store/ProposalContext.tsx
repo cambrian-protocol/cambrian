@@ -1,20 +1,15 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 import {
-    ceramicInstance,
-    loadCommitWorkaround,
     loadStageDoc,
     loadStageStackFromID,
 } from '../services/ceramic/CeramicUtils'
 import {
     getApprovedProposalCommitID,
     getLatestProposalSubmission,
-    getOnChainProposal,
     getOnChainProposalId,
     getProposalStatus,
 } from '../utils/helpers/proposalHelper'
 
-import { CAMBRIAN_DID } from 'packages/app/config'
-import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
@@ -52,243 +47,179 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             currentUser.signer,
             currentUser.chainId
         )
+        const [canonicalProposalCommitID, setCanonicalProposalCommitID] =
+            useState<string | undefined>()
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>()
         const [stageStack, setStageStack] = useState<StageStackType>()
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
-        const [isLoaded, setIsLoaded] = useState(false)
+        const [onChainProposalID, setOnChainProposalID] = useState<string>()
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<TemplateModel>>()
         const [collateralToken, setCollateralToken] = useState<TokenModel>()
+        const [isLoaded, setIsLoaded] = useState(false)
 
         useEffect(() => {
-            init()
+            update()
         }, [])
 
-        // Init offchain Listeners
+        // kicks off chain of updates
+        // loadTemplate -> setCanonicalProposalCommitID -> loadStageStack -> updateOnChainProposalID & updateProposalStatus & updateCollateralToken
+        const update = async () => {
+            try {
+                loadTemplate()
+            } catch (e) {
+                console.error(e)
+                cpLogger.push(e)
+            }
+        }
+
         useEffect(() => {
+            loadStageStack()
+        }, [canonicalProposalCommitID])
+
+        useEffect(() => {
+            updateProposalStatus()
+            updateCollateralToken()
+            updateOnChainProposalID()
+        }, [stageStack, onChainProposal])
+
+        useEffect(() => {
+            const listeners = listenOffChain()
+            return () => {
+                listeners?.proposal?.unsubscribe()
+                listeners?.template?.unsubscribe()
+            }
+        }, [templateStreamDoc, proposalStatus])
+
+        useEffect(() => {
+            listenOnChain() // listens on proposalsHub.contract
+            return () => {
+                proposalsHub.contract.removeAllListeners()
+            }
+        }, [proposalStatus, stageStack])
+
+        useEffect(() => {
+            if (templateStreamDoc) {
+                setCanonicalProposalCommitID(
+                    // approved || most recent || undefined
+                    getApprovedProposalCommitID(
+                        templateStreamDoc.content,
+                        proposalStreamDoc.id.toString()
+                    ) ||
+                        getLatestProposalSubmission(
+                            proposalStreamDoc.id.toString(),
+                            templateStreamDoc.content.receivedProposals
+                        )?.proposalCommitID
+                )
+            }
+        }, [templateStreamDoc])
+
+        const loadTemplate = async () => {
+            setTemplateStreamDoc(
+                await loadStageDoc<TemplateModel>(
+                    currentUser,
+                    proposalStreamDoc.content.template.streamID
+                )
+            )
+        }
+
+        const loadStageStack = async () => {
+            setStageStack(
+                await loadStageStackFromID(
+                    proposalStreamDoc.id.toString(),
+                    canonicalProposalCommitID
+                )
+            )
+            setIsLoaded(true)
+        }
+
+        // Might be async later when we do NEEDED defensive checking
+        const updateOnChainProposalID = () => {
+            setOnChainProposalID(
+                stageStack
+                    ? getOnChainProposalId(
+                          stageStack.proposalCommitID,
+                          stageStack.proposal.template.commitID
+                      )
+                    : undefined
+            )
+        }
+
+        const updateProposalStatus = () => {
+            if (onChainProposal) {
+                onChainProposal.isExecuted
+                    ? setProposalStatus(ProposalStatus.Executed)
+                    : setProposalStatus(ProposalStatus.Funding)
+            } else if (stageStack) {
+                setProposalStatus(
+                    getProposalStatus(
+                        stageStack.proposal,
+                        (getApprovedProposalCommitID(
+                            stageStack.template,
+                            proposalStreamDoc.id.toString()
+                        ) &&
+                            stageStack) ||
+                            undefined
+                    )
+                )
+            } else {
+                setProposalStatus(getProposalStatus(proposalStreamDoc.content))
+            }
+        }
+
+        const updateCollateralToken = async () => {
+            setCollateralToken(
+                await TokenAPI.getTokenInfo(
+                    stageStack?.proposal.price.tokenAddress ||
+                        proposalStreamDoc.content.price.tokenAddress,
+                    currentUser.web3Provider,
+                    currentUser.chainId
+                )
+            )
+        }
+
+        const listenOffChain = () => {
             if (
                 proposalStatus === ProposalStatus.OnReview ||
                 proposalStatus === ProposalStatus.ChangeRequested
             ) {
-                if (proposalStreamDoc && templateStreamDoc) {
-                    const proposalSub = proposalStreamDoc.subscribe(
-                        async (x) => {
-                            await initProposal(
-                                proposalStreamDoc,
-                                templateStreamDoc
-                            )
-                        }
-                    )
-                    const templateSub = templateStreamDoc.subscribe(
-                        async (x) => {
-                            setProposalStatus(
-                                getProposalStatus(
-                                    proposalStreamDoc.content,
-                                    undefined,
-                                    onChainProposal,
-                                    templateStreamDoc.content.receivedProposals[
-                                        proposalStreamDoc.id.toString()
-                                    ]
-                                )
-                            )
-                        }
-                    )
-                    return () => {
-                        proposalSub.unsubscribe()
-                        templateSub.unsubscribe()
-                    }
+                return {
+                    proposal: proposalStreamDoc.subscribe(async (x) => {
+                        await update()
+                    }),
+                    template: templateStreamDoc?.subscribe(async (x) => {
+                        await update()
+                    }),
                 }
             }
-        }, [proposalStreamDoc, templateStreamDoc, proposalStatus])
+        }
 
-        // Init onchain Listeners
-        useEffect(() => {
-            if (stageStack) {
-                initProposalsHubListener(proposalsHub, stageStack)
-                return () => {
-                    proposalsHub.contract.removeAllListeners()
-                }
-            }
-        }, [proposalStatus, stageStack])
-
-        const initProposalsHubListener = async (
-            proposalsHub: ProposalsHub,
-            stageStack: StageStackType
-        ) => {
-            const proposalID = getOnChainProposalId(
-                stageStack.proposalCommitID,
-                stageStack.proposal.template.commitID
-            )
-            if (proposalStatus === ProposalStatus.Approved) {
+        // TODO IMPORTANT: CHECK that gotten proposal MATCHES expectations
+        // If an attacker calculates this proposalID and creates a bad one while user on this page...
+        const listenOnChain = () => {
+            if (onChainProposalID) {
                 proposalsHub.contract.on(
-                    proposalsHub.contract.filters.CreateProposal(proposalID),
+                    proposalsHub.contract.filters.CreateProposal(
+                        onChainProposalID
+                    ),
                     async () => {
-                        setProposalStatus(ProposalStatus.Funding)
                         setOnChainProposal(
-                            await proposalsHub.getProposal(proposalID)
+                            await proposalsHub.getProposal(onChainProposalID)
                         )
                     }
                 )
-            } else if (proposalStatus === ProposalStatus.Funding) {
+
                 proposalsHub.contract.on(
-                    proposalsHub.contract.filters.ExecuteProposal(proposalID),
+                    proposalsHub.contract.filters.ExecuteProposal(
+                        onChainProposalID
+                    ),
                     async () => {
-                        setProposalStatus(ProposalStatus.Executed)
+                        setOnChainProposal(
+                            await proposalsHub.getProposal(onChainProposalID)
+                        )
                     }
                 )
-            }
-        }
-
-        const init = async () => {
-            try {
-                const _templateStreamDoc = await loadStageDoc<TemplateModel>(
-                    currentUser,
-                    proposalStreamDoc.content.template.streamID
-                )
-
-                await initProposal(proposalStreamDoc, _templateStreamDoc)
-
-                setTemplateStreamDoc(_templateStreamDoc)
-                setIsLoaded(true)
-            } catch (e) {
-                cpLogger.push(e)
-            }
-        }
-
-        const initProposal = async (
-            proposalStreamDoc: TileDocument<ProposalModel>,
-            templateStreamDoc: TileDocument<TemplateModel>
-        ) => {
-            try {
-                const proposalStreamID = proposalStreamDoc.id.toString()
-
-                const cambrianStageStackDoc = (await TileDocument.deterministic(
-                    ceramicInstance(currentUser),
-                    {
-                        controllers: [CAMBRIAN_DID],
-                        family: 'cambrian-archive',
-                        tags: [proposalStreamID],
-                    }
-                )) as TileDocument<{ proposalStack: StageStackType }>
-
-                if (cambrianStageStackDoc.content.proposalStack) {
-                    const stageStack = await loadStageStackFromID(
-                        proposalStreamID,
-                        cambrianStageStackDoc.content.proposalStack
-                            .proposalCommitID
-                    )
-
-                    const onChainProposal = await getOnChainProposal(
-                        currentUser,
-                        cambrianStageStackDoc.content.proposalStack
-                            .proposalCommitID,
-                        cambrianStageStackDoc.content.proposalStack.proposal
-                            .template.commitID
-                    )
-                    setProposalStatus(
-                        getProposalStatus(
-                            stageStack.proposal,
-                            cambrianStageStackDoc.content.proposalStack,
-                            onChainProposal
-                        )
-                    )
-                    setOnChainProposal(onChainProposal)
-                    setStageStack(stageStack)
-                    setCollateralToken(
-                        await TokenAPI.getTokenInfo(
-                            cambrianStageStackDoc.content.proposalStack.proposal
-                                .price.tokenAddress,
-                            currentUser.web3Provider,
-                            currentUser.chainId
-                        )
-                    )
-                } else {
-                    // Fallback in case cambrian-stageStack had no entry but there is an approved commit
-                    const approvedCommitID = getApprovedProposalCommitID(
-                        templateStreamDoc.content,
-                        proposalStreamDoc.id.toString()
-                    )
-                    let onChainProposal: ethers.Contract | undefined
-                    if (approvedCommitID) {
-                        onChainProposal = await getOnChainProposal(
-                            currentUser,
-                            approvedCommitID,
-                            proposalStreamDoc.content.template.commitID
-                        )
-                        setOnChainProposal(onChainProposal)
-                    }
-
-                    const stageStack = await loadStageStackFromID(
-                        proposalStreamID,
-                        approvedCommitID
-                    )
-
-                    let receivedProposals =
-                        templateStreamDoc.content.receivedProposals
-
-                    // Register new submitted proposal if user is template author
-                    if (
-                        stageStack.template.author === currentUser.did &&
-                        stageStack.proposal.isSubmitted
-                    ) {
-                        const ceramicTemplateAPI = new CeramicTemplateAPI(
-                            currentUser
-                        )
-                        receivedProposals =
-                            await ceramicTemplateAPI.registerNewProposalSubmission(
-                                stageStack
-                            )
-                    }
-
-                    setProposalStatus(
-                        getProposalStatus(
-                            stageStack.proposal,
-                            undefined,
-                            onChainProposal,
-                            receivedProposals[proposalStreamID]
-                        )
-                    )
-                    if (proposalStreamDoc.content.isSubmitted) {
-                        setStageStack(stageStack)
-                        setCollateralToken(
-                            await TokenAPI.getTokenInfo(
-                                stageStack.proposal.price.tokenAddress,
-                                currentUser.web3Provider,
-                                currentUser.chainId
-                            )
-                        )
-                    } else {
-                        const _latestProposalSubmission =
-                            getLatestProposalSubmission(
-                                proposalStreamID,
-                                templateStreamDoc.content.receivedProposals
-                            )
-                        if (_latestProposalSubmission) {
-                            // Initialize the latest submission/commit as stageStack
-                            const latestProposalCommitContent = (
-                                await loadCommitWorkaround(
-                                    _latestProposalSubmission.proposalCommitID
-                                )
-                            ).content as ProposalModel
-                            setCollateralToken(
-                                await TokenAPI.getTokenInfo(
-                                    latestProposalCommitContent.price
-                                        .tokenAddress,
-                                    currentUser.web3Provider,
-                                    currentUser.chainId
-                                )
-                            )
-                            setStageStack({
-                                ...stageStack,
-                                proposal: latestProposalCommitContent,
-                            })
-                        }
-                        // Note: If there are no latest submissions and the proposal has not been submitted, no stack will be set
-                    }
-                }
-            } catch (e) {
-                cpLogger.push(e)
             }
         }
 
