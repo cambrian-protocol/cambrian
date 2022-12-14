@@ -19,7 +19,7 @@ import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
-export type EditProposalContextType = {
+export type EditProposalType = {
     proposalStreamID: string
     isValidProposal: boolean
     stageStack: StageStackType | undefined

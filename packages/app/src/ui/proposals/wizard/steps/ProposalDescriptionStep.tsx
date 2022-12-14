@@ -4,25 +4,21 @@ import {
     ProposalWizardStepsType,
 } from '../ProposalWizard'
 
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalDescriptionForm from '../../forms/ProposalDescriptionForm'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import { SetStateAction } from 'react'
 import router from 'next/router'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalDescriptionStepProps {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
     stepperCallback: (step: ProposalWizardStepsType) => void
 }
 
 const ProposalDescriptionStep = ({
-    editProposalContext,
+    editProposalProps,
     stepperCallback,
 }: ProposalDescriptionStepProps) => {
-    const { onSaveProposal, stageStack } = editProposalContext
+    const { onSaveProposal, stageStack } = editProposalProps
 
     return (
         <Box gap="medium">
@@ -43,7 +39,7 @@ const ProposalDescriptionStep = ({
                 )}
             </Box>
             <ProposalDescriptionForm
-                editProposalContext={editProposalContext}
+                editProposalProps={editProposalProps}
                 onSubmit={async () => {
                     if (await onSaveProposal())
                         stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)

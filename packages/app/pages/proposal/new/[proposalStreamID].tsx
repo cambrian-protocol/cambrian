@@ -9,19 +9,18 @@ import _ from 'lodash'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function NewProposalPage() {
-    const editProposalContext = useEditProposal()
+    const editProposalProps = useEditProposal()
 
     return (
         <>
-            {!editProposalContext.isLoaded ? (
+            {!editProposalProps.isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : editProposalContext.proposal &&
-              editProposalContext.stageStack ? (
+            ) : editProposalProps.proposal && editProposalProps.stageStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
                     <Box align="center">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
-                                editProposalContext={editProposalContext}
+                                editProposalProps={editProposalProps}
                             />
                         </Box>
                     </Box>
@@ -29,12 +28,10 @@ export default function NewProposalPage() {
             ) : (
                 <Custom404Page />
             )}
-            {editProposalContext.errorMessage && (
+            {editProposalProps.errorMessage && (
                 <ErrorPopupModal
-                    errorMessage={editProposalContext.errorMessage}
-                    onClose={() =>
-                        editProposalContext.setErrorMessage(undefined)
-                    }
+                    errorMessage={editProposalProps.errorMessage}
+                    onClose={() => editProposalProps.setErrorMessage(undefined)}
                 />
             )}
         </>

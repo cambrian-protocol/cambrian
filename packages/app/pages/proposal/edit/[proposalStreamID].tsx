@@ -20,7 +20,7 @@ import { useState } from 'react'
 
 export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
-    const editProposalContext = useEditProposal()
+    const editProposalProps = useEditProposal()
 
     const {
         stageStack,
@@ -30,7 +30,7 @@ export default function EditProposalPage() {
         errorMessage,
         setErrorMessage,
         isLoaded,
-    } = editProposalContext
+    } = editProposalProps
 
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -90,8 +90,8 @@ export default function EditProposalPage() {
                                             )}
                                         </Box>
                                         <ProposalDescriptionForm
-                                            editProposalContext={
-                                                editProposalContext
+                                            editProposalProps={
+                                                editProposalProps
                                             }
                                         />
                                     </Box>
@@ -105,8 +105,8 @@ export default function EditProposalPage() {
                                             />
                                         </Box>
                                         <ProposalPricingForm
-                                            editProposalContext={
-                                                editProposalContext
+                                            editProposalProps={
+                                                editProposalProps
                                             }
                                         />
                                     </Box>
@@ -122,8 +122,8 @@ export default function EditProposalPage() {
                                                 />
                                             </Box>
                                             <ProposalFlexInputsForm
-                                                editProposalContext={
-                                                    editProposalContext
+                                                editProposalProps={
+                                                    editProposalProps
                                                 }
                                             />
                                         </Box>
@@ -132,7 +132,7 @@ export default function EditProposalPage() {
                             </Tabs>
                             <PlainSectionDivider />
                             <ProposalSubmitControl
-                                editProposalContext={editProposalContext}
+                                editProposalProps={editProposalProps}
                             />
                         </Box>
                     </PageLayout>

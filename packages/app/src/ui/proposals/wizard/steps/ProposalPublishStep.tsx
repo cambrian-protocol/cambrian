@@ -5,6 +5,7 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
@@ -14,16 +15,13 @@ import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
 
 const ProposalPublishStep = ({
-    editProposalContext,
+    editProposalProps,
 }: {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
 }) => {
-    const { proposalStreamID } = editProposalContext
+    const { proposalStreamID } = editProposalProps
     const { currentUser } = useCurrentUserContext()
 
     const router = useRouter()

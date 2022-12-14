@@ -1,17 +1,14 @@
 import { Box, Button, Form, FormField, TextArea, TextInput } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 
 interface ProposalDescriptionFormProps {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -19,14 +16,14 @@ interface ProposalDescriptionFormProps {
 }
 
 const ProposalDescriptionForm = ({
-    editProposalContext,
+    editProposalProps,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
     const { proposal, setProposal, onSaveProposal, onResetProposal } =
-        editProposalContext
+        editProposalProps
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async () => {

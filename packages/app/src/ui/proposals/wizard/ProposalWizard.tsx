@@ -1,12 +1,12 @@
-import { SetStateAction, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import { EditProposalType as EditProposalPropsType } from '@cambrian/app/hooks/useEditProposal'
 import ProposalDescriptionStep from './steps/ProposalDescriptionStep'
 import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 
 export enum PROPOSAL_WIZARD_STEPS {
     DESCRIPTION,
@@ -22,9 +22,9 @@ export type ProposalWizardStepsType =
     | PROPOSAL_WIZARD_STEPS.PUBLISH
 
 const ProposalWizard = ({
-    editProposalContext,
+    editProposalProps,
 }: {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalPropsType
 }) => {
     const [currentStep, setCurrentStep] = useState<ProposalWizardStepsType>(
         PROPOSAL_WIZARD_STEPS.DESCRIPTION
@@ -41,28 +41,28 @@ const ProposalWizard = ({
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <ProposalDescriptionStep
-                        editProposalContext={editProposalContext}
+                        editProposalProps={editProposalProps}
                         stepperCallback={setCurrentStep}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PRICING:
                 return (
                     <ProposalPricingStep
-                        editProposalContext={editProposalContext}
+                        editProposalProps={editProposalProps}
                         stepperCallback={setCurrentStep}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
                 return (
                     <ProposalFlexInputsStep
-                        editProposalContext={editProposalContext}
+                        editProposalProps={editProposalProps}
                         stepperCallback={setCurrentStep}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
                 return (
                     <ProposalPublishStep
-                        editProposalContext={editProposalContext}
+                        editProposalProps={editProposalProps}
                     />
                 )
             default:

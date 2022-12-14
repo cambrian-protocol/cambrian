@@ -2,7 +2,7 @@ import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
-import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
@@ -10,7 +10,7 @@ import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButto
 import { useState } from 'react'
 
 interface ProposalPricingFormProps {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -18,7 +18,7 @@ interface ProposalPricingFormProps {
 }
 
 const ProposalPricingForm = ({
-    editProposalContext,
+    editProposalProps,
     onSubmit,
     onCancel,
     submitLabel,
@@ -31,7 +31,7 @@ const ProposalPricingForm = ({
         onSaveProposal,
         onResetProposal,
         collateralToken,
-    } = editProposalContext
+    } = editProposalProps
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 

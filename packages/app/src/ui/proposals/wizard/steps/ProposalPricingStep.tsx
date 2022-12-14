@@ -4,32 +4,27 @@ import {
 } from '../ProposalWizard'
 
 import { Box } from 'grommet'
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
-import { SetStateAction } from 'react'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalPricingStepProps {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
     stepperCallback: (step: ProposalWizardStepsType) => void
 }
 
 const ProposalPricingStep = ({
-    editProposalContext,
+    editProposalProps,
     stepperCallback,
 }: ProposalPricingStepProps) => {
-    const { proposal, onSaveProposal } = editProposalContext
+    const { proposal, onSaveProposal } = editProposalProps
     return (
         <Box>
             <Box pad="xsmall">
                 <HeaderTextSection title="Great! And how much are you willing to pay?" />
             </Box>
             <ProposalPricingForm
-                editProposalContext={editProposalContext}
+                editProposalProps={editProposalProps}
                 onSubmit={async () => {
                     if (await onSaveProposal()) {
                         if (proposal && proposal.flexInputs.length > 0) {

@@ -7,7 +7,7 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
+import { EditProposalType } from '@cambrian/app/hooks/useEditProposal'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
@@ -15,7 +15,7 @@ import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
 interface ProposalFlexInputsFormProps {
-    editProposalContext: EditProposalContextType
+    editProposalProps: EditProposalType
     onSubmit?: () => Promise<void>
     onCancel?: () => void
     submitLabel?: string
@@ -23,7 +23,7 @@ interface ProposalFlexInputsFormProps {
 }
 
 const ProposalFlexInputsForm = ({
-    editProposalContext,
+    editProposalProps,
     onSubmit,
     onCancel,
     submitLabel,
@@ -35,7 +35,7 @@ const ProposalFlexInputsForm = ({
         setProposal,
         onSaveProposal,
         onResetProposal,
-    } = editProposalContext
+    } = editProposalProps
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [timelock, setTimelock] = useState(
