@@ -1,19 +1,19 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
-import { AllocationModel } from '../models/AllocationModel'
-import BaseAvatar from '../components/avatars/BaseAvatar'
+import { AllocationModel } from '../../models/AllocationModel'
+import BaseAvatar from '../avatars/BaseAvatar'
 import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
-import CambrianProfileAbout from '../components/info/CambrianProfileAbout'
-import { CambrianProfileType } from '../store/UserContext'
+import CambrianProfileAbout from '../info/CambrianProfileAbout'
+import { CambrianProfileType } from '../../store/UserContext'
 import { CeramicClient } from '@ceramicnetwork/http-client'
-import InfoDropButton from '../components/buttons/InfoDropButton'
-import { SolidityDataTypes } from '../models/SolidityDataTypes'
+import InfoDropButton from '../buttons/InfoDropButton'
+import { SolidityDataTypes } from '../../models/SolidityDataTypes'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { TokenModel } from '../models/TokenModel'
-import { decodeData } from '../utils/helpers/decodeData'
+import { TokenModel } from '../../models/TokenModel'
+import { decodeData } from '../../utils/helpers/decodeData'
 import { ethers } from 'ethers'
-import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
+import { useCurrentUserContext } from '../../hooks/useCurrentUserContext'
 
 interface OutcomeChartRecipientLegendItemProps {
     allocation: AllocationModel

@@ -7,7 +7,7 @@ import {
 } from 'grommet'
 
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
+import OutcomeChart from '@cambrian/app/components/charts/OutcomeChart'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'

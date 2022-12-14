@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 
 import { Cursor } from 'phosphor-react'
 import OutcomeChartRecipientLegendItem from './OutcomeChartLegendItem'
-import { OutcomeCollectionModel } from '../models/OutcomeCollectionModel'
+import { OutcomeCollectionModel } from '../../models/OutcomeCollectionModel'
 import ReactSvgPieChart from 'react-svg-piechart'
-import { TokenModel } from '../models/TokenModel'
-import { cpTheme } from '../theme/theme'
+import { TokenModel } from '../../models/TokenModel'
+import { cpTheme } from '../../theme/theme'
 import { ethers } from 'ethers'
 
 interface OutcomeChartProps {

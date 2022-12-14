@@ -1,5 +1,5 @@
 import { Box } from 'grommet'
-import OutcomeChart from '@cambrian/app/charts/OutcomeChart'
+import OutcomeChart from '@cambrian/app/components/charts/OutcomeChart'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeDetailItem from './OutcomeDetailItem'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
