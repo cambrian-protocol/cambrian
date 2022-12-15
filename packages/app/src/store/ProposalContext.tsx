@@ -74,7 +74,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 typeof templateStreamDoc != undefined &&
                 typeof stageStack != undefined &&
                 typeof receivedProposals != undefined,
-            [proposalStatus, templateStreamDoc]
+            [proposalStatus, templateStreamDoc, stageStack, receivedProposals]
         )
 
         useEffect(() => {
