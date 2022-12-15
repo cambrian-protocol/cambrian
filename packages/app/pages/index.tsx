@@ -8,7 +8,6 @@ import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import Glow from '@cambrian/app/components/branding/Glow'
 import { Image } from 'grommet'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
-import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { Text } from 'grommet'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -60,10 +59,10 @@ const sections: BackgroundScrollSection[] = [
 
 export default function Home() {
     const router = useRouter()
-    const { currentUser, isUserLoaded } = useCurrentUserContext()
+    const { currentUser } = useCurrentUserContext()
 
     function handleClickHeaderCTA() {
-        router.push('dashboard?idx=5')
+        router.push('/copywriter')
     }
 
     useEffect(() => {
