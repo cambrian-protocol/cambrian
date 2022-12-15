@@ -1,4 +1,9 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react'
+import React, {
+    PropsWithChildren,
+    useCallback,
+    useEffect,
+    useState,
+} from 'react'
 import {
     loadStageDoc,
     loadStageStackFromID,
@@ -14,14 +19,20 @@ import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
-import { TemplateModel } from '../models/TemplateModel'
+import {
+    ReceivedProposalCommitType,
+    ReceivedProposalsHashmapType,
+    TemplateModel,
+} from '../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenAPI } from '../services/api/Token.api'
 import { TokenModel } from '../models/TokenModel'
 import { UserType } from './UserContext'
-import _ from 'lodash'
+import _, { template } from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
+import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
+import usePrevious from '../hooks/usePrevious'
 
 export type ProposalContextType = {
     stageStack?: StageStackType
@@ -57,127 +68,142 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<TemplateModel>>()
         const [collateralToken, setCollateralToken] = useState<TokenModel>()
+        const [receivedProposals, setReceivedProposals] =
+            useState<ReceivedProposalCommitType[]>()
         const [isLoaded, setIsLoaded] = useState(false)
 
+        const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
+        const prevTemplate = usePrevious(templateStreamDoc?.content)
+
         useEffect(() => {
-            update()
+            const updateTemplate = async () => {
+                setTemplateStreamDoc(await getTemplate())
+            }
+            updateTemplate()
         }, [])
 
-        // kicks off chain of updates
-        // loadTemplate -> setCanonicalProposalCommitID -> loadStageStack -> updateOnChainProposalID & updateProposalStatus & updateCollateralToken
-        const update = async () => {
-            try {
-                loadTemplate()
-            } catch (e) {
-                console.error(e)
-                cpLogger.push(e)
+        useEffect(() => {
+            setCanonicalProposalCommitID(getCanonicalProposalCommitID())
+        }, [templateStreamDoc])
+
+        useEffect(() => {
+            const updateStageStack = async () => {
+                setStageStack(await getStageStack())
             }
-        }
+            updateStageStack()
+        }, [canonicalProposalCommitID, receivedProposals])
 
         useEffect(() => {
-            loadStageStack()
-        }, [canonicalProposalCommitID])
+            const updateReceivedProposals = async () => {
+                setReceivedProposals(await registerNewProposals())
+            }
 
-        useEffect(() => {
-            updateProposalStatus()
+            const updateCollateralToken = async () => {
+                setCollateralToken(await getCollateralToken())
+            }
+
+            updateReceivedProposals()
             updateCollateralToken()
-            updateOnChainProposalID()
-        }, [stageStack, onChainProposal])
+        }, [stageStack])
 
         useEffect(() => {
-            const listeners = listenOffChain()
-            return () => {
-                listeners?.proposal?.unsubscribe()
-                listeners?.template?.unsubscribe()
-            }
-        }, [templateStreamDoc, proposalStatus])
+            setProposalStatus(_getProposalStatus())
+            setOnChainProposalID(getOnChainProposalID())
+        }, [receivedProposals, onChainProposal])
 
         useEffect(() => {
             listenOnChain() // listens on proposalsHub.contract
             return () => {
                 proposalsHub.contract.removeAllListeners()
             }
-        }, [proposalStatus, stageStack])
+        }, [proposalStatus])
 
         useEffect(() => {
-            if (templateStreamDoc) {
-                setCanonicalProposalCommitID(
-                    // approved || most recent || undefined
-                    getApprovedProposalCommitID(
-                        templateStreamDoc.content,
-                        proposalStreamDoc.id.toString()
-                    ) ||
-                        getLatestProposalSubmission(
-                            proposalStreamDoc.id.toString(),
-                            templateStreamDoc.content.receivedProposals
-                        )?.proposalCommitID
-                )
+            if (
+                templateStreamDoc &&
+                !_.isEqual(templateStreamDoc?.content, prevTemplate)
+            ) {
+                const listeners = listenOffChain()
+                return () => {
+                    listeners?.proposal?.unsubscribe()
+                    listeners?.template?.unsubscribe()
+                }
             }
-        }, [templateStreamDoc])
+        }, [proposalStatus])
 
-        const loadTemplate = async () => {
-            setTemplateStreamDoc(
-                await loadStageDoc<TemplateModel>(
-                    currentUser,
-                    proposalStreamDoc.content.template.streamID
-                )
+        const getTemplate = async () => {
+            return await loadStageDoc<TemplateModel>(
+                currentUser,
+                proposalStreamDoc.content.template.streamID
             )
         }
 
-        const loadStageStack = async () => {
-            setStageStack(
-                await loadStageStackFromID(
-                    proposalStreamDoc.id.toString(),
-                    canonicalProposalCommitID
-                )
-            )
-            setIsLoaded(true)
+        const getCanonicalProposalCommitID = () => {
+            return templateStreamDoc
+                ? isProposalFinalized()
+                    ? getApprovedProposalCommitID(
+                          templateStreamDoc.content,
+                          proposalStreamDoc.id.toString()
+                      )
+                    : isProposalSubmitted()
+                    ? proposalStreamDoc.commitId.toString()
+                    : undefined
+                : undefined
         }
+
+        const getStageStack = useCallback(() => {
+            return canonicalProposalCommitID
+                ? loadStageStackFromID(
+                      proposalStreamDoc.id.toString(),
+                      canonicalProposalCommitID
+                  )
+                : undefined
+        }, [canonicalProposalCommitID])
 
         // Might be async later when we do NEEDED defensive checking
-        const updateOnChainProposalID = () => {
-            setOnChainProposalID(
-                stageStack
-                    ? getOnChainProposalId(
-                          stageStack.proposalCommitID,
-                          stageStack.proposal.template.commitID
-                      )
-                    : undefined
+        const getOnChainProposalID = useCallback(() => {
+            return stageStack
+                ? getOnChainProposalId(
+                      stageStack.proposalCommitID,
+                      stageStack.proposal.template.commitID
+                  )
+                : undefined
+        }, [stageStack])
+
+        const _getProposalStatus = () => {
+            return getProposalStatus(
+                stageStack?.proposal || proposalStreamDoc.content,
+                (stageStack &&
+                    getApprovedProposalCommitID(
+                        stageStack.template,
+                        proposalStreamDoc.id.toString()
+                    ) &&
+                    stageStack) ||
+                    undefined,
+                onChainProposal,
+                receivedProposals
             )
         }
 
-        const updateProposalStatus = () => {
-            if (onChainProposal) {
-                onChainProposal.isExecuted
-                    ? setProposalStatus(ProposalStatus.Executed)
-                    : setProposalStatus(ProposalStatus.Funding)
-            } else if (stageStack) {
-                setProposalStatus(
-                    getProposalStatus(
-                        stageStack.proposal,
-                        (getApprovedProposalCommitID(
-                            stageStack.template,
-                            proposalStreamDoc.id.toString()
-                        ) &&
-                            stageStack) ||
-                            undefined
+        // Register new submitted proposal if user is template author
+        const registerNewProposals = async () => {
+            if (stageStack && isTemplateAuthor() && isProposalSubmitted()) {
+                return (
+                    await ceramicTemplateAPI.registerNewProposalSubmission(
+                        stageStack
                     )
-                )
-            } else {
-                setProposalStatus(getProposalStatus(proposalStreamDoc.content))
+                )[proposalStreamDoc.id.toString()]
             }
         }
 
-        const updateCollateralToken = async () => {
-            setCollateralToken(
-                await TokenAPI.getTokenInfo(
-                    stageStack?.proposal.price.tokenAddress ||
-                        proposalStreamDoc.content.price.tokenAddress,
-                    currentUser.web3Provider,
-                    currentUser.chainId
-                )
+        const getCollateralToken = useCallback(async () => {
+            return TokenAPI.getTokenInfo(
+                stageStack?.proposal.price.tokenAddress ||
+                    proposalStreamDoc.content.price.tokenAddress,
+                currentUser.web3Provider,
+                currentUser.chainId
             )
-        }
+        }, [stageStack])
 
         const listenOffChain = () => {
             if (
@@ -186,10 +212,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             ) {
                 return {
                     proposal: proposalStreamDoc.subscribe(async (x) => {
-                        await update()
+                        setTemplateStreamDoc(await getTemplate())
                     }),
                     template: templateStreamDoc?.subscribe(async (x) => {
-                        await update()
+                        setTemplateStreamDoc(await getTemplate())
                     }),
                 }
             }
@@ -221,6 +247,18 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     }
                 )
             }
+        }
+
+        const isTemplateAuthor = () => {
+            return stageStack && stageStack.template.author === currentUser.did
+        }
+
+        const isProposalSubmitted = () => {
+            return proposalStreamDoc.content.isSubmitted
+        }
+
+        const isProposalFinalized = () => {
+            return proposalStatus && proposalStatus >= ProposalStatus.Canceled
         }
 
         return (
