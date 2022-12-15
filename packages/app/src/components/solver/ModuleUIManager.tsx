@@ -3,7 +3,6 @@ import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import ModuleRegistryAPI from '@cambrian/app/services/api/ModuleRegistry'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { Text } from 'grommet'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
@@ -37,16 +36,11 @@ const ModuleUIManager = ({
                 const Component = module.component
                 if (Component) {
                     moduleComponents.push(
-                        <Box gap="small">
-                            <Text color="dark-4" size="small">
-                                {module.name}
-                            </Text>
-                            <Component
-                                solverAddress={solverAddress}
-                                currentCondition={currentCondition}
-                                currentUser={currentUser}
-                            />
-                        </Box>
+                        <Component
+                            solverAddress={solverAddress}
+                            currentCondition={currentCondition}
+                            currentUser={currentUser}
+                        />
                     )
                 }
             }
