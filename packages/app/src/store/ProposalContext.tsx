@@ -1,16 +1,10 @@
-import React, {
-    PropsWithChildren,
-    useCallback,
-    useEffect,
-    useState,
-} from 'react'
+import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import {
     loadStageDoc,
     loadStageStackFromID,
 } from '../services/ceramic/CeramicUtils'
 import {
     getApprovedProposalCommitID,
-    getLatestProposalSubmission,
     getOnChainProposalId,
     getProposalStatus,
 } from '../utils/helpers/proposalHelper'
@@ -21,21 +15,19 @@ import ProposalsHub from '../hubs/ProposalsHub'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import {
     ReceivedProposalCommitType,
-    ReceivedProposalsHashmapType,
     TemplateModel,
 } from '../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenAPI } from '../services/api/Token.api'
 import { TokenModel } from '../models/TokenModel'
 import { UserType } from './UserContext'
-import _, { template } from 'lodash'
-import { cpLogger } from '../services/api/Logger.api'
+import _ from 'lodash'
 import { ethers } from 'ethers'
 import CeramicTemplateAPI from '../services/ceramic/CeramicTemplateAPI'
 import usePrevious from '../hooks/usePrevious'
 
 export type ProposalContextType = {
-    stageStack?: StageStackType
+    stageStack?: StageStackType | null
     proposalContract?: ethers.Contract
     proposalStatus?: ProposalStatus
     collateralToken?: TokenModel
@@ -61,7 +53,9 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [canonicalProposalCommitID, setCanonicalProposalCommitID] =
             useState<string | undefined>()
         const [proposalStatus, setProposalStatus] = useState<ProposalStatus>()
-        const [stageStack, setStageStack] = useState<StageStackType>()
+        const [stageStack, setStageStack] = useState<
+            StageStackType | undefined | null
+        >()
         const [onChainProposal, setOnChainProposal] =
             useState<ethers.Contract>()
         const [onChainProposalID, setOnChainProposalID] = useState<string>()
@@ -70,10 +64,18 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [collateralToken, setCollateralToken] = useState<TokenModel>()
         const [receivedProposals, setReceivedProposals] =
             useState<ReceivedProposalCommitType[]>()
-        const [isLoaded, setIsLoaded] = useState(false)
 
         const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
         const prevTemplate = usePrevious(templateStreamDoc?.content)
+
+        const isLoaded = useMemo(
+            () =>
+                typeof proposalStatus != undefined &&
+                typeof templateStreamDoc != undefined &&
+                typeof stageStack != undefined &&
+                typeof receivedProposals != undefined,
+            [proposalStatus, templateStreamDoc]
+        )
 
         useEffect(() => {
             const updateTemplate = async () => {
@@ -151,24 +153,24 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 : undefined
         }
 
-        const getStageStack = useCallback(() => {
+        const getStageStack = () => {
             return canonicalProposalCommitID
                 ? loadStageStackFromID(
                       proposalStreamDoc.id.toString(),
                       canonicalProposalCommitID
                   )
-                : undefined
-        }, [canonicalProposalCommitID])
+                : null
+        }
 
         // Might be async later when we do NEEDED defensive checking
-        const getOnChainProposalID = useCallback(() => {
+        const getOnChainProposalID = () => {
             return stageStack
                 ? getOnChainProposalId(
                       stageStack.proposalCommitID,
                       stageStack.proposal.template.commitID
                   )
                 : undefined
-        }, [stageStack])
+        }
 
         const _getProposalStatus = () => {
             return getProposalStatus(
@@ -196,14 +198,14 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             }
         }
 
-        const getCollateralToken = useCallback(async () => {
+        const getCollateralToken = async () => {
             return TokenAPI.getTokenInfo(
                 stageStack?.proposal.price.tokenAddress ||
                     proposalStreamDoc.content.price.tokenAddress,
                 currentUser.web3Provider,
                 currentUser.chainId
             )
-        }, [stageStack])
+        }
 
         const listenOffChain = () => {
             if (
