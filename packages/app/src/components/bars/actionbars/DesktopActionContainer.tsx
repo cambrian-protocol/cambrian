@@ -19,7 +19,6 @@ const DesktopActionContainer = ({
                     }}
                     gap="small"
                 >
-                    <Text size="small">{'\u00A0'}</Text>
                     <Box
                         width={'medium'}
                         border
