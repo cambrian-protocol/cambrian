@@ -80,8 +80,7 @@ const ArbitrateActionbar = ({
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Arbitrate Outcome"
-                    description='Please hit the "Arbitrate Outcome"-Button at your
-                    right and select the outcome that resulted from the arbitration.'
+                    description='Please hit the "Arbitrate Outcome"-Button and select the outcome that resulted from the arbitration.'
                     list={[
                         {
                             icon: <Scales />,

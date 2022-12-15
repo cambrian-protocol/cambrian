@@ -13,8 +13,7 @@ const LockedByArbitrationActionbar = ({
         messenger={messenger}
         info={{
             title: 'Arbitration in Progress',
-            subTitle:
-                'Somebody has disagreed with the proposed outcome, please reach out to the Arbitrator for more information',
+            subTitle: 'Somebody has disagreed with the proposed outcome',
             dropContent: (
                 <ActionbarItemDropContainer
                     title="Arbitration in Progress"
