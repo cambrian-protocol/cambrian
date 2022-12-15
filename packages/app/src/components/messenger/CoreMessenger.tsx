@@ -173,7 +173,7 @@ export default function CoreMessenger({
         }
 
         if (unreadMessages !== notificationCounter) {
-            playNotificationSoundCallback.current()
+            //playNotificationSoundCallback.current()
             setNotificationCounter(unreadMessages)
         }
     }
