@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import ProposalsHub from '../hubs/ProposalsHub'
 import { TokenAPI } from '../services/api/Token.api'
 import { TokenModel } from '../models/TokenModel'
-import { UserType } from '../store/UserContext'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export const useProposalFunding = (onChainProposalId?: string) => {
@@ -17,8 +16,7 @@ export const useProposalFunding = (onChainProposalId?: string) => {
     const [fundingPercentage, setFundingPercentage] = useState<number>()
 
     useEffect(() => {
-        if (currentUser && onChainProposalId)
-            init(currentUser, onChainProposalId)
+        init()
     }, [currentUser, onChainProposalId])
 
     useEffect(() => {
@@ -30,29 +28,34 @@ export const useProposalFunding = (onChainProposalId?: string) => {
         }
     }, [proposalsHub, proposalContract])
 
-    const init = async (user: UserType, onChainProposalId: string) => {
-        const proposalsHub = new ProposalsHub(user.signer, user.chainId)
-        const onChainProposal = await proposalsHub.getProposal(
-            onChainProposalId
-        )
-        if (onChainProposal.id !== ethers.constants.HashZero) {
-            const funding = await proposalsHub.getProposalFunding(
-                onChainProposal.id
+    const init = async () => {
+        if (currentUser && onChainProposalId) {
+            const proposalsHub = new ProposalsHub(
+                currentUser.signer,
+                currentUser.chainId
             )
-            const token = await TokenAPI.getTokenInfo(
-                onChainProposal.collateralToken,
-                user.web3Provider,
-                user.chainId
+            const onChainProposal = await proposalsHub.getProposal(
+                onChainProposalId
             )
-            if (funding) setFunding(funding)
+            if (onChainProposal.id !== ethers.constants.HashZero) {
+                const funding = await proposalsHub.getProposalFunding(
+                    onChainProposal.id
+                )
+                const token = await TokenAPI.getTokenInfo(
+                    onChainProposal.collateralToken,
+                    currentUser.web3Provider,
+                    currentUser.chainId
+                )
+                if (funding) setFunding(funding)
 
-            setFundingPercentage(
-                getPercentage(funding, onChainProposal.fundingGoal)
-            )
-            setProposalContract(onChainProposal)
-            setFundingGoal(onChainProposal.fundingGoal)
-            setProposalsHub(proposalsHub)
-            setCollateralToken(token)
+                setFundingPercentage(
+                    getPercentage(funding, onChainProposal.fundingGoal)
+                )
+                setProposalContract(onChainProposal)
+                setFundingGoal(onChainProposal.fundingGoal)
+                setProposalsHub(proposalsHub)
+                setCollateralToken(token)
+            }
         }
     }
 
@@ -103,5 +106,6 @@ export const useProposalFunding = (onChainProposalId?: string) => {
         fundingGoal: fundingGoal,
         collateralToken: collateralToken,
         fundingPercentage: fundingPercentage,
+        initFunding: init,
     }
 }
