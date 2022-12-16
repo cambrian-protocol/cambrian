@@ -1,7 +1,12 @@
+import 'react-quill/dist/quill.bubble.css'
+
 import { Box } from 'grommet'
 import { CircleDashed } from 'phosphor-react'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { Text } from 'grommet'
+import dynamic from 'next/dynamic'
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
 interface PublicUIProps {
     latestSubmission: SubmissionModel
@@ -27,9 +32,10 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                         </Text>
                     </Box>
                 ) : (
-                    <Text style={{ whiteSpace: 'pre-line' }}>
-                        {latestSubmission.submission}
-                    </Text>
+                    <ReactQuill
+                        value={latestSubmission.submission}
+                        theme={'bubble'}
+                    />
                 )}
             </Box>
         </Box>
