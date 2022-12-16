@@ -6,6 +6,7 @@ import { StageNames } from '../../models/StageModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
+import { SCHEMA_VER } from 'packages/app/config'
 
 /** 
  API functions to maintain compositions and the users composition-lib.
@@ -33,6 +34,7 @@ export default class CeramicCompositionAPI {
                 composition
                     ? { ...composition }
                     : {
+                          schemaVer: SCHEMA_VER['composition'],
                           title: title,
                           description: '',
                           flowElements: initialComposer.flowElements,

@@ -8,7 +8,6 @@ const loadCompositionAction = (
     state: CompositionModel,
     payload: CompositionModel
 ) => {
-    console.log('payload: ', payload)
     const composition = updateToSchema(SCHEMA_VER['composition'], payload)
     //TODO Dynamic ABI import of solver interface (Can't create functional Interface from JSON)
     const solversWithCorrectABI = composition.solvers.map((solver) => {
@@ -25,6 +24,9 @@ const loadCompositionAction = (
         ...composition,
         solvers: solversWithCorrectABI,
         schemaVer: SCHEMA_VER['composition'],
+        // unset currentElement && currentIdPath
+        currentElement: undefined,
+        currentIdPath: undefined,
     }
 }
 
