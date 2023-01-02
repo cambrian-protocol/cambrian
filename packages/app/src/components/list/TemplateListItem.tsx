@@ -12,20 +12,17 @@ import { useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ListSkeleton from '../skeletons/ListSkeleton'
 import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalHashmap } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
 import ResponsiveButton from '../buttons/ResponsiveButton'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface TemplateListItemProps {
     currentUser: UserType
@@ -40,6 +37,8 @@ const TemplateListItem = ({
     templateStreamID,
     receivedProposalsArchive,
 }: TemplateListItemProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [receivedProposals, setReceivedProposals] = useState<ProposalHashmap>(
@@ -48,7 +47,6 @@ const TemplateListItem = ({
     const [isLoading, setIsLoading] = useState(false)
     const [isTogglingActive, setIsTogglingActive] = useState(false)
     const [isActive, setIsActive] = useState(template.isActive)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout
@@ -83,7 +81,7 @@ const TemplateListItem = ({
                 )) as ProposalHashmap
             )
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsLoading(false)
     }
@@ -94,7 +92,7 @@ const TemplateListItem = ({
             await ceramicTemplateAPI.toggleActivate(templateStreamID)
             setIsActive(!isActive)
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsTogglingActive(false)
     }
@@ -105,277 +103,257 @@ const TemplateListItem = ({
             await ceramicTemplateAPI.archiveTemplate(templateStreamID)
         } catch (e) {
             setIsLoading(false)
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
     return (
-        <>
-            <ResponsiveContext.Consumer>
-                {(screenSize) => {
-                    return (
-                        <Box
-                            background="background-back"
-                            border
-                            pad={{
-                                horizontal: 'medium',
-                                vertical: 'small',
-                            }}
-                            direction="row"
-                            justify="between"
-                            gap="small"
-                            round="xsmall"
-                        >
-                            <Box flex>
-                                <AccordionPanel
-                                    label={
-                                        <Box gap="xsmall">
-                                            <Text>{template.title}</Text>
-                                            <Box
-                                                direction="row"
-                                                gap="small"
-                                                align="center"
-                                            >
-                                                {isLoading ? (
-                                                    <BaseSkeletonBox
-                                                        height={'2em'}
-                                                        width={'small'}
-                                                    />
-                                                ) : (
-                                                    <Box
-                                                        height="2em"
-                                                        direction="row"
-                                                        gap="xsmall"
-                                                    >
-                                                        <Text
-                                                            color="dark-4"
-                                                            size="small"
-                                                        >
-                                                            Received proposals:
-                                                        </Text>
-                                                        <Text
-                                                            color="dark-4"
-                                                            size="small"
-                                                        >
-                                                            {
-                                                                Object.keys(
-                                                                    receivedProposals
-                                                                ).length
-                                                            }
-                                                        </Text>
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        </Box>
-                                    }
-                                >
-                                    <Box>
-                                        <Box direction="row" justify="end" wrap>
-                                            <Box pad="small">
-                                                <LoaderButton
-                                                    isLoading={isTogglingActive}
-                                                    color="dark-4"
-                                                    icon={
-                                                        isActive ? (
-                                                            <CheckCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-ok'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <PauseCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-error'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        )
-                                                    }
-                                                    label={
-                                                        isActive
-                                                            ? 'Open for proposals'
-                                                            : 'Closed for propsals'
-                                                    }
-                                                    onClick={toggleIsActive}
+        <ResponsiveContext.Consumer>
+            {(screenSize) => {
+                return (
+                    <Box
+                        background="background-back"
+                        border
+                        pad={{
+                            horizontal: 'medium',
+                            vertical: 'small',
+                        }}
+                        direction="row"
+                        justify="between"
+                        gap="small"
+                        round="xsmall"
+                    >
+                        <Box flex>
+                            <AccordionPanel
+                                label={
+                                    <Box gap="xsmall">
+                                        <Text>{template.title}</Text>
+                                        <Box
+                                            direction="row"
+                                            gap="small"
+                                            align="center"
+                                        >
+                                            {isLoading ? (
+                                                <BaseSkeletonBox
+                                                    height={'2em'}
+                                                    width={'small'}
                                                 />
-                                            </Box>
-                                            <Box
-                                                direction="row"
-                                                justify="end"
-                                                gap="small"
-                                                pad={{ vertical: 'small' }}
-                                            >
-                                                <ResponsiveButton
-                                                    href={`/solver/${templateStreamID}`}
-                                                    label="View"
-                                                    icon={
-                                                        <Eye
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                                <Button
-                                                    color="dark-4"
-                                                    size="small"
-                                                    icon={
-                                                        isSavedToClipboard ? (
-                                                            <Check
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'dark-4'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <Copy
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'dark-4'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        )
-                                                    }
-                                                    onClick={() => {
-                                                        navigator.clipboard.writeText(
-                                                            `${window.location.origin}/solver/${templateStreamID}`
-                                                        )
-                                                        setIsSavedToClipboard(
-                                                            true
-                                                        )
-                                                    }}
-                                                    label={
-                                                        screenSize !== 'small'
-                                                            ? 'Copy link'
-                                                            : undefined
-                                                    }
-                                                />
-                                                <ResponsiveButton
-                                                    href={`/template/edit/${templateStreamID}`}
-                                                    label="Edit"
-                                                    icon={
-                                                        <Pen
-                                                            color={
-                                                                cpTheme.global
-                                                                    .colors[
-                                                                    'dark-4'
-                                                                ]
-                                                            }
-                                                        />
-                                                    }
-                                                />
-                                                <ResponsiveContext.Consumer>
-                                                    {(screenSize) => {
-                                                        return (
-                                                            <Button
-                                                                color="dark-4"
-                                                                onClick={() => {
-                                                                    onArchiveTemplate(
-                                                                        templateStreamID
-                                                                    )
-                                                                }}
-                                                                size="small"
-                                                                label={
-                                                                    screenSize !==
-                                                                    'small'
-                                                                        ? 'Archive'
-                                                                        : undefined
-                                                                }
-                                                                icon={
-                                                                    <Archive
-                                                                        color={
-                                                                            cpTheme
-                                                                                .global
-                                                                                .colors[
-                                                                                'dark-4'
-                                                                            ]
-                                                                        }
-                                                                    />
-                                                                }
-                                                            />
-                                                        )
-                                                    }}
-                                                </ResponsiveContext.Consumer>
-                                            </Box>
-                                        </Box>
-                                        <Box gap="small">
-                                            <PlainSectionDivider />
-                                            <Box
-                                                gap="small"
-                                                pad={{ bottom: 'small' }}
-                                            >
-                                                <Text
-                                                    size="small"
-                                                    color="dark-4"
+                                            ) : (
+                                                <Box
+                                                    height="2em"
+                                                    direction="row"
+                                                    gap="xsmall"
                                                 >
-                                                    Proposals
-                                                </Text>
-                                                {receivedProposals &&
-                                                Object.keys(receivedProposals)
-                                                    .length > 0 ? (
-                                                    Object.keys(
-                                                        receivedProposals
-                                                    ).map(
-                                                        (proposalStreamID) => {
-                                                            return (
-                                                                <ReceivedProposalListItem
-                                                                    key={
-                                                                        proposalStreamID
-                                                                    }
-                                                                    currentUser={
-                                                                        currentUser
-                                                                    }
-                                                                    proposalStreamID={
-                                                                        proposalStreamID
-                                                                    }
-                                                                    proposal={
-                                                                        receivedProposals[
-                                                                            proposalStreamID
-                                                                        ]
-                                                                            .content
-                                                                    }
-                                                                />
-                                                            )
+                                                    <Text
+                                                        color="dark-4"
+                                                        size="small"
+                                                    >
+                                                        Received proposals:
+                                                    </Text>
+                                                    <Text
+                                                        color="dark-4"
+                                                        size="small"
+                                                    >
+                                                        {
+                                                            Object.keys(
+                                                                receivedProposals
+                                                            ).length
                                                         }
-                                                    )
-                                                ) : (
-                                                    <ListSkeleton
-                                                        isFetching={isLoading}
-                                                        subject="received proposals"
-                                                    />
-                                                )}
-                                            </Box>
+                                                    </Text>
+                                                </Box>
+                                            )}
                                         </Box>
                                     </Box>
-                                </AccordionPanel>
-                            </Box>
+                                }
+                            >
+                                <Box>
+                                    <Box direction="row" justify="end" wrap>
+                                        <Box pad="small">
+                                            <LoaderButton
+                                                isLoading={isTogglingActive}
+                                                color="dark-4"
+                                                icon={
+                                                    isActive ? (
+                                                        <CheckCircle
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'status-ok'
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <PauseCircle
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'status-error'
+                                                                ]
+                                                            }
+                                                        />
+                                                    )
+                                                }
+                                                label={
+                                                    isActive
+                                                        ? 'Open for proposals'
+                                                        : 'Closed for propsals'
+                                                }
+                                                onClick={toggleIsActive}
+                                            />
+                                        </Box>
+                                        <Box
+                                            direction="row"
+                                            justify="end"
+                                            gap="small"
+                                            pad={{ vertical: 'small' }}
+                                        >
+                                            <ResponsiveButton
+                                                href={`/solver/${templateStreamID}`}
+                                                label="View"
+                                                icon={
+                                                    <Eye
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'dark-4'
+                                                            ]
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                            <Button
+                                                color="dark-4"
+                                                size="small"
+                                                icon={
+                                                    isSavedToClipboard ? (
+                                                        <Check
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'dark-4'
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <Copy
+                                                            color={
+                                                                cpTheme.global
+                                                                    .colors[
+                                                                    'dark-4'
+                                                                ]
+                                                            }
+                                                        />
+                                                    )
+                                                }
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        `${window.location.origin}/solver/${templateStreamID}`
+                                                    )
+                                                    setIsSavedToClipboard(true)
+                                                }}
+                                                label={
+                                                    screenSize !== 'small'
+                                                        ? 'Copy link'
+                                                        : undefined
+                                                }
+                                            />
+                                            <ResponsiveButton
+                                                href={`/template/edit/${templateStreamID}`}
+                                                label="Edit"
+                                                icon={
+                                                    <Pen
+                                                        color={
+                                                            cpTheme.global
+                                                                .colors[
+                                                                'dark-4'
+                                                            ]
+                                                        }
+                                                    />
+                                                }
+                                            />
+                                            <ResponsiveContext.Consumer>
+                                                {(screenSize) => {
+                                                    return (
+                                                        <Button
+                                                            color="dark-4"
+                                                            onClick={() => {
+                                                                onArchiveTemplate(
+                                                                    templateStreamID
+                                                                )
+                                                            }}
+                                                            size="small"
+                                                            label={
+                                                                screenSize !==
+                                                                'small'
+                                                                    ? 'Archive'
+                                                                    : undefined
+                                                            }
+                                                            icon={
+                                                                <Archive
+                                                                    color={
+                                                                        cpTheme
+                                                                            .global
+                                                                            .colors[
+                                                                            'dark-4'
+                                                                        ]
+                                                                    }
+                                                                />
+                                                            }
+                                                        />
+                                                    )
+                                                }}
+                                            </ResponsiveContext.Consumer>
+                                        </Box>
+                                    </Box>
+                                    <Box gap="small">
+                                        <PlainSectionDivider />
+                                        <Box
+                                            gap="small"
+                                            pad={{ bottom: 'small' }}
+                                        >
+                                            <Text size="small" color="dark-4">
+                                                Proposals
+                                            </Text>
+                                            {receivedProposals &&
+                                            Object.keys(receivedProposals)
+                                                .length > 0 ? (
+                                                Object.keys(
+                                                    receivedProposals
+                                                ).map((proposalStreamID) => {
+                                                    return (
+                                                        <ReceivedProposalListItem
+                                                            key={
+                                                                proposalStreamID
+                                                            }
+                                                            currentUser={
+                                                                currentUser
+                                                            }
+                                                            proposalStreamID={
+                                                                proposalStreamID
+                                                            }
+                                                            proposal={
+                                                                receivedProposals[
+                                                                    proposalStreamID
+                                                                ].content
+                                                            }
+                                                        />
+                                                    )
+                                                })
+                                            ) : (
+                                                <ListSkeleton
+                                                    isFetching={isLoading}
+                                                    subject="received proposals"
+                                                />
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </AccordionPanel>
                         </Box>
-                    )
-                }}
-            </ResponsiveContext.Consumer>
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
-            )}
-        </>
+                    </Box>
+                )
+            }}
+        </ResponsiveContext.Consumer>
     )
 }
 

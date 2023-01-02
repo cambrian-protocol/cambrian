@@ -1,15 +1,11 @@
 import { Box, Button, Text } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import { Swap, UsersFour } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import BaseActionbar from '../BaseActionbar'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import FundProposalForm from '@cambrian/app/ui/proposals/forms/FundProposalForm'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
@@ -18,8 +14,8 @@ import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 import { useState } from 'react'
 
@@ -34,11 +30,11 @@ const ProposalFundingActionbar = ({
     currentUser,
     proposalContract,
 }: ProposalFundingActionbarProps) => {
+    const { showAndLogError } = useErrorContext()
     const { funding, fundingGoal, collateralToken, fundingPercentage } =
         useProposalFunding(proposalContract.id)
     const [showProposalFundingModal, setShowProposalFundingModal] =
         useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isExecuting, setIsExecuting] = useState(false)
 
     const toggleShowProposalFundingModal = () =>
@@ -79,7 +75,7 @@ const ProposalFundingActionbar = ({
                 }
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsExecuting(false)
         }
     }
@@ -175,12 +171,6 @@ const ProposalFundingActionbar = ({
                         />
                     </Box>
                 </BaseLayerModal>
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             )}
         </>
     )

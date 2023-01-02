@@ -2,10 +2,6 @@ import BaseActionbar, { ActionbarInfoType } from '../BaseActionbar'
 import { Box, Text } from 'grommet'
 import { Chats, PencilLine, User } from 'phosphor-react'
 import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import {
     SolverSafetyCheckResponseType,
     solverSafetyCheck,
 } from '@cambrian/app/utils/helpers/safetyChecks'
@@ -14,13 +10,13 @@ import { useEffect, useState } from 'react'
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import ClipboardButton from '@cambrian/app/components/buttons/ClipboardButton'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { StageStackType } from '../../../../ui/dashboard/ProposalsDashboardUI'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ProposalReviewActionbarProps {
     stageStack: StageStackType
@@ -41,10 +37,10 @@ const ProposalReviewActionbar = ({
     messenger,
     proposedPrice,
 }: ProposalReviewActionbarProps) => {
+    const { showAndLogError } = useErrorContext()
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [safetyChecks, setSafetyChecks] =
         useState<SolverSafetyCheckResponseType>()
     const [passedSafetyChecks, setPassedSafetyChecks] = useState(false)
@@ -80,7 +76,7 @@ const ProposalReviewActionbar = ({
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
             } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
+                showAndLogError(e)
             }
         }
         setIsApproving(false)
@@ -97,7 +93,7 @@ const ProposalReviewActionbar = ({
                 if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']
             } catch (e) {
                 setIsRequestingChange(false)
-                setErrorMessage(await cpLogger.push(e))
+                showAndLogError(e)
             }
         }
     }
@@ -213,12 +209,6 @@ const ProposalReviewActionbar = ({
                 />
             ) : (
                 <></>
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
             )}
         </>
     )

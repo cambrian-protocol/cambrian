@@ -1,20 +1,15 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import { SetStateAction, useState } from 'react'
-
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../../components/solver/Solver'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeOverview from '../../solver/OutcomeOverview'
+import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ArbitrateModalProps {
     solverMethods: GenericMethods
@@ -33,7 +28,7 @@ const ArbitrateModal = ({
     isArbitrating,
     setIsArbitrating,
 }: ArbitrateModalProps) => {
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
 
     const onArbitrate = async (indexSet: number) => {
         setIsArbitrating(indexSet)
@@ -51,42 +46,34 @@ const ArbitrateModal = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['ARBITRATION_ERROR']
         } catch (e) {
-            setErrMsg(await cpLogger.push(e))
+            showAndLogError(e)
             setIsArbitrating(undefined)
         }
     }
 
     return (
-        <>
-            <BaseLayerModal onBack={onBack} width="xlarge">
-                <ModalHeader
-                    metaInfo="Arbitration"
-                    title="Arbitrate an outcome"
-                    description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
+        <BaseLayerModal onBack={onBack} width="xlarge">
+            <ModalHeader
+                metaInfo="Arbitration"
+                title="Arbitrate an outcome"
+                description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
+            />
+            <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
+                <OutcomeOverview
+                    reportProps={{
+                        onReport: onArbitrate,
+                        reportedIndexSet: isArbitrating,
+                        reportLabel: 'Arbitrate Outcome',
+                    }}
+                    collateralToken={solverData.collateralToken}
+                    outcomeCollections={
+                        solverData.outcomeCollections[
+                            currentCondition.conditionId
+                        ]
+                    }
                 />
-                <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    <OutcomeOverview
-                        reportProps={{
-                            onReport: onArbitrate,
-                            reportedIndexSet: isArbitrating,
-                            reportLabel: 'Arbitrate Outcome',
-                        }}
-                        collateralToken={solverData.collateralToken}
-                        outcomeCollections={
-                            solverData.outcomeCollections[
-                                currentCondition.conditionId
-                            ]
-                        }
-                    />
-                </Box>
-            </BaseLayerModal>
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
-        </>
+            </Box>
+        </BaseLayerModal>
     )
 }
 

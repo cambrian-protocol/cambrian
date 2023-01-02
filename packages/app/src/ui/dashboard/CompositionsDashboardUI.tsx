@@ -6,8 +6,6 @@ import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicComposi
 import CompositionDashboardTile from './tiles/CompositionDashboardTile'
 import CreateCompositionModal from './modals/CreateCompositionModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ImportCompositionModal from './modals/ImportCompositionModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -26,7 +24,6 @@ const CompositionsDashboardUI = ({
 }: CompositionsDashboardUIProps) => {
     const ceramicCompositionAPI = new CeramicCompositionAPI(currentUser)
 
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [showLoadCompositionModal, setShowLoadCompositionModal] =
         useState(false)
     const [showCreateCompositionModal, setShowCreateCompositionModal] =
@@ -109,12 +106,6 @@ const CompositionsDashboardUI = ({
                 <ImportCompositionModal
                     ceramicCompositionAPI={ceramicCompositionAPI}
                     onClose={toggleShowLoadCompositionModal}
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

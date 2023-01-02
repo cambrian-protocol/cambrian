@@ -11,13 +11,14 @@ import React, {
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import ConnectWalletPage from '../components/sections/ConnectWalletPage'
 import { DIDSession } from 'did-session'
+import { GENERAL_ERROR } from '../constants/ErrorMessages'
 import PermissionProvider from './PermissionContext'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import _ from 'lodash'
-import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '../hooks/useErrorContext'
 import { useRouter } from 'next/router'
 
 export type PermissionType = string
@@ -165,6 +166,7 @@ export const UserContextProvider = ({
     const [user, dispatch] = useReducer(userReducer, null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
     const router = useRouter()
+    const { showAndLogError } = useErrorContext()
 
     const connectWallet = useCallback(async function () {
         try {
@@ -221,7 +223,7 @@ export const UserContextProvider = ({
             }
             setIsUserLoaded(true)
         } catch (e) {
-            cpLogger.push(e)
+            showAndLogError(GENERAL_ERROR['CERAMIC_LOAD_ERROR'])
             setIsUserLoaded(true)
         }
     }, [])

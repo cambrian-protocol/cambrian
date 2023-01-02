@@ -1,19 +1,14 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-
 import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import BaseActionbar from './BaseActionbar'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
-import ErrorPopupModal from '../../modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '../../buttons/LoaderButton'
 import { TemplatePriceModel } from '@cambrian/app/models/TemplateModel'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
@@ -33,7 +28,7 @@ const TemplateActionbar = ({
     const router = useRouter()
     const { currentUser } = useCurrentUserContext()
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
 
     const onCreateProposal = async () => {
         setIsCreatingProposal(true)
@@ -57,7 +52,7 @@ const TemplateActionbar = ({
                 )
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsCreatingProposal(false)
         }
     }
@@ -90,12 +85,6 @@ const TemplateActionbar = ({
                     ),
                 }}
             />
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
-            )}
         </>
     )
 }

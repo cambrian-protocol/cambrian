@@ -1,7 +1,6 @@
 import { Box, Heading, Stack, Tab, Tabs, Text } from 'grommet'
 
 import Custom404Page from 'packages/app/pages/404'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
@@ -22,15 +21,8 @@ export default function EditProposalPage() {
     const { currentUser } = useCurrentUserContext()
     const editProposalProps = useEditProposal()
 
-    const {
-        stageStack,
-        proposalStatus,
-        proposal,
-        proposalStreamID,
-        errorMessage,
-        setErrorMessage,
-        isLoaded,
-    } = editProposalProps
+    const { stageStack, proposalStatus, proposal, proposalStreamID, isLoaded } =
+        editProposalProps
 
     const [activeIndex, setActiveIndex] = useState(0)
 
@@ -149,12 +141,6 @@ export default function EditProposalPage() {
                 </Stack>
             ) : (
                 <Custom404Page />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
             )}
         </>
     )

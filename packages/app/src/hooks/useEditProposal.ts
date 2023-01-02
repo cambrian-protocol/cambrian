@@ -5,7 +5,6 @@ import {
 } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
-import { ErrorMessageType } from '../constants/ErrorMessages'
 import { ProposalModel } from '../models/ProposalModel'
 import { ProposalStatus } from '../models/ProposalStatus'
 import { StageNames } from '../models/StageModel'
@@ -14,9 +13,9 @@ import { TemplateModel } from '../models/TemplateModel'
 import { TokenAPI } from '../services/api/Token.api'
 import { TokenModel } from '../models/TokenModel'
 import _ from 'lodash'
-import { cpLogger } from './../services/api/Logger.api'
 import { loadStageStackFromID } from './../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
+import { useErrorContext } from './useErrorContext'
 import { useRouter } from 'next/router'
 
 export type EditProposalType = {
@@ -29,15 +28,12 @@ export type EditProposalType = {
     setProposal: React.Dispatch<React.SetStateAction<ProposalModel | undefined>>
     proposalStatus: ProposalStatus
     isLoaded: boolean
-    errorMessage: ErrorMessageType | undefined
-    setErrorMessage: React.Dispatch<
-        React.SetStateAction<ErrorMessageType | undefined>
-    >
     collateralToken?: TokenModel
 }
 
 const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
+    const { showAndLogError } = useErrorContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
 
@@ -49,7 +45,6 @@ const useEditProposal = () => {
     )
     const [isLoaded, setIsLoaded] = useState(false)
     const [isValidProposal, setIsValidProposal] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
     useEffect(() => {
@@ -117,7 +112,7 @@ const useEditProposal = () => {
                 }
                 setIsLoaded(true)
             } catch (e) {
-                cpLogger.push(e)
+                showAndLogError(e)
             }
         }
     }
@@ -154,7 +149,7 @@ const useEditProposal = () => {
 
                     return true
                 } catch (e) {
-                    setErrorMessage(await cpLogger.push(e))
+                    showAndLogError(e)
                 }
             } else {
                 return true
@@ -190,8 +185,6 @@ const useEditProposal = () => {
         setProposal: setProposal,
         proposalStatus: proposalStatus,
         isLoaded: isLoaded,
-        errorMessage: errorMessage,
-        setErrorMessage: setErrorMessage,
         collateralToken: collateralToken,
     }
 }

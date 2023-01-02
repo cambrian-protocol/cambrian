@@ -8,19 +8,17 @@ import { useEffect, useState } from 'react'
 
 import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem'
 import CreateArbitratorModal from '@cambrian/app/ui/dashboard/modals/CreateArbitratorModal'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 export default function ArbitratorsDashboardPage() {
     const { currentUser } = useCurrentUserContext()
+    const { showAndLogError } = useErrorContext()
     const [arbitratorContracts, setArbitratorContracts] =
         useState<{ [address: string]: number }>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
 
     const [showCreateArbitrator, setShowCreateArbitrator] = useState(false)
@@ -53,7 +51,7 @@ export default function ArbitratorsDashboardPage() {
                     setArbitratorContracts(arbitratorLib.content)
                 }
             } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
+                showAndLogError(e)
             }
         }
         setIsFetching(false)
@@ -155,12 +153,6 @@ export default function ArbitratorsDashboardPage() {
                 <CreateArbitratorModal
                     currentUser={currentUser}
                     onClose={toggleShowCreateArbitrator}
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

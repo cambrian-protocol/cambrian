@@ -7,14 +7,12 @@ import {
 import { useEffect, useState } from 'react'
 
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import Link from 'next/link'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface RedeemableTokensWidgetProps {
     currentUser: UserType
@@ -23,11 +21,11 @@ interface RedeemableTokensWidgetProps {
 const RedeemableTokenListWidget = ({
     currentUser,
 }: RedeemableTokensWidgetProps) => {
+    const { showAndLogError } = useErrorContext()
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
     const [isLoading, setIsLoading] = useState(true)
     const [isRedeeming, setIsRedeeming] = useState<string>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         init()
@@ -39,7 +37,9 @@ const RedeemableTokenListWidget = ({
                 currentUser
             )
             setRedeemablePositions(redeemablePositions)
-        } catch (e) {}
+        } catch (e) {
+            showAndLogError(e)
+        }
         setIsLoading(false)
     }
 
@@ -60,7 +60,7 @@ const RedeemableTokenListWidget = ({
             await tx.wait()
             await init()
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsRedeeming(undefined)
     }
@@ -150,12 +150,6 @@ const RedeemableTokenListWidget = ({
                 <ListSkeleton
                     isFetching={isLoading}
                     subject="redeemable tokens"
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

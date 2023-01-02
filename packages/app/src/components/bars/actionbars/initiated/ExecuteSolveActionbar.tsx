@@ -2,12 +2,12 @@ import { RocketLaunch, UsersThree } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
+import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface ExecuteSolveActionbarProps {
@@ -21,22 +21,26 @@ const ExecuteSolveActionbar = ({
     messenger,
 }: ExecuteSolveActionbarProps) => {
     const [isExecuting, setIsExecuting] = useState(false)
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
 
     const onExecuteSolve = async () => {
-        await invokeContractFunction(
-            'ChangedStatus',
-            async () => {
-                const conditionIndex =
-                    currentCondition === undefined
-                        ? 0
-                        : currentCondition.executions - 1
-                return solverMethods.executeSolve(conditionIndex)
-            },
-            setIsExecuting,
-            setErrMsg,
-            'EXECUTE_SOLVER_ERROR'
-        )
+        setIsExecuting(true)
+        try {
+            const conditionIndex =
+                currentCondition === undefined
+                    ? 0
+                    : currentCondition.executions - 1
+            const transaction: ethers.ContractTransaction =
+                await solverMethods.executeSolve(conditionIndex)
+
+            const rc = await transaction.wait()
+
+            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
+                throw GENERAL_ERROR['EXECUTE_SOLVER_ERROR']
+        } catch (e) {
+            showAndLogError(e)
+            setIsExecuting(false)
+        }
     }
 
     return (
@@ -72,12 +76,6 @@ const ExecuteSolveActionbar = ({
                     ),
                 }}
             />
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
         </>
     )
 }

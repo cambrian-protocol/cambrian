@@ -1,16 +1,13 @@
-import { SetStateAction, useState } from 'react'
-
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import OutcomeOverview from '../../solver/OutcomeOverview'
+import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ArbitrationDesireOutcomeModalProps {
     solverAddress: string
@@ -33,7 +30,7 @@ const ArbitrationDesireOutcomeModal = ({
     solverAddress,
     fee,
 }: ArbitrationDesireOutcomeModalProps) => {
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
 
     const onDesireOutcome = async (indexSet: number) => {
         setDesiredIndexSet(indexSet)
@@ -55,42 +52,34 @@ const ArbitrationDesireOutcomeModal = ({
             await tx.wait()
             onBack()
         } catch (e) {
-            setErrMsg(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setDesiredIndexSet(undefined)
     }
 
     return (
-        <>
-            <BaseLayerModal onBack={onBack}>
-                <ModalHeader
-                    metaInfo="Arbitration"
-                    title="Propose an outcome"
-                    description="Please select your desired outcome."
+        <BaseLayerModal onBack={onBack}>
+            <ModalHeader
+                metaInfo="Arbitration"
+                title="Propose an outcome"
+                description="Please select your desired outcome."
+            />
+            <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
+                <OutcomeOverview
+                    reportProps={{
+                        onReport: onDesireOutcome,
+                        reportedIndexSet: desiredIndexSet,
+                        reportLabel: 'Request Outcome',
+                    }}
+                    collateralToken={solverData.collateralToken}
+                    outcomeCollections={
+                        solverData.outcomeCollections[
+                            currentCondition.conditionId
+                        ]
+                    }
                 />
-                <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    <OutcomeOverview
-                        reportProps={{
-                            onReport: onDesireOutcome,
-                            reportedIndexSet: desiredIndexSet,
-                            reportLabel: 'Request Outcome',
-                        }}
-                        collateralToken={solverData.collateralToken}
-                        outcomeCollections={
-                            solverData.outcomeCollections[
-                                currentCondition.conditionId
-                            ]
-                        }
-                    />
-                </Box>
-            </BaseLayerModal>
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
-        </>
+            </Box>
+        </BaseLayerModal>
     )
 }
 

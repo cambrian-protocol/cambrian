@@ -3,12 +3,10 @@ import { useEffect, useState } from 'react'
 
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { Coins } from 'phosphor-react'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ReimbursementComponentProps {
     arbitratorContract: ethers.Contract
@@ -20,9 +18,10 @@ const ReimbursementComponent = ({
     arbitratorContract,
     currentUser,
 }: ReimbursementComponentProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const [isWithdrawing, setIsWithdrawing] = useState(false)
     const [balance, setBalance] = useState<BigNumber>(BigNumber.from(0))
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         fetchBalance()
@@ -33,7 +32,7 @@ const ReimbursementComponent = ({
             const res = await arbitratorContract.balances(currentUser.address)
             setBalance(res)
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
@@ -46,7 +45,7 @@ const ReimbursementComponent = ({
             await transaction.wait()
             fetchBalance()
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsWithdrawing(false)
     }
@@ -73,12 +72,6 @@ const ReimbursementComponent = ({
                         />
                     </SidebarComponentContainer>
                 </BaseFormGroupContainer>
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             )}
         </>
     )

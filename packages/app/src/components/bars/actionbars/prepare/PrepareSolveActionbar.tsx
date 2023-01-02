@@ -1,11 +1,11 @@
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { Shield } from 'phosphor-react'
-import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
+import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface PrepareSolveActionbarProps {
@@ -16,16 +16,20 @@ const PrepareSolveActionbar = ({
     solverMethods,
 }: PrepareSolveActionbarProps) => {
     const [isPreparing, setIsPreparing] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
 
     const onPrepareSolve = async () => {
-        await invokeContractFunction(
-            'ChangedStatus',
-            () => solverMethods.prepareSolve(0),
-            setIsPreparing,
-            setErrorMessage,
-            'PREPARE_SOLVE_ERROR'
-        )
+        setIsPreparing(true)
+        try {
+            const transaction: ethers.ContractTransaction =
+                await solverMethods.prepareSolve(0)
+            const rc = await transaction.wait()
+            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
+                throw GENERAL_ERROR['PREPARE_SOLVE_ERROR']
+        } catch (e) {
+            showAndLogError(e)
+            setIsPreparing(false)
+        }
     }
 
     return (
@@ -56,12 +60,6 @@ const PrepareSolveActionbar = ({
                     ),
                 }}
             />
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
-            )}
         </>
     )
 }

@@ -1,17 +1,12 @@
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-
-import ErrorPopupModal from '../../components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../components/solver/Solver'
 import LoaderButton from '../../components/buttons/LoaderButton'
 import { ProhibitInset } from 'phosphor-react'
 import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface ArbitrateNullComponentProps {
@@ -28,8 +23,9 @@ const ArbitrateNullComponent = ({
     currentCondition,
     solverMethods,
 }: ArbitrateNullComponentProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const [isArbitrating, setIsArbitrating] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onArbitrateNull = async () => {
         setIsArbitrating(true)
@@ -51,32 +47,24 @@ const ArbitrateNullComponent = ({
                     throw GENERAL_ERROR['ARBITRATE_ERROR']
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsArbitrating(false)
         }
     }
 
     return (
-        <>
-            <SidebarComponentContainer
-                title="Cancel Arbitration"
-                description="Void this dispute, put the Solver back to the state before arbitration has been requested and reimburse the disputers."
-            >
-                <LoaderButton
-                    label="Void this dispute"
-                    secondary
-                    icon={<ProhibitInset />}
-                    onClick={onArbitrateNull}
-                    isLoading={isArbitrating}
-                />
-            </SidebarComponentContainer>
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
-            )}
-        </>
+        <SidebarComponentContainer
+            title="Cancel Arbitration"
+            description="Void this dispute, put the Solver back to the state before arbitration has been requested and reimburse the disputers."
+        >
+            <LoaderButton
+                label="Void this dispute"
+                secondary
+                icon={<ProhibitInset />}
+                onClick={onArbitrateNull}
+                isLoading={isArbitrating}
+            />
+        </SidebarComponentContainer>
     )
 }
 

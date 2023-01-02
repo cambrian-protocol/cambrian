@@ -1,18 +1,15 @@
-import { SetStateAction, useState } from 'react'
-
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
 import { Box } from 'grommet'
 import { DisputeModel } from '@cambrian/app/models/DisputeModel'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import OutcomeOverview from '../../solver/OutcomeOverview'
+import { SetStateAction } from 'react'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ArbitrateDesiredOutcomeModalProps {
     onBack: () => void
@@ -35,7 +32,7 @@ const ArbitrateDesiredOutcomeModal = ({
     currentCondition,
     isArbitrating,
 }: ArbitrateDesiredOutcomeModalProps) => {
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
+    const { showAndLogError } = useErrorContext()
     const onArbitrate = async (choiceIndex: number) => {
         setIsArbitrating(choiceIndex)
         try {
@@ -44,43 +41,35 @@ const ArbitrateDesiredOutcomeModal = ({
             ](disputeId, choiceIndex)
             await tx.wait()
         } catch (e) {
-            setErrMsg(await cpLogger.push(e))
+            showAndLogError(e)
             setIsArbitrating(undefined)
         }
     }
 
     return (
-        <>
-            <BaseLayerModal onBack={onBack} width="xlarge">
-                <ModalHeader
-                    metaInfo="Arbitration"
-                    title="Arbitrate an outcome"
-                    description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
+        <BaseLayerModal onBack={onBack} width="xlarge">
+            <ModalHeader
+                metaInfo="Arbitration"
+                title="Arbitrate an outcome"
+                description="This report will overwrite the Keepers proposed outcome and allocates tokens accordingly."
+            />
+            <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
+                <OutcomeOverview
+                    outcomeCollections={getOutcomeCollectionsToArbitrate(
+                        dispute,
+                        solverData,
+                        currentCondition
+                    )}
+                    collateralToken={solverData.collateralToken}
+                    reportProps={{
+                        onReport: onArbitrate,
+                        reportLabel: 'Arbitrate Outcome',
+                        reportedIndexSet: isArbitrating,
+                        useChoiceIndex: true,
+                    }}
                 />
-                <Box gap="medium" height={{ min: 'auto' }} fill="horizontal">
-                    <OutcomeOverview
-                        outcomeCollections={getOutcomeCollectionsToArbitrate(
-                            dispute,
-                            solverData,
-                            currentCondition
-                        )}
-                        collateralToken={solverData.collateralToken}
-                        reportProps={{
-                            onReport: onArbitrate,
-                            reportLabel: 'Arbitrate Outcome',
-                            reportedIndexSet: isArbitrating,
-                            useChoiceIndex: true,
-                        }}
-                    />
-                </Box>
-            </BaseLayerModal>
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
-        </>
+            </Box>
+        </BaseLayerModal>
     )
 }
 

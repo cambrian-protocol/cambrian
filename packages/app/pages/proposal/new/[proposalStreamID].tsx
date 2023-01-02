@@ -1,6 +1,5 @@
 import { Box } from 'grommet'
 import Custom404Page from 'packages/app/pages/404'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
@@ -27,12 +26,6 @@ export default function NewProposalPage() {
                 </PageLayout>
             ) : (
                 <Custom404Page />
-            )}
-            {editProposalProps.errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={editProposalProps.errorMessage}
-                    onClose={() => editProposalProps.setErrorMessage(undefined)}
-                />
             )}
         </>
     )

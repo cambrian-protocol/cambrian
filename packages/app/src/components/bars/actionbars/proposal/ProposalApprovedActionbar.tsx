@@ -7,15 +7,13 @@ import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import BaseActionbar from '../BaseActionbar'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolutionModel } from '@cambrian/app/models/SolutionModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { Users } from 'phosphor-react'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalApprovedActionbarProps {
@@ -31,13 +29,13 @@ const ProposalApprovedActionbar = ({
     setIsApproving,
     messenger,
 }: ProposalApprovedActionbarProps) => {
+    const { showAndLogError } = useErrorContext()
     const solutionsHub = new IPFSSolutionsHub(
         currentUser.signer,
         currentUser.chainId
     )
     const { stageStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [solutionBase, setSolutionBase] = useState<SolutionModel>()
     const [isLoaded, setIsLoaded] = useState(false)
 
@@ -52,7 +50,7 @@ const ProposalApprovedActionbar = ({
                 await deployProposal(currentUser, stageStack)
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsInTransaction(false)
         }
     }
@@ -65,7 +63,7 @@ const ProposalApprovedActionbar = ({
                 await fetchSolution()
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsApproving(false)
         }
     }
@@ -148,12 +146,6 @@ const ProposalApprovedActionbar = ({
                 )
             ) : (
                 <></>
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
             )}
         </>
     )

@@ -12,8 +12,6 @@ import { useEffect, useState } from 'react'
 
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from './DropButtonListItem'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../modals/ErrorPopupModal'
 import Link from 'next/link'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalInfoType } from './ProposalListItem'
@@ -21,9 +19,9 @@ import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../badges/ProposalStatusBadge'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { fetchProposalInfo } from '@cambrian/app/utils/helpers/proposalHelper'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useRouter } from 'next/router'
 
 interface ReceivedProposalListItemProps {
@@ -38,10 +36,11 @@ const ReceivedProposalListItem = ({
     proposalStreamID,
 }: ReceivedProposalListItemProps) => {
     const router = useRouter()
+    const { showAndLogError } = useErrorContext()
+
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [isRemoving, setIsRemoving] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [proposalInfo, setProposalInfo] = useState<ProposalInfoType>()
 
     const isEditable =
@@ -75,7 +74,7 @@ const ReceivedProposalListItem = ({
                 await fetchProposalInfo(currentUser, proposalStreamID)
             )
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
@@ -91,158 +90,145 @@ const ReceivedProposalListItem = ({
             )
         } catch (e) {
             setIsRemoving(false)
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
     return (
-        <>
-            <Box
-                border
-                flex
-                height={{ min: 'auto' }}
-                pad={{
-                    horizontal: 'small',
-                    vertical: 'small',
-                }}
-                direction="row"
-                justify="between"
-                align="center"
-                round="xsmall"
-            >
-                <Box flex>
-                    <Link
-                        href={
-                            proposalInfo
-                                ? isEditable &&
-                                  proposal.author === currentUser.did
-                                    ? `/proposal/edit/${proposalStreamID}`
-                                    : `/solver/${proposalStreamID}`
-                                : ''
-                        }
-                        passHref
-                    >
-                        <Button>
-                            <Box flex focusIndicator={false}>
-                                <Box
-                                    direction="row"
-                                    wrap="reverse"
-                                    align="center"
-                                >
-                                    <Box pad="xsmall">
-                                        <Text>{proposal.title}</Text>
-                                    </Box>
-                                    <Box pad="xsmall">
-                                        <ProposalStatusBadge
-                                            status={proposalInfo?.status}
-                                            onChainProposalId={
-                                                proposalInfo?.onChainProposalId
-                                            }
-                                        />
-                                    </Box>
+        <Box
+            border
+            flex
+            height={{ min: 'auto' }}
+            pad={{
+                horizontal: 'small',
+                vertical: 'small',
+            }}
+            direction="row"
+            justify="between"
+            align="center"
+            round="xsmall"
+        >
+            <Box flex>
+                <Link
+                    href={
+                        proposalInfo
+                            ? isEditable && proposal.author === currentUser.did
+                                ? `/proposal/edit/${proposalStreamID}`
+                                : `/solver/${proposalStreamID}`
+                            : ''
+                    }
+                    passHref
+                >
+                    <Button>
+                        <Box flex focusIndicator={false}>
+                            <Box direction="row" wrap="reverse" align="center">
+                                <Box pad="xsmall">
+                                    <Text>{proposal.title}</Text>
+                                </Box>
+                                <Box pad="xsmall">
+                                    <ProposalStatusBadge
+                                        status={proposalInfo?.status}
+                                        onChainProposalId={
+                                            proposalInfo?.onChainProposalId
+                                        }
+                                    />
                                 </Box>
                             </Box>
-                        </Button>
-                    </Link>
-                </Box>
-                <Box direction="row" width={{ min: 'auto' }} justify="end">
-                    <DropButton
-                        size="small"
-                        dropContent={
-                            <Box width={'small'}>
-                                {proposalInfo &&
-                                    proposalInfo.status !==
-                                        ProposalStatus.Draft && (
-                                        <DropButtonListItem
-                                            icon={
-                                                isSavedToClipboard ? (
-                                                    <Check />
-                                                ) : (
-                                                    <Copy />
-                                                )
-                                            }
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(
-                                                    `${window.location.origin}/solver/${proposalStreamID}`
-                                                )
-                                                setIsSavedToClipboard(true)
-                                            }}
-                                            label="Copy link"
-                                        />
-                                    )}
-                                {proposalInfo &&
-                                    isEditable &&
-                                    proposal.author === currentUser.did && (
-                                        <DropButtonListItem
-                                            icon={<Pen />}
-                                            label="Edit"
-                                            onClick={() =>
-                                                router.push(
-                                                    `/proposal/edit/${proposalStreamID}`
-                                                )
-                                            }
-                                        />
-                                    )}
-                                <PlainSectionDivider />
-                                {proposalInfo && (
+                        </Box>
+                    </Button>
+                </Link>
+            </Box>
+            <Box direction="row" width={{ min: 'auto' }} justify="end">
+                <DropButton
+                    size="small"
+                    dropContent={
+                        <Box width={'small'}>
+                            {proposalInfo &&
+                                proposalInfo.status !==
+                                    ProposalStatus.Draft && (
                                     <DropButtonListItem
                                         icon={
-                                            isRemoving ? (
-                                                <Spinner />
-                                            ) : isRemoveable ? (
-                                                <XCircle
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'status-error'
-                                                        ]
-                                                    }
-                                                />
-                                            ) : isDeclinable ? (
-                                                <HandPalm
-                                                    color={
-                                                        cpTheme.global.colors[
-                                                            'status-error'
-                                                        ]
-                                                    }
-                                                />
+                                            isSavedToClipboard ? (
+                                                <Check />
                                             ) : (
-                                                <Archive />
+                                                <Copy />
                                             )
                                         }
-                                        label={
-                                            isRemoveable
-                                                ? 'Remove'
-                                                : isDeclinable
-                                                ? 'Decline'
-                                                : 'Archive'
-                                        }
-                                        onClick={
-                                            isRemoving
-                                                ? undefined
-                                                : () =>
-                                                      onRemove(
-                                                          proposalStreamID,
-                                                          isDeclinable
-                                                              ? 'DECLINE'
-                                                              : 'ARCHIVE'
-                                                      )
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(
+                                                `${window.location.origin}/solver/${proposalStreamID}`
+                                            )
+                                            setIsSavedToClipboard(true)
+                                        }}
+                                        label="Copy link"
+                                    />
+                                )}
+                            {proposalInfo &&
+                                isEditable &&
+                                proposal.author === currentUser.did && (
+                                    <DropButtonListItem
+                                        icon={<Pen />}
+                                        label="Edit"
+                                        onClick={() =>
+                                            router.push(
+                                                `/proposal/edit/${proposalStreamID}`
+                                            )
                                         }
                                     />
                                 )}
-                            </Box>
-                        }
-                        dropAlign={{ top: 'bottom', right: 'right' }}
-                        icon={<DotsThree size="24" />}
-                    />
-                </Box>
-            </Box>
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
+                            <PlainSectionDivider />
+                            {proposalInfo && (
+                                <DropButtonListItem
+                                    icon={
+                                        isRemoving ? (
+                                            <Spinner />
+                                        ) : isRemoveable ? (
+                                            <XCircle
+                                                color={
+                                                    cpTheme.global.colors[
+                                                        'status-error'
+                                                    ]
+                                                }
+                                            />
+                                        ) : isDeclinable ? (
+                                            <HandPalm
+                                                color={
+                                                    cpTheme.global.colors[
+                                                        'status-error'
+                                                    ]
+                                                }
+                                            />
+                                        ) : (
+                                            <Archive />
+                                        )
+                                    }
+                                    label={
+                                        isRemoveable
+                                            ? 'Remove'
+                                            : isDeclinable
+                                            ? 'Decline'
+                                            : 'Archive'
+                                    }
+                                    onClick={
+                                        isRemoving
+                                            ? undefined
+                                            : () =>
+                                                  onRemove(
+                                                      proposalStreamID,
+                                                      isDeclinable
+                                                          ? 'DECLINE'
+                                                          : 'ARCHIVE'
+                                                  )
+                                    }
+                                />
+                            )}
+                        </Box>
+                    }
+                    dropAlign={{ top: 'bottom', right: 'right' }}
+                    icon={<DotsThree size="24" />}
                 />
-            )}
-        </>
+            </Box>
+        </Box>
     )
 }
 

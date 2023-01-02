@@ -1,9 +1,5 @@
 import 'react-quill/dist/quill.snow.css'
 
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
 import {
     ceramicInstance,
@@ -13,18 +9,18 @@ import styled, { css } from 'styled-components'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import dynamic from 'next/dynamic'
 import { ethers } from 'ethers'
 import { initialSubmission } from './SubmissionContainer'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false })
 
@@ -43,8 +39,8 @@ const SubmissionForm = ({
     moduleContract,
     latestSubmission,
 }: WriterUIProps) => {
+    const { showAndLogError } = useErrorContext()
     const [input, setInput] = useState<SubmissionModel>(initialSubmission)
-    const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [submissionsTileDocument, setSubmissionsTileDocument] =
@@ -95,7 +91,7 @@ const SubmissionForm = ({
                     throw new Error('Error while submitting work')
             }
         } catch (e) {
-            setErrorMsg(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsSubmitting(false)
     }
@@ -123,80 +119,70 @@ const SubmissionForm = ({
                 )
             }
         } catch (e) {
-            setErrorMsg(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsSaving(false)
     }
 
     return (
-        <>
+        <Box
+            fill
+            gap="small"
+            height={{ min: 'large', max: 'large' }}
+            pad={{ bottom: 'medium' }}
+        >
             <Box
-                fill
-                gap="small"
-                height={{ min: 'large', max: 'large' }}
-                pad={{ bottom: 'medium' }}
+                flex
+                border
+                round="xsmall"
+                background="background-contrast-transparent"
+                color="white"
+                overflow={'hidden'}
             >
-                <Box
-                    flex
-                    border
-                    round="xsmall"
-                    background="background-contrast-transparent"
-                    color="white"
-                    overflow={'hidden'}
-                >
-                    <StyledReactQuill
-                        theme="snow"
-                        readOnly={isSubmitting}
-                        value={input.submission}
-                        onChange={(e) => {
-                            setInput({
-                                ...input,
-                                submission: e,
-                            })
-                        }}
-                    />
-                </Box>
-                <Box height={{ min: 'auto' }}>
-                    <TwoButtonWrapContainer
-                        primaryButton={
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                disabled={
-                                    latestSubmission.submission ===
-                                    input.submission
-                                }
-                                primary
-                                reverse
-                                icon={<PaperPlaneRight />}
-                                label={'Submit'}
-                                onClick={onSubmit}
-                            />
-                        }
-                        secondaryButton={
-                            <LoaderButton
-                                secondary
-                                disabled={
-                                    isSubmitting ||
-                                    input.submission ===
-                                        submissionsTileDocument?.content
-                                            .submission
-                                }
-                                isLoading={isSaving}
-                                onClick={onSave}
-                                label="Save"
-                                icon={<FloppyDisk />}
-                            />
-                        }
-                    />
-                </Box>
-            </Box>
-            {errorMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMsg(undefined)}
-                    errorMessage={errorMsg}
+                <StyledReactQuill
+                    theme="snow"
+                    readOnly={isSubmitting}
+                    value={input.submission}
+                    onChange={(e) => {
+                        setInput({
+                            ...input,
+                            submission: e,
+                        })
+                    }}
                 />
-            )}
-        </>
+            </Box>
+            <Box height={{ min: 'auto' }}>
+                <TwoButtonWrapContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            disabled={
+                                latestSubmission.submission === input.submission
+                            }
+                            primary
+                            reverse
+                            icon={<PaperPlaneRight />}
+                            label={'Submit'}
+                            onClick={onSubmit}
+                        />
+                    }
+                    secondaryButton={
+                        <LoaderButton
+                            secondary
+                            disabled={
+                                isSubmitting ||
+                                input.submission ===
+                                    submissionsTileDocument?.content.submission
+                            }
+                            isLoading={isSaving}
+                            onClick={onSave}
+                            label="Save"
+                            icon={<FloppyDisk />}
+                        />
+                    }
+                />
+            </Box>
+        </Box>
     )
 }
 

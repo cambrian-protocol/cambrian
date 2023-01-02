@@ -1,17 +1,13 @@
 import { ClockCounterClockwise, Lock } from 'phosphor-react'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import SidebarComponentContainer from '../../components/containers/SidebarComponentContainer'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface ArbitrateLockComponentProps {
@@ -23,9 +19,10 @@ const ArbitrateLockComponent = ({
     solverMethods,
     currentCondition,
 }: ArbitrateLockComponentProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const [isRequestingArbitration, setIsRequestingArbitration] =
         useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onArbitratorRequestArbitration = async () => {
         setIsRequestingArbitration(true)
@@ -49,51 +46,42 @@ const ArbitrateLockComponent = ({
             }
         } catch (e) {
             setIsRequestingArbitration(false)
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
     return (
-        <>
-            <SidebarComponentContainer
-                title={
+        <SidebarComponentContainer
+            title={
+                currentCondition.status === ConditionStatus.OutcomeProposed
+                    ? 'Begin Arbitration'
+                    : 'More Arbitration Requested'
+            }
+            description={
+                currentCondition.status === ConditionStatus.OutcomeProposed
+                    ? 'If you have received an Arbitration Request, please lock the Solver here'
+                    : 'If you have received an additional arbitration request, you may update the Solver locking period.'
+            }
+        >
+            <LoaderButton
+                secondary
+                isLoading={isRequestingArbitration}
+                label={
                     currentCondition.status === ConditionStatus.OutcomeProposed
-                        ? 'Begin Arbitration'
-                        : 'More Arbitration Requested'
+                        ? 'Lock Solver'
+                        : 'Update Lock'
                 }
-                description={
-                    currentCondition.status === ConditionStatus.OutcomeProposed
-                        ? 'If you have received an Arbitration Request, please lock the Solver here'
-                        : 'If you have received an additional arbitration request, you may update the Solver locking period.'
+                icon={
+                    currentCondition.status ===
+                    ConditionStatus.OutcomeProposed ? (
+                        <Lock />
+                    ) : (
+                        <ClockCounterClockwise />
+                    )
                 }
-            >
-                <LoaderButton
-                    secondary
-                    isLoading={isRequestingArbitration}
-                    label={
-                        currentCondition.status ===
-                        ConditionStatus.OutcomeProposed
-                            ? 'Lock Solver'
-                            : 'Update Lock'
-                    }
-                    icon={
-                        currentCondition.status ===
-                        ConditionStatus.OutcomeProposed ? (
-                            <Lock />
-                        ) : (
-                            <ClockCounterClockwise />
-                        )
-                    }
-                    onClick={onArbitratorRequestArbitration}
-                />
-            </SidebarComponentContainer>
-            {errorMessage && (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
-            )}
-        </>
+                onClick={onArbitratorRequestArbitration}
+            />
+        </SidebarComponentContainer>
     )
 }
 

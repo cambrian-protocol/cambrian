@@ -3,14 +3,13 @@ import React, { SetStateAction, useEffect, useState } from 'react'
 
 import AddManualSlotDataInput from '../../../components/inputs/AddManualSlotDataInput'
 import BaseLayerModal from '../../../components/modals/BaseLayerModal'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../../components/solver/Solver'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { ethers } from 'ethers'
-import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
 import { isAddress } from '@cambrian/app/utils/helpers/validation'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ExecuteSolverModalProps {
     isAddingData: boolean
@@ -33,8 +32,8 @@ const AddDataModal = ({
     manualSlots,
     solverMethods,
 }: ExecuteSolverModalProps) => {
+    const { showAndLogError } = useErrorContext()
     const [manualInputs, setManualInputs] = useState<ManualInputFormType[]>()
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
 
     useEffect(() => {
         const manualInputs = manualSlots.map((slot) => {
@@ -46,21 +45,24 @@ const AddDataModal = ({
 
     const onAddData = async (idx: number) => {
         if (manualInputs) {
+            setIsAddingData(true)
             const encodedData = ethers.utils.defaultAbiCoder.encode(
                 ['address'],
                 [manualInputs[idx].data]
             )
-            await invokeContractFunction(
-                'IngestedData',
-                () =>
-                    solverMethods.addData(
+            try {
+                const transaction: ethers.ContractTransaction =
+                    await solverMethods.addData(
                         manualInputs[idx].slotWithMetaData.slot.slot,
                         encodedData
-                    ),
-                setIsAddingData,
-                setErrMsg,
-                'ADD_DATA_ERROR'
-            )
+                    )
+                const rc = await transaction.wait()
+                if (!rc.events?.find((event) => event.event === 'IngestedData'))
+                    throw GENERAL_ERROR['ADD_DATA_ERROR']
+            } catch (e) {
+                showAndLogError(e)
+                setIsAddingData(false)
+            }
         }
     }
 
@@ -98,23 +100,15 @@ const AddDataModal = ({
     }
 
     return (
-        <>
-            <BaseLayerModal onBack={onBack}>
-                <ModalHeader
-                    title="Add solve data"
-                    description='This Solver requires the following data. Fields marked "*" must be added before execution.'
-                />
-                <Box gap="medium" fill>
-                    {ManualInputGroup}
-                </Box>
-            </BaseLayerModal>
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
-        </>
+        <BaseLayerModal onBack={onBack}>
+            <ModalHeader
+                title="Add solve data"
+                description='This Solver requires the following data. Fields marked "*" must be added before execution.'
+            />
+            <Box gap="medium" fill>
+                {ManualInputGroup}
+            </Box>
+        </BaseLayerModal>
     )
 }
 

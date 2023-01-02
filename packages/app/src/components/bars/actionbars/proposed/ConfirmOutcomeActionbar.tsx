@@ -4,13 +4,13 @@ import BaseActionbar, {
 import { Lock, Timer, UsersThree } from 'phosphor-react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from '../../../solver/Solver'
 import LoaderButton from '../../../buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
-import { invokeContractFunction } from '@cambrian/app/utils/helpers/invokeContractFunctiion'
+import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface ConfirmOutcomeActionbarProps {
@@ -27,17 +27,23 @@ const ConfirmOutcomeActionbar = ({
     messenger,
 }: ConfirmOutcomeActionbarProps) => {
     const [isConfirming, setIsConfirming] = useState(false)
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
     const { isTimelockActive, timelockSeconds } = solverTimelock
+    const { showAndLogError } = useErrorContext()
 
     const onConfirmOutcome = async () => {
-        await invokeContractFunction(
-            'ChangedStatus',
-            () => solverMethods.confirmPayouts(currentCondition.executions - 1),
-            setIsConfirming,
-            setErrMsg,
-            'CONFIRM_OUTCOME_ERROR'
-        )
+        setIsConfirming(true)
+        try {
+            const transaction: ethers.ContractTransaction =
+                await solverMethods.confirmPayouts(
+                    currentCondition.executions - 1
+                )
+            const rc = await transaction.wait()
+            if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
+                throw GENERAL_ERROR['CONFIRM_OUTCOME_ERROR']
+        } catch (e) {
+            showAndLogError(e)
+            setIsConfirming(false)
+        }
     }
 
     let actionbarInfo: ActionbarInfoType
@@ -85,28 +91,20 @@ const ConfirmOutcomeActionbar = ({
     }
 
     return (
-        <>
-            <BaseActionbar
-                messenger={messenger}
-                info={actionbarInfo}
-                primaryAction={
-                    <LoaderButton
-                        disabled={isTimelockActive}
-                        primary
-                        onClick={onConfirmOutcome}
-                        label="Confirm Outcome"
-                        icon={isTimelockActive ? <Lock /> : undefined}
-                        isLoading={isConfirming}
-                    />
-                }
-            />
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
+        <BaseActionbar
+            messenger={messenger}
+            info={actionbarInfo}
+            primaryAction={
+                <LoaderButton
+                    disabled={isTimelockActive}
+                    primary
+                    onClick={onConfirmOutcome}
+                    label="Confirm Outcome"
+                    icon={isTimelockActive ? <Lock /> : undefined}
+                    isLoading={isConfirming}
                 />
-            )}
-        </>
+            }
+        />
     )
 }
 

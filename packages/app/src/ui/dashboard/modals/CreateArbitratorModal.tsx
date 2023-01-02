@@ -1,20 +1,16 @@
 import { Box, Form, FormField, Text, TextInput } from 'grommet'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 
 import { ARBITRATOR_FACTORY_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicArbitratorAPI from '@cambrian/app/services/ceramic/CeramicArbitratorAPI'
 import { CurrencyEth } from 'phosphor-react'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import { useState } from 'react'
 
 interface CreateArbitratorModalProps {
@@ -22,14 +18,13 @@ interface CreateArbitratorModalProps {
     currentUser: UserType
 }
 
-// TODO Create arbitrator-lib and extract functionality to there
 const CreateArbitratorModal = ({
     onClose,
     currentUser,
 }: CreateArbitratorModalProps) => {
+    const { showAndLogError } = useErrorContext()
     const [input, setInput] = useState(0)
     const [isCreatingArbitrator, setIsCreatingArbitrator] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const onSubmit = async () => {
         setIsCreatingArbitrator(true)
@@ -77,63 +72,52 @@ const CreateArbitratorModal = ({
             )
             onClose()
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
             setIsCreatingArbitrator(false)
         }
     }
 
     return (
-        <>
-            <BaseLayerModal onClose={onClose}>
-                <ModalHeader
-                    title="Create Arbitrator"
-                    description="This Arbitration Smart Contract will be tied to your wallet"
-                />
-                <Form onSubmit={onSubmit}>
-                    <Box gap="medium">
-                        <>
-                            <Box direction="row" align="center" gap="small">
-                                <Box flex>
-                                    <FormField
-                                        name="fee"
-                                        label="Arbitration fee"
-                                    >
-                                        <TextInput
-                                            disabled={isCreatingArbitrator}
-                                            type="number"
-                                            value={input}
-                                            min={0}
-                                            step={0.000000001}
-                                            onChange={(e) =>
-                                                setInput(Number(e.target.value))
-                                            }
-                                        />
-                                    </FormField>
-                                </Box>
-                                <CurrencyEth size="24" />
-                                <Text>ETH</Text>
+        <BaseLayerModal onClose={onClose}>
+            <ModalHeader
+                title="Create Arbitrator"
+                description="This Arbitration Smart Contract will be tied to your wallet"
+            />
+            <Form onSubmit={onSubmit}>
+                <Box gap="medium">
+                    <>
+                        <Box direction="row" align="center" gap="small">
+                            <Box flex>
+                                <FormField name="fee" label="Arbitration fee">
+                                    <TextInput
+                                        disabled={isCreatingArbitrator}
+                                        type="number"
+                                        value={input}
+                                        min={0}
+                                        step={0.000000001}
+                                        onChange={(e) =>
+                                            setInput(Number(e.target.value))
+                                        }
+                                    />
+                                </FormField>
                             </Box>
-                            <Text size="small" color="dark-4">
-                                Please provide us with the amount of Ether you
-                                take to offer an Arbitration Service
-                            </Text>
-                        </>
-                        <LoaderButton
-                            isLoading={isCreatingArbitrator}
-                            label="Create"
-                            primary
-                            type="submit"
-                        />
-                    </Box>
-                </Form>
-            </BaseLayerModal>
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
-                />
-            )}
-        </>
+                            <CurrencyEth size="24" />
+                            <Text>ETH</Text>
+                        </Box>
+                        <Text size="small" color="dark-4">
+                            Please provide us with the amount of Ether you take
+                            to offer an Arbitration Service
+                        </Text>
+                    </>
+                    <LoaderButton
+                        isLoading={isCreatingArbitrator}
+                        label="Create"
+                        primary
+                        type="submit"
+                    />
+                </Box>
+            </Form>
+        </BaseLayerModal>
     )
 }
 

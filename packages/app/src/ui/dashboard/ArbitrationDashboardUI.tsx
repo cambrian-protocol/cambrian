@@ -5,12 +5,10 @@ import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem
 import CeramicArbitratorAPI from '@cambrian/app/services/ceramic/CeramicArbitratorAPI'
 import CreateArbitratorModal from './modals/CreateArbitratorModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import { Scales } from 'phosphor-react'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface ArbitrationDashboardUIProps {
     currentUser: UserType
@@ -19,9 +17,10 @@ interface ArbitrationDashboardUIProps {
 const ArbitrationDashboardUI = ({
     currentUser,
 }: ArbitrationDashboardUIProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const [arbitratorContracts, setArbitratorContracts] =
         useState<{ [address: string]: number }>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
 
     const [showCreateArbitrator, setShowCreateArbitrator] = useState(false)
@@ -46,7 +45,7 @@ const ArbitrationDashboardUI = ({
                     await arbitratorAPI.getArbitratorContracts()
                 )
             } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
+                showAndLogError(e)
             }
         }
         setIsFetching(false)
@@ -108,12 +107,6 @@ const ArbitrationDashboardUI = ({
                 <CreateArbitratorModal
                     currentUser={currentUser}
                     onClose={toggleShowCreateArbitrator}
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

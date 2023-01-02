@@ -11,10 +11,7 @@ import {
     getSolverRecipientSlots,
 } from '@cambrian/app/utils/helpers/solverHelpers'
 
-import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../modals/ErrorPopupModal'
 import HeaderTextSection from '../sections/HeaderTextSection'
 import InitiatedSolverContent from '@cambrian/app/components/info/InitiatedSolverContent'
 import InteractionLayout from '../layout/InteractionLayout'
@@ -34,11 +31,11 @@ import SolverSidebar from '../bars/sidebar/SolverSidebar'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 export type GenericMethod<T> = {
     (...args: T[]): Promise<any>
@@ -51,6 +48,8 @@ interface SolverProps {
 }
 
 const Solver = ({ currentUser, solverContract }: SolverProps) => {
+    const { showAndLogError } = useErrorContext()
+
     const [solverData, setSolverData] = useState<SolverModel>()
     const [solverTimelock, setSolverTimelock] = useState<TimelockModel>({
         isTimelockActive: false,
@@ -64,7 +63,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
         useState<SolverContractCondition>()
     const [metadata, setMetadata] = useState<SolverMetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const [proposedOutcome, setProposedOutcome] =
         useState<OutcomeCollectionModel>()
@@ -219,7 +217,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             setMetadata(fetchedMetadata)
             setOutcomes(fetchedOutcomes)
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
@@ -348,11 +346,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         paragraph="This Solver was deployed manually. Click Prepare Solve to initialize the contract."
                     />
                 </PageLayout>
-            ) : errorMessage ? (
-                <ErrorPopupModal
-                    onClose={() => setErrorMessage(undefined)}
-                    errorMessage={errorMessage}
-                />
             ) : (
                 <LoadingScreen context={LOADING_MESSAGE['SOLVER']} />
             )}

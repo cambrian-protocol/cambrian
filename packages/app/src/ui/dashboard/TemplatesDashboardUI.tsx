@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react'
 
 import CreateTemplateModal from './modals/CreateTemplateModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
@@ -13,7 +11,7 @@ import { TemplateStagesLibType } from '@cambrian/app/classes/stageLibs/TemplateS
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface TemplatesDashboardUIProps {
     currentUser: UserType
@@ -28,10 +26,10 @@ const TemplatesDashboardUI = ({
     currentUser,
     templatesLib,
 }: TemplatesDashboardUIProps) => {
+    const { showAndLogError } = useErrorContext()
     const [templates, setTemplates] = useState<TemplateHashmap>({})
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isFetching, setIsFetching] = useState(false)
 
     const toggleShowCreateTemplateModal = () =>
@@ -56,7 +54,7 @@ const TemplatesDashboardUI = ({
                 setTemplates({})
             }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
         setIsFetching(false)
     }
@@ -121,12 +119,6 @@ const TemplatesDashboardUI = ({
                 <CreateTemplateModal
                     currentUser={currentUser}
                     onClose={toggleShowCreateTemplateModal}
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

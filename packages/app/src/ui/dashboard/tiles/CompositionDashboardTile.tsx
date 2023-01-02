@@ -19,25 +19,21 @@ import {
     Trash,
     TreeStructure,
 } from 'phosphor-react'
-import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
-import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
+import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RenameCompositionModal from '../modals/RenameCompositionModal'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 interface CompositionDashboardTileProps {
     compositionTag: string
@@ -50,6 +46,7 @@ const CompositionDashboardTile = ({
     compositionStreamID,
     ceramicCompositionAPI,
 }: CompositionDashboardTileProps) => {
+    const { showAndLogError } = useErrorContext()
     const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
     const [currentTag, setCurrentTag] = useState(compositionTag)
@@ -57,7 +54,6 @@ const CompositionDashboardTile = ({
     const [showRenameCompositionModal, setShowRenameCompositionModal] =
         useState(false)
     const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [isRemoving, setIsRemoving] = useState(false)
 
     const toggleShowRenameCompositionModal = () =>
@@ -95,7 +91,7 @@ const CompositionDashboardTile = ({
             }
         } catch (e) {
             setIsCreatingTemplate(false)
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
@@ -105,7 +101,7 @@ const CompositionDashboardTile = ({
             await ceramicCompositionAPI.archiveComposition(compositionID)
         } catch (e) {
             setIsRemoving(false)
-            setErrorMessage(await cpLogger.push(e))
+            showAndLogError(e)
         }
     }
 
@@ -225,12 +221,6 @@ const CompositionDashboardTile = ({
                     compositionStreamID={compositionStreamID}
                     setCurrentTag={setCurrentTag}
                     onClose={toggleShowRenameCompositionModal}
-                />
-            )}
-            {errorMessage && (
-                <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
                 />
             )}
         </>

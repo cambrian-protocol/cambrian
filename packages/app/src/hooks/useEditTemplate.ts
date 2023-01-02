@@ -7,13 +7,12 @@ import { updateStage } from '../services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
 import { CompositionModel } from '../models/CompositionModel'
-import { ErrorMessageType } from '../constants/ErrorMessages'
 import { StageNames } from '../models/StageModel'
 import { TemplateModel } from '../models/TemplateModel'
 import _ from 'lodash'
-import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
+import { useErrorContext } from './useErrorContext'
 
 export type EditTemplatePropsType = {
     template: TemplateModel | undefined
@@ -24,21 +23,17 @@ export type EditTemplatePropsType = {
     composition: CompositionModel | undefined
     onResetTemplate: () => void
     onSaveTemplate: () => Promise<boolean>
-    errorMessage: ErrorMessageType | undefined
-    setErrorMessage: React.Dispatch<
-        React.SetStateAction<ErrorMessageType | undefined>
-    >
 }
 
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
+    const { showAndLogError } = useErrorContext()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
     const [template, setTemplate] = useState<TemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
-    const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
         if (router.isReady && currentUser) fetchTemplate()
@@ -83,7 +78,7 @@ const useEditTemplate = () => {
                     }
                 }
             } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
+                showAndLogError(e)
             }
         }
         setShow404NotFound(true)
@@ -107,7 +102,7 @@ const useEditTemplate = () => {
                     setTemplate(templateWithUniqueTitle)
                     return true
                 } catch (e) {
-                    setErrorMessage(await cpLogger.push(e))
+                    showAndLogError(e)
                 }
             } else {
                 return true
@@ -125,8 +120,6 @@ const useEditTemplate = () => {
         setTemplate: setTemplate,
         composition: composition,
         show404NotFound: show404NotFound,
-        errorMessage: errorMessage,
-        setErrorMessage: setErrorMessage,
         onSaveTemplate: onSaveTemplate,
         onResetTemplate: onResetTemplate,
         templateStreamID: templateStreamID as string,

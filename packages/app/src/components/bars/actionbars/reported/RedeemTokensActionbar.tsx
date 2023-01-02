@@ -13,16 +13,14 @@ import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropContainer'
 import ClipboardButton from '@cambrian/app/components/buttons/ClipboardButton'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
-import ErrorPopupModal from '../../../modals/ErrorPopupModal'
 import LoaderButton from '../../../buttons/LoaderButton'
 import ReclaimTokensModal from '@cambrian/app/ui/common/modals/ReclaimTokensModal'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { ethers } from 'ethers'
+import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 import useRedeem from '@cambrian/app/hooks/useRedeem'
 
 interface RedeemTokensActionbarProps {
@@ -40,13 +38,13 @@ const RedeemTokensActionbar = ({
     currentUser,
     messenger,
 }: RedeemTokensActionbarProps) => {
+    const { showAndLogError } = useErrorContext()
     const { payoutInfo, redeemedAmount, ctfContract, isLoaded } = useRedeem(
         currentUser,
         solverData,
         currentCondition
     )
     const [isRedeeming, setIsRedeeming] = useState(false)
-    const [errMsg, setErrMsg] = useState<ErrorMessageType>()
     const [reclaimableTokens, setReclaimableTokens] =
         useState<ReclaimableTokensType>()
     const [showReclaimTokenModal, setShowReclaimTokenModal] = useState(false)
@@ -89,7 +87,7 @@ const RedeemTokensActionbar = ({
                 solverData.config.conditionBase.partition
             )
         } catch (e) {
-            setErrMsg(await cpLogger.push(e))
+            showAndLogError(e)
             setIsRedeeming(false)
         }
     }
@@ -269,12 +267,6 @@ const RedeemTokensActionbar = ({
                         updateReclaimableTokens={initReclaimableTokens}
                     />
                 )}
-            {errMsg && (
-                <ErrorPopupModal
-                    onClose={() => setErrMsg(undefined)}
-                    errorMessage={errMsg}
-                />
-            )}
         </>
     )
 }
