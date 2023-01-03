@@ -37,7 +37,7 @@ const TemplateListItem = ({
     templateStreamID,
     receivedProposalsArchive,
 }: TemplateListItemProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
@@ -81,7 +81,7 @@ const TemplateListItem = ({
                 )) as ProposalHashmap
             )
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsLoading(false)
     }
@@ -92,7 +92,7 @@ const TemplateListItem = ({
             await ceramicTemplateAPI.toggleActivate(templateStreamID)
             setIsActive(!isActive)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsTogglingActive(false)
     }
@@ -103,7 +103,7 @@ const TemplateListItem = ({
             await ceramicTemplateAPI.archiveTemplate(templateStreamID)
         } catch (e) {
             setIsLoading(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

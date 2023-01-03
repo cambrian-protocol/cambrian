@@ -2,11 +2,11 @@ import { archiveStage, createStage } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
+import { SCHEMA_VER } from 'packages/app/config'
 import { StageNames } from '../../models/StageModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
-import { SCHEMA_VER } from 'packages/app/config'
 
 /** 
  API functions to maintain compositions and the users composition-lib.
@@ -44,7 +44,7 @@ export default class CeramicCompositionAPI {
                 this.user
             )
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -59,7 +59,7 @@ export default class CeramicCompositionAPI {
             await archiveStage(this.user, streamId, StageNames.composition)
             return true
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }

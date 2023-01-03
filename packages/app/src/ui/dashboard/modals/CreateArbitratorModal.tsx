@@ -22,7 +22,7 @@ const CreateArbitratorModal = ({
     onClose,
     currentUser,
 }: CreateArbitratorModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [input, setInput] = useState(0)
     const [isCreatingArbitrator, setIsCreatingArbitrator] = useState(false)
 
@@ -72,7 +72,7 @@ const CreateArbitratorModal = ({
             )
             onClose()
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsCreatingArbitrator(false)
         }
     }

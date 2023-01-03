@@ -156,7 +156,7 @@ export default function CoreMessenger({
                 )
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
     }
@@ -185,7 +185,7 @@ export default function CoreMessenger({
             setOutbox((oldOutbox) => [...oldOutbox, message])
             setMessageInput('')
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -201,7 +201,7 @@ export default function CoreMessenger({
                 }
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -253,7 +253,7 @@ export default function CoreMessenger({
 
             return true
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }

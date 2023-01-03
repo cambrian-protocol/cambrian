@@ -60,7 +60,7 @@ export default class CeramicArbitratorAPI {
                 )
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -90,7 +90,7 @@ export default class CeramicArbitratorAPI {
                 }
                 return arbitratorContractsOnConnectedChain
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
                 throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
             }
         }

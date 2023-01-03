@@ -15,7 +15,7 @@ interface ProposalSubmitControl {
 const ProposalSubmitControl = ({
     editProposalProps,
 }: ProposalSubmitControl) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { proposalStreamID, isValidProposal, onSaveProposal } =
         editProposalProps
     const { currentUser } = useCurrentUserContext()
@@ -45,7 +45,7 @@ const ProposalSubmitControl = ({
                 }
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsSubmitting(false)
         }
     }

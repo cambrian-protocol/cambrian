@@ -37,7 +37,7 @@ const ProposalReviewActionbar = ({
     messenger,
     proposedPrice,
 }: ProposalReviewActionbarProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
 
     const [isRequestingChange, setIsRequestingChange] = useState(false)
@@ -76,7 +76,7 @@ const ProposalReviewActionbar = ({
 
                 if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
         setIsApproving(false)
@@ -93,7 +93,7 @@ const ProposalReviewActionbar = ({
                 if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']
             } catch (e) {
                 setIsRequestingChange(false)
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
     }

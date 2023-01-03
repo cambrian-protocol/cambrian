@@ -21,7 +21,7 @@ const DispatchArbitrationComponent = ({
     solverAddress,
     currentCondition,
 }: DispatchArbitrationComponentProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     // Note: Simple state to inform User that he dispatched an Arbitration Request to the EOA Arbitrator. Resets on refresh, therefore can be done multiple times.
     const [hasArbitrationRequested, setHasArbitrationRequested] =
@@ -53,7 +53,7 @@ const DispatchArbitrationComponent = ({
 
                 setHasArbitrationRequested(true)
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
         setIsRequestingArbitration(false)

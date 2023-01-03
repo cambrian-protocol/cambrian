@@ -28,7 +28,7 @@ export type EditTemplatePropsType = {
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
     const [template, setTemplate] = useState<TemplateModel>()
@@ -78,7 +78,7 @@ const useEditTemplate = () => {
                     }
                 }
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
         setShow404NotFound(true)
@@ -102,7 +102,7 @@ const useEditTemplate = () => {
                     setTemplate(templateWithUniqueTitle)
                     return true
                 } catch (e) {
-                    showAndLogError(e)
+                    setAndLogError(e)
                 }
             } else {
                 return true

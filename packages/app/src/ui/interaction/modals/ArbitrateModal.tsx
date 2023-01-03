@@ -28,7 +28,7 @@ const ArbitrateModal = ({
     isArbitrating,
     setIsArbitrating,
 }: ArbitrateModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onArbitrate = async (indexSet: number) => {
         setIsArbitrating(indexSet)
@@ -46,7 +46,7 @@ const ArbitrateModal = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['ARBITRATION_ERROR']
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsArbitrating(undefined)
         }
     }

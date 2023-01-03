@@ -45,7 +45,7 @@ const RequestContractArbitrationComponent = ({
                     setFee(fee)
                 }
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
             }
         }
         getFee()

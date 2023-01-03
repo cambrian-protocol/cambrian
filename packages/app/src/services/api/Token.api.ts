@@ -19,7 +19,7 @@ export const TokenAPI = {
                     provider
                 )
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
             }
 
             if (erc20Contract) {
@@ -61,7 +61,7 @@ export const TokenAPI = {
 
                     return token
                 } catch (e) {
-                    cpLogger.push(e)
+                    cpLogger.pushError(e)
                 }
             }
         }

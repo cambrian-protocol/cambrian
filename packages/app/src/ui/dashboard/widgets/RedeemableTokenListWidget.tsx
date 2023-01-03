@@ -21,7 +21,7 @@ interface RedeemableTokensWidgetProps {
 const RedeemableTokenListWidget = ({
     currentUser,
 }: RedeemableTokensWidgetProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
     const [isLoading, setIsLoading] = useState(true)
@@ -38,7 +38,7 @@ const RedeemableTokenListWidget = ({
             )
             setRedeemablePositions(redeemablePositions)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsLoading(false)
     }
@@ -60,7 +60,7 @@ const RedeemableTokenListWidget = ({
             await tx.wait()
             await init()
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsRedeeming(undefined)
     }

@@ -16,7 +16,7 @@ import { useErrorContext } from '@cambrian/app/hooks/useErrorContext'
 
 export default function ArbitratorsDashboardPage() {
     const { currentUser } = useCurrentUserContext()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [arbitratorContracts, setArbitratorContracts] =
         useState<{ [address: string]: number }>()
     const [isFetching, setIsFetching] = useState(false)
@@ -51,7 +51,7 @@ export default function ArbitratorsDashboardPage() {
                     setArbitratorContracts(arbitratorLib.content)
                 }
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
         setIsFetching(false)

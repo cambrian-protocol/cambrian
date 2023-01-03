@@ -65,7 +65,7 @@ export const getSolverConfig = async (
             conditionBase: parsedCondition,
         }
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         return Promise.reject()
     }
 }
@@ -85,7 +85,7 @@ export const getSolverConditions = async (
             }
         })
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         return Promise.reject()
     }
 }
@@ -465,7 +465,7 @@ export const getSolverMetadata = async (
             }
         }
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
     }
 }
 

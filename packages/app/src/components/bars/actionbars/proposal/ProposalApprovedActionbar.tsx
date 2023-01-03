@@ -29,7 +29,7 @@ const ProposalApprovedActionbar = ({
     setIsApproving,
     messenger,
 }: ProposalApprovedActionbarProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const solutionsHub = new IPFSSolutionsHub(
         currentUser.signer,
         currentUser.chainId
@@ -50,7 +50,7 @@ const ProposalApprovedActionbar = ({
                 await deployProposal(currentUser, stageStack)
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsInTransaction(false)
         }
     }
@@ -63,7 +63,7 @@ const ProposalApprovedActionbar = ({
                 await fetchSolution()
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsApproving(false)
         }
     }

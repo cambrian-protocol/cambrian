@@ -45,7 +45,7 @@ const ModuleUIManager = ({
                 }
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
         }
     })
 

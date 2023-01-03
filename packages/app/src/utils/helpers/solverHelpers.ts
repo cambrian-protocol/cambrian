@@ -341,6 +341,6 @@ export const getComposerRichSlot = (
             },
         }
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
     }
 }

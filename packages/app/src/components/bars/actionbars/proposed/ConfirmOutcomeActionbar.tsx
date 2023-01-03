@@ -28,7 +28,7 @@ const ConfirmOutcomeActionbar = ({
 }: ConfirmOutcomeActionbarProps) => {
     const [isConfirming, setIsConfirming] = useState(false)
     const { isTimelockActive, timelockSeconds } = solverTimelock
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onConfirmOutcome = async () => {
         setIsConfirming(true)
@@ -41,7 +41,7 @@ const ConfirmOutcomeActionbar = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['CONFIRM_OUTCOME_ERROR']
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsConfirming(false)
         }
     }

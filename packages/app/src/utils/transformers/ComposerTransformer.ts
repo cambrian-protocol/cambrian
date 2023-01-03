@@ -147,7 +147,7 @@ export function parseModuleLoaders(
 
         return parsedModuleLoaders
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         return []
     }
 }

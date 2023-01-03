@@ -23,7 +23,7 @@ const ArbitrateNullComponent = ({
     currentCondition,
     solverMethods,
 }: ArbitrateNullComponentProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [isArbitrating, setIsArbitrating] = useState(false)
 
@@ -47,7 +47,7 @@ const ArbitrateNullComponent = ({
                     throw GENERAL_ERROR['ARBITRATE_ERROR']
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsArbitrating(false)
         }
     }

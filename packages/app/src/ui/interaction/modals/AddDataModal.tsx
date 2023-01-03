@@ -32,7 +32,7 @@ const AddDataModal = ({
     manualSlots,
     solverMethods,
 }: ExecuteSolverModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [manualInputs, setManualInputs] = useState<ManualInputFormType[]>()
 
     useEffect(() => {
@@ -60,7 +60,7 @@ const AddDataModal = ({
                 if (!rc.events?.find((event) => event.event === 'IngestedData'))
                     throw GENERAL_ERROR['ADD_DATA_ERROR']
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
                 setIsAddingData(false)
             }
         }

@@ -166,7 +166,7 @@ export const UserContextProvider = ({
     const [user, dispatch] = useReducer(userReducer, null)
     const [isUserLoaded, setIsUserLoaded] = useState(false)
     const router = useRouter()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const connectWallet = useCallback(async function () {
         try {
@@ -223,7 +223,7 @@ export const UserContextProvider = ({
             }
             setIsUserLoaded(true)
         } catch (e) {
-            showAndLogError(GENERAL_ERROR['CERAMIC_LOAD_ERROR'])
+            setAndLogError(GENERAL_ERROR['CERAMIC_LOAD_ERROR'])
             setIsUserLoaded(true)
         }
     }, [])

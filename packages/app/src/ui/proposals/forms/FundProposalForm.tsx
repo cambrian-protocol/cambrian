@@ -37,7 +37,7 @@ const FundProposalForm = ({
     currentUser,
     collateralToken,
 }: FundProposalFormProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { funding } = useProposalFunding(proposalContract.id)
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
 
@@ -113,7 +113,7 @@ const FundProposalForm = ({
                 setInput(initialInput)
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 
@@ -183,7 +183,7 @@ const FundProposalForm = ({
             await contractCall()
         } catch (e) {
             isLoading(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

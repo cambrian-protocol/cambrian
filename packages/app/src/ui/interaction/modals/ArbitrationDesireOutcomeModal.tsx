@@ -30,7 +30,7 @@ const ArbitrationDesireOutcomeModal = ({
     solverAddress,
     fee,
 }: ArbitrationDesireOutcomeModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onDesireOutcome = async (indexSet: number) => {
         setDesiredIndexSet(indexSet)
@@ -52,7 +52,7 @@ const ArbitrationDesireOutcomeModal = ({
             await tx.wait()
             onBack()
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setDesiredIndexSet(undefined)
     }

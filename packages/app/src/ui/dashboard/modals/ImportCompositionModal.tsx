@@ -25,7 +25,7 @@ const ImportCompositionModal = ({
     onClose,
     ceramicCompositionAPI,
 }: ImportCompositionModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [input, setInput] = useState<ImportCompositionFormType>({
         compositionCID: '',
     })
@@ -56,7 +56,7 @@ const ImportCompositionModal = ({
 
             if (streamID) router.push(`/solver/${streamID}`)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsLoading(false)
         }
     }

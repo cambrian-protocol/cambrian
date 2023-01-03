@@ -30,7 +30,7 @@ const ProposalFundingActionbar = ({
     currentUser,
     proposalContract,
 }: ProposalFundingActionbarProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { funding, fundingGoal, collateralToken, fundingPercentage } =
         useProposalFunding(proposalContract.id)
     const [showProposalFundingModal, setShowProposalFundingModal] =
@@ -75,7 +75,7 @@ const ProposalFundingActionbar = ({
                 }
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsExecuting(false)
         }
     }

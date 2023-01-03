@@ -24,7 +24,7 @@ const ComposerToolbar = ({
     compositionStreamID,
 }: ComposerToolbarProps) => {
     const { currentUser } = useCurrentUserContext()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [showConfig, setShowConfig] = useState(false)
     const [showExportCompositionModal, setShowExportCompostionModal] =
         useState(false)
@@ -46,7 +46,7 @@ const ComposerToolbar = ({
                 )
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsSaving(false)
     }

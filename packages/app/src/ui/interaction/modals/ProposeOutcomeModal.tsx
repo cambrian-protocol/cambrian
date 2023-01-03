@@ -28,7 +28,7 @@ const ProposeOutcomeModal = ({
     currentCondition,
     onBack,
 }: ProposeOutcomeModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onProposeOutcome = async (indexSet: number) => {
         setProposedIndexSet(indexSet)
@@ -46,7 +46,7 @@ const ProposeOutcomeModal = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['PROPOSE_OUTCOME_ERROR']
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setProposedIndexSet(undefined)
         }
     }

@@ -27,7 +27,7 @@ const RenameCompositionModal = ({
     setCurrentTag,
     currentTag,
 }: RenameCompositionModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { currentUser } = useCurrentUserContext()
     const [input, setInput] = useState(currentTag)
     const [isSaving, setIsSaving] = useState(false)
@@ -53,7 +53,7 @@ const RenameCompositionModal = ({
                 onClose()
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsSaving(false)
     }

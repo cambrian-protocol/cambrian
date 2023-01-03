@@ -43,7 +43,7 @@ export const loadStageDoc = async <T>(
             streamID
         )) as TileDocument<T>
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
     }
 }
@@ -103,7 +103,7 @@ export const loadStagesLib = async (currentUser: UserType) => {
 
         return stagesLibDoc
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
 }
@@ -138,7 +138,7 @@ export const archiveStage = async (
         }
         await stagesLib.update(updatedStagesLib.data)
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
 }
@@ -232,7 +232,7 @@ export const createStage = async (
         await stagesLibDoc.update(updatedStages.data)
         return { streamID: stageStreamID, title: uniqueTitle }
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
 }
@@ -292,7 +292,7 @@ export const updateStage = async (
 
         return uniqueTitle
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
 }
@@ -315,7 +315,7 @@ export const addRecentStage = async (
             await stagesLibDoc.update(stagesLib.data)
         }
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
         throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
 }
@@ -352,7 +352,7 @@ export const saveCambrianCommitData = async (
 
         return res
     } catch (e) {
-        cpLogger.push(e)
+        cpLogger.pushError(e)
     }
 }
 
@@ -427,7 +427,7 @@ export const loadCommitWorkaround = async <T>(
                 )
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
         }
     }

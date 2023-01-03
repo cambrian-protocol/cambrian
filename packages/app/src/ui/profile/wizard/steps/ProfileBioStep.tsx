@@ -29,7 +29,7 @@ const ProfileBioStep = ({
     stepperCallback,
     onSaveProfile,
 }: ProfileBioStepProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [isSaving, setIsSaving] = useState(false)
 
     const onSubmit = async () => {
@@ -38,7 +38,7 @@ const ProfileBioStep = ({
             await onSaveProfile()
             stepperCallback(PROFILE_WIZARD_STEPS.CONTACT)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsSaving(false)
         }
     }

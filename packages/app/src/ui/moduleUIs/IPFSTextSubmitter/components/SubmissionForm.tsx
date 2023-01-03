@@ -39,7 +39,7 @@ const SubmissionForm = ({
     moduleContract,
     latestSubmission,
 }: WriterUIProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [input, setInput] = useState<SubmissionModel>(initialSubmission)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
@@ -91,7 +91,7 @@ const SubmissionForm = ({
                     throw new Error('Error while submitting work')
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsSubmitting(false)
     }
@@ -119,7 +119,7 @@ const SubmissionForm = ({
                 )
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsSaving(false)
     }

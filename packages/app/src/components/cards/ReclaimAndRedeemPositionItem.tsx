@@ -39,7 +39,7 @@ const ReclaimAndRedeemPositionItem = ({
     solverData,
     updateReclaimableTokens,
 }: ReclaimablePositionItemProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { payoutInfo, redeemedAmount, ctfContract, isLoaded } = useRedeem(
         currentUser,
         solverData,
@@ -57,7 +57,7 @@ const ReclaimAndRedeemPositionItem = ({
                 solverData.config.conditionBase.partition
             )
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsRedeeming(false)
         }
     }

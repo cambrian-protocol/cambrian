@@ -51,7 +51,7 @@ const ProposalListItem = ({
     proposalStreamID,
     currentUser,
 }: ProposalListItemProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const router = useRouter()
     const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
@@ -95,7 +95,7 @@ const ProposalListItem = ({
             await ceramicProposalAPI.removeProposal(proposalStreamID, type)
         } catch (e) {
             setIsRemoving(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

@@ -21,7 +21,7 @@ export const WebhookAPI = {
                 body: JSON.stringify(data),
             })
         } catch (e: any) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['POST_WEBHOOK_ERROR']
         }
     },

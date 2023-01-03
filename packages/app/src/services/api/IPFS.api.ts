@@ -20,7 +20,7 @@ export class IPFSAPI {
                 return this.tryParseJson(data)
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
         }
     }
 
@@ -35,7 +35,7 @@ export class IPFSAPI {
                     return obj
                 }
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
             }
         }
 
@@ -47,7 +47,7 @@ export class IPFSAPI {
         try {
             base32 = new CID(cid).toV1().toString('base32')
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             return undefined
         }
 
@@ -67,7 +67,7 @@ export class IPFSAPI {
                 try {
                     localStorage.setItem(cid, JSON.stringify(obj))
                 } catch (e) {
-                    cpLogger.push(e)
+                    cpLogger.pushError(e)
                 }
                 return obj
             } else {
@@ -111,7 +111,7 @@ export class IPFSAPI {
                 return false
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             return false
         }
     }
@@ -133,7 +133,7 @@ export class IPFSAPI {
 
             return res.json() as Promise<PinResponse>
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
         }
     }
 }

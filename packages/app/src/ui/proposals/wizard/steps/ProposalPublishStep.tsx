@@ -17,7 +17,7 @@ const ProposalPublishStep = ({
 }: {
     editProposalProps: EditProposalType
 }) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { proposalStreamID } = editProposalProps
     const { currentUser } = useCurrentUserContext()
 
@@ -33,7 +33,7 @@ const ProposalPublishStep = ({
             await ceramicProposalAPI.submitProposal(proposalStreamID)
             router.push(`${window.location.origin}/solver/${proposalStreamID}`)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsSubmitting(false)
         }
     }

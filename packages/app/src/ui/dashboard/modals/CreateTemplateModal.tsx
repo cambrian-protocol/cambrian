@@ -25,7 +25,7 @@ const CreateTemplateModal = ({
     onClose,
     currentUser,
 }: CreateTemplateModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [compositions, setCompositions] = useState<StringHashmap>()
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
@@ -47,7 +47,7 @@ const CreateTemplateModal = ({
                 setCompositions(stagesLibDoc.content.compositions.lib)
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsFetching(false)
     }
@@ -72,7 +72,7 @@ const CreateTemplateModal = ({
             }
         } catch (e) {
             setIsCreatingTemplate(undefined)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

@@ -18,7 +18,7 @@ const ReimbursementComponent = ({
     arbitratorContract,
     currentUser,
 }: ReimbursementComponentProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [isWithdrawing, setIsWithdrawing] = useState(false)
     const [balance, setBalance] = useState<BigNumber>(BigNumber.from(0))
@@ -32,7 +32,7 @@ const ReimbursementComponent = ({
             const res = await arbitratorContract.balances(currentUser.address)
             setBalance(res)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 
@@ -45,7 +45,7 @@ const ReimbursementComponent = ({
             await transaction.wait()
             fetchBalance()
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsWithdrawing(false)
     }

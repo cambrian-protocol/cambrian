@@ -25,7 +25,7 @@ const ProfileNameStep = ({
     stepperCallback,
     onSaveProfile,
 }: ProfileNameStepProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { currentUser } = useCurrentUserContext()
     const [isSaving, setIsSaving] = useState(false)
 
@@ -35,7 +35,7 @@ const ProfileNameStep = ({
             await onSaveProfile()
             stepperCallback(PROFILE_WIZARD_STEPS.BIO)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsSaving(false)
         }
     }

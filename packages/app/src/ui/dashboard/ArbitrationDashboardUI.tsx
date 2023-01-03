@@ -17,7 +17,7 @@ interface ArbitrationDashboardUIProps {
 const ArbitrationDashboardUI = ({
     currentUser,
 }: ArbitrationDashboardUIProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [arbitratorContracts, setArbitratorContracts] =
         useState<{ [address: string]: number }>()
@@ -45,7 +45,7 @@ const ArbitrationDashboardUI = ({
                     await arbitratorAPI.getArbitratorContracts()
                 )
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
         setIsFetching(false)

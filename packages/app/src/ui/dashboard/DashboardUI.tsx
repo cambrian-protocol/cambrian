@@ -29,7 +29,7 @@ interface DashboardUIProps {
 }
 
 const DashboardUI = ({ currentUser }: DashboardUIProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const router = useRouter()
     const { query } = router
     const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
@@ -98,7 +98,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
             const stagesLib = await loadStagesLib(currentUser)
             setStagesLib(stagesLib.content)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsFetching(false)
     }

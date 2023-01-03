@@ -119,7 +119,7 @@ export default class CeramicTemplateAPI {
             return (await createStage(template, StageNames.template, this.user))
                 .streamID
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -153,11 +153,11 @@ export default class CeramicTemplateAPI {
                 })
                 return true
             } else {
-                cpLogger.push(res.status)
+                cpLogger.pushError(res.status)
                 return false
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -190,7 +190,7 @@ export default class CeramicTemplateAPI {
                 })
                 return await createSolutionBase(this.user, stageStack)
             } else {
-                cpLogger.push(res.status)
+                cpLogger.pushError(res.status)
                 return false
             }
         } catch (e) {
@@ -314,7 +314,7 @@ export default class CeramicTemplateAPI {
             }
             return updatedReceivedProposals
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -331,7 +331,7 @@ export default class CeramicTemplateAPI {
                 isActive: !templateStreamDoc.content.isActive,
             })
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -355,7 +355,7 @@ export default class CeramicTemplateAPI {
 
             await archiveStage(this.user, templateStreamID, StageNames.template)
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -419,7 +419,7 @@ export default class CeramicTemplateAPI {
 
             await stagesLib.update(updatedStages.data)
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }

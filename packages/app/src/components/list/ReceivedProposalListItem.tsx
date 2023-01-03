@@ -36,7 +36,7 @@ const ReceivedProposalListItem = ({
     proposalStreamID,
 }: ReceivedProposalListItemProps) => {
     const router = useRouter()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
@@ -74,7 +74,7 @@ const ReceivedProposalListItem = ({
                 await fetchProposalInfo(currentUser, proposalStreamID)
             )
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 
@@ -90,7 +90,7 @@ const ReceivedProposalListItem = ({
             )
         } catch (e) {
             setIsRemoving(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

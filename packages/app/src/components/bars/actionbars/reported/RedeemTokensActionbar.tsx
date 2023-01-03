@@ -38,7 +38,7 @@ const RedeemTokensActionbar = ({
     currentUser,
     messenger,
 }: RedeemTokensActionbarProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { payoutInfo, redeemedAmount, ctfContract, isLoaded } = useRedeem(
         currentUser,
         solverData,
@@ -87,7 +87,7 @@ const RedeemTokensActionbar = ({
                 solverData.config.conditionBase.partition
             )
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsRedeeming(false)
         }
     }

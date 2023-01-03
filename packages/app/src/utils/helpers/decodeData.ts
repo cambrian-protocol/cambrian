@@ -9,7 +9,7 @@ export const decodeData = (types: SolidityDataTypes[], data: any) => {
         decoded = ethers.utils.defaultAbiCoder.decode(types, data)
     } catch (e) {
         decoded = [`Invalid decoding`]
-        cpLogger.push(e)
+        cpLogger.pushError(e)
     }
     return decoded.toString()
 }

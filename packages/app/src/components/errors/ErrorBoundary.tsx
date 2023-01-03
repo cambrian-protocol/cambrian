@@ -21,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
     }
 
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        cpLogger.push({ error, errorInfo })
+        cpLogger.pushError({ error, errorInfo })
     }
 
     public render() {

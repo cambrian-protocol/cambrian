@@ -152,7 +152,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 setTemplateStreamDoc(_templateStreamDoc)
                 setIsLoaded(true)
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
             }
         }
 
@@ -288,7 +288,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     }
                 }
             } catch (e) {
-                cpLogger.push(e)
+                cpLogger.pushError(e)
             }
         }
 

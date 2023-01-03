@@ -28,7 +28,7 @@ const TemplateActionbar = ({
     const router = useRouter()
     const { currentUser } = useCurrentUserContext()
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onCreateProposal = async () => {
         setIsCreatingProposal(true)
@@ -52,7 +52,7 @@ const TemplateActionbar = ({
                 )
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsCreatingProposal(false)
         }
     }

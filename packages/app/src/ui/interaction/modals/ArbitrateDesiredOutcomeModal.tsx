@@ -32,7 +32,7 @@ const ArbitrateDesiredOutcomeModal = ({
     currentCondition,
     isArbitrating,
 }: ArbitrateDesiredOutcomeModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const onArbitrate = async (choiceIndex: number) => {
         setIsArbitrating(choiceIndex)
         try {
@@ -41,7 +41,7 @@ const ArbitrateDesiredOutcomeModal = ({
             ](disputeId, choiceIndex)
             await tx.wait()
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsArbitrating(undefined)
         }
     }

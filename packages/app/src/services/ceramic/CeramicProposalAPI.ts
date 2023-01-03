@@ -66,7 +66,7 @@ export default class CeramicProposalAPI {
             return (await createStage(proposal, StageNames.proposal, this.user))
                 .streamID
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
@@ -103,11 +103,11 @@ export default class CeramicProposalAPI {
                 })
                 return true
             } else {
-                cpLogger.push(res.status)
+                cpLogger.pushError(res.status)
                 return false
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
         }
     }
 
@@ -138,7 +138,7 @@ export default class CeramicProposalAPI {
 
             await archiveStage(this.user, proposalStreamID, StageNames.proposal)
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }

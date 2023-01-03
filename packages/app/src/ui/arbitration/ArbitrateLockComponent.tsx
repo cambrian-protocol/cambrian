@@ -19,7 +19,7 @@ const ArbitrateLockComponent = ({
     solverMethods,
     currentCondition,
 }: ArbitrateLockComponentProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [isRequestingArbitration, setIsRequestingArbitration] =
         useState(false)
@@ -46,7 +46,7 @@ const ArbitrateLockComponent = ({
             }
         } catch (e) {
             setIsRequestingArbitration(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

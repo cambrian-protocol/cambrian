@@ -60,7 +60,7 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
                 onBack()
             }
         } catch (e) {
-            cpLogger.push(e)
+            cpLogger.pushError(e)
         }
         setIsExporting(false)
     }

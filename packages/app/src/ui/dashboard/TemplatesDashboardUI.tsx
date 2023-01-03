@@ -26,7 +26,7 @@ const TemplatesDashboardUI = ({
     currentUser,
     templatesLib,
 }: TemplatesDashboardUIProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [templates, setTemplates] = useState<TemplateHashmap>({})
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
@@ -54,7 +54,7 @@ const TemplatesDashboardUI = ({
                 setTemplates({})
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsFetching(false)
     }

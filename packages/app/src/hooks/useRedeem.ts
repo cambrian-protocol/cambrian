@@ -65,7 +65,7 @@ const useRedeem = (
             )
             setIsLoaded(true)
         } catch (e) {
-            await cpLogger.push(e)
+            await cpLogger.pushError(e)
         }
     }
 

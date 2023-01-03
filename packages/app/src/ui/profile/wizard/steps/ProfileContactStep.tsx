@@ -25,7 +25,7 @@ const ProfileContactStep = ({
     onSaveProfile,
     successRoute,
 }: ProfileContactStepProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const router = useRouter()
     const [isSaving, setIsSaving] = useState(false)
 
@@ -35,7 +35,7 @@ const ProfileContactStep = ({
             await onSaveProfile()
             router.push(successRoute || '/dashboard')
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsSaving(false)
         }
     }

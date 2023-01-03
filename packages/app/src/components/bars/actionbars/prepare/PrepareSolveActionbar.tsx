@@ -16,7 +16,7 @@ const PrepareSolveActionbar = ({
     solverMethods,
 }: PrepareSolveActionbarProps) => {
     const [isPreparing, setIsPreparing] = useState(false)
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onPrepareSolve = async () => {
         setIsPreparing(true)
@@ -27,7 +27,7 @@ const PrepareSolveActionbar = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['PREPARE_SOLVE_ERROR']
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsPreparing(false)
         }
     }

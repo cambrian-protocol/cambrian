@@ -18,7 +18,7 @@ const CreateCompositionModal = ({
     ceramicCompositionAPI,
     onClose,
 }: CreateCompositionModalProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const [isCreating, setIsCreating] = useState(false)
     const [input, setInput] = useState('')
 
@@ -35,7 +35,7 @@ const CreateCompositionModal = ({
             router.push(`/solver/${streamID}`)
         } catch (e) {
             setIsCreating(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

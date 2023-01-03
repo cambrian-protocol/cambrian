@@ -48,7 +48,7 @@ interface SolverProps {
 }
 
 const Solver = ({ currentUser, solverContract }: SolverProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [solverData, setSolverData] = useState<SolverModel>()
     const [solverTimelock, setSolverTimelock] = useState<TimelockModel>({
@@ -217,7 +217,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             setMetadata(fetchedMetadata)
             setOutcomes(fetchedOutcomes)
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

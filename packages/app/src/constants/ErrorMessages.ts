@@ -1,8 +1,8 @@
 export type ErrorMessagesType = {
-    [code: string]: ErrorMessageType
+    [code: string]: CambrianErrorType
 }
 
-export type ErrorMessageType = {
+export type CambrianErrorType = {
     title: string
     message?: string
     error?: any
@@ -159,7 +159,7 @@ export const GENERAL_ERROR: ErrorMessagesType = {
     },
 }
 
-export const CONTRACT_ERROR: ErrorMessagesType = {
+export const SMART_CONTRACT_ERROR: ErrorMessagesType = {
     INVALID_ARGUMENT: {
         title: 'Invalid Contract Input',
         message: 'Please check your inputs and try again.',

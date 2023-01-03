@@ -46,7 +46,7 @@ const CompositionDashboardTile = ({
     compositionStreamID,
     ceramicCompositionAPI,
 }: CompositionDashboardTileProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
     const [currentTag, setCurrentTag] = useState(compositionTag)
@@ -91,7 +91,7 @@ const CompositionDashboardTile = ({
             }
         } catch (e) {
             setIsCreatingTemplate(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 
@@ -101,7 +101,7 @@ const CompositionDashboardTile = ({
             await ceramicCompositionAPI.archiveComposition(compositionID)
         } catch (e) {
             setIsRemoving(false)
-            showAndLogError(e)
+            setAndLogError(e)
         }
     }
 

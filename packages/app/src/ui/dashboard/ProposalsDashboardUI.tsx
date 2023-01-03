@@ -38,7 +38,7 @@ const ProposalsDashboardUI = ({
     currentUser,
     proposalsLib,
 }: ProposalsDashboardUIProps) => {
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const [proposals, setProposals] = useState<ProposalHashmap>({})
     const [isFetching, setIsFetching] = useState(false)
@@ -62,7 +62,7 @@ const ProposalsDashboardUI = ({
                 setProposals({})
             }
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
         }
         setIsFetching(false)
     }

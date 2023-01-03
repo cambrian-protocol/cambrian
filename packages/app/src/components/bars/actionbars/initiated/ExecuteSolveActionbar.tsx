@@ -21,7 +21,7 @@ const ExecuteSolveActionbar = ({
     messenger,
 }: ExecuteSolveActionbarProps) => {
     const [isExecuting, setIsExecuting] = useState(false)
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
 
     const onExecuteSolve = async () => {
         setIsExecuting(true)
@@ -38,7 +38,7 @@ const ExecuteSolveActionbar = ({
             if (!rc.events?.find((event) => event.event === 'ChangedStatus'))
                 throw GENERAL_ERROR['EXECUTE_SOLVER_ERROR']
         } catch (e) {
-            showAndLogError(e)
+            setAndLogError(e)
             setIsExecuting(false)
         }
     }

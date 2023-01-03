@@ -33,7 +33,7 @@ export type EditProposalType = {
 
 const useEditProposal = () => {
     const { currentUser } = useCurrentUserContext()
-    const { showAndLogError } = useErrorContext()
+    const { setAndLogError } = useErrorContext()
     const router = useRouter()
     const { proposalStreamID } = router.query
 
@@ -112,7 +112,7 @@ const useEditProposal = () => {
                 }
                 setIsLoaded(true)
             } catch (e) {
-                showAndLogError(e)
+                setAndLogError(e)
             }
         }
     }
@@ -149,7 +149,7 @@ const useEditProposal = () => {
 
                     return true
                 } catch (e) {
-                    showAndLogError(e)
+                    setAndLogError(e)
                 }
             } else {
                 return true
