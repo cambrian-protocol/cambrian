@@ -1,8 +1,8 @@
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { BASE_SOLVER_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { updateToSchema } from '@cambrian/app/utils/transformers/schema/ComposerSolver'
-import { SCHEMA_VER } from 'packages/app/config'
 
 const loadCompositionAction = (
     state: CompositionModel,
