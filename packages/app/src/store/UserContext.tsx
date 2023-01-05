@@ -223,7 +223,6 @@ export const UserContextProvider = ({
             }
             setIsUserLoaded(true)
         } catch (e) {
-            setAndLogError(GENERAL_ERROR['CERAMIC_LOAD_ERROR'])
             setIsUserLoaded(true)
         }
     }, [])

@@ -37,9 +37,7 @@ const RedeemableTokenListWidget = ({
                 currentUser
             )
             setRedeemablePositions(redeemablePositions)
-        } catch (e) {
-            setAndLogError(e)
-        }
+        } catch (e) {}
         setIsLoading(false)
     }
 
