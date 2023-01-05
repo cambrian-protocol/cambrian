@@ -59,6 +59,7 @@
         "@babel/preset-typescript": "^7.16.5",
         "@testing-library/jest-dom": "^5.16.1",
         "@testing-library/react": "^12.1.2",
+        "@types/jest": "^29.2.5",
         "@types/lodash": "^4.14.177",
         "@types/node": "^15.12.2",
         "@types/react": "18.0.0",

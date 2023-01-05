@@ -1,4 +1,8 @@
-import { TemplateStagesLibType } from '@cambrian/app/classes/stageLibs/TemplateStageLib'
+import {
+    TemplateStagesLibType,
+    defaultTemplateStagesLib,
+} from '@cambrian/app/classes/stageLibs/TemplateStageLib'
+
 import { updateBaseStageLibFromVersion0 } from './BaseStageLibTransformer'
 
 /**
@@ -11,8 +15,10 @@ export function updateTemplateStagesLibToSchema(
     schemaVer: number,
     templateStagesLib: TemplateStagesLibType
 ) {
+    if (!templateStagesLib) return defaultTemplateStagesLib
+
     if (
-        !templateStagesLib._schemaVer ||
+        templateStagesLib._schemaVer === undefined ||
         templateStagesLib._schemaVer < schemaVer
     ) {
         templateStagesLib =
