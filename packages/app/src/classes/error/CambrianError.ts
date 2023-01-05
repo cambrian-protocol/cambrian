@@ -1,5 +1,6 @@
 import {
     CambrianErrorType,
+    GENERAL_ERROR,
     METAMASK_ERROR,
     SMART_CONTRACT_ERROR,
 } from '../../constants/ErrorMessages'
@@ -30,6 +31,8 @@ export default class CambrianError extends Error {
             return METAMASK_ERROR[error.code]
         } else if (this.isSmartContractError()) {
             return SMART_CONTRACT_ERROR[error.code]
+        } else if (this.isGeneralError()) {
+            return GENERAL_ERROR[error.code]
         } else {
             return DEFAULT_ERROR
         }
@@ -45,6 +48,11 @@ export default class CambrianError extends Error {
         return (
             this._originalError?.code &&
             SMART_CONTRACT_ERROR[this._originalError.code]
+        )
+    }
+    public isGeneralError(): boolean {
+        return (
+            this._originalError?.code && GENERAL_ERROR[this._originalError.code]
         )
     }
 

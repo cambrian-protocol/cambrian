@@ -1,4 +1,4 @@
-import { ERROR_LOG_API_ENDPOINT } from 'packages/app/config'
+import { ERROR_LOG_API_ENDPOINT } from '@cambrian/app/config'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 
 export const cpLogger = {
