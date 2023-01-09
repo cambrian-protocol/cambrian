@@ -33,6 +33,7 @@ const SubmissionView = ({ latestSubmission }: PublicUIProps) => (
                     </Box>
                 ) : (
                     <ReactQuill
+                        readOnly
                         value={latestSubmission.submission}
                         theme={'bubble'}
                     />
