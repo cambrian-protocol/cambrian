@@ -1,5 +1,5 @@
 import { updateTemplateStagesLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/TemplateStageLibTransformer'
-import { SCHEMA_VER } from 'packages/app/config'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import BaseStageLib, {
     BaseStageLibType,
     defaultBaseStagesLib,
@@ -48,7 +48,8 @@ export default class TemplateStageLib extends BaseStageLib {
         )
 
         this._schemaVer = updatedTemplateLib._schemaVer
-        this._lib = updatedTemplateLib.lib
-        this._archive = updatedTemplateLib.archive
+        this._lib = updatedTemplateLib.lib || defaultTemplateStagesLib.lib
+        this._archive =
+            updatedTemplateLib.archive || defaultTemplateStagesLib.archive
     }
 }

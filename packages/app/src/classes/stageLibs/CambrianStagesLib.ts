@@ -7,7 +7,7 @@ import TemplateStageLib, {
     defaultTemplateStagesLib,
 } from './TemplateStageLib'
 
-import { SCHEMA_VER } from 'packages/app/config'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import { updateCambrianStagesLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/CambrianStagesLibTransformer'
 
 export type CambrianStagesLibType = {
@@ -72,7 +72,7 @@ export default class CambrianStagesLib {
             cambrianStagesLib
         )
         this._schemaVer = updatedCambrianStagesLib._schemaVer
-        this._recents = updatedCambrianStagesLib.recents
+        this._recents = updatedCambrianStagesLib.recents || []
         this._proposals.update(updatedCambrianStagesLib.proposals)
         this._templates.update(updatedCambrianStagesLib.templates)
         this._compositions.update(updatedCambrianStagesLib.compositions)

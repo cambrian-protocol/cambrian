@@ -33,8 +33,6 @@ export default function SolverPage() {
     const determineQuery = async (currentUser: UserType) => {
         if (solverAddress !== undefined && typeof solverAddress === 'string') {
             try {
-                if (currentUser.session)
-                    await addRecentStage(currentUser, solverAddress as string)
                 if (solverAddress.startsWith('0x')) {
                     setUi(
                         <SolverUI
@@ -70,6 +68,11 @@ export default function SolverPage() {
                             </ProposalContextProvider>
                         )
                     }
+                    if (currentUser.session)
+                        await addRecentStage(
+                            currentUser,
+                            solverAddress as string
+                        )
                 }
             } catch (e) {
                 console.error(e)

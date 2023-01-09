@@ -1,7 +1,7 @@
 import { Elements } from 'react-flow-renderer'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SCHEMA_VER } from 'packages/app/config'
+import { SCHEMA_VER } from '@cambrian/app/config'
 
 function initComposer(): CompositionModel {
     const defaultSolver = new Solver()
