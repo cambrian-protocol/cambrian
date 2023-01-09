@@ -32,6 +32,7 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                 </Text>
                             </Box>
                             <Box
+                                height={{ min: 'auto' }}
                                 width={{ min: 'auto' }}
                                 flex
                                 pad={
@@ -39,7 +40,6 @@ const SolverConfigItem = ({ id, value, slotTags }: SolverConfigItemProps) => {
                                         ? { left: 'large' }
                                         : undefined
                                 }
-                                height={'100%'}
                             >
                                 {value}
                             </Box>
