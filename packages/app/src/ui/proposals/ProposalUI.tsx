@@ -31,7 +31,7 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                     actionBar={
                         <ProposalActionbar
                             proposedPrice={{
-                                amount: stageStack?.proposal.price.amount,
+                                amount: stageStack?.proposal.price.amount || '',
                                 token: collateralToken,
                             }}
                             messenger={

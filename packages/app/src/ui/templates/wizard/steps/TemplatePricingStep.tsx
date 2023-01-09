@@ -4,24 +4,20 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from '../../forms/TemplatePricingForm'
-import useEditTemplate, {
-    EditTemplateContextType,
-} from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplatePricingStepProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
 const TemplatePricingStep = ({
-    editTemplateContext,
+    editTemplateProps,
     stepperCallback,
 }: TemplatePricingStepProps) => {
-    const { template, onSaveTemplate } = editTemplateContext
+    const { template, onSaveTemplate } = editTemplateProps
 
     if (!template) {
         return null
@@ -35,7 +31,7 @@ const TemplatePricingStep = ({
                 />
             </Box>
             <TemplatePricingForm
-                editTemplateContext={editTemplateContext}
+                editTemplateProps={editTemplateProps}
                 onSubmit={async () => {
                     if (await onSaveTemplate()) {
                         if (template.flexInputs.length > 0) {

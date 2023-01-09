@@ -42,12 +42,7 @@ const ComposerToolbar = ({
             if (currentUser) {
                 await updateStage(
                     compositionStreamID,
-                    {
-                        title: currentComposition.title,
-                        description: '',
-                        solvers: currentComposition.solvers,
-                        flowElements: currentComposition.flowElements,
-                    },
+                    currentComposition,
                     StageNames.composition,
                     currentUser
                 )

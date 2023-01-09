@@ -1,6 +1,6 @@
-import { Box, Button, Tab, Tabs } from 'grommet'
+import { Box, Tab, Tabs } from 'grommet'
 import { Clipboard, Eye } from 'phosphor-react'
-import { SetStateAction, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
@@ -8,18 +8,15 @@ import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
+import TemplateUpdateFromComposition from './TemplateUpdateFromComposition'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import TemplateUpdateFromComposition from './TemplateUpdateFromComposition'
 
 const EditTemplateUI = () => {
-    const editTemplateContext = useEditTemplate()
-    const { template, templateStreamID, cachedTemplate } = editTemplateContext
+    const editTemplateProps = useEditTemplate()
+    const { template, templateStreamID, cachedTemplate } = editTemplateProps
     const [activeIndex, setActiveIndex] = useState(0)
     const [authorProfile] = useCambrianProfile(template?.author)
 
@@ -71,7 +68,7 @@ const EditTemplateUI = () => {
                         />
                     </Box>
                     <TemplateDescriptionForm
-                        editTemplateContext={editTemplateContext}
+                        editTemplateProps={editTemplateProps}
                     />
                 </Tab>
                 <Tab title="Pricing">
@@ -83,7 +80,7 @@ const EditTemplateUI = () => {
                         />
                     </Box>
                     <TemplatePricingForm
-                        editTemplateContext={editTemplateContext}
+                        editTemplateProps={editTemplateProps}
                     />
                 </Tab>
                 {template.flexInputs.length > 0 && (
@@ -96,7 +93,7 @@ const EditTemplateUI = () => {
                             />
                         </Box>
                         <TemplateFlexInputsForm
-                            editTemplateContext={editTemplateContext}
+                            editTemplateProps={editTemplateProps}
                         />
                     </Tab>
                 )}
@@ -109,7 +106,7 @@ const EditTemplateUI = () => {
                         />
                     </Box>
                     <TemplateRequirementsForm
-                        editTemplateContext={editTemplateContext}
+                        editTemplateProps={editTemplateProps}
                     />
                 </Tab>
                 <Tab title="Advanced">
@@ -121,7 +118,7 @@ const EditTemplateUI = () => {
                         />
 
                         <TemplateUpdateFromComposition
-                            editTemplateContext={editTemplateContext}
+                            editTemplateProps={editTemplateProps}
                         />
                     </Box>
                 </Tab>

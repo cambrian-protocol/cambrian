@@ -1,4 +1,4 @@
-import { SCHEMA_VER } from 'packages/app/config'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { updateBaseStageLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/BaseStageLibTransformer'
 
@@ -11,6 +11,7 @@ export type BaseStageLibType = {
 }
 
 export const defaultBaseStagesLib: BaseStageLibType = {
+    _schemaVer: SCHEMA_VER['baseStageLib'],
     lib: {},
     archive: { lib: [] },
 }
@@ -46,8 +47,8 @@ export default class BaseStageLib {
             baseLib
         )
         this._schemaVer = updatedBaseLib._schemaVer
-        this._lib = updatedBaseLib.lib
-        this._archive = updatedBaseLib.archive
+        this._lib = updatedBaseLib.lib || defaultBaseStagesLib.lib
+        this._archive = updatedBaseLib.archive || defaultBaseStagesLib.archive
     }
 
     public addStageWithUniqueTitle(streamID: string, title: string): string {
@@ -70,7 +71,6 @@ export default class BaseStageLib {
             (key) => (titleHasmap[this._lib[key]] = key)
         )
 
-        // To o(1) check if title exists
         while (titleHasmap[uniqueValue]) {
             uniqueValue = title + ` (${counter++})`
         }

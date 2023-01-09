@@ -98,7 +98,7 @@ export default class CeramicTemplateAPI {
                 description: '',
                 requirements: '',
                 price: {
-                    amount: 0,
+                    amount: '',
                     denominationTokenAddress:
                         composition.content.solvers[0].config.collateralToken ||
                         '',

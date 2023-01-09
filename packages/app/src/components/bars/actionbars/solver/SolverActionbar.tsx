@@ -53,13 +53,33 @@ const SolverActionbar = ({
     }, [currentCondition])
 
     const initMessenger = async (condition: SolverContractCondition) => {
-        const recipientDIDs: string[] = getSolverRecipientSlots(
-            solverData,
-            condition
-        ).map((recipient) =>
-            getDIDfromAddress(
-                decodeData([SolidityDataTypes.Address], recipient.slot.data),
-                currentUser.chainId
+        const recipientDIDs: string[] = []
+        await Promise.all(
+            getSolverRecipientSlots(solverData, condition).map(
+                async (recipient) => {
+                    const recipientAddress = decodeData(
+                        [SolidityDataTypes.Address],
+                        recipient.slot.data
+                    )
+
+                    const recipientCode =
+                        await currentUser.signer.provider?.getCode(
+                            recipientAddress
+                        )
+                    const isContract = recipientCode !== '0x'
+
+                    if (!isContract) {
+                        recipientDIDs.push(
+                            getDIDfromAddress(
+                                decodeData(
+                                    [SolidityDataTypes.Address],
+                                    recipient.slot.data
+                                ),
+                                currentUser.chainId
+                            )
+                        )
+                    }
+                }
             )
         )
 
@@ -73,6 +93,7 @@ const SolverActionbar = ({
         )
 
         const uniqueParticipants = [...new Set(recipientDIDs)]
+
         setMessenger(
             <Messenger
                 chatID={solverAddress}

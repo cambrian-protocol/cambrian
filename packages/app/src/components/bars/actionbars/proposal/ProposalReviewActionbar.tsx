@@ -31,7 +31,7 @@ interface ProposalReviewActionbarProps {
     proposedPrice: PriceModel
 }
 
-export type PriceModel = { amount?: number; token?: TokenModel }
+export type PriceModel = { amount: number | ''; token?: TokenModel }
 
 const ProposalReviewActionbar = ({
     stageStack,

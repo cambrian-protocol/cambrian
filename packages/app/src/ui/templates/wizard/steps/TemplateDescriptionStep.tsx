@@ -4,21 +4,21 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import TemplateDescriptionForm from '../../forms/TemplateDescriptionForm'
 import router from 'next/router'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateDescriptionStepProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
 const TemplateDescriptionStep = ({
-    editTemplateContext,
+    editTemplateProps,
     stepperCallback,
 }: TemplateDescriptionStepProps) => {
-    const { onSaveTemplate } = editTemplateContext
+    const { onSaveTemplate } = editTemplateProps
 
     return (
         <Box>
@@ -29,7 +29,7 @@ const TemplateDescriptionStep = ({
                 />
             </Box>
             <TemplateDescriptionForm
-                editTemplateContext={editTemplateContext}
+                editTemplateProps={editTemplateProps}
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)

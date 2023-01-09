@@ -13,19 +13,17 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress } from 'ethers/lib/utils'
-import useEditTemplate, {
-    EditTemplateContextType,
-} from '@cambrian/app/hooks/useEditTemplate'
 import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -38,7 +36,7 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
-    editTemplateContext,
+    editTemplateProps,
     onSubmit,
     onCancel,
     submitLabel,
@@ -50,7 +48,7 @@ const TemplateFlexInputsForm = ({
         setTemplate,
         onSaveTemplate,
         onResetTemplate,
-    } = editTemplateContext
+    } = editTemplateProps
 
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [timelock, setTimelock] = useState(
@@ -250,6 +248,7 @@ const TemplateFlexInputsForm = ({
                                                     e.target.value
                                                 )
                                             }
+                                            placeholder={flexInput.instruction}
                                         />
                                     </FormField>
                                     {flexInput.description && (
@@ -259,15 +258,6 @@ const TemplateFlexInputsForm = ({
                                             margin={{ bottom: 'small' }}
                                         >
                                             {flexInput.description}
-                                        </Text>
-                                    )}
-                                    {flexInput.instruction && (
-                                        <Text
-                                            size="small"
-                                            color="dark-4"
-                                            margin={{ bottom: 'small' }}
-                                        >
-                                            {flexInput.instruction}
                                         </Text>
                                     )}
                                 </Box>

@@ -30,7 +30,7 @@ export type ReceivedProposalPropsType = {
 }
 
 export type TemplatePriceModel = {
-    amount?: number
+    amount: number | ''
     denominationTokenAddress: string
     preferredTokens: string[]
     allowAnyPaymentToken: boolean

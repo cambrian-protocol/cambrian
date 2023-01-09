@@ -3,7 +3,7 @@ import { Box, Button, CheckBox, Form, FormExtendedEvent, Text } from 'grommet'
 import AddTokenItem from '@cambrian/app/components/token/AddTokenItem'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
@@ -13,7 +13,7 @@ import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButto
 import { useState } from 'react'
 
 interface TemplatePricingFormProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -21,14 +21,14 @@ interface TemplatePricingFormProps {
 }
 
 const TemplatePricingForm = ({
-    editTemplateContext,
+    editTemplateProps,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplatePricingFormProps) => {
     const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        editTemplateContext
+        editTemplateProps
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
@@ -78,7 +78,7 @@ const TemplatePricingForm = ({
                                                 ...template.price,
                                                 amount:
                                                     e.target.value === ''
-                                                        ? undefined
+                                                        ? ''
                                                         : Number(
                                                               e.target.value
                                                           ),

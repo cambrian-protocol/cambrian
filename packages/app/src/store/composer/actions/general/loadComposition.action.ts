@@ -1,14 +1,13 @@
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { BASE_SOLVER_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import Solver from '@cambrian/app/classes/ComposerSolver'
 import { updateToSchema } from '@cambrian/app/utils/transformers/schema/ComposerSolver'
-import { SCHEMA_VER } from 'packages/app/config'
 
 const loadCompositionAction = (
     state: CompositionModel,
     payload: CompositionModel
 ) => {
-    console.log('payload: ', payload)
     const composition = updateToSchema(SCHEMA_VER['composition'], payload)
     //TODO Dynamic ABI import of solver interface (Can't create functional Interface from JSON)
     const solversWithCorrectABI = composition.solvers.map((solver) => {
@@ -25,6 +24,9 @@ const loadCompositionAction = (
         ...composition,
         solvers: solversWithCorrectABI,
         schemaVer: SCHEMA_VER['composition'],
+        // unset currentElement && currentIdPath
+        currentElement: undefined,
+        currentIdPath: undefined,
     }
 }
 

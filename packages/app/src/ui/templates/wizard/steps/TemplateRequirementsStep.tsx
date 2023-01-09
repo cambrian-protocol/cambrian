@@ -4,20 +4,20 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 interface TemplateRequirementsStepProps {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
 const TemplateRequirementsStep = ({
-    editTemplateContext,
+    editTemplateProps,
     stepperCallback,
 }: TemplateRequirementsStepProps) => {
-    const { template, onSaveTemplate } = editTemplateContext
+    const { template, onSaveTemplate } = editTemplateProps
 
     if (!template) {
         return null
@@ -31,7 +31,7 @@ const TemplateRequirementsStep = ({
                 />
             </Box>
             <TemplateRequirementsForm
-                editTemplateContext={editTemplateContext}
+                editTemplateProps={editTemplateProps}
                 submitLabel="Save & Finish"
                 onSubmit={async () => {
                     if ((await onSaveTemplate()) == true) {

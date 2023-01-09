@@ -2,17 +2,17 @@ import { Box, Button, TextInput } from 'grommet'
 import { Check, Copy } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { EditTemplateContextType } from '@cambrian/app/hooks/useEditTemplate'
 
 const TemplatePublishStep = ({
-    editTemplateContext,
+    editTemplateProps,
 }: {
-    editTemplateContext: EditTemplateContextType
+    editTemplateProps: EditTemplatePropsType
 }) => {
-    const { templateStreamID } = editTemplateContext
+    const { templateStreamID } = editTemplateProps
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
 
     useEffect(() => {
