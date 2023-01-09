@@ -24,11 +24,11 @@ import {
     ComposerAllocationsHashMapType,
 } from '../models/AllocationModel'
 import { ComposerSolverConfigModel } from '../models/SolverConfigModel'
-import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
+import { BASE_SOLVER_IFACE } from '@cambrian/app/config/ContractInterfaces'
 import { ComposerModuleModel } from '../models/ModuleModel'
 import { ComposerOutcomeCollectionModel } from '../models/OutcomeCollectionModel'
 import SlotTag, { defaultSlotTagValues } from './Tags/SlotTag'
-import { SCHEMA_VER } from 'packages/app/config'
+import { SCHEMA_VER } from '@cambrian/app/config'
 import { KeeperTag } from './Tags/KeeperTag'
 import { ArbitratorTag } from './Tags/ArbitratorTag'
 import { CollateralTokenTag } from './Tags/CollateralTokenTag'
