@@ -32,7 +32,9 @@ const Appbar = () => {
                         >
                             {screenSize === 'small' ? (
                                 <Box pad={{ vertical: 'medium' }}>
-                                    <CambrianLogoMark />
+                                    <CambrianLogoMark
+                                        isSafeApp={currentUser?.isSafeApp}
+                                    />
                                 </Box>
                             ) : (
                                 <CambrianLogo />
