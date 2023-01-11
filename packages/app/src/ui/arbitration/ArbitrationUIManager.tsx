@@ -144,9 +144,9 @@ const ArbitrationUIManager = ({
         if (ArbitrationUI)
             return (
                 <BaseFormGroupContainer
-                    groupTitle="Arbitration"
+                    border
                     gap="small"
-                    pad={{ horizontal: 'medium' }}
+                    pad={{ horizontal: 'small' }}
                 >
                     {ArbitrationUI}
                 </BaseFormGroupContainer>

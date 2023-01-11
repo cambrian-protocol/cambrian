@@ -92,7 +92,12 @@ const InteractionLayout = ({
                                             >
                                                 <Box flex>{children}</Box>
                                                 {screenSize !== 'small' && (
-                                                    <Box width={'auto'}>
+                                                    <Box
+                                                        width={{
+                                                            min: 'auto',
+                                                            max: 'medium',
+                                                        }}
+                                                    >
                                                         {actionBar}
                                                         {sidebar}
                                                     </Box>

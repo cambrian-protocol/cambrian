@@ -55,7 +55,10 @@ const LoaderButton = ({
     return (
         <>
             {isInitializing ? (
-                <BaseSkeletonBox height={'3.5em'} width={'8em'} />
+                <BaseSkeletonBox
+                    height={'3.5em'}
+                    width={{ min: '8em', max: '100%' }}
+                />
             ) : (
                 <Button
                     {...props}

@@ -11,7 +11,7 @@ import {
     getSolverRecipientSlots,
 } from '@cambrian/app/utils/helpers/solverHelpers'
 
-import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
+import ArbitrationUIManager from '@cambrian/app/ui/arbitration/ArbitrationUIManager'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
@@ -21,7 +21,6 @@ import InteractionLayout from '../layout/InteractionLayout'
 import { LOADING_MESSAGE } from '@cambrian/app/constants/LoadingMessages'
 import LoadingScreen from '../info/LoadingScreen'
 import ModuleUIManager from './ModuleUIManager'
-import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -30,14 +29,12 @@ import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverMetadataModel } from '../../models/SolverMetadataModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
-import SolverSidebar from '../bars/sidebar/SolverSidebar'
 import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
-import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export type GenericMethod<T> = {
@@ -65,9 +62,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
     const [metadata, setMetadata] = useState<SolverMetadataModel>()
     const [outcomes, setOutcomes] = useState<OutcomeModel[]>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-
-    const [proposedOutcome, setProposedOutcome] =
-        useState<OutcomeCollectionModel>()
 
     const { addPermission } = useCurrentUserContext()
 
@@ -124,17 +118,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             }
         }
     }, [currentUser, solverData, currentCondition])
-
-    useEffect(() => {
-        if (
-            currentCondition?.status === ConditionStatus.OutcomeProposed ||
-            currentCondition?.status === ConditionStatus.ArbitrationRequested ||
-            currentCondition?.status === ConditionStatus.ArbitrationDelivered ||
-            currentCondition?.status === ConditionStatus.OutcomeReported
-        ) {
-            initProposedOutcome()
-        }
-    }, [currentCondition, solverData])
 
     useEffect(() => {
         solverContract.on(changedStatusFilter, updateSolverData)
@@ -243,22 +226,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
         }
     }
 
-    const initProposedOutcome = () => {
-        if (!currentCondition || currentCondition.payouts.length === 0) {
-            setProposedOutcome(undefined)
-        } else {
-            const indexSet = getIndexSetFromBinaryArray(
-                currentCondition.payouts
-            )
-            const outcomeCollection = solverData?.outcomeCollections[
-                currentCondition.conditionId
-            ].find(
-                (outcomeCollection) => outcomeCollection.indexSet === indexSet
-            )
-            setProposedOutcome(outcomeCollection)
-        }
-    }
-
     // Trigger Update for the listeners
     const updateSolverData = async () => {
         if (isInitialized) {
@@ -316,17 +283,14 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                         />
                     }
                     sidebar={
-                        proposedOutcome && (
-                            <SolverSidebar
-                                solverData={solverData}
-                                solverTimelock={solverTimelock}
-                                solverAddress={solverContract.address}
-                                solverMethods={solverMethods}
-                                currentCondition={currentCondition}
-                                currentUser={currentUser}
-                                proposedOutcome={proposedOutcome}
-                            />
-                        )
+                        <ArbitrationUIManager
+                            solverTimelock={solverTimelock}
+                            currentCondition={currentCondition}
+                            solverAddress={solverContract.address}
+                            solverData={solverData}
+                            solverMethods={solverMethods}
+                            currentUser={currentUser}
+                        />
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (

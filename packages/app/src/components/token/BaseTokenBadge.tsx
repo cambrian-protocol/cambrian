@@ -55,7 +55,10 @@ const BaseTokenBadge = ({
     }
 
     return (
-        <Box pad={{ right: 'xsmall', vertical: 'xsmall' }}>
+        <Box
+            pad={{ right: 'xsmall', vertical: 'xsmall' }}
+            width={{ min: 'auto' }}
+        >
             <Box
                 onClick={onClick}
                 hoverIndicator

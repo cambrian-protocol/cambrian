@@ -24,7 +24,7 @@ const colors: any = {
     'background-contrast-transparent': '#00202b70',
     'background-popup': { dark: '#0e2027', light: '#0A1F23' },
     'primary-gradient':
-        'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
+        'linear-gradient(129.92deg, #02455B 11.73%, #040f11 79.76%)',
     'secondary-gradient':
         'linear-gradient(138.58deg, #132124 16.84%, #012b39 81.09%)',
     'accent-1': '#2d3a41',
