@@ -1,11 +1,12 @@
 {
-  "private": true,
-  "name": "cambrian",
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {},
-  "resolutions": {
-    "web3modal/react-dom": "17.0.2"
-  }
+    "private": true,
+    "name": "cambrian",
+    "version": "1.0.0",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {},
+    "resolutions": {
+        "web3modal/react-dom": "17.0.2"
+    }
 }
