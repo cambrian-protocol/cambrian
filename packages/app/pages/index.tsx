@@ -137,6 +137,7 @@ export default function Home() {
                                     >
                                         <Image
                                             fit="contain"
+                                            fill
                                             src="/images/composer_preview.png"
                                         />
                                     </Box>
