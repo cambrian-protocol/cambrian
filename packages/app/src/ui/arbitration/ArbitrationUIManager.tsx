@@ -4,7 +4,6 @@ import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseForm
 import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import DispatchArbitrationComponent from './DispatchArbitrationComponent'
-import DisputerListComponent from './DisputerListComponent'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import PlainSectionDivider from '../../components/sections/PlainSectionDivider'
 import ReimbursementComponent from './ReimbursementComponent'
@@ -123,7 +122,7 @@ const ArbitrationUIManager = ({
             )
         }
 
-        if (
+        /*         if (
             currentCondition.status === ConditionStatus.ArbitrationRequested &&
             arbitratorContract &&
             disputeId
@@ -140,7 +139,7 @@ const ArbitrationUIManager = ({
                     {ArbitrationUI}
                 </>
             )
-        }
+        } */
 
         if (ArbitrationUI)
             return (

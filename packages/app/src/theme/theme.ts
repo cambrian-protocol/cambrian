@@ -2,6 +2,7 @@ import { deepMerge } from 'grommet/utils'
 import { grommet } from 'grommet'
 
 const colors: any = {
+    focus: 'brand',
     brand: {
         light: '#2d7dac',
         dark: '#2d7dac',
@@ -21,11 +22,11 @@ const colors: any = {
         light: '#95d4e8',
     },
     'background-contrast-transparent': '#00202b70',
-    'background-popup': { dark: '#132e33', light: '#0A1F23' },
+    'background-popup': { dark: '#0e2027', light: '#0A1F23' },
     'primary-gradient':
         'linear-gradient(129.92deg, #2B5466 11.73%, #799AB8 79.76%)',
     'secondary-gradient':
-        'linear-gradient(138.58deg, #132124 16.84%, #3F4C55 81.09%)',
+        'linear-gradient(138.58deg, #132124 16.84%, #012b39 81.09%)',
     'accent-1': '#2d3a41',
     'accent-2': '#0064a4',
     'status-warning': '#ffdc4d',
@@ -43,6 +44,7 @@ const colors: any = {
 export const cpTheme = deepMerge(grommet, {
     defaultMode: 'dark',
     global: {
+        borderSize: { small: '4px' },
         colors,
         font: {
             family: 'Segoe UI, sans-serif;',
@@ -62,9 +64,30 @@ export const cpTheme = deepMerge(grommet, {
             },
         },
         drop: {
-            background: 'background-popup',
+            background: 'background-front',
             border: { radius: '5px' },
         },
+    },
+    box: {
+        extend: `/* width */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: #040f11; 
+    }
+     
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #012b39; 
+    }
+    
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #012e3d; 
+    }`,
     },
     paragraph: {
         small: {
@@ -156,10 +179,10 @@ export const cpTheme = deepMerge(grommet, {
         round: 'xsmall',
     },
     meter: {
-        color: 'brand',
+        color: 'status-arbitration',
     },
     layer: {
-        border: { radius: 'small' },
+        border: { radius: 'xsmall' },
         container: { elevation: 'large' },
     },
     checkBox: {

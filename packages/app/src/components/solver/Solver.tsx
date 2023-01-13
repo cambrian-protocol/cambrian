@@ -6,7 +6,10 @@ import {
     getSolverMetadata,
     getSolverOutcomes,
 } from './SolverGetters'
-import { getSolverMethods, getSolverRecipientSlots } from './SolverHelpers'
+import {
+    getSolverMethods,
+    getSolverRecipientSlots,
+} from '@cambrian/app/utils/helpers/solverHelpers'
 
 import { BASIC_ARBITRATOR_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
@@ -21,10 +24,8 @@ import ModuleUIManager from './ModuleUIManager'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import PageLayout from '../layout/PageLayout'
-import ProposalHeader from '../layout/header/ProposalHeader'
-import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
-import SolverActionbar from '@cambrian/app/components/bars/actionbars/SolverActionbar'
+import SolverActionbar from '@cambrian/app/components/bars/actionbars/solver/SolverActionbar'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverHeader from '../layout/header/SolverHeader'
 import { SolverMetadataModel } from '../../models/SolverMetadataModel'
@@ -35,6 +36,7 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
+import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
 import { getIndexSetFromBinaryArray } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -162,22 +164,14 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
 
     const initArbitratorPermission = async () => {
         if (solverData) {
-            const arbitratorCode = await currentUser.signer.provider?.getCode(
-                solverData.config.arbitrator
-            )
-            const isContract = arbitratorCode !== '0x'
-
-            if (isContract) {
-                const arbitratorContract = new ethers.Contract(
+            if (
+                (await getArbitratorAddressOrOwner(
                     solverData.config.arbitrator,
-                    BASIC_ARBITRATOR_IFACE,
-                    currentUser.signer
-                )
-                const owner = await arbitratorContract.owner()
-                if (owner && currentUser.address === owner)
-                    addPermission('Arbitrator')
-            } else if (currentUser.address === solverData.config.arbitrator)
+                    currentUser
+                )) === currentUser.address
+            ) {
                 addPermission('Arbitrator')
+            }
         }
     }
 
@@ -189,8 +183,7 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
         try {
             const fetchedMetadata = await getSolverMetadata(
                 solverContract,
-                currentUser.signer,
-                currentUser.chainId
+                currentUser.web3Provider
             )
 
             const fetchedSolverConfig = await getSolverConfig(solverContract)
@@ -304,15 +297,13 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
             solverMethods &&
             currentUser.chainId ? (
                 <InteractionLayout
-                    proposalHeader={
-                        <ProposalHeader
-                            stageStack={metadata?.stageStack}
-                            proposalStatus={ProposalStatus.Executed}
-                            showProposalDetails
+                    contextTitle={metadata?.solverTag?.title || 'Solver'}
+                    header={
+                        <SolverHeader
+                            currentCondition={currentCondition}
+                            solverData={solverData}
+                            metadata={metadata}
                         />
-                    }
-                    contextTitle={
-                        metadata?.stageStack?.proposal?.title || 'Solver'
                     }
                     actionBar={
                         <SolverActionbar
@@ -336,13 +327,6 @@ const Solver = ({ currentUser, solverContract }: SolverProps) => {
                                 proposedOutcome={proposedOutcome}
                             />
                         )
-                    }
-                    solverHeader={
-                        <SolverHeader
-                            currentCondition={currentCondition}
-                            solverData={solverData}
-                            metadata={metadata}
-                        />
                     }
                 >
                     {currentCondition.status === ConditionStatus.Initiated ? (

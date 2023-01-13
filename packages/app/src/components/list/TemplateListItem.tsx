@@ -19,7 +19,7 @@ import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalHashmap } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
-import ResponsiveLinkButton from '../buttons/ResponsiveLinkButton'
+import ResponsiveButton from '../buttons/ResponsiveButton'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -31,7 +31,7 @@ interface TemplateListItemProps {
     currentUser: UserType
     templateStreamID: string
     template: TemplateModel
-    receivedProposalsArchive?: StringHashmap
+    receivedProposalsArchive?: string[]
 }
 
 const TemplateListItem = ({
@@ -70,12 +70,9 @@ const TemplateListItem = ({
             let filteredReceivedProposals = Object.keys(
                 template.receivedProposals
             )
-            // Filter agains archive
             if (receivedProposalsArchive) {
                 filteredReceivedProposals = filteredReceivedProposals.filter(
-                    (rp) =>
-                        Object.values(receivedProposalsArchive).indexOf(rp) ===
-                        -1
+                    (rp) => receivedProposalsArchive.indexOf(rp) === -1
                 )
             }
             setReceivedProposals(
@@ -102,16 +99,10 @@ const TemplateListItem = ({
         setIsTogglingActive(false)
     }
 
-    const onArchiveTemplate = async (
-        templateTag: string,
-        templateStreamID: string
-    ) => {
+    const onArchiveTemplate = async (templateStreamID: string) => {
         try {
             setIsLoading(true)
-            await ceramicTemplateAPI.archiveTemplate(
-                templateTag,
-                templateStreamID
-            )
+            await ceramicTemplateAPI.archiveTemplate(templateStreamID)
         } catch (e) {
             setIsLoading(false)
             setErrorMessage(await cpLogger.push(e))
@@ -221,7 +212,7 @@ const TemplateListItem = ({
                                                 gap="small"
                                                 pad={{ vertical: 'small' }}
                                             >
-                                                <ResponsiveLinkButton
+                                                <ResponsiveButton
                                                     href={`/solver/${templateStreamID}`}
                                                     label="View"
                                                     icon={
@@ -275,7 +266,7 @@ const TemplateListItem = ({
                                                             : undefined
                                                     }
                                                 />
-                                                <ResponsiveLinkButton
+                                                <ResponsiveButton
                                                     href={`/template/edit/${templateStreamID}`}
                                                     label="Edit"
                                                     icon={
@@ -296,7 +287,6 @@ const TemplateListItem = ({
                                                                 color="dark-4"
                                                                 onClick={() => {
                                                                     onArchiveTemplate(
-                                                                        template.title,
                                                                         templateStreamID
                                                                     )
                                                                 }}

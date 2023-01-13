@@ -2,7 +2,7 @@ import {
     AsteriskSimple,
     EnvelopeSimple,
     Handshake,
-    RocketLaunch,
+    Play,
     Scales,
 } from 'phosphor-react'
 
@@ -34,9 +34,9 @@ CONDITION_STATUS_INFO[ConditionStatus.Initiated] = {
     color: 'status-initiated',
 }
 CONDITION_STATUS_INFO[ConditionStatus.Executed] = {
-    name: 'Executed',
+    name: 'Solving',
     description: 'Work in progress',
-    icon: <RocketLaunch />,
+    icon: <Play />,
     color: 'status-executed',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeProposed] = {
@@ -58,7 +58,7 @@ CONDITION_STATUS_INFO[ConditionStatus.ArbitrationDelivered] = {
     color: 'status-reported',
 }
 CONDITION_STATUS_INFO[ConditionStatus.OutcomeReported] = {
-    name: 'Outcome Reported',
+    name: 'Outcome Confirmed',
     description: 'An Outcome has been reported',
     icon: <Handshake />,
     color: 'status-reported',

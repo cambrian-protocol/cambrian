@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.14;
 
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Receiver.sol";
 
@@ -10,7 +11,11 @@ import "../interfaces/IConditionalTokens.sol";
 
 import "../solvers/SolverLib.sol";
 
+import "../ABDKMath64x64.sol";
+
 contract ProposalsHub is ERC1155Receiver {
+    using SafeERC20 for IERC20;
+
     // Used to allow funders to reclaim conditional tokens sent to this address
     IConditionalTokens public immutable conditionalTokens;
 
@@ -93,10 +98,7 @@ contract ProposalsHub is ERC1155Receiver {
 
         IERC20 _token = IERC20(proposals[proposalId].collateralToken);
         uint256 beforeBalance = _token.balanceOf(address(this));
-        require(
-            _token.transfer(solver, proposals[proposalId].funding),
-            "Transfer failed"
-        );
+        _token.safeTransfer(solver, proposals[proposalId].funding);
         require(
             beforeBalance - _token.balanceOf(address(this)) ==
                 proposals[proposalId].fundingGoal,
@@ -211,10 +213,7 @@ contract ProposalsHub is ERC1155Receiver {
         );
 
         uint256 beforeBalance = token.balanceOf(address(this));
-        require(
-            token.transferFrom(msg.sender, address(this), amount),
-            "Could not transfer from msg.sender"
-        );
+        token.safeTransferFrom(msg.sender, address(this), amount);
         require(
             token.balanceOf(address(this)) - beforeBalance == amount,
             "Incorrect balance after transfer"
@@ -256,7 +255,7 @@ contract ProposalsHub is ERC1155Receiver {
         proposals[proposalId].funding -= amount;
         funderAmountMap[proposalId][msg.sender] -= amount;
 
-        require(token.transfer(msg.sender, amount), "Transfer failed");
+        token.safeTransfer(msg.sender, amount);
 
         require(
             beforeBalance - token.balanceOf(address(this)) == amount,
@@ -306,11 +305,17 @@ contract ProposalsHub is ERC1155Receiver {
             funderAmountMap[proposalId][msg.sender] > 0,
             "ProposalsHub::msg.sender has no claim"
         );
-        uint256 _claimDenominator = proposals[proposalId].funding /
-            funderAmountMap[proposalId][msg.sender];
 
-        uint256 _claimAmount = (reclaimableTokens[proposalId][tokenId] /
-            _claimDenominator) - reclaimedTokens[tokenId][msg.sender];
+        int128 _coefficient = ABDKMath64x64.divu(
+            funderAmountMap[proposalId][msg.sender],
+            proposals[proposalId].funding
+        );
+
+        uint256 _claimAmount = ABDKMath64x64.mulu(
+            _coefficient,
+            reclaimableTokens[proposalId][tokenId]
+        ) - reclaimedTokens[tokenId][msg.sender];
+
         require(_claimAmount > 0, "ProposalsHub::Claim is 0");
         require(
             _claimAmount <= reclaimableTokens[proposalId][tokenId],

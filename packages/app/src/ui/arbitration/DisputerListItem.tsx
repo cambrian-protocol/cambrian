@@ -1,7 +1,7 @@
+import { AccordionPanel, Box } from 'grommet'
+
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
-import { Box } from 'grommet'
-import { CardHeader } from 'grommet'
-import OutcomeCollectionCard from '@cambrian/app/components/cards/OutcomeCollectionCard'
+import OutcomePreview from '../solver/OutcomePreview'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -16,6 +16,7 @@ interface DisputerListItemProps {
     currentCondition: SolverContractCondition
 }
 
+// Currently not used, left here for Arbitration UX improvements
 const DisputerListItem = ({
     choice,
     recipient,
@@ -32,30 +33,23 @@ const DisputerListItem = ({
     return (
         <>
             {outcomeCollection && (
-                <Box
-                    background={'background-contrast-hover'}
-                    round="xsmall"
-                    elevation="small"
+                <AccordionPanel
+                    label={
+                        <Box direction="row" align="center" gap="small">
+                            <BaseAvatar address={address} />
+                            <Text truncate>
+                                {recipient?.tag.label}'s choice
+                            </Text>
+                        </Box>
+                    }
                 >
-                    <OutcomeCollectionCard
-                        cardHeader={
-                            <CardHeader
-                                pad="small"
-                                elevation="small"
-                                direction="row"
-                                gap="small"
-                                justify="start"
-                            >
-                                <BaseAvatar address={address} />
-                                <Text truncate>
-                                    {recipient?.tag.label}'s choice
-                                </Text>
-                            </CardHeader>
-                        }
-                        outcomeCollection={outcomeCollection}
-                        token={solverData.collateralToken}
-                    />
-                </Box>
+                    <Box pad={{ top: 'small' }}>
+                        <OutcomePreview
+                            outcome={outcomeCollection}
+                            collateralToken={solverData.collateralToken}
+                        />
+                    </Box>
+                </AccordionPanel>
             )}
         </>
     )

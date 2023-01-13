@@ -60,8 +60,6 @@ const DeliveredArbitrationInfoComponent = ({
                 <PayoutInfoComponent
                     border
                     title="Reported Outcome"
-                    reporterOrProposer="Arbitrator"
-                    keeperOrArbitratorAddress={solverData.config.arbitrator}
                     token={solverData.collateralToken}
                     outcome={reportedOutcome}
                 />

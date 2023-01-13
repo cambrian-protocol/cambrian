@@ -2,7 +2,7 @@ import { AllocationModel } from './AllocationModel'
 import { OutcomeModel } from './OutcomeModel'
 
 export type OutcomeCollectionModel = {
-    indexSet: number
+    indexSet?: number
     outcomes: OutcomeModel[]
     allocations: AllocationModel[]
 }

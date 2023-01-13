@@ -6,6 +6,7 @@ import { StageNames } from '../../models/StageModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 import initialComposer from '@cambrian/app/store/composer/composer.init'
+import { SCHEMA_VER } from 'packages/app/config'
 
 /** 
  API functions to maintain compositions and the users composition-lib.
@@ -27,12 +28,13 @@ export default class CeramicCompositionAPI {
     createComposition = async (
         title: string,
         composition?: CompositionModel
-    ): Promise<string> => {
+    ): Promise<{ streamID: string; title: string }> => {
         try {
             return await createStage(
                 composition
-                    ? composition
+                    ? { ...composition }
                     : {
+                          schemaVer: SCHEMA_VER['composition'],
                           title: title,
                           description: '',
                           flowElements: initialComposer.flowElements,
@@ -50,11 +52,11 @@ export default class CeramicCompositionAPI {
     /**
      * Removes composition from composition-lib doc, and adds it to the composition-archive
      *
-     * @param tag Composition Title / Unique tag
+     * @param streamId
      */
-    archiveComposition = async (tag: string) => {
+    archiveComposition = async (streamId: string) => {
         try {
-            await archiveStage(this.user, tag, StageNames.composition)
+            await archiveStage(this.user, streamId, StageNames.composition)
             return true
         } catch (e) {
             cpLogger.push(e)

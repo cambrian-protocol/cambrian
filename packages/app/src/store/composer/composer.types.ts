@@ -8,7 +8,7 @@ import { CreateSlotActionPayload } from './actions/solverActions/createSlot.acti
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import { SelectRecipientType } from '@cambrian/app/components/selects/SelectRecipient'
 import { SelectedRecipientFormType } from '@cambrian/app/ui/composer/controls/solver/recipientList/forms/SelectRecipientForm'
-import { SlotTagFormFieldsType } from './../../ui/composer/controls/solver/general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SolutionConfigFormType } from '@cambrian/app/ui/composer/config/SolutionConfig'
 import { SolverMainConfigType } from './actions/solverActions/updateSolverMainConfig.action'
 import { SolverTagModel } from '@cambrian/app/models/SolverTagModel'
@@ -49,7 +49,7 @@ type UpdateSlotTagActionType = {
     type: 'UPDATE_SLOT_TAG'
     payload: {
         slotIdToUpdate: string
-        slotTag: SlotTagFormFieldsType
+        slotTag: SlotTagModel
     }
 }
 
@@ -142,7 +142,7 @@ type CreateRecipientWithAllocationAction = {
 
 type AddRecipientWithAllocationAction = {
     type: 'ADD_RECIPIENT_WITH_ALLOCATION'
-    payload: SlotTagFormFieldsType &
+    payload: SlotTagModel &
         SelectRecipientType & { amount: ComposerSlotModel | number }
 }
 type AddRecipientAction = {

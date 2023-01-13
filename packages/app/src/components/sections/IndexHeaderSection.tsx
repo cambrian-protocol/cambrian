@@ -17,7 +17,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
             const isSmallScreen = screenSize === 'small'
             return (
                 <Box
-                    height="90vh"
+                    height="80vh"
                     style={{ position: 'relative', overflow: 'hidden' }}
                 >
                     <WorldMap
@@ -54,8 +54,9 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 size="large"
                                 textAlign={isSmallScreen ? 'center' : 'start'}
                             >
-                                Buy and sell services, freelance work and more
-                                on a free platform owned by its users.
+                                Sell services, freelance work and more for
+                                cryptocurrency on a free and decentralized
+                                platform.
                             </Text>
                             <Box
                                 direction={isSmallScreen ? 'column' : 'row'}
@@ -68,7 +69,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                                 >
                                     <Button
                                         primary
-                                        label="Get started"
+                                        label="Create your listing"
                                         onClick={onClickCTA}
                                     />
                                 </Box>

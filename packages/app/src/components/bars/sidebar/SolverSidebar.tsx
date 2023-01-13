@@ -39,17 +39,18 @@ const SolverSidebar = ({
                     solverData={solverData}
                 />
             )}
-            <PayoutInfoComponent
-                title={
-                    currentCondition.status === ConditionStatus.OutcomeReported
-                        ? 'Reported Outcome'
-                        : 'Proposed Outcome'
-                }
-                reporterOrProposer="Keeper"
-                keeperOrArbitratorAddress={solverData.config.keeper}
-                token={solverData.collateralToken}
-                outcome={proposedOutcome}
-            />
+            {proposedOutcome && (
+                <PayoutInfoComponent
+                    title={
+                        currentCondition.status ===
+                        ConditionStatus.OutcomeReported
+                            ? 'Confirmed Outcome'
+                            : 'Proposed Outcome'
+                    }
+                    token={solverData.collateralToken}
+                    outcome={proposedOutcome}
+                />
+            )}
             <ArbitrationUIManager
                 solverTimelock={solverTimelock}
                 currentCondition={currentCondition}

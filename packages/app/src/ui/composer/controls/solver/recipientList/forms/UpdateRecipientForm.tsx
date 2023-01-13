@@ -3,15 +3,14 @@ import {
     ComposerSlotModel,
     ComposerSlotPathType,
 } from '@cambrian/app/models/SlotModel'
-import SlotTagFormFields, {
-    initialSlotTagInput,
-} from '../../general/forms/SlotTagFormFields'
 import { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
 import { CreateRecipientFormType } from './CreateRecipientForm'
 import ReferencedSlotInfo from '@cambrian/app/components/info/ReferencedSlotInfo'
+import SlotTagFormFields from '../../general/forms/SlotTagFormFields'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface RecipientConfigFormProps {
@@ -20,7 +19,7 @@ interface RecipientConfigFormProps {
 }
 
 export const initialCreateRecipientFormInput = {
-    ...initialSlotTagInput,
+    ...defaultSlotTagValues,
     address: '',
 }
 
@@ -47,8 +46,11 @@ const UpdateRecipientForm = ({
                 address: recipient.data[0].toString(),
                 label: (slotTag && slotTag.label) || '',
                 description: (slotTag && slotTag.description) || '',
+                instruction: (slotTag && slotTag.instruction) || '',
                 isFlex: (slotTag && slotTag.isFlex) || false,
                 reference: recipient.reference,
+                slotId: slotTag.slotId,
+                solverId: slotTag.solverId,
             })
         }
     }, [])

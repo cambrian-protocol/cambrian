@@ -33,7 +33,6 @@ export default function SolverPage() {
     const determineQuery = async (currentUser: UserType) => {
         if (solverAddress !== undefined && typeof solverAddress === 'string') {
             try {
-                await addRecentStage(currentUser, solverAddress as string)
                 if (solverAddress.startsWith('0x')) {
                     setUi(
                         <SolverUI
@@ -45,7 +44,6 @@ export default function SolverPage() {
                     const stage = (await ceramicInstance(
                         currentUser
                     ).loadStream(solverAddress)) as TileDocument<any>
-
                     if (stage.content.solvers) {
                         // Its a Composition
                         setUi(
@@ -58,12 +56,7 @@ export default function SolverPage() {
                         )
                     } else if (stage.content.composition) {
                         // Its a Template
-                        setUi(
-                            <TemplateUI
-                                currentUser={currentUser}
-                                templateStreamDoc={stage}
-                            />
-                        )
+                        setUi(<TemplateUI templateStreamDoc={stage} />)
                     } else if (stage.content.template) {
                         // Its a Proposal
                         setUi(
@@ -75,6 +68,11 @@ export default function SolverPage() {
                             </ProposalContextProvider>
                         )
                     }
+                    if (currentUser.session)
+                        await addRecentStage(
+                            currentUser,
+                            solverAddress as string
+                        )
                 }
             } catch (e) {
                 console.error(e)
@@ -83,5 +81,17 @@ export default function SolverPage() {
         setIsLoaded(true)
     }
 
-    return <>{isLoaded ? ui ? ui : <Custom404Page /> : <LoadingScreen />}</>
+    return (
+        <>
+            {isLoaded ? (
+                ui ? (
+                    ui
+                ) : (
+                    <Custom404Page />
+                )
+            ) : (
+                <LoadingScreen context="Finding your Solver..." />
+            )}
+        </>
+    )
 }

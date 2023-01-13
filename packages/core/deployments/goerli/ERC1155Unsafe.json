@@ -1,0 +1,87 @@
+{
+  "address": "0xF110bFd8b5193087c965262a7fcFA57F0f559659",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC1155Rescue",
+          "name": "_rescue",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "bagId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "name": "rescueBag",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xe28be4fd23d27d30ecdd9822ef1ef488633f3cc203a66c1a3baa6bdd1fc83105",
+  "receipt": {
+    "to": null,
+    "from": "0x582B5C951E7e6f599c87E86f32B7C5549B34158d",
+    "contractAddress": "0xF110bFd8b5193087c965262a7fcFA57F0f559659",
+    "transactionIndex": 71,
+    "gasUsed": "137874",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xd6dc0c7ddd2efe57b8c78905629ea4474acf796007e7ed34a5ba9a14626bb8de",
+    "transactionHash": "0xe28be4fd23d27d30ecdd9822ef1ef488633f3cc203a66c1a3baa6bdd1fc83105",
+    "logs": [],
+    "blockNumber": 7920575,
+    "cumulativeGasUsed": "21596253",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x58577c2b1CbE76538B9d7217B5C76D8E3359E3A1"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "33354247c16047509b325c318c8ec1d5",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.14+commit.80d49f37\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IERC1155Rescue\",\"name\":\"_rescue\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"bagId\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"}],\"name\":\"rescueBag\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/test/ERC1155Unsafe.sol\":\"ERC1155Unsafe\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":1},\"remappings\":[]},\"sources\":{\"contracts/interfaces/IERC1155Rescue.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\r\\npragma solidity ^0.8.14;\\r\\n\\r\\ninterface IERC1155Rescue {\\r\\n    function rescueBag(bytes32 bagId, address to) external;\\r\\n\\r\\n    function getBagId(\\r\\n        address solver,\\r\\n        uint256[] calldata tokenIds,\\r\\n        uint256[] calldata tokenAmounts\\r\\n    ) external pure returns (bytes32);\\r\\n\\r\\n    function onERC1155BatchReceived(\\r\\n        address operator,\\r\\n        address from,\\r\\n        uint256[] calldata ids,\\r\\n        uint256[] calldata values,\\r\\n        bytes calldata data\\r\\n    ) external returns (bytes4);\\r\\n\\r\\n    function onERC1155Received(\\r\\n        address operator,\\r\\n        address from,\\r\\n        uint256 id,\\r\\n        uint256 value,\\r\\n        bytes calldata data\\r\\n    ) external returns (bytes4);\\r\\n}\\r\\n\",\"keccak256\":\"0xa776fab63fa8cc91430079f8607cbb9b188ef0297dc7a1275327e03bfe832d11\",\"license\":\"GPL-3.0\"},\"contracts/test/ERC1155Unsafe.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\r\\npragma solidity ^0.8.14;\\r\\n\\r\\nimport \\\"../interfaces/IERC1155Rescue.sol\\\";\\r\\n\\r\\ncontract ERC1155Unsafe {\\r\\n    IERC1155Rescue rescue;\\r\\n\\r\\n    constructor(IERC1155Rescue _rescue) {\\r\\n        rescue = _rescue;\\r\\n    }\\r\\n\\r\\n    function rescueBag(bytes32 bagId, address to) external {\\r\\n        rescue.rescueBag(bagId, to);\\r\\n    }\\r\\n}\\r\\n\",\"keccak256\":\"0x6450c772d7f3e3f52714292be5a69effa774339848da598c66c21f79e345f9d4\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516101a93803806101a983398101604081905261002f91610054565b600080546001600160a01b0319166001600160a01b0392909216919091179055610084565b60006020828403121561006657600080fd5b81516001600160a01b038116811461007d57600080fd5b9392505050565b610116806100936000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80635463511414602d575b600080fd5b603c603836600460a6565b603e565b005b600054604051631518d44560e21b8152600481018490526001600160a01b03838116602483015290911690635463511490604401600060405180830381600087803b158015608b57600080fd5b505af1158015609e573d6000803e3d6000fd5b505050505050565b6000806040838503121560b857600080fd5b8235915060208301356001600160a01b038116811460d557600080fd5b80915050925092905056fea26469706673582212203fecc0bface718ae6fd3b661321ee098a3a2ea93e2ed6ee15481ab23f4676abd64736f6c634300080e0033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80635463511414602d575b600080fd5b603c603836600460a6565b603e565b005b600054604051631518d44560e21b8152600481018490526001600160a01b03838116602483015290911690635463511490604401600060405180830381600087803b158015608b57600080fd5b505af1158015609e573d6000803e3d6000fd5b505050505050565b6000806040838503121560b857600080fd5b8235915060208301356001600160a01b038116811460d557600080fd5b80915050925092905056fea26469706673582212203fecc0bface718ae6fd3b661321ee098a3a2ea93e2ed6ee15481ab23f4676abd64736f6c634300080e0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 13508,
+        "contract": "contracts/test/ERC1155Unsafe.sol:ERC1155Unsafe",
+        "label": "rescue",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_contract(IERC1155Rescue)7961"
+      }
+    ],
+    "types": {
+      "t_contract(IERC1155Rescue)7961": {
+        "encoding": "inplace",
+        "label": "contract IERC1155Rescue",
+        "numberOfBytes": "20"
+      }
+    }
+  }
+}

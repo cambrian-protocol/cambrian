@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 
+import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { ButtonExtendedProps } from 'grommet'
 import { IconContext } from 'phosphor-react'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
+import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
 
 export type LoaderButtonProps = ButtonExtendedProps & {
-    isLoading: boolean
+    isLoading?: boolean
+    isInitializing?: boolean
 }
 
 const LoaderButton = ({
@@ -16,8 +19,10 @@ const LoaderButton = ({
     isLoading,
     label,
     icon,
+    isInitializing,
     ...props
 }: LoaderButtonProps) => {
+    const windowSize = useWindowSize()
     const [showLoader, setShowLoader] = useState(false)
     const [width, setWidth] = useState(0)
     const [height, setHeight] = useState(0)
@@ -30,7 +35,7 @@ const LoaderButton = ({
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [children])
+    }, [children, windowSize, props.disabled])
 
     useEffect(() => {
         if (isLoading) {
@@ -48,53 +53,65 @@ const LoaderButton = ({
         }
     }, [isLoading, showLoader])
     return (
-        <Button
-            {...props}
-            ref={ref}
-            style={
-                showLoader
-                    ? {
-                          width: `${width}px`,
-                          height: `${height}px`,
-                      }
-                    : {}
-            }
-            disabled={showLoader || props.disabled}
-            label={
-                label && (
-                    <Box justify="center" align="center">
-                        {!showLoader ? (
-                            <Box animation="fadeIn">
-                                <Text size="small">{label}</Text>
+        <>
+            {isInitializing ? (
+                <BaseSkeletonBox height={'3.5em'} width={'8em'} />
+            ) : (
+                <Button
+                    {...props}
+                    ref={ref}
+                    style={
+                        showLoader
+                            ? {
+                                  width: `${width}px`,
+                                  height: `${height}px`,
+                                  maxWidth: '100%',
+                              }
+                            : {}
+                    }
+                    disabled={showLoader || props.disabled}
+                    label={
+                        label && (
+                            <Box justify="center" align="center">
+                                {!showLoader ? (
+                                    <Box animation="fadeIn">
+                                        <Text size="small">{label}</Text>
+                                    </Box>
+                                ) : (
+                                    <Box animation="fadeIn">
+                                        <Spinner color={'white'} />
+                                    </Box>
+                                )}
                             </Box>
-                        ) : (
-                            <Box animation="fadeIn">
-                                <Spinner color={'white'} />
+                        )
+                    }
+                    icon={
+                        icon && !label ? (
+                            <Box justify="center" align="center">
+                                {!showLoader ? (
+                                    <IconContext.Provider
+                                        value={{ size: '24' }}
+                                    >
+                                        <Box align="center" animation="fadeIn">
+                                            {icon}
+                                        </Box>
+                                    </IconContext.Provider>
+                                ) : (
+                                    <Box animation="fadeIn">
+                                        <Spinner
+                                            color={'white'}
+                                            size="xsmall"
+                                        />
+                                    </Box>
+                                )}
                             </Box>
-                        )}
-                    </Box>
-                )
-            }
-            icon={
-                icon && !label ? (
-                    <Box justify="center" align="center">
-                        {!showLoader ? (
-                            <IconContext.Provider value={{ size: '24' }}>
-                                <Box align="center" animation="fadeIn">
-                                    {icon}
-                                </Box>
-                            </IconContext.Provider>
-                        ) : (
-                            <Box animation="fadeIn">
-                                <Spinner color={'white'} size="xsmall" />
-                            </Box>
-                        )}
-                    </Box>
-                ) : !showLoader ? (
-                    icon
-                ) : undefined
-            }
-        />
+                        ) : !showLoader ? (
+                            icon
+                        ) : undefined
+                    }
+                />
+            )}
+        </>
     )
 }
 

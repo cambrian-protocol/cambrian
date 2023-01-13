@@ -2,7 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "composite": true,
-        "target": "es5",
+        "target": "es6",
         "lib": ["dom", "dom.iterable", "esnext"],
         "allowJs": true,
         "skipLibCheck": true,
@@ -16,7 +16,9 @@
         "jsx": "preserve",
         "incremental": true,
         "noEmit": true,
-        "typeRoots": ["src/@types", "node_modules/@types"]
+        "typeRoots": ["src/@types", "node_modules/@types"],
+        "downlevelIteration": true,
+
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.test.ts", "**/*.tsx"],
     "exclude": ["node_modules"],

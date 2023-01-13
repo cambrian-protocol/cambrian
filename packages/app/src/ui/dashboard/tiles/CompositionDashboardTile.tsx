@@ -8,7 +8,6 @@ import {
     DropButton,
     Heading,
     Spinner,
-    Text,
 } from 'grommet'
 import {
     Check,
@@ -20,18 +19,22 @@ import {
     Trash,
     TreeStructure,
 } from 'phosphor-react'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RenameCompositionModal from '../modals/RenameCompositionModal'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import randimals from 'randimals'
 import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -74,14 +77,21 @@ const CompositionDashboardTile = ({
         setIsCreatingTemplate(true)
         try {
             if (currentUser) {
+                if (!currentUser.did || !currentUser.cambrianProfileDoc)
+                    throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
                 const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
                 const streamID = await ceramicTemplateAPI.createTemplate(
                     randimals(),
                     compositionStreamID
                 )
-                router.push(
-                    `${window.location.origin}/template/new/${streamID}`
-                )
+                if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
+                    router.push(`/profile/new/${streamID}?target=template`)
+                } else {
+                    router.push(
+                        `${window.location.origin}/template/new/${streamID}`
+                    )
+                }
             }
         } catch (e) {
             setIsCreatingTemplate(false)
@@ -111,9 +121,6 @@ const CompositionDashboardTile = ({
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>
                             <Box pad={{ left: 'medium' }}>
                                 <Heading level="4">{currentTag}</Heading>
-                                <Text truncate size="small" color="dark-4">
-                                    {compositionStreamID}
-                                </Text>
                             </Box>
                             <DropButton
                                 size="small"
@@ -148,7 +155,7 @@ const CompositionDashboardTile = ({
                                                     ? undefined
                                                     : () =>
                                                           onRemove(
-                                                              compositionTag
+                                                              compositionStreamID
                                                           )
                                             }
                                         />

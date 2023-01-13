@@ -5,6 +5,7 @@ import {
 
 import { Box } from 'grommet'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
+import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { PaperPlaneRight } from 'phosphor-react'
@@ -13,17 +14,15 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-interface ProposalSubmitControlProps {
-    onSave: () => Promise<boolean>
-    proposalStreamID: string
-    isValidProposal: boolean
+interface ProposalSubmitControl {
+    editProposalContext: EditProposalContextType
 }
 
 const ProposalSubmitControl = ({
-    onSave,
-    isValidProposal,
-    proposalStreamID,
-}: ProposalSubmitControlProps) => {
+    editProposalContext,
+}: ProposalSubmitControl) => {
+    const { proposalStreamID, isValidProposal, onSaveProposal } =
+        editProposalContext
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
 
@@ -34,7 +33,7 @@ const ProposalSubmitControl = ({
         setIsSubmitting(true)
         try {
             if (currentUser) {
-                if (await onSave()) {
+                if (await onSaveProposal()) {
                     const ceramicProposalAPI = new CeramicProposalAPI(
                         currentUser
                     )

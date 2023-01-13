@@ -1,23 +1,13 @@
-import { SetStateAction, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import TemplateDescriptionStep from './steps/TemplateDescriptionStep'
 import TemplateFlexInputsStep from './steps/TemplateFlexInputsStep'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingStep from './steps/TemplatePricingStep'
 import TemplatePublishStep from './steps/TemplatePublishStep'
 import TemplateRequirementsStep from './steps/TemplateRequirementsStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { UserType } from '@cambrian/app/store/UserContext'
-
-interface TemplateWizardProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    templateStreamID: string
-    onSaveTemplate: () => Promise<boolean>
-    composition: CompositionModel
-}
 
 export enum TEMPLATE_WIZARD_STEPS {
     DESCRIPTION,
@@ -34,12 +24,10 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
 const TemplateWizard = ({
-    templateInput,
-    setTemplateInput,
-    templateStreamID,
-    onSaveTemplate,
-    composition,
-}: TemplateWizardProps) => {
+    editTemplateProps: editTemplateProps,
+}: {
+    editTemplateProps: EditTemplatePropsType
+}) => {
     const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
         TEMPLATE_WIZARD_STEPS.DESCRIPTION
     )
@@ -55,43 +43,36 @@ const TemplateWizard = ({
             case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <TemplateDescriptionStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        editTemplateProps={editTemplateProps}
                         stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PRICING:
                 return (
                     <TemplatePricingStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        editTemplateProps={editTemplateProps}
                         stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
                     <TemplateFlexInputsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        editTemplateProps={editTemplateProps}
                         stepperCallback={setCurrentStep}
-                        composition={composition}
-                        onSaveTemplate={onSaveTemplate}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
                     <TemplateRequirementsStep
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
+                        editTemplateProps={editTemplateProps}
                         stepperCallback={setCurrentStep}
-                        onSaveTemplate={onSaveTemplate}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PUBLISH:
                 return (
-                    <TemplatePublishStep templateStreamID={templateStreamID} />
+                    <TemplatePublishStep
+                        editTemplateProps={editTemplateProps}
+                    />
                 )
             default:
                 return <></>
@@ -100,7 +81,7 @@ const TemplateWizard = ({
 
     return (
         <>
-            <Box height={{ min: '90vh' }} justify="center" pad="large">
+            <Box height={{ min: '80vh' }} justify="center">
                 {/* TODO Wizard Nav  */}
                 {renderCurrentFormStep()}
             </Box>

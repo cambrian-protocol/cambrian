@@ -6,18 +6,18 @@ import {
     FormField,
     TextArea,
 } from 'grommet'
-import { SetStateAction, useEffect, useState } from 'react'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import { useState } from 'react'
 
 interface TemplateRequirementsFormProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    onSubmit: () => Promise<void>
+    editTemplateProps: EditTemplatePropsType
+    onSubmit?: () => void
+    onCancel?: () => void
     submitLabel?: string
-    onCancel: () => void
     cancelLabel?: string
 }
 
@@ -26,26 +26,32 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    templateInput,
-    setTemplateInput,
+    editTemplateProps,
     onSubmit,
-    submitLabel,
     onCancel,
+    submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false)
+    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
+        editTemplateProps
 
-    useEffect(() => {
-        return () => {}
-    }, [])
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateRequirementsFormType, Element>
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        await onSubmit()
+        onSubmit ? await onSubmit() : await onSaveTemplate()
         setIsSubmitting(false)
+    }
+
+    if (!template) {
+        return (
+            <Box height="large" gap="medium">
+                <BaseSkeletonBox height={'small'} width={'100%'} />
+            </Box>
+        )
     }
 
     return (
@@ -54,12 +60,17 @@ const TemplateRequirementsForm = ({
                 <Box pad="xsmall">
                     <FormField label="Requirements" name="requirements">
                         <TextArea
-                            value={templateInput.requirements}
+                            placeholder="Example:
+                        1. A clear understanding of the purpose of the article
+                        2. A list of topics to cover in the article
+                        3. An outline of the structure and flow of the article
+                        4. Access to relevant research and data to support the article"
+                            value={template.requirements}
                             resize={false}
                             rows={10}
                             onChange={(e) =>
-                                setTemplateInput({
-                                    ...templateInput,
+                                setTemplate({
+                                    ...template,
                                     requirements: e.target.value,
                                 })
                             }
@@ -81,7 +92,7 @@ const TemplateRequirementsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel}
+                            onClick={onCancel ? onCancel : onResetTemplate}
                         />
                     }
                 />

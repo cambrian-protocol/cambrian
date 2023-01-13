@@ -8,21 +8,13 @@ const {
 } = require("@openzeppelin/test-helpers");
 const { getBytes32FromMultihash } = require("../../helpers/multihash.js");
 
-describe("Solver | deployChild", function () {
+describe("Solver | safetyCheck", function () {
   this.beforeEach(async function () {
     const [keeper, arbitrator] = await ethers.getSigners();
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "SolverFactory",
-      "ProposalsHub",
-      "ToyToken",
-      "BasicSolverV1",
-      "IPFSSolutionsHub",
-      "ProposalsHub",
-    ]);
+    await deployments.fixture(["test"]);
 
     this.ProposalsHub = await ethers.getContract("ProposalsHub");
     this.ConditionalTokens = await ethers.getContract("ConditionalTokens");

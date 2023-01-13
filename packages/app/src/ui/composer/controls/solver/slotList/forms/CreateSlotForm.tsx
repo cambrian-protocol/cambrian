@@ -1,8 +1,4 @@
 import { Box, Button, Form, FormExtendedEvent, FormField } from 'grommet'
-import SlotTagFormFields, {
-    SlotTagFormFieldsType,
-    initialSlotTagInput,
-} from '../../general/forms/SlotTagFormFields'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
@@ -13,9 +9,12 @@ import SelectSlot from '@cambrian/app/components/selects/SelectSlot'
 import SelectSlotType from '@cambrian/app/components/selects/SelectSlotType'
 import SelectSolverFunction from '@cambrian/app/components/selects/SelectSolverFunction'
 import SlotDataInputField from '@cambrian/app/components/inputs/SlotDataInput'
+import SlotTagFormFields from '../../general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import _uniqueId from 'lodash/uniqueId'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { ethers } from 'ethers'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useState } from 'react'
@@ -24,7 +23,7 @@ type SlotConfigFormProps = {
     onClose: () => void
 }
 
-export type CreateSlotFormType = SlotTagFormFieldsType & {
+export type CreateSlotFormType = SlotTagModel & {
     slotType: SlotType
     dataInputFields: SlotDataInputType[]
     solverFunction?: ethers.utils.FunctionFragment
@@ -39,7 +38,7 @@ type SlotDataInputType = {
 }
 
 export const initialCreateSlotInput: CreateSlotFormType = {
-    ...initialSlotTagInput,
+    ...defaultSlotTagValues,
     slotType: SlotType.Constant,
     dataInputFields: [
         { id: _uniqueId(), data: '', dataType: SolidityDataTypes.Bytes },
@@ -206,11 +205,14 @@ export const mapSlotFormTypeToSlotActionPayload = (
     const slotPayload: CreateSlotActionPayload = {
         label: slotConfigFormInput.label,
         description: slotConfigFormInput.description,
+        instruction: slotConfigFormInput.instruction,
         isFlex: slotConfigFormInput.isFlex,
         slotType: slotConfigFormInput.slotType,
         dataTypes: dataTypes,
         data: data,
         reference: slotConfigFormInput.reference,
+        solverId: slotConfigFormInput.solverId,
+        slotId: slotConfigFormInput.slotId,
     }
 
     switch (slotConfigFormInput.slotType) {

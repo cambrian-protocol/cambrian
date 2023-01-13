@@ -18,12 +18,7 @@ describe("ArbitrationDispatch", function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "SolverFactory",
-      "ToyToken",
-      "BasicSolverV1",
-      "ArbitrationDispatch",
-    ]);
+    await deployments.fixture(["test"]);
 
     this.ArbitrationDispatch = await ethers.getContract("ArbitrationDispatch");
     this.SolverFactory = await ethers.getContract("SolverFactory");

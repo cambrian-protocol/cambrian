@@ -13,9 +13,11 @@ import PageLayout from '../layout/PageLayout'
 import { SignIn } from 'phosphor-react'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-const ConnectWalletPage = () => {
-    const { connectWallet } = useCurrentUserContext()
+interface ConnectWalletPageProps {
+    connectWallet: () => Promise<void>
+}
 
+const ConnectWalletPage = ({ connectWallet }: ConnectWalletPageProps) => {
     return (
         <ResponsiveContext.Consumer>
             {(screenSize) => {

@@ -1,21 +1,17 @@
 import { Box, Form, FormField, Text, TextInput } from 'grommet'
 import {
-    CAMBRIAN_LIB_NAME,
-    ceramicInstance,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
-import { CurrencyEth, Scales } from 'phosphor-react'
-import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { ARBITRATOR_FACTORY_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import CeramicArbitratorAPI from '@cambrian/app/services/ceramic/CeramicArbitratorAPI'
+import { CurrencyEth } from 'phosphor-react'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
@@ -75,48 +71,10 @@ const CreateArbitratorModal = ({
             if (!arbitratorContract)
                 throw GENERAL_ERROR['CREATE_ARBITRATOR_ERROR']
 
-            const arbitratorsLib = await TileDocument.deterministic(
-                ceramicInstance(currentUser),
-                {
-                    controllers: [currentUser.did],
-                    family: CAMBRIAN_LIB_NAME,
-                    tags: ['arbitrators'],
-                },
-                { pin: true }
+            await new CeramicArbitratorAPI(currentUser).createArbitrator(
+                arbitratorContract,
+                input
             )
-
-            const currentDoc = await TileDocument.deterministic(
-                ceramicInstance(currentUser),
-                {
-                    controllers: [currentUser.did],
-                    family: `cambrian-arbitrators`,
-                    tags: [arbitratorContract],
-                },
-                { pin: true }
-            )
-            await currentDoc.update({ fee: input })
-
-            if (
-                arbitratorsLib.content !== null &&
-                typeof arbitratorsLib.content === 'object'
-            ) {
-                await arbitratorsLib.update(
-                    {
-                        ...arbitratorsLib.content,
-                        [arbitratorContract]: input,
-                    },
-                    undefined,
-                    { pin: true }
-                )
-            } else {
-                await arbitratorsLib.update(
-                    {
-                        [arbitratorContract]: input,
-                    },
-                    undefined,
-                    { pin: true }
-                )
-            }
             onClose()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -130,7 +88,6 @@ const CreateArbitratorModal = ({
                 <ModalHeader
                     title="Create Arbitrator"
                     description="This Arbitration Smart Contract will be tied to your wallet"
-                    icon={<Scales />}
                 />
                 <Form onSubmit={onSubmit}>
                     <Box gap="medium">

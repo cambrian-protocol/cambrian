@@ -1,4 +1,7 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
+import CambrianStagesLib, {
+    CambrianStagesLibType,
+} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -11,7 +14,6 @@ import {
 import { useEffect, useState } from 'react'
 
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
-import { CambrianStagesLibType } from '@cambrian/app/models/StageModel'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -21,6 +23,7 @@ import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useRouter } from 'next/router'
@@ -36,13 +39,12 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [stagesLib, setStagesLib] = useState<CambrianStagesLibType>()
     const [isFetching, setIsFetching] = useState(false)
     const [activeIndex, setActiveIndex] = useState(0)
-    const [userName, setUserName] = useState(
-        currentUser.cambrianProfileDoc.content.name || 'Anon'
-    )
+    const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
+        setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
         initDocSubsciption()
-    }, [])
+    }, [currentUser])
 
     useEffect(() => {
         if (query.idx !== activeIndex.toString()) {
@@ -63,28 +65,42 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         setActiveIndex(nextActiveIndex)
     }
 
+    const onDeleteRecent = async (streamId: string) => {
+        const newStagesLib = _.cloneDeep(stagesLib)
+        if (newStagesLib?.recents) {
+            const index = newStagesLib.recents.indexOf(streamId)
+            if (index > -1) {
+                newStagesLib.recents.splice(index, 1)
+            }
+        }
+        const stagesLibDoc = await loadStagesLib(currentUser)
+        await stagesLibDoc.update(newStagesLib)
+        setStagesLib(newStagesLib)
+    }
+
     const initDocSubsciption = async () => {
         const stagesLib = await loadStagesLib(currentUser)
         const cambrianStagesLibSub = stagesLib.subscribe(() => {
             initStagesLib()
         })
-        const cambrianProfileSub = currentUser.cambrianProfileDoc.subscribe(
+        const cambrianProfileSub = currentUser.cambrianProfileDoc?.subscribe(
             () => {
-                if (userName !== currentUser.cambrianProfileDoc.content.name) {
-                    setUserName(currentUser.cambrianProfileDoc.content.name)
+                if (userName !== currentUser.cambrianProfileDoc?.content.name) {
+                    setUserName(currentUser.cambrianProfileDoc?.content.name)
                 }
             }
         )
         return () => {
             cambrianStagesLibSub.unsubscribe()
-            cambrianProfileSub.unsubscribe()
+            cambrianProfileSub?.unsubscribe()
         }
     }
 
     const initStagesLib = async () => {
         setIsFetching(true)
         try {
-            setStagesLib((await loadStagesLib(currentUser)).content)
+            const stagesLib = await loadStagesLib(currentUser)
+            setStagesLib(stagesLib.content)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
@@ -94,9 +110,11 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     return (
         <>
             <PageLayout contextTitle="Dashboard">
-                <Box pad="large" gap="medium">
+                <Box gap="medium">
                     <Heading>Dashboard</Heading>
-                    <Text color="dark-4">Welcome back, {userName}!</Text>
+                    <Text color="dark-4">
+                        Welcome back, {userName || 'Anon'}!
+                    </Text>
                     <IconContext.Provider value={{ size: '18' }}>
                         <Tabs
                             activeIndex={activeIndex}
@@ -107,6 +125,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                                 <OverviewDashboardUI
                                     currentUser={currentUser}
                                     recents={stagesLib?.recents}
+                                    onDeleteRecent={onDeleteRecent}
                                 />
                             </Tab>
                             <Tab title="Templates" icon={<File />}>

@@ -1,10 +1,7 @@
 import { ethers } from 'ethers'
 import _ from 'lodash'
 
-import {
-    ComposerSolverModel,
-    SolverModel,
-} from '@cambrian/app/models/SolverModel'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import {
     ComposerSolverConfigModel,
     SolverConfigModel,
@@ -23,10 +20,12 @@ import { ComposerModuleModel } from '@cambrian/app/models/ModuleModel'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { ComposerOutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
+import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export async function parseComposerSolvers(
-    composerSolvers: ComposerSolverModel[],
-    provider: ethers.providers.Provider
+    composerSolvers: ComposerSolver[],
+    currentUser: UserType
 ): Promise<SolverModel[] | undefined> {
     if (composerSolvers.length === 0) {
         console.error('No Solver existent.')
@@ -40,7 +39,8 @@ export async function parseComposerSolvers(
 
     const collateralToken = await TokenAPI.getTokenInfo(
         composerSolvers[0].config.collateralToken,
-        provider
+        currentUser.web3Provider,
+        currentUser.chainId
     )
 
     const sortedSolvers = getSolverHierarchy(
@@ -54,8 +54,6 @@ export async function parseComposerSolvers(
         ) // Todo error context?
         return undefined
     }
-
-    const { chainId } = await provider.getNetwork()
 
     return sortedSolvers.map((solver, index) => {
         return {
@@ -71,7 +69,7 @@ export async function parseComposerSolvers(
                 solver.config,
                 index,
                 sortedSolvers,
-                chainId
+                currentUser.chainId
             ),
         }
     })
@@ -80,7 +78,7 @@ export async function parseComposerSolvers(
 export function parseComposerSolverConfig(
     composerSolverConfig: ComposerSolverConfigModel,
     currentSolverIndex: number,
-    sortedSolvers: ComposerSolverModel[],
+    sortedSolvers: ComposerSolver[],
     chainId: number
 ): SolverConfigModel {
     const chainData = SUPPORTED_CHAINS[chainId]
@@ -156,7 +154,7 @@ export function parseModuleLoaders(
 
 export function parseComposerSlot(
     inSlot: ComposerSlotModel,
-    sortedSolvers: ComposerSolverModel[]
+    sortedSolvers: ComposerSolver[]
 ): SlotModel {
     const outSlot = <SlotModel>{
         executions: 0,
@@ -208,10 +206,14 @@ export function parseComposerSlot(
             }
 
             outSlot.solverIndex = 0
-            outSlot.data = ethers.utils.defaultAbiCoder.encode(
-                [inSlot.dataTypes[0]],
-                [dataToAdd]
-            )
+            try {
+                outSlot.data = ethers.utils.defaultAbiCoder.encode(
+                    [inSlot.dataTypes[0]],
+                    [dataToAdd]
+                )
+            } catch (e) {
+                console.error(inSlot, dataToAdd)
+            }
             break
         case 2: // Function slot
             if (inSlot.data.length != inSlot.dataTypes.length) {
@@ -255,7 +257,7 @@ export function parseComposerSlot(
 export function parseComposerCondition(
     config: ComposerSolverConfigModel,
     currentSolverIndex: number,
-    sortedSolvers: ComposerSolverModel[]
+    sortedSolvers: ComposerSolver[]
 ): ConditionModel {
     const outCondition = <ConditionModel>{}
 

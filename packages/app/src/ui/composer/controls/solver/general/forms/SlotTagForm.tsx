@@ -1,13 +1,12 @@
-import SlotTagFormFields, {
-    SlotTagFormFieldsType,
-    initialSlotTagInput,
-} from './SlotTagFormFields'
 import { useEffect, useState } from 'react'
 
 import BaseFormContainer from '@cambrian/app/components/containers/BaseFormContainer'
 import { Button } from 'grommet'
 import { Form } from 'grommet'
 import { FormExtendedEvent } from 'grommet'
+import SlotTagFormFields from './SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
+import { defaultSlotTagValues } from '@cambrian/app/classes/Tags/SlotTag'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 
 interface SlotTagFormProps {
@@ -18,19 +17,16 @@ interface SlotTagFormProps {
 const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
     const { currentSolver, dispatch } = useComposerContext()
 
-    const [input, setInput] =
-        useState<SlotTagFormFieldsType>(initialSlotTagInput)
+    const [input, setInput] = useState<SlotTagModel>(defaultSlotTagValues)
 
     //Init
     useEffect(() => {
         if (currentSolver && currentSolver.slotTags[slotId]) {
-            setInput(currentSolver.slotTags[slotId])
+            setInput(currentSolver.slotTags[slotId].metadata)
         }
     }, [])
 
-    const onSubmit = (
-        event: FormExtendedEvent<SlotTagFormFieldsType, Element>
-    ) => {
+    const onSubmit = (event: FormExtendedEvent<SlotTagModel, Element>) => {
         event.preventDefault()
         dispatch({
             type: 'UPDATE_SLOT_TAG',
@@ -40,10 +36,10 @@ const SlotTagForm = ({ onClose, slotId }: SlotTagFormProps) => {
     }
 
     return (
-        <Form<SlotTagFormFieldsType>
+        <Form<SlotTagModel>
             value={input}
             onSubmit={(event) => onSubmit(event)}
-            onChange={(nextValue: SlotTagFormFieldsType) => {
+            onChange={(nextValue: SlotTagModel) => {
                 setInput(nextValue)
             }}
         >

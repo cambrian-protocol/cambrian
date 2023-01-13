@@ -23,7 +23,7 @@
     "ethereum-waffle": "3.3.0",
     "glob-parent": "5.1.2",
     "hardhat": "2.11.2",
-    "hardhat-deploy": "0.8.11",
+    "hardhat-deploy": "^0.11.20",
     "hardhat-gas-reporter": "^1.0.4",
     "ipfs-only-hash": "^4.0.0",
     "lodash": "4.17.21",
@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+    "@pwnednomore/contracts": "^0.2.14",
+    "forge-std": "^1.1.2",
     "hardhat-contract-sizer": "^2.5.1",
     "hardhat-log-remover": "^2.0.2",
     "solc": "0.8.0"

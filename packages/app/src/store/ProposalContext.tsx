@@ -1,11 +1,5 @@
-import React, {
-    PropsWithChildren,
-    useCallback,
-    useEffect,
-    useState,
-} from 'react'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 import {
-    addRecentStage,
     ceramicInstance,
     loadCommitWorkaround,
     loadStageDoc,
@@ -27,16 +21,18 @@ import ProposalsHub from '../hubs/ProposalsHub'
 import { StageStackType } from '../ui/dashboard/ProposalsDashboardUI'
 import { TemplateModel } from '../models/TemplateModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { TokenAPI } from '../services/api/Token.api'
+import { TokenModel } from '../models/TokenModel'
 import { UserType } from './UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
 import { ethers } from 'ethers'
-import { solverSafetyCheck } from '../utils/helpers/safetyChecks'
 
 export type ProposalContextType = {
     stageStack?: StageStackType
     proposalContract?: ethers.Contract
     proposalStatus?: ProposalStatus
+    collateralToken?: TokenModel
     isLoaded: boolean
 }
 
@@ -63,10 +59,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [isLoaded, setIsLoaded] = useState(false)
         const [templateStreamDoc, setTemplateStreamDoc] =
             useState<TileDocument<TemplateModel>>()
+        const [collateralToken, setCollateralToken] = useState<TokenModel>()
 
         useEffect(() => {
             init()
-            safetyCheckSolver(stageStack, currentUser)
         }, [])
 
         // Init offchain Listeners
@@ -115,15 +111,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 }
             }
         }, [proposalStatus, stageStack])
-
-        const safetyCheckSolver = useCallback(
-            async (stageStack?: StageStackType, currentUser?: UserType) => {
-                if (stageStack && currentUser) {
-                    solverSafetyCheck(stageStack, currentUser)
-                }
-            },
-            [stageStack]
-        )
 
         const initProposalsHubListener = async (
             proposalsHub: ProposalsHub,
@@ -199,7 +186,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         cambrianStageStackDoc.content.proposalStack.proposal
                             .template.commitID
                     )
-
                     setProposalStatus(
                         getProposalStatus(
                             stageStack.proposal,
@@ -209,6 +195,14 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     )
                     setOnChainProposal(onChainProposal)
                     setStageStack(stageStack)
+                    setCollateralToken(
+                        await TokenAPI.getTokenInfo(
+                            cambrianStageStackDoc.content.proposalStack.proposal
+                                .price.tokenAddress,
+                            currentUser.web3Provider,
+                            currentUser.chainId
+                        )
+                    )
                 } else {
                     // Fallback in case cambrian-stageStack had no entry but there is an approved commit
                     const approvedCommitID = getApprovedProposalCommitID(
@@ -257,6 +251,13 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     )
                     if (proposalStreamDoc.content.isSubmitted) {
                         setStageStack(stageStack)
+                        setCollateralToken(
+                            await TokenAPI.getTokenInfo(
+                                stageStack.proposal.price.tokenAddress,
+                                currentUser.web3Provider,
+                                currentUser.chainId
+                            )
+                        )
                     } else {
                         const _latestProposalSubmission =
                             getLatestProposalSubmission(
@@ -270,6 +271,14 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                                     _latestProposalSubmission.proposalCommitID
                                 )
                             ).content as ProposalModel
+                            setCollateralToken(
+                                await TokenAPI.getTokenInfo(
+                                    latestProposalCommitContent.price
+                                        .tokenAddress,
+                                    currentUser.web3Provider,
+                                    currentUser.chainId
+                                )
+                            )
                             setStageStack({
                                 ...stageStack,
                                 proposal: latestProposalCommitContent,
@@ -289,6 +298,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     stageStack: stageStack,
                     proposalStatus: proposalStatus,
                     proposalContract: onChainProposal,
+                    collateralToken: collateralToken,
                     isLoaded: isLoaded,
                 }}
             >

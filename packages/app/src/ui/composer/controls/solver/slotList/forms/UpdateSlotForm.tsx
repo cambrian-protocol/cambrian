@@ -59,7 +59,10 @@ const UpdateSlotForm = ({ onClose, slot }: UpdateSlotFormProps) => {
             reference: slot.reference,
             label: (slotTag && slotTag.label) || '',
             description: (slotTag && slotTag.description) || '',
+            instruction: (slotTag && slotTag.instruction) || '',
             isFlex: (slotTag && slotTag.isFlex) || false,
+            slotId: slotTag.slotId,
+            solverId: slotTag.solverId,
         })
     }, [])
 

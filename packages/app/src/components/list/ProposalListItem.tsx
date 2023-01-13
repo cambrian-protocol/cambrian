@@ -45,6 +45,7 @@ export type ProposalInfoType = {
     title: string
     status: ProposalStatus
     template: TemplateModel
+    onChainProposalId?: string
 }
 
 const ProposalListItem = ({
@@ -88,17 +89,12 @@ const ProposalListItem = ({
     }
 
     const onRemove = async (
-        proposalTag: string,
         proposalStreamID: string,
         type: 'CANCEL' | 'ARCHIVE'
     ) => {
         try {
             setIsRemoving(true)
-            await ceramicProposalAPI.removeProposal(
-                proposalTag,
-                proposalStreamID,
-                type
-            )
+            await ceramicProposalAPI.removeProposal(proposalStreamID, type)
         } catch (e) {
             setIsRemoving(false)
             setErrorMessage(await cpLogger.push(e))
@@ -140,6 +136,9 @@ const ProposalListItem = ({
                                 <Box pad="xsmall">
                                     <ProposalStatusBadge
                                         status={proposalInfo?.status}
+                                        onChainProposalId={
+                                            proposalInfo?.onChainProposalId
+                                        }
                                     />
                                 </Box>
                             </Box>
@@ -229,7 +228,6 @@ const ProposalListItem = ({
                                             ? undefined
                                             : () =>
                                                   onRemove(
-                                                      proposal.title,
                                                       proposalStreamID,
                                                       isDeletable
                                                           ? 'CANCEL'

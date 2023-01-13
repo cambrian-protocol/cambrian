@@ -9,37 +9,30 @@ import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
 import { SetStateAction } from 'react'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
 interface ProposalPricingStepProps {
+    editProposalContext: EditProposalContextType
     stepperCallback: (step: ProposalWizardStepsType) => void
-    proposalInput: ProposalModel
-    setProposalInput: React.Dispatch<SetStateAction<ProposalModel | undefined>>
-    onSaveProposal: () => Promise<boolean>
-    template: TemplateModel
 }
 
 const ProposalPricingStep = ({
-    template,
+    editProposalContext,
     stepperCallback,
-    onSaveProposal,
-    proposalInput,
-    setProposalInput,
 }: ProposalPricingStepProps) => {
+    const { proposal, onSaveProposal } = editProposalContext
     return (
         <Box>
             <Box pad="xsmall">
                 <HeaderTextSection title="Great! And how much are you willing to pay?" />
             </Box>
             <ProposalPricingForm
-                template={template}
-                proposalInput={proposalInput}
-                setProposalInput={setProposalInput}
+                editProposalContext={editProposalContext}
                 onSubmit={async () => {
                     if (await onSaveProposal()) {
-                        if (
-                            proposalInput &&
-                            proposalInput.flexInputs.length > 0
-                        ) {
+                        if (proposal && proposal.flexInputs.length > 0) {
                             stepperCallback(PROPOSAL_WIZARD_STEPS.FLEX_INPUTS)
                         } else {
                             stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)

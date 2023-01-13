@@ -22,14 +22,8 @@ describe("SolverRetries", async function () {
     this.keeper = keeper;
     this.arbitrator = arbitrator;
 
-    await deployments.fixture([
-      "ConditionalTokens",
-      "SolverFactory",
-      "ProposalsHub",
-      "ToyToken",
-      "BasicSolverV1",
-      "IPFSSolutionsHub",
-    ]);
+    await deployments.fixture(["test"]);
+
     this.CT = await ethers.getContract("ConditionalTokens");
     this.SolverFactory = await ethers.getContract("SolverFactory");
     this.ToyToken = await ethers.getContract("ToyToken");

@@ -1,3 +1,23 @@
+import ARBITRUM_ArbitrationDispatch from '@cambrian/core/deployments/arbitrum/ArbitrationDispatch.json'
+import ARBITRUM_ArbitratorFactory from '@cambrian/core/deployments/arbitrum/ArbitratorFactory.json'
+import ARBITRUM_BasicArbitrator from '@cambrian/core/deployments/arbitrum/BasicArbitrator.json'
+import ARBITRUM_BasicSolverV1 from '@cambrian/core/deployments/arbitrum/BasicSolverV1.json'
+import ARBITRUM_ConditionalTokens from '@cambrian/core/deployments/arbitrum/ConditionalTokens.json'
+import ARBITRUM_IPFSSolutionsHub from '@cambrian/core/deployments/arbitrum/IPFSSolutionsHub.json'
+import ARBITRUM_ProposalsHub from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
+import ARBITRUM_SolverFactory from '@cambrian/core/deployments/arbitrum/SolverFactory.json'
+import ARBITRUM_SolverLib from '@cambrian/core/deployments/arbitrum/SolverLib.json'
+import ARBITRUM_ToyToken from '@cambrian/core/deployments/arbitrum/ToyToken.json'
+import GOERLI_ArbitrationDispatch from '@cambrian/core/deployments/goerli/ArbitrationDispatch.json'
+import GOERLI_ArbitratorFactory from '@cambrian/core/deployments/goerli/ArbitratorFactory.json'
+import GOERLI_BasicArbitrator from '@cambrian/core/deployments/goerli/BasicArbitrator.json'
+import GOERLI_BasicSolverV1 from '@cambrian/core/deployments/goerli/BasicSolverV1.json'
+import GOERLI_ConditionalTokens from '@cambrian/core/deployments/goerli/ConditionalTokens.json'
+import GOERLI_IPFSSolutionsHub from '@cambrian/core/deployments/goerli/IPFSSolutionsHub.json'
+import GOERLI_ProposalsHub from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import GOERLI_SolverFactory from '@cambrian/core/deployments/goerli/SolverFactory.json'
+import GOERLI_SolverLib from '@cambrian/core/deployments/goerli/SolverLib.json'
+import GOERLI_ToyToken from '@cambrian/core/deployments/goerli/ToyToken.json'
 import LOCAL_ArbitrationDispatch from '@cambrian/core/deployments/localhost/ArbitrationDispatch.json'
 import LOCAL_ArbitratorFactory from '@cambrian/core/deployments/localhost/ArbitratorFactory.json'
 import LOCAL_BasicArbitrator from '@cambrian/core/deployments/localhost/BasicArbitrator.json'
@@ -9,51 +29,18 @@ import LOCAL_SolverFactory from '@cambrian/core/deployments/localhost/SolverFact
 import LOCAL_SolverLib from '@cambrian/core/deployments/localhost/SolverLib.json'
 import LOCAL_ToyToken from '@cambrian/core/deployments/localhost/ToyToken.json'
 
-import ROPSTEN_ArbitrationDispatch from '@cambrian/core/deployments/ropsten/ArbitrationDispatch.json'
-import ROPSTEN_ArbitratorFactory from '@cambrian/core/deployments/ropsten/ArbitratorFactory.json'
-import ROPSTEN_BasicArbitrator from '@cambrian/core/deployments/ropsten/BasicArbitrator.json'
-import ROPSTEN_BasicSolverV1 from '@cambrian/core/deployments/ropsten/BasicSolverV1.json'
-import ROPSTEN_ConditionalTokens from '@cambrian/core/deployments/ropsten/ConditionalTokens.json'
-import ROPSTEN_IPFSSolutionsHub from '@cambrian/core/deployments/ropsten/IPFSSolutionsHub.json'
-import ROPSTEN_ProposalsHub from '@cambrian/core/deployments/ropsten/ProposalsHub.json'
-import ROPSTEN_SolverFactory from '@cambrian/core/deployments/ropsten/SolverFactory.json'
-import ROPSTEN_SolverLib from '@cambrian/core/deployments/ropsten/SolverLib.json'
-import ROPSTEN_ToyToken from '@cambrian/core/deployments/ropsten/ToyToken.json'
+// import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
+// import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
+// import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
+// import NOVA_BasicSolverV1 from '@cambrian/core/deployments/nova/BasicSolverV1.json'
+// import NOVA_ConditionalTokens from '@cambrian/core/deployments/nova/ConditionalTokens.json'
+// import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutionsHub.json'
+// import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
+// import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
+// import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
+// import NOVA_ToyToken from '@cambrian/core/deployments/nova/ToyToken.json'
 
-import NOVA_ArbitrationDispatch from '@cambrian/core/deployments/nova/ArbitrationDispatch.json'
-import NOVA_ArbitratorFactory from '@cambrian/core/deployments/nova/ArbitratorFactory.json'
-import NOVA_BasicArbitrator from '@cambrian/core/deployments/nova/BasicArbitrator.json'
-import NOVA_BasicSolverV1 from '@cambrian/core/deployments/nova/BasicSolverV1.json'
-import NOVA_ConditionalTokens from '@cambrian/core/deployments/nova/ConditionalTokens.json'
-import NOVA_IPFSSolutionsHub from '@cambrian/core/deployments/nova/IPFSSolutionsHub.json'
-import NOVA_ProposalsHub from '@cambrian/core/deployments/nova/ProposalsHub.json'
-import NOVA_SolverFactory from '@cambrian/core/deployments/nova/SolverFactory.json'
-import NOVA_SolverLib from '@cambrian/core/deployments/nova/SolverLib.json'
-import NOVA_ToyToken from '@cambrian/core/deployments/nova/ToyToken.json'
-
-import GOERLI_ArbitrationDispatch from '@cambrian/core/deployments/goerli/ArbitrationDispatch.json'
-import GOERLI_ArbitratorFactory from '@cambrian/core/deployments/goerli/ArbitratorFactory.json'
-import GOERLI_BasicArbitrator from '@cambrian/core/deployments/goerli/BasicArbitrator.json'
-import GOERLI_BasicSolverV1 from '@cambrian/core/deployments/goerli/BasicSolverV1.json'
-import GOERLI_ConditionalTokens from '@cambrian/core/deployments/goerli/ConditionalTokens.json'
-import GOERLI_IPFSSolutionsHub from '@cambrian/core/deployments/goerli/IPFSSolutionsHub.json'
-import GOERLI_ProposalsHub from '@cambrian/core/deployments/goerli/ProposalsHub.json'
-import GOERLI_SolverFactory from '@cambrian/core/deployments/goerli/SolverFactory.json'
-import GOERLI_SolverLib from '@cambrian/core/deployments/goerli/SolverLib.json'
-import GOERLI_ToyToken from '@cambrian/core/deployments/goerli/ToyToken.json'
-
-import ARBITRUM_ArbitrationDispatch from '@cambrian/core/deployments/arbitrum/ArbitrationDispatch.json'
-import ARBITRUM_ArbitratorFactory from '@cambrian/core/deployments/arbitrum/ArbitratorFactory.json'
-import ARBITRUM_BasicArbitrator from '@cambrian/core/deployments/arbitrum/BasicArbitrator.json'
-import ARBITRUM_BasicSolverV1 from '@cambrian/core/deployments/arbitrum/BasicSolverV1.json'
-import ARBITRUM_ConditionalTokens from '@cambrian/core/deployments/arbitrum/ConditionalTokens.json'
-import ARBITRUM_IPFSSolutionsHub from '@cambrian/core/deployments/arbitrum/IPFSSolutionsHub.json'
-import ARBITRUM_ProposalsHub from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
-import ARBITRUM_SolverFactory from '@cambrian/core/deployments/arbitrum/SolverFactory.json'
-import ARBITRUM_SolverLib from '@cambrian/core/deployments/arbitrum/SolverLib.json'
-import ARBITRUM_ToyToken from '@cambrian/core/deployments/arbitrum/ToyToken.json'
-
-interface ChainInfo {
+export type ChainInfo = {
     name: string
     shortName: string
     chain: string
@@ -62,6 +49,9 @@ interface ChainInfo {
     networkId: number
     rpcUrl: string
     nativeCurrency: NativeCurrencyType
+    logoURI?: string
+    tokenListURI?: string
+    bridgeURI?: string
 }
 
 interface NativeCurrencyType {
@@ -80,6 +70,7 @@ export type ChainDataHashMapType = {
     [chainId: number]: {
         chainData: ChainInfo
         contracts: ContractAddresses
+        compositions: { [title: string]: string }
     }
 }
 
@@ -100,6 +91,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/hardhat_logo.png',
         },
         contracts: {
             arbitratorFactory: LOCAL_ArbitratorFactory.address,
@@ -115,74 +107,45 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
+        compositions: {},
     },
-    3: {
-        chainData: {
-            name: 'Ropsten Test Network',
-            shortName: 'rop',
-            chain: 'ETH',
-            network: 'ropsten',
-            chainId: 3,
-            networkId: 3,
-            rpcUrl: 'https://ropsten.infura.io/v3/5e5e73b367364266b008aed15e5b3189',
-            nativeCurrency: {
-                symbol: 'ETH',
-                name: 'Ethereum',
-                decimals: '18',
-                contractAddress: '',
-                balance: '',
-            },
-        },
-        contracts: {
-            arbitratorFactory: ROPSTEN_ArbitratorFactory.address,
-            arbitrationDispatch: ROPSTEN_ArbitrationDispatch.address,
-            basicArbitrator: ROPSTEN_BasicArbitrator.address,
-            basicSolverV1: ROPSTEN_BasicSolverV1.address,
-            conditionalTokens: ROPSTEN_ConditionalTokens.address,
-            ipfsSolutionsHub: ROPSTEN_IPFSSolutionsHub.address,
-            proposalsHub: ROPSTEN_ProposalsHub.address,
-            solverFactory: ROPSTEN_SolverFactory.address,
-            solverLib: ROPSTEN_SolverLib.address,
-            toyToken: ROPSTEN_ToyToken.address,
-            defaultDenominationToken:
-                '0xc778417e063141139fce010982780140aa0cd5ab',
-        },
-    },
-    42170: {
-        chainData: {
-            name: 'Arbitrum Nova',
-            shortName: 'arb-nova',
-            chain: 'ETH',
-            network: 'arbitrum-nova',
-            chainId: 42170,
-            networkId: 42170,
-            rpcUrl: 'https://nova.arbitrum.io/rpc',
-            nativeCurrency: {
-                symbol: 'ETH',
-                name: 'Ethereum',
-                decimals: '18',
-                contractAddress: '',
-                balance: '',
-            },
-        },
-        contracts: {
-            arbitratorFactory: NOVA_ArbitratorFactory.address,
-            arbitrationDispatch: NOVA_ArbitrationDispatch.address,
-            basicArbitrator: NOVA_BasicArbitrator.address,
-            basicSolverV1: NOVA_BasicSolverV1.address,
-            conditionalTokens: NOVA_ConditionalTokens.address,
-            ipfsSolutionsHub: NOVA_IPFSSolutionsHub.address,
-            proposalsHub: NOVA_ProposalsHub.address,
-            solverFactory: NOVA_SolverFactory.address,
-            solverLib: NOVA_SolverLib.address,
-            toyToken: NOVA_ToyToken.address,
-            defaultDenominationToken:
-                '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
-        },
-    },
+    // 42170: {
+    //     chainData: {
+    //         name: 'Arbitrum Nova',
+    //         shortName: 'arb-nova',
+    //         chain: 'ETH',
+    //         network: 'arbitrum-nova',
+    //         chainId: 42170,
+    //         networkId: 42170,
+    //         rpcUrl: 'https://nova.arbitrum.io/rpc',
+    //         nativeCurrency: {
+    //             symbol: 'ETH',
+    //             name: 'Ethereum',
+    //             decimals: '18',
+    //             contractAddress: '',
+    //             balance: '',
+    //         },
+    //         logoURI: '/images/logo/arbitrum_nova_logo.svg',
+    //     },
+    //     contracts: {
+    //         arbitratorFactory: NOVA_ArbitratorFactory.address,
+    //         arbitrationDispatch: NOVA_ArbitrationDispatch.address,
+    //         basicArbitrator: NOVA_BasicArbitrator.address,
+    //         basicSolverV1: NOVA_BasicSolverV1.address,
+    //         conditionalTokens: NOVA_ConditionalTokens.address,
+    //         ipfsSolutionsHub: NOVA_IPFSSolutionsHub.address,
+    //         proposalsHub: NOVA_ProposalsHub.address,
+    //         solverFactory: NOVA_SolverFactory.address,
+    //         solverLib: NOVA_SolverLib.address,
+    //         toyToken: NOVA_ToyToken.address,
+    //         defaultDenominationToken:
+    //             '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
+    //     },
+    //     compositions: {},
+    // },
     5: {
         chainData: {
-            name: 'Goerli Test Network',
+            name: 'Görli',
             shortName: 'gor',
             chain: 'ETH',
             network: 'goerli',
@@ -196,6 +159,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/ethereum_logo.svg',
         },
         contracts: {
             arbitratorFactory: GOERLI_ArbitratorFactory.address,
@@ -210,6 +174,10 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             toyToken: GOERLI_ToyToken.address,
             defaultDenominationToken: GOERLI_ToyToken.address,
         },
+        compositions: {
+            Copywriter:
+                'kjzl6cwe1jw145fuuak9g2ca5cpomea02x29fx43mjhowii1l7mlbdq84dim1ao',
+        },
     },
     42161: {
         chainData: {
@@ -217,7 +185,7 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             shortName: 'arb-one',
             chain: 'ETH',
             network: 'arbitrum-one',
-            chainId: 421761,
+            chainId: 42161,
             networkId: 42161,
             rpcUrl: 'https://arbitrum-mainnet.infura.io/v3/5e58480c71ad4bf3bb584550df349e01',
             nativeCurrency: {
@@ -227,6 +195,8 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
                 contractAddress: '',
                 balance: '',
             },
+            logoURI: '/images/logo/arbitrum_one_logo.svg',
+            bridgeURI: 'https://bridge.arbitrum.io/',
         },
         contracts: {
             arbitratorFactory: ARBITRUM_ArbitratorFactory.address,
@@ -242,5 +212,6 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1', // DAI
         },
+        compositions: {},
     },
 }

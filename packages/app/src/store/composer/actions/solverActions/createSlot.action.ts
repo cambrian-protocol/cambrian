@@ -1,11 +1,11 @@
 import { ComposerSlotPathType } from '@cambrian/app/models/SlotModel'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SlotTagFormFieldsType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { ethers } from 'ethers'
 
-export type CreateSlotActionPayload = SlotTagFormFieldsType & {
+export type CreateSlotActionPayload = SlotTagModel & {
     slotType: SlotType
     dataTypes: SolidityDataTypes[]
     data: any[]
@@ -55,6 +55,7 @@ const createSlotAction = (
             slotId: newSlot.id,
             label: payload.label,
             description: payload.description,
+            instruction: payload.instruction,
             isFlex: payload.isFlex,
         })
 

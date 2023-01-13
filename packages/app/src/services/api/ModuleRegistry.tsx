@@ -23,9 +23,9 @@ const moduleRegistry: ModuleRegistryType = {}
 
 moduleRegistry[IPFS_TEXT_SUBMITTER_MODULE_KEY] = {
     key: IPFS_TEXT_SUBMITTER_MODULE_KEY,
-    name: 'IPFS Text Submitter',
+    name: 'Text Submission',
     description:
-        'Enables a UI for an approved user to submit text through IPFS and record the submission in an on-chain event.',
+        'Enables a UI for an approved user to submit text on Ceramic and record the submission in an on-chain event.',
     dataInputs: [
         {
             type: SolidityDataTypes.Bytes32,

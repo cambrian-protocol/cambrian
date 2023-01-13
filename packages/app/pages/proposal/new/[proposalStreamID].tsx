@@ -9,31 +9,19 @@ import _ from 'lodash'
 import useEditProposal from '@cambrian/app/hooks/useEditProposal'
 
 export default function NewProposalPage() {
-    const {
-        isLoaded,
-        proposalInput,
-        setProposalInput,
-        stageStack,
-        onSaveProposal,
-        proposalStreamID,
-        errorMessage,
-        setErrorMessage,
-    } = useEditProposal()
+    const editProposalContext = useEditProposal()
 
     return (
         <>
-            {!isLoaded ? (
+            {!editProposalContext.isLoaded ? (
                 <LoadingScreen context={LOADING_MESSAGE['PROPOSAL']} />
-            ) : proposalInput && stageStack ? (
+            ) : editProposalContext.proposal &&
+              editProposalContext.stageStack ? (
                 <PageLayout contextTitle="New Proposal" kind="narrow">
-                    <Box align="center" pad="large">
+                    <Box align="center">
                         <Box width={'xlarge'} gap="large">
                             <ProposalWizard
-                                proposalStreamID={proposalStreamID}
-                                onSaveProposal={onSaveProposal}
-                                stageStack={stageStack}
-                                proposalInput={proposalInput}
-                                setProposalInput={setProposalInput}
+                                editProposalContext={editProposalContext}
                             />
                         </Box>
                     </Box>
@@ -41,10 +29,12 @@ export default function NewProposalPage() {
             ) : (
                 <Custom404Page />
             )}
-            {errorMessage && (
+            {editProposalContext.errorMessage && (
                 <ErrorPopupModal
-                    errorMessage={errorMessage}
-                    onClose={() => setErrorMessage(undefined)}
+                    errorMessage={editProposalContext.errorMessage}
+                    onClose={() =>
+                        editProposalContext.setErrorMessage(undefined)
+                    }
                 />
             )}
         </>

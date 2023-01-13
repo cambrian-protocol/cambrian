@@ -7,6 +7,7 @@ import { PropsWithChildren } from 'react'
 export type BaseLayerModalProps = PropsWithChildren<{}> &
     LayerProps & {
         title?: string
+        width?: 'xlarge'
     } & (
         | { onBack: () => void; onClose?: never }
         | { onClose: () => void; onBack?: never }
@@ -15,6 +16,7 @@ export type BaseLayerModalProps = PropsWithChildren<{}> &
 const BaseLayerModal = ({
     children,
     title,
+    width,
     onBack,
     onClose,
     ...props
@@ -28,7 +30,7 @@ const BaseLayerModal = ({
         background="background-back"
     >
         <Box
-            width="large"
+            width={width ? width : 'large'}
             style={{ position: 'relative' }}
             overflow="hidden"
             height={{ min: '100vh' }}
@@ -43,6 +45,7 @@ const BaseLayerModal = ({
                 elevation="small"
                 height={{ max: 'xxsmall', min: 'xxsmall' }}
                 style={{ position: 'relative' }}
+                gap="medium"
             >
                 <IconContext.Provider value={{ size: '24' }}>
                     <Box onClick={onBack || onClose} focusIndicator={false}>

@@ -1,20 +1,8 @@
 import BaseFormGroupContainer from '@cambrian/app/components/containers/BaseFormGroupContainer'
-import { Box } from 'grommet'
-import { CheckBox } from 'grommet'
+import { Box, RadioButtonGroup } from 'grommet'
 import { FormField } from 'grommet'
 import { TextArea } from 'grommet'
 
-export type SlotTagFormFieldsType = {
-    label: string
-    description: string
-    isFlex: boolean
-}
-
-export const initialSlotTagInput = {
-    label: '',
-    description: '',
-    isFlex: false,
-}
 const SlotTagFormFields = () => {
     return (
         <BaseFormGroupContainer>
@@ -23,9 +11,12 @@ const SlotTagFormFields = () => {
                 <FormField label="Description">
                     <TextArea name="description" rows={2} resize={false} />
                 </FormField>
-                <CheckBox
-                    label="Is flexible and can be defined during template and proposal creation process"
+                <FormField label="Instruction">
+                    <TextArea name="instruction" rows={2} resize={false} />
+                </FormField>
+                <RadioButtonGroup
                     name="isFlex"
+                    options={['None', 'Both', 'Template', 'Proposal']}
                 />
             </Box>
         </BaseFormGroupContainer>

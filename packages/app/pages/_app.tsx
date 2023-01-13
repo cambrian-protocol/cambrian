@@ -31,7 +31,7 @@ const Core = ({ Component, pageProps }: AppProps) => {
             background={'background-back'}
         >
             <GlobalStyle />
-            <Store>
+            <Store pageProps={pageProps as any}>
                 <ErrorBoundary>
                     <Component {...pageProps} />
                 </ErrorBoundary>

@@ -11,7 +11,6 @@ import {
     loadStageDoc,
     loadStagesLib,
     loadStageStackFromID,
-    saveCambrianCommitData,
 } from './CeramicUtils'
 
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
@@ -25,7 +24,9 @@ import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '../api/Logger.api'
-import { deploySolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
+import { createSolutionBase } from '@cambrian/app/utils/helpers/proposalHelper'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
+import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 
 /** 
  API functions to maintain templates and the users template-lib
@@ -35,6 +36,36 @@ export default class CeramicTemplateAPI {
 
     constructor(currentUser: UserType) {
         this.user = currentUser
+    }
+
+    getFormFlexInputs = (composition: CompositionModel) => {
+        let isCollateralFlex = false
+        const formFlexInputs: FlexInputFormType[] = []
+        composition.solvers.forEach((solver) => {
+            Object.keys(solver.slotTags).forEach((tagId) => {
+                if (solver.slotTags[tagId].isFlex !== 'None') {
+                    if (tagId === 'collateralToken') {
+                        isCollateralFlex = true
+                    } else {
+                        formFlexInputs.push({
+                            ...(solver.slotTags[tagId] as SlotTagModel),
+                            tagId: tagId,
+                            value:
+                                tagId === 'timelockSeconds'
+                                    ? solver.config.timelockSeconds?.toString() ||
+                                      ''
+                                    : '', // TODO this is stupid
+                        })
+                        formFlexInputs.push()
+                    }
+                }
+            })
+        })
+
+        return {
+            formFlexInputs: formFlexInputs,
+            isCollateralFlex: isCollateralFlex,
+        }
     }
 
     /**
@@ -49,37 +80,25 @@ export default class CeramicTemplateAPI {
         compositionStreamID: string
     ): Promise<string> => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const composition: TileDocument<CompositionModel> =
                 await TileDocument.load(
                     ceramicInstance(this.user),
                     compositionStreamID
                 )
 
-            let isCollateralFlex = false
-            const formFlexInputs: FlexInputFormType[] = []
-            composition.content.solvers.forEach((solver) => {
-                Object.keys(solver.slotTags).forEach((tagId) => {
-                    if (solver.slotTags[tagId].isFlex === true) {
-                        if (tagId === 'collateralToken') {
-                            isCollateralFlex = true
-                        } else {
-                            formFlexInputs.push({
-                                ...solver.slotTags[tagId],
-                                solverId: solver.id,
-                                tagId: tagId,
-                                value: '',
-                            })
-                        }
-                    }
-                })
-            })
+            const { formFlexInputs, isCollateralFlex } = this.getFormFlexInputs(
+                composition.content
+            )
 
             const template: TemplateModel = {
                 title: title,
                 description: '',
                 requirements: '',
                 price: {
-                    amount: 0,
+                    amount: '',
                     denominationTokenAddress:
                         composition.content.solvers[0].config.collateralToken ||
                         '',
@@ -97,13 +116,8 @@ export default class CeramicTemplateAPI {
                 isActive: true,
             }
 
-            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-            await saveCambrianCommitData(
-                this.user,
-                composition.commitId.toString()
-            )
-
-            return createStage(template, StageNames.template, this.user)
+            return (await createStage(template, StageNames.template, this.user))
+                .streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -118,6 +132,9 @@ export default class CeramicTemplateAPI {
      */
     requestProposalChange = async (stageStack: StageStackType) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
                 method: 'POST',
@@ -148,39 +165,33 @@ export default class CeramicTemplateAPI {
     /**
      * Deploys a SolutionBase from the ProposalCommitID and the TemplateCommitID, hits mailbox server and sets the approved flag in the template.receivedProposals to true
      *
-     * @param currentUser
      * @param stageStack
      * @auth must be done by the Templater
      */
-    approveProposal = async (
-        currentUser: UserType,
-        stageStack: StageStackType
-    ) => {
+    approveProposal = async (stageStack: StageStackType) => {
         try {
-            if (await deploySolutionBase(currentUser, stageStack)) {
-                // Hit mailbox server
-                const res = await fetch(
-                    `${TRILOBOT_ENDPOINT}/approveProposal`,
-                    {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            id: stageStack.proposalStreamID,
-                            session: this.user.session.serialize(),
-                        }),
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                )
-                if (res.status === 200) {
-                    await this.updateProposalEntry(stageStack, {
-                        approved: true,
-                    })
-                    return true
-                } else {
-                    cpLogger.push(res.status)
-                    return false
-                }
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
+            // Hit mailbox server
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: stageStack.proposalStreamID,
+                    session: this.user.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            if (res.status === 200) {
+                await this.updateProposalEntry(stageStack, {
+                    approved: true,
+                })
+                return await createSolutionBase(this.user, stageStack)
+            } else {
+                cpLogger.push(res.status)
+                return false
             }
         } catch (e) {
             throw e
@@ -267,11 +278,6 @@ export default class CeramicTemplateAPI {
                     },
                 ]
 
-                // NOTE: Workaround until Ceramics load bugfix is merged
-                await saveCambrianCommitData(
-                    this.user,
-                    stageStack.proposalCommitID
-                )
                 await templateStreamDoc.update({
                     ...templateStreamDoc.content,
                     receivedProposals: updatedReceivedProposals,
@@ -300,11 +306,6 @@ export default class CeramicTemplateAPI {
                         proposalCommitID: stageStack.proposalCommitID,
                     })
 
-                    // NOTE: Workaround until Ceramics load  bugfix is merged
-                    await saveCambrianCommitData(
-                        this.user,
-                        stageStack.proposalCommitID
-                    )
                     await templateStreamDoc.update({
                         ...templateStreamDoc.content,
                         receivedProposals: updatedReceivedProposals,
@@ -338,10 +339,10 @@ export default class CeramicTemplateAPI {
     /**
      * Removes template from template-lib doc and sets isActive flag to false.
      *
-     * @param tag Template Title / Unique tag
+     * @param templateStreamID Template Title / Unique tag
      * @auth Done by Templater
      */
-    archiveTemplate = async (tag: string, templateStreamID: string) => {
+    archiveTemplate = async (templateStreamID: string) => {
         try {
             const templateStreamDoc = await loadStageDoc<TemplateModel>(
                 this.user,
@@ -352,7 +353,7 @@ export default class CeramicTemplateAPI {
                 isActive: false,
             })
 
-            await archiveStage(this.user, tag, StageNames.template)
+            await archiveStage(this.user, templateStreamID, StageNames.template)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -406,9 +407,7 @@ export default class CeramicTemplateAPI {
         try {
             const stagesLib = await loadStagesLib(this.user)
 
-            const updatedStagesLib = {
-                ...stagesLib.content,
-            }
+            const updatedStages = new CambrianStagesLib(stagesLib.content)
 
             const stageStack = await loadStageStackFromID(proposalStreamID)
             // Set isDeclined if proposal is before approved
@@ -416,11 +415,9 @@ export default class CeramicTemplateAPI {
                 await this.updateProposalEntry(stageStack, { isDeclined: true })
             }
 
-            updatedStagesLib.templates.archive.receivedProposals[
-                stageStack.proposal.title
-            ] = proposalStreamID
+            updatedStages.templates.archiveReceivedProposal(proposalStreamID)
 
-            await stagesLib.update(updatedStagesLib)
+            await stagesLib.update(updatedStages.data)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

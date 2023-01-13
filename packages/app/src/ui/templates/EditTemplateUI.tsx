@@ -1,37 +1,24 @@
 import { Box, Tab, Tabs } from 'grommet'
-import { SetStateAction, useContext, useEffect, useState } from 'react'
+import { Clipboard, Eye } from 'phosphor-react'
+import { useContext, useEffect, useState } from 'react'
 
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
-import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
+import TemplateUpdateFromComposition from './TemplateUpdateFromComposition'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import { cpTheme } from '@cambrian/app/theme/theme'
+import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
+import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
 
-interface EditTemplateUIProps {
-    cachedTemplateTitle: string
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
-    templateStreamID: string
-    onSaveTemplate: () => Promise<boolean>
-    onResetTemplate: () => void
-    composition: CompositionModel
-}
-
-const EditTemplateUI = ({
-    cachedTemplateTitle,
-    templateInput,
-    setTemplateInput,
-    onSaveTemplate,
-    onResetTemplate,
-    composition,
-    templateStreamID,
-}: EditTemplateUIProps) => {
+const EditTemplateUI = () => {
+    const editTemplateProps = useEditTemplate()
+    const { template, templateStreamID, cachedTemplate } = editTemplateProps
     const [activeIndex, setActiveIndex] = useState(0)
+    const [authorProfile] = useCambrianProfile(template?.author)
 
     // Scroll up when step changes
     const topRefContext = useContext(TopRefContext)
@@ -40,17 +27,33 @@ const EditTemplateUI = ({
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
-    const onSubmit = async () => {
-        await onSaveTemplate()
+    if (!template) {
+        return null
     }
 
     return (
-        <Box gap="medium" pad="large">
-            <TemplateHeader
-                title={cachedTemplateTitle}
-                link={`${window.location.origin}/solver/${templateStreamID}`}
+        <Box gap="medium">
+            <BaseHeader
+                authorProfileDoc={authorProfile}
+                title={cachedTemplate?.title || 'Untitled'}
+                metaTitle="Edit Template"
+                items={[
+                    {
+                        label: 'View Template',
+                        icon: <Eye color={cpTheme.global.colors['dark-4']} />,
+                        href: `/solver/${templateStreamID}`,
+                    },
+                    {
+                        label: 'Copy URL',
+                        icon: (
+                            <Clipboard
+                                color={cpTheme.global.colors['dark-4']}
+                            />
+                        ),
+                        value: `${window.location.host}/solver/${templateStreamID}`,
+                    },
+                ]}
             />
-            <PlainSectionDivider />
             <Tabs
                 justify="start"
                 activeIndex={activeIndex}
@@ -65,10 +68,7 @@ const EditTemplateUI = ({
                         />
                     </Box>
                     <TemplateDescriptionForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
+                        editTemplateProps={editTemplateProps}
                     />
                 </Tab>
                 <Tab title="Pricing">
@@ -80,27 +80,20 @@ const EditTemplateUI = ({
                         />
                     </Box>
                     <TemplatePricingForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
+                        editTemplateProps={editTemplateProps}
                     />
                 </Tab>
-                {templateInput.flexInputs.length > 0 && (
+                {template.flexInputs.length > 0 && (
                     <Tab title="Solver Config">
                         <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
                             <HeaderTextSection
                                 size="small"
                                 title="Solver Config"
-                                paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
+                                paragraph="Configure the Solver by completing these fields as instructed."
                             />
                         </Box>
                         <TemplateFlexInputsForm
-                            composition={composition}
-                            templateInput={templateInput}
-                            setTemplateInput={setTemplateInput}
-                            onSubmit={onSubmit}
-                            onCancel={onResetTemplate}
+                            editTemplateProps={editTemplateProps}
                         />
                     </Tab>
                 )}
@@ -113,11 +106,21 @@ const EditTemplateUI = ({
                         />
                     </Box>
                     <TemplateRequirementsForm
-                        templateInput={templateInput}
-                        setTemplateInput={setTemplateInput}
-                        onSubmit={onSubmit}
-                        onCancel={onResetTemplate}
+                        editTemplateProps={editTemplateProps}
                     />
+                </Tab>
+                <Tab title="Advanced">
+                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                        <HeaderTextSection
+                            size="small"
+                            title="Update Template from Composition"
+                            paragraph="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
+                        />
+
+                        <TemplateUpdateFromComposition
+                            editTemplateProps={editTemplateProps}
+                        />
+                    </Box>
                 </Tab>
             </Tabs>
         </Box>

@@ -1,5 +1,4 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
-import { TokenModel } from './TokenModel'
 
 export type TemplateModel = {
     title: string
@@ -31,9 +30,9 @@ export type ReceivedProposalPropsType = {
 }
 
 export type TemplatePriceModel = {
-    amount: number
+    amount: number | ''
     denominationTokenAddress: string
-    preferredTokens: TokenModel[]
+    preferredTokens: string[]
     allowAnyPaymentToken: boolean
     isCollateralFlex: boolean
 }

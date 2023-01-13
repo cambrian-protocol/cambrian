@@ -1,12 +1,4 @@
-import {
-    Books,
-    Question,
-    SignIn,
-    SignOut,
-    User,
-    Wallet,
-    WarningOctagon,
-} from 'phosphor-react'
+import { Books, Question, SignOut, User, Wallet } from 'phosphor-react'
 import {
     SUPPORT_DISCORD_LINK,
     WIKI_NOTION_LINK,
@@ -17,7 +9,6 @@ import { Menu } from 'grommet'
 import React from 'react'
 import UserMenuItemIcon from './UserMenuItemIcon'
 import UserMenuItemLabel from './UserMenuItemLabel'
-import { clearStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
@@ -41,41 +32,35 @@ export default function UserMenu() {
     ]
 
     if (currentUser) {
-        menuItems.unshift({
-            label: (
-                <UserMenuItemLabel
-                    subTitle={ellipseAddress(currentUser.address, 9)}
-                    label={
-                        currentUser.cambrianProfileDoc.content?.name || 'Anon'
-                    }
-                />
-            ),
-            icon: <UserMenuItemIcon icon={<User />} />,
-            onClick: () => router.push('/dashboard?idx=5'),
-        })
+        if (currentUser.isSafeApp) {
+            menuItems.unshift({
+                label: (
+                    <UserMenuItemLabel
+                        subTitle={'Connected with Gnosis Safe App'}
+                        label={ellipseAddress(currentUser.address, 7)}
+                    />
+                ),
+                icon: <UserMenuItemIcon icon={<User />} />,
+            })
+        } else {
+            menuItems.unshift({
+                label: (
+                    <UserMenuItemLabel
+                        subTitle={ellipseAddress(currentUser.address, 9)}
+                        label={
+                            currentUser.cambrianProfileDoc?.content?.name ||
+                            'Anon'
+                        }
+                    />
+                ),
+                icon: <UserMenuItemIcon icon={<User />} />,
+                onClick: () => router.push('/dashboard?idx=5'),
+            })
+        }
         menuItems.push({
-            label: <UserMenuItemLabel label="Reset Account" />,
-            icon: <UserMenuItemIcon icon={<WarningOctagon color="red" />} />,
-            onClick: async () => {
-                if (
-                    window.confirm(
-                        'Are you sure? All your compositions, templates and proposal will be deleted from your dashboard after confirming.'
-                    )
-                ) {
-                    await clearStagesLib(currentUser)
-                }
-            },
-        })
-        menuItems.push({
-            label: (
-                <UserMenuItemLabel label={currentUser ? 'Logout' : 'Login'} />
-            ),
+            label: <UserMenuItemLabel label={'Logout'} />,
             onClick: disconnectWallet,
-            icon: (
-                <UserMenuItemIcon
-                    icon={currentUser ? <SignOut /> : <SignIn />}
-                />
-            ),
+            icon: <UserMenuItemIcon icon={<SignOut />} />,
         })
     } else {
         menuItems.unshift({
@@ -91,14 +76,14 @@ export default function UserMenu() {
             dropProps={{
                 round: {
                     corner: 'bottom',
-                    size: 'small',
+                    size: 'xsmall',
                 },
             }}
             dropBackground="background-popup"
             items={menuItems}
         >
             {currentUser ? (
-                currentUser.cambrianProfileDoc.content?.avatar ? (
+                currentUser.cambrianProfileDoc?.content?.avatar ? (
                     <BaseAvatar
                         pfpPath={
                             currentUser.cambrianProfileDoc.content

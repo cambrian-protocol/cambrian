@@ -4,39 +4,31 @@ import {
 } from '../TemplateWizard'
 
 import { Box } from 'grommet'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { SetStateAction } from 'react'
 import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 
 interface TemplateFlexInputsStepProps {
-    templateInput: TemplateModel
-    setTemplateInput: React.Dispatch<SetStateAction<TemplateModel | undefined>>
+    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
-    composition: CompositionModel
-    onSaveTemplate: () => Promise<boolean>
 }
 
 const TemplateFlexInputsStep = ({
+    editTemplateProps,
     stepperCallback,
-    templateInput,
-    setTemplateInput,
-    onSaveTemplate,
-    composition,
 }: TemplateFlexInputsStepProps) => {
+    const { onSaveTemplate } = editTemplateProps
+
     return (
         <Box>
             <Box pad="xsmall">
                 <HeaderTextSection
                     title="Solver Config"
-                    paragraph="These fields configure the Solver for you and your service. Leave blank those which should be completed by a customer (e.g. 'Client Address')"
+                    paragraph="Configure the Solver by completing these fields as instructed."
                 />
             </Box>
             <TemplateFlexInputsForm
-                composition={composition}
-                templateInput={templateInput}
-                setTemplateInput={setTemplateInput}
+                editTemplateProps={editTemplateProps}
                 onSubmit={async () => {
                     if (await onSaveTemplate())
                         stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)

@@ -1,9 +1,4 @@
-import {
-    archiveStage,
-    ceramicInstance,
-    createStage,
-    saveCambrianCommitData,
-} from './CeramicUtils'
+import { archiveStage, ceramicInstance, createStage } from './CeramicUtils'
 
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
@@ -37,6 +32,9 @@ export default class CeramicProposalAPI {
         templateStreamID: string
     ): Promise<string> => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             const templateStreamDoc: TileDocument<TemplateModel> =
                 await ceramicInstance(this.user).loadStream(templateStreamID)
 
@@ -54,7 +52,10 @@ export default class CeramicProposalAPI {
                 ),
                 author: this.user.did,
                 price: {
-                    amount: 0,
+                    amount:
+                        templateStreamDoc.content.price.amount !== ''
+                            ? templateStreamDoc.content.price.amount
+                            : 0,
                     tokenAddress:
                         templateStreamDoc.content.price
                             .denominationTokenAddress,
@@ -62,13 +63,8 @@ export default class CeramicProposalAPI {
                 isSubmitted: false,
             }
 
-            // NOTE: Workaround until Ceramics load commitID Bugfix is merged
-            await saveCambrianCommitData(
-                this.user,
-                templateStreamDoc.commitId.toString()
-            )
-
-            return await createStage(proposal, StageNames.proposal, this.user)
+            return (await createStage(proposal, StageNames.proposal, this.user))
+                .streamID
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
@@ -82,6 +78,9 @@ export default class CeramicProposalAPI {
      */
     submitProposal = async (proposalStreamID: string) => {
         try {
+            if (!this.user.did || !this.user.session)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
             // Hit mailbox server
             const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
                 method: 'POST',
@@ -98,14 +97,10 @@ export default class CeramicProposalAPI {
                     this.user
                 ).loadStream(proposalStreamID)) as TileDocument<ProposalModel>
 
-                await proposalStreamDoc.update(
-                    {
-                        ...(proposalStreamDoc.content as ProposalModel),
-                        isSubmitted: true,
-                    },
-                    { ...proposalStreamDoc.metadata },
-                    { pin: true }
-                )
+                await proposalStreamDoc.update({
+                    ...(proposalStreamDoc.content as ProposalModel),
+                    isSubmitted: true,
+                })
                 return true
             } else {
                 cpLogger.push(res.status)
@@ -119,12 +114,11 @@ export default class CeramicProposalAPI {
     /**
      * Removes proposal from proposal-lib doc, and either sets the deleted flag or adds it to the proposal-archive.
      *
-     * @param tag Proposal title / Unique tag
+     * @param proposalStreamID
      * @param type 'CANCEL' or 'ARCHIVE' (Before approval proposal can be safely deleted, after approval proposal must be archived)
      * @auth Done by proposer
      */
     removeProposal = async (
-        tag: string,
         proposalStreamID: string,
         type: 'CANCEL' | 'ARCHIVE'
     ) => {
@@ -142,7 +136,7 @@ export default class CeramicProposalAPI {
                 })
             }
 
-            await archiveStage(this.user, tag, StageNames.proposal)
+            await archiveStage(this.user, proposalStreamID, StageNames.proposal)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

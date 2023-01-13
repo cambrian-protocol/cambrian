@@ -8,7 +8,6 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { TreeStructure } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
 import router from 'next/router'
@@ -68,9 +67,8 @@ const ImportCompositionModal = ({
         <>
             <BaseLayerModal onClose={onClose}>
                 <ModalHeader
-                    title="Import a Composition"
-                    description="Please provide us with your Composition CID"
-                    icon={<TreeStructure />}
+                    title="Import Composition from IPFS"
+                    description="Composition CID"
                 />
                 <Form<ImportCompositionFormType>
                     onChange={(nextValue: ImportCompositionFormType) =>

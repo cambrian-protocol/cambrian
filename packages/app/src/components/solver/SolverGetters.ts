@@ -12,21 +12,19 @@ import {
     calculateCollectionId,
     calculatePositionId,
     getSolverIngestWithMetaData,
-} from './SolverHelpers'
+} from '@cambrian/app/utils/helpers/solverHelpers'
 
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
-import { CeramicClient } from '@ceramicnetwork/http-client'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
+import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
-import { SlotTagsHashMapType } from '@cambrian/app/models/SlotTagModel'
+import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
@@ -122,6 +120,7 @@ export const getSolverOutcomeCollections = async (
     config: SolverConfigModel,
     conditions: SolverContractCondition[],
     slotHistory: SlotsHistoryHashMapType,
+    collateralBalance: BigNumber,
     slotTags?: SlotTagsHashMapType,
     storedOutcomes?: OutcomeModel[],
     numMintedTokensByCondition?: {
@@ -168,19 +167,24 @@ export const getSolverOutcomeCollections = async (
                         let amountPercentage = amount.toNumber() / 100
                         if (amountPercentage % 1) amountPercentage.toFixed(2)
 
-                        let mintedAmountWei
-                        if (
-                            numMintedTokensByCondition &&
-                            numMintedTokensByCondition[condition.conditionId] &&
-                            !numMintedTokensByCondition[
-                                condition.conditionId
-                            ].isZero() &&
-                            !amount.isZero()
-                        ) {
-                            mintedAmountWei =
+                        let amountWei
+                        if (!amount.isZero()) {
+                            if (
+                                numMintedTokensByCondition &&
                                 numMintedTokensByCondition[
                                     condition.conditionId
-                                ].mul(amount)
+                                ] &&
+                                !numMintedTokensByCondition[
+                                    condition.conditionId
+                                ].isZero()
+                            ) {
+                                amountWei =
+                                    numMintedTokensByCondition[
+                                        condition.conditionId
+                                    ].mul(amount)
+                            } else {
+                                amountWei = collateralBalance.mul(amount)
+                            }
                         }
 
                         const positionId = calculatePositionId(
@@ -201,7 +205,7 @@ export const getSolverOutcomeCollections = async (
                                 ),
                             amountPercentage: amountPercentage.toString(),
                             positionId: positionId,
-                            amount: mintedAmountWei,
+                            amount: amountWei,
                         }
                     })
 
@@ -307,10 +311,11 @@ export const getSolverSlots = async (
                     tag: slotTags
                         ? slotTags[ulid]
                         : {
-                              id: ulid,
+                              slotId: ulid,
                               label: '',
-                              isFlex: false,
+                              isFlex: 'None',
                               description: '',
+                              instruction: '',
                           },
                 }
             }
@@ -394,7 +399,8 @@ export const getSolverData = async (
 
     const collateralToken = await TokenAPI.getTokenInfo(
         config.conditionBase.collateralToken,
-        currentUser.web3Provider
+        currentUser.web3Provider,
+        currentUser.chainId
     )
 
     const timelocksHistory = await getSolverTimelocks(
@@ -408,6 +414,7 @@ export const getSolverData = async (
         config,
         conditions,
         slotsHistory,
+        collateralBalance,
         storedMetadata?.slotTags,
         storedOutcomes,
         numMintedTokensByCondition
@@ -429,33 +436,91 @@ export const getSolverData = async (
 
 export const getSolverMetadata = async (
     solverContract: ethers.Contract,
-    signerOrProvider: ethers.Signer | ethers.providers.Provider,
-    chainId: number
+    provider: ethers.providers.Provider
 ) => {
-    const proposalId = await solverContract.trackingId()
-    if (proposalId) {
-        const proposalsHub = new ProposalsHub(signerOrProvider, chainId)
-        const metadataURI = await proposalsHub.getMetadataCID(proposalId)
-
+    try {
+        const proposalId = await solverContract.trackingId()
         if (proposalId) {
-            const stageStack = await loadStageStackFromID(metadataURI)
-
-            if (stageStack) {
-                const solverIndex = (await solverContract.chainIndex()) as
-                    | number
-                    | undefined
-                if (solverIndex !== undefined) {
-                    return {
-                        slotTags:
-                            stageStack.composition.solvers[solverIndex]
-                                .slotTags,
-                        solverTag:
-                            stageStack.composition.solvers[solverIndex]
-                                .solverTag,
-                        stageStack: stageStack,
+            const network = await provider.getNetwork()
+            const proposalsHub = new ProposalsHub(provider, network.chainId)
+            const metadataURI = await proposalsHub.getMetadataCID(proposalId)
+            if (proposalId && metadataURI !== '') {
+                const stageStack = await loadStageStackFromID(metadataURI)
+                if (stageStack) {
+                    const solverIndex = (await solverContract.chainIndex()) as
+                        | number
+                        | undefined
+                    if (solverIndex !== undefined) {
+                        return {
+                            slotTags:
+                                stageStack.composition.solvers[solverIndex]
+                                    .slotTags,
+                            solverTag:
+                                stageStack.composition.solvers[solverIndex]
+                                    .solverTag,
+                            stageStack: stageStack,
+                        }
                     }
                 }
             }
         }
+    } catch (e) {
+        cpLogger.push(e)
+    }
+}
+
+export const getCurrentEscrow = async (
+    currentUser: UserType,
+    contractSolverData: SolverModel,
+    contractCondition: SolverContractCondition
+) => {
+    if (contractSolverData.numMintedTokensByCondition) {
+        const numMintedTokens =
+            contractSolverData.numMintedTokensByCondition[
+                contractCondition.conditionId
+            ]
+        let alreadyRedeemed = BigNumber.from(0)
+
+        if (
+            contractCondition.status === ConditionStatus.ArbitrationDelivered ||
+            contractCondition.status === ConditionStatus.OutcomeReported
+        ) {
+            if (currentUser) {
+                const ctf = new CTFContract(
+                    currentUser.signer,
+                    currentUser.chainId
+                )
+
+                const payoutRedemptionFilter =
+                    ctf.contract.filters.PayoutRedemption(
+                        null,
+                        contractSolverData.config.conditionBase.collateralToken,
+                        contractCondition.parentCollectionId,
+                        null,
+                        null,
+                        null
+                    )
+
+                const logs = await ctf.contract.queryFilter(
+                    payoutRedemptionFilter
+                )
+                const conditionLogs = logs.filter(
+                    (l) => l.args?.conditionId == contractCondition.conditionId
+                )
+
+                alreadyRedeemed = conditionLogs
+                    .map((l) => l.args?.payout)
+                    .filter(Boolean)
+                    .reduce((x, y) => {
+                        return BigNumber.from(x).add(BigNumber.from(y))
+                    }, BigNumber.from(0))
+            }
+        }
+
+        const totalEscrow = numMintedTokens.sub(alreadyRedeemed)
+        return ethers.utils.formatUnits(
+            totalEscrow,
+            contractSolverData.collateralToken.decimals
+        )
     }
 }

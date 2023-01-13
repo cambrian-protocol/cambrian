@@ -42,11 +42,8 @@ export default function ViewTemplatePage() {
     return (
         <>
             {isLoaded ? (
-                templateStreamDoc && currentUser ? (
-                    <TemplateUI
-                        currentUser={currentUser}
-                        templateStreamDoc={templateStreamDoc}
-                    />
+                templateStreamDoc ? (
+                    <TemplateUI templateStreamDoc={templateStreamDoc} />
                 ) : (
                     <Custom404Page />
                 )

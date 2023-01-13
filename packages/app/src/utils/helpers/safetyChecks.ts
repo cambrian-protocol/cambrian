@@ -1,11 +1,21 @@
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
+import _, { result } from 'lodash'
+
+import CTFContract from '@cambrian/app/contracts/CTFContract'
+import PROPOSALSHUB_ARBITRUM from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
+import PROPOSALSHUB_GOERLI from '@cambrian/core/deployments/goerli/ProposalsHub.json'
+import PROPOSALSHUB_LOCAL from '@cambrian/core/deployments/localhost/ProposalsHub.json'
 import { SlotType } from '@cambrian/app/models/SlotType'
+import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
 import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
-import { getParsedSolvers } from './proposalHelper'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import _ from 'lodash'
-import CTFContract from '@cambrian/app/contracts/CTFContract'
+import { getParsedSolvers } from './proposalHelper'
+
+const PROPOSALHUBS = [
+    PROPOSALSHUB_GOERLI.address,
+    PROPOSALSHUB_ARBITRUM.address,
+    PROPOSALSHUB_LOCAL.address,
+]
 
 /**
  * IMPORTANT
@@ -21,20 +31,27 @@ import CTFContract from '@cambrian/app/contracts/CTFContract'
  * We can put this check in other places throughout the app to try and prevent mistakes
  *
  */
+export type SolverSafetyCheckResponseType = { to: string; result: boolean }[][]
 
 export const solverSafetyCheck = async (
     stageStack: StageStackType,
     currentUser: UserType
-) => {
-    const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
-    if (parsedSolvers) {
-        const configs = parsedSolvers.map((solver) => solver.config)
-        const results = await Promise.all(
-            configs.map((config) =>
-                checkConstantRecipients(config, currentUser)
+): Promise<SolverSafetyCheckResponseType | undefined> => {
+    try {
+        const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
+        if (parsedSolvers) {
+            const configs = parsedSolvers.map((solver) => solver.config)
+            return await Promise.all(
+                configs.map((config) =>
+                    checkConstantRecipients(config, currentUser)
+                )
             )
-        )
-        console.log('Escrow Transfer Safety Check Results: ', results)
+        }
+    } catch (e) {
+        console.error(e)
+        return [
+            [{ to: 'internal error: Likely a missing address', result: false }],
+        ]
     }
 }
 
@@ -80,6 +97,12 @@ export const tryTransferCT = async (
     CTF: CTFContract
 ) => {
     try {
+        if (PROPOSALHUBS.includes(to)) {
+            return {
+                to: to,
+                result: true,
+            }
+        }
         await CTF.contract.callStatic.safeBatchTransferFrom(
             from, // from
             to, // to

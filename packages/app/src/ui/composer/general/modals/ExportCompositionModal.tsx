@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
-import { FloppyDisk } from 'phosphor-react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -19,7 +18,7 @@ interface ExportCompositionModalProps {
 const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
     const router = useRouter()
     const { currentUser } = useCurrentUserContext()
-    const { composer } = useComposerContext()
+    const { composer, dispatch } = useComposerContext()
     const [isExporting, setIsExporting] = useState(false)
 
     const [compositionTitleInput, setCompositionTitleInput] =
@@ -37,15 +36,27 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
                 const ceramicCompositionAPI = new CeramicCompositionAPI(
                     currentUser
                 )
-                const streamID = await ceramicCompositionAPI.createComposition(
-                    compositionTitleInput,
-                    {
-                        ...composer,
-                        title: compositionTitleInput,
-                        description: '',
-                    }
-                )
-                if (streamID) router.push(`/solver/${streamID}`)
+                const newComposition =
+                    await ceramicCompositionAPI.createComposition(
+                        compositionTitleInput,
+                        {
+                            ...composer,
+                            title: compositionTitleInput,
+                            description: '',
+                        }
+                    )
+
+                if (newComposition) {
+                    dispatch({
+                        type: 'LOAD_COMPOSITION',
+                        payload: {
+                            ...composer,
+                            title: newComposition.title,
+                        },
+                    })
+
+                    router.push(`/solver/${newComposition.streamID}`)
+                }
                 onBack()
             }
         } catch (e) {
@@ -59,7 +70,6 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
             <ModalHeader
                 title={'Save Composition as...'}
                 description="Your composition will be saved to IPFS and is going to be accessible for anybody with the created link."
-                icon={<FloppyDisk />}
             />
             <Form onSubmit={onExport}>
                 <FormField

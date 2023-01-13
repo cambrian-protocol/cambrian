@@ -7,6 +7,7 @@ import {
     FileX,
     PencilSimpleLine,
     Question,
+    RocketLaunch,
 } from 'phosphor-react'
 
 export enum ProposalStatus {
@@ -39,53 +40,53 @@ PROPOSAL_STATUS_INFO[ProposalStatus.Unknown] = {
     color: 'status-initiated',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Draft] = {
-    name: 'DRAFT',
+    name: 'Draft',
     icon: <FileDotted />,
     description: 'Proposal has not been submitted to the Seller.',
     color: 'grey',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.OnReview] = {
-    name: 'ON REVIEW',
+    name: 'On Review',
     icon: <Eye />,
     description:
         'Proposal has been submitted to the Seller and needs approval.',
     color: 'status-executed',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Canceled] = {
-    name: 'CANCELED',
+    name: 'Canceled',
     icon: <FileX />,
     description:
         'Proposal has been declined by the templater or deleted by the proposer.',
     color: 'status-error',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.ChangeRequested] = {
-    name: 'CHANGE REQUESTED',
+    name: 'Change Requested',
     icon: <PencilSimpleLine />,
     description: 'The Seller requested some changes.',
     color: 'status-warning',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Modified] = {
-    name: 'MODIFIED',
+    name: 'Modified',
     icon: <PencilSimpleLine />,
     description:
         'You have modified this proposal. It has not been submitted to the Seller',
     color: 'accent-3',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Approved] = {
-    name: 'APPROVED',
+    name: 'Approved',
     icon: <CheckCircle />,
     description: 'Proposal has been accepted by the Seller.',
     color: 'brand',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Funding] = {
-    name: 'FUNDING',
+    name: 'Funding',
     icon: <Coins />,
     description: 'Proposal can receive funding.',
     color: 'status-arbitration',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Executed] = {
-    name: 'ACTIVE',
-    icon: <Activity />,
+    name: 'Executed',
+    icon: <RocketLaunch />,
     description: 'Proposal is fully funded and currently ongoing.',
     color: 'status-reported',
 }

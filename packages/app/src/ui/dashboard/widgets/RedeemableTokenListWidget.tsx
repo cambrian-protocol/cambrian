@@ -2,7 +2,7 @@ import { Box, Button, Text } from 'grommet'
 import {
     RedeemablePosition,
     RedeemablePositionsHash,
-    getRedeemablePositions,
+    getAllRedeemablePositions,
 } from '@cambrian/app/utils/helpers/redeemHelper'
 import { useEffect, useState } from 'react'
 
@@ -12,23 +12,20 @@ import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import Link from 'next/link'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ethers } from 'ethers'
 
 interface RedeemableTokensWidgetProps {
-    address: string
-    signerOrProvider: ethers.Signer | ethers.providers.Provider
-    chainId: number
+    currentUser: UserType
 }
 
 const RedeemableTokenListWidget = ({
-    address,
-    signerOrProvider,
-    chainId,
+    currentUser,
 }: RedeemableTokensWidgetProps) => {
     const [redeemablePositions, setRedeemablePositions] =
         useState<RedeemablePositionsHash>()
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [isRedeeming, setIsRedeeming] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -38,10 +35,10 @@ const RedeemableTokenListWidget = ({
 
     const init = async () => {
         try {
-            setIsLoading(true)
-            setRedeemablePositions(
-                await getRedeemablePositions(address, signerOrProvider, chainId)
+            const redeemablePositions = await getAllRedeemablePositions(
+                currentUser
             )
+            setRedeemablePositions(redeemablePositions)
         } catch (e) {}
         setIsLoading(false)
     }
@@ -49,13 +46,19 @@ const RedeemableTokenListWidget = ({
     const onRedeem = async (redeemablePosition: RedeemablePosition) => {
         try {
             setIsRedeeming(redeemablePosition.positionId)
-            const ctfContract = new CTFContract(signerOrProvider, chainId)
-            await ctfContract.contract.redeemPositions(
-                redeemablePosition.collateralToken.address,
-                redeemablePosition.parentCollectionId,
-                redeemablePosition.conditionId,
-                redeemablePosition.partition
+            const ctfContract = new CTFContract(
+                currentUser.signer,
+                currentUser.chainId
             )
+            const tx: ethers.ContractTransaction =
+                await ctfContract.contract.redeemPositions(
+                    redeemablePosition.collateralToken.address,
+                    redeemablePosition.parentCollectionId,
+                    redeemablePosition.conditionId,
+                    redeemablePosition.partition
+                )
+            await tx.wait()
+            await init()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

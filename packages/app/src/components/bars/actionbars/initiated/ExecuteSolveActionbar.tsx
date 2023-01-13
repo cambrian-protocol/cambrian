@@ -13,10 +13,12 @@ import { useState } from 'react'
 interface ExecuteSolveActionbarProps {
     currentCondition: SolverContractCondition
     solverMethods: GenericMethods
+    messenger?: JSX.Element
 }
 const ExecuteSolveActionbar = ({
     currentCondition,
     solverMethods,
+    messenger,
 }: ExecuteSolveActionbarProps) => {
     const [isExecuting, setIsExecuting] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
@@ -40,21 +42,22 @@ const ExecuteSolveActionbar = ({
     return (
         <>
             <BaseActionbar
+                messenger={messenger}
                 primaryAction={
                     <LoaderButton
                         primary
                         isLoading={isExecuting}
-                        label="Progress"
+                        label="GO"
                         onClick={onExecuteSolve}
                     />
                 }
                 info={{
-                    title: 'Ready to progress',
-                    subTitle: 'After this step the work can begin',
+                    title: 'Ready to go',
+                    subTitle: 'Configuration complete. You may proceed!',
                     dropContent: (
                         <ActionbarItemDropContainer
-                            title="Ready to progress"
-                            description='Please hit on the "Progress"-Button at your right and confirm the transaction.'
+                            title="Ready to go"
+                            description='Please hit on the "GO"-Button at your right and confirm the transaction.'
                             list={[
                                 {
                                     icon: <UsersThree />,

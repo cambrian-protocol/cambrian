@@ -15,12 +15,27 @@ import { cpLogger } from '../services/api/Logger.api'
 import { useCurrentUserContext } from './useCurrentUserContext'
 import { useRouter } from 'next/router'
 
+export type EditTemplatePropsType = {
+    template: TemplateModel | undefined
+    templateStreamID: string
+    cachedTemplate: TemplateModel | undefined
+    setTemplate: React.Dispatch<React.SetStateAction<TemplateModel | undefined>>
+    show404NotFound: boolean
+    composition: CompositionModel | undefined
+    onResetTemplate: () => void
+    onSaveTemplate: () => Promise<boolean>
+    errorMessage: ErrorMessageType | undefined
+    setErrorMessage: React.Dispatch<
+        React.SetStateAction<ErrorMessageType | undefined>
+    >
+}
+
 const useEditTemplate = () => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
     const { templateStreamID } = router.query
     const [cachedTemplate, setCachedTemplate] = useState<TemplateModel>()
-    const [templateInput, setTemplateInput] = useState<TemplateModel>()
+    const [template, setTemplate] = useState<TemplateModel>()
     const [composition, setComposition] = useState<CompositionModel>()
     const [show404NotFound, setShow404NotFound] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -63,7 +78,7 @@ const useEditTemplate = () => {
                         if (_composition) {
                             setComposition(_composition)
                             setCachedTemplate(_.cloneDeep(templateDoc.content))
-                            return setTemplateInput(templateDoc.content)
+                            return setTemplate(templateDoc.content)
                         }
                     }
                 }
@@ -75,21 +90,21 @@ const useEditTemplate = () => {
     }
 
     const onSaveTemplate = async (): Promise<boolean> => {
-        if (templateInput && currentUser) {
-            if (!_.isEqual(templateInput, cachedTemplate)) {
+        if (template && currentUser) {
+            if (!_.isEqual(template, cachedTemplate)) {
                 try {
                     const title = await updateStage(
                         templateStreamID as string,
-                        templateInput,
+                        template,
                         StageNames.template,
                         currentUser
                     )
                     const templateWithUniqueTitle = {
-                        ...templateInput,
+                        ...template,
                         title: title,
                     }
                     setCachedTemplate(_.cloneDeep(templateWithUniqueTitle))
-                    setTemplateInput(templateWithUniqueTitle)
+                    setTemplate(templateWithUniqueTitle)
                     return true
                 } catch (e) {
                     setErrorMessage(await cpLogger.push(e))
@@ -102,12 +117,12 @@ const useEditTemplate = () => {
     }
 
     const onResetTemplate = () => {
-        setTemplateInput(cachedTemplate)
+        setTemplate(cachedTemplate)
     }
 
     return {
-        templateInput: templateInput,
-        setTemplateInput: setTemplateInput,
+        template: template,
+        setTemplate: setTemplate,
         composition: composition,
         show404NotFound: show404NotFound,
         errorMessage: errorMessage,

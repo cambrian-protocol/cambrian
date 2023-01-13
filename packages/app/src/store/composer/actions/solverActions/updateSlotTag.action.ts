@@ -1,11 +1,11 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { SlotTagFormFieldsType } from '@cambrian/app/ui/composer/controls/solver/general/forms/SlotTagFormFields'
+import { SlotTagModel } from '@cambrian/app/src/classes/Tags/SlotTag'
 
 const updateSlotTagAction = (
     state: CompositionModel,
     payload: {
         slotIdToUpdate: string
-        slotTag: SlotTagFormFieldsType
+        slotTag: SlotTagModel
     }
 ) => {
     if (
@@ -25,6 +25,7 @@ const updateSlotTagAction = (
             slotId: payload.slotIdToUpdate,
             label: payload.slotTag.label,
             description: payload.slotTag.description,
+            instruction: payload.slotTag.instruction,
             isFlex: payload.slotTag.isFlex,
         })
 
