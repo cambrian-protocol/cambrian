@@ -88,10 +88,18 @@ export default function Home() {
                                 subTitle={''}
                                 paragraph="Use your own smart contract that protects you and your work."
                                 image={
-                                    <Image
-                                        fit="contain"
-                                        src="/images/template.png"
-                                    />
+                                    <Box
+                                        round="xsmall"
+                                        elevation="large"
+                                        border
+                                        overflow="hidden"
+                                    >
+                                        <Image
+                                            fit="contain"
+                                            fill
+                                            src="/images/template.png"
+                                        />
+                                    </Box>
                                 }
                                 anchor={
                                     <Text size="small">

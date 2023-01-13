@@ -25,6 +25,7 @@ const CambrianLogoMark = ({ size }: CambrianLogoMarkProps) => {
         >
             <Image
                 fit="contain"
+                fill
                 src="/images/logo/cambrian_protocol_logo.svg"
             />
         </Box>

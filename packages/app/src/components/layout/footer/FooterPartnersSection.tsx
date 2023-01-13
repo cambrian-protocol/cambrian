@@ -28,6 +28,7 @@ const FooterPartnersSection = () => (
                         >
                             <Image
                                 fit="contain"
+                                fill
                                 src="/images/logo/chainlink_startup_logo.svg"
                             />
                         </Box>
@@ -40,6 +41,7 @@ const FooterPartnersSection = () => (
                         >
                             <Image
                                 fit="contain"
+                                fill
                                 src="/images/logo/techstars_iowa_logo.png"
                             />
                         </Box>
