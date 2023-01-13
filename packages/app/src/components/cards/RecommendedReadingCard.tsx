@@ -24,7 +24,7 @@ const RecommendedReadingCard = ({
                 background="background-contrast"
                 width={{ min: '23em', max: '23em' }}
             >
-                <Image src={imageUrl} fit="cover" />
+                <Image src={imageUrl} fit="cover" fill />
                 <Box height={{ min: '30%' }} pad="medium">
                     <Text weight={'normal'} color="dark-4" size="small">
                         {author}
