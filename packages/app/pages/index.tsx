@@ -88,22 +88,14 @@ export default function Home() {
                                 subTitle={''}
                                 paragraph="Use your own smart contract that protects you and your work."
                                 image={
-                                    <Box
-                                        round="xsmall"
-                                        elevation="large"
-                                        border
-                                        overflow="hidden"
-                                        height={'auto'}
-                                    >
-                                        <Image
-                                            fit="contain"
-                                            src="/images/template.png"
-                                        />
-                                    </Box>
+                                    <Image
+                                        fit="contain"
+                                        src="/images/template.png"
+                                    />
                                 }
                                 anchor={
                                     <Text size="small">
-                                        🟢 Live on Goerli Test Network
+                                        🟢 Live on Arbitrum Network
                                     </Text>
                                 }
                             />
@@ -145,6 +137,7 @@ export default function Home() {
                                     >
                                         <Image
                                             fit="contain"
+                                            fill
                                             src="/images/composer_preview.png"
                                         />
                                     </Box>
