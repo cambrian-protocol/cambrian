@@ -95,7 +95,7 @@ export default function Home() {
                                         overflow="hidden"
                                     >
                                         <Image
-                                            fit="cover"
+                                            fit="contain"
                                             src="/images/template.png"
                                         />
                                     </Box>
@@ -142,7 +142,10 @@ export default function Home() {
                                         border
                                         overflow="hidden"
                                     >
-                                        <Image src="/images/composer_preview.png" />
+                                        <Image
+                                            fit="contain"
+                                            src="/images/composer_preview.png"
+                                        />
                                     </Box>
                                 }
                                 anchor={

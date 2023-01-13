@@ -23,7 +23,10 @@ const CambrianLogoMark = ({ size }: CambrianLogoMarkProps) => {
                 max: size ? size : 'xxsmall',
             }}
         >
-            <Image src="/images/logo/cambrian_protocol_logo.svg" />
+            <Image
+                fit="contain"
+                src="/images/logo/cambrian_protocol_logo.svg"
+            />
         </Box>
     )
 }
