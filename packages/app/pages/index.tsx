@@ -1,12 +1,11 @@
 import { ArrowsOut, Graph, Handshake, ShareNetwork } from 'phosphor-react'
+import { Box, Image } from 'grommet'
 
 import { BackgroundScrollSection } from '@cambrian/app/components/sections/BackgroundScrollSection'
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
-import { Box } from 'grommet'
 import CodeMirror from '@uiw/react-codemirror'
 import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import Glow from '@cambrian/app/components/branding/Glow'
-import { Image } from 'grommet'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import { Text } from 'grommet'
@@ -95,7 +94,10 @@ export default function Home() {
                                         border
                                         overflow="hidden"
                                     >
-                                        <Image src="/images/template.png" />
+                                        <Image
+                                            fit="cover"
+                                            src="/images/template.png"
+                                        />
                                     </Box>
                                 }
                                 anchor={
