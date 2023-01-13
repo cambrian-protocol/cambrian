@@ -93,7 +93,6 @@ export default function Home() {
                                         elevation="large"
                                         border
                                         overflow="hidden"
-                                        height={'auto'}
                                     >
                                         <Image
                                             fit="contain"
