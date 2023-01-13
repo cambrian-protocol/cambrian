@@ -26,7 +26,11 @@ const FooterPartnersSection = () => (
                                 max: 'small',
                             }}
                         >
-                            <Image src="/images/logo/chainlink_startup_logo.svg" />
+                            <Image
+                                fit="contain"
+                                fill
+                                src="/images/logo/chainlink_startup_logo.svg"
+                            />
                         </Box>
                         <Box
                             pad="small"
@@ -35,7 +39,11 @@ const FooterPartnersSection = () => (
                                 max: 'xsmall',
                             }}
                         >
-                            <Image src="/images/logo/techstars_iowa_logo.png" />
+                            <Image
+                                fit="contain"
+                                fill
+                                src="/images/logo/techstars_iowa_logo.png"
+                            />
                         </Box>
                     </Box>
                 </Box>
