@@ -52,6 +52,7 @@ const BaseContentSection = ({
                             justify={
                                 screenSize === 'small' ? 'start' : 'center'
                             }
+                            height="auto"
                         >
                             {image}
                         </Box>
