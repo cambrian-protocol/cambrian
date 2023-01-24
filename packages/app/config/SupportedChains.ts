@@ -174,7 +174,10 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             toyToken: GOERLI_ToyToken.address,
             defaultDenominationToken: GOERLI_ToyToken.address,
         },
-        compositions: {},
+        compositions: {
+            Copywriter:
+                'kjzl6cwe1jw145fuuak9g2ca5cpomea02x29fx43mjhowii1l7mlbdq84dim1ao',
+        },
     },
     42161: {
         chainData: {

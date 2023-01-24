@@ -6,6 +6,7 @@ import {
 
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { IconContext } from 'phosphor-react'
+import { useEffect } from 'react'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 
 interface ProposalStatusBadgeProps {
@@ -17,7 +18,12 @@ const ProposalStatusBadge = ({
     status,
     onChainProposalId,
 }: ProposalStatusBadgeProps) => {
-    const { fundingPercentage } = useProposalFunding(onChainProposalId)
+    const { fundingPercentage, initFunding } =
+        useProposalFunding(onChainProposalId)
+
+    useEffect(() => {
+        initFunding()
+    }, [status])
 
     return (
         <IconContext.Provider value={{ size: '16' }}>

@@ -44,6 +44,7 @@ const colors: any = {
 export const cpTheme = deepMerge(grommet, {
     defaultMode: 'dark',
     global: {
+        borderSize: { small: '4px' },
         colors,
         font: {
             family: 'Segoe UI, sans-serif;',

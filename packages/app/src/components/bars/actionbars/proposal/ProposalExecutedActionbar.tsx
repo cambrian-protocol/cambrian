@@ -16,6 +16,7 @@ import BaseActionbar from '../BaseActionbar'
 import { Button } from 'grommet'
 import { Cursor } from 'phosphor-react'
 import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ReclaimAndRedeemTokensModal from '@cambrian/app/ui/common/modals/ReclaimAndRedeemTokensModal'
 import SolverListModal from '@cambrian/app/ui/common/modals/SolverListModal'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
@@ -131,8 +132,8 @@ const ProposalExecutedActionbar = ({
             <BaseActionbar
                 messenger={messenger}
                 primaryAction={
-                    <Button
-                        disabled={solvers === undefined}
+                    <LoaderButton
+                        isInitializing={solvers === undefined}
                         primary
                         size="small"
                         label="View Solver"
