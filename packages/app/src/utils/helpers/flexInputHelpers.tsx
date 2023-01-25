@@ -52,61 +52,67 @@ export const mergeFlexIntoComposition = (
                 (flexInput) => flexInput.solverId === solver.id
             )
             filteredFlexInputs.forEach((filteredFlexInput) => {
-                solver.slotTags[filteredFlexInput.tagId].update({
-                    ...solver.slotTags[filteredFlexInput.tagId].metadata,
-                    isFlex: filteredFlexInput.isFlex,
-                })
+                if (solver.slotTags[filteredFlexInput.tagId]) {
+                    solver.slotTags[filteredFlexInput.tagId].update({
+                        ...solver.slotTags[filteredFlexInput.tagId].metadata,
+                        isFlex: filteredFlexInput.isFlex,
+                    })
+                    if (
+                        typeof filteredFlexInput.value !== 'undefined' &&
+                        filteredFlexInput.value !== ''
+                    ) {
+                        switch (filteredFlexInput.tagId) {
+                            case 'keeper':
+                                solver.slotTags['keeper'].update({
+                                    ...solver.slotTags['keeper'].metadata,
+                                    isFlex: 'None',
+                                })
+                                solver.updateKeeper(filteredFlexInput.value)
+                                break
 
-                if (
-                    typeof filteredFlexInput.value !== 'undefined' &&
-                    filteredFlexInput.value !== ''
-                ) {
-                    switch (filteredFlexInput.tagId) {
-                        case 'keeper':
-                            solver.slotTags['keeper'].update({
-                                ...solver.slotTags['keeper'].metadata,
-                                isFlex: 'None',
-                            })
-                            solver.updateKeeper(filteredFlexInput.value)
-                            break
+                            case 'arbitrator':
+                                solver.slotTags['arbitrator'].update({
+                                    ...solver.slotTags['arbitrator'].metadata,
+                                    isFlex: 'None',
+                                })
+                                solver.updateArbitrator(filteredFlexInput.value)
+                                break
 
-                        case 'arbitrator':
-                            solver.slotTags['arbitrator'].update({
-                                ...solver.slotTags['arbitrator'].metadata,
-                                isFlex: 'None',
-                            })
-                            solver.updateArbitrator(filteredFlexInput.value)
-                            break
+                            // case 'data':
+                            //     composerSolvers[i].config['data'] =
+                            //         taggedInput.value
+                            //     break
 
-                        // case 'data':
-                        //     composerSolvers[i].config['data'] =
-                        //         taggedInput.value
-                        //     break
-
-                        /*   case 'collateralToken':
+                            /*   case 'collateralToken':
                                 solver.config['collateralToken'] =
                                     filteredFlexInput.value
                                 break */
 
-                        case 'timelockSeconds':
-                            solver.slotTags['timelockSeconds'].update({
-                                ...solver.slotTags['timelockSeconds'].metadata,
-                                isFlex: 'None',
-                            })
-                            solver.updateTimelock(
-                                parseInt(filteredFlexInput.value)
-                            )
-                            break
+                            case 'timelockSeconds':
+                                solver.slotTags['timelockSeconds'].update({
+                                    ...solver.slotTags['timelockSeconds']
+                                        .metadata,
+                                    isFlex: 'None',
+                                })
+                                solver.updateTimelock(
+                                    parseInt(filteredFlexInput.value)
+                                )
+                                break
 
-                        default:
-                            solver.slotTags[filteredFlexInput.tagId].update({
-                                ...solver.slotTags[filteredFlexInput.tagId]
-                                    .metadata,
-                                isFlex: 'None',
-                            })
-                            // SlotID
-                            solver.config.slots[filteredFlexInput.tagId].data =
-                                [filteredFlexInput.value]
+                            default:
+                                solver.slotTags[filteredFlexInput.tagId].update(
+                                    {
+                                        ...solver.slotTags[
+                                            filteredFlexInput.tagId
+                                        ].metadata,
+                                        isFlex: 'None',
+                                    }
+                                )
+                                // SlotID
+                                solver.config.slots[
+                                    filteredFlexInput.tagId
+                                ].data = [filteredFlexInput.value]
+                        }
                     }
                 }
             })
