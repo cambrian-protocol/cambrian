@@ -9,7 +9,7 @@ import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-const CopyWriterOnboarding = () => {
+const FreelancerOnboarding = () => {
     const { currentUser, connectWallet } = useCurrentUserContext()
     const router = useRouter()
 
@@ -25,7 +25,7 @@ const CopyWriterOnboarding = () => {
             const streamID = await ceramicTemplateAPI.createTemplate(
                 randimals(),
                 SUPPORTED_CHAINS[currentUser?.chainId].compositions[
-                    'Copywriter'
+                    'Basic Freelance/Bounty'
                 ]
             )
 
@@ -42,7 +42,7 @@ const CopyWriterOnboarding = () => {
     return (
         <>
             {currentUser?.session ? (
-                <LoadingScreen context={'Initializing Copywriter Service'} />
+                <LoadingScreen context={'Initializing Freelancing Service'} />
             ) : (
                 <ConnectWalletPage connectWallet={connectWallet} />
             )}
@@ -50,4 +50,4 @@ const CopyWriterOnboarding = () => {
     )
 }
 
-export default CopyWriterOnboarding
+export default FreelancerOnboarding

@@ -61,7 +61,7 @@ export default function Home() {
     const { currentUser } = useCurrentUserContext()
 
     function handleClickHeaderCTA() {
-        router.push('/copywriter')
+        router.push('/freelancer')
     }
 
     useEffect(() => {
