@@ -224,7 +224,12 @@ const TemplateFlexInputsForm = ({
                                                         idx
                                                     ].value.trim().length === 0
                                                 ) {
-                                                    return undefined
+                                                    if (
+                                                        flexInput.isFlex ===
+                                                        'Template'
+                                                    ) {
+                                                        return 'Required'
+                                                    }
                                                 } else if (
                                                     type === 'address' &&
                                                     !isAddress(
