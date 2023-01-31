@@ -456,6 +456,7 @@ const calculateReclaimableTokens = (
     }
 }
 
+// TODO FIX: the payout numerators are only a "binary array" when the outcome report is categorical
 const getPositionIdFromConditionResolution = async (
     ctfContract: ethers.Contract,
     conditionId: string,
