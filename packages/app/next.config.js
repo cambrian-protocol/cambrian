@@ -6,7 +6,7 @@ module.exports = {
                 headers: [
                     {
                         key: 'Access-Control-Allow-Origin',
-                        value: '*',
+                        value: 'https://cambrianprotocol.com',
                     },
                     {
                         key: 'Access-Control-Allow-Methods',
