@@ -3,7 +3,6 @@ import { CeramicClient } from '@ceramicnetwork/http-client';
 import { TileDocument } from "@ceramicnetwork/stream-tile"
 import { UserType } from "@cambrian/app/store/UserContext"
 import _ from "lodash";
-import { ulid } from "ulid";
 
 const baseUrl =
     process.env.NODE_ENV === 'production'
@@ -51,110 +50,103 @@ export const ceramicInstance = (currentUser: UserType) => {
     return ceramicClient
 }
 
-const generateStreamAndCommitIds = (auth: UserType, body: { data: any }): { streamId: string, commitId: string } => {
-    // Todo replace ulid with Ceramics streamId generator alg
-    const _streamId = ulid()
-    const _commitId = generateCommitId(auth, body, _streamId)
-    return { streamId: _streamId, commitId: _commitId }
-}
 
-const generateCommitId = (auth: UserType, body: { data: any }, streamId: string): string => {
-    // Todo replace ulid with Ceramics commitId generator alg
-    return ulid()
+interface DocumentModel {
+    content: any
+    streamId: string
+    commitId: string
 }
 
 
 const doc = {
     create: async (
         auth: UserType,
-        body: { data: any },
-        tags: [string],
-        family: string
+        content: any,
+        metadata: {
+            family: string,
+            tags: string[],
+        }
     ) => {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
-            const ids = generateStreamAndCommitIds(auth, body)
+
+            const res = await call(`streams/`, 'POST', auth, { data: content, metadata: metadata }) as DocumentModel
 
             const tileDoc = await TileDocument.deterministic(
                 ceramicInstance(auth),
                 {
                     controllers: [auth.did],
-                    family: family,
-                    tags: tags
+                    family: metadata.family,
+                    tags: metadata.tags
                 }
             )
-            await tileDoc.update(body)
+            await tileDoc.update(content)
 
-            if (ids.streamId !== tileDoc.id.toString() || ids.commitId !== tileDoc.commitId.toString())
-                throw new Error('Generated streamId or commitId does not match with Ceramics generated ids!')
+            if (res.streamId !== tileDoc.id.toString() || res.commitId !== tileDoc.commitId.toString()) {
+                console.warn('Generated streamId or commitId does not match with Ceramics generated ids!')
+            }
 
-            // TODO firestore structure
-            await call(`controller/${auth.did}/streams/${ids.streamId}/commits/${ids.commitId}`, 'POST', auth, body)
-
+            return res
         } catch (e) { console.error(e) }
     },
 
-    readStream: async (streamId: string, controller: string, family?: string) => {
+    readStream: async (streamId: string,): Promise<DocumentModel | undefined> => {
         try {
-            const firestoreData = await call(`controller/${controller}/streams/${streamId}`, 'GET')
+            const firestoreDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel
 
             // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
-
-            if (!_.isEqual(firestoreData, ceramicDoc.content)) {
+            if (!_.isEqual(firestoreDoc.content, ceramicDoc.content)) {
                 console.warn('Corrupt data')
                 // TODO Clean up corruption
             }
 
             // TODO integrate data handling switch
-            return firestoreData
+            return firestoreDoc
         } catch (e) { console.error(e) }
     },
 
 
-    readCommit: async (streamId: string, commitId: string, controller: string, family?: string) => {
+    readCommit: async (streamId: string, commitId: string,) => {
         try {
-            const firestoreData = await call(`controller/${controller}/streams/${streamId}/commits/${commitId}`, 'GET')
+            const firestoreDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel
 
             // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, commitId)
-
-            if (!_.isEqual(firestoreData, ceramicDoc.content)) {
+            if (!_.isEqual(firestoreDoc.content, ceramicDoc.content)) {
                 console.warn('Corrupt data')
                 // TODO Clean up corruption
             }
 
             // TODO integrate data handling switch
-            return firestoreData
+            return firestoreDoc
         } catch (e) { console.error(e) }
     },
 
 
-    updateStream: async (streamId: string, auth: UserType, body: { data: any }) => {
+    updateStream: async (auth: UserType, streamId: string, content: any) => {
         try {
-            if (!auth.did) throw new Error('Unauthorized!')
-
-            const commitId = generateCommitId(auth, body, streamId)
+            const res = await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel
 
             const tileDoc = await TileDocument.load(
                 ceramicInstance(auth),
                 streamId
             )
-            await tileDoc.update(body)
+            await tileDoc.update(content)
+            if (res.streamId !== tileDoc.id.toString() || res.commitId !== tileDoc.commitId.toString()) {
+                console.warn('Corrupt data')
+                // TODO Clean up corruption
+            }
 
-            if (streamId !== tileDoc.id.toString() || commitId !== tileDoc.commitId.toString())
-                throw new Error('Generated streamId or commitId does not match with Ceramics generated ids!')
-
-
-            // TODO firestore structure && BE needs to create a new commit entry
-            await call(`controller/${auth.did}/streams/${streamId}`, 'PUT', auth, body)
         } catch (e) { console.error(e) }
     },
 
     subscribe: async (streamId: string, onChange: () => Promise<void>) => {
         try {
+            // TODO Firestore realtime updates integration
+
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const tileDoc = await TileDocument.load(
                 readOnlyCeramicClient,
@@ -167,6 +159,10 @@ const doc = {
         } catch (e) {
             console.error(e)
         }
+    },
+
+    unsubscribe: async (streamId: string) => {
+        // TODO
     }
 }
 
