@@ -1,5 +1,6 @@
 import { CERAMIC_NODE_ENDPOINT } from "packages/app/config"
 import { CeramicClient } from '@ceramicnetwork/http-client';
+import { TemplateModel } from '@cambrian/app/models/TemplateModel';
 import { TileDocument } from "@ceramicnetwork/stream-tile"
 import { UserType } from "@cambrian/app/store/UserContext"
 import _ from "lodash";
@@ -51,15 +52,15 @@ export const ceramicInstance = (currentUser: UserType) => {
 }
 
 
-interface DocumentModel {
-    content: any
+interface DocumentModel<T> {
+    content: T
     streamId: string
     commitId: string
 }
 
 
 const doc = {
-    create: async (
+    create: async <T>(
         auth: UserType,
         content: any,
         metadata: {
@@ -70,7 +71,7 @@ const doc = {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
 
-            const res = await call(`streams/`, 'POST', auth, { data: content, metadata: metadata }) as DocumentModel
+            const res = await call(`streams/`, 'POST', auth, { data: content, metadata: metadata }) as DocumentModel<T>
 
             const tileDoc = await TileDocument.deterministic(
                 ceramicInstance(auth),
@@ -90,9 +91,9 @@ const doc = {
         } catch (e) { console.error(e) }
     },
 
-    readStream: async (streamId: string,): Promise<DocumentModel | undefined> => {
+    readStream: async <T>(streamId: string,): Promise<DocumentModel<T> | undefined> => {
         try {
-            const firestoreDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel
+            const firestoreDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
 
             // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
@@ -108,9 +109,9 @@ const doc = {
     },
 
 
-    readCommit: async (streamId: string, commitId: string,) => {
+    readCommit: async <T>(streamId: string, commitId: string,): Promise<DocumentModel<T> | undefined> => {
         try {
-            const firestoreDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel
+            const firestoreDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
 
             // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
@@ -126,9 +127,9 @@ const doc = {
     },
 
 
-    updateStream: async (auth: UserType, streamId: string, content: any) => {
+    updateStream: async <T>(auth: UserType, streamId: string, content: any) => {
         try {
-            const res = await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel
+            const res = await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
 
             const tileDoc = await TileDocument.load(
                 ceramicInstance(auth),

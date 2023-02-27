@@ -49,8 +49,7 @@ export default class Proposal {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
 
-            // TODO Type casts
-            const templateDoc = await API.doc.readStream(templateStreamId) as { content: TemplateModel, streamId: string, commitId: string }
+            const templateDoc = await API.doc.readStream<TemplateModel>(templateStreamId)
 
             if (!templateDoc) throw new Error('No Template found!')
 
