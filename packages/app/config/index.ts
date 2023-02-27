@@ -36,4 +36,6 @@ export const SCHEMA_VER = {
     cambrianStagesLib: 1,
     baseStageLib: 1,
     templateStageLib: 1,
+    proposal: 1,
+    template: 1,
 }
