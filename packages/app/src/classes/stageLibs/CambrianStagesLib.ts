@@ -38,8 +38,8 @@ export default class CambrianStagesLib {
         defaultCambrianStagesLib.compositions
     )
 
-    constructor(cambrianStagesLib?: CambrianStagesLibType) {
-        this.update(cambrianStagesLib || defaultCambrianStagesLib)
+    constructor(cambrianStagesLib: CambrianStagesLibType) {
+        this.update(cambrianStagesLib)
     }
 
     public get recents() {

@@ -1,9 +1,33 @@
 import CambrianStagesLib, {
     CambrianStagesLibType,
-    defaultCambrianStagesLib,
 } from '../CambrianStagesLib'
 
+import { StageNames } from '@cambrian/app/models/StageModel'
 import { expect } from '@jest/globals'
+
+let defaultCambrianStagesLib: CambrianStagesLibType
+
+beforeEach(() => {
+    defaultCambrianStagesLib = {
+        _schemaVer: 1,
+        recents: [],
+        proposals: {
+            _schemaVer: 1,
+            lib: {},
+            archive: { lib: [] },
+        },
+        templates: {
+            _schemaVer: 1,
+            lib: {},
+            archive: { lib: [], receivedProposals: [] },
+        },
+        compositions: {
+            _schemaVer: 1,
+            lib: {},
+            archive: { lib: [] },
+        },
+    }
+});
 
 test('handles incomplete stagesLib', () => {
     const dummyCambrianStagesLib = { _schemaVer: 1 }
@@ -84,4 +108,56 @@ test('updates from non existent schemaVer', () => {
     expect(updatedCambrianStageLib.templates.archive.receivedProposals).toEqual(
         updatedArchive
     )
+})
+
+test('add stages correctly', () => {
+    const cambrianStagesLib = new CambrianStagesLib(
+        defaultCambrianStagesLib
+    )
+
+    cambrianStagesLib.addStage('composition-streamId', 'Composition Title', StageNames.composition)
+    cambrianStagesLib.addStage('template-streamId', 'Template Title', StageNames.template)
+    cambrianStagesLib.addStage('proposal-streamId', 'Proposal Title', StageNames.proposal)
+
+    expect(cambrianStagesLib.data.compositions.lib['composition-streamId']).toEqual('Composition Title')
+    expect(cambrianStagesLib.data.templates.lib['template-streamId']).toEqual('Template Title')
+    expect(cambrianStagesLib.data.proposals.lib['proposal-streamId']).toEqual('Proposal Title')
+})
+
+test('adds stages with existing titles correctly', () => {
+    const cambrianStagesLib = new CambrianStagesLib(
+        defaultCambrianStagesLib
+    )
+
+    const sameCompTitle = 'Composition Title'
+
+    cambrianStagesLib.addStage('composition-streamId-1', sameCompTitle, StageNames.composition)
+    cambrianStagesLib.addStage('composition-streamId-2', sameCompTitle, StageNames.composition)
+    cambrianStagesLib.addStage('composition-streamId-3', sameCompTitle, StageNames.composition)
+
+    const sameTemplateTitle = 'Template Title'
+
+    cambrianStagesLib.addStage('template-streamId-1', sameTemplateTitle, StageNames.template)
+    cambrianStagesLib.addStage('template-streamId-2', sameTemplateTitle, StageNames.template)
+    cambrianStagesLib.addStage('template-streamId-3', sameTemplateTitle, StageNames.template)
+
+    const sameProposalTitle = 'Proposal Title'
+
+    cambrianStagesLib.addStage('proposal-streamId-1', sameProposalTitle, StageNames.proposal)
+    cambrianStagesLib.addStage('proposal-streamId-2', sameProposalTitle, StageNames.proposal)
+    cambrianStagesLib.addStage('proposal-streamId-3', sameProposalTitle, StageNames.proposal)
+
+
+    expect(cambrianStagesLib.data.compositions.lib['composition-streamId-1']).toEqual('Composition Title')
+    expect(cambrianStagesLib.data.compositions.lib['composition-streamId-2']).toEqual('Composition Title (1)')
+    expect(cambrianStagesLib.data.compositions.lib['composition-streamId-3']).toEqual('Composition Title (2)')
+
+    expect(cambrianStagesLib.data.templates.lib['template-streamId-1']).toEqual('Template Title')
+    expect(cambrianStagesLib.data.templates.lib['template-streamId-2']).toEqual('Template Title (1)')
+    expect(cambrianStagesLib.data.templates.lib['template-streamId-3']).toEqual('Template Title (2)')
+
+    expect(cambrianStagesLib.data.proposals.lib['proposal-streamId-1']).toEqual('Proposal Title')
+    expect(cambrianStagesLib.data.proposals.lib['proposal-streamId-2']).toEqual('Proposal Title (1)')
+    expect(cambrianStagesLib.data.proposals.lib['proposal-streamId-3']).toEqual('Proposal Title (2)')
+
 })
