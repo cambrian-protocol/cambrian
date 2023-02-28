@@ -83,13 +83,33 @@ export default class Proposal {
         } catch (e) { console.error(e) }
     }
 
+    // Proposer
     public async submit() { }
-
-    public async requestChange() { }
 
     public async update() { }
 
-    public async archive() { }
+    public async archive() {
+        // Determine who is the caller and either archive as Templater or as Proposer
+    }
+    public async withdraw() {
+        // Former cancel
+    }
 
-    public async cancel() { }
+    // Templater
+    public async receive() {
+        // Former registerNewProposalSubmission
+    }
+
+    public async requestChange() {
+        // Uses updateProposalEntry()
+    }
+
+    public async approve() {
+        // Uses updateProposalEntry()
+    }
+
+    public async decline() {
+        // Uses updateProposalEntry()
+    }
+
 }

@@ -56,25 +56,4 @@ export default class Template {
     public async unpublish() { }
 
     public async archive() { }
-
-    // Consider moving functions below to Proposal class. 
-
-    public async addProposalSubmission() {
-        // Former registerNewProposalSubmission
-    }
-
-    public async requestProposalChange() {
-        // Uses updateProposalEntry()
-    }
-
-    public async approveProposal() {
-        // Uses updateProposalEntry()
-    }
-
-    public async declineProposal() {
-        // Uses updateProposalEntry()
-    }
-
-    public async archiveProposal() { }
-
 }
