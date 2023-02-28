@@ -52,27 +52,23 @@ export const ceramicInstance = (currentUser: UserType) => {
 }
 
 
-interface DocumentModel<T> {
+export interface DocumentModel<T> {
     content: T
     streamId: string
     commitId: string
 }
 
+interface MetadataModel {
+    controllers?: string[]
+    family?: string
+    tags?: string[]
+}
+
 
 const doc = {
-    create: async <T>(
-        auth: UserType,
-        content: any,
-        metadata: {
-            family: string,
-            tags: string[],
-        }
-    ) => {
+    generateStreamAndCommitId: async (auth: UserType, metadata: MetadataModel) => {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
-
-            const res = await call(`streams/`, 'POST', auth, { data: content, metadata: metadata }) as DocumentModel<T>
-
             const tileDoc = await TileDocument.deterministic(
                 ceramicInstance(auth),
                 {
@@ -81,13 +77,43 @@ const doc = {
                     tags: metadata.tags
                 }
             )
+            return {
+                streamId: tileDoc.id.toString(),
+                commitId: tileDoc.commitId.toString()
+            }
+        } catch (e) {
+            console.error(e)
+        }
+    },
+
+    create: async <T>(
+        auth: UserType,
+        content: any,
+        metadata: MetadataModel
+    ) => {
+        try {
+            if (!auth.did) throw new Error('Unauthorized!')
+
+            const tileDoc = await TileDocument.deterministic(
+                ceramicInstance(auth),
+                {
+                    controllers: [auth.did],
+                    family: metadata.family,
+                    tags: metadata.tags
+                },
+                { pin: true }
+            )
             await tileDoc.update(content)
 
-            if (res.streamId !== tileDoc.id.toString() || res.commitId !== tileDoc.commitId.toString()) {
-                console.warn('Generated streamId or commitId does not match with Ceramics generated ids!')
-            }
+            const res = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
 
-            return res
+            if (res.status === 200) {
+                return {
+                    streamId: tileDoc.id.toString(),
+                    commitId: tileDoc.commitId.toString(),
+                    content: content
+                }
+            }
         } catch (e) { console.error(e) }
     },
 
@@ -126,8 +152,30 @@ const doc = {
         } catch (e) { console.error(e) }
     },
 
+    deterministic: async <T>(metadata: MetadataModel): Promise<DocumentModel<T> | undefined> => {
+        try {
+            const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            const ceramicDoc = await TileDocument.deterministic(readOnlyCeramicClient, metadata)
 
-    updateStream: async <T>(auth: UserType, streamId: string, content: any) => {
+            const firestoreContent = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as T
+
+            // Ceramic redundancy check
+            if (!_.isEqual(firestoreContent, ceramicDoc.content)) {
+                console.warn('Corrupt data')
+                // TODO Clean up corruption
+            }
+
+            // TODO integrate data handling switch
+            return {
+                streamId: ceramicDoc.id.toString(),
+                commitId: ceramicDoc.commitId.toString(),
+                content: firestoreContent
+            }
+        } catch (e) { console.error(e) }
+
+    },
+
+    updateStream: async <T>(auth: UserType, streamId: string, content: any, metadata?: MetadataModel) => {
         try {
             const res = await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
 
@@ -135,7 +183,8 @@ const doc = {
                 ceramicInstance(auth),
                 streamId
             )
-            await tileDoc.update(content)
+            await tileDoc.update(content, metadata)
+
             if (res.streamId !== tileDoc.id.toString() || res.commitId !== tileDoc.commitId.toString()) {
                 console.warn('Corrupt data')
                 // TODO Clean up corruption
