@@ -98,8 +98,7 @@ export default class CambrianStagesLib {
             case StageNames.proposal:
                 return this._proposals.addStageWithUniqueTitle(stageStreamId, title)
             default:
-                break
+                return title
         }
     }
-
 }
