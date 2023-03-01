@@ -56,8 +56,14 @@ export default class Proposal {
         if (this._status === ProposalStatus.ChangeRequested) {
             this._status = ProposalStatus.Modified
         }
+    }
 
-
+    public receiveChangeRequest(authDid: string) {
+        if (authDid !== this._proposalDoc.content.author) {
+            console.error('Unauthorized!')
+            return
+        }
+        this._proposalDoc.content.isSubmitted = false
     }
 
     public requestChange(authDid: string): void {
@@ -90,6 +96,21 @@ export default class Proposal {
     public submit(authDid: string): void {
         if (authDid !== this._proposalDoc.content.author) {
             console.error('Unauthorized!')
+            return
+        }
+
+        if (this._proposalDoc.content.isSubmitted) {
+            console.error('Proposal already submitted!')
+            return
+        }
+
+        const isStatusValid = [
+            ProposalStatus.Draft,
+            ProposalStatus.Modified,
+        ].includes(this._status)
+
+        if (!isStatusValid) {
+            console.error('Invalid status!')
             return
         }
 

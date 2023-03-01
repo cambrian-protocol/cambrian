@@ -127,6 +127,15 @@ test('Succesfully request change on Proposal', () => {
     expect(proposal.templateDoc.content.receivedProposals[proposal.doc.streamID][0]).toEqual({ proposalCommitID: proposal.doc.commitID, requestChange: true })
 })
 
+test('Succesfully resetted isSubmit flag when received changeRequest', () => {
+    const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc)
+    proposal.submit(proposalAuthor)
+    proposal.receive(templateAuthor)
+    proposal.requestChange(templateAuthor)
+    proposal.receiveChangeRequest(proposalAuthor)
+    expect(proposal.data.isSubmitted).toBeFalsy()
+})
+
 test('Succesfully updated and resubmitted a Proposal', () => {
     const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc)
     proposal.submit(proposalAuthor)
@@ -162,8 +171,8 @@ test('Succesfully updated and resubmitted a Proposal', () => {
     expect(proposal.data).toEqual(updatedProposal)
     expect(proposal.status).toEqual(ProposalStatus.Modified)
 
-    //Todo resubmit.
-
+    proposal.submit(proposalAuthor)
+    expect(proposal.status).toEqual(ProposalStatus.OnReview)
 
 })
 
