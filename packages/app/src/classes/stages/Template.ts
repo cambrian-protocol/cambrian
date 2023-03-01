@@ -1,5 +1,5 @@
-import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
-import { ProposalModel } from './../../models/ProposalModel';
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
+import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
 
 export default class Template {
@@ -21,42 +21,49 @@ export default class Template {
     public async create() { }
 
     public receive(authDid: string, proposalDoc: DocumentModel<ProposalModel>) {
-        try {
-            if (authDid !== this._templateDoc.content.author) throw new Error("Unauthorized!")
-
-            if (proposalDoc.content.isSubmitted) {
-                const receivedProposals = this._templateDoc.content.receivedProposals
-                const streamID = proposalDoc.streamID
-                const commitID = proposalDoc.commitID
-
-                if (receivedProposals[streamID]) {
-                    receivedProposals[streamID].push({ proposalCommitID: commitID })
-                } else {
-                    receivedProposals[streamID] = [{ proposalCommitID: commitID }]
-                }
-            }
-
-        } catch (e) {
-            console.error(e)
+        if (authDid !== this._templateDoc.content.author) {
+            console.error("Unauthorized!")
+            return
         }
+
+        if (!proposalDoc.content.isSubmitted) {
+            return
+        }
+
+        const receivedProposals = this._templateDoc.content.receivedProposals
+        const streamID = proposalDoc.streamID
+        const commitID = proposalDoc.commitID
+
+        if (receivedProposals[streamID]) {
+            receivedProposals[streamID].push({ proposalCommitID: commitID })
+        } else {
+            receivedProposals[streamID] = [{ proposalCommitID: commitID }]
+        }
+
     }
 
     public requestChange(authDid: string, proposalDoc: DocumentModel<ProposalModel>) {
-        try {
-            if (authDid !== this._templateDoc.content.author) throw new Error("Unauthorized!")
-            if (proposalDoc.content.isSubmitted) {
-                const streamID = proposalDoc.streamID
-                const receivedProposals = this._templateDoc.content.receivedProposals
-                const latestProposalCommit = receivedProposals[streamID][receivedProposals[streamID].length - 1]
+        if (authDid !== this._templateDoc.content.author) {
+            console.error("Unauthorized!")
+            return
+        }
 
-                if (proposalDoc.commitID !== latestProposalCommit.proposalCommitID) throw new Error('Provided proposalCommitID does not match with latest received commitID!')
+        if (!proposalDoc.content.isSubmitted) {
+            return
+        }
 
-                receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
-                    ...receivedProposals[streamID][receivedProposals[streamID].length - 1], requestChange: true
-                }
-            }
-        } catch (e) {
-            console.error(e)
+        const streamID = proposalDoc.streamID
+        const receivedProposals = this._templateDoc.content.receivedProposals
+        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+
+        if (!latestProposalCommit || proposalDoc.commitID !== latestProposalCommit.proposalCommitID) {
+            console.error('Provided proposalCommitID does not match with latest received commitID!')
+            return
+        }
+
+        receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
+            ...latestProposalCommit,
+            requestChange: true
         }
     }
 

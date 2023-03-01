@@ -34,9 +34,13 @@ export default class Proposal {
         return this._status
     }
 
-    public requestChange(authDid: string) {
+    public requestChange(authDid: string): void {
+        if (authDid !== this._template.data.author) {
+            console.error('Unauthorized!')
+            return
+        }
+
         try {
-            if (authDid !== this._template.data.author) throw new Error('Unauthorized!')
             this._template.requestChange(authDid, this._proposalDoc)
             this._status = ProposalStatus.ChangeRequested
         } catch (e) {
@@ -44,36 +48,41 @@ export default class Proposal {
         }
     }
 
-    public receive(authDid: string) {
+    public receive(authDid: string): void {
+        if (authDid !== this._template.data.author) {
+            console.error('Unauthorized!')
+            return
+        }
+
         try {
-            if (authDid !== this._template.data.author) throw new Error('Unauthorized!')
             this._template.receive(authDid, this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
     }
 
-    public submit(authDid: string) {
-        try {
-            if (authDid !== this._proposalDoc.content.author) throw new Error('Unauthorized!')
-            this._proposalDoc.content.isSubmitted = true
-            this._status = ProposalStatus.OnReview
-        } catch (e) {
-            console.error(e)
+    public submit(authDid: string): void {
+        if (authDid !== this._proposalDoc.content.author) {
+            console.error('Unauthorized!')
+            return
         }
+
+        this._proposalDoc.content.isSubmitted = true
+        this._status = ProposalStatus.OnReview
     }
 
-    // TODO Refactor
+    // TODO Write tests
     private getProposalStatus(templateDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>, onChainProposal?: any): ProposalStatus {
-        if (onChainProposal) {
-            if (onChainProposal.isExecuted) {
-                return ProposalStatus.Executed
-            } else {
-                return ProposalStatus.Funding
-            }
+        if (onChainProposal && onChainProposal.isExecuted) {
+            return ProposalStatus.Executed
+        } else if (onChainProposal) {
+            return ProposalStatus.Funding
         }
 
-        if (this.getApprovedProposalCommitID(templateDoc.content.receivedProposals)) {
+        const receivedProposals = templateDoc.content.receivedProposals
+
+        const approvedProposalCommitID = this.getApprovedProposalCommitID(receivedProposals)
+        if (approvedProposalCommitID) {
             return ProposalStatus.Approved
         }
 
@@ -81,11 +90,10 @@ export default class Proposal {
             return ProposalStatus.Canceled
         }
 
-        const receivedProposalCommits = templateDoc.content.receivedProposals[proposalDoc.streamID]
+        const receivedProposalCommits = receivedProposals[proposalDoc.streamID]
 
         if (receivedProposalCommits) {
-            const proposalCommit =
-                receivedProposalCommits[receivedProposalCommits.length - 1]
+            const proposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
 
             if (proposalCommit.isDeclined) {
                 return ProposalStatus.Canceled
@@ -96,13 +104,13 @@ export default class Proposal {
             } else {
                 return ProposalStatus.OnReview
             }
-        } else {
-            if (proposalDoc.content.isSubmitted) {
-                return ProposalStatus.OnReview
-            } else {
-                return ProposalStatus.Draft
-            }
         }
+
+        if (proposalDoc.content.isSubmitted) {
+            return ProposalStatus.OnReview
+        }
+
+        return ProposalStatus.Draft
     }
 
     private getApprovedProposalCommitID = (receivedProposals: ReceivedProposalsHashmapType
@@ -113,8 +121,6 @@ export default class Proposal {
             )?.proposalCommitID) ||
             undefined
     }
-
-
 
 
 }
