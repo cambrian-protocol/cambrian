@@ -116,21 +116,62 @@ test('Do not register an unsubmitted Proposal', () => {
     expect(proposal.templateDoc.content.receivedProposals[proposal.doc.streamID]).toEqual(undefined)
 })
 
-
-
 test('Succesfully request change on Proposal', () => {
     const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc)
     proposal.submit(proposalAuthor)
-    proposal.receive(templateAuthor)
 
+    proposal.receive(templateAuthor)
     proposal.requestChange(templateAuthor)
+
     expect(proposal.status).toEqual(ProposalStatus.ChangeRequested)
+    expect(proposal.templateDoc.content.receivedProposals[proposal.doc.streamID][0]).toEqual({ proposalCommitID: proposal.doc.commitID, requestChange: true })
 })
+
+test('Succesfully updated and resubmitted a Proposal', () => {
+    const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc)
+    proposal.submit(proposalAuthor)
+
+    proposal.receive(templateAuthor)
+    proposal.requestChange(templateAuthor)
+
+    const updatedProposal = {
+        title: 'Dummy Proposal with another title',
+        description: '',
+        template: {
+            streamID: dummyTemplateStreamDoc.streamID,
+            commitID: dummyTemplateStreamDoc.commitID,
+        },
+        flexInputs: dummyTemplateStreamDoc.content.flexInputs.filter(
+            (flexInput) =>
+                flexInput.tagId !== 'collateralToken' &&
+                flexInput.value === ''
+        ),
+        author: proposalAuthor,
+        price: {
+            amount:
+                100,
+            tokenAddress:
+                dummyTemplateStreamDoc.content.price
+                    .denominationTokenAddress,
+        },
+        isSubmitted: false,
+    }
+
+    proposal.updateContent(proposalAuthor, updatedProposal)
+
+    expect(proposal.data).toEqual(updatedProposal)
+    expect(proposal.status).toEqual(ProposalStatus.Modified)
+
+    //Todo resubmit.
+
+
+})
+
+
+
 
 /* 
 
-test('Succesfully updated and resubmitted a Proposal', () => {
-})
 
 test('Succesfully approved Proposal', () => {
 

@@ -34,6 +34,32 @@ export default class Proposal {
         return this._status
     }
 
+    public updateContent(authDid: string, updatedProposal: ProposalModel) {
+        if (authDid !== this._proposalDoc.content.author) {
+            console.error('Unauthorized!')
+            return
+        }
+
+        const isStatusValid = [
+            ProposalStatus.Draft,
+            ProposalStatus.ChangeRequested,
+            ProposalStatus.Modified,
+        ].includes(this._status)
+
+        if (!isStatusValid) {
+            console.error('Invalid status!')
+            return
+        }
+
+        this._proposalDoc.content = updatedProposal
+
+        if (this._status === ProposalStatus.ChangeRequested) {
+            this._status = ProposalStatus.Modified
+        }
+
+
+    }
+
     public requestChange(authDid: string): void {
         if (authDid !== this._template.data.author) {
             console.error('Unauthorized!')
