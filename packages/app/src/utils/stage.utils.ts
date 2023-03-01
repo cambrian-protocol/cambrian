@@ -30,7 +30,7 @@ export const createStage = async (
 
         await API.doc.updateStream(auth, stageIds.streamId, { ...stage, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
 
-        await API.doc.updateStream(auth, stagesLibDoc.streamId, stagesLibDoc.content)
+        await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content)
 
         return { streamID: stageIds.streamId, title: uniqueTitle }
     } catch (e) {

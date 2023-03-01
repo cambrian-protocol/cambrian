@@ -54,8 +54,8 @@ export const ceramicInstance = (currentUser: UserType) => {
 
 export interface DocumentModel<T> {
     content: T
-    streamId: string
-    commitId: string
+    streamID: string
+    commitID: string
 }
 
 interface MetadataModel {
@@ -167,8 +167,8 @@ const doc = {
 
             // TODO integrate data handling switch
             return {
-                streamId: ceramicDoc.id.toString(),
-                commitId: ceramicDoc.commitId.toString(),
+                streamID: ceramicDoc.id.toString(),
+                commitID: ceramicDoc.commitId.toString(),
                 content: firestoreContent
             }
         } catch (e) { console.error(e) }
@@ -185,7 +185,7 @@ const doc = {
             )
             await tileDoc.update(content, metadata)
 
-            if (res.streamId !== tileDoc.id.toString() || res.commitId !== tileDoc.commitId.toString()) {
+            if (res.streamID !== tileDoc.id.toString() || res.commitID !== tileDoc.commitId.toString()) {
                 console.warn('Corrupt data')
                 // TODO Clean up corruption
             }

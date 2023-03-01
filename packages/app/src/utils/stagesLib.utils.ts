@@ -36,12 +36,12 @@ export const loadStagesLib = async (currentUser: UserType): Promise<DocumentMode
                 family: 'cambrianStagesLibBackup',
                 tags: [stagesLibDoc?.content._schemaVer?.toString() || '0']
             },)
-            await API.doc.updateStream(currentUser, stagesLibDoc.streamId, cambrianStagesLib.data)
+            await API.doc.updateStream(currentUser, stagesLibDoc.streamID, cambrianStagesLib.data)
         }
 
         return {
-            streamId: stagesLibDoc.streamId,
-            commitId: stagesLibDoc.commitId,
+            streamID: stagesLibDoc.streamID,
+            commitID: stagesLibDoc.commitID,
             content: cambrianStagesLib,
         }
     } catch (e) {

@@ -1,5 +1,5 @@
-import ComposerSolver from './ComposerSolver'
-import { CompositionModel } from '../models/CompositionModel'
+import ComposerSolver from '../ComposerSolver'
+import { CompositionModel } from '../../models/CompositionModel'
 import { Elements } from 'react-flow-renderer'
 import { SCHEMA_VER } from '@cambrian/app/config'
 
@@ -28,7 +28,8 @@ export default class Composition {
         }
     }
 
-    public async create() { }
+    public async create() {
+    }
 
     public async archive() { }
 }
