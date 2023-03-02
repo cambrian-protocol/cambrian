@@ -2,23 +2,34 @@ import { ReceivedProposalsHashmapType, TemplateModel } from '../../models/Templa
 
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from '../../models/ProposalModel'
+import ProposalService from '@cambrian/app/services/ProposalService'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import Template from './Template'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export default class Proposal {
+    private _auth?: UserType
     private _proposalDoc: DocumentModel<ProposalModel>
     private _template: Template
     private _status: ProposalStatus
+    private _proposalService: ProposalService
 
 
-    constructor(templateStreamDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>,) {
+    constructor(
+        templateStreamDoc: DocumentModel<TemplateModel>,
+        proposalDoc: DocumentModel<ProposalModel>,
+        proposalService: ProposalService,
+        auth?: UserType,
+    ) {
+        this._auth = auth
+        this._proposalService = proposalService
         this._proposalDoc = proposalDoc
-        this._template = new Template(templateStreamDoc)
+        this._template = new Template(templateStreamDoc, auth)
         this._status = this.getProposalStatus(templateStreamDoc, proposalDoc)
 
     }
 
-    public get data(): ProposalModel {
+    public get content(): ProposalModel {
         return this._proposalDoc.content
     }
 
@@ -34,8 +45,18 @@ export default class Proposal {
         return this._status
     }
 
-    public updateContent(authDid: string, updatedProposal: ProposalModel) {
-        if (authDid !== this._proposalDoc.content.author) {
+    public create() {
+        // TODO
+    }
+
+    public updateDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
+        this._proposalDoc = updatedProposalDoc
+        if (updatedTemplateDoc) this._template.updateDoc(updatedTemplateDoc)
+        this._status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
+    }
+
+    public updateContent(updatedProposal: ProposalModel,) {
+        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
             console.error('Unauthorized!')
             return
         }
@@ -58,43 +79,45 @@ export default class Proposal {
         }
     }
 
-    public receiveChangeRequest(authDid: string) {
-        if (authDid !== this._proposalDoc.content.author) {
+    public async receiveChangeRequest() {
+        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
             console.error('Unauthorized!')
             return
         }
+
         this._proposalDoc.content.isSubmitted = false
+        await this._proposalService.saveProposal(this._auth, this._proposalDoc)
     }
 
-    public requestChange(authDid: string): void {
-        if (authDid !== this._template.data.author) {
+    public requestChange() {
+        if (!this._auth || this._auth.did !== this._template.content.author) {
             console.error('Unauthorized!')
             return
         }
 
         try {
-            this._template.requestChange(authDid, this._proposalDoc)
+            this._template.requestChange(this._proposalDoc)
             this._status = ProposalStatus.ChangeRequested
         } catch (e) {
             console.error(e)
         }
     }
 
-    public receive(authDid: string): void {
-        if (authDid !== this._template.data.author) {
+    public receive() {
+        if (!this._auth || this._auth.did !== this._template.content.author) {
             console.error('Unauthorized!')
             return
         }
 
         try {
-            this._template.receive(authDid, this._proposalDoc)
+            this._template.receive(this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
     }
 
-    public submit(authDid: string): void {
-        if (authDid !== this._proposalDoc.content.author) {
+    public submit() {
+        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
             console.error('Unauthorized!')
             return
         }

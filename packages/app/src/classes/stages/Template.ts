@@ -1,16 +1,19 @@
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export default class Template {
+    private _auth?: UserType
     private _templateDoc: DocumentModel<TemplateModel>
 
 
-    constructor(templateDoc: DocumentModel<TemplateModel>) {
+    constructor(templateDoc: DocumentModel<TemplateModel>, auth?: UserType,) {
+        this._auth = auth
         this._templateDoc = templateDoc
     }
 
-    public get data(): TemplateModel {
+    public get content(): TemplateModel {
         return this._templateDoc.content
     }
 
@@ -20,9 +23,13 @@ export default class Template {
 
     public async create() { }
 
-    public receive(authDid: string, proposalDoc: DocumentModel<ProposalModel>) {
-        if (authDid !== this._templateDoc.content.author) {
-            console.error("Unauthorized!")
+    public updateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
+        this._templateDoc = updatedTemplateDoc
+    }
+
+    public receive(proposalDoc: DocumentModel<ProposalModel>) {
+        if (!this._auth || this._auth.did !== this._templateDoc.content.author) {
+            console.error('Unauthorized!')
             return
         }
 
@@ -42,9 +49,9 @@ export default class Template {
 
     }
 
-    public requestChange(authDid: string, proposalDoc: DocumentModel<ProposalModel>) {
-        if (authDid !== this._templateDoc.content.author) {
-            console.error("Unauthorized!")
+    public requestChange(proposalDoc: DocumentModel<ProposalModel>) {
+        if (!this._auth || this._auth.did !== this._templateDoc.content.author) {
+            console.error('Unauthorized!')
             return
         }
 
