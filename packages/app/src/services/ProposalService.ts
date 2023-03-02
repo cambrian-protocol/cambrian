@@ -14,6 +14,16 @@ export default class ProposalService {
         await API.doc.updateStream(auth, templateDoc.streamID, templateDoc.content)
     }
 
+    async createProposal(auth: UserType, proposal: ProposalModel) {
+        if (!auth.did) {
+            console.error('Unauthorized!')
+            return
+        }
+
+        //TODO Tags ??
+        await API.doc.create(auth, proposal, { controllers: [auth.did], family: 'proposal' })
+    }
+
     async subscribe() { }
 
     async unsubscribe() { }

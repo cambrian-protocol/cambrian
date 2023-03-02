@@ -11,6 +11,8 @@ export default class MockProposalService {
     async saveTemplate(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
     }
 
+    async createProposal(auth: UserType, proposal: ProposalModel) { }
+
     async subscribe() { }
 
     async unsubscribe() { }

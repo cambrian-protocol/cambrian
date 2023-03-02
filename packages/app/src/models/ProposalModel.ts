@@ -13,4 +13,5 @@ export type ProposalModel = {
     author: string // DID
     isSubmitted: boolean
     isCanceled?: boolean
+    version?: number
 }

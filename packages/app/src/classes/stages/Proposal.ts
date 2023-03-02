@@ -1,10 +1,9 @@
-import { ReceivedProposalsHashmapType, TemplateModel } from '../../models/TemplateModel'
-
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from '../../models/ProposalModel'
 import ProposalService from '@cambrian/app/services/ProposalService'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import Template from './Template'
+import { TemplateModel } from '../../models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 export default class Proposal {
@@ -45,17 +44,27 @@ export default class Proposal {
         return this._status
     }
 
-    public create() {
-        // TODO
+    public async create() {
+        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
+            console.error('Unauthorized!')
+            return
+        }
+
+        try {
+            await this._proposalService.createProposal(this._auth, this._proposalDoc.content)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    public updateDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
+    public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
         this._proposalDoc = updatedProposalDoc
-        if (updatedTemplateDoc) this._template.updateDoc(updatedTemplateDoc)
-        this._status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
+        if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)
+        const status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
+        this._status = status
     }
 
-    public updateContent(updatedProposal: ProposalModel,) {
+    public async updateContent(updatedProposal: ProposalModel,) {
         if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
             console.error('Unauthorized!')
             return
@@ -77,6 +86,12 @@ export default class Proposal {
         if (this._status === ProposalStatus.ChangeRequested) {
             this._status = ProposalStatus.Modified
         }
+
+        try {
+            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     public async receiveChangeRequest() {
@@ -85,51 +100,89 @@ export default class Proposal {
             return
         }
 
-        this._proposalDoc.content.isSubmitted = false
-        await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+        if (this._status !== ProposalStatus.ChangeRequested) {
+            console.error('Invalid status!')
+            return
+        }
+
+        try {
+            this._proposalDoc.content.isSubmitted = false
+            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    public requestChange() {
+    public async requestChange() {
         if (!this._auth || this._auth.did !== this._template.content.author) {
             console.error('Unauthorized!')
+            return
+        }
+
+        if (this._status !== ProposalStatus.OnReview) {
+            console.error('Invalid status!')
             return
         }
 
         try {
             this._template.requestChange(this._proposalDoc)
             this._status = ProposalStatus.ChangeRequested
+            await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
         }
     }
 
-    public receive() {
+    public async receive() {
         if (!this._auth || this._auth.did !== this._template.content.author) {
             console.error('Unauthorized!')
             return
         }
 
+        if (this._status !== ProposalStatus.Submitted) {
+            console.error('Invalid status!')
+            return
+        }
+
         try {
             this._template.receive(this._proposalDoc)
+            this._status = ProposalStatus.OnReview
+            await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
         }
     }
 
-    public submit() {
-        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
+    public async approve() {
+        if (!this._auth || this._auth.did !== this._template.content.author) {
             console.error('Unauthorized!')
             return
         }
 
-        if (this._proposalDoc.content.isSubmitted) {
-            console.error('Proposal already submitted!')
+        if (this._status !== ProposalStatus.OnReview) {
+            console.error('Invalid status!')
+            return
+        }
+
+        try {
+            this._template.approve(this._proposalDoc)
+            this._status = ProposalStatus.Approved
+            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async submit() {
+        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
+            console.error('Unauthorized!')
             return
         }
 
         const isStatusValid = [
             ProposalStatus.Draft,
             ProposalStatus.Modified,
+            ProposalStatus.ChangeRequested
         ].includes(this._status)
 
         if (!isStatusValid) {
@@ -138,59 +191,43 @@ export default class Proposal {
         }
 
         this._proposalDoc.content.isSubmitted = true
-        this._status = ProposalStatus.OnReview
+        this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
+        this._status = ProposalStatus.Submitted
+
+        try {
+            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    // TODO Write tests
     private getProposalStatus(templateDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>, onChainProposal?: any): ProposalStatus {
-        if (onChainProposal && onChainProposal.isExecuted) {
-            return ProposalStatus.Executed
-        } else if (onChainProposal) {
-            return ProposalStatus.Funding
+        if (onChainProposal) {
+            return onChainProposal.isExecuted ? ProposalStatus.Executed : ProposalStatus.Funding
         }
 
-        const receivedProposals = templateDoc.content.receivedProposals
+        const receivedProposalCommits = templateDoc.content.receivedProposals[proposalDoc.streamID] || []
+        const latestProposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
 
-        const approvedProposalCommitID = this.getApprovedProposalCommitID(receivedProposals)
-        if (approvedProposalCommitID) {
-            return ProposalStatus.Approved
-        }
-
-        if (proposalDoc.content.isCanceled) {
-            return ProposalStatus.Canceled
-        }
-
-        const receivedProposalCommits = receivedProposals[proposalDoc.streamID]
-
-        if (receivedProposalCommits) {
-            const proposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
-
-            if (proposalCommit.isDeclined) {
+        if (latestProposalCommit) {
+            if (latestProposalCommit.isDeclined) {
                 return ProposalStatus.Canceled
-            } else if (proposalCommit.approved) {
+            } else if (latestProposalCommit.approved) {
                 return ProposalStatus.Approved
-            } else if (proposalCommit.requestChange) {
-                return ProposalStatus.ChangeRequested
+            } else if (latestProposalCommit.requestChange) {
+                const version = proposalDoc.content.version || 0
+                const hasNewVersion = version > receivedProposalCommits.length
+                if (hasNewVersion && proposalDoc.content.isSubmitted) {
+                    return ProposalStatus.Submitted
+                } else {
+                    return ProposalStatus.ChangeRequested
+                }
             } else {
                 return ProposalStatus.OnReview
             }
         }
 
-        if (proposalDoc.content.isSubmitted) {
-            return ProposalStatus.OnReview
-        }
-
-        return ProposalStatus.Draft
+        return proposalDoc.content.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
     }
-
-    private getApprovedProposalCommitID = (receivedProposals: ReceivedProposalsHashmapType
-    ) => {
-        return (receivedProposals &&
-            receivedProposals[this._proposalDoc.streamID]?.find(
-                (commit) => commit.approved
-            )?.proposalCommitID) ||
-            undefined
-    }
-
 
 }

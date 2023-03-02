@@ -23,7 +23,7 @@ export default class Template {
 
     public async create() { }
 
-    public updateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
+    public refreshDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._templateDoc = updatedTemplateDoc
     }
 
@@ -71,6 +71,32 @@ export default class Template {
         receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
             ...latestProposalCommit,
             requestChange: true
+        }
+    }
+
+    public async approve(proposalDoc: DocumentModel<ProposalModel>) {
+        if (!this._auth || this._auth.did !== this._templateDoc.content.author) {
+            console.error('Unauthorized!')
+            return
+        }
+
+        if (!proposalDoc.content.isSubmitted) {
+            return
+        }
+
+        const streamID = proposalDoc.streamID
+        const receivedProposals = this._templateDoc.content.receivedProposals
+        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+
+        // This check can fail when CAS rolled out new commitIds. TODO double check if this could cause a problem.
+        /* if (!latestProposalCommit || proposalDoc.commitID !== latestProposalCommit.proposalCommitID) {
+            console.error('Provided proposalCommitID does not match with latest received commitID!')
+            return
+        } */
+
+        receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
+            ...latestProposalCommit,
+            approved: true
         }
     }
 
