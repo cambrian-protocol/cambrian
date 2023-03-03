@@ -6,6 +6,7 @@ import Template from './Template'
 import { TemplateModel } from '../../models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
+import { isStatusValid } from '@cambrian/app/utils/proposal.utils'
 
 /* Flow order
 
@@ -97,14 +98,10 @@ export default class Proposal {
             return
         }
 
-        const isStatusValid = [
-            ProposalStatus.Draft,
+        if (!isStatusValid(this._status,
+            [ProposalStatus.Draft,
             ProposalStatus.ChangeRequested,
-            ProposalStatus.Modified,
-        ].includes(this._status)
-
-        if (!isStatusValid) {
-            console.error('Invalid status!')
+            ProposalStatus.Modified,])) {
             return
         }
 
@@ -130,8 +127,7 @@ export default class Proposal {
             return
         }
 
-        if (this._status !== ProposalStatus.ChangeRequested) {
-            console.error('Invalid status!')
+        if (!isStatusValid(this._status, [ProposalStatus.ChangeRequested])) {
             return
         }
 
@@ -148,8 +144,7 @@ export default class Proposal {
             return
         }
 
-        if (this._status !== ProposalStatus.OnReview) {
-            console.error('Invalid status!')
+        if (!isStatusValid(this._status, [ProposalStatus.OnReview])) {
             return
         }
 
@@ -167,8 +162,7 @@ export default class Proposal {
             return
         }
 
-        if (this._status !== ProposalStatus.Submitted) {
-            console.error('Invalid status!')
+        if (!isStatusValid(this._status, [ProposalStatus.Submitted])) {
             return
         }
 
@@ -186,8 +180,7 @@ export default class Proposal {
             return
         }
 
-        if (this._status !== ProposalStatus.OnReview) {
-            console.error('Invalid status!')
+        if (!isStatusValid(this._status, [ProposalStatus.OnReview])) {
             return
         }
 
@@ -205,14 +198,10 @@ export default class Proposal {
             return
         }
 
-        const isStatusValid = [
-            ProposalStatus.Draft,
+        if (!isStatusValid(this._status,
+            [ProposalStatus.Draft,
             ProposalStatus.Modified,
-            ProposalStatus.ChangeRequested
-        ].includes(this._status)
-
-        if (!isStatusValid) {
-            console.error('Invalid status!')
+            ProposalStatus.ChangeRequested])) {
             return
         }
 
