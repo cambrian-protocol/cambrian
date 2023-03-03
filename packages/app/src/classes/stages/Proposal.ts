@@ -5,7 +5,35 @@ import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import Template from './Template'
 import { TemplateModel } from '../../models/TemplateModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 
+/* Flow order
+
+---- Proposer ----
+1.
+create() 
+- creates a new Proposal with the current instance
+- user must be Proposal author
+- adds Proposal to users StagesLib
+
+2.
+updateContent()  (optional)
+- updates the content of the Proposal
+- user must be Proposal author
+- Proposal must be in status DRAFT
+
+3.
+submit()
+- 
+
+
+
+
+
+
+
+
+*/
 export default class Proposal {
     private _auth?: UserType
     private _proposalDoc: DocumentModel<ProposalModel>
@@ -45,12 +73,12 @@ export default class Proposal {
     }
 
     public async create() {
-        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
         try {
+            // TODO StagesLib handling
             await this._proposalService.createProposal(this._auth, this._proposalDoc.content)
         } catch (e) {
             console.error(e)
@@ -65,8 +93,7 @@ export default class Proposal {
     }
 
     public async updateContent(updatedProposal: ProposalModel,) {
-        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
@@ -87,6 +114,10 @@ export default class Proposal {
             this._status = ProposalStatus.Modified
         }
 
+        if (this._proposalDoc.content.isSubmitted) {
+            this._proposalDoc.content.isSubmitted = false
+        }
+
         try {
             await this._proposalService.saveProposal(this._auth, this._proposalDoc)
         } catch (e) {
@@ -95,8 +126,7 @@ export default class Proposal {
     }
 
     public async receiveChangeRequest() {
-        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
@@ -114,8 +144,7 @@ export default class Proposal {
     }
 
     public async requestChange() {
-        if (!this._auth || this._auth.did !== this._template.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
             return
         }
 
@@ -134,8 +163,7 @@ export default class Proposal {
     }
 
     public async receive() {
-        if (!this._auth || this._auth.did !== this._template.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
             return
         }
 
@@ -154,8 +182,7 @@ export default class Proposal {
     }
 
     public async approve() {
-        if (!this._auth || this._auth.did !== this._template.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
             return
         }
 
@@ -174,8 +201,7 @@ export default class Proposal {
     }
 
     public async submit() {
-        if (!this._auth || this._auth.did !== this._proposalDoc.content.author) {
-            console.error('Unauthorized!')
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
