@@ -339,7 +339,11 @@ export default class Proposal {
                 if (hasNewVersion && proposalDoc.content.isSubmitted) {
                     return ProposalStatus.Submitted
                 } else {
-                    return ProposalStatus.ChangeRequested
+                    if (this._auth?.did === this._proposalDoc.content.author && !this._proposalDoc.content.isSubmitted) {
+                        return ProposalStatus.Modified
+                    } else {
+                        return ProposalStatus.ChangeRequested
+                    }
                 }
             } else {
                 return ProposalStatus.OnReview

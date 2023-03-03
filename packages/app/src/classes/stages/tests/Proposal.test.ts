@@ -187,19 +187,39 @@ describe('Proposal ', () => {
         expect(proposalP.status).toEqual(ProposalStatus.Submitted)
     })
 
-    it('approved updated Proposal', async () => {
+    it('approved updated Proposal initializes statuses correct', async () => {
         // Proposer
         const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
         const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+
+        // Status init check
+        expect(proposalT.status).toEqual(ProposalStatus.Submitted)
+        expect(proposalP.status).toEqual(ProposalStatus.Submitted)
+
         await proposalT.receive()
+
+        // Status init check
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.OnReview)
+        expect(proposalP.status).toEqual(ProposalStatus.OnReview)
+
         await proposalT.requestChange()
 
-        //Proposer
+        // Status init check
         proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
+        expect(proposalP.status).toEqual(ProposalStatus.ChangeRequested)
+
+        //Proposer
         await proposalP.receiveChangeRequest()
+
+        // Status init check
+        proposalT.refreshDocs(proposalP.doc, proposalP.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
+        expect(proposalP.status).toEqual(ProposalStatus.ChangeRequested)
 
         const updatedProposalDoc: DocumentModel<ProposalModel> = {
             ...proposalT.doc,
@@ -212,16 +232,41 @@ describe('Proposal ', () => {
         }
         await proposalP.updateContent(updatedProposalDoc.content)
         expect(proposalP.content).toEqual(updatedProposalDoc.content)
+
+        // Proposer should see status modified, Templater should see status change requested
+        proposalT.refreshDocs(updatedProposalDoc, proposalP.templateDoc)
         expect(proposalP.status).toEqual(ProposalStatus.Modified)
+        expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
+        // Proposer needs to see see Modified on refresh
+        proposalP.refreshDocs(updatedProposalDoc, proposalP.templateDoc)
+        expect(proposalP.status).toEqual(ProposalStatus.Modified)
+
         await proposalP.submit()
+
+        // Status init check
+        proposalT.refreshDocs(proposalP.doc, proposalP.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.Submitted)
         expect(proposalP.status).toEqual(ProposalStatus.Submitted)
 
         // Templater
-        proposalT.refreshDocs(updatedProposalDoc, proposalP.templateDoc)
         await proposalT.receive()
+
+        // Status init check
+        proposalP.refreshDocs(proposalT.doc, proposalP.templateDoc)
         expect(proposalT.status).toEqual(ProposalStatus.OnReview)
+        expect(proposalP.status).toEqual(ProposalStatus.OnReview)
+
         await proposalT.approve()
+
+        // Status init check
+        proposalP.refreshDocs(proposalT.doc, proposalP.templateDoc)
+        expect(proposalP.status).toEqual(ProposalStatus.Approved)
         expect(proposalT.status).toEqual(ProposalStatus.Approved)
+
+        const registeredCommits = proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID]
+
+        expect(registeredCommits[registeredCommits.length - 1]).toEqual({ proposalCommitID: updatedProposalDoc.commitID, approved: true })
+        expect(registeredCommits.length).toEqual(2)
     })
 
     it('declines Proposal', async () => {
@@ -321,11 +366,23 @@ describe('Proposal ', () => {
 
     /* 
      TODO Tests
-
-     it('returns initiates the right statuses', async () => {})
-
-
      it('archives a Proposal', async () => {})
     */
+
+})
+
+describe('Proposal Statuses', () => {
+
+    it('initiates Draft', () => {
+
+
+    })
+    it('initiates Submitted', () => { })
+    it('initiates OnReview', () => { })
+    it('initiates ChangeRequested', () => { })
+    it('initiates Modified', () => { })
+    it('initiates Canceled', () => { })
+    it('initiates Declined', () => { })
+    it('initiates Approved', () => { })
 
 })
