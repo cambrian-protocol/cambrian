@@ -4,6 +4,7 @@ import ProposalService from '@cambrian/app/services/ProposalService'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import Template from './Template'
 import { TemplateModel } from '../../models/TemplateModel'
+import TemplateService from '@cambrian/app/services/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 import { isStatusValid } from '@cambrian/app/utils/proposal.utils'
@@ -93,14 +94,14 @@ export default class Proposal {
         templateStreamDoc: DocumentModel<TemplateModel>,
         proposalDoc: DocumentModel<ProposalModel>,
         proposalService: ProposalService,
+        templateService: TemplateService,
         auth?: UserType,
     ) {
         this._auth = auth
         this._proposalService = proposalService
         this._proposalDoc = proposalDoc
-        this._template = new Template(templateStreamDoc, auth)
+        this._template = new Template(templateStreamDoc, templateService, auth)
         this._status = this.getProposalStatus(templateStreamDoc, proposalDoc)
-
     }
 
     public get content(): ProposalModel {

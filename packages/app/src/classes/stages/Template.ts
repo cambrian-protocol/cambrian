@@ -1,17 +1,21 @@
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
+import TemplateService from '@cambrian/app/services/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 
 export default class Template {
     private _auth?: UserType
     private _templateDoc: DocumentModel<TemplateModel>
+    private _templateService: TemplateService
 
 
-    constructor(templateDoc: DocumentModel<TemplateModel>, auth?: UserType,) {
+    constructor(templateDoc: DocumentModel<TemplateModel>, templateService: TemplateService, auth?: UserType,) {
         this._auth = auth
         this._templateDoc = templateDoc
+        this._templateService = templateService
     }
 
     public get content(): TemplateModel {
@@ -49,7 +53,7 @@ export default class Template {
 
     }
 
-    public requestChange(proposalDoc: DocumentModel<ProposalModel>) {
+    public async approve(proposalDoc: DocumentModel<ProposalModel>) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
@@ -60,16 +64,15 @@ export default class Template {
 
         const streamID = proposalDoc.streamID
         const receivedProposals = this._templateDoc.content.receivedProposals
-        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+        const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
-        if (!latestProposalCommit || proposalDoc.commitID !== latestProposalCommit.proposalCommitID) {
-            console.error('Provided proposalCommitID does not match with latest received commitID!')
+        if (!this.isProposalsLatestVersion(proposalDoc)) {
             return
         }
 
         receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
             ...latestProposalCommit,
-            requestChange: true
+            approved: true
         }
     }
 
@@ -86,7 +89,9 @@ export default class Template {
         const receivedProposals = this._templateDoc.content.receivedProposals
         const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
 
-        // Todo check if content matches lates commit
+        if (!this.isProposalsLatestVersion(proposalDoc)) {
+            return
+        }
 
         receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
             ...latestProposalCommit,
@@ -94,7 +99,7 @@ export default class Template {
         }
     }
 
-    public async approve(proposalDoc: DocumentModel<ProposalModel>) {
+    public requestChange(proposalDoc: DocumentModel<ProposalModel>) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
@@ -107,17 +112,33 @@ export default class Template {
         const receivedProposals = this._templateDoc.content.receivedProposals
         const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
 
-        // This check can fail when CAS rolled out new commitIds. Maybe there is a way to check if the freshly rolled-out commitId has the not-anchored commit as a parent? So we can really be sure that the templater and proposer have agreed. Fetching the content and comparing at least?
-
-        /* if (!latestProposalCommit || proposalDoc.commitID !== latestProposalCommit.proposalCommitID) {
-            console.error('Provided proposalCommitID does not match with latest received commitID!')
+        if (!this.isProposalsLatestVersion(proposalDoc)) {
             return
-        } */
+        }
 
         receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
             ...latestProposalCommit,
-            approved: true
+            requestChange: true
         }
+    }
+
+    private async isProposalsLatestVersion(proposalDoc: DocumentModel<ProposalModel>) {
+        const streamID = proposalDoc.streamID
+        const receivedProposals = this._templateDoc.content.receivedProposals
+        const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
+
+        if (latestProposalCommit?.proposalCommitID === proposalDoc.commitID) {
+            return true
+        }
+
+        // CAS might have rolled out anchored commitIds. We compare the contents of the latest version.
+        const latestProposalCommitDoc = await this._templateService.readProposalCommit(proposalDoc.streamID, latestProposalCommit.proposalCommitID)
+
+        if (!_.isEqual(latestProposalCommitDoc?.content, proposalDoc.content)) {
+            console.error('Proposal does not match with the latest registered version!')
+            return false
+        }
+        return true
     }
 
     // Former toggleActivate

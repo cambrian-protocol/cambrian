@@ -1,6 +1,7 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel';
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
 import MockProposalService from './MockProposalService';
+import MockTemplateService from './MockTemplateService';
 import Proposal from '../Proposal';
 import { ProposalModel } from '@cambrian/app/models/ProposalModel';
 import { ProposalStatus } from './../../../models/ProposalStatus';
@@ -27,6 +28,7 @@ let dummyTemplateStreamDoc: DocumentModel<TemplateModel>
 let dummyProposalDoc: DocumentModel<ProposalModel>
 
 const mockProposalServie = new MockProposalService()
+const mockTemplateService = new MockTemplateService()
 
 describe('Proposal ', () => {
     beforeEach(() => {
@@ -100,24 +102,24 @@ describe('Proposal ', () => {
     });
 
     it('creates a Proposal', async () => {
-        const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposal.create()
         expect(proposal.status).toEqual(ProposalStatus.Draft)
         expect(proposal.content).toEqual(dummyProposalDoc.content)
     })
 
     it('submits a Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
         expect(proposalP.status).toEqual(ProposalStatus.Submitted)
         expect(proposalP.content.isSubmitted).toBeTruthy()
     })
 
     it('receives a Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
 
@@ -126,19 +128,19 @@ describe('Proposal ', () => {
     })
 
     it('does not register an unsubmitted Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
         expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID]).toEqual(undefined)
     })
 
     it('requests change on Proposal and receives changeRequest', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
         await proposalT.requestChange()
@@ -156,11 +158,11 @@ describe('Proposal ', () => {
 
     it('updated and resubmitted a Proposal', async () => {
         // Creating & Submitting Proposal
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Receiving & Requesting Change
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.requestChange()
 
@@ -186,11 +188,11 @@ describe('Proposal ', () => {
 
     it('approved updated Proposal', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.requestChange()
 
@@ -223,11 +225,11 @@ describe('Proposal ', () => {
 
     it('declines Proposal', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.decline()
 
