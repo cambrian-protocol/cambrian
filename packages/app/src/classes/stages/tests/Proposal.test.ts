@@ -236,22 +236,23 @@ describe('Proposal ', () => {
         expect(proposalT.status).toEqual(ProposalStatus.Declined)
         expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID, isDeclined: true })
     })
+
+    it('cancels a Proposal', async () => {
+        // Proposer
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        await proposalP.submit()
+
+        // Templater
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        await proposalT.receive()
+
+        // Proposer
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        await proposalP.cancel()
+        expect(proposalP.status).toEqual(ProposalStatus.Canceled)
+
+        proposalT.refreshDocs(proposalP.doc, proposalP.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.Canceled)
+    })
+
 })
-
-
-
-
-
-
-/* 
-
-
-
-test('Succesfully declined Proposal', () => {
-})
-
- */
-
-
-
-

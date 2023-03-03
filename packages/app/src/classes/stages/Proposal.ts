@@ -191,6 +191,30 @@ export default class Proposal {
         }
     }
 
+    public async cancel() {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+            return
+        }
+
+        if (!isStatusValid(this._status,
+            [ProposalStatus.OnReview,
+            ProposalStatus.ChangeRequested,
+            ProposalStatus.Modified,
+            ProposalStatus.Submitted,
+            ])) {
+            return
+        }
+
+        this._status = ProposalStatus.Canceled
+        this._proposalDoc.content.isCanceled = true
+
+        try {
+            await this._proposalService.save(this._auth, this._proposalDoc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     public async receive() {
         if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
             return
@@ -289,9 +313,13 @@ export default class Proposal {
         const receivedProposalCommits = templateDoc.content.receivedProposals[proposalDoc.streamID] || []
         const latestProposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
 
+        if (proposalDoc.content.isCanceled) {
+            return ProposalStatus.Canceled
+        }
+
         if (latestProposalCommit) {
             if (latestProposalCommit.isDeclined) {
-                return ProposalStatus.Canceled
+                return ProposalStatus.Declined
             } else if (latestProposalCommit.approved) {
                 return ProposalStatus.Approved
             } else if (latestProposalCommit.requestChange) {
