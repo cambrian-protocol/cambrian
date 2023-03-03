@@ -56,6 +56,7 @@ export interface DocumentModel<T> {
     content: T
     streamID: string
     commitID: string
+    metadata?: MetadataModel
 }
 
 interface MetadataModel {

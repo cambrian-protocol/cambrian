@@ -133,7 +133,6 @@ export default class Proposal {
         }
 
         try {
-            // TODO StagesLib handling
             await this._proposalService.createProposal(this._auth, this._proposalDoc.content)
         } catch (e) {
             console.error(e)
@@ -163,7 +162,7 @@ export default class Proposal {
         }
 
         try {
-            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+            await this._proposalService.save(this._auth, this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -186,7 +185,7 @@ export default class Proposal {
         this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
 
         try {
-            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+            await this._proposalService.save(this._auth, this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -204,8 +203,7 @@ export default class Proposal {
         this._status = ProposalStatus.OnReview
 
         try {
-            this._template.receive(this._proposalDoc)
-            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+            await this._template.receive(this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -223,8 +221,7 @@ export default class Proposal {
         this._status = ProposalStatus.Approved
 
         try {
-            this._template.approve(this._proposalDoc)
-            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+            await this._template.approve(this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -242,8 +239,7 @@ export default class Proposal {
         this._status = ProposalStatus.Declined
 
         try {
-            this._template.decline(this._proposalDoc)
-            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+            await this._template.decline(this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -261,8 +257,7 @@ export default class Proposal {
         this._status = ProposalStatus.ChangeRequested
 
         try {
-            this._template.requestChange(this._proposalDoc)
-            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+            await this._template.requestChange(this._proposalDoc)
         } catch (e) {
             console.error(e)
         }
@@ -280,7 +275,7 @@ export default class Proposal {
         this._proposalDoc.content.isSubmitted = false
 
         try {
-            await this._proposalService.saveProposal(this._auth, this._proposalDoc)
+            await this._proposalService.save(this._auth, this._proposalDoc)
         } catch (e) {
             console.error(e)
         }

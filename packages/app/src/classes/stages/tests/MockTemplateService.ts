@@ -2,9 +2,9 @@ import { DocumentModel } from "../../../services/api/cambrian.api";
 import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { UserType } from "@cambrian/app/store/UserContext";
 
-export default class MockProposalService {
+export default class MockTemplateService {
 
-    async saveTemplate(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
+    async save(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
     }
 
     async readProposalCommit(streamID: string, commitID: string) {

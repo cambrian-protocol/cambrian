@@ -5,10 +5,9 @@ import { TemplateModel } from "../models/TemplateModel";
 import { UserType } from "../store/UserContext";
 
 export default class TemplateService {
-
-    async saveTemplate(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
+    async save(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
         try {
-            await API.doc.updateStream(auth, templateDoc.streamID, templateDoc.content)
+            await API.doc.updateStream(auth, templateDoc.streamID, templateDoc.content, { ...templateDoc.metadata, tags: [templateDoc.content.title] })
         } catch (e) {
             console.error(e)
         }

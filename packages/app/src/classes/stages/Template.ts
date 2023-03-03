@@ -26,13 +26,15 @@ export default class Template {
         return this._templateDoc
     }
 
-    public async create() { }
+    public async create() {
+        // TODO
+    }
 
     public refreshDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._templateDoc = updatedTemplateDoc
     }
 
-    public receive(proposalDoc: DocumentModel<ProposalModel>) {
+    public async receive(proposalDoc: DocumentModel<ProposalModel>) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
@@ -49,6 +51,12 @@ export default class Template {
             receivedProposals[streamID].push({ proposalCommitID: commitID })
         } else {
             receivedProposals[streamID] = [{ proposalCommitID: commitID }]
+        }
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
         }
 
     }
@@ -74,6 +82,12 @@ export default class Template {
             ...latestProposalCommit,
             approved: true
         }
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     public async decline(proposalDoc: DocumentModel<ProposalModel>) {
@@ -97,9 +111,15 @@ export default class Template {
             ...latestProposalCommit,
             isDeclined: true
         }
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    public requestChange(proposalDoc: DocumentModel<ProposalModel>) {
+    public async requestChange(proposalDoc: DocumentModel<ProposalModel>) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
@@ -119,6 +139,12 @@ export default class Template {
         receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
             ...latestProposalCommit,
             requestChange: true
+        }
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
         }
     }
 
