@@ -11,21 +11,38 @@ import { isStatusValid } from '@cambrian/app/utils/proposal.utils'
 /* Flow order
 
 ---- Proposer ----
+
 1.
 create() 
+- AUTH: user must be Proposal author
 - creates a new Proposal with the current instance
-- user must be Proposal author
 - adds Proposal to users StagesLib
 
-2.
-updateContent()  (optional)
+2. (optional)
+updateContent()  
+- AUTH: user must be Proposal author
+- STATUS: Proposal must be in DRAFT, CHANGE_REQUESTED or MODIFIED
 - updates the content of the Proposal
-- user must be Proposal author
-- Proposal must be in status DRAFT
 
 3.
 submit()
-- 
+- AUTH: user must be Proposal author
+- STATUS: Proposal must be in DRAFT, CHANGE_REQUESTED or MODIFIED
+- changes the isSubmitted flag to true
+- sets version number to 1
+
+---- Templater ----
+
+4.
+receive()
+- AUTH: user must be Template author
+- STATUS: Proposal must be in Submitted
+- adds an entry at the Templates receivedProposals with the current proposals streamId as the key and creates an array for every proposal commit with the first entry of an object containing the current proposals commitId 
+
+5. (optional)
+requestChange()
+- AUTH: 
+
 
 
 
@@ -131,8 +148,9 @@ export default class Proposal {
             return
         }
 
+        this._proposalDoc.content.isSubmitted = false
+
         try {
-            this._proposalDoc.content.isSubmitted = false
             await this._proposalService.saveProposal(this._auth, this._proposalDoc)
         } catch (e) {
             console.error(e)
@@ -148,9 +166,10 @@ export default class Proposal {
             return
         }
 
+        this._status = ProposalStatus.ChangeRequested
+
         try {
             this._template.requestChange(this._proposalDoc)
-            this._status = ProposalStatus.ChangeRequested
             await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
@@ -166,9 +185,10 @@ export default class Proposal {
             return
         }
 
+        this._status = ProposalStatus.OnReview
+
         try {
             this._template.receive(this._proposalDoc)
-            this._status = ProposalStatus.OnReview
             await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
@@ -184,9 +204,29 @@ export default class Proposal {
             return
         }
 
+        this._status = ProposalStatus.Approved
+
         try {
             this._template.approve(this._proposalDoc)
-            this._status = ProposalStatus.Approved
+            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async decline() {
+        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
+            return
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.OnReview])) {
+            return
+        }
+
+        this._status = ProposalStatus.Declined
+
+        try {
+            this._template.decline(this._proposalDoc)
             await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
@@ -205,9 +245,9 @@ export default class Proposal {
             return
         }
 
+        this._status = ProposalStatus.Submitted
         this._proposalDoc.content.isSubmitted = true
         this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
-        this._status = ProposalStatus.Submitted
 
         try {
             await this._proposalService.saveProposal(this._auth, this._proposalDoc)

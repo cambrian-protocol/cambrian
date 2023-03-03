@@ -18,6 +18,7 @@ export enum ProposalStatus {
     ChangeRequested,
     Modified,
     Canceled,
+    Declined,
     Approved,
     Funding,
     Executed,

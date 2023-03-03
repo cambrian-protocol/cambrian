@@ -107,118 +107,132 @@ describe('Proposal ', () => {
     })
 
     it('submits a Proposal', async () => {
-        const proposalWithProposerAuth = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
-        await proposalWithProposerAuth.submit()
-        expect(proposalWithProposerAuth.status).toEqual(ProposalStatus.Submitted)
-        expect(proposalWithProposerAuth.content.isSubmitted).toBeTruthy()
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
+        expect(proposalP.status).toEqual(ProposalStatus.Submitted)
+        expect(proposalP.content.isSubmitted).toBeTruthy()
     })
 
     it('receives a Proposal', async () => {
-        const proposalWithProposerAuth = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
-        await proposalWithProposerAuth.submit()
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
 
-        const proposalWithTemplaterAuth = new Proposal(proposalWithProposerAuth.templateDoc, proposalWithProposerAuth.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
 
-        await proposalWithTemplaterAuth.receive()
+        await proposalT.receive()
 
-        expect(proposalWithTemplaterAuth.templateDoc.content.receivedProposals[proposalWithTemplaterAuth.doc.streamID][0]).toEqual({ proposalCommitID: proposalWithTemplaterAuth.doc.commitID })
+        expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID })
 
     })
 
     it('does not register an unsubmitted Proposal', async () => {
-        const proposalWithProposerAuth = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
 
-        const proposalWithTemplaterAuth = new Proposal(proposalWithProposerAuth.templateDoc, proposalWithProposerAuth.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
 
-        await proposalWithTemplaterAuth.receive()
-        expect(proposalWithTemplaterAuth.templateDoc.content.receivedProposals[proposalWithTemplaterAuth.doc.streamID]).toEqual(undefined)
+        await proposalT.receive()
+        expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID]).toEqual(undefined)
     })
 
     it('requests change on Proposal and receives changeRequest', async () => {
-        const proposalWithProposerAuth = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
-        await proposalWithProposerAuth.submit()
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
 
-        const proposalWithTemplaterAuth = new Proposal(proposalWithProposerAuth.templateDoc, proposalWithProposerAuth.doc, mockProposalServie, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
 
-        await proposalWithTemplaterAuth.receive()
-        await proposalWithTemplaterAuth.requestChange()
+        await proposalT.receive()
+        await proposalT.requestChange()
 
-        expect(proposalWithTemplaterAuth.status).toEqual(ProposalStatus.ChangeRequested)
-        expect(proposalWithTemplaterAuth.templateDoc.content.receivedProposals[proposalWithTemplaterAuth.doc.streamID][0]).toEqual({ proposalCommitID: proposalWithTemplaterAuth.doc.commitID, requestChange: true })
+        expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
+        expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID, requestChange: true })
 
         // Receiving ChangeRequest
-        proposalWithProposerAuth.refreshDocs(proposalWithTemplaterAuth.doc, proposalWithTemplaterAuth.templateDoc)
-        await proposalWithProposerAuth.receiveChangeRequest()
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        await proposalP.receiveChangeRequest()
 
         // isSubmitted flag needs to be reset
-        expect(proposalWithProposerAuth.content.isSubmitted).toBeFalsy()
+        expect(proposalP.content.isSubmitted).toBeFalsy()
     })
 
     it('updated and resubmitted a Proposal', async () => {
         // Creating & Submitting Proposal
-        const proposalWithProposerAuth = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
-        await proposalWithProposerAuth.submit()
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
 
         // Receiving & Requesting Change
-        const proposalWithTemplaterAuth = new Proposal(proposalWithProposerAuth.templateDoc, proposalWithProposerAuth.doc, mockProposalServie, templateAuthorUser)
-        await proposalWithTemplaterAuth.receive()
-        await proposalWithTemplaterAuth.requestChange()
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        await proposalT.receive()
+        await proposalT.requestChange()
 
         const updatedProposalDoc: DocumentModel<ProposalModel> = {
-            ...proposalWithTemplaterAuth.doc,
+            ...proposalT.doc,
             content: {
-                ...proposalWithTemplaterAuth.content,
+                ...proposalT.content,
                 title: 'Dummy Proposal with another title',
-                price: { ...proposalWithTemplaterAuth.content.price, amount: 100 },
+                price: { ...proposalT.content.price, amount: 100 },
             },
             commitID: 'dummy-proposal-commitID-2'
         }
 
-        proposalWithProposerAuth.refreshDocs(proposalWithTemplaterAuth.doc, proposalWithTemplaterAuth.templateDoc)
-        await proposalWithProposerAuth.updateContent(updatedProposalDoc.content)
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        await proposalP.updateContent(updatedProposalDoc.content)
 
-        expect(proposalWithProposerAuth.content).toEqual(updatedProposalDoc.content)
-        expect(proposalWithProposerAuth.status).toEqual(ProposalStatus.Modified)
+        expect(proposalP.content).toEqual(updatedProposalDoc.content)
+        expect(proposalP.status).toEqual(ProposalStatus.Modified)
 
-        await proposalWithProposerAuth.submit()
-        expect(proposalWithProposerAuth.status).toEqual(ProposalStatus.Submitted)
+        await proposalP.submit()
+        expect(proposalP.status).toEqual(ProposalStatus.Submitted)
     })
 
     it('approved updated Proposal', async () => {
         // Proposer
-        const proposer = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
-        await proposer.submit()
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
 
         // Templater
-        const templater = new Proposal(proposer.templateDoc, proposer.doc, mockProposalServie, templateAuthorUser)
-        await templater.receive()
-        await templater.requestChange()
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        await proposalT.receive()
+        await proposalT.requestChange()
 
         //Proposer
-        proposer.refreshDocs(templater.doc, templater.templateDoc)
-        await proposer.receiveChangeRequest()
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        await proposalP.receiveChangeRequest()
 
         const updatedProposalDoc: DocumentModel<ProposalModel> = {
-            ...templater.doc,
+            ...proposalT.doc,
             content: {
-                ...templater.content,
+                ...proposalT.content,
                 title: 'Dummy Proposal with another title',
-                price: { ...templater.content.price, amount: 100 },
+                price: { ...proposalT.content.price, amount: 100 },
             },
             commitID: 'dummy-proposal-commitID-2'
         }
-        await proposer.updateContent(updatedProposalDoc.content)
-        expect(proposer.content).toEqual(updatedProposalDoc.content)
-        expect(proposer.status).toEqual(ProposalStatus.Modified)
-        await proposer.submit()
-        expect(proposer.status).toEqual(ProposalStatus.Submitted)
+        await proposalP.updateContent(updatedProposalDoc.content)
+        expect(proposalP.content).toEqual(updatedProposalDoc.content)
+        expect(proposalP.status).toEqual(ProposalStatus.Modified)
+        await proposalP.submit()
+        expect(proposalP.status).toEqual(ProposalStatus.Submitted)
 
         // Templater
-        templater.refreshDocs(updatedProposalDoc, proposer.templateDoc)
-        await templater.receive()
-        expect(templater.status).toEqual(ProposalStatus.OnReview)
-        await templater.approve()
-        expect(templater.status).toEqual(ProposalStatus.Approved)
+        proposalT.refreshDocs(updatedProposalDoc, proposalP.templateDoc)
+        await proposalT.receive()
+        expect(proposalT.status).toEqual(ProposalStatus.OnReview)
+        await proposalT.approve()
+        expect(proposalT.status).toEqual(ProposalStatus.Approved)
+    })
+
+    it('declines Proposal', async () => {
+        // Proposer
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, proposalAuthorUser)
+        await proposalP.submit()
+
+        // Templater
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, templateAuthorUser)
+        await proposalT.receive()
+        await proposalT.decline()
+
+        expect(proposalT.status).toEqual(ProposalStatus.Declined)
+        expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID, isDeclined: true })
     })
 })
 

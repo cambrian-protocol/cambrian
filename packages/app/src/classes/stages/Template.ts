@@ -73,6 +73,27 @@ export default class Template {
         }
     }
 
+    public async decline(proposalDoc: DocumentModel<ProposalModel>) {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        if (!proposalDoc.content.isSubmitted) {
+            return
+        }
+
+        const streamID = proposalDoc.streamID
+        const receivedProposals = this._templateDoc.content.receivedProposals
+        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+
+        // Todo check if content matches lates commit
+
+        receivedProposals[streamID][receivedProposals[streamID].length - 1] = {
+            ...latestProposalCommit,
+            isDeclined: true
+        }
+    }
+
     public async approve(proposalDoc: DocumentModel<ProposalModel>) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
