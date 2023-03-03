@@ -3,18 +3,13 @@ import API, { DocumentModel } from "./api/cambrian.api";
 import { GENERAL_ERROR } from "../constants/ErrorMessages";
 import { ProposalModel } from "../models/ProposalModel";
 import { StageNames } from "../models/StageModel";
-import { TemplateModel } from "../models/TemplateModel";
 import { UserType } from "../store/UserContext";
 import { cpLogger } from "./api/Logger.api";
 import { loadStagesLib } from "../utils/stagesLib.utils";
 
 export default class ProposalService {
 
-    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) {
-        await API.doc.updateStream(auth, proposalDoc.streamID, proposalDoc.content, { ...proposalDoc.metadata, tags: [proposalDoc.content.title] })
-    }
-
-    async createProposal(auth: UserType, proposal: ProposalModel) {
+    async create(auth: UserType, proposal: ProposalModel) {
         try {
             if (!auth.session || !auth.did)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
@@ -36,6 +31,15 @@ export default class ProposalService {
             await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content)
 
             return { streamID: stageIds.streamId, title: uniqueTitle }
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) {
+        try {
+            await API.doc.updateStream(auth, proposalDoc.streamID, proposalDoc.content, { ...proposalDoc.metadata, tags: [proposalDoc.content.title] })
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

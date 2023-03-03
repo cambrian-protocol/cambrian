@@ -4,6 +4,10 @@ import { UserType } from "@cambrian/app/store/UserContext";
 
 export default class MockTemplateService {
 
+    async create(auth: UserType, template: TemplateModel) {
+        return { streamID: 'mock-streamID', title: template.title }
+    }
+
     async save(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
     }
 

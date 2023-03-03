@@ -133,7 +133,7 @@ export default class Proposal {
         }
 
         try {
-            await this._proposalService.createProposal(this._auth, this._proposalDoc.content)
+            await this._proposalService.create(this._auth, this._proposalDoc.content)
         } catch (e) {
             console.error(e)
         }

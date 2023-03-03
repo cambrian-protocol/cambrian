@@ -27,7 +27,43 @@ export default class Template {
     }
 
     public async create() {
-        // TODO
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        try {
+            await this._templateService.create(this._auth, this._templateDoc.content)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async publish() {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        this._templateDoc.content.isActive = true
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async unpublish() {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        this._templateDoc.content.isActive = false
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     public refreshDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
@@ -166,12 +202,6 @@ export default class Template {
         }
         return true
     }
-
-    // Former toggleActivate
-    public async publish() { }
-
-    // Former toggleActivate
-    public async unpublish() { }
 
     public async archive() { }
 }
