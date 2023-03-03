@@ -137,7 +137,7 @@ export default class Template {
 
         const streamID = proposalDoc.streamID
         const receivedProposals = this._templateDoc.content.receivedProposals
-        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+        const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
         if (!this.isProposalsLatestVersion(proposalDoc)) {
             return
@@ -166,7 +166,7 @@ export default class Template {
 
         const streamID = proposalDoc.streamID
         const receivedProposals = this._templateDoc.content.receivedProposals
-        const latestProposalCommit = receivedProposals[streamID]?.[receivedProposals[streamID].length - 1]
+        const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
         if (!this.isProposalsLatestVersion(proposalDoc)) {
             return
