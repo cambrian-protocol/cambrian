@@ -5,6 +5,7 @@ import MockTemplateService from './MockTemplateService';
 import Proposal from '../Proposal';
 import { ProposalModel } from '@cambrian/app/models/ProposalModel';
 import { ProposalStatus } from './../../../models/ProposalStatus';
+import Template from '../Template';
 import { TemplateModel } from './../../../models/TemplateModel';
 import { UserType } from './../../../store/UserContext';
 import { expect } from '@jest/globals'
@@ -257,14 +258,72 @@ describe('Proposal ', () => {
         expect(proposalT.status).toEqual(ProposalStatus.Canceled)
     })
 
+    it('fails to submit a new Proposal to an unpublished Template', async () => {
+        const unpublishedTemplate: DocumentModel<TemplateModel> = {
+            ...dummyTemplateStreamDoc,
+            content: { ...dummyTemplateStreamDoc.content, isActive: false }
+        }
+
+        // Proposer
+        const proposalP = new Proposal(unpublishedTemplate, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        await proposalP.submit()
+
+        expect(proposalP.status).toEqual(ProposalStatus.Draft)
+
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        proposalT.receive()
+
+        expect(proposalT.status).toEqual(ProposalStatus.Draft)
+    })
+
+    it('submits a new Proposal version to an unpublished Template', async () => {
+        // Proposer
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        await proposalP.submit()
+
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        await proposalT.receive()
+        await proposalT.requestChange()
+
+        // Unpublish template
+        const template = new Template(proposalT.templateDoc, mockTemplateService, templateAuthorUser)
+        await template.unpublish()
+
+        proposalP.refreshDocs(proposalT.doc, template.doc)
+
+
+        const updatedProposalDoc: DocumentModel<ProposalModel> = {
+            ...proposalP.doc,
+            content: {
+                ...proposalT.content,
+                title: 'Dummy Proposal with another title',
+                price: { ...proposalT.content.price, amount: 100 },
+            },
+            commitID: 'dummy-proposal-commitID-2'
+        }
+
+        await proposalP.updateContent(updatedProposalDoc.content)
+        await proposalP.submit()
+
+        expect(proposalP.status).toEqual(ProposalStatus.Submitted)
+
+        proposalT.refreshDocs(proposalP.doc, proposalP.templateDoc)
+        expect(proposalT.status).toEqual(ProposalStatus.Submitted)
+
+        await proposalT.receive()
+        expect(proposalT.status).toEqual(ProposalStatus.OnReview)
+
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        expect(proposalP.status).toEqual(ProposalStatus.OnReview)
+        expect(proposalP.templateDoc.content.receivedProposals[proposalP.doc.streamID].length).toEqual(2)
+    })
+
+
     /* 
      TODO Tests
 
      it('returns initiates the right statuses', async () => {})
 
-     it('fails to submit a new Proposal to an unpublished Template', async () => {})
-
-     it('submits a new Proposal version to an unpublished Template', async () => {})
 
      it('archives a Proposal', async () => {})
     */

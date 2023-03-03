@@ -180,6 +180,11 @@ export default class Proposal {
             return
         }
 
+        if (!this._template.content.isActive && !this._template.content.receivedProposals[this._proposalDoc.streamID]) {
+            console.error('Template is unpublished!')
+            return
+        }
+
         this._status = ProposalStatus.Submitted
         this._proposalDoc.content.isSubmitted = true
         this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
