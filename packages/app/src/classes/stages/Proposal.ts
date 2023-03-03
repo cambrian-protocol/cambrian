@@ -36,27 +36,56 @@ submit()
 4.
 receive()
 - AUTH: user must be Template author
-- STATUS: Proposal must be in Submitted
+- STATUS: Proposal must be in SUBMITTED
 - adds an entry at the Templates receivedProposals with the current proposals streamId as the key and creates an array for every proposal commit with the first entry of an object containing the current proposals commitId 
 
-5. (optional)
+5. a (optional)
+approve()
+- AUTH: user must be Template author
+- STATUS: Proposal must be ONREVIEW
+- modifies the latest received proposal commit entry and sets the approved flag to true
+
+5. b (optional)
+decline()
+- AUTH: user must be Template author
+- STATUS: Proposal must be ONREVIEW
+- modifies the latest received proposal commit entry and sets the isDeclined flag to true
+
+5. c (optional)
 requestChange()
-- AUTH: 
+- AUTH: user must be Template author
+- STATUS: Proposal must be ONREVIEW
+- modifies the latest received proposal commit entry and sets the requestChange flag to true
 
+    ---- Proposer ----
 
+    6. (optional)
+    receiveChangeRequest()
+    - AUTH: user must be Proposal author
+    - STATUS: Proposal must be in CHANGE_REQUESTED
+    - resets the isSubmitted flag to false
 
+    7. (optional)
+    updateContent()  
+    - AUTH: user must be Proposal author
+    - STATUS: Proposal must be in CHANGE_REQUESTED or MODIFIED
+    - updates the content of the Proposal
 
+    3. 
+    submit()
+    - AUTH: user must be Proposal author
+    - STATUS: Proposal must be in CHANGE_REQUESTED or MODIFIED
+    - changes the isSubmitted flag to true
+    - increments the Proposals version number
 
-
-
-
+    ...Continue with 4.
 
 */
 export default class Proposal {
     private _auth?: UserType
     private _proposalDoc: DocumentModel<ProposalModel>
     private _template: Template
-    private _status: ProposalStatus
+    private _status: ProposalStatus = ProposalStatus.Unknown
     private _proposalService: ProposalService
 
 
@@ -90,6 +119,13 @@ export default class Proposal {
         return this._status
     }
 
+    public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
+        this._proposalDoc = updatedProposalDoc
+        if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)
+        const status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
+        this._status = status
+    }
+
     public async create() {
         if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
@@ -101,13 +137,6 @@ export default class Proposal {
         } catch (e) {
             console.error(e)
         }
-    }
-
-    public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
-        this._proposalDoc = updatedProposalDoc
-        if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)
-        const status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
-        this._status = status
     }
 
     public async updateContent(updatedProposal: ProposalModel,) {
@@ -139,38 +168,24 @@ export default class Proposal {
         }
     }
 
-    public async receiveChangeRequest() {
+    public async submit() {
         if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
-        if (!isStatusValid(this._status, [ProposalStatus.ChangeRequested])) {
+        if (!isStatusValid(this._status,
+            [ProposalStatus.Draft,
+            ProposalStatus.Modified,
+            ProposalStatus.ChangeRequested])) {
             return
         }
 
-        this._proposalDoc.content.isSubmitted = false
+        this._status = ProposalStatus.Submitted
+        this._proposalDoc.content.isSubmitted = true
+        this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
 
         try {
             await this._proposalService.saveProposal(this._auth, this._proposalDoc)
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    public async requestChange() {
-        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
-            return
-        }
-
-        if (!isStatusValid(this._status, [ProposalStatus.OnReview])) {
-            return
-        }
-
-        this._status = ProposalStatus.ChangeRequested
-
-        try {
-            this._template.requestChange(this._proposalDoc)
-            await this._proposalService.saveTemplate(this._auth, this._template.doc)
         } catch (e) {
             console.error(e)
         }
@@ -233,21 +248,35 @@ export default class Proposal {
         }
     }
 
-    public async submit() {
+    public async requestChange() {
+        if (!this._auth || !checkAuthorization(this._auth, this._template.doc)) {
+            return
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.OnReview])) {
+            return
+        }
+
+        this._status = ProposalStatus.ChangeRequested
+
+        try {
+            this._template.requestChange(this._proposalDoc)
+            await this._proposalService.saveTemplate(this._auth, this._template.doc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async receiveChangeRequest() {
         if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return
         }
 
-        if (!isStatusValid(this._status,
-            [ProposalStatus.Draft,
-            ProposalStatus.Modified,
-            ProposalStatus.ChangeRequested])) {
+        if (!isStatusValid(this._status, [ProposalStatus.ChangeRequested])) {
             return
         }
 
-        this._status = ProposalStatus.Submitted
-        this._proposalDoc.content.isSubmitted = true
-        this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
+        this._proposalDoc.content.isSubmitted = false
 
         try {
             await this._proposalService.saveProposal(this._auth, this._proposalDoc)
