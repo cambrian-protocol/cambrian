@@ -233,8 +233,10 @@ describe('Proposal ', () => {
         await proposalT.receive()
         await proposalT.decline()
 
+        proposalP.refreshDocs(proposalT.doc, proposalT.templateDoc)
+        expect(proposalP.status).toEqual(ProposalStatus.Declined)
         expect(proposalT.status).toEqual(ProposalStatus.Declined)
-        expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID, isDeclined: true })
+        expect(proposalP.templateDoc.content.receivedProposals[proposalP.doc.streamID][0]).toEqual({ proposalCommitID: proposalP.doc.commitID, isDeclined: true })
     })
 
     it('cancels a Proposal', async () => {
@@ -254,5 +256,17 @@ describe('Proposal ', () => {
         proposalT.refreshDocs(proposalP.doc, proposalP.templateDoc)
         expect(proposalT.status).toEqual(ProposalStatus.Canceled)
     })
+
+    /* 
+     TODO Tests
+
+     it('returns initiates the right statuses', async () => {})
+
+     it('fails to submit a new Proposal to an unpublished Template', async () => {})
+
+     it('submits a new Proposal version to an unpublished Template', async () => {})
+
+     it('archives a Proposal', async () => {})
+    */
 
 })

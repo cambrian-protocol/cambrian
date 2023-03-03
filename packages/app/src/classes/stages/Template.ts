@@ -91,6 +91,7 @@ export default class Template {
 
         try {
             await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.receive(this._auth, proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -121,6 +122,7 @@ export default class Template {
 
         try {
             await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.approve(this._auth, proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -150,6 +152,7 @@ export default class Template {
 
         try {
             await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.decline(this._auth, proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -179,6 +182,7 @@ export default class Template {
 
         try {
             await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.requestChange(this._auth, proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }

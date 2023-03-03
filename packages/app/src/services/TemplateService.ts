@@ -3,6 +3,7 @@ import API, { DocumentModel } from "./api/cambrian.api";
 import { GENERAL_ERROR } from "../constants/ErrorMessages";
 import { ProposalModel } from "../models/ProposalModel";
 import { StageNames } from "../models/StageModel";
+import { TRILOBOT_ENDPOINT } from "packages/app/config";
 import { TemplateModel } from "../models/TemplateModel";
 import { UserType } from "../store/UserContext";
 import { cpLogger } from "./api/Logger.api";
@@ -54,6 +55,89 @@ export default class TemplateService {
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
+        }
+    }
+
+    async requestChange(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
+        }
+    }
+
+    async receive(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+            // TODO create Trilobot endpoint. Notify that proposal has been received and is being on review
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/receiveProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
+        }
+    }
+
+    async decline(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+            // TODO create Trilobot endpoint
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/declineProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
+        }
+    }
+
+    async approve(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+            // TODO create Trilobot endpoint
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
         }
     }
 

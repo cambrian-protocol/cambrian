@@ -3,6 +3,7 @@ import API, { DocumentModel } from "./api/cambrian.api";
 import { GENERAL_ERROR } from "../constants/ErrorMessages";
 import { ProposalModel } from "../models/ProposalModel";
 import { StageNames } from "../models/StageModel";
+import { TRILOBOT_ENDPOINT } from "packages/app/config";
 import { UserType } from "../store/UserContext";
 import { cpLogger } from "./api/Logger.api";
 import { loadStagesLib } from "../utils/stagesLib.utils";
@@ -43,6 +44,51 @@ export default class ProposalService {
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+        }
+    }
+
+    async submit(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(), // Ceramic types not updated for WebClientSession yet
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
+        }
+    }
+
+    // TODO create Trilobot endpoint to notify Templater that a Proposal has been cancelled
+    async cancel(auth: UserType, proposalStreamID: string) {
+        try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
+            const res = await fetch(`${TRILOBOT_ENDPOINT}/cancelProposal`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    id: proposalStreamID,
+                    session: auth.session.serialize(), // Ceramic types not updated for WebClientSession yet
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+
+        } catch (e) {
+            cpLogger.push(e)
+            throw GENERAL_ERROR['TRILOBOT_ERROR']
         }
     }
 

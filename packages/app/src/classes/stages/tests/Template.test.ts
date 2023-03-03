@@ -1,16 +1,22 @@
 import { CompositionModel } from '@cambrian/app/models/CompositionModel';
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
-import { ProposalModel } from '@cambrian/app/models/ProposalModel';
+import MockTemplateService from './MockTemplateService';
+import Template from '../Template';
 import { TemplateModel } from './../../../models/TemplateModel';
+import { expect } from '@jest/globals';
 import initialComposer from '@cambrian/app/store/composer/composer.init';
 
-const templateAuthor = '0x:templateAuthor'
-const proposalAuthor = '0x:proposalAuthor'
+const templateAuthorDid = '0x:templateAuthor'
+
+//@ts-ignore
+const templateAuthorUser: UserType = {
+    did: templateAuthorDid
+}
 
 let dummyCompositionDoc: DocumentModel<CompositionModel>
 let dummyTemplateStreamDoc: DocumentModel<TemplateModel>
-let dummyProposalDoc: DocumentModel<ProposalModel>
 
+const mockTemplateService = new MockTemplateService()
 
 beforeEach(() => {
     dummyCompositionDoc = {
@@ -46,64 +52,61 @@ beforeEach(() => {
                 streamID: dummyCompositionDoc.streamID,
                 commitID: dummyCompositionDoc.commitID,
             },
-            author: templateAuthor,
+            author: templateAuthorUser.did,
             receivedProposals: {},
             isActive: true,
         }
     }
-
-    dummyProposalDoc = {
-        streamID: 'dummy-proposal-streamID',
-        commitID: 'dummy-proposal-commitID',
-        content: {
-            title: 'Dummy Proposal',
-            description: '',
-            template: {
-                streamID: dummyTemplateStreamDoc.streamID,
-                commitID: dummyTemplateStreamDoc.commitID,
-            },
-            flexInputs: dummyTemplateStreamDoc.content.flexInputs.filter(
-                (flexInput) =>
-                    flexInput.tagId !== 'collateralToken' &&
-                    flexInput.value === ''
-            ),
-            author: proposalAuthor,
-            price: {
-                amount:
-                    dummyTemplateStreamDoc.content.price.amount !== ''
-                        ? dummyTemplateStreamDoc.content.price.amount
-                        : 0,
-                tokenAddress:
-                    dummyTemplateStreamDoc.content.price
-                        .denominationTokenAddress,
-            },
-            isSubmitted: false,
-        }
-    }
 });
 
-test('Succesfully receive a Proposal', () => {
-    /*  const proposal = new ProposalV2(dummyTemplateStreamDoc, dummyProposalDoc)
-     proposal.submit(proposalAuthor)
-     const template = new Template(dummyTemplateStreamDoc)
-     template.receive(templateAuthor, proposal.doc)
-     expect(template.data.receivedProposals[proposal.doc.streamID][0]).toEqual({ proposalCommitID: proposal.doc.commitID }) */
+describe('Template ', () => {
+    beforeEach(() => {
+        dummyCompositionDoc = {
+            streamID: 'dummy-composition-streamID',
+            commitID: 'dummy-composition-commitID',
+            content: {
+                schemaVer: 1,
+                title: 'Dummy Composition',
+                description: '',
+                flowElements: initialComposer.flowElements,
+                solvers: initialComposer.solvers,
+            }
+        }
+
+        dummyTemplateStreamDoc = {
+            streamID: 'dummy-template-streamID',
+            commitID: 'dummy-template-streamID',
+            content: {
+                title: 'Dummy Template',
+                description: '',
+                requirements: '',
+                price: {
+                    amount: '',
+                    denominationTokenAddress:
+                        dummyCompositionDoc.content.solvers[0].config.collateralToken ||
+                        '',
+                    preferredTokens: [],
+                    allowAnyPaymentToken: false,
+                    isCollateralFlex: true,
+                },
+                flexInputs: [],
+                composition: {
+                    streamID: dummyCompositionDoc.streamID,
+                    commitID: dummyCompositionDoc.commitID,
+                },
+                author: templateAuthorUser.did!,
+                receivedProposals: {},
+                isActive: true,
+            }
+        }
+    });
+
+    it('Publishes a Template', async () => {
+        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+        await template.publish()
+
+        // TODO
+
+
+    })
 })
-
-/* test('Succesfully receive a Proposal', () => {
-    const proposal = new ProposalV2(dummyTemplateStreamDoc, dummyProposalDoc)
-    proposal.submit(proposalAuthor)
-    const template = new Template(dummyTemplateStreamDoc)
-    template.receive(templateAuthor, proposal.doc)
-    expect(template.data.receivedProposals[proposal.doc.streamID][0]).toEqual({ proposalCommitID: proposal.doc.commitID })
-
-})
-
-test('Do not register an unsubmitted Proposal', () => {
-    const proposal = new ProposalV2(dummyTemplateStreamDoc, dummyProposalDoc)
-    const template = new Template(dummyTemplateStreamDoc)
-    template.receive(templateAuthor, proposal.doc)
-    expect(template.data.receivedProposals[proposal.doc.streamID]).toEqual(undefined)
-})
- */
-

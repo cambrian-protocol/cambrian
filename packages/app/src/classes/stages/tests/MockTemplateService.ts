@@ -35,6 +35,14 @@ export default class MockTemplateService {
         }
     }
 
+    async requestChange(auth: UserType, proposalStreamID: string) { }
+
+    async receive(auth: UserType, proposalStreamID: string) { }
+
+    async decline(auth: UserType, proposalStreamID: string) { }
+
+    async approve(auth: UserType, proposalStreamID: string) { }
+
     async subscribe() { }
 
     async unsubscribe() { }

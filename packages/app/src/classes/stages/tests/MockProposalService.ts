@@ -8,8 +8,11 @@ export default class MockProposalService {
         return { streamID: 'mock-streamID', title: proposal.title }
     }
 
-    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) {
-    }
+    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) { }
+
+    async submit(auth: UserType, proposalStreamID: string) { }
+
+    async cancel(auth: UserType, proposalStreamID: string) { }
 
     async subscribe() { }
 

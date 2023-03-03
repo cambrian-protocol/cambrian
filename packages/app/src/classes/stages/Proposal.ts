@@ -186,6 +186,7 @@ export default class Proposal {
 
         try {
             await this._proposalService.save(this._auth, this._proposalDoc)
+            await this._proposalService.submit(this._auth, this._proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -210,6 +211,7 @@ export default class Proposal {
 
         try {
             await this._proposalService.save(this._auth, this._proposalDoc)
+            await this._proposalService.cancel(this._auth, this._proposalDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -303,6 +305,10 @@ export default class Proposal {
         } catch (e) {
             console.error(e)
         }
+    }
+
+    public async archive() {
+        // TODO
     }
 
     private getProposalStatus(templateDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>, onChainProposal?: any): ProposalStatus {
