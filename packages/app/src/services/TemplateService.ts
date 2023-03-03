@@ -3,9 +3,9 @@ import API, { DocumentModel } from "./api/cambrian.api";
 import { GENERAL_ERROR } from "../constants/ErrorMessages";
 import { ProposalModel } from "../models/ProposalModel";
 import { StageNames } from "../models/StageModel";
-import { TRILOBOT_ENDPOINT } from "packages/app/config";
 import { TemplateModel } from "../models/TemplateModel";
 import { UserType } from "../store/UserContext";
+import { call } from "../utils/service.utils";
 import { cpLogger } from "./api/Logger.api";
 import { loadStagesLib } from "../utils/stagesLib.utils";
 
@@ -61,83 +61,62 @@ export default class TemplateService {
     async requestChange(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/requestChange`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(),
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            call('requestChange', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
+
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['TRILOBOT_ERROR']
+            console.error(e)
         }
     }
 
+    // TODO create Trilobot endpoint. Notify Proposal author that proposal has been received and is on review
     async receive(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
-            // TODO create Trilobot endpoint. Notify that proposal has been received and is being on review
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/receiveProposal`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(),
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            call('receiveProposal', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
+
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['TRILOBOT_ERROR']
+            console.error(e)
         }
     }
 
+    // TODO create Trilobot endpoint. Notify Proposal author that proposal has been declined 
     async decline(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
-            // TODO create Trilobot endpoint
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/declineProposal`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(),
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            call('declineProposal', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
+
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['TRILOBOT_ERROR']
+            console.error(e)
         }
     }
 
     async approve(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
-            // TODO create Trilobot endpoint
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/approveProposal`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(),
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            call('approveProposal', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
+
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['TRILOBOT_ERROR']
+            console.error(e)
         }
     }
 

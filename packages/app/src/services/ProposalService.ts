@@ -3,8 +3,8 @@ import API, { DocumentModel } from "./api/cambrian.api";
 import { GENERAL_ERROR } from "../constants/ErrorMessages";
 import { ProposalModel } from "../models/ProposalModel";
 import { StageNames } from "../models/StageModel";
-import { TRILOBOT_ENDPOINT } from "packages/app/config";
 import { UserType } from "../store/UserContext";
+import { call } from "../utils/service.utils";
 import { cpLogger } from "./api/Logger.api";
 import { loadStagesLib } from "../utils/stagesLib.utils";
 
@@ -50,22 +50,15 @@ export default class ProposalService {
     async submit(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+                throw GENERAL_ERROR['UNAUTHORIZED']
 
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/proposeDraft`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(), // Ceramic types not updated for WebClientSession yet
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            call('proposeDraft', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
 
         } catch (e) {
-            cpLogger.push(e)
-            throw GENERAL_ERROR['TRILOBOT_ERROR']
+            console.error(e)
         }
     }
 
@@ -73,17 +66,11 @@ export default class ProposalService {
     async cancel(auth: UserType, proposalStreamID: string) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+                throw GENERAL_ERROR['UNAUTHORIZED']
 
-            const res = await fetch(`${TRILOBOT_ENDPOINT}/cancelProposal`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    id: proposalStreamID,
-                    session: auth.session.serialize(), // Ceramic types not updated for WebClientSession yet
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            call('cancelProposal', 'POST', auth, {
+                id: proposalStreamID,
+                session: auth.session.serialize(),
             })
 
         } catch (e) {
