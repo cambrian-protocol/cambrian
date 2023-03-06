@@ -1,7 +1,7 @@
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
-import TemplateService from '@cambrian/app/services/TemplateService'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
