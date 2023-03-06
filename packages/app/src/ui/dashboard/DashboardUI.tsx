@@ -67,7 +67,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     }
 
     const onDeleteRecent = async (streamId: string) => {
-        /*    const newStagesLib = _.cloneDeep(stagesLib)
+        const newStagesLib = _.cloneDeep(stagesLib)
         if (newStagesLib) {
             if (newStagesLib?.recents) {
                 const index = newStagesLib.recents.indexOf(streamId)
@@ -81,7 +81,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                 ...stagesLibDoc.content.data,
             })
             setStagesLib(newStagesLib)
-        } */
+        }
     }
 
     const initDocSubsciption = async () => {
