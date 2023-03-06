@@ -13,6 +13,7 @@ import {
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
@@ -25,7 +26,7 @@ import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useRouter } from 'next/router'
 
 interface DashboardUIProps {
@@ -43,7 +44,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
 
     useEffect(() => {
         setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
-        initDocSubsciption()
+        initStagesLib()
     }, [currentUser])
 
     useEffect(() => {
@@ -66,20 +67,25 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     }
 
     const onDeleteRecent = async (streamId: string) => {
-        const newStagesLib = _.cloneDeep(stagesLib)
-        if (newStagesLib?.recents) {
-            const index = newStagesLib.recents.indexOf(streamId)
-            if (index > -1) {
-                newStagesLib.recents.splice(index, 1)
+        /*    const newStagesLib = _.cloneDeep(stagesLib)
+        if (newStagesLib) {
+            if (newStagesLib?.recents) {
+                const index = newStagesLib.recents.indexOf(streamId)
+                if (index > -1) {
+                    newStagesLib.recents.splice(index, 1)
+                }
             }
-        }
-        const stagesLibDoc = await loadStagesLib(currentUser)
-        await stagesLibDoc.update(newStagesLib)
-        setStagesLib(newStagesLib)
+            const stagesLibDoc = await loadStagesLib(currentUser)
+            stagesLibDoc.content.update(newStagesLib)
+            await API.doc.updateStream(currentUser, stagesLibDoc.streamID, {
+                ...stagesLibDoc.content.data,
+            })
+            setStagesLib(newStagesLib)
+        } */
     }
 
     const initDocSubsciption = async () => {
-        const stagesLib = await loadStagesLib(currentUser)
+        /*   const stagesLib = await loadStagesLib(currentUser)
         const cambrianStagesLibSub = stagesLib.subscribe(() => {
             initStagesLib()
         })
@@ -93,14 +99,14 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
         return () => {
             cambrianStagesLibSub.unsubscribe()
             cambrianProfileSub?.unsubscribe()
-        }
+        } */
     }
 
     const initStagesLib = async () => {
         setIsFetching(true)
         try {
             const stagesLib = await loadStagesLib(currentUser)
-            setStagesLib(stagesLib.content)
+            setStagesLib(stagesLib.content.data)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

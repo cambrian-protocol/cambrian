@@ -6,7 +6,7 @@ import { CompositionModel } from '../models/CompositionModel'
 import CompositionService from '../services/stages/CompositionService'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
-type CompositionContextType = {
+export type CompositionContextType = {
     composition?: Composition
     isLoaded: boolean
 }

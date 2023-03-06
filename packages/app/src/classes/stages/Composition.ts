@@ -19,16 +19,8 @@ export default class Composition {
         return this._compositionDoc.content
     }
 
-    public async create() {
-        if (!this._auth) {
-            return
-        }
-
-        try {
-            await this._compositionService.create(this._auth, this._compositionDoc.content)
-        } catch (e) {
-            console.error(e)
-        }
+    public get doc(): DocumentModel<CompositionModel> {
+        return this._compositionDoc
     }
 
     public async updateContent(updatedComposition: CompositionModel) {

@@ -92,7 +92,7 @@ const doc = {
         auth: UserType,
         content: any,
         metadata: MetadataModel
-    ) => {
+    ): Promise<DocumentModel<T> | undefined> => {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
 
@@ -107,58 +107,84 @@ const doc = {
             )
             await tileDoc.update(content)
 
-            const res = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
+            try {
+                const firebaseDoc = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
+                if (!firebaseDoc) throw new Error('Failed to POST data to Firebase')
 
-            if (res.status === 200 && DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                return {
-                    streamId: tileDoc.id.toString(),
-                    commitId: tileDoc.commitId.toString(),
-                    content: content
+                if (firebaseDoc.status === 200 && DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                    return {
+                        streamID: tileDoc.id.toString(),
+                        commitID: tileDoc.commitId.toString(),
+                        content: firebaseDoc.content
+                    }
                 }
+            } catch (e) {
+                console.warn(e)
             }
 
-            return tileDoc as unknown as DocumentModel<T>
+            return {
+                streamID: tileDoc.id.toString(),
+                commitID: tileDoc.commitId.toString(),
+                content: tileDoc.content as T
+            }
+
         } catch (e) { console.error(e) }
     },
 
     readStream: async <T>(streamId: string,): Promise<DocumentModel<T> | undefined> => {
         try {
-            const firestoreDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
-
-            // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
-            if (!_.isEqual(firestoreDoc.content, ceramicDoc.content)) {
-                console.warn('Corrupt data')
-                // TODO Clean up corruption
+
+            try {
+                const firebaseDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
+                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
+
+                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                    console.warn('Corrupt data')
+                    // TODO Clean up corruption
+                }
+                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                    return firebaseDoc
+                }
+            } catch (e) {
+                console.warn(e)
             }
 
-            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                return firestoreDoc
+            return {
+                streamID: ceramicDoc.id.toString(),
+                commitID: ceramicDoc.commitId.toString(),
+                content: ceramicDoc.content as T
             }
-
-            return ceramicDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
     },
 
 
     readCommit: async <T>(streamId: string, commitId: string,): Promise<DocumentModel<T> | undefined> => {
         try {
-            const firestoreDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
-
-            // Ceramic redundancy check
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, commitId)
-            if (!_.isEqual(firestoreDoc.content, ceramicDoc.content)) {
-                console.warn('Corrupt data')
-                // TODO Clean up corruption
+            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
+
+            try {
+                const firebaseDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
+                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
+
+                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                    console.warn('Corrupt data')
+                    // TODO Clean up corruption
+                }
+                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                    return firebaseDoc
+                }
+            } catch (e) {
+                console.warn(e)
             }
 
-            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                return firestoreDoc
+            return {
+                streamID: ceramicDoc.id.toString(),
+                commitID: ceramicDoc.commitId.toString(),
+                content: ceramicDoc.content as T
             }
-
-            return ceramicDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
     },
 
@@ -167,41 +193,46 @@ const doc = {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.deterministic(readOnlyCeramicClient, metadata)
 
-            const firestoreContent = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as T
+            try {
+                const firebaseDoc = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as DocumentModel<T>
+                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
-            // Ceramic redundancy check
-            if (!_.isEqual(firestoreContent, ceramicDoc.content)) {
-                console.warn('Corrupt data')
-                // TODO Clean up corruption
-            }
-            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                return {
-                    streamID: ceramicDoc.id.toString(),
-                    commitID: ceramicDoc.commitId.toString(),
-                    content: firestoreContent
+                // Ceramic redundancy check
+                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                    console.warn('Corrupt data')
+                    // TODO Clean up corruption
                 }
+
+                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                    return firebaseDoc
+                }
+
+            } catch (e) {
+                console.warn(e)
             }
 
-            return ceramicDoc as unknown as DocumentModel<T>
+            return {
+                streamID: ceramicDoc.id.toString(),
+                commitID: ceramicDoc.commitId.toString(),
+                content: ceramicDoc.content as T
+            }
         } catch (e) { console.error(e) }
 
     },
 
     updateStream: async <T>(auth: UserType, streamId: string, content: any, metadata?: MetadataModel) => {
         try {
-            const res = await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
-
             const tileDoc = await TileDocument.load(
                 ceramicInstance(auth),
                 streamId
             )
             await tileDoc.update(content, metadata)
 
-            if (res.streamID !== tileDoc.id.toString() || res.commitID !== tileDoc.commitId.toString()) {
-                console.warn('Corrupt data')
-                // TODO Clean up corruption
+            try {
+                await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
+            } catch (e) {
+                console.warn('Failed to update Firebase data')
             }
-
         } catch (e) { console.error(e) }
     },
 

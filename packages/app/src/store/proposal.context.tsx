@@ -9,7 +9,7 @@ import TemplateService from '../services/stages/TemplateService'
 import _ from 'lodash'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
-type ProposalContextType = {
+export type ProposalContextType = {
     proposal?: Proposal
     isLoaded: boolean
 }

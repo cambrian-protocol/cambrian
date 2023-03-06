@@ -26,11 +26,13 @@ export default class CompositionService {
 
             const stagesLibDoc = await loadStagesLib(auth)
             const uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamId, composition.title, StageNames.composition)
+            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
 
-            await API.doc.updateStream(auth, stageIds.streamId, { ...composition, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
-            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content)
+            const res = await API.doc.create<CompositionModel>(auth, { ...composition, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
 
-            return { streamID: stageIds.streamId, title: uniqueTitle }
+            if (!res) throw new Error('Failed to create a Composition')
+
+            return { streamID: res.streamID, title: uniqueTitle }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
