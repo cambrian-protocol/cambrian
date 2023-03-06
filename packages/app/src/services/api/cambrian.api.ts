@@ -1,6 +1,7 @@
+import { DATA_HANDLING, DATA_HANLDING_OPTIONS } from './../../../config/index';
+
 import { CERAMIC_NODE_ENDPOINT } from "packages/app/config"
 import { CeramicClient } from '@ceramicnetwork/http-client';
-import { TemplateModel } from '@cambrian/app/models/TemplateModel';
 import { TileDocument } from "@ceramicnetwork/stream-tile"
 import { UserType } from "@cambrian/app/store/UserContext"
 import _ from "lodash";
@@ -108,13 +109,15 @@ const doc = {
 
             const res = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
 
-            if (res.status === 200) {
+            if (res.status === 200 && DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
                 return {
                     streamId: tileDoc.id.toString(),
                     commitId: tileDoc.commitId.toString(),
                     content: content
                 }
             }
+
+            return tileDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
     },
 
@@ -130,8 +133,11 @@ const doc = {
                 // TODO Clean up corruption
             }
 
-            // TODO integrate data handling switch
-            return firestoreDoc
+            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                return firestoreDoc
+            }
+
+            return ceramicDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
     },
 
@@ -148,8 +154,11 @@ const doc = {
                 // TODO Clean up corruption
             }
 
-            // TODO integrate data handling switch
-            return firestoreDoc
+            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                return firestoreDoc
+            }
+
+            return ceramicDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
     },
 
@@ -165,13 +174,15 @@ const doc = {
                 console.warn('Corrupt data')
                 // TODO Clean up corruption
             }
-
-            // TODO integrate data handling switch
-            return {
-                streamID: ceramicDoc.id.toString(),
-                commitID: ceramicDoc.commitId.toString(),
-                content: firestoreContent
+            if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
+                return {
+                    streamID: ceramicDoc.id.toString(),
+                    commitID: ceramicDoc.commitId.toString(),
+                    content: firestoreContent
+                }
             }
+
+            return ceramicDoc as unknown as DocumentModel<T>
         } catch (e) { console.error(e) }
 
     },
@@ -197,7 +208,6 @@ const doc = {
     subscribe: async (streamId: string, onChange: () => Promise<void>) => {
         try {
             // TODO Firestore realtime updates integration
-
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const tileDoc = await TileDocument.load(
                 readOnlyCeramicClient,

@@ -39,3 +39,11 @@ export const SCHEMA_VER = {
     proposal: 1,
     template: 1,
 }
+
+export enum DATA_HANLDING_OPTIONS {
+    FIREBASE,
+    CERAMIC // Default
+}
+
+// Data handling
+export const DATA_HANDLING: DATA_HANLDING_OPTIONS = DATA_HANLDING_OPTIONS.CERAMIC
