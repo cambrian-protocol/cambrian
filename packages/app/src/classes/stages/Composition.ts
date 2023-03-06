@@ -1,35 +1,60 @@
-import ComposerSolver from '../ComposerSolver'
 import { CompositionModel } from '../../models/CompositionModel'
-import { Elements } from 'react-flow-renderer'
-import { SCHEMA_VER } from '@cambrian/app/config'
+import CompositionService from '@cambrian/app/services/CompositionService';
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
+import { UserType } from '@cambrian/app/store/UserContext';
 
 export default class Composition {
-    protected _schemaVer?: number = SCHEMA_VER['composition']
-    protected _title: string
-    protected _description: string
-    protected _flowElements: Elements
-    protected _solvers: ComposerSolver[]
+    private _auth?: UserType
+    private _compositionDoc: DocumentModel<CompositionModel>
+    private _compositionService: CompositionService
 
 
-    constructor({ schemaVer, title, description, flowElements, solvers }: CompositionModel) {
-        this._schemaVer = schemaVer || SCHEMA_VER['composition']
-        this._title = title
-        this._description = description
-        this._flowElements = flowElements
-        this._solvers = solvers
+    constructor(compositionDoc: DocumentModel<CompositionModel>, compositionService: CompositionService, auth?: UserType) {
+        this._auth = auth
+        this._compositionDoc = compositionDoc
+        this._compositionService = compositionService
     }
 
-    public get data(): CompositionModel {
-        return {
-            title: this._title,
-            description: this._description,
-            flowElements: this._flowElements,
-            solvers: this._solvers
-        }
+    public get content(): CompositionModel {
+        return this._compositionDoc.content
     }
 
     public async create() {
+        if (!this._auth) {
+            return
+        }
+
+        try {
+            await this._compositionService.create(this._auth, this._compositionDoc.content)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    public async archive() { }
+    public async updateContent(updatedComposition: CompositionModel) {
+        if (!this._auth) {
+            return
+        }
+
+        this._compositionDoc.content = updatedComposition
+
+        try {
+            await this._compositionService.save(this._auth, this._compositionDoc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async archive() {
+        if (!this._auth) {
+            return
+        }
+
+        try {
+            await this._compositionService.archive(this._auth, this._compositionDoc.streamID)
+        } catch (e) {
+            console.error(e)
+        }
+
+    }
 }
