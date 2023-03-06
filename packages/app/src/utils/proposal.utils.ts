@@ -4,7 +4,6 @@ export const isStatusValid = (status: ProposalStatus, validStatuses: ProposalSta
     if (validStatuses.includes(status)) {
         return true
     } else {
-        console.error('Invalid status!')
         return false
     }
 }

@@ -370,19 +370,3 @@ describe('Proposal ', () => {
     */
 
 })
-
-describe('Proposal Statuses', () => {
-
-    it('initiates Draft', () => {
-
-
-    })
-    it('initiates Submitted', () => { })
-    it('initiates OnReview', () => { })
-    it('initiates ChangeRequested', () => { })
-    it('initiates Modified', () => { })
-    it('initiates Canceled', () => { })
-    it('initiates Declined', () => { })
-    it('initiates Approved', () => { })
-
-})

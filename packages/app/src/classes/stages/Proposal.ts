@@ -181,7 +181,6 @@ export default class Proposal {
         }
 
         if (!this._template.content.isActive && !this._template.content.receivedProposals[this._proposalDoc.streamID]) {
-            console.error('Template is unpublished!')
             return
         }
 
