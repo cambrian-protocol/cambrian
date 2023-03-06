@@ -1,11 +1,11 @@
-import API, { DocumentModel } from "./api/cambrian.api";
+import API, { DocumentModel } from "./../api/cambrian.api";
 
-import { CompositionModel } from "../models/CompositionModel";
-import { GENERAL_ERROR } from "../constants/ErrorMessages";
-import { StageNames } from "../models/StageModel";
-import { UserType } from "../store/UserContext";
-import { cpLogger } from "./api/Logger.api";
-import { loadStagesLib } from "../utils/stagesLib.utils";
+import { CompositionModel } from "../../models/CompositionModel";
+import { GENERAL_ERROR } from "../../constants/ErrorMessages";
+import { StageNames } from "../../models/StageModel";
+import { UserType } from "../../store/UserContext";
+import { cpLogger } from "./../api/Logger.api";
+import { loadStagesLib } from "../../utils/stagesLib.utils";
 
 export default class CompositionService {
 

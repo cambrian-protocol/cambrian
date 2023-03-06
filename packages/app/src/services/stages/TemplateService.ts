@@ -1,13 +1,13 @@
-import API, { DocumentModel } from "./api/cambrian.api";
+import API, { DocumentModel } from "./../api/cambrian.api";
 
-import { GENERAL_ERROR } from "../constants/ErrorMessages";
-import { ProposalModel } from "../models/ProposalModel";
-import { StageNames } from "../models/StageModel";
-import { TemplateModel } from "../models/TemplateModel";
-import { UserType } from "../store/UserContext";
-import { call } from "../utils/service.utils";
-import { cpLogger } from "./api/Logger.api";
-import { loadStagesLib } from "../utils/stagesLib.utils";
+import { GENERAL_ERROR } from "../../constants/ErrorMessages";
+import { ProposalModel } from "../../models/ProposalModel";
+import { StageNames } from "../../models/StageModel";
+import { TemplateModel } from "../../models/TemplateModel";
+import { UserType } from "../../store/UserContext";
+import { call } from "../../utils/service.utils";
+import { cpLogger } from "./../api/Logger.api";
+import { loadStagesLib } from "../../utils/stagesLib.utils";
 
 export default class TemplateService {
 
