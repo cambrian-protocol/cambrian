@@ -1,7 +1,7 @@
 import { CompositionModel } from '../../models/CompositionModel'
-import CompositionService from '@cambrian/app/services/CompositionService';
-import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
-import { UserType } from '@cambrian/app/store/UserContext';
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
+import { UserType } from '@cambrian/app/store/UserContext'
 
 export default class Composition {
     private _auth?: UserType
