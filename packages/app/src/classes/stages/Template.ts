@@ -7,12 +7,12 @@ import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 
 export default class Template {
-    private _auth?: UserType
+    private _auth?: UserType | null
     private _templateDoc: DocumentModel<TemplateModel>
     private _templateService: TemplateService
 
 
-    constructor(templateDoc: DocumentModel<TemplateModel>, templateService: TemplateService, auth?: UserType,) {
+    constructor(templateDoc: DocumentModel<TemplateModel>, templateService: TemplateService, auth?: UserType | null,) {
         this._auth = auth
         this._templateDoc = templateDoc
         this._templateService = templateService

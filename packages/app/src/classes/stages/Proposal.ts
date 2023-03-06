@@ -83,7 +83,7 @@ requestChange()
 
 */
 export default class Proposal {
-    private _auth?: UserType
+    private _auth?: UserType | null
     private _proposalDoc: DocumentModel<ProposalModel>
     private _template: Template
     private _status: ProposalStatus = ProposalStatus.Unknown
@@ -95,7 +95,7 @@ export default class Proposal {
         proposalDoc: DocumentModel<ProposalModel>,
         proposalService: ProposalService,
         templateService: TemplateService,
-        auth?: UserType,
+        auth?: UserType | null,
     ) {
         this._auth = auth
         this._proposalService = proposalService
