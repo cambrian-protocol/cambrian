@@ -4,12 +4,12 @@ import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 export default class Composition {
-    private _auth?: UserType
+    private _auth?: UserType | null
     private _compositionDoc: DocumentModel<CompositionModel>
     private _compositionService: CompositionService
 
 
-    constructor(compositionDoc: DocumentModel<CompositionModel>, compositionService: CompositionService, auth?: UserType) {
+    constructor(compositionDoc: DocumentModel<CompositionModel>, compositionService: CompositionService, auth?: UserType | null) {
         this._auth = auth
         this._compositionDoc = compositionDoc
         this._compositionService = compositionService

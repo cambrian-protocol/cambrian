@@ -9,20 +9,20 @@ import TemplateService from '../services/stages/TemplateService'
 import _ from 'lodash'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
-export type ProposalContextTypeV2 = {
+type ProposalContextType = {
     proposal?: Proposal
     isLoaded: boolean
 }
 
-type ProposalProviderPropsV2 = PropsWithChildren<{}> & {
+type ProposalProviderProps = PropsWithChildren<{}> & {
     proposalStreamID: string
 }
 
-export const ProposalContextV2 = React.createContext<ProposalContextTypeV2>({
+export const ProposalContext = React.createContext<ProposalContextType>({
     isLoaded: false,
 })
 
-export const ProposalContextProviderV2: React.FunctionComponent<ProposalProviderPropsV2> =
+export const ProposalContextProvider: React.FunctionComponent<ProposalProviderProps> =
     ({ proposalStreamID, children }) => {
         const { currentUser, isUserLoaded } = useCurrentUserContext()
         const [isLoaded, setIsLoaded] = useState(false)
@@ -33,6 +33,7 @@ export const ProposalContextProviderV2: React.FunctionComponent<ProposalProvider
         }, [proposalStreamID, currentUser])
 
         const init = async () => {
+            setIsLoaded(false)
             const proposalService = new ProposalService()
             const templateService = new TemplateService()
 
@@ -62,13 +63,13 @@ export const ProposalContextProviderV2: React.FunctionComponent<ProposalProvider
         }
 
         return (
-            <ProposalContextV2.Provider
+            <ProposalContext.Provider
                 value={{
                     proposal: proposal,
                     isLoaded: isLoaded,
                 }}
             >
                 {children}
-            </ProposalContextV2.Provider>
+            </ProposalContext.Provider>
         )
     }

@@ -15,11 +15,11 @@ type TemplateProviderProps = PropsWithChildren<{}> & {
     templateStreamID: string
 }
 
-export const ProposalContextV2 = React.createContext<TemplateContextType>({
+export const TemplateContext = React.createContext<TemplateContextType>({
     isLoaded: false,
 })
 
-export const ProposalContextProviderV2: React.FunctionComponent<TemplateProviderProps> =
+export const TemplateContextProvider: React.FunctionComponent<TemplateProviderProps> =
     ({ templateStreamID, children }) => {
         const { currentUser, isUserLoaded } = useCurrentUserContext()
         const [isLoaded, setIsLoaded] = useState(false)
@@ -50,13 +50,13 @@ export const ProposalContextProviderV2: React.FunctionComponent<TemplateProvider
         }
 
         return (
-            <ProposalContextV2.Provider
+            <TemplateContext.Provider
                 value={{
                     template: template,
                     isLoaded: isLoaded,
                 }}
             >
                 {children}
-            </ProposalContextV2.Provider>
+            </TemplateContext.Provider>
         )
     }
