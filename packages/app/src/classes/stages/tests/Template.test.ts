@@ -101,12 +101,33 @@ describe('Template ', () => {
         }
     });
 
-    it('Publishes a Template', async () => {
+    it('Create/Publish a Template', async () => {
         const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
-        await template.publish()
+        expect(template.content).toEqual(dummyTemplateStreamDoc.content)
+        expect(template.content.isActive).toBeTruthy()
+    })
 
-        // TODO
+    it('Unpublish a Template', async () => {
+        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+        await template.unpublish()
 
+        expect(template.content).toEqual(dummyTemplateStreamDoc.content)
+        expect(template.content.isActive).toBeFalsy()
+    })
 
+    it('Update a Template', async () => {
+        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+
+        const updatedTemplateDoc: DocumentModel<TemplateModel> = {
+            ...template.doc,
+            content: {
+                ...template.content,
+                title: 'Dummy Template with another title',
+            },
+            commitID: 'dummy-template-commitID-2'
+        }
+
+        await template.updateContent(updatedTemplateDoc.content)
+        expect(template.content).toEqual(updatedTemplateDoc.content)
     })
 })

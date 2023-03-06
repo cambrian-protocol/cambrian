@@ -38,6 +38,20 @@ export default class Template {
         }
     }
 
+    public async updateContent(updatedTemplate: TemplateModel) {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        this._templateDoc.content = updatedTemplate
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     public async publish() {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
