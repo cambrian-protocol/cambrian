@@ -101,7 +101,6 @@ const CompositionsDashboardUI = ({
             </Box>
             {showCreateCompositionModal && (
                 <CreateCompositionModal
-                    ceramicCompositionAPI={ceramicCompositionAPI}
                     onClose={toggleShowCreateCompositionModal}
                 />
             )}

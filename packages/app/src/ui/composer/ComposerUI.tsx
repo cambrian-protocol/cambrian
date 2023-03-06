@@ -16,18 +16,16 @@ import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
 import ComposerToolbar from '@cambrian/app/components/bars/ComposerToolbar'
 import CompositionHeader from '@cambrian/app/components/layout/header/CompositionHeader'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
+import { useCompositionContext } from '@cambrian/app/hooks/useCompositionContext'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
-
-interface ComposerUIProps {
-    currentUser: UserType
-    compositionStreamDoc: TileDocument<CompositionModel>
-}
 
 const nodeTypes = {
     solver: SolverNode,
@@ -43,57 +41,57 @@ TODO
 - Manual connection of Nodes
 
 */
-export const ComposerUI = ({
-    currentUser,
-    compositionStreamDoc,
-}: ComposerUIProps) => {
+export const ComposerUI = () => {
     const router = useRouter()
-    const { composer, dispatch } = useComposerContext()
+    const { currentUser } = useCurrentUserContext()
+    const { composer, dispatch, composition } = useComposerContext()
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
         init()
-    }, [])
+    }, [currentUser, composition])
 
     // TODO Error handling, if query doesn't get something, show invalid query and cta to create a new
     const init = async () => {
-        try {
-            const stagesLib = await loadStagesLib(currentUser)
-            if (
-                !stagesLib.content.compositions ||
-                !stagesLib.content.compositions.lib[
-                    compositionStreamDoc.id.toString()
-                ]
-            ) {
-                const ceramicCompositionAPI = new CeramicCompositionAPI(
-                    currentUser
-                )
-                const newComposition =
-                    await ceramicCompositionAPI.createComposition(
-                        compositionStreamDoc.content.title,
-                        compositionStreamDoc.content
+        if (currentUser && composition) {
+            try {
+                const stagesLib = await loadStagesLib(currentUser)
+                if (
+                    !stagesLib.content.data.compositions ||
+                    !stagesLib.content.data.compositions.lib[
+                        composition.doc.streamID
+                    ]
+                ) {
+                    const compositionService = new CompositionService()
+                    const newComposition = await compositionService.create(
+                        currentUser,
+                        composition.content
                     )
-                router.push(
-                    `${window.location.origin}/solver/${newComposition.streamID}`
-                )
-                dispatch({
-                    type: 'LOAD_COMPOSITION',
-                    payload: {
-                        ...compositionStreamDoc.content,
-                        title: newComposition.title,
-                    },
-                })
-            } else {
-                dispatch({
-                    type: 'LOAD_COMPOSITION',
-                    payload: {
-                        ...compositionStreamDoc.content,
-                    },
-                })
-            }
 
-            setIsInitialized(true)
-        } catch (e) {}
+                    if (newComposition) {
+                        router.push(
+                            `${window.location.origin}/solver/${newComposition.streamID}`
+                        )
+                        dispatch({
+                            type: 'LOAD_COMPOSITION',
+                            payload: {
+                                ...composition.content,
+                                title: newComposition.title,
+                            },
+                        })
+                    }
+                } else {
+                    dispatch({
+                        type: 'LOAD_COMPOSITION',
+                        payload: {
+                            ...composition.content,
+                        },
+                    })
+                }
+
+                setIsInitialized(true)
+            } catch (e) {}
+        }
     }
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
@@ -134,51 +132,60 @@ export const ComposerUI = ({
 
     return (
         <>
-            <ComposerLayout
-                contextTitle={`Composer | ${composer.title || 'Loading...'}`}
-                sidebar={
-                    <Box gap="small" fill>
-                        <CompositionHeader
-                            compositionTitle={composer.title || 'Unknown'}
-                        />
-                        {renderControl()}
-                    </Box>
-                }
-                toolbar={
-                    <ComposerToolbar
-                        currentComposition={composer}
-                        compositionStreamID={compositionStreamDoc.id.toString()}
-                    />
-                }
-            >
-                <Box direction="row" justify="between" fill>
-                    {isInitialized ? (
-                        <ReactFlow
-                            elementsSelectable
-                            elements={composer.flowElements}
-                            deleteKeyCode={46}
-                            //@ts-ignore
-                            nodeTypes={nodeTypes}
-                            /*    onConnect={onConnect}
-                             */
-                            onElementsRemove={onElementsRemove}
-                            onElementClick={onSelect}
-                            onPaneClick={onSelect}
-                            onNodeDragStop={onNodeDragStop}
-                            snapToGrid={true}
-                            snapGrid={snapGrid}
-                        >
-                            <ReactFlowControls />
-                            <Background />
-                        </ReactFlow>
-                    ) : (
-                        <Box fill justify="center" align="center" gap="medium">
-                            <Spinner size="medium" />
-                            <Text>Loading Composition...</Text>
+            {composition && (
+                <ComposerLayout
+                    contextTitle={`Composer | ${
+                        composer.title || 'Loading...'
+                    }`}
+                    sidebar={
+                        <Box gap="small" fill>
+                            <CompositionHeader
+                                compositionTitle={composer.title || 'Unknown'}
+                            />
+                            {renderControl()}
                         </Box>
-                    )}
-                </Box>
-            </ComposerLayout>
+                    }
+                    toolbar={
+                        <ComposerToolbar
+                            currentComposition={composer}
+                            compositionStreamID={composition.doc.streamID}
+                        />
+                    }
+                >
+                    <Box direction="row" justify="between" fill>
+                        {isInitialized ? (
+                            <ReactFlow
+                                elementsSelectable
+                                elements={composer.flowElements}
+                                deleteKeyCode={46}
+                                //@ts-ignore
+                                nodeTypes={nodeTypes}
+                                /*    onConnect={onConnect}
+                                 */
+                                onElementsRemove={onElementsRemove}
+                                onElementClick={onSelect}
+                                onPaneClick={onSelect}
+                                onNodeDragStop={onNodeDragStop}
+                                snapToGrid={true}
+                                snapGrid={snapGrid}
+                            >
+                                <ReactFlowControls />
+                                <Background />
+                            </ReactFlow>
+                        ) : (
+                            <Box
+                                fill
+                                justify="center"
+                                align="center"
+                                gap="medium"
+                            >
+                                <Spinner size="medium" />
+                                <Text>Loading Composition...</Text>
+                            </Box>
+                        )}
+                    </Box>
+                </ComposerLayout>
+            )}
         </>
     )
 }
