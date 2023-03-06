@@ -14,6 +14,8 @@ export default class MockProposalService {
 
     async cancel(auth: UserType, proposalStreamID: string) { }
 
+    async archive(auth: UserType, proposalStreamID: string) { }
+
     async subscribe() { }
 
     async unsubscribe() { }

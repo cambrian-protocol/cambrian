@@ -66,6 +66,33 @@ export default class Template {
         }
     }
 
+    public async archive() {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        this._templateDoc.content.isActive = false
+
+        try {
+            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.archive(this._auth, this._templateDoc.streamID)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async archiveReceivedProposal(proposalStreamId: string) {
+        if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
+            return
+        }
+
+        try {
+            await this._templateService.archiveReceivedProposal(this._auth, proposalStreamId)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     public refreshDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._templateDoc = updatedTemplateDoc
     }
@@ -207,5 +234,4 @@ export default class Template {
         return true
     }
 
-    public async archive() { }
 }

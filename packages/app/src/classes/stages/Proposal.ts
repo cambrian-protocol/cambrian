@@ -312,7 +312,15 @@ export default class Proposal {
     }
 
     public async archive() {
-        // TODO
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+            return
+        }
+
+        try {
+            await this._proposalService.archive(this._auth, this._proposalDoc.streamID)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     private getProposalStatus(templateDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>, onChainProposal?: any): ProposalStatus {

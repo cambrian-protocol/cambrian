@@ -120,6 +120,26 @@ export default class TemplateService {
         }
     }
 
+    async archive(auth: UserType, templateStreamID: string) {
+        try {
+            const stagesLibDoc = await loadStagesLib(auth)
+            stagesLibDoc.content.templates.archiveStage(templateStreamID)
+            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    async archiveReceivedProposal(auth: UserType, proposalStreamID: string) {
+        try {
+            const stagesLibDoc = await loadStagesLib(auth)
+            stagesLibDoc.content.templates.archiveReceivedProposal(proposalStreamID)
+            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     async subscribe() { }
 
     async unsubscribe() { }

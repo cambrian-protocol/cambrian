@@ -43,6 +43,10 @@ export default class MockTemplateService {
 
     async approve(auth: UserType, proposalStreamID: string) { }
 
+    async archive(auth: UserType, templateStreamID: string) { }
+
+    async archiveReceivedProposal(auth: UserType, proposalStreamID: string) { }
+
     async subscribe() { }
 
     async unsubscribe() { }

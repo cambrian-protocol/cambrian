@@ -79,6 +79,16 @@ export default class ProposalService {
         }
     }
 
+    async archive(auth: UserType, proposalStreamID: string) {
+        try {
+            const stagesLibDoc = await loadStagesLib(auth)
+            stagesLibDoc.content.proposals.archiveStage(proposalStreamID)
+            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     async subscribe() { }
 
     async unsubscribe() { }
