@@ -233,7 +233,11 @@ const doc = {
             } catch (e) {
                 console.warn('Failed to update Firebase data')
             }
-        } catch (e) { console.error(e) }
+
+            return { status: 200 }
+        } catch (e) {
+            console.error(e)
+        }
     },
 
     subscribe: async (streamId: string, onChange: () => Promise<void>) => {

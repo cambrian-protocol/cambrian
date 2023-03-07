@@ -52,11 +52,9 @@ export default class CompositionService {
         try {
             const stagesLibDoc = await loadStagesLib(auth)
             stagesLibDoc.content.compositions.archiveStage(compositionStreamID)
-            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+            return await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
         } catch (e) {
             console.error(e)
         }
     }
-
-
 }
