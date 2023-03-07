@@ -1,5 +1,5 @@
 import API, { DocumentModel } from "./../api/cambrian.api";
-import { createStage, getFormFlexInputs } from "@cambrian/app/utils/stage.utils";
+import { createStage, getFormFlexInputs, updateStage } from "@cambrian/app/utils/stage.utils";
 
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
@@ -54,9 +54,9 @@ export default class TemplateService {
         }
     }
 
-    async save(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
+    async update(auth: UserType, currentTemplateDoc: DocumentModel<TemplateModel>, updatedTemplate: TemplateModel) {
         try {
-            await API.doc.updateStream(auth, templateDoc.streamID, templateDoc.content, { ...templateDoc.metadata, tags: [templateDoc.content.title] })
+            return await updateStage(auth, currentTemplateDoc, updatedTemplate)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

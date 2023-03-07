@@ -1,3 +1,4 @@
+import { CambrianStagesLibType } from '../stageLibs/CambrianStagesLib';
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
@@ -5,6 +6,7 @@ import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 
 export default class Template {
     private _auth?: UserType | null
@@ -26,13 +28,13 @@ export default class Template {
         return this._templateDoc
     }
 
-    public async create() {
+    public async create(compositionStreamID: string, templateTitle: string) {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
 
         try {
-            await this._templateService.create(this._auth, this._templateDoc.content)
+            await this._templateService.create(this._auth, compositionStreamID, templateTitle)
         } catch (e) {
             console.error(e)
         }
@@ -42,11 +44,11 @@ export default class Template {
         if (!this._auth || !checkAuthorization(this._auth, this._templateDoc)) {
             return
         }
-
-        this._templateDoc.content = updatedTemplate
-
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            const uniqueTitle = await this._templateService.update(this._auth, this._templateDoc, updatedTemplate)
+            if (!uniqueTitle) throw new Error('Failed to updated Template')
+
+            this._templateDoc.content = { ...updatedTemplate, title: uniqueTitle }
         } catch (e) {
             console.error(e)
         }
@@ -57,10 +59,11 @@ export default class Template {
             return
         }
 
-        this._templateDoc.content.isActive = true
+        const _updatedTemplate = { ...this._templateDoc.content, isActive: true }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -71,10 +74,11 @@ export default class Template {
             return
         }
 
-        this._templateDoc.content.isActive = false
+        const _updatedTemplate = { ...this._templateDoc.content, isActive: false }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -85,11 +89,12 @@ export default class Template {
             return
         }
 
-        this._templateDoc.content.isActive = false
+        const _updatedTemplate = { ...this._templateDoc.content, isActive: false }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
             await this._templateService.archive(this._auth, this._templateDoc.streamID)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -119,20 +124,21 @@ export default class Template {
         if (!proposalDoc.content.isSubmitted) {
             return
         }
-
-        const receivedProposals = this._templateDoc.content.receivedProposals
+        const _updatedTemplate = { ...this._templateDoc.content }
+        const updatedReceivedProposals = _updatedTemplate.receivedProposals
         const streamID = proposalDoc.streamID
         const commitID = proposalDoc.commitID
 
-        if (receivedProposals[streamID]) {
-            receivedProposals[streamID].push({ proposalCommitID: commitID })
+        if (updatedReceivedProposals[streamID]) {
+            updatedReceivedProposals[streamID].push({ proposalCommitID: commitID })
         } else {
-            receivedProposals[streamID] = [{ proposalCommitID: commitID }]
+            updatedReceivedProposals[streamID] = [{ proposalCommitID: commitID }]
         }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
             await this._templateService.receive(this._auth, proposalDoc.streamID)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -147,9 +153,9 @@ export default class Template {
         if (!proposalDoc.content.isSubmitted) {
             return
         }
-
+        const _updatedTemplate = { ...this._templateDoc.content }
         const streamID = proposalDoc.streamID
-        const receivedProposals = this._templateDoc.content.receivedProposals
+        const receivedProposals = _updatedTemplate.receivedProposals
         const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
         if (!this.isProposalsLatestVersion(proposalDoc)) {
@@ -162,8 +168,9 @@ export default class Template {
         }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
             await this._templateService.approve(this._auth, proposalDoc.streamID)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -177,9 +184,9 @@ export default class Template {
         if (!proposalDoc.content.isSubmitted) {
             return
         }
-
+        const _updatedTemplate = { ...this._templateDoc.content }
         const streamID = proposalDoc.streamID
-        const receivedProposals = this._templateDoc.content.receivedProposals
+        const receivedProposals = _updatedTemplate.receivedProposals
         const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
         if (!this.isProposalsLatestVersion(proposalDoc)) {
@@ -192,8 +199,9 @@ export default class Template {
         }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
             await this._templateService.decline(this._auth, proposalDoc.streamID)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }
@@ -208,8 +216,9 @@ export default class Template {
             return
         }
 
+        const _updatedTemplate = { ...this._templateDoc.content }
         const streamID = proposalDoc.streamID
-        const receivedProposals = this._templateDoc.content.receivedProposals
+        const receivedProposals = _updatedTemplate.receivedProposals
         const latestProposalCommit = receivedProposals[streamID]?.slice(-1)[0]
 
         if (!this.isProposalsLatestVersion(proposalDoc)) {
@@ -222,8 +231,9 @@ export default class Template {
         }
 
         try {
-            await this._templateService.save(this._auth, this._templateDoc)
+            await this._templateService.update(this._auth, this._templateDoc, _updatedTemplate)
             await this._templateService.requestChange(this._auth, proposalDoc.streamID)
+            this._templateDoc.content = _updatedTemplate
         } catch (e) {
             console.error(e)
         }

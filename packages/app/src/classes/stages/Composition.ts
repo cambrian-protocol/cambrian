@@ -23,15 +23,29 @@ export default class Composition {
         return this._compositionDoc
     }
 
-    public async updateContent(updatedComposition: CompositionModel) {
+    public async create() {
         if (!this._auth) {
             return
         }
 
-        this._compositionDoc.content = updatedComposition
-
         try {
-            await this._compositionService.save(this._auth, this._compositionDoc)
+            return await this._compositionService.create(this._auth, this._compositionDoc.content.title, this._compositionDoc.content)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    public async updateContent(updatedComposition: CompositionModel) {
+        if (!this._auth) {
+            return
+        }
+        try {
+            const _uniqueTitle = await this._compositionService.update(this._auth, this._compositionDoc, updatedComposition)
+            if (_uniqueTitle) {
+                this._compositionDoc.content = { ...updatedComposition, title: _uniqueTitle }
+                return _uniqueTitle
+            }
+            return
         } catch (e) {
             console.error(e)
         }
