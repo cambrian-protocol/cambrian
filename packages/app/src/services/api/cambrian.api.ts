@@ -80,8 +80,8 @@ const doc = {
                 }
             )
             return {
-                streamId: tileDoc.id.toString(),
-                commitId: tileDoc.commitId.toString()
+                streamID: tileDoc.id.toString(),
+                commitID: tileDoc.commitId.toString()
             }
         } catch (e) {
             console.error(e)

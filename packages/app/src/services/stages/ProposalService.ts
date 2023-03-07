@@ -26,12 +26,12 @@ export default class ProposalService {
             if (!stageIds) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
             const stagesLibDoc = await loadStagesLib(auth)
-            const uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamId, proposal.title, StageNames.proposal)
+            const uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamID, proposal.title, StageNames.proposal)
 
-            await API.doc.updateStream(auth, stageIds.streamId, { ...proposal, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
+            await API.doc.updateStream(auth, stageIds.streamID, { ...proposal, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
             await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content)
 
-            return { streamID: stageIds.streamId, title: uniqueTitle }
+            return { streamID: stageIds.streamID, title: uniqueTitle }
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
