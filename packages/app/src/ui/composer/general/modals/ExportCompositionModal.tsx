@@ -2,7 +2,7 @@ import { Box, Form, FormExtendedEvent, FormField } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -33,30 +33,24 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
         setIsExporting(true)
         try {
             if (currentUser) {
-                const ceramicCompositionAPI = new CeramicCompositionAPI(
-                    currentUser
-                )
-                const newComposition =
-                    await ceramicCompositionAPI.createComposition(
-                        compositionTitleInput,
-                        {
-                            ...composer,
-                            title: compositionTitleInput,
-                            description: '',
-                        }
-                    )
+                const ceramicService = new CompositionService()
+                const res = await ceramicService.create(currentUser, {
+                    ...composer,
+                    title: compositionTitleInput,
+                    description: '',
+                })
 
-                if (newComposition) {
-                    dispatch({
-                        type: 'LOAD_COMPOSITION',
-                        payload: {
-                            ...composer,
-                            title: newComposition.title,
-                        },
-                    })
+                if (!res) throw new Error('Failed to create Composition')
 
-                    router.push(`/solver/${newComposition.streamID}`)
-                }
+                dispatch({
+                    type: 'LOAD_COMPOSITION',
+                    payload: {
+                        ...composer,
+                        title: res.title,
+                    },
+                })
+
+                router.push(`/solver/${res.streamID}`)
                 onBack()
             }
         } catch (e) {

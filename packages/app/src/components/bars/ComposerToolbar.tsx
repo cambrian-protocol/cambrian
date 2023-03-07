@@ -3,28 +3,19 @@ import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import StackedIcon from '../icons/StackedIcon'
-import { StageNames } from '@cambrian/app/models/StageModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
-import { updateStage } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useState } from 'react'
 
-interface ComposerToolbarProps {
-    currentComposition: CompositionModel
-    compositionStreamID: string
-}
-
-const ComposerToolbar = ({
-    currentComposition,
-    compositionStreamID,
-}: ComposerToolbarProps) => {
+const ComposerToolbar = () => {
+    const { composer, composition } = useComposerContext()
     const { currentUser } = useCurrentUserContext()
     const [showConfig, setShowConfig] = useState(false)
     const [showExportCompositionModal, setShowExportCompostionModal] =
@@ -39,13 +30,8 @@ const ComposerToolbar = ({
     const onSaveComposition = async () => {
         setIsSaving(true)
         try {
-            if (currentUser) {
-                await updateStage(
-                    compositionStreamID,
-                    currentComposition,
-                    StageNames.composition,
-                    currentUser
-                )
+            if (composition) {
+                await composition.updateContent(composer)
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -56,13 +42,11 @@ const ComposerToolbar = ({
     const onTestLog = async () => {
         if (currentUser?.signer.provider) {
             const solvers = await parseComposerSolvers(
-                currentComposition.solvers,
+                composer.solvers,
                 currentUser
             )
             console.log(solvers)
         }
-
-        // await cpLogger.push(GENERAL_ERROR['TEST_ERROR'])
     }
 
     return (

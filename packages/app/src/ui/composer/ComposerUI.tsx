@@ -8,22 +8,17 @@ import ReactFlow, {
     isNode,
 } from 'react-flow-renderer'
 
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
 import ComposerDefaultControl from './controls/ComposerDefaultControl'
 import ComposerLayout from '@cambrian/app/components/layout/ComposerLayout'
 import ComposerOutcomeCollectionControl from './controls/outcomeCollection/ComposerOutcomeCollectionControl'
 import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
 import ComposerToolbar from '@cambrian/app/components/bars/ComposerToolbar'
 import CompositionHeader from '@cambrian/app/components/layout/header/CompositionHeader'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
-import { useCompositionContext } from '@cambrian/app/hooks/useCompositionContext'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -145,12 +140,7 @@ export const ComposerUI = () => {
                             {renderControl()}
                         </Box>
                     }
-                    toolbar={
-                        <ComposerToolbar
-                            currentComposition={composer}
-                            compositionStreamID={composition.doc.streamID}
-                        />
-                    }
+                    toolbar={<ComposerToolbar />}
                 >
                     <Box direction="row" justify="between" fill>
                         {isInitialized ? (
