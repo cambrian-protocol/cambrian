@@ -1,11 +1,11 @@
 import API, { DocumentModel } from "./../api/cambrian.api";
+import { createStage, updateStage } from "@cambrian/app/utils/stage.utils";
 
 import { CompositionModel } from "../../models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
 import { SCHEMA_VER } from "packages/app/config";
 import { UserType } from "../../store/UserContext";
 import { cpLogger } from "./../api/Logger.api";
-import { createStage } from "@cambrian/app/utils/stage.utils";
 import initialComposer from "@cambrian/app/store/composer/composer.init";
 import { loadStagesLib } from "../../utils/stagesLib.utils";
 
@@ -31,9 +31,9 @@ export default class CompositionService {
         }
     }
 
-    async save(auth: UserType, compositionDoc: DocumentModel<CompositionModel>) {
+    async update(auth: UserType, currentCompositionDoc: DocumentModel<CompositionModel>, updatedComposition: CompositionModel): Promise<string | undefined> {
         try {
-            await API.doc.updateStream(auth, compositionDoc.streamID, compositionDoc.content, { ...compositionDoc.metadata, tags: [compositionDoc.content.title] })
+            return await updateStage(auth, currentCompositionDoc, updatedComposition)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

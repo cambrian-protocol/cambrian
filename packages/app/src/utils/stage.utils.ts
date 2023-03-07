@@ -88,25 +88,25 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
 
 export const updateStage = async <T extends StageModel>(
     auth: UserType,
-    currentStage: DocumentModel<T>,
+    currentStageDoc: DocumentModel<T>,
     updatedStage: T,
 ): Promise<string | undefined> => {
     try {
         let uniqueTitle = updatedStage.title
-        if (currentStage.content.title !== updatedStage.title) {
+        if (currentStageDoc.content.title !== updatedStage.title) {
             const stagesLibDoc = await loadStagesLib(auth)
-            if (isCompositionStage(currentStage.content)) {
-                uniqueTitle = stagesLibDoc.content.compositions.updateTitle(currentStage.streamID, updatedStage.title)
-            } else if (isTemplateStage(currentStage.content)) {
-                uniqueTitle = stagesLibDoc.content.templates.updateTitle(currentStage.streamID, updatedStage.title)
-            } else if (isProposalStage(currentStage.content)) {
-                uniqueTitle = stagesLibDoc.content.proposals.updateTitle(currentStage.streamID, updatedStage.title)
+            if (isCompositionStage(currentStageDoc.content)) {
+                uniqueTitle = stagesLibDoc.content.compositions.updateTitle(currentStageDoc.streamID, updatedStage.title)
+            } else if (isTemplateStage(currentStageDoc.content)) {
+                uniqueTitle = stagesLibDoc.content.templates.updateTitle(currentStageDoc.streamID, updatedStage.title)
+            } else if (isProposalStage(currentStageDoc.content)) {
+                uniqueTitle = stagesLibDoc.content.proposals.updateTitle(currentStageDoc.streamID, updatedStage.title)
             }
 
             await API.doc.updateStream<CambrianStagesLibType>(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
         }
 
-        const res = await API.doc.updateStream<T>(auth, currentStage.streamID, updatedStage)
+        const res = await API.doc.updateStream<T>(auth, currentStageDoc.streamID, updatedStage, { ...currentStageDoc.metadata, tags: [uniqueTitle] })
 
         if (res?.status === 200) {
             return uniqueTitle
