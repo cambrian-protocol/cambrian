@@ -220,7 +220,7 @@ const doc = {
 
     },
 
-    updateStream: async <T>(auth: UserType, streamId: string, content: any, metadata?: MetadataModel) => {
+    updateStream: async <T>(auth: UserType, streamId: string, content: T, metadata?: MetadataModel) => {
         try {
             const tileDoc = await TileDocument.load(
                 ceramicInstance(auth),
