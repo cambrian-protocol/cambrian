@@ -2,38 +2,29 @@ import API, { DocumentModel } from "./../api/cambrian.api";
 
 import { CompositionModel } from "../../models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
-import { StageNames } from "../../models/StageModel";
+import { SCHEMA_VER } from "packages/app/config";
 import { UserType } from "../../store/UserContext";
 import { cpLogger } from "./../api/Logger.api";
+import { createStage } from "@cambrian/app/utils/stage.utils";
+import initialComposer from "@cambrian/app/store/composer/composer.init";
 import { loadStagesLib } from "../../utils/stagesLib.utils";
 
 export default class CompositionService {
 
-    async create(auth: UserType, composition: CompositionModel) {
+    async create(auth: UserType, title: string, composition?: CompositionModel) {
         try {
             if (!auth.session || !auth.did)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const stageMetadata = {
-                controllers: [auth.did],
-                family: `composition`,
-                tags: [composition.title]
-            }
-
-            const stageIds = await API.doc.generateStreamAndCommitId(auth, stageMetadata)
-
-            if (!stageIds) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-
-            const stagesLibDoc = await loadStagesLib(auth)
-            const uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamID, composition.title, StageNames.composition)
-
-            const res = await API.doc.create<CompositionModel>(auth, { ...composition, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
-
-            if (!res) throw new Error('Failed to create a Composition')
-
-            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
-
-            return { streamID: res.streamID, title: uniqueTitle }
+            return await createStage(auth, composition
+                ? { ...composition }
+                : {
+                    schemaVer: SCHEMA_VER['composition'],
+                    title: title,
+                    description: '',
+                    flowElements: initialComposer.flowElements,
+                    solvers: initialComposer.solvers,
+                },)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

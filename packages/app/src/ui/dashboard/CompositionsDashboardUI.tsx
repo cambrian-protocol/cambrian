@@ -61,7 +61,7 @@ const CompositionsDashboardUI = ({
                                         return (
                                             <CompositionDashboardTile
                                                 key={streamID}
-                                                title={title}
+                                                compositionTitle={title}
                                                 compositionStreamID={streamID}
                                             />
                                         )

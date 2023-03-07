@@ -40,17 +40,17 @@ import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface CompositionDashboardTileProps {
-    title: string
+    compositionTitle: string
     compositionStreamID: string
 }
 
 const CompositionDashboardTile = ({
-    title,
+    compositionTitle,
     compositionStreamID,
 }: CompositionDashboardTileProps) => {
     const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
-    const [currentTag, setCurrentTag] = useState(title)
+    const [title, setTitle] = useState(compositionTitle)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [showRenameCompositionModal, setShowRenameCompositionModal] =
         useState(false)
@@ -130,7 +130,7 @@ const CompositionDashboardTile = ({
                     >
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>
                             <Box pad={{ left: 'medium' }}>
-                                <Heading level="4">{currentTag}</Heading>
+                                <Heading level="4">{title}</Heading>
                             </Box>
                             <DropButton
                                 size="small"
@@ -231,9 +231,9 @@ const CompositionDashboardTile = ({
             </IconContext.Provider>
             {showRenameCompositionModal && (
                 <RenameCompositionModal
-                    currentTag={currentTag}
+                    title={title}
+                    setTitle={setTitle}
                     compositionStreamID={compositionStreamID}
-                    setCurrentTag={setCurrentTag}
                     onClose={toggleShowRenameCompositionModal}
                 />
             )}

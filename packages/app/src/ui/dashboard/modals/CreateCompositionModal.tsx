@@ -2,16 +2,12 @@ import { Box, Form, FormField } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
-import Composition from '@cambrian/app/classes/stages/Composition'
 import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { SCHEMA_VER } from 'packages/app/config'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import initialComposer from '@cambrian/app/store/composer/composer.init'
 import randimals from 'randimals'
 import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -35,13 +31,7 @@ const CreateCompositionModal = ({ onClose }: CreateCompositionModalProps) => {
         try {
             const compositionService = new CompositionService()
             if (currentUser) {
-                const res = await compositionService.create(currentUser, {
-                    schemaVer: SCHEMA_VER['composition'],
-                    title: input,
-                    description: '',
-                    flowElements: initialComposer.flowElements,
-                    solvers: initialComposer.solvers,
-                })
+                const res = await compositionService.create(currentUser, input)
 
                 if (res) router.push(`/solver/${res.streamID}`)
             }
