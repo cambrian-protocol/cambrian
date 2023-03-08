@@ -72,7 +72,7 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         }
 
         const res = await API.doc.create<T>(auth, { ...stage, title: uniqueTitle }, stageMetadata)
-        if (!res) throw new Error('Failed to create Stage')
+        if (!res) throw new Error('Stage create error: failed to create stage')
 
         const updateRes = await API.doc.updateStream<CambrianStagesLibType>(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
 
@@ -80,12 +80,9 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
             return { streamID: res.streamID, title: uniqueTitle }
         }
 
-
     } catch (e) {
         cpLogger.push(e)
-        throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
     }
-
 }
 
 export const updateStage = async <T extends StageModel>(
@@ -110,9 +107,9 @@ export const updateStage = async <T extends StageModel>(
 
         const res = await API.doc.updateStream<T>(auth, currentStageDoc.streamID, updatedStage, { ...currentStageDoc.metadata, tags: [uniqueTitle] })
 
-        if (res?.status === 200) {
-            return uniqueTitle
-        }
+        if (!res || res.status !== 200) throw new Error('Stage update error: failed to update stage')
+
+        return uniqueTitle
     } catch (e) {
         cpLogger.push(e)
     }

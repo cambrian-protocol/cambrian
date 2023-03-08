@@ -14,9 +14,9 @@ export default class CompositionService {
     async create(auth: UserType, title: string, composition?: CompositionModel) {
         try {
             if (!auth.session || !auth.did)
-                throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+                throw GENERAL_ERROR['UNAUTHORIZED']
 
-            return await createStage(auth, composition
+            const res = await createStage(auth, composition
                 ? { ...composition }
                 : {
                     schemaVer: SCHEMA_VER['composition'],
@@ -25,28 +25,40 @@ export default class CompositionService {
                     flowElements: initialComposer.flowElements,
                     solvers: initialComposer.solvers,
                 },)
+            if (!res) throw new Error('Stage create error: failed to create composition')
+
+            return res
         } catch (e) {
             cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
 
     async update(auth: UserType, currentCompositionDoc: DocumentModel<CompositionModel>, updatedComposition: CompositionModel): Promise<string | undefined> {
         try {
-            return await updateStage(auth, currentCompositionDoc, updatedComposition)
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            const res = await updateStage(auth, currentCompositionDoc, updatedComposition)
+            if (!res) throw new Error('Stage update error: failed to update composition')
+
+            return res
         } catch (e) {
             cpLogger.push(e)
-            throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
         }
     }
 
     async archive(auth: UserType, compositionStreamID: string) {
         try {
+            if (!auth.session || !auth.did)
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
             const stagesLibDoc = await loadStagesLib(auth)
             stagesLibDoc.content.compositions.archiveStage(compositionStreamID)
-            return await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+            const res = await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+            if (!res || res.status !== 200) throw new Error('Stage archive error: failed to archive composition')
+            return res
         } catch (e) {
-            console.error(e)
+            cpLogger.push(e)
         }
     }
 }
