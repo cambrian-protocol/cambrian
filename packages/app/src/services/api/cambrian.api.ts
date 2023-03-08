@@ -108,19 +108,21 @@ const doc = {
             )
             await tileDoc.update(content, { ...metadata, tags: [content.title] })
 
-            try {
-                const firebaseDoc = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
-                if (!firebaseDoc) throw new Error('Failed to POST data to Firebase')
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    const firebaseDoc = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
+                    if (!firebaseDoc) throw new Error('Failed to POST data to Firebase')
 
-                if (firebaseDoc.status === 200 && DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                    return {
-                        streamID: tileDoc.id.toString(),
-                        commitID: tileDoc.commitId.toString(),
-                        content: firebaseDoc.content
+                    if (firebaseDoc.status === 200 && DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
+                        return {
+                            streamID: tileDoc.id.toString(),
+                            commitID: tileDoc.commitId.toString(),
+                            content: firebaseDoc.content
+                        }
                     }
+                } catch (e) {
+                    console.warn(e)
                 }
-            } catch (e) {
-                console.warn(e)
             }
 
             return {
@@ -137,19 +139,21 @@ const doc = {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
 
-            try {
-                const firebaseDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
-                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    const firebaseDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
+                    if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
-                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
-                    console.warn('Corrupt data')
-                    // TODO Clean up corruption
+                    if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                        console.warn('Corrupt data')
+                        // TODO Clean up corruption
+                    }
+                    if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
+                        return firebaseDoc
+                    }
+                } catch (e) {
+                    console.warn(e)
                 }
-                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                    return firebaseDoc
-                }
-            } catch (e) {
-                console.warn(e)
             }
 
             return {
@@ -165,20 +169,21 @@ const doc = {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    const firebaseDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
+                    if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
-            try {
-                const firebaseDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
-                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
-
-                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
-                    console.warn('Corrupt data')
-                    // TODO Clean up corruption
+                    if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                        console.warn('Corrupt data')
+                        // TODO Clean up corruption
+                    }
+                    if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
+                        return firebaseDoc
+                    }
+                } catch (e) {
+                    console.warn(e)
                 }
-                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                    return firebaseDoc
-                }
-            } catch (e) {
-                console.warn(e)
             }
 
             return {
@@ -193,23 +198,24 @@ const doc = {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.deterministic(readOnlyCeramicClient, metadata)
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    const firebaseDoc = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as DocumentModel<T>
+                    if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
-            try {
-                const firebaseDoc = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as DocumentModel<T>
-                if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
+                    // Ceramic redundancy check
+                    if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                        console.warn('Corrupt data')
+                        // TODO Clean up corruption
+                    }
 
-                // Ceramic redundancy check
-                if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
-                    console.warn('Corrupt data')
-                    // TODO Clean up corruption
+                    if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
+                        return firebaseDoc
+                    }
+
+                } catch (e) {
+                    console.warn(e)
                 }
-
-                if (DATA_HANDLING === DATA_HANLDING_OPTIONS.FIREBASE) {
-                    return firebaseDoc
-                }
-
-            } catch (e) {
-                console.warn(e)
             }
 
             return {
@@ -228,11 +234,12 @@ const doc = {
                 streamId
             )
             await tileDoc.update(content, metadata)
-
-            try {
-                await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
-            } catch (e) {
-                console.warn('Failed to update Firebase data')
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    await call(`streams/${streamId}`, 'PUT', auth, { data: content }) as DocumentModel<T>
+                } catch (e) {
+                    console.warn('Failed to update Firebase data')
+                }
             }
 
             return { status: 200 }
