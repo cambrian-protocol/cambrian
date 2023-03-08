@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import TemplateDescriptionStep from './steps/TemplateDescriptionStep'
 import TemplateFlexInputsStep from './steps/TemplateFlexInputsStep'
 import TemplatePricingStep from './steps/TemplatePricingStep'
@@ -23,11 +22,7 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.REQUIREMENTS
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
-const TemplateWizard = ({
-    editTemplateProps: editTemplateProps,
-}: {
-    editTemplateProps: EditTemplatePropsType
-}) => {
+const TemplateWizard = () => {
     const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
         TEMPLATE_WIZARD_STEPS.DESCRIPTION
     )
@@ -42,38 +37,22 @@ const TemplateWizard = ({
         switch (currentStep) {
             case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
-                    <TemplateDescriptionStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
-                    />
+                    <TemplateDescriptionStep stepperCallback={setCurrentStep} />
                 )
             case TEMPLATE_WIZARD_STEPS.PRICING:
-                return (
-                    <TemplatePricingStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
-                    />
-                )
+                return <TemplatePricingStep stepperCallback={setCurrentStep} />
             case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
-                    <TemplateFlexInputsStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
-                    />
+                    <TemplateFlexInputsStep stepperCallback={setCurrentStep} />
                 )
             case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
                     <TemplateRequirementsStep
-                        editTemplateProps={editTemplateProps}
                         stepperCallback={setCurrentStep}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PUBLISH:
-                return (
-                    <TemplatePublishStep
-                        editTemplateProps={editTemplateProps}
-                    />
-                )
+                return <TemplatePublishStep />
             default:
                 return <></>
         }

@@ -12,10 +12,10 @@ import {
     parseSecondsToForm,
 } from '@cambrian/app/utils/helpers/timeParsing'
 
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
+import Template from '@cambrian/app/classes/stages/Template'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
@@ -23,7 +23,8 @@ import { isAddress } from 'ethers/lib/utils'
 import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
-    editTemplateProps: EditTemplatePropsType
+    template: Template
+    compositionContent: CompositionModel
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -36,25 +37,19 @@ export type FlexInputFormType = TaggedInput & {
 }
 
 const TemplateFlexInputsForm = ({
-    editTemplateProps,
+    template,
+    compositionContent,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateFlexInputsFormProps) => {
-    const {
-        template,
-        composition,
-        setTemplate,
-        onSaveTemplate,
-        onResetTemplate,
-    } = editTemplateProps
-
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [flexInputs, setFlexInputs] = useState(template.content.flexInputs)
     const [timelock, setTimelock] = useState(
         parseSecondsToForm(
             parseInt(
-                template?.flexInputs.find(
+                template.content.flexInputs.find(
                     (fi) => fi.slotId === 'timelockSeconds'
                 )?.value || '0'
             )
@@ -85,14 +80,21 @@ const TemplateFlexInputsForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        onSubmit ? await onSubmit() : await onSaveTemplate()
+        const updatedTemplate = {
+            ...template.content,
+            flexInputs: flexInputs,
+        }
+        if (!_.isEqual(updatedTemplate, template.content)) {
+            await template.updateContent(updatedTemplate)
+        }
+        onSubmit && onSubmit()
         setIsSubmitting(false)
     }
 
     const updateFlexInput = (idx: number, value: string) => {
-        const templateClone = _.cloneDeep(template)
-        templateClone!.flexInputs[idx].value = value
-        setTemplate(templateClone)
+        const updatedFlexInputs = _.cloneDeep(flexInputs)
+        updatedFlexInputs[idx].value = value
+        setFlexInputs(updatedFlexInputs)
     }
 
     const renderTimelockSecondsForm = (
@@ -160,7 +162,6 @@ const TemplateFlexInputsForm = ({
                         />
                     </FormField>
                 </Box>
-
                 {flexInput.description && (
                     <Text
                         size="small"
@@ -183,24 +184,13 @@ const TemplateFlexInputsForm = ({
         )
     }
 
-    if (!template || !composition) {
-        return (
-            <Box height="large" gap="medium">
-                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-            </Box>
-        )
-    }
-
     return (
         <Form onSubmit={handleSubmit}>
             <Box height={{ min: '50vh' }} justify="between">
                 <Box pad="xsmall">
-                    {template.flexInputs.map((flexInput, idx) => {
+                    {flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
-                            composition.solvers,
+                            compositionContent.solvers,
                             flexInput
                         )
 
@@ -220,9 +210,8 @@ const TemplateFlexInputsForm = ({
                                         validate={[
                                             () => {
                                                 if (
-                                                    template.flexInputs[
-                                                        idx
-                                                    ].value.trim().length === 0
+                                                    flexInputs[idx].value.trim()
+                                                        .length === 0
                                                 ) {
                                                     if (
                                                         flexInput.isFlex ===
@@ -233,8 +222,7 @@ const TemplateFlexInputsForm = ({
                                                 } else if (
                                                     type === 'address' &&
                                                     !isAddress(
-                                                        template.flexInputs[idx]
-                                                            .value
+                                                        flexInputs[idx].value
                                                     )
                                                 ) {
                                                     return 'Invalid Address'
@@ -244,9 +232,7 @@ const TemplateFlexInputsForm = ({
                                     >
                                         <TextInput
                                             type={type}
-                                            value={
-                                                template.flexInputs[idx].value
-                                            }
+                                            value={flexInputs[idx].value}
                                             onChange={(e) =>
                                                 updateFlexInput(
                                                     idx,
@@ -287,7 +273,11 @@ const TemplateFlexInputsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel ? onCancel : onResetTemplate}
+                            onClick={
+                                onCancel
+                                    ? onCancel
+                                    : () => window.alert('Todo reset Template')
+                            }
                         />
                     }
                 />

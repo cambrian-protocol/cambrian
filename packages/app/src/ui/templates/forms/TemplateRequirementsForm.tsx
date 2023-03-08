@@ -7,14 +7,14 @@ import {
     TextArea,
 } from 'grommet'
 
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import Template from '@cambrian/app/classes/stages/Template'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import _ from 'lodash'
 import { useState } from 'react'
 
 interface TemplateRequirementsFormProps {
-    editTemplateProps: EditTemplatePropsType
+    template: Template
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -26,15 +26,15 @@ export type TemplateRequirementsFormType = {
 }
 
 const TemplateRequirementsForm = ({
-    editTemplateProps,
+    template,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateRequirementsFormProps) => {
-    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        editTemplateProps
-
+    const [requirements, setRequirements] = useState(
+        template.content.requirements
+    )
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
@@ -42,16 +42,15 @@ const TemplateRequirementsForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        onSubmit ? await onSubmit() : await onSaveTemplate()
+        const updatedTemplate = {
+            ...template.content,
+            requirements: requirements,
+        }
+        if (!_.isEqual(updatedTemplate, template.content)) {
+            await template.updateContent(updatedTemplate)
+        }
+        onSubmit && onSubmit()
         setIsSubmitting(false)
-    }
-
-    if (!template) {
-        return (
-            <Box height="large" gap="medium">
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-            </Box>
-        )
     }
 
     return (
@@ -65,15 +64,10 @@ const TemplateRequirementsForm = ({
                         2. A list of topics to cover in the article
                         3. An outline of the structure and flow of the article
                         4. Access to relevant research and data to support the article"
-                            value={template.requirements}
+                            value={requirements}
                             resize={false}
                             rows={10}
-                            onChange={(e) =>
-                                setTemplate({
-                                    ...template,
-                                    requirements: e.target.value,
-                                })
-                            }
+                            onChange={(e) => setRequirements(e.target.value)}
                         />
                     </FormField>
                 </Box>
@@ -92,7 +86,11 @@ const TemplateRequirementsForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel ? onCancel : onResetTemplate}
+                            onClick={
+                                onCancel
+                                    ? onCancel
+                                    : () => window.alert('Todo reset Template')
+                            }
                         />
                     }
                 />

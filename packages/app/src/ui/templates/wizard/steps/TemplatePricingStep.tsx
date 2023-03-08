@@ -3,25 +3,19 @@ import {
     TemplateWizardStepsType,
 } from '../TemplateWizard'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import TemplatePricingForm from '../../forms/TemplatePricingForm'
+import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 interface TemplatePricingStepProps {
-    editTemplateProps: EditTemplatePropsType
     stepperCallback: (step: TemplateWizardStepsType) => void
 }
 
-const TemplatePricingStep = ({
-    editTemplateProps,
-    stepperCallback,
-}: TemplatePricingStepProps) => {
-    const { template, onSaveTemplate } = editTemplateProps
+const TemplatePricingStep = ({ stepperCallback }: TemplatePricingStepProps) => {
+    const { template } = useTemplateContext()
 
-    if (!template) {
-        return null
-    }
     return (
         <Box>
             <Box pad="xsmall">
@@ -30,23 +24,28 @@ const TemplatePricingStep = ({
                     paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
                 />
             </Box>
-            <TemplatePricingForm
-                editTemplateProps={editTemplateProps}
-                onSubmit={async () => {
-                    if (await onSaveTemplate()) {
-                        if (template.flexInputs.length > 0) {
+            {template ? (
+                <TemplatePricingForm
+                    template={template}
+                    onSubmit={async () => {
+                        if (template.content.flexInputs.length > 0) {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
                         } else {
                             stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
                         }
+                    }}
+                    submitLabel="Save & Continue"
+                    onCancel={() =>
+                        stepperCallback(TEMPLATE_WIZARD_STEPS.DESCRIPTION)
                     }
-                }}
-                submitLabel="Save & Continue"
-                onCancel={() =>
-                    stepperCallback(TEMPLATE_WIZARD_STEPS.DESCRIPTION)
-                }
-                cancelLabel="Back"
-            />
+                    cancelLabel="Back"
+                />
+            ) : (
+                <Box height="large" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'small'} width={'100%'} />
+                </Box>
+            )}
         </Box>
     )
 }

@@ -8,10 +8,10 @@ import {
     TextInput,
 } from 'grommet'
 
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import Template from '@cambrian/app/classes/stages/Template'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
+import _ from 'lodash'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import { useState } from 'react'
 
@@ -20,7 +20,7 @@ export type TemplateDescriptionFormType = {
     description: string
 }
 interface TemplateDescriptionFormProps {
-    editTemplateProps: EditTemplatePropsType
+    template: Template
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -28,15 +28,14 @@ interface TemplateDescriptionFormProps {
 }
 
 const TemplateDescriptionForm = ({
-    editTemplateProps,
+    template,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: TemplateDescriptionFormProps) => {
-    const { template, setTemplate, onSaveTemplate, onResetTemplate } =
-        editTemplateProps
-
+    const [title, setTitle] = useState(template.content.title)
+    const [description, setDescription] = useState(template.content.description)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (
@@ -44,17 +43,16 @@ const TemplateDescriptionForm = ({
     ) => {
         event.preventDefault()
         setIsSubmitting(true)
-        onSubmit ? await onSubmit() : await onSaveTemplate()
+        const updatedTemplate = {
+            ...template.content,
+            title: title,
+            description: description,
+        }
+        if (!_.isEqual(updatedTemplate, template.content)) {
+            await template.updateContent(updatedTemplate)
+        }
+        onSubmit && onSubmit()
         setIsSubmitting(false)
-    }
-
-    if (!template) {
-        return (
-            <Box height="large" gap="medium">
-                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-            </Box>
-        )
     }
 
     return (
@@ -64,35 +62,25 @@ const TemplateDescriptionForm = ({
                     <FormField
                         name="title"
                         label="Title"
-                        validate={[() => isRequired(template.title)]}
+                        validate={[() => isRequired(title)]}
                     >
                         <TextInput
                             placeholder='Short summary of your service, i.e. "English to Spanish Technical Translation."'
-                            value={template.title}
-                            onChange={(e) =>
-                                setTemplate({
-                                    ...template,
-                                    title: e.target.value,
-                                })
-                            }
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                         />
                     </FormField>
                     <FormField
                         name="description"
                         label="Description"
-                        validate={[() => isRequired(template.description)]}
+                        validate={[() => isRequired(description)]}
                     >
                         <TextArea
                             placeholder="Describe your service at length. Communicate your unique value, details of your service, and the format and content of information you need from customers. Customers will send proposals in response to this description."
                             rows={15}
                             resize={false}
-                            value={template.description}
-                            onChange={(e) =>
-                                setTemplate({
-                                    ...template,
-                                    description: e.target.value,
-                                })
-                            }
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                         />
                     </FormField>
                 </Box>
@@ -111,7 +99,11 @@ const TemplateDescriptionForm = ({
                             size="small"
                             secondary
                             label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel ? onCancel : onResetTemplate}
+                            onClick={
+                                onCancel
+                                    ? onCancel
+                                    : () => window.alert('Todo Reset Template')
+                            }
                         />
                     }
                 />

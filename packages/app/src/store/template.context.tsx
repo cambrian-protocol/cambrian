@@ -1,6 +1,6 @@
+import API, { DocumentModel } from '../services/api/cambrian.api'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
-import API from '../services/api/cambrian.api'
 import Template from '../classes/stages/Template'
 import { TemplateModel } from '../models/TemplateModel'
 import TemplateService from '../services/stages/TemplateService'
@@ -12,7 +12,7 @@ export type TemplateContextType = {
 }
 
 type TemplateProviderProps = PropsWithChildren<{}> & {
-    templateStreamID: string
+    templateDoc: DocumentModel<TemplateModel>
 }
 
 export const TemplateContext = React.createContext<TemplateContextType>({
@@ -20,33 +20,25 @@ export const TemplateContext = React.createContext<TemplateContextType>({
 })
 
 export const TemplateContextProvider: React.FunctionComponent<TemplateProviderProps> =
-    ({ templateStreamID, children }) => {
-        const { currentUser, isUserLoaded } = useCurrentUserContext()
+    ({ templateDoc, children }) => {
+        const { currentUser } = useCurrentUserContext()
         const [isLoaded, setIsLoaded] = useState(false)
         const [template, setTemplate] = useState<Template>()
 
         useEffect(() => {
-            if (isUserLoaded) init()
-        }, [templateStreamID, currentUser])
+            if (currentUser) init()
+        }, [currentUser])
 
         const init = async () => {
             setIsLoaded(false)
             const templateService = new TemplateService()
-
-            const templateStreamDoc = await API.doc.readStream<TemplateModel>(
-                templateStreamID
+            const _template = new Template(
+                templateDoc,
+                templateService,
+                currentUser
             )
-
-            if (templateStreamDoc) {
-                const _template = new Template(
-                    templateStreamDoc,
-                    templateService,
-                    currentUser
-                )
-
-                setTemplate(_template)
-                setIsLoaded(true)
-            }
+            setTemplate(_template)
+            setIsLoaded(true)
         }
 
         return (
