@@ -75,11 +75,9 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         if (!res) throw new Error('Stage create error: failed to create stage')
 
         const updateRes = await API.doc.updateStream<CambrianStagesLibType>(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+        if (!updateRes || updateRes.status !== 200) throw new Error('StageLib update error: failed to update stagesLib')
 
-        if (updateRes?.status === 200) {
-            return { streamID: res.streamID, title: uniqueTitle }
-        }
-
+        return { streamID: res.streamID, title: uniqueTitle }
     } catch (e) {
         cpLogger.push(e)
     }
