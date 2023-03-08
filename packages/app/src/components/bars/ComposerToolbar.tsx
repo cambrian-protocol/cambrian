@@ -1,4 +1,4 @@
-import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
+import { Bug, FilePlus, FloppyDisk, Gear, Pen } from 'phosphor-react'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -11,20 +11,26 @@ import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import StackedIcon from '../icons/StackedIcon'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
 import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
+import randimals from 'randimals'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 const ComposerToolbar = () => {
+    const router = useRouter()
     const { composer, composition } = useComposerContext()
     const { currentUser } = useCurrentUserContext()
     const [showConfig, setShowConfig] = useState(false)
     const [showExportCompositionModal, setShowExportCompostionModal] =
         useState(false)
     const [isSaving, setIsSaving] = useState(false)
+    const [isCreatingTemplate, setIsCreatingTemplate] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     const toggleShowConfig = () => setShowConfig(!showConfig)
@@ -51,6 +57,35 @@ const ComposerToolbar = () => {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsSaving(false)
+    }
+
+    const onCreateTemplate = async () => {
+        setIsCreatingTemplate(true)
+        try {
+            if (currentUser && composition) {
+                if (!currentUser.did || !currentUser.cambrianProfileDoc)
+                    throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
+
+                const templateService = new TemplateService()
+                const res = await templateService.create(
+                    currentUser,
+                    composition.doc.streamID,
+                    randimals()
+                )
+                if (!res) throw new Error('Failed to create Template')
+
+                if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
+                    router.push(`/profile/new/${res.streamID}?target=template`)
+                } else {
+                    router.push(
+                        `${window.location.origin}/template/new/${res.streamID}`
+                    )
+                }
+            }
+        } catch (e) {
+            setIsCreatingTemplate(false)
+            setErrorMessage(await cpLogger.push(e))
+        }
     }
 
     const onTestLog = async () => {
@@ -84,6 +119,12 @@ const ComposerToolbar = () => {
                     onClick={toggleShowConfig}
                     label="Solution"
                     icon={<Gear />}
+                />
+                <ComposerToolbarButton
+                    onClick={onCreateTemplate}
+                    label="Create Template"
+                    icon={<FilePlus />}
+                    disabled={isCreatingTemplate}
                 />
                 <ComposerToolbarButton
                     onClick={toggleShowExportCompositionModal}

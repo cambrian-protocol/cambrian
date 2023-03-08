@@ -1,4 +1,5 @@
-import { Box } from 'grommet'
+import { Box, Spinner } from 'grommet'
+
 import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
 import { cpTheme } from '@cambrian/app/theme/theme'
@@ -18,20 +19,27 @@ const ComposerToolbarButton = ({
 }: ComposerToolbarButtonProps) => {
     const iconColor = disabled ? cpTheme.global.colors['dark-4'] : undefined
     return (
-        <Box
-            focusIndicator={false}
-            onClick={disabled ? undefined : onClick}
-            hoverIndicator
-            pad="small"
-            round="xsmall"
-        >
-            <IconContext.Provider value={{ size: '48', color: iconColor }}>
-                {icon}
+        <IconContext.Provider value={{ size: '48', color: iconColor }}>
+            <Box
+                focusIndicator={false}
+                onClick={disabled ? undefined : onClick}
+                hoverIndicator
+                pad="small"
+                round="xsmall"
+                align="center"
+            >
+                {disabled ? (
+                    <Box height={{ min: '48px', max: '48px' }} justify="center">
+                        <Spinner />
+                    </Box>
+                ) : (
+                    icon
+                )}
                 <Text size="small" textAlign="center" color="dark-4">
                     {label}
                 </Text>
-            </IconContext.Provider>
-        </Box>
+            </Box>
+        </IconContext.Provider>
     )
 }
 
