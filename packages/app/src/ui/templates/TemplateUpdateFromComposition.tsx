@@ -1,18 +1,18 @@
 import { Box, Button } from 'grommet'
-import { useEffect, useState } from 'react'
 
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import Template from '@cambrian/app/classes/stages/Template'
+import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
+import _ from 'lodash'
+import { getFormFlexInputs } from '@cambrian/app/utils/stage.utils'
+import { useState } from 'react'
 
-interface TemplateUpdateFromCompositionProps {
-    editTemplateProps: EditTemplatePropsType
+interface ITemplateUpdateFromComposition {
+    template: Template
+    compositionDoc: DocumentModel<CompositionModel>
 }
 
 export type TemplateUpdateFromCompositionType = {
@@ -20,117 +20,74 @@ export type TemplateUpdateFromCompositionType = {
 }
 
 const TemplateUpdateFromComposition = ({
-    editTemplateProps,
-}: TemplateUpdateFromCompositionProps) => {
-    const {
-        template,
-        setTemplate,
-        cachedTemplate,
-        onSaveTemplate,
-        onResetTemplate,
-    } = editTemplateProps
-    const { currentUser } = useCurrentUserContext()
+    template,
+    compositionDoc,
+}: ITemplateUpdateFromComposition) => {
+    const [updatedTemplate, setUpdatedTemplate] = useState<TemplateModel>()
     const [isUpdating, setIsUpdating] = useState(false)
-    const [isUpdated, setIsUpdated] = useState<boolean>()
-
     const [isSaving, setIsSaving] = useState(false)
-
-    useEffect(() => {
-        if (currentUser && cachedTemplate && template) {
-            getIsUpdated()
-        }
-    }, [template])
+    const isUpdated =
+        template.content.composition.commitID !== compositionDoc.commitID
 
     const handleSave = async () => {
-        setIsSaving(true)
-        await onSaveTemplate()
-        setIsSaving(false)
-    }
-
-    const getIsUpdated = async () => {
-        if (cachedTemplate?.composition.streamID) {
-            const compositionDoc = await loadCommitWorkaround(
-                cachedTemplate?.composition.streamID
-            )
-
+        try {
+            setIsSaving(true)
             if (
-                compositionDoc?.commitId.toString() !==
-                template?.composition.commitID
+                updatedTemplate &&
+                !_.isEqual(updatedTemplate, template.content)
             ) {
-                setIsUpdated(false)
-            } else {
-                setIsUpdated(true)
+                await template.updateContent(updatedTemplate)
             }
+        } catch (e) {
+            console.error(e)
         }
+        setIsSaving(false)
     }
 
     const updateTemplateFromComposition = async () => {
         try {
             setIsUpdating(true)
-            if (
-                currentUser &&
-                template &&
-                cachedTemplate?.composition.streamID
-            ) {
-                const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
+            const { formFlexInputs, isCollateralFlex } = getFormFlexInputs(
+                compositionDoc.content
+            )
 
-                const compositionDoc = (await loadCommitWorkaround(
-                    cachedTemplate?.composition.streamID
-                )) as TileDocument<CompositionModel>
-
-                if (compositionDoc.content) {
-                    const { formFlexInputs, isCollateralFlex } =
-                        ceramicTemplateAPI.getFormFlexInputs(
-                            compositionDoc.content
-                        )
-
-                    const mergedFormFlexInputs = formFlexInputs
-                    mergedFormFlexInputs.forEach((flexInput, idx) => {
-                        const preExisting = template.flexInputs.find(
-                            (x) =>
-                                x.tagId == flexInput.tagId &&
-                                (flexInput.isFlex == 'Both' ||
-                                    x.isFlex == flexInput.isFlex)
-                        )
-                        if (preExisting) {
-                            mergedFormFlexInputs[idx].value = preExisting.value
-                        }
-                    })
-
-                    setTemplate({
-                        ...template,
-                        flexInputs: formFlexInputs,
-                        price: {
-                            ...cachedTemplate.price,
-                            isCollateralFlex: isCollateralFlex,
-                        },
-                        composition: {
-                            ...cachedTemplate.composition,
-                            commitID: compositionDoc.commitId.toString(),
-                        },
-                    })
+            const mergedFormFlexInputs = formFlexInputs
+            mergedFormFlexInputs.forEach((flexInput, idx) => {
+                const preExisting = template.content.flexInputs.find(
+                    (x) =>
+                        x.tagId == flexInput.tagId &&
+                        (flexInput.isFlex == 'Both' ||
+                            x.isFlex == flexInput.isFlex)
+                )
+                if (preExisting) {
+                    mergedFormFlexInputs[idx].value = preExisting.value
                 }
-            }
+            })
+
+            setUpdatedTemplate({
+                ...template.content,
+                flexInputs: formFlexInputs,
+                price: {
+                    ...template.content.price,
+                    isCollateralFlex: isCollateralFlex,
+                },
+                composition: {
+                    ...template.content.composition,
+                    commitID: compositionDoc.commitID,
+                },
+            })
+
             setIsUpdating(false)
         } catch (e) {
             setIsUpdating(false)
         }
     }
 
-    if (!template) {
-        return (
-            <Box height="large" gap="medium">
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-            </Box>
-        )
-    }
-
     return (
         <Box gap="xlarge" pad={{ horizontal: 'xsmall', top: 'medium' }}>
             <LoaderButton
                 isLoading={isUpdating}
-                secondary
-                color={isUpdated ? 'dark-gray' : undefined}
+                primary
                 disabled={isUpdated}
                 size="small"
                 label={isUpdated ? 'Currently Up-to-date' : 'Update'}
@@ -143,6 +100,7 @@ const TemplateUpdateFromComposition = ({
                         size="small"
                         primary
                         label={'Save'}
+                        disabled={updatedTemplate === undefined}
                         onClick={() => handleSave()}
                     />
                 }
@@ -150,8 +108,8 @@ const TemplateUpdateFromComposition = ({
                     <Button
                         size="small"
                         secondary
-                        label={'Reset all changes'}
-                        onClick={onResetTemplate}
+                        label={'Reset changes'}
+                        onClick={() => setUpdatedTemplate(undefined)}
                     />
                 }
             />

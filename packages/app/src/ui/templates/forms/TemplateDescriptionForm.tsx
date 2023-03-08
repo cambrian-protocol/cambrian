@@ -41,18 +41,27 @@ const TemplateDescriptionForm = ({
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateDescriptionFormType, Element>
     ) => {
-        event.preventDefault()
-        setIsSubmitting(true)
-        const updatedTemplate = {
-            ...template.content,
-            title: title,
-            description: description,
+        try {
+            event.preventDefault()
+            setIsSubmitting(true)
+            const updatedTemplate = {
+                ...template.content,
+                title: title,
+                description: description,
+            }
+            if (!_.isEqual(updatedTemplate, template.content)) {
+                await template.updateContent(updatedTemplate)
+            }
+            onSubmit && onSubmit()
+            setIsSubmitting(false)
+        } catch (e) {
+            console.error(e)
         }
-        if (!_.isEqual(updatedTemplate, template.content)) {
-            await template.updateContent(updatedTemplate)
-        }
-        onSubmit && onSubmit()
-        setIsSubmitting(false)
+    }
+
+    const onReset = () => {
+        setTitle(template.content.title)
+        setDescription(template.content.description)
     }
 
     return (
@@ -98,12 +107,8 @@ const TemplateDescriptionForm = ({
                         <Button
                             size="small"
                             secondary
-                            label={cancelLabel || 'Reset all changes'}
-                            onClick={
-                                onCancel
-                                    ? onCancel
-                                    : () => window.alert('Todo Reset Template')
-                            }
+                            label={cancelLabel || 'Reset changes'}
+                            onClick={onCancel ? onCancel : onReset}
                         />
                     }
                 />

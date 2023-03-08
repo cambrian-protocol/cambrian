@@ -1,9 +1,13 @@
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { Box, Tab, Tabs } from 'grommet'
 import { Clipboard, Eye } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import Template from '@cambrian/app/classes/stages/Template'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplatePricingForm from './forms/TemplatePricingForm'
@@ -12,118 +16,152 @@ import TemplateUpdateFromComposition from './TemplateUpdateFromComposition'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
-import useEditTemplate from '@cambrian/app/hooks/useEditTemplate'
+import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 const EditTemplateUI = () => {
-    const editTemplateProps = useEditTemplate()
-    const { template, templateStreamID, cachedTemplate } = editTemplateProps
+    const { template } = useTemplateContext()
     const [activeIndex, setActiveIndex] = useState(0)
-    const [authorProfile] = useCambrianProfile(template?.author)
 
-    // Scroll up when step changes
+    const [compositionDoc, setComposition] =
+        useState<DocumentModel<CompositionModel>>()
+    const [authorProfile] = useCambrianProfile(template?.content.author)
+
+    // Scroll up when tab changes
     const topRefContext = useContext(TopRefContext)
     useEffect(() => {
         if (topRefContext)
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
-    if (!template) {
-        return null
+    useEffect(() => {
+        if (template) initComposition(template)
+    }, [template])
+
+    const initComposition = async (_template: Template) => {
+        try {
+            const _compositionDoc = await API.doc.readCommit<CompositionModel>(
+                _template.content.composition.streamID,
+                _template.content.composition.commitID
+            )
+
+            if (!_compositionDoc)
+                throw new Error(
+                    'Commit read error: failed to load Composition Commit'
+                )
+
+            setComposition(_compositionDoc)
+        } catch (e) {
+            console.error(e)
+        }
     }
-
     return (
-        <Box gap="medium">
-            <BaseHeader
-                authorProfileDoc={authorProfile}
-                title={cachedTemplate?.title || 'Untitled'}
-                metaTitle="Edit Template"
-                items={[
-                    {
-                        label: 'View Template',
-                        icon: <Eye color={cpTheme.global.colors['dark-4']} />,
-                        href: `/solver/${templateStreamID}`,
-                    },
-                    {
-                        label: 'Copy URL',
-                        icon: (
-                            <Clipboard
-                                color={cpTheme.global.colors['dark-4']}
-                            />
-                        ),
-                        value: `${window.location.host}/solver/${templateStreamID}`,
-                    },
-                ]}
-            />
-            <Tabs
-                justify="start"
-                activeIndex={activeIndex}
-                onActive={(nextIndex: number) => setActiveIndex(nextIndex)}
-            >
-                <Tab title="Description">
-                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
-                        <HeaderTextSection
-                            size="small"
-                            title={`What service are you offering?`}
-                            paragraph="Let the world know how you can help."
-                        />
-                    </Box>
-                    <TemplateDescriptionForm
-                        editTemplateProps={editTemplateProps}
+        <>
+            {template && compositionDoc ? (
+                <Box gap="medium">
+                    <BaseHeader
+                        authorProfileDoc={authorProfile}
+                        title={template.content.title || 'Untitled'}
+                        metaTitle="Edit Template"
+                        items={[
+                            {
+                                label: 'View Template',
+                                icon: (
+                                    <Eye
+                                        color={cpTheme.global.colors['dark-4']}
+                                    />
+                                ),
+                                href: `/solver/${template.doc.streamID}`,
+                            },
+                            {
+                                label: 'Copy URL',
+                                icon: (
+                                    <Clipboard
+                                        color={cpTheme.global.colors['dark-4']}
+                                    />
+                                ),
+                                value: `${window.location.host}/solver/${template.doc.streamID}`,
+                            },
+                        ]}
                     />
-                </Tab>
-                <Tab title="Pricing">
-                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
-                        <HeaderTextSection
-                            size="small"
-                            title="How much does it cost?"
-                            paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
-                        />
-                    </Box>
-                    <TemplatePricingForm
-                        editTemplateProps={editTemplateProps}
-                    />
-                </Tab>
-                {template.flexInputs.length > 0 && (
-                    <Tab title="Solver Config">
-                        <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
-                            <HeaderTextSection
-                                size="small"
-                                title="Solver Config"
-                                paragraph="Configure the Solver by completing these fields as instructed."
-                            />
-                        </Box>
-                        <TemplateFlexInputsForm
-                            editTemplateProps={editTemplateProps}
-                        />
-                    </Tab>
-                )}
-                <Tab title="Requirements">
-                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
-                        <HeaderTextSection
-                            size="small"
-                            title="Requirements"
-                            paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
-                        />
-                    </Box>
-                    <TemplateRequirementsForm
-                        editTemplateProps={editTemplateProps}
-                    />
-                </Tab>
-                <Tab title="Advanced">
-                    <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
-                        <HeaderTextSection
-                            size="small"
-                            title="Update Template from Composition"
-                            paragraph="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
-                        />
-
-                        <TemplateUpdateFromComposition
-                            editTemplateProps={editTemplateProps}
-                        />
-                    </Box>
-                </Tab>
-            </Tabs>
-        </Box>
+                    <Tabs
+                        justify="start"
+                        activeIndex={activeIndex}
+                        onActive={(nextIndex: number) =>
+                            setActiveIndex(nextIndex)
+                        }
+                    >
+                        <Tab title="Description">
+                            <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                                <HeaderTextSection
+                                    size="small"
+                                    title={`What service are you offering?`}
+                                    paragraph="Let the world know how you can help."
+                                />
+                            </Box>
+                            <TemplateDescriptionForm template={template} />
+                        </Tab>
+                        <Tab title="Pricing">
+                            <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                                <HeaderTextSection
+                                    size="small"
+                                    title="How much does it cost?"
+                                    paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
+                                />
+                            </Box>
+                            <TemplatePricingForm template={template} />
+                        </Tab>
+                        {template.content.flexInputs.length > 0 && (
+                            <Tab title="Solver Config">
+                                <Box
+                                    pad={{
+                                        horizontal: 'xsmall',
+                                        top: 'medium',
+                                    }}
+                                >
+                                    <HeaderTextSection
+                                        size="small"
+                                        title="Solver Config"
+                                        paragraph="Configure the Solver by completing these fields as instructed."
+                                    />
+                                </Box>
+                                <TemplateFlexInputsForm
+                                    template={template}
+                                    compositionContent={compositionDoc.content}
+                                />
+                            </Tab>
+                        )}
+                        <Tab title="Requirements">
+                            <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                                <HeaderTextSection
+                                    size="small"
+                                    title="Requirements"
+                                    paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
+                                />
+                            </Box>
+                            <TemplateRequirementsForm template={template} />
+                        </Tab>
+                        <Tab title="Advanced">
+                            <Box pad={{ horizontal: 'xsmall', top: 'medium' }}>
+                                <HeaderTextSection
+                                    size="small"
+                                    title="Update Template from Composition"
+                                    paragraph="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
+                                />
+                                <TemplateUpdateFromComposition
+                                    template={template}
+                                    compositionDoc={compositionDoc}
+                                />
+                            </Box>
+                        </Tab>
+                    </Tabs>
+                </Box>
+            ) : (
+                <Box height="medium" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                </Box>
+            )}
+        </>
     )
 }
 

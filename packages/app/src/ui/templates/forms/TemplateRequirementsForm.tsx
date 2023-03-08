@@ -40,17 +40,25 @@ const TemplateRequirementsForm = ({
     const handleSubmit = async (
         event: FormExtendedEvent<TemplateRequirementsFormType, Element>
     ) => {
-        event.preventDefault()
-        setIsSubmitting(true)
-        const updatedTemplate = {
-            ...template.content,
-            requirements: requirements,
+        try {
+            event.preventDefault()
+            setIsSubmitting(true)
+            const updatedTemplate = {
+                ...template.content,
+                requirements: requirements,
+            }
+            if (!_.isEqual(updatedTemplate, template.content)) {
+                await template.updateContent(updatedTemplate)
+            }
+            onSubmit && onSubmit()
+            setIsSubmitting(false)
+        } catch (e) {
+            console.error(e)
         }
-        if (!_.isEqual(updatedTemplate, template.content)) {
-            await template.updateContent(updatedTemplate)
-        }
-        onSubmit && onSubmit()
-        setIsSubmitting(false)
+    }
+
+    const onReset = () => {
+        setRequirements(template.content.requirements)
     }
 
     return (
@@ -85,12 +93,8 @@ const TemplateRequirementsForm = ({
                         <Button
                             size="small"
                             secondary
-                            label={cancelLabel || 'Reset all changes'}
-                            onClick={
-                                onCancel
-                                    ? onCancel
-                                    : () => window.alert('Todo reset Template')
-                            }
+                            label={cancelLabel || 'Reset changes'}
+                            onClick={onCancel ? onCancel : onReset}
                         />
                     }
                 />

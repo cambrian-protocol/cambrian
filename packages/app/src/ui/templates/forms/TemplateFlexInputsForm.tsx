@@ -78,17 +78,34 @@ const TemplateFlexInputsForm = ({
     const handleSubmit = async (
         event: FormExtendedEvent<FlexInputFormType[], Element>
     ) => {
-        event.preventDefault()
-        setIsSubmitting(true)
-        const updatedTemplate = {
-            ...template.content,
-            flexInputs: flexInputs,
+        try {
+            event.preventDefault()
+            setIsSubmitting(true)
+            const updatedTemplate = {
+                ...template.content,
+                flexInputs: flexInputs,
+            }
+            if (!_.isEqual(updatedTemplate, template.content)) {
+                await template.updateContent(updatedTemplate)
+            }
+            onSubmit && onSubmit()
+            setIsSubmitting(false)
+        } catch (e) {
+            console.error(e)
         }
-        if (!_.isEqual(updatedTemplate, template.content)) {
-            await template.updateContent(updatedTemplate)
-        }
-        onSubmit && onSubmit()
-        setIsSubmitting(false)
+    }
+
+    const onReset = () => {
+        setFlexInputs(template.content.flexInputs)
+        setTimelock(
+            parseSecondsToForm(
+                parseInt(
+                    template.content.flexInputs.find(
+                        (fi) => fi.slotId === 'timelockSeconds'
+                    )?.value || '0'
+                )
+            )
+        )
     }
 
     const updateFlexInput = (idx: number, value: string) => {
@@ -272,12 +289,8 @@ const TemplateFlexInputsForm = ({
                         <Button
                             size="small"
                             secondary
-                            label={cancelLabel || 'Reset all changes'}
-                            onClick={
-                                onCancel
-                                    ? onCancel
-                                    : () => window.alert('Todo reset Template')
-                            }
+                            label={cancelLabel || 'Reset changes'}
+                            onClick={onCancel ? onCancel : onReset}
                         />
                     }
                 />

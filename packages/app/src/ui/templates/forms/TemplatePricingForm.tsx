@@ -42,23 +42,36 @@ const TemplatePricingForm = ({
     const handleSubmit = async (
         event: FormExtendedEvent<TemplatePriceModel, Element>
     ) => {
-        event.preventDefault()
-        setIsSubmitting(true)
-        const updatedTemplate = {
-            ...template.content,
-            price: {
-                ...template.content.price,
-                amount: amount,
-                denominationTokenAddress: denominationTokenAddress,
-                allowAnyPaymentToken: allowAnyPaymentToken,
-                preferredTokens: preferredTokenAddresses,
-            },
+        try {
+            event.preventDefault()
+            setIsSubmitting(true)
+            const updatedTemplate = {
+                ...template.content,
+                price: {
+                    ...template.content.price,
+                    amount: amount,
+                    denominationTokenAddress: denominationTokenAddress,
+                    allowAnyPaymentToken: allowAnyPaymentToken,
+                    preferredTokens: preferredTokenAddresses,
+                },
+            }
+            if (!_.isEqual(updatedTemplate, template.content)) {
+                await template.updateContent(updatedTemplate)
+            }
+            onSubmit && onSubmit()
+            setIsSubmitting(false)
+        } catch (e) {
+            console.error(e)
         }
-        if (!_.isEqual(updatedTemplate, template.content)) {
-            await template.updateContent(updatedTemplate)
-        }
-        onSubmit && onSubmit()
-        setIsSubmitting(false)
+    }
+
+    const onReset = () => {
+        setAmount(template.content.price.amount)
+        setAllowAnyPaymentToken(template.content.price.allowAnyPaymentToken)
+        setDenominationTokenAddress(
+            template.content.price.denominationTokenAddress
+        )
+        setPreferredTokenAddresses(template.content.price.preferredTokens)
     }
 
     return (
@@ -200,15 +213,8 @@ const TemplatePricingForm = ({
                             <Button
                                 size="small"
                                 secondary
-                                label={cancelLabel || 'Reset all changes'}
-                                onClick={
-                                    onCancel
-                                        ? onCancel
-                                        : () =>
-                                              window.alert(
-                                                  'Todo reset Template'
-                                              )
-                                }
+                                label={cancelLabel || 'Reset changes'}
+                                onClick={onCancel ? onCancel : onReset}
                             />
                         }
                     />
