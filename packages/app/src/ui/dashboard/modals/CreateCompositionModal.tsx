@@ -29,11 +29,12 @@ const CreateCompositionModal = ({ onClose }: CreateCompositionModalProps) => {
     const onSubmit = async () => {
         setIsCreating(true)
         try {
-            const compositionService = new CompositionService()
             if (currentUser) {
+                const compositionService = new CompositionService()
                 const res = await compositionService.create(currentUser, input)
-
-                if (res) router.push(`/solver/${res.streamID}`)
+                if (res) {
+                    router.push(`/solver/${res.streamID}`)
+                }
             }
         } catch (e) {
             setIsCreating(false)

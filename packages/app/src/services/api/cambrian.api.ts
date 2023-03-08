@@ -2,6 +2,7 @@ import { DATA_HANDLING, DATA_HANLDING_OPTIONS } from './../../../config/index';
 
 import { CERAMIC_NODE_ENDPOINT } from "packages/app/config"
 import { CeramicClient } from '@ceramicnetwork/http-client';
+import { StageModel } from './../../models/StageModel';
 import { TileDocument } from "@ceramicnetwork/stream-tile"
 import { UserType } from "@cambrian/app/store/UserContext"
 import _ from "lodash";
@@ -88,9 +89,9 @@ const doc = {
         }
     },
 
-    create: async <T>(
+    create: async <T extends StageModel>(
         auth: UserType,
-        content: any,
+        content: T,
         metadata: MetadataModel
     ): Promise<DocumentModel<T> | undefined> => {
         try {
@@ -105,7 +106,7 @@ const doc = {
                 },
                 { pin: true }
             )
-            await tileDoc.update(content)
+            await tileDoc.update(content, { ...metadata, tags: [content.title] })
 
             try {
                 const firebaseDoc = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })

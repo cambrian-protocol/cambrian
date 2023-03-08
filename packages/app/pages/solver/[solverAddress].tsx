@@ -1,4 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import {
+    isCompositionStage,
+    isProposalStage,
+    isTemplateStage,
+} from '@cambrian/app/utils/stage.utils'
 
 import API from '@cambrian/app/services/api/cambrian.api'
 import { ComposerContextProvider } from '@cambrian/app/store/composer/composer.context'
@@ -35,30 +40,31 @@ export default function SolverPage() {
                         />
                     )
                 } else {
-                    const stage = await API.doc.readStream<any>(solverAddress)
+                    const stageDoc = await API.doc.readStream<any>(
+                        solverAddress
+                    )
+                    if (!stageDoc) throw new Error('Failed to fetch stage!')
 
-                    if (!stage) throw new Error('Failed to fetch stage!')
-
-                    if (stage.content.solvers) {
+                    if (isCompositionStage(stageDoc.content)) {
                         // Its a Composition
                         setUi(
-                            <ComposerContextProvider compositionDoc={stage}>
+                            <ComposerContextProvider compositionDoc={stageDoc}>
                                 <ComposerUI />
                             </ComposerContextProvider>
                         )
-                    } else if (stage.content.composition) {
+                    } else if (isTemplateStage(stageDoc.content)) {
                         // Its a Template
-                        // setUi(<TemplateUI templateStreamDoc={stage} />)
-                    } else if (stage.content.template) {
+                        //setUi(<TemplateUI templateStreamDoc={stage} />)
+                    } else if (isProposalStage(stageDoc.content)) {
                         // Its a Proposal
-                        /*   setUi(
+                        /*  setUi(
                             <ProposalContextProvider
                                 proposalStreamDoc={stage}
                                 currentUser={currentUser}
                             >
                                 <ProposalUI currentUser={currentUser} />
                             </ProposalContextProvider>
-                        ) */
+                        )  */
                     }
                     if (currentUser.session)
                         await addRecentStage(

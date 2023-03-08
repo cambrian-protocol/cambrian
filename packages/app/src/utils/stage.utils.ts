@@ -9,6 +9,7 @@ import { SlotTagModel } from "../classes/Tags/SlotTag";
 import { UserType } from "../store/UserContext";
 import { cpLogger } from '../services/api/Logger.api';
 import { loadStagesLib } from './stagesLib.utils';
+import { ulid } from "ulid";
 
 export const isCompositionStage = (stage: any) => stage.solvers !== undefined
 export const isTemplateStage = (stage: any) => stage.composition !== undefined
@@ -50,10 +51,11 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         if (!auth.session || !auth.did)
             throw GENERAL_ERROR['UNAUTHORIZED']
 
+        const tempUlid = ulid()
         const stageMetadata = {
             controllers: [auth.did],
             family: `template`,
-            tags: [stage.title]
+            tags: [tempUlid] // To generate a unique streamID. Meta tag will be changed to title at API.doc.create  
         }
 
         const stageIds = await API.doc.generateStreamAndCommitId(auth, stageMetadata)
@@ -69,7 +71,7 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
             uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamID, stage.title, StageNames.proposal)
         }
 
-        const res = await API.doc.create<T>(auth, { ...stage, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
+        const res = await API.doc.create<T>(auth, { ...stage, title: uniqueTitle }, stageMetadata)
         if (!res) throw new Error('Failed to create Stage')
 
         const updateRes = await API.doc.updateStream<CambrianStagesLibType>(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)

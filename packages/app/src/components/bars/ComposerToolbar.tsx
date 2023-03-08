@@ -1,14 +1,18 @@
 import { Bug, FloppyDisk, Gear, Pen } from 'phosphor-react'
+import {
+    ErrorMessageType,
+    GENERAL_ERROR,
+} from '@cambrian/app/constants/ErrorMessages'
 
 import BaseLayerModal from '../modals/BaseLayerModal'
 import { Box } from 'grommet'
 import ComposerToolbarButton from '../buttons/ComposerToolbarButton'
-import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ExportCompositionModal from '@cambrian/app/ui/composer/general/modals/ExportCompositionModal'
 import SolutionConfig from '@cambrian/app/ui/composer/config/SolutionConfig'
 import StackedIcon from '../icons/StackedIcon'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { parseComposerSolvers } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { useComposerContext } from '@cambrian/app/store/composer/composer.context'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -30,9 +34,19 @@ const ComposerToolbar = () => {
     const onSaveComposition = async () => {
         setIsSaving(true)
         try {
-            if (composition) {
-                await composition.updateContent(composer)
+            if (!composition || !currentUser)
+                throw GENERAL_ERROR['UNAUTHORIZED']
+
+            const stagesLib = await loadStagesLib(currentUser)
+            if (
+                !stagesLib.content.data.compositions ||
+                !stagesLib.content.data.compositions.lib[
+                    composition.doc.streamID
+                ]
+            ) {
+                await composition.create()
             }
+            await composition.updateContent(composer)
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }

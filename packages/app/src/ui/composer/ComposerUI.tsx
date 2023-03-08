@@ -14,13 +14,9 @@ import ComposerOutcomeCollectionControl from './controls/outcomeCollection/Compo
 import { ComposerSolverControl } from './controls/solver/ComposerSolverControl'
 import ComposerToolbar from '@cambrian/app/components/bars/ComposerToolbar'
 import CompositionHeader from '@cambrian/app/components/layout/header/CompositionHeader'
-import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { OutcomeCollectionNode } from './nodes/OutcomeCollectionNode'
 import { SolverNode } from './nodes/SolverNode'
-import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useComposerContext } from '@cambrian/app/src/store/composer/composer.context'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
-import { useRouter } from 'next/router'
 
 const nodeTypes = {
     solver: SolverNode,
@@ -37,57 +33,20 @@ TODO
 
 */
 export const ComposerUI = () => {
-    const router = useRouter()
-    const { currentUser } = useCurrentUserContext()
     const { composer, dispatch, composition } = useComposerContext()
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        init()
-    }, [currentUser, composition])
-
-    // TODO Error handling, if query doesn't get something, show invalid query and cta to create a new
-    const init = async () => {
-        if (currentUser && composition) {
-            try {
-                const stagesLib = await loadStagesLib(currentUser)
-                if (
-                    !stagesLib.content.data.compositions ||
-                    !stagesLib.content.data.compositions.lib[
-                        composition.doc.streamID
-                    ]
-                ) {
-                    const compositionService = new CompositionService()
-                    const newComposition = await compositionService.create(
-                        currentUser,
-                        composition.content
-                    )
-
-                    if (newComposition) {
-                        router.push(
-                            `${window.location.origin}/solver/${newComposition.streamID}`
-                        )
-                        dispatch({
-                            type: 'LOAD_COMPOSITION',
-                            payload: {
-                                ...composition.content,
-                                title: newComposition.title,
-                            },
-                        })
-                    }
-                } else {
-                    dispatch({
-                        type: 'LOAD_COMPOSITION',
-                        payload: {
-                            ...composition.content,
-                        },
-                    })
-                }
-
-                setIsInitialized(true)
-            } catch (e) {}
+        if (composition) {
+            dispatch({
+                type: 'LOAD_COMPOSITION',
+                payload: {
+                    ...composition.content,
+                },
+            })
+            setIsInitialized(true)
         }
-    }
+    }, [composition])
 
     const onElementsRemove = (elsToRemove: FlowElement[]) => {
         // TODO Ask if sure
