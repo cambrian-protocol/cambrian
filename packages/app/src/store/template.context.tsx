@@ -22,18 +22,20 @@ export const TemplateContext = React.createContext<TemplateContextType>({
 
 export const TemplateContextProvider: React.FunctionComponent<TemplateProviderProps> =
     ({ templateDoc, children }) => {
-        const { currentUser } = useCurrentUserContext()
+        const { currentUser, isUserLoaded } = useCurrentUserContext()
         const [isLoaded, setIsLoaded] = useState(false)
         const [template, setTemplate] = useState<Template>()
 
         useEffect(() => {
-            if (currentUser) init()
-        }, [currentUser])
+            if (isUserLoaded) init()
+        }, [isUserLoaded])
 
         const init = async () => {
             setIsLoaded(false)
             const denominationToken = await TokenAPI.getTokenInfo(
-                templateDoc.content.price.denominationTokenAddress
+                templateDoc.content.price.denominationTokenAddress,
+                currentUser?.web3Provider,
+                currentUser?.chainId
             )
             const templateService = new TemplateService()
             const _template = new Template(

@@ -35,13 +35,13 @@ export const TokenAPI = {
                 const tokenListTokenInfo: TokenModel | undefined =
                     tokenList.tokens.find(
                         (token) =>
-                            token.chainId === chainId &&
+                            token.chainId === chainIdValue &&
                             token.address === address
                     )
 
                 try {
                     const token = <TokenModel>{
-                        chainId: chainId,
+                        chainId: chainIdValue,
                         address: address,
                         decimals:
                             decimals.status === 'fulfilled'
@@ -68,9 +68,10 @@ export const TokenAPI = {
         }
 
         return <TokenModel>{
-            chainId: chainId,
+            chainId: chainIdValue,
             address: address,
             symbol: '??',
+            name: '??',
             decimals: 18,
         }
     },
