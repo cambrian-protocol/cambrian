@@ -97,7 +97,7 @@ const doc = {
         try {
             if (!auth.did) throw new Error('Unauthorized!')
 
-            const tileDoc = await TileDocument.deterministic(
+            const ceramicDoc = await TileDocument.deterministic(
                 ceramicInstance(auth),
                 {
                     controllers: [auth.did],
@@ -106,17 +106,17 @@ const doc = {
                 },
                 { pin: true }
             )
-            await tileDoc.update(content, { ...metadata, tags: [content.title] })
+            await ceramicDoc.update(content, { ...metadata, tags: [content.title] })
 
             if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
                 try {
-                    const firebaseDoc = await call(`streams/${tileDoc.id.toString()}/commits/${tileDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
+                    const firebaseDoc = await call(`streams/${ceramicDoc.id.toString()}/commits/${ceramicDoc.commitId.toString()}`, 'POST', auth, { data: content, metadata: metadata })
                     if (!firebaseDoc) throw new Error('Failed to POST data to Firebase')
 
                     if (firebaseDoc.status === 200 && DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
                         return {
-                            streamID: tileDoc.id.toString(),
-                            commitID: tileDoc.commitId.toString(),
+                            streamID: ceramicDoc.id.toString(),
+                            commitID: ceramicDoc.commitId.toString(),
                             content: firebaseDoc.content
                         }
                     }
@@ -126,22 +126,23 @@ const doc = {
             }
 
             return {
-                streamID: tileDoc.id.toString(),
-                commitID: tileDoc.commitId.toString(),
-                content: tileDoc.content as T
+                streamID: ceramicDoc.id.toString(),
+                commitID: ceramicDoc.commitId.toString(),
+                content: ceramicDoc.content as T,
+                metadata: ceramicDoc.metadata
             }
 
         } catch (e) { console.error(e) }
     },
 
-    readStream: async <T>(streamId: string,): Promise<DocumentModel<T> | undefined> => {
+    readStream: async <T>(streamID: string,): Promise<DocumentModel<T> | undefined> => {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
+            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamID)
 
             if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
                 try {
-                    const firebaseDoc = await call(`streams/${streamId}`, 'GET') as DocumentModel<T>
+                    const firebaseDoc = await call(`streams/${streamID}`, 'GET') as DocumentModel<T>
                     if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
                     if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
@@ -159,19 +160,20 @@ const doc = {
             return {
                 streamID: ceramicDoc.id.toString(),
                 commitID: ceramicDoc.commitId.toString(),
-                content: ceramicDoc.content as T
+                content: ceramicDoc.content as T,
+                metadata: ceramicDoc.metadata
             }
         } catch (e) { console.error(e) }
     },
 
 
-    readCommit: async <T>(streamId: string, commitId: string,): Promise<DocumentModel<T> | undefined> => {
+    readCommit: async <T>(streamID: string, commitID: string,): Promise<DocumentModel<T> | undefined> => {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamId)
+            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamID)
             if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
                 try {
-                    const firebaseDoc = await call(`streams/${streamId}/commits/${commitId}`, 'GET') as DocumentModel<T>
+                    const firebaseDoc = await call(`streams/${streamID}/commits/${commitID}`, 'GET') as DocumentModel<T>
                     if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
 
                     if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
@@ -189,9 +191,51 @@ const doc = {
             return {
                 streamID: ceramicDoc.id.toString(),
                 commitID: ceramicDoc.commitId.toString(),
-                content: ceramicDoc.content as T
+                content: ceramicDoc.content as T,
+                metadata: ceramicDoc.metadata
             }
         } catch (e) { console.error(e) }
+    },
+
+    multiQuery: async <T>(streamIDs: string[]): Promise<DocumentModel<T>[] | undefined> => {
+        try {
+            const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
+            const record = await readOnlyCeramicClient.multiQuery(streamIDs.map((id) => { return { streamId: id } }))
+
+            if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
+                try {
+                    /*   
+                    TODO fetch multiple streamIDs from Firebase
+                    
+                    const firebaseDocs = await call(`streams/${ceramicDoc.id.toString()}`, 'GET') as DocumentModel<T>
+                      if (!firebaseDoc) throw new Error('Failed to fetch from Firebase')
+  
+                      // Ceramic redundancy check
+                      if (!_.isEqual(firebaseDoc.content, ceramicDoc.content)) {
+                          console.warn('Corrupt data')
+                          // TODO Clean up corruption
+                      }
+  
+                      if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.RETURN_FIREBASE_DATA)) {
+                          return firebaseDoc
+                      } */
+
+                } catch (e) {
+                    console.warn(e)
+                }
+            }
+
+            return Object.keys(record).map((key) => {
+                return {
+                    streamID: key,
+                    commitID: record[key].commitId.toString(),
+                    content: record[key].content,
+                    metadata: record[key].metadata
+                }
+            })
+        } catch (e) {
+            console.error(e)
+        }
     },
 
     deterministic: async <T>(metadata: MetadataModel): Promise<DocumentModel<T> | undefined> => {
@@ -221,7 +265,8 @@ const doc = {
             return {
                 streamID: ceramicDoc.id.toString(),
                 commitID: ceramicDoc.commitId.toString(),
-                content: ceramicDoc.content as T
+                content: ceramicDoc.content as T,
+                metadata: ceramicDoc.metadata
             }
         } catch (e) { console.error(e) }
 
