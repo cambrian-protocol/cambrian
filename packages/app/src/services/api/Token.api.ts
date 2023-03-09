@@ -7,9 +7,10 @@ import tokenList from '@cambrian/app/public/tokenlists/uniswap_tokenlist.json'
 export const TokenAPI = {
     getTokenInfo: async (
         address: string,
-        provider: ethers.providers.Provider,
-        chainId: number
+        provider?: ethers.providers.Provider,
+        chainId?: number
     ): Promise<TokenModel> => {
+        const chainIdValue = chainId || 42161
         if (address && address.length === 42) {
             let erc20Contract
             try {

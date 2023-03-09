@@ -1,9 +1,10 @@
-import API, { DocumentModel } from '../services/api/cambrian.api'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
+import { DocumentModel } from '../services/api/cambrian.api'
 import Template from '../classes/stages/Template'
 import { TemplateModel } from '../models/TemplateModel'
 import TemplateService from '../services/stages/TemplateService'
+import { TokenAPI } from '../services/api/Token.api'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
 export type TemplateContextType = {
@@ -31,9 +32,13 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
 
         const init = async () => {
             setIsLoaded(false)
+            const denominationToken = await TokenAPI.getTokenInfo(
+                templateDoc.content.price.denominationTokenAddress
+            )
             const templateService = new TemplateService()
             const _template = new Template(
                 templateDoc,
+                denominationToken,
                 templateService,
                 currentUser
             )

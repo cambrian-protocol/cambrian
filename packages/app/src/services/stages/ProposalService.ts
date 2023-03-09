@@ -3,6 +3,7 @@ import API, { DocumentModel } from "../api/cambrian.api";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
 import { ProposalModel } from "../../models/ProposalModel";
 import { StageNames } from "../../models/StageModel";
+import { TokenAPI } from "../api/Token.api";
 import { UserType } from "../../store/UserContext";
 import { call } from "../../utils/service.utils";
 import { cpLogger } from "../api/Logger.api";
@@ -84,6 +85,14 @@ export default class ProposalService {
             const stagesLibDoc = await loadStagesLib(auth)
             stagesLibDoc.content.proposals.archiveStage(proposalStreamID)
             await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    async fetchToken(tokenAddress: string, auth?: UserType,) {
+        try {
+            return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
         } catch (e) {
             console.error(e)
         }

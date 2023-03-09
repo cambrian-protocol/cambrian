@@ -1,23 +1,24 @@
-import { CambrianStagesLibType } from '../stageLibs/CambrianStagesLib';
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
 import TemplateService from '@cambrian/app/services/stages/TemplateService'
+import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
-import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 
 export default class Template {
     private _auth?: UserType | null
     private _templateDoc: DocumentModel<TemplateModel>
     private _templateService: TemplateService
+    private _denominationToken: TokenModel
 
 
-    constructor(templateDoc: DocumentModel<TemplateModel>, templateService: TemplateService, auth?: UserType | null,) {
+    constructor(templateDoc: DocumentModel<TemplateModel>, denominationToken: TokenModel, templateService: TemplateService, auth?: UserType | null,) {
         this._auth = auth
         this._templateDoc = templateDoc
         this._templateService = templateService
+        this._denominationToken = denominationToken
     }
 
     public get content(): TemplateModel {
@@ -26,6 +27,10 @@ export default class Template {
 
     public get doc(): DocumentModel<TemplateModel> {
         return this._templateDoc
+    }
+
+    public get denominationToken(): TokenModel {
+        return this._denominationToken
     }
 
     public async create(compositionStreamID: string, templateTitle: string) {
@@ -47,6 +52,15 @@ export default class Template {
         try {
             const uniqueTitle = await this._templateService.update(this._auth, this._templateDoc, updatedTemplate)
             if (!uniqueTitle) throw new Error('Failed to updated Template')
+
+            if (updatedTemplate.price.denominationTokenAddress !== this._denominationToken.address) {
+
+                const newToken = await this._templateService.fetchToken(updatedTemplate.price.denominationTokenAddress)
+
+                if (!newToken) throw new Error('Failed to fetch denominationToken')
+
+                this._denominationToken = newToken
+            }
 
             this._templateDoc.content = { ...updatedTemplate, title: uniqueTitle }
         } catch (e) {

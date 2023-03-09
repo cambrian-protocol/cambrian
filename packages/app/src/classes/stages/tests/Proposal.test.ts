@@ -7,6 +7,7 @@ import { ProposalModel } from '@cambrian/app/models/ProposalModel';
 import { ProposalStatus } from './../../../models/ProposalStatus';
 import Template from '../Template';
 import { TemplateModel } from './../../../models/TemplateModel';
+import { TokenModel } from '@cambrian/app/models/TokenModel';
 import { UserType } from './../../../store/UserContext';
 import { expect } from '@jest/globals'
 import initialComposer from '@cambrian/app/store/composer/composer.init';
@@ -30,6 +31,14 @@ let dummyProposalDoc: DocumentModel<ProposalModel>
 
 const mockProposalServie = new MockProposalService()
 const mockTemplateService = new MockTemplateService()
+
+const mockToken: TokenModel = {
+    chainId: 31337,
+    address: "0xc778417e063141139fce010982780140aa0cd5ab",
+    symbol: '??',
+    decimals: 18,
+    name: '??'
+}
 
 describe('Proposal ', () => {
     beforeEach(() => {
@@ -55,8 +64,7 @@ describe('Proposal ', () => {
                 price: {
                     amount: '',
                     denominationTokenAddress:
-                        dummyCompositionDoc.content.solvers[0].config.collateralToken ||
-                        '',
+                        mockToken.address,
                     preferredTokens: [],
                     allowAnyPaymentToken: false,
                     isCollateralFlex: true,
@@ -103,24 +111,24 @@ describe('Proposal ', () => {
     });
 
     it('creates a Proposal', async () => {
-        const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposal.create()
         expect(proposal.status).toEqual(ProposalStatus.Draft)
         expect(proposal.content).toEqual(dummyProposalDoc.content)
     })
 
     it('submits a Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
         expect(proposalP.status).toEqual(ProposalStatus.Submitted)
         expect(proposalP.content.isSubmitted).toBeTruthy()
     })
 
     it('receives a Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
 
@@ -129,19 +137,19 @@ describe('Proposal ', () => {
     })
 
     it('does not register an unsubmitted Proposal', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
         expect(proposalT.templateDoc.content.receivedProposals[proposalT.doc.streamID]).toEqual(undefined)
     })
 
     it('requests change on Proposal and receives changeRequest', async () => {
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         await proposalT.receive()
         await proposalT.requestChange()
@@ -159,11 +167,11 @@ describe('Proposal ', () => {
 
     it('updated and resubmitted a Proposal', async () => {
         // Creating & Submitting Proposal
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Receiving & Requesting Change
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.requestChange()
 
@@ -189,11 +197,11 @@ describe('Proposal ', () => {
 
     it('approved updated Proposal initializes statuses correct', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
 
         // Status init check
         expect(proposalT.status).toEqual(ProposalStatus.Submitted)
@@ -271,11 +279,11 @@ describe('Proposal ', () => {
 
     it('declines Proposal', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.decline()
 
@@ -287,11 +295,11 @@ describe('Proposal ', () => {
 
     it('cancels a Proposal', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         // Templater
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
 
         // Proposer
@@ -310,12 +318,12 @@ describe('Proposal ', () => {
         }
 
         // Proposer
-        const proposalP = new Proposal(unpublishedTemplate, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(unpublishedTemplate, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
         expect(proposalP.status).toEqual(ProposalStatus.Draft)
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
         proposalT.receive()
 
         expect(proposalT.status).toEqual(ProposalStatus.Draft)
@@ -323,15 +331,15 @@ describe('Proposal ', () => {
 
     it('submits a new Proposal version to an unpublished Template', async () => {
         // Proposer
-        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockProposalServie, mockTemplateService, proposalAuthorUser)
+        const proposalP = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
         await proposalP.submit()
 
-        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockProposalServie, mockTemplateService, templateAuthorUser)
+        const proposalT = new Proposal(proposalP.templateDoc, proposalP.doc, mockToken, mockProposalServie, mockTemplateService, templateAuthorUser)
         await proposalT.receive()
         await proposalT.requestChange()
 
         // Unpublish template
-        const template = new Template(proposalT.templateDoc, mockTemplateService, templateAuthorUser)
+        const template = new Template(proposalT.templateDoc, mockToken, mockTemplateService, templateAuthorUser)
         await template.unpublish()
 
         proposalP.refreshDocs(proposalT.doc, template.doc)

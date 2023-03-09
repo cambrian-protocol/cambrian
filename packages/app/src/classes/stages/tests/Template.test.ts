@@ -3,6 +3,7 @@ import { DocumentModel } from '@cambrian/app/services/api/cambrian.api';
 import MockTemplateService from './MockTemplateService';
 import Template from '../Template';
 import { TemplateModel } from './../../../models/TemplateModel';
+import { TokenModel } from '@cambrian/app/models/TokenModel';
 import { expect } from '@jest/globals';
 import initialComposer from '@cambrian/app/store/composer/composer.init';
 
@@ -17,6 +18,14 @@ let dummyCompositionDoc: DocumentModel<CompositionModel>
 let dummyTemplateStreamDoc: DocumentModel<TemplateModel>
 
 const mockTemplateService = new MockTemplateService()
+
+const mockToken: TokenModel = {
+    chainId: 31337,
+    address: "0xc778417e063141139fce010982780140aa0cd5ab",
+    symbol: '??',
+    decimals: 18,
+    name: '??'
+}
 
 beforeEach(() => {
     dummyCompositionDoc = {
@@ -102,13 +111,13 @@ describe('Template ', () => {
     });
 
     it('Create/Publish a Template', async () => {
-        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+        const template = new Template(dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
         expect(template.content).toEqual(dummyTemplateStreamDoc.content)
         expect(template.content.isActive).toBeTruthy()
     })
 
     it('Unpublish a Template', async () => {
-        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+        const template = new Template(dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
         await template.unpublish()
 
         expect(template.content).toEqual(dummyTemplateStreamDoc.content)
@@ -116,7 +125,7 @@ describe('Template ', () => {
     })
 
     it('Update a Template', async () => {
-        const template = new Template(dummyTemplateStreamDoc, mockTemplateService, templateAuthorUser)
+        const template = new Template(dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
 
         const updatedTemplateDoc: DocumentModel<TemplateModel> = {
             ...template.doc,
