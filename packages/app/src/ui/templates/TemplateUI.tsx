@@ -8,22 +8,17 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 const TemplateUI = () => {
     const { template } = useTemplateContext()
+
     return (
         <>
             {template ? (
                 <InteractionLayout
                     contextTitle={template.content.title}
-                    actionBar={
-                        <TemplateActionbar
-                            isActive={template.content.isActive || false}
-                            price={template.content.price}
-                            templateStreamID={template.doc.streamID}
-                        />
-                    }
+                    actionBar={<TemplateActionbar template={template} />}
                 >
                     <Box height={{ min: '80vh' }}>
                         <TemplatePreview
-                            template={template.content}
+                            template={template}
                             showConfiguration
                         />
                     </Box>

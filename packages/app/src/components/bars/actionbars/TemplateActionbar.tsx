@@ -1,83 +1,33 @@
-import ActionbarItemDropContainer, {
-    ActionbarItemDropListType,
-} from '../../containers/ActionbarItemDropContainer'
 import { Box, Text } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
-import { useEffect, useState } from 'react'
 
+import ActionbarItemDropContainer from '../../containers/ActionbarItemDropContainer'
 import BaseActionbar from './BaseActionbar'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ClipboardButton from '../../buttons/ClipboardButton'
 import { Coin } from 'phosphor-react'
 import ErrorPopupModal from '../../modals/ErrorPopupModal'
 import LoaderButton from '../../buttons/LoaderButton'
-import { TemplatePriceModel } from '@cambrian/app/models/TemplateModel'
-import { TokenAPI } from '@cambrian/app/services/api/Token.api'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
+import ProposalService from '@cambrian/app/services/stages/ProposalService'
+import Template from '@cambrian/app/classes/stages/Template'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
-import randimals from 'randimals'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 
 interface TemplateActionbarProps {
-    isActive: boolean
-    templateStreamID: string
-    price: TemplatePriceModel
+    template: Template
 }
 
-const TemplateActionbar = ({
-    isActive,
-    price,
-    templateStreamID,
-}: TemplateActionbarProps) => {
+const TemplateActionbar = ({ template }: TemplateActionbarProps) => {
     const router = useRouter()
     const { currentUser } = useCurrentUserContext()
-    const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [isCreatingProposal, setIsCreatingProposal] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [infoList, setInfoList] = useState<ActionbarItemDropListType>([])
-
-    useEffect(() => {
-        init()
-    }, [currentUser])
-
-    const init = async () => {
-        if (price.denominationTokenAddress && currentUser) {
-            const ct = await TokenAPI.getTokenInfo(
-                price.denominationTokenAddress,
-                currentUser.web3Provider,
-                currentUser.chainId
-            )
-            if (ct) setCollateralToken(ct)
-            const infos: ActionbarItemDropListType = [
-                {
-                    icon: <Coin />,
-                    label: `${ct?.symbol} Token address`,
-                    description: (
-                        <Box direction="row" gap="small" align="center">
-                            <Text size="small" color="dark-4">
-                                {ellipseAddress(
-                                    price.denominationTokenAddress,
-                                    10
-                                )}
-                            </Text>
-                            <ClipboardButton
-                                size="xsmall"
-                                value={price.denominationTokenAddress}
-                            />
-                        </Box>
-                    ),
-                },
-            ]
-
-            setInfoList(infos)
-        }
-    }
 
     const onCreateProposal = async () => {
         setIsCreatingProposal(true)
@@ -85,19 +35,16 @@ const TemplateActionbar = ({
             if (!currentUser || !currentUser.cambrianProfileDoc)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
-            const streamID = await ceramicProposalAPI.createProposal(
-                randimals(),
-                templateStreamID
-            )
+            const proposalService = new ProposalService()
+            const res = await proposalService.create(currentUser, template.doc)
 
-            if (!streamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            if (!res) throw Error('Failed to create Proposal')
 
             if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
-                router.push(`/profile/new/${streamID}?target=proposal`)
+                router.push(`/profile/new/${res.streamID}?target=proposal`)
             } else {
                 router.push(
-                    `${window.location.origin}/proposal/new/${streamID}`
+                    `${window.location.origin}/proposal/new/${res.streamID}`
                 )
             }
         } catch (e) {
@@ -113,10 +60,10 @@ const TemplateActionbar = ({
                     <LoaderButton
                         isLoading={isCreatingProposal}
                         primary
-                        disabled={!isActive}
+                        disabled={!template.content.isActive}
                         size="small"
                         label={
-                            isActive
+                            template.content.isActive
                                 ? 'Create Proposal'
                                 : 'Closed for Proposals'
                         }
@@ -124,13 +71,42 @@ const TemplateActionbar = ({
                     />
                 }
                 info={{
-                    title: `${price.amount} ${collateralToken?.symbol || '??'}`,
+                    title: `${template.content.price.amount} ${
+                        template.denominationToken.symbol || '??'
+                    }`,
                     subTitle: "Seller's quote",
                     dropContent: (
                         <ActionbarItemDropContainer
                             title="Create a Proposal"
                             description='Hit the "Create Proposal"-Button at your right, define your proposal, offer a price and get your work done.'
-                            list={infoList}
+                            list={[
+                                {
+                                    icon: <Coin />,
+                                    label: `${template.denominationToken.symbol} Token address`,
+                                    description: (
+                                        <Box
+                                            direction="row"
+                                            gap="small"
+                                            align="center"
+                                        >
+                                            <Text size="small" color="dark-4">
+                                                {ellipseAddress(
+                                                    template.denominationToken
+                                                        .address,
+                                                    10
+                                                )}
+                                            </Text>
+                                            <ClipboardButton
+                                                size="xsmall"
+                                                value={
+                                                    template.denominationToken
+                                                        .address
+                                                }
+                                            />
+                                        </Box>
+                                    ),
+                                },
+                            ]}
                         />
                     ),
                 }}

@@ -2,37 +2,49 @@ import API, { DocumentModel } from "../api/cambrian.api";
 
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
 import { ProposalModel } from "../../models/ProposalModel";
-import { StageNames } from "../../models/StageModel";
+import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { TokenAPI } from "../api/Token.api";
 import { UserType } from "../../store/UserContext";
 import { call } from "../../utils/service.utils";
 import { cpLogger } from "../api/Logger.api";
+import { createStage } from "@cambrian/app/utils/stage.utils";
 import { loadStagesLib } from "../../utils/stagesLib.utils";
+import randimals from 'randimals'
 
 export default class ProposalService {
 
-    async create(auth: UserType, proposal: ProposalModel) {
+    async create(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
         try {
             if (!auth.session || !auth.did)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const stageMetadata = {
-                controllers: [auth.did],
-                family: `proposal`,
-                tags: [proposal.title]
+
+            const proposal: ProposalModel = {
+                title: randimals(),
+                description: '',
+                template: {
+                    streamID: templateDoc.streamID,
+                    commitID: templateDoc.commitID,
+                },
+                flexInputs: templateDoc.content.flexInputs.filter(
+                    (flexInput) =>
+                        flexInput.tagId !== 'collateralToken' &&
+                        flexInput.value === ''
+                ),
+                author: auth.did,
+                price: {
+                    amount:
+                        templateDoc.content.price.amount !== ''
+                            ? templateDoc.content.price.amount
+                            : 0,
+                    tokenAddress:
+                        templateDoc.content.price
+                            .denominationTokenAddress,
+                },
+                isSubmitted: false,
             }
 
-            const stageIds = await API.doc.generateStreamAndCommitId(auth, stageMetadata)
-
-            if (!stageIds) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
-
-            const stagesLibDoc = await loadStagesLib(auth)
-            const uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamID, proposal.title, StageNames.proposal)
-
-            await API.doc.updateStream(auth, stageIds.streamID, { ...proposal, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
-            await API.doc.updateStream(auth, stagesLibDoc.streamID, stagesLibDoc.content)
-
-            return { streamID: stageIds.streamID, title: uniqueTitle }
+            return await createStage(auth, proposal)
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
