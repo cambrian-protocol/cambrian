@@ -27,7 +27,7 @@ const TemplateUpdateFromComposition = ({
     const [isUpdating, setIsUpdating] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const isUpdated =
-        template.content.composition.commitID !== compositionDoc.commitID
+        template.content.composition.commitID === compositionDoc.commitID
 
     const handleSave = async () => {
         try {
@@ -88,7 +88,7 @@ const TemplateUpdateFromComposition = ({
             <LoaderButton
                 isLoading={isUpdating}
                 primary
-                disabled={isUpdated}
+                disabled={isUpdated || updatedTemplate !== undefined}
                 size="small"
                 label={isUpdated ? 'Currently Up-to-date' : 'Update'}
                 onClick={() => updateTemplateFromComposition()}
