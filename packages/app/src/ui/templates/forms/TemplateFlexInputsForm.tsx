@@ -12,11 +12,11 @@ import {
     parseSecondsToForm,
 } from '@cambrian/app/utils/helpers/timeParsing'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import Template from '@cambrian/app/classes/stages/Template'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 import { isAddress } from 'ethers/lib/utils'
@@ -203,8 +203,8 @@ const TemplateFlexInputsForm = ({
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Box height={{ min: '50vh' }} justify="between">
-                <Box pad="xsmall">
+            <Box gap="medium">
+                <Box gap="medium">
                     {flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
                             compositionContent.solvers,
@@ -220,7 +220,7 @@ const TemplateFlexInputsForm = ({
                             }
 
                             return (
-                                <Box key={idx} pad={{ bottom: 'medium' }}>
+                                <Box key={idx}>
                                     <FormField
                                         name={`${flexInput.slotId}`}
                                         label={flexInput.label}
@@ -275,7 +275,7 @@ const TemplateFlexInputsForm = ({
                         }
                     })}
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

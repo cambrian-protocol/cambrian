@@ -7,9 +7,9 @@ import {
     TextArea,
 } from 'grommet'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Template from '@cambrian/app/classes/stages/Template'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { useState } from 'react'
 
@@ -63,23 +63,21 @@ const TemplateRequirementsForm = ({
 
     return (
         <Form<TemplateRequirementsFormType> onSubmit={handleSubmit}>
-            <Box height="50vh" justify="between">
-                <Box pad="xsmall">
-                    <FormField label="Requirements" name="requirements">
-                        <TextArea
-                            placeholder="Example:
+            <Box gap="medium">
+                <FormField label="Requirements" name="requirements">
+                    <TextArea
+                        placeholder="Example:
                         1. A clear understanding of the purpose of the article
                         2. A list of topics to cover in the article
                         3. An outline of the structure and flow of the article
                         4. Access to relevant research and data to support the article"
-                            value={requirements}
-                            resize={false}
-                            rows={10}
-                            onChange={(e) => setRequirements(e.target.value)}
-                        />
-                    </FormField>
-                </Box>
-                <TwoButtonWrapContainer
+                        value={requirements}
+                        resize={false}
+                        rows={10}
+                        onChange={(e) => setRequirements(e.target.value)}
+                    />
+                </FormField>
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

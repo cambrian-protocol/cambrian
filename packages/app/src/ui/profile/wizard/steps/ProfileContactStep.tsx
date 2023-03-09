@@ -2,12 +2,12 @@ import { Box, Button, Form, FormField, TextInput } from 'grommet'
 import { PROFILE_WIZARD_STEPS, ProfileWizardStepsType } from '../ProfileWizard'
 import { SetStateAction, useState } from 'react'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import { useRouter } from 'next/router'
@@ -73,7 +73,7 @@ const ProfileContactStep = ({
                                 />
                             </FormField>
                         </Box>
-                        <TwoButtonWrapContainer
+                        <ButtonRowContainer
                             primaryButton={
                                 <LoaderButton
                                     isLoading={isSaving}

@@ -1,11 +1,11 @@
 import { Box, Button } from 'grommet'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Template from '@cambrian/app/classes/stages/Template'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFormFlexInputs } from '@cambrian/app/utils/stage.utils'
 import { useState } from 'react'
@@ -84,7 +84,7 @@ const TemplateUpdateFromComposition = ({
     }
 
     return (
-        <Box gap="xlarge" pad={{ horizontal: 'xsmall', top: 'medium' }}>
+        <Box gap="medium">
             <LoaderButton
                 isLoading={isUpdating}
                 primary
@@ -93,7 +93,7 @@ const TemplateUpdateFromComposition = ({
                 label={isUpdated ? 'Currently Up-to-date' : 'Update'}
                 onClick={() => updateTemplateFromComposition()}
             />
-            <TwoButtonWrapContainer
+            <ButtonRowContainer
                 primaryButton={
                     <LoaderButton
                         isLoading={isSaving}

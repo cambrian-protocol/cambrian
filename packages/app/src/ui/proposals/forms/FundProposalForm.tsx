@@ -4,6 +4,7 @@ import { Box, Button, Form, Text } from 'grommet'
 import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -15,7 +16,6 @@ import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import TokenBridgeButton from '@cambrian/app/components/buttons/TokenBridgeButton'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
@@ -394,7 +394,7 @@ const FundProposalForm = ({
                                             )}
                                         </Box>
                                     </Box>
-                                    <TwoButtonWrapContainer
+                                    <ButtonRowContainer
                                         primaryButton={
                                             funding.eq(
                                                 proposalContract.fundingGoal

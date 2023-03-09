@@ -13,12 +13,12 @@ import styled, { css } from 'styled-components'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
@@ -157,7 +157,7 @@ const SubmissionForm = ({
                     />
                 </Box>
                 <Box height={{ min: 'auto' }}>
-                    <TwoButtonWrapContainer
+                    <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
                                 isLoading={isSubmitting}

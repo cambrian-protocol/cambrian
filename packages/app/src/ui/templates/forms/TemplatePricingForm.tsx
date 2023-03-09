@@ -2,13 +2,13 @@ import { Box, Button, CheckBox, Form, FormExtendedEvent, Text } from 'grommet'
 
 import AddTokenItem from '@cambrian/app/components/token/AddTokenItem'
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import RemoveTokenItem from '@cambrian/app/components/token/RemoveTokenItem'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
 import Template from '@cambrian/app/classes/stages/Template'
 import { TemplatePriceModel } from '@cambrian/app/models/TemplateModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { useState } from 'react'
 
@@ -75,152 +75,137 @@ const TemplatePricingForm = ({
     }
 
     return (
-        <>
-            <Form<TemplatePriceModel> onSubmit={handleSubmit}>
+        <Form<TemplatePriceModel> onSubmit={handleSubmit}>
+            <Box gap="medium">
                 <Box gap="medium">
                     <Box
-                        pad={{ horizontal: 'xsmall' }}
-                        gap="medium"
-                        height={{ min: '30vh' }}
+                        border
+                        round="xsmall"
+                        pad="small"
+                        direction="row"
+                        align="center"
+                        gap="small"
+                        justify="between"
                     >
-                        <Box
-                            border
-                            round="xsmall"
-                            pad="small"
-                            direction="row"
-                            align="center"
-                            gap="small"
-                            justify="between"
-                        >
-                            <Box flex>
-                                <NumberInput
-                                    name="amount"
-                                    value={amount}
-                                    onChange={(e) =>
-                                        setAmount(
-                                            e.target.value === ''
-                                                ? ''
-                                                : Number(e.target.value)
-                                        )
-                                    }
-                                />
-                            </Box>
-                            {template.content.price.isCollateralFlex ? (
-                                <SelectTokenItem
-                                    allowAnyPaymentToken
-                                    tokenAddress={denominationTokenAddress}
-                                    onSelect={(newSelectedToken) => {
-                                        const filteredTokens = [
-                                            ...preferredTokenAddresses,
-                                        ].filter(
-                                            (token) =>
-                                                token !== newSelectedToken
-                                        )
-                                        setPreferredTokenAddresses(
-                                            filteredTokens
-                                        )
-                                        setDenominationTokenAddress(
-                                            newSelectedToken
-                                        )
-                                    }}
-                                />
-                            ) : (
-                                <BaseTokenBadge
-                                    tokenAddress={denominationTokenAddress}
-                                />
-                            )}
+                        <Box flex>
+                            <NumberInput
+                                name="amount"
+                                value={amount}
+                                onChange={(e) =>
+                                    setAmount(
+                                        e.target.value === ''
+                                            ? ''
+                                            : Number(e.target.value)
+                                    )
+                                }
+                            />
                         </Box>
-                        {template.content.price.isCollateralFlex && (
-                            <Box gap="small">
-                                <Box gap="xsmall">
-                                    <Text size="small" color="dark-4">{`${
-                                        allowAnyPaymentToken
-                                            ? 'Preferred '
-                                            : 'Alternative '
-                                    }tokens which can be used for payment`}</Text>
-                                    <Box
-                                        border
-                                        round="xsmall"
-                                        pad="small"
-                                        direction="row"
-                                        wrap
-                                    >
-                                        {preferredTokenAddresses.map(
-                                            (preferredToken) => (
-                                                <RemoveTokenItem
-                                                    key={preferredToken}
-                                                    tokenAddress={
-                                                        preferredToken
-                                                    }
-                                                    onRemove={(
-                                                        removedToken
-                                                    ) => {
-                                                        const filteredTokens = [
-                                                            ...preferredTokenAddresses,
-                                                        ].filter(
-                                                            (token) =>
-                                                                token !==
-                                                                removedToken
-                                                        )
-                                                        setPreferredTokenAddresses(
-                                                            filteredTokens
-                                                        )
-                                                    }}
-                                                />
-                                            )
-                                        )}
-                                        <AddTokenItem
-                                            addedTokens={preferredTokenAddresses.concat(
-                                                denominationTokenAddress
-                                            )}
-                                            onAddToken={(newToken) => {
-                                                const updatedPreferredTokens = [
-                                                    ...preferredTokenAddresses,
-                                                ]
-                                                updatedPreferredTokens.push(
-                                                    newToken
-                                                )
-                                                setPreferredTokenAddresses(
-                                                    updatedPreferredTokens
-                                                )
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
-                                <CheckBox
-                                    checked={allowAnyPaymentToken}
-                                    onChange={(e) =>
-                                        setAllowAnyPaymentToken(
-                                            e.target.checked
-                                        )
-                                    }
-                                    label="Allow any token for payment"
-                                />
-                            </Box>
+                        {template.content.price.isCollateralFlex ? (
+                            <SelectTokenItem
+                                allowAnyPaymentToken
+                                tokenAddress={denominationTokenAddress}
+                                onSelect={(newSelectedToken) => {
+                                    const filteredTokens = [
+                                        ...preferredTokenAddresses,
+                                    ].filter(
+                                        (token) => token !== newSelectedToken
+                                    )
+                                    setPreferredTokenAddresses(filteredTokens)
+                                    setDenominationTokenAddress(
+                                        newSelectedToken
+                                    )
+                                }}
+                            />
+                        ) : (
+                            <BaseTokenBadge
+                                tokenAddress={denominationTokenAddress}
+                            />
                         )}
                     </Box>
-                    <TwoButtonWrapContainer
-                        primaryButton={
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                size="small"
-                                primary
-                                label={submitLabel || 'Save'}
-                                type="submit"
+                    {template.content.price.isCollateralFlex && (
+                        <Box gap="small">
+                            <Box gap="xsmall">
+                                <Text size="small" color="dark-4">{`${
+                                    allowAnyPaymentToken
+                                        ? 'Preferred '
+                                        : 'Alternative '
+                                }tokens which can be used for payment`}</Text>
+                                <Box
+                                    border
+                                    round="xsmall"
+                                    pad="small"
+                                    direction="row"
+                                    wrap
+                                >
+                                    {preferredTokenAddresses.map(
+                                        (preferredToken) => (
+                                            <RemoveTokenItem
+                                                key={preferredToken}
+                                                tokenAddress={preferredToken}
+                                                onRemove={(removedToken) => {
+                                                    const filteredTokens = [
+                                                        ...preferredTokenAddresses,
+                                                    ].filter(
+                                                        (token) =>
+                                                            token !==
+                                                            removedToken
+                                                    )
+                                                    setPreferredTokenAddresses(
+                                                        filteredTokens
+                                                    )
+                                                }}
+                                            />
+                                        )
+                                    )}
+                                    <AddTokenItem
+                                        addedTokens={preferredTokenAddresses.concat(
+                                            denominationTokenAddress
+                                        )}
+                                        onAddToken={(newToken) => {
+                                            const updatedPreferredTokens = [
+                                                ...preferredTokenAddresses,
+                                            ]
+                                            updatedPreferredTokens.push(
+                                                newToken
+                                            )
+                                            setPreferredTokenAddresses(
+                                                updatedPreferredTokens
+                                            )
+                                        }}
+                                    />
+                                </Box>
+                            </Box>
+                            <CheckBox
+                                checked={allowAnyPaymentToken}
+                                onChange={(e) =>
+                                    setAllowAnyPaymentToken(e.target.checked)
+                                }
+                                label="Allow any token for payment"
                             />
-                        }
-                        secondaryButton={
-                            <Button
-                                size="small"
-                                secondary
-                                label={cancelLabel || 'Reset changes'}
-                                onClick={onCancel ? onCancel : onReset}
-                            />
-                        }
-                    />
+                        </Box>
+                    )}
                 </Box>
-            </Form>
-        </>
+                <ButtonRowContainer
+                    primaryButton={
+                        <LoaderButton
+                            isLoading={isSubmitting}
+                            size="small"
+                            primary
+                            label={submitLabel || 'Save'}
+                            type="submit"
+                        />
+                    }
+                    secondaryButton={
+                        <Button
+                            size="small"
+                            secondary
+                            label={cancelLabel || 'Reset changes'}
+                            onClick={onCancel ? onCancel : onReset}
+                        />
+                    }
+                />
+            </Box>
+        </Form>
     )
 }
 

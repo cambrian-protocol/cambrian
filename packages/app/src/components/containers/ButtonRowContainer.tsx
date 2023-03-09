@@ -1,26 +1,24 @@
 import { Box } from 'grommet'
 
-interface TwoButtonWrapContainerProps {
+interface IButtonRowContainer {
     primaryButton: JSX.Element
     secondaryButton?: JSX.Element
 }
 
-const TwoButtonWrapContainer = ({
+const ButtonRowContainer = ({
     primaryButton,
     secondaryButton,
-}: TwoButtonWrapContainerProps) => {
+}: IButtonRowContainer) => {
     return (
         <Box direction="row" justify="between">
             {secondaryButton && (
-                <Box flex pad="xsmall">
+                <Box flex pad={{ right: 'small' }}>
                     {secondaryButton}
                 </Box>
             )}
-            <Box flex pad="xsmall">
-                {primaryButton}
-            </Box>
+            <Box flex>{primaryButton}</Box>
         </Box>
     )
 }
 
-export default TwoButtonWrapContainer
+export default ButtonRowContainer

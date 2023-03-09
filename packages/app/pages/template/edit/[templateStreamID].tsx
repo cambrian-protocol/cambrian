@@ -46,9 +46,7 @@ export default function EditTemplatePage() {
                 templateDoc &&
                 currentUser?.did === templateDoc.content.author ? (
                     <TemplateContextProvider templateDoc={templateDoc}>
-                        <PageLayout contextTitle="Edit Template" kind="narrow">
-                            <EditTemplateUI />
-                        </PageLayout>
+                        <EditTemplateUI />
                     </TemplateContextProvider>
                 ) : (
                     <Custom404Page />

@@ -6,13 +6,17 @@ import {
 } from '@cambrian/app/utils/stage.utils'
 
 import API from '@cambrian/app/services/api/cambrian.api'
+import { CambrianStagesLibType } from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import { ComposerContextProvider } from '@cambrian/app/store/composer/composer.context'
 import { ComposerUI } from '@cambrian/app/ui/composer/ComposerUI'
 import Custom404Page from '../404'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
 import SolverUI from '@cambrian/app/ui/solver/SolverUI'
+import { TemplateContextProvider } from '@cambrian/app/store/template.context'
+import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { addRecentStage } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -46,15 +50,17 @@ export default function SolverPage() {
                     if (!stageDoc) throw new Error('Failed to fetch stage!')
 
                     if (isCompositionStage(stageDoc.content)) {
-                        // Its a Composition
                         setUi(
                             <ComposerContextProvider compositionDoc={stageDoc}>
                                 <ComposerUI />
                             </ComposerContextProvider>
                         )
                     } else if (isTemplateStage(stageDoc.content)) {
-                        // Its a Template
-                        //setUi(<TemplateUI templateStreamDoc={stage} />)
+                        setUi(
+                            <TemplateContextProvider templateDoc={stageDoc}>
+                                <TemplateUI />
+                            </TemplateContextProvider>
+                        )
                     } else if (isProposalStage(stageDoc.content)) {
                         // Its a Proposal
                         /*  setUi(
@@ -66,11 +72,16 @@ export default function SolverPage() {
                             </ProposalContextProvider>
                         )  */
                     }
-                    if (currentUser.session)
-                        await addRecentStage(
+
+                    if (currentUser) {
+                        const stagesLib = await loadStagesLib(currentUser)
+                        stagesLib.content.addRecent(solverAddress)
+                        await API.doc.updateStream<CambrianStagesLibType>(
                             currentUser,
-                            solverAddress as string
+                            stagesLib.streamID,
+                            stagesLib.content.data
                         )
+                    }
                 }
             } catch (e) {
                 console.error(e)

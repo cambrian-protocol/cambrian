@@ -3,9 +3,9 @@ import { Check, Copy } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 const TemplatePublishStep = () => {
@@ -46,7 +46,7 @@ const TemplatePublishStep = () => {
                             />
                         </Box>
                     </Box>
-                    <TwoButtonWrapContainer
+                    <ButtonRowContainer
                         primaryButton={
                             <Link
                                 href={`${window.location.origin}/solver/${template.doc.streamID}`}

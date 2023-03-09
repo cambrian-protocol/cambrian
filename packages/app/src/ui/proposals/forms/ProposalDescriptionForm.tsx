@@ -1,14 +1,14 @@
 import { Box, Button, Form, FormField, TextArea, TextInput } from 'grommet'
 import React, { SetStateAction, useEffect, useState } from 'react'
-
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
-import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import useEditProposal, {
     EditProposalContextType,
 } from '@cambrian/app/hooks/useEditProposal'
+
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
 interface ProposalDescriptionFormProps {
     editProposalContext: EditProposalContextType
@@ -84,7 +84,7 @@ const ProposalDescriptionForm = ({
                         />
                     </FormField>
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

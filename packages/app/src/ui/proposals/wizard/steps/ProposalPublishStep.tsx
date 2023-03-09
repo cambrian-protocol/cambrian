@@ -3,20 +3,20 @@ import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
+import useEditProposal, {
+    EditProposalContextType,
+} from '@cambrian/app/hooks/useEditProposal'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
 
 const ProposalPublishStep = ({
     editProposalContext,
@@ -52,7 +52,7 @@ const ProposalPublishStep = ({
                         paragraph="Your proposal has been saved. You may submit it now or leave it as a draft."
                     />
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

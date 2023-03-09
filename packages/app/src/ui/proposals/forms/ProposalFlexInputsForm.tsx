@@ -7,10 +7,10 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
@@ -243,7 +243,7 @@ const ProposalFlexInputsForm = ({
                         }
                     })}
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

@@ -8,9 +8,9 @@ import {
     TextInput,
 } from 'grommet'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Template from '@cambrian/app/classes/stages/Template'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import _ from 'lodash'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 import { useState } from 'react'
@@ -66,8 +66,8 @@ const TemplateDescriptionForm = ({
 
     return (
         <Form onSubmit={handleSubmit}>
-            <Box height={{ min: '50vh' }} justify="between">
-                <Box height={{ min: 'auto' }} pad="xsmall">
+            <Box gap="medium">
+                <Box>
                     <FormField
                         name="title"
                         label="Title"
@@ -93,7 +93,7 @@ const TemplateDescriptionForm = ({
                         />
                     </FormField>
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}

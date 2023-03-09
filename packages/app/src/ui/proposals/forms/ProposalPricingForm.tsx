@@ -2,11 +2,11 @@ import { Box, Button, Form, FormExtendedEvent, Text } from 'grommet'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
 import SelectTokenItem from '@cambrian/app/components/token/SelectTokenItem'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { useState } from 'react'
 
 interface ProposalPricingFormProps {
@@ -147,7 +147,7 @@ const ProposalPricingForm = ({
                         </Box>
                     </Box>
                 </Box>
-                <TwoButtonWrapContainer
+                <ButtonRowContainer
                     primaryButton={
                         <LoaderButton
                             isLoading={isSubmitting}
