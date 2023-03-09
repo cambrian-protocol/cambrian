@@ -107,7 +107,10 @@ export const SUPPORTED_CHAINS: ChainDataHashMapType = {
             defaultDenominationToken:
                 '0xc778417e063141139fce010982780140aa0cd5ab',
         },
-        compositions: {},
+        compositions: {
+            Copywriter:
+                'kjzl6cwe1jw145fuuak9g2ca5cpomea02x29fx43mjhowii1l7mlbdq84dim1ao',
+        },
     },
     // 42170: {
     //     chainData: {
