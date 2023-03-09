@@ -18,12 +18,10 @@ const TemplatePricingStep = ({ stepperCallback }: TemplatePricingStepProps) => {
 
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title="How much does it cost?"
-                    paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
-                />
-            </Box>
+            <HeaderTextSection
+                title="How much does it cost?"
+                paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
+            />
             {template ? (
                 <TemplatePricingForm
                     template={template}

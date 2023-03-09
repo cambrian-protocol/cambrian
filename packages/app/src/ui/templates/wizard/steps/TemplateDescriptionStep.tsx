@@ -21,12 +21,10 @@ const TemplateDescriptionStep = ({
 
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title={`What service are you offering?`}
-                    paragraph="Let the world know how you can help."
-                />
-            </Box>
+            <HeaderTextSection
+                title={`What service are you offering?`}
+                paragraph="Let the world know how you can help."
+            />
             {template ? (
                 <TemplateDescriptionForm
                     template={template}

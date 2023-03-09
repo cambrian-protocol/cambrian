@@ -20,12 +20,10 @@ const TemplateRequirementsStep = ({
 
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title="Requirements"
-                    paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
-                />
-            </Box>
+            <HeaderTextSection
+                title="Requirements"
+                paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
+            />
             {template ? (
                 <TemplateRequirementsForm
                     template={template}

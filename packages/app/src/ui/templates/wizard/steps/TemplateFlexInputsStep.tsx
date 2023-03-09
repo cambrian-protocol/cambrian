@@ -48,12 +48,10 @@ const TemplateFlexInputsStep = ({
 
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title="Solver Config"
-                    paragraph="Configure the Solver by completing these fields as instructed."
-                />
-            </Box>
+            <HeaderTextSection
+                title="Solver Config"
+                paragraph="Configure the Solver by completing these fields as instructed."
+            />
             {template && compositionContent ? (
                 <TemplateFlexInputsForm
                     template={template}
