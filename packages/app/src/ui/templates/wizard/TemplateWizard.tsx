@@ -59,12 +59,12 @@ const TemplateWizard = () => {
     }
 
     return (
-        <>
-            <Box height={{ min: '80vh' }} justify="center">
+        <Box align="center">
+            <Box height={{ min: '80vh' }} justify="center" width={'xlarge'}>
                 {/* TODO Wizard Nav  */}
                 {renderCurrentFormStep()}
             </Box>
-        </>
+        </Box>
     )
 }
 
