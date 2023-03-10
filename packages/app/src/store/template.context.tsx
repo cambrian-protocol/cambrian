@@ -31,21 +31,25 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
         }, [isUserLoaded])
 
         const init = async () => {
-            setIsLoaded(false)
-            const denominationToken = await TokenAPI.getTokenInfo(
-                templateDoc.content.price.denominationTokenAddress,
-                currentUser?.web3Provider,
-                currentUser?.chainId
-            )
-            const templateService = new TemplateService()
-            const _template = new Template(
-                templateDoc,
-                denominationToken,
-                templateService,
-                currentUser
-            )
-            setTemplate(_template)
-            setIsLoaded(true)
+            try {
+                setIsLoaded(false)
+                const denominationToken = await TokenAPI.getTokenInfo(
+                    templateDoc.content.price.denominationTokenAddress,
+                    currentUser?.web3Provider,
+                    currentUser?.chainId
+                )
+                const templateService = new TemplateService()
+                const _template = new Template(
+                    templateDoc,
+                    denominationToken,
+                    templateService,
+                    currentUser
+                )
+                setTemplate(_template)
+                setIsLoaded(true)
+            } catch (e) {
+                console.error(e)
+            }
         }
 
         return (

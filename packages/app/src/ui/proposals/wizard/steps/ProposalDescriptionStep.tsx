@@ -4,56 +4,62 @@ import {
     ProposalWizardStepsType,
 } from '../ProposalWizard'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import ProposalDescriptionForm from '../../forms/ProposalDescriptionForm'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
-import { SetStateAction } from 'react'
 import router from 'next/router'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalDescriptionStepProps {
-    editProposalContext: EditProposalContextType
     stepperCallback: (step: ProposalWizardStepsType) => void
 }
 
 const ProposalDescriptionStep = ({
-    editProposalContext,
     stepperCallback,
 }: ProposalDescriptionStepProps) => {
-    const { onSaveProposal, stageStack } = editProposalContext
+    const { proposal } = useProposalContext()
 
     return (
-        <Box gap="medium">
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title={`Provide us with details about the project`}
-                    paragraph={
-                        'Please be sure to include information requested by the Template description.'
-                    }
-                />
-                {stageStack?.template.requirements.trim() !== '' && (
-                    <Box gap="xsmall">
-                        <Heading level="4">Requirements</Heading>
-                        <Text color="dark-4" style={{ whiteSpace: 'pre-line' }}>
-                            {stageStack?.template.requirements}
-                        </Text>
-                    </Box>
-                )}
-            </Box>
-            <ProposalDescriptionForm
-                editProposalContext={editProposalContext}
-                onSubmit={async () => {
-                    if (await onSaveProposal())
-                        stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
-                }}
-                submitLabel="Save & Continue"
-                onCancel={() =>
-                    router.push(`${window.location.origin}/dashboard?idx=2`)
+        <Box>
+            <HeaderTextSection
+                title={`Provide us with details about the project`}
+                paragraph={
+                    'Please be sure to include information requested by the Template description.'
                 }
-                cancelLabel="Cancel"
             />
+            {proposal ? (
+                <>
+                    {proposal.templateDoc.content.requirements !== '' && (
+                        <Box gap="xsmall">
+                            <Heading level="4">Requirements</Heading>
+                            <Text
+                                color="dark-4"
+                                style={{ whiteSpace: 'pre-line' }}
+                            >
+                                {proposal.templateDoc.content.requirements}
+                            </Text>
+                        </Box>
+                    )}
+                    <ProposalDescriptionForm
+                        proposal={proposal}
+                        onSubmit={() =>
+                            stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
+                        }
+                        submitLabel="Save & Continue"
+                        onCancel={() =>
+                            router.push(
+                                `${window.location.origin}/dashboard?idx=2`
+                            )
+                        }
+                        cancelLabel="Cancel"
+                    />
+                </>
+            ) : (
+                <Box height="large" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'small'} width={'100%'} />
+                </Box>
+            )}
         </Box>
     )
 }

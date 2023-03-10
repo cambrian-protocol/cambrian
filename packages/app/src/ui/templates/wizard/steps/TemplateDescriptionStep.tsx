@@ -28,9 +28,9 @@ const TemplateDescriptionStep = ({
             {template ? (
                 <TemplateDescriptionForm
                     template={template}
-                    onSubmit={async () => {
+                    onSubmit={() =>
                         stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
-                    }}
+                    }
                     submitLabel="Save & Continue"
                     onCancel={() =>
                         router.push(`${window.location.origin}/dashboard?idx=1`)

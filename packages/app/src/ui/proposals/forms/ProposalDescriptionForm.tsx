@@ -1,72 +1,90 @@
-import { Box, Button, Form, FormField, TextArea, TextInput } from 'grommet'
-import React, { SetStateAction, useEffect, useState } from 'react'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
+import {
+    Box,
+    Button,
+    Form,
+    FormExtendedEvent,
+    FormField,
+    TextArea,
+    TextInput,
+} from 'grommet'
+import React, { useState } from 'react'
 
-import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
+import _ from 'lodash'
 import { isRequired } from '@cambrian/app/utils/helpers/validation'
 
+export type ProposalDescriptionFormType = {
+    title: string
+    description: string
+}
 interface ProposalDescriptionFormProps {
-    editProposalContext: EditProposalContextType
-    onSubmit?: () => Promise<void>
+    proposal: Proposal
+    onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
     cancelLabel?: string
 }
 
 const ProposalDescriptionForm = ({
-    editProposalContext,
+    proposal,
     onSubmit,
     onCancel,
     submitLabel,
     cancelLabel,
 }: ProposalDescriptionFormProps) => {
-    const { proposal, setProposal, onSaveProposal, onResetProposal } =
-        editProposalContext
+    const [title, setTitle] = useState(proposal.content.title)
+    const [description, setDescription] = useState(proposal.content.description)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const handleSubmit = async () => {
-        setIsSubmitting(true)
-        onSubmit ? await onSubmit() : await onSaveProposal()
-        setIsSubmitting(false)
+    const handleSubmit = async (
+        event: FormExtendedEvent<ProposalDescriptionFormType, Element>
+    ) => {
+        try {
+            event.preventDefault()
+            setIsSubmitting(true)
+            const updatedProposal = {
+                ...proposal.content,
+                title: title,
+                description: description,
+            }
+            if (!_.isEqual(updatedProposal, proposal.content)) {
+                await proposal.updateContent(updatedProposal)
+            }
+            onSubmit && onSubmit()
+            setIsSubmitting(false)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
-    if (!proposal) {
-        return (
-            <Box height="large" gap="medium">
-                <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
-                <BaseSkeletonBox height={'small'} width={'100%'} />
-            </Box>
-        )
+    const onReset = () => {
+        setTitle(proposal.content.title)
+        setDescription(proposal.content.description)
     }
+
     return (
         <Form onSubmit={handleSubmit}>
-            <Box justify="between" height={{ min: '50vh' }}>
-                <Box height={{ min: 'auto' }} pad="xsmall">
+            <Box gap="medium">
+                <Box>
                     <FormField
                         name="title"
                         label="Title"
-                        validate={[() => isRequired(proposal.title)]}
+                        validate={[() => isRequired(title)]}
                     >
                         <TextInput
                             placeholder={'Type your proposal title here...'}
-                            value={proposal.title}
+                            value={title}
                             onChange={(e) => {
-                                setProposal({
-                                    ...proposal,
-                                    title: e.target.value,
-                                })
+                                setTitle(e.target.value)
                             }}
                         />
                     </FormField>
                     <FormField
                         name="description"
                         label="Description"
-                        validate={[() => isRequired(proposal.description)]}
+                        validate={[() => isRequired(description)]}
                     >
                         <TextArea
                             placeholder={
@@ -74,13 +92,8 @@ const ProposalDescriptionForm = ({
                             }
                             rows={15}
                             resize={false}
-                            value={proposal.description}
-                            onChange={(e) =>
-                                setProposal({
-                                    ...proposal,
-                                    description: e.target.value,
-                                })
-                            }
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                         />
                     </FormField>
                 </Box>
@@ -98,8 +111,8 @@ const ProposalDescriptionForm = ({
                         <Button
                             size="small"
                             secondary
-                            label={cancelLabel || 'Reset all changes'}
-                            onClick={onCancel ? onCancel : onResetProposal}
+                            label={cancelLabel || 'Reset changes'}
+                            onClick={onCancel ? onCancel : onReset}
                         />
                     }
                 />
