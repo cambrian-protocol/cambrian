@@ -32,6 +32,8 @@ const ProposalUI = () => {
     /* TODO 
     View restrictions when on DRAFT
     Display latest proposal commit when on MODIFIED or CHANGE_REQUESTED
+    receive Proposal as Templater
+    receiveChangeRequest as Proposer
     */
 
     return (

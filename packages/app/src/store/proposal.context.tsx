@@ -8,6 +8,7 @@ import ProposalService from '../services/stages/ProposalService'
 import { TemplateModel } from '../models/TemplateModel'
 import TemplateService from '../services/stages/TemplateService'
 import { TokenAPI } from '../services/api/Token.api'
+import { TokenModel } from '../models/TokenModel'
 import _ from 'lodash'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
@@ -58,25 +59,13 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         'Read Commit Error: Failed to load Composition'
                     )
 
-                const collateralToken = await TokenAPI.getTokenInfo(
-                    proposalDoc.content.price.tokenAddress,
-                    currentUser?.web3Provider,
-                    currentUser?.chainId
-                )
-
-                let denominationToken = collateralToken
-                if (
-                    templateStreamDoc.content.price.denominationTokenAddress !==
-                    proposalDoc.content.price.tokenAddress
-                ) {
-                    denominationToken = await TokenAPI.getTokenInfo(
-                        templateStreamDoc.content.price
-                            .denominationTokenAddress,
-                        currentUser?.web3Provider,
-                        currentUser?.chainId
+                const { collateralToken, denominationToken } =
+                    await getProposalTokenInfos(
+                        proposalDoc.content.price.tokenAddress,
+                        templateStreamDoc.content.price.denominationTokenAddress
                     )
-                }
 
+                // TODO I will need the templateCommitDoc too.. otherwise the information of the templateStream will be displayed
                 const _proposal = new Proposal(
                     compositionDoc,
                     templateStreamDoc,
@@ -92,6 +81,33 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 setIsLoaded(true)
             } catch (e) {
                 console.error(e)
+            }
+        }
+
+        const getProposalTokenInfos = async (
+            collateralTokenAddress: string,
+            denominationTokenAddress: string
+        ): Promise<{
+            collateralToken: TokenModel
+            denominationToken: TokenModel
+        }> => {
+            const collateralToken = await TokenAPI.getTokenInfo(
+                collateralTokenAddress,
+                currentUser?.web3Provider,
+                currentUser?.chainId
+            )
+
+            let denominationToken = collateralToken
+            if (denominationTokenAddress !== collateralTokenAddress) {
+                denominationToken = await TokenAPI.getTokenInfo(
+                    denominationTokenAddress,
+                    currentUser?.web3Provider,
+                    currentUser?.chainId
+                )
+            }
+            return {
+                collateralToken: collateralToken,
+                denominationToken: denominationToken,
             }
         }
 
