@@ -112,7 +112,6 @@ describe('Proposal ', () => {
 
     it('creates a Proposal', async () => {
         const proposal = new Proposal(dummyTemplateStreamDoc, dummyProposalDoc, mockToken, mockProposalServie, mockTemplateService, proposalAuthorUser)
-        await proposal.create()
         expect(proposal.status).toEqual(ProposalStatus.Draft)
         expect(proposal.content).toEqual(dummyProposalDoc.content)
     })

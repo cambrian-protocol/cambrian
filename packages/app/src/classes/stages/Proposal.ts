@@ -137,18 +137,6 @@ export default class Proposal {
         this._status = status
     }
 
-    public async create() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
-            return
-        }
-
-        try {
-            await this._proposalService.create(this._auth, this._proposalDoc.content)
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     public async updateContent(updatedProposal: ProposalModel,) {
         if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
             return

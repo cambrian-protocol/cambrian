@@ -1,11 +1,12 @@
 import { DocumentModel } from "../../../services/api/cambrian.api";
 import { ProposalModel } from "@cambrian/app/models/ProposalModel";
+import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { UserType } from "@cambrian/app/store/UserContext";
 
 export default class MockProposalService {
 
-    async create(auth: UserType, proposal: ProposalModel) {
-        return { streamID: 'mock-streamID', title: proposal.title }
+    async create(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
+        return { streamID: 'mock-streamID', title: "Proposal" }
     }
 
     async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) { }
@@ -25,7 +26,6 @@ export default class MockProposalService {
             name: '??'
         }
     }
-
 
     async subscribe() { }
 
