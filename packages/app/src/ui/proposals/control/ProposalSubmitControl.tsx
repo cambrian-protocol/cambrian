@@ -4,25 +4,20 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 
 import { Box } from 'grommet'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
-import { EditProposalContextType } from '@cambrian/app/hooks/useEditProposal'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { PaperPlaneRight } from 'phosphor-react'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface ProposalSubmitControl {
-    editProposalContext: EditProposalContextType
+    proposal: Proposal
 }
 
-const ProposalSubmitControl = ({
-    editProposalContext,
-}: ProposalSubmitControl) => {
-    const { proposalStreamID, isValidProposal, onSaveProposal } =
-        editProposalContext
+const ProposalSubmitControl = ({ proposal }: ProposalSubmitControl) => {
     const { currentUser } = useCurrentUserContext()
     const router = useRouter()
 
@@ -32,24 +27,13 @@ const ProposalSubmitControl = ({
     const onSubmitProposal = async () => {
         setIsSubmitting(true)
         try {
-            if (currentUser) {
-                if (await onSaveProposal()) {
-                    const ceramicProposalAPI = new CeramicProposalAPI(
-                        currentUser
-                    )
-                    if (
-                        await ceramicProposalAPI.submitProposal(
-                            proposalStreamID
-                        )
-                    ) {
-                        router.push(
-                            `${window.location.origin}/solver/${proposalStreamID}`
-                        )
-                    } else {
-                        throw GENERAL_ERROR['PROPOSAL_SUBMIT_ERROR']
-                    }
-                }
-            }
+            if (!currentUser) throw GENERAL_ERROR['UNAUTHORIZED']
+
+            await proposal.submit()
+
+            router.push(
+                `${window.location.origin}/solver/${proposal.doc.streamID}`
+            )
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsSubmitting(false)
@@ -59,7 +43,7 @@ const ProposalSubmitControl = ({
         <Box>
             <LoaderButton
                 icon={<PaperPlaneRight />}
-                disabled={!isValidProposal}
+                disabled={!proposal.isValid}
                 isLoading={isSubmitting}
                 reverse
                 label="Save & Submit"

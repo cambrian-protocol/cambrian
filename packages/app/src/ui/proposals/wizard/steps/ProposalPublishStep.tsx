@@ -6,7 +6,6 @@ import {
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import Link from 'next/link'

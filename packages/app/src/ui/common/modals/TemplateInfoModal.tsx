@@ -11,7 +11,7 @@ interface TemplateInfoModalProps {
 const TemplateInfoModal = ({ template, onClose }: TemplateInfoModalProps) => (
     <BaseLayerModal onClose={onClose} width="xlarge">
         <Box height={{ min: 'auto' }}>
-            <TemplatePreview template={template} />
+            <TemplatePreview template={template} showLinkToTemplate />
         </Box>
     </BaseLayerModal>
 )

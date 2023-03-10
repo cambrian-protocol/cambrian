@@ -15,7 +15,6 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { FlexInputFormType } from '../../templates/forms/TemplateFlexInputsForm'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
@@ -24,7 +23,6 @@ import { getFlexInputType } from '@cambrian/app/utils/helpers/flexInputHelpers'
 
 interface ProposalFlexInputsFormProps {
     proposal: Proposal
-    compositionContent: CompositionModel
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -33,7 +31,6 @@ interface ProposalFlexInputsFormProps {
 
 const ProposalFlexInputsForm = ({
     proposal,
-    compositionContent,
     onSubmit,
     onCancel,
     submitLabel,
@@ -203,7 +200,7 @@ const ProposalFlexInputsForm = ({
                 <Box gap="medium">
                     {proposal.content.flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
-                            compositionContent.solvers,
+                            proposal.compositionDoc.content.solvers,
                             flexInput
                         )
                         if (

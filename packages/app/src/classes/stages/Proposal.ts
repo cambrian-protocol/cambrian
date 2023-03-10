@@ -145,6 +145,15 @@ export default class Proposal {
         return this._template.denominationToken
     }
 
+    public get isValid(): boolean {
+        return this._proposalDoc.content.title.length > 0 &&
+            this._proposalDoc.content.description.length > 0 &&
+            this._proposalDoc.content.price.tokenAddress.length > 0 &&
+            this._proposalDoc.content.flexInputs.every(
+                (flexInput) => flexInput.value.length > 0
+            )
+    }
+
     public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
         this._proposalDoc = updatedProposalDoc
         if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)
