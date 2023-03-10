@@ -12,9 +12,8 @@ export const call = async (
             method: method,
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: auth?.session?.serialize() || '',
             },
-            body: body ? JSON.stringify(body) : undefined,
+            body: body ? JSON.stringify({ ...body, session: auth?.session?.serialize() }) : JSON.stringify({ session: auth?.session?.serialize() }),
         })
 
         try {
