@@ -9,7 +9,7 @@ export default class MockProposalService {
         return { streamID: 'mock-streamID', title: "Proposal" }
     }
 
-    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) { }
+    async update(auth: UserType, currentProposalDoc: DocumentModel<ProposalModel>, updatedProposal: ProposalModel) { }
 
     async submit(auth: UserType, proposalStreamID: string): Promise<Response | undefined> {
         return { status: 200 } as Response

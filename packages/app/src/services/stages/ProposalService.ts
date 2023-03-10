@@ -51,9 +51,13 @@ export default class ProposalService {
         }
     }
 
-    async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) {
+    async update(auth: UserType, currentProposalDoc: DocumentModel<ProposalModel>, updatedProposal: ProposalModel) {
         try {
-            await API.doc.updateStream(auth, proposalDoc.streamID, proposalDoc.content, { ...proposalDoc.metadata, tags: [proposalDoc.content.title] })
+            await API.doc.updateStream(auth,
+                currentProposalDoc.streamID,
+                updatedProposal,
+                { ...currentProposalDoc.metadata, tags: [updatedProposal.title] }
+            )
         } catch (e) {
             cpLogger.push(e)
             throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']

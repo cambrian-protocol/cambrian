@@ -84,49 +84,74 @@ requestChange()
     ...Continue with 4.
 
 */
+
+export interface ProposalConfig {
+    proposalDocs: {
+        streamDoc: DocumentModel<ProposalModel>,
+        latestCommitDoc?: DocumentModel<ProposalModel>
+    },
+    templateDocs: {
+        streamDoc: DocumentModel<TemplateModel>,
+        commitDoc: DocumentModel<TemplateModel>
+    }
+    compositionDoc: DocumentModel<CompositionModel>,
+    tokens: {
+        collateral: TokenModel
+        denomination: TokenModel
+    }
+    onChainProposal?: any
+}
 export default class Proposal {
-    private _onChainProposal?: any // TODO Types
     private _auth?: UserType | null
-    private _proposalDoc: DocumentModel<ProposalModel>
+
+    private _onChainProposal?: any // TODO Types
+    private _proposalStreamDoc: DocumentModel<ProposalModel>
+    private _latestProposalCommitDoc?: DocumentModel<ProposalModel>
+
     private _template: Template
+    private _templateCommitDoc: DocumentModel<TemplateModel>
+
+    private _collateralToken: TokenModel
+
     private _status: ProposalStatus = ProposalStatus.Unknown
     private _proposalService: ProposalService
-    private _collateralToken: TokenModel
 
 
     constructor(
-        compositionDoc: DocumentModel<CompositionModel>,
-        templateDoc: DocumentModel<TemplateModel>,
-        proposalDoc: DocumentModel<ProposalModel>,
+        config: ProposalConfig,
         proposalService: ProposalService,
         templateService: TemplateService,
-        collateralToken: TokenModel,
-        denominationToken: TokenModel,
         auth?: UserType | null,
     ) {
         this._auth = auth
         this._proposalService = proposalService
-        this._proposalDoc = proposalDoc
-        this._collateralToken = collateralToken
-        this._template = new Template(compositionDoc, templateDoc, denominationToken, templateService, auth)
-        this._status = this.getProposalStatus(templateDoc, proposalDoc)
-    }
 
-    public get content(): ProposalModel {
-        return this._proposalDoc.content
+        const { compositionDoc, templateDocs, proposalDocs, tokens, onChainProposal } = config
+
+        this._collateralToken = tokens.collateral
+        this._proposalStreamDoc = proposalDocs.streamDoc
+        this._latestProposalCommitDoc = proposalDocs.latestCommitDoc
+        this._onChainProposal = onChainProposal
+        this._status = this.getProposalStatus(templateDocs.streamDoc, proposalDocs.streamDoc)
+
+        this._template = new Template(compositionDoc, templateDocs.streamDoc, tokens.denomination, templateService, auth)
+        this._templateCommitDoc = templateDocs.commitDoc
     }
 
     public get doc(): DocumentModel<ProposalModel> {
-        return this._proposalDoc
+        return this._proposalStreamDoc
     }
 
-    // TODO remove templateDoc and exchange with template()
-    public get templateDoc(): DocumentModel<TemplateModel> {
-        return this._template.doc
+    public get latestCommitDoc(): DocumentModel<ProposalModel> | undefined {
+        return this._latestProposalCommitDoc
     }
 
     public get template(): Template {
         return this._template
+    }
+
+    public get templateCommitDoc(): DocumentModel<TemplateModel> {
+        return this._templateCommitDoc
     }
 
     public get compositionDoc(): DocumentModel<CompositionModel> {
@@ -146,23 +171,22 @@ export default class Proposal {
     }
 
     public get isValid(): boolean {
-        return this._proposalDoc.content.title.length > 0 &&
-            this._proposalDoc.content.description.length > 0 &&
-            this._proposalDoc.content.price.tokenAddress.length > 0 &&
-            this._proposalDoc.content.flexInputs.every(
+        return this._proposalStreamDoc.content.title.length > 0 &&
+            this._proposalStreamDoc.content.description.length > 0 &&
+            this._proposalStreamDoc.content.price.tokenAddress.length > 0 &&
+            this._proposalStreamDoc.content.flexInputs.every(
                 (flexInput) => flexInput.value.length > 0
             )
     }
 
-    public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
-        this._proposalDoc = updatedProposalDoc
-        if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)
-        const status = this.getProposalStatus(updatedTemplateDoc || this.templateDoc, updatedProposalDoc)
-        this._status = status
+    public refreshDocs(updatedProposalStreamDoc: DocumentModel<ProposalModel>, updatedTemplateStreamDoc?: DocumentModel<TemplateModel>) {
+        this._proposalStreamDoc = updatedProposalStreamDoc
+        if (updatedTemplateStreamDoc) this._template.refreshDoc(updatedTemplateStreamDoc)
+        this._status = this.getProposalStatus(updatedTemplateStreamDoc || this.template.doc, updatedProposalStreamDoc)
     }
 
-    public async updateContent(updatedProposal: ProposalModel,) {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+    public async updateContent(updatedProposal: ProposalModel) {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return
         }
 
@@ -173,38 +197,29 @@ export default class Proposal {
             return
         }
 
+        const unsubmittedUpdatedProposal = { ...updatedProposal, isSubmitted: false }
+
         try {
-            await this._proposalService.save(this._auth, this._proposalDoc)
+            if (this._proposalStreamDoc.content.price.tokenAddress !== updatedProposal.price.tokenAddress) {
+                const newToken = await this._proposalService.fetchToken(updatedProposal.price.tokenAddress, this._auth)
+                if (!newToken) throw new Error('Failed to fetch collateralToken')
+                this._collateralToken = newToken
+            }
+
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, unsubmittedUpdatedProposal)
         } catch (e) {
             console.error(e)
             return
         }
 
-        this._proposalDoc.content = updatedProposal
-
-        if (this._status === ProposalStatus.ChangeRequested) {
+        this._proposalStreamDoc.content = unsubmittedUpdatedProposal
+        if (this._status !== ProposalStatus.Draft) {
             this._status = ProposalStatus.Modified
-        }
-
-        if (this._proposalDoc.content.isSubmitted) {
-            this._proposalDoc.content.isSubmitted = false
-        }
-
-        try {
-            if (this._proposalDoc.content.price.tokenAddress !== updatedProposal.price.tokenAddress) {
-                const newToken = await this._proposalService.fetchToken(updatedProposal.price.tokenAddress, this._auth)
-
-                if (!newToken) throw new Error('Failed to fetch collateralToken')
-
-                this._collateralToken = newToken
-            }
-        } catch (e) {
-            console.error(e)
         }
     }
 
     public async submit() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return
         }
 
@@ -215,14 +230,19 @@ export default class Proposal {
             return
         }
 
-        if (!this._template.content.isActive && !this._template.content.receivedProposals[this._proposalDoc.streamID]) {
+        if (!this._template.content.isActive && !this._template.content.receivedProposals[this._proposalStreamDoc.streamID]) {
             return
         }
 
-        try {
-            await this._proposalService.save(this._auth, this._proposalDoc)
+        const submittedUpdatedProposal = {
+            ...this._proposalStreamDoc.content,
+            isSubmitted: true,
+            version: this._proposalStreamDoc.content.version ? ++this._proposalStreamDoc.content.version : 1
+        }
 
-            const res = await this._proposalService.submit(this._auth, this._proposalDoc.streamID)
+        try {
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, submittedUpdatedProposal)
+            const res = await this._proposalService.submit(this._auth, this._proposalStreamDoc.streamID)
 
             if (!res || res.status !== 200) {
                 throw Error('Failed to submit Proposal.')
@@ -233,12 +253,11 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.Submitted
-        this._proposalDoc.content.isSubmitted = true
-        this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
+        this._proposalStreamDoc.content = submittedUpdatedProposal
     }
 
     public async cancel() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return
         }
 
@@ -251,16 +270,21 @@ export default class Proposal {
             return
         }
 
+        const canceledProposal = {
+            ...this._proposalStreamDoc.content,
+            isCanceled: true,
+        }
+
         try {
-            await this._proposalService.save(this._auth, this._proposalDoc)
-            await this._proposalService.cancel(this._auth, this._proposalDoc.streamID)
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, canceledProposal)
+            await this._proposalService.cancel(this._auth, this._proposalStreamDoc.streamID)
         } catch (e) {
             console.error(e)
             return
         }
 
         this._status = ProposalStatus.Canceled
-        this._proposalDoc.content.isCanceled = true
+        this._proposalStreamDoc.content = canceledProposal
     }
 
     public async receive() {
@@ -273,7 +297,7 @@ export default class Proposal {
         }
 
         try {
-            await this._template.receive(this._proposalDoc)
+            await this._template.receive(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return
@@ -292,7 +316,7 @@ export default class Proposal {
         }
 
         try {
-            await this._template.approve(this._proposalDoc)
+            await this._template.approve(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return
@@ -311,7 +335,7 @@ export default class Proposal {
         }
 
         try {
-            await this._template.decline(this._proposalDoc)
+            await this._template.decline(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return
@@ -330,7 +354,7 @@ export default class Proposal {
         }
 
         try {
-            await this._template.requestChange(this._proposalDoc)
+            await this._template.requestChange(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return
@@ -340,7 +364,7 @@ export default class Proposal {
     }
 
     public async receiveChangeRequest() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return
         }
 
@@ -348,23 +372,25 @@ export default class Proposal {
             return
         }
 
+        const unsubmittedUpdatedProposal = { ...this._proposalStreamDoc.content, isSubmitted: false }
+
         try {
-            await this._proposalService.save(this._auth, this._proposalDoc)
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, unsubmittedUpdatedProposal)
         } catch (e) {
             console.error(e)
             return
         }
 
-        this._proposalDoc.content.isSubmitted = false
+        this._proposalStreamDoc.content = unsubmittedUpdatedProposal
     }
 
     public async archive() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalDoc)) {
+        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return
         }
 
         try {
-            await this._proposalService.archive(this._auth, this._proposalDoc.streamID)
+            await this._proposalService.archive(this._auth, this._proposalStreamDoc.streamID)
         } catch (e) {
             console.error(e)
         }
@@ -393,7 +419,7 @@ export default class Proposal {
                 if (hasNewVersion && proposalDoc.content.isSubmitted) {
                     return ProposalStatus.Submitted
                 } else {
-                    if (this._auth?.did === this._proposalDoc.content.author && !this._proposalDoc.content.isSubmitted) {
+                    if (this._auth?.did === this._proposalStreamDoc.content.author && !this._proposalStreamDoc.content.isSubmitted) {
                         return ProposalStatus.Modified
                     } else {
                         return ProposalStatus.ChangeRequested

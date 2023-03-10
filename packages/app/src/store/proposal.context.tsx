@@ -1,8 +1,8 @@
 import API, { DocumentModel } from '../services/api/cambrian.api'
+import Proposal, { ProposalConfig } from '../classes/stages/Proposal'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { CompositionModel } from '../models/CompositionModel'
-import Proposal from '../classes/stages/Proposal'
 import { ProposalModel } from '../models/ProposalModel'
 import ProposalService from '../services/stages/ProposalService'
 import { TemplateModel } from '../models/TemplateModel'
@@ -42,10 +42,24 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     await API.doc.readStream<TemplateModel>(
                         proposalDoc.content.template.streamID
                     )
-
                 if (!templateStreamDoc)
                     throw new Error(
                         'Read Stream Error: Failed to load Template'
+                    )
+
+                const latestProposalCommitDoc =
+                    await getLatestProposalCommitDoc(
+                        templateStreamDoc,
+                        proposalDoc.streamID
+                    )
+
+                const templateCommitDoc =
+                    await API.doc.readStream<TemplateModel>(
+                        proposalDoc.content.template.commitID
+                    )
+                if (!templateCommitDoc)
+                    throw new Error(
+                        'Read Commit Error: Failed to load Template'
                     )
 
                 const compositionDoc =
@@ -53,7 +67,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         templateStreamDoc.content.composition.streamID,
                         templateStreamDoc.content.composition.commitID
                     )
-
                 if (!compositionDoc)
                     throw new Error(
                         'Read Commit Error: Failed to load Composition'
@@ -65,15 +78,26 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                         templateStreamDoc.content.price.denominationTokenAddress
                     )
 
-                // TODO I will need the templateCommitDoc too.. otherwise the information of the templateStream will be displayed
+                const proposalConfig: ProposalConfig = {
+                    compositionDoc: compositionDoc,
+                    proposalDocs: {
+                        streamDoc: proposalDoc,
+                        latestCommitDoc: latestProposalCommitDoc,
+                    },
+                    templateDocs: {
+                        streamDoc: templateStreamDoc,
+                        commitDoc: templateCommitDoc,
+                    },
+                    tokens: {
+                        denomination: denominationToken,
+                        collateral: collateralToken,
+                    },
+                }
+
                 const _proposal = new Proposal(
-                    compositionDoc,
-                    templateStreamDoc,
-                    proposalDoc,
+                    proposalConfig,
                     new ProposalService(),
                     new TemplateService(),
-                    collateralToken,
-                    denominationToken,
                     currentUser
                 )
 
@@ -81,6 +105,21 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 setIsLoaded(true)
             } catch (e) {
                 console.error(e)
+            }
+        }
+
+        const getLatestProposalCommitDoc = async (
+            templateStreamDoc: DocumentModel<TemplateModel>,
+            proposalStreamID: string
+        ): Promise<DocumentModel<ProposalModel> | undefined> => {
+            const allProposalCommits =
+                templateStreamDoc.content.receivedProposals[proposalStreamID]
+            if (allProposalCommits && allProposalCommits.length > 0) {
+                const latestProposalCommit = allProposalCommits.slice(-1)[0]
+                return await API.doc.readCommit<ProposalModel>(
+                    proposalStreamID,
+                    latestProposalCommit.proposalCommitID
+                )
             }
         }
 
@@ -96,15 +135,15 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 currentUser?.web3Provider,
                 currentUser?.chainId
             )
+            const denominationToken =
+                denominationTokenAddress === collateralTokenAddress
+                    ? collateralToken
+                    : await TokenAPI.getTokenInfo(
+                          denominationTokenAddress,
+                          currentUser?.web3Provider,
+                          currentUser?.chainId
+                      )
 
-            let denominationToken = collateralToken
-            if (denominationTokenAddress !== collateralTokenAddress) {
-                denominationToken = await TokenAPI.getTokenInfo(
-                    denominationTokenAddress,
-                    currentUser?.web3Provider,
-                    currentUser?.chainId
-                )
-            }
             return {
                 collateralToken: collateralToken,
                 denominationToken: denominationToken,
