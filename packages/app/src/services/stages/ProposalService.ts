@@ -65,11 +65,10 @@ export default class ProposalService {
             if (!auth.session || !auth.did)
                 throw GENERAL_ERROR['UNAUTHORIZED']
 
-            call('proposeDraft', 'POST', auth, {
+            return call('proposeDraft', 'POST', auth, {
                 id: proposalStreamID,
                 session: auth.session.serialize(),
             })
-
         } catch (e) {
             console.error(e)
         }

@@ -39,15 +39,12 @@ const ProposalWizard = () => {
                 )
             case PROPOSAL_WIZARD_STEPS.PRICING:
                 return <ProposalPricingStep stepperCallback={setCurrentStep} />
-            /*case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
+            case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
                 return (
                     <ProposalFlexInputsStep stepperCallback={setCurrentStep} />
                 )
-          case PROPOSAL_WIZARD_STEPS.PUBLISH:
-                return (
-                    <ProposalPublishStep
-                    />
-                ) */
+            case PROPOSAL_WIZARD_STEPS.PUBLISH:
+                return <ProposalPublishStep />
             default:
                 return <></>
         }

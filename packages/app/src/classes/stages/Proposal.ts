@@ -201,7 +201,12 @@ export default class Proposal {
 
         try {
             await this._proposalService.save(this._auth, this._proposalDoc)
-            await this._proposalService.submit(this._auth, this._proposalDoc.streamID)
+
+            const res = await this._proposalService.submit(this._auth, this._proposalDoc.streamID)
+
+            if (!res || res.status !== 200) {
+                throw Error('Failed to submit Proposal.')
+            }
         } catch (e) {
             console.error(e)
             return
@@ -210,8 +215,6 @@ export default class Proposal {
         this._status = ProposalStatus.Submitted
         this._proposalDoc.content.isSubmitted = true
         this._proposalDoc.content.version = this._proposalDoc.content.version ? ++this._proposalDoc.content.version : 1
-
-
     }
 
     public async cancel() {

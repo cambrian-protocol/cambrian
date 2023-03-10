@@ -6,7 +6,7 @@ export const call = async (
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     auth?: UserType,
     body?: any
-) => {
+): Promise<Response | undefined> => {
     try {
         const res = await fetch(`${TRILOBOT_ENDPOINT}/${route}`, {
             method: method,
