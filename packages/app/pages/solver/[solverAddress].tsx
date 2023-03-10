@@ -11,11 +11,12 @@ import { ComposerContextProvider } from '@cambrian/app/store/composer/composer.c
 import { ComposerUI } from '@cambrian/app/ui/composer/ComposerUI'
 import Custom404Page from '../404'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
+import { ProposalContextProvider } from '@cambrian/app/store/proposal.context'
+import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import SolverUI from '@cambrian/app/ui/solver/SolverUI'
 import { TemplateContextProvider } from '@cambrian/app/store/template.context'
 import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { addRecentStage } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
@@ -62,15 +63,11 @@ export default function SolverPage() {
                             </TemplateContextProvider>
                         )
                     } else if (isProposalStage(stageDoc.content)) {
-                        // Its a Proposal
-                        /*  setUi(
-                            <ProposalContextProvider
-                                proposalStreamDoc={stage}
-                                currentUser={currentUser}
-                            >
-                                <ProposalUI currentUser={currentUser} />
+                        setUi(
+                            <ProposalContextProvider proposalDoc={stageDoc}>
+                                <ProposalUI />
                             </ProposalContextProvider>
-                        )  */
+                        )
                     }
 
                     if (currentUser) {

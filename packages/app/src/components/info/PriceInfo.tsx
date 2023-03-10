@@ -5,7 +5,7 @@ import { TokenModel } from '@cambrian/app/models/TokenModel'
 
 interface PriceInfoProps {
     label: string
-    amount: number
+    amount: number | ''
     token?: TokenModel
     allowAnyPaymentToken?: boolean
     preferredTokens?: string[]

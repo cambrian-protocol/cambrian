@@ -3,54 +3,48 @@ import { Box, Heading, Text } from 'grommet'
 import CambrianProfileAbout from '@cambrian/app/components/info/CambrianProfileAbout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { StageStackType } from '../dashboard/ProposalsDashboardUI'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalPreviewProps {
-    stageStack: StageStackType
-    proposalStatus?: ProposalStatus
-    collateralToken?: TokenModel
+    proposal: Proposal
     showConfiguration?: boolean
     showProposalLink?: boolean
 }
 
 const ProposalPreview = ({
-    stageStack,
-    proposalStatus,
-    collateralToken,
+    proposal,
     showConfiguration,
     showProposalLink,
 }: ProposalPreviewProps) => {
-    const [proposerProfile] = useCambrianProfile(stageStack.proposal.author)
+    const [proposerProfile] = useCambrianProfile(proposal.content.author)
+
     return (
         <Box gap="medium">
             <ProposalHeader
-                collateralToken={collateralToken}
-                stageStack={stageStack}
-                proposalStatus={proposalStatus}
+                proposal={proposal}
                 showConfiguration={showConfiguration}
                 showProposalLink={showProposalLink}
             />
             <Box gap="small">
                 <Heading level="3">Project details</Heading>
                 <Text style={{ whiteSpace: 'pre-line' }}>
-                    {stageStack.proposal.description}
+                    {proposal.content.description}
                 </Text>
             </Box>
             <PlainSectionDivider />
             <PriceInfo
                 label={
-                    proposalStatus === ProposalStatus.Funding
+                    proposal.status === ProposalStatus.Funding
                         ? 'Goal'
-                        : proposalStatus === ProposalStatus.Executed
+                        : proposal.status === ProposalStatus.Executed
                         ? 'Price'
                         : 'Proposed Price'
                 }
-                amount={stageStack.proposal.price.amount}
-                token={collateralToken}
+                amount={proposal.content.price.amount}
+                token={proposal.collateralToken}
             />
             <PlainSectionDivider />
             {proposerProfile && (

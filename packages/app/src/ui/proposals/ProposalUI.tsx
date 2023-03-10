@@ -1,47 +1,58 @@
-import Custom404Page from 'packages/app/pages/404'
+import { useEffect, useState } from 'react'
+
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import { Box } from 'grommet'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import Messenger from '@cambrian/app/components/messenger/Messenger'
+import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal/ProposalActionbar'
 import ProposalPreview from './ProposalPreview'
-import ProposalSkeleton from '@cambrian/app/components/skeletons/ProposalSkeleton'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { UserType } from '@cambrian/app/store/UserContext'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
-interface ProposalUIProps {
-    currentUser: UserType
-}
+const ProposalUI = () => {
+    const { currentUser } = useCurrentUserContext()
+    const { proposal } = useProposalContext()
+    const [showMessenger, setShowMessenger] = useState(false)
 
-const ProposalUI = ({ currentUser }: ProposalUIProps) => {
-    const { isLoaded, stageStack, proposalStatus, collateralToken } =
-        useProposalContext()
+    useEffect(() => {
+        if (
+            currentUser &&
+            proposal &&
+            proposal.status !== ProposalStatus.Draft
+        ) {
+            setShowMessenger(
+                currentUser.did === proposal.doc.content.author ||
+                    currentUser.did === proposal.template.content.author
+            )
+        }
+    }, [proposal, currentUser])
 
-    const initMessenger =
-        (currentUser.did === stageStack?.template.author ||
-            currentUser.did === stageStack?.proposal.author) &&
-        proposalStatus !== ProposalStatus.Draft
+    /* TODO 
+    View restrictions when on DRAFT
+    Display latest proposal commit when on MODIFIED or CHANGE_REQUESTED
+    */
 
     return (
         <>
-            {isLoaded && stageStack === undefined ? (
-                <Custom404Page />
-            ) : (
+            {proposal ? (
                 <InteractionLayout
-                    contextTitle={stageStack?.proposal.title || 'Proposal'}
+                    contextTitle={proposal.content.title}
                     actionBar={
                         <ProposalActionbar
                             proposedPrice={{
-                                amount: stageStack?.proposal.price.amount || '',
-                                token: collateralToken,
+                                amount: proposal.content.price.amount || '',
+                                token: proposal.collateralToken,
                             }}
                             messenger={
-                                initMessenger && stageStack ? (
+                                showMessenger ? (
                                     <Messenger
-                                        chatID={stageStack.proposalStreamID}
-                                        currentUser={currentUser}
+                                        chatID={proposal.doc.streamID}
+                                        currentUser={currentUser!}
                                         participantDIDs={[
-                                            stageStack.proposal.author,
-                                            stageStack.template.author,
+                                            proposal.content.author,
+                                            proposal.template.content.author,
                                         ]}
                                     />
                                 ) : undefined
@@ -49,16 +60,21 @@ const ProposalUI = ({ currentUser }: ProposalUIProps) => {
                         />
                     }
                 >
-                    {stageStack ? (
+                    <Box height={{ min: '80vh' }}>
                         <ProposalPreview
+                            proposal={proposal}
                             showConfiguration
-                            stageStack={stageStack}
-                            collateralToken={collateralToken}
-                            proposalStatus={proposalStatus}
                         />
-                    ) : (
-                        <ProposalSkeleton />
-                    )}
+                    </Box>
+                </InteractionLayout>
+            ) : (
+                <InteractionLayout contextTitle={'Loading...'}>
+                    <Box gap="medium">
+                        <BaseSkeletonBox height={'xsmall'} width={'50%'} />
+                        <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                        <PlainSectionDivider />
+                        <BaseSkeletonBox height={'medium'} width={'100%'} />
+                    </Box>
                 </InteractionLayout>
             )}
         </>
