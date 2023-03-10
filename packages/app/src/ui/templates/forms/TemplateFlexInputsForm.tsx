@@ -13,7 +13,6 @@ import {
 } from '@cambrian/app/utils/helpers/timeParsing'
 
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { TaggedInput } from '@cambrian/app/src/classes/Tags/SlotTag'
 import Template from '@cambrian/app/classes/stages/Template'
@@ -24,7 +23,6 @@ import { useState } from 'react'
 
 interface TemplateFlexInputsFormProps {
     template: Template
-    compositionContent: CompositionModel
     onSubmit?: () => void
     onCancel?: () => void
     submitLabel?: string
@@ -38,7 +36,6 @@ export type FlexInputFormType = TaggedInput & {
 
 const TemplateFlexInputsForm = ({
     template,
-    compositionContent,
     onSubmit,
     onCancel,
     submitLabel,
@@ -207,7 +204,7 @@ const TemplateFlexInputsForm = ({
                 <Box gap="medium">
                     {flexInputs.map((flexInput, idx) => {
                         const type = getFlexInputType(
-                            compositionContent.solvers,
+                            template.compositionDoc.content.solvers,
                             flexInput
                         )
 

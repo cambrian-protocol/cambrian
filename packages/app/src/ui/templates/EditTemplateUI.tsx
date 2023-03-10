@@ -1,15 +1,12 @@
-import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { Box, Tab, Tabs } from 'grommet'
 import { Clipboard, Eye } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 
 import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import Template from '@cambrian/app/classes/stages/Template'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
 import TemplateFlexInputsForm from './forms/TemplateFlexInputsForm'
 import TemplatePricingForm from './forms/TemplatePricingForm'
@@ -23,9 +20,6 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 const EditTemplateUI = () => {
     const { template } = useTemplateContext()
     const [activeIndex, setActiveIndex] = useState(0)
-
-    const [compositionDoc, setComposition] =
-        useState<DocumentModel<CompositionModel>>()
     const [authorProfile] = useCambrianProfile(template?.content.author)
 
     // Scroll up when tab changes
@@ -35,30 +29,9 @@ const EditTemplateUI = () => {
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
-    useEffect(() => {
-        if (template) initComposition(template)
-    }, [template])
-
-    const initComposition = async (_template: Template) => {
-        try {
-            const _compositionDoc = await API.doc.readCommit<CompositionModel>(
-                _template.content.composition.streamID,
-                _template.content.composition.commitID
-            )
-
-            if (!_compositionDoc)
-                throw new Error(
-                    'Commit read error: failed to load Composition Commit'
-                )
-
-            setComposition(_compositionDoc)
-        } catch (e) {
-            console.error(e)
-        }
-    }
     return (
         <>
-            {template && compositionDoc ? (
+            {template ? (
                 <PageLayout
                     contextTitle={`Edit | ${template.content.title}`}
                     kind="narrow"
@@ -143,9 +116,6 @@ const EditTemplateUI = () => {
                                     </Box>
                                     <TemplateFlexInputsForm
                                         template={template}
-                                        compositionContent={
-                                            compositionDoc.content
-                                        }
                                     />
                                 </Tab>
                             )}
@@ -176,7 +146,6 @@ const EditTemplateUI = () => {
                                     />
                                     <TemplateUpdateFromComposition
                                         template={template}
-                                        compositionDoc={compositionDoc}
                                     />
                                 </Box>
                             </Tab>

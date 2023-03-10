@@ -1,8 +1,6 @@
 import { Box, Button } from 'grommet'
 
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Template from '@cambrian/app/classes/stages/Template'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -12,7 +10,6 @@ import { useState } from 'react'
 
 interface ITemplateUpdateFromComposition {
     template: Template
-    compositionDoc: DocumentModel<CompositionModel>
 }
 
 export type TemplateUpdateFromCompositionType = {
@@ -21,13 +18,13 @@ export type TemplateUpdateFromCompositionType = {
 
 const TemplateUpdateFromComposition = ({
     template,
-    compositionDoc,
 }: ITemplateUpdateFromComposition) => {
     const [updatedTemplate, setUpdatedTemplate] = useState<TemplateModel>()
     const [isUpdating, setIsUpdating] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const isUpdated =
-        template.content.composition.commitID === compositionDoc.commitID
+        template.content.composition.commitID ===
+        template.compositionDoc.commitID
 
     const handleSave = async () => {
         try {
@@ -48,7 +45,7 @@ const TemplateUpdateFromComposition = ({
         try {
             setIsUpdating(true)
             const { formFlexInputs, isCollateralFlex } = getFormFlexInputs(
-                compositionDoc.content
+                template.compositionDoc.content
             )
 
             const mergedFormFlexInputs = formFlexInputs
@@ -73,7 +70,7 @@ const TemplateUpdateFromComposition = ({
                 },
                 composition: {
                     ...template.content.composition,
-                    commitID: compositionDoc.commitID,
+                    commitID: template.compositionDoc.commitID,
                 },
             })
 

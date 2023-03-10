@@ -1,6 +1,7 @@
 import API, { DocumentModel } from '../services/api/cambrian.api'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
+import { CompositionModel } from '../models/CompositionModel'
 import Proposal from '../classes/stages/Proposal'
 import { ProposalModel } from '../models/ProposalModel'
 import ProposalService from '../services/stages/ProposalService'
@@ -42,7 +43,20 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     )
 
                 if (!templateStreamDoc)
-                    throw new Error('Failed to load Template')
+                    throw new Error(
+                        'Read Stream Error: Failed to load Template'
+                    )
+
+                const compositionDoc =
+                    await API.doc.readCommit<CompositionModel>(
+                        templateStreamDoc.content.composition.streamID,
+                        templateStreamDoc.content.composition.commitID
+                    )
+
+                if (!compositionDoc)
+                    throw new Error(
+                        'Read Commit Error: Failed to load Composition'
+                    )
 
                 const collateralToken = await TokenAPI.getTokenInfo(
                     proposalDoc.content.price.tokenAddress,
@@ -50,15 +64,27 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     currentUser?.chainId
                 )
 
-                const proposalService = new ProposalService()
-                const templateService = new TemplateService()
+                let denominationToken = collateralToken
+                if (
+                    templateStreamDoc.content.price.denominationTokenAddress !==
+                    proposalDoc.content.price.tokenAddress
+                ) {
+                    denominationToken = await TokenAPI.getTokenInfo(
+                        templateStreamDoc.content.price
+                            .denominationTokenAddress,
+                        currentUser?.web3Provider,
+                        currentUser?.chainId
+                    )
+                }
 
                 const _proposal = new Proposal(
+                    compositionDoc,
                     templateStreamDoc,
                     proposalDoc,
+                    new ProposalService(),
+                    new TemplateService(),
                     collateralToken,
-                    proposalService,
-                    templateService,
+                    denominationToken,
                     currentUser
                 )
 

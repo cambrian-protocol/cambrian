@@ -1,20 +1,17 @@
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import { Box } from 'grommet'
-import { StageStackType } from '../../dashboard/ProposalsDashboardUI'
+import Template from '@cambrian/app/classes/stages/Template'
 import TemplatePreview from '../../templates/TemplatePreview'
 
 interface TemplateInfoModalProps {
-    stageStack: StageStackType
+    template: Template
     onClose: () => void
 }
 
-const TemplateInfoModal = ({ stageStack, onClose }: TemplateInfoModalProps) => (
+const TemplateInfoModal = ({ template, onClose }: TemplateInfoModalProps) => (
     <BaseLayerModal onClose={onClose} width="xlarge">
         <Box height={{ min: 'auto' }}>
-            <TemplatePreview
-                template={stageStack.template}
-                templateStreamID={stageStack.proposal.template.streamID}
-            />
+            <TemplatePreview template={template} />
         </Box>
     </BaseLayerModal>
 )

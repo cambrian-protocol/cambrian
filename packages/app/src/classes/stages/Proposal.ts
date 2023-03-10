@@ -1,3 +1,4 @@
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from '../../models/ProposalModel'
 import ProposalService from '@cambrian/app/services/stages/ProposalService'
@@ -94,20 +95,21 @@ export default class Proposal {
 
 
     constructor(
-        templateStreamDoc: DocumentModel<TemplateModel>,
+        compositionDoc: DocumentModel<CompositionModel>,
+        templateDoc: DocumentModel<TemplateModel>,
         proposalDoc: DocumentModel<ProposalModel>,
-        collateralToken: TokenModel,
         proposalService: ProposalService,
         templateService: TemplateService,
+        collateralToken: TokenModel,
+        denominationToken: TokenModel,
         auth?: UserType | null,
     ) {
         this._auth = auth
         this._proposalService = proposalService
         this._proposalDoc = proposalDoc
         this._collateralToken = collateralToken
-        // TODO collateralToken might be different to denominationToken
-        this._template = new Template(templateStreamDoc, collateralToken, templateService, auth)
-        this._status = this.getProposalStatus(templateStreamDoc, proposalDoc)
+        this._template = new Template(compositionDoc, templateDoc, denominationToken, templateService, auth)
+        this._status = this.getProposalStatus(templateDoc, proposalDoc)
     }
 
     public get content(): ProposalModel {
@@ -118,8 +120,17 @@ export default class Proposal {
         return this._proposalDoc
     }
 
+    // TODO remove templateDoc and exchange with template()
     public get templateDoc(): DocumentModel<TemplateModel> {
         return this._template.doc
+    }
+
+    public get template(): Template {
+        return this._template
+    }
+
+    public get compositionDoc(): DocumentModel<CompositionModel> {
+        return this.template.compositionDoc
     }
 
     public get status(): ProposalStatus {

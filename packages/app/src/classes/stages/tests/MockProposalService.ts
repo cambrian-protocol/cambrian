@@ -11,7 +11,9 @@ export default class MockProposalService {
 
     async save(auth: UserType, proposalDoc: DocumentModel<ProposalModel>) { }
 
-    async submit(auth: UserType, proposalStreamID: string) { }
+    async submit(auth: UserType, proposalStreamID: string): Promise<Response | undefined> {
+        return { status: 200 } as Response
+    }
 
     async cancel(auth: UserType, proposalStreamID: string) { }
 

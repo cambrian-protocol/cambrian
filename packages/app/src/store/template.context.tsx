@@ -1,6 +1,7 @@
+import API, { DocumentModel } from '../services/api/cambrian.api'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
-import { DocumentModel } from '../services/api/cambrian.api'
+import { CompositionModel } from '../models/CompositionModel'
 import Template from '../classes/stages/Template'
 import { TemplateModel } from '../models/TemplateModel'
 import TemplateService from '../services/stages/TemplateService'
@@ -33,6 +34,18 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
         const init = async () => {
             try {
                 setIsLoaded(false)
+
+                const compositionDoc =
+                    await API.doc.readCommit<CompositionModel>(
+                        templateDoc.content.composition.streamID,
+                        templateDoc.content.composition.commitID
+                    )
+
+                if (!compositionDoc)
+                    throw new Error(
+                        'Read Commit Error: Failed to load Composition'
+                    )
+
                 const denominationToken = await TokenAPI.getTokenInfo(
                     templateDoc.content.price.denominationTokenAddress,
                     currentUser?.web3Provider,
@@ -40,6 +53,7 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
                 )
                 const templateService = new TemplateService()
                 const _template = new Template(
+                    compositionDoc,
                     templateDoc,
                     denominationToken,
                     templateService,

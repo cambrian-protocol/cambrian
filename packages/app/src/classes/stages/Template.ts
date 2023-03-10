@@ -1,3 +1,4 @@
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ProposalModel } from './../../models/ProposalModel'
 import { TemplateModel } from '../../models/TemplateModel'
@@ -9,14 +10,16 @@ import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 
 export default class Template {
     private _auth?: UserType | null
+    private _compositionDoc: DocumentModel<CompositionModel>
     private _templateDoc: DocumentModel<TemplateModel>
     private _templateService: TemplateService
     private _denominationToken: TokenModel
 
 
-    constructor(templateDoc: DocumentModel<TemplateModel>, denominationToken: TokenModel, templateService: TemplateService, auth?: UserType | null,) {
+    constructor(compositionDoc: DocumentModel<CompositionModel>, templateDoc: DocumentModel<TemplateModel>, denominationToken: TokenModel, templateService: TemplateService, auth?: UserType | null,) {
         this._auth = auth
         this._templateDoc = templateDoc
+        this._compositionDoc = compositionDoc
         this._templateService = templateService
         this._denominationToken = denominationToken
     }
@@ -27,6 +30,10 @@ export default class Template {
 
     public get doc(): DocumentModel<TemplateModel> {
         return this._templateDoc
+    }
+
+    public get compositionDoc(): DocumentModel<CompositionModel> {
+        return this._compositionDoc
     }
 
     public get denominationToken(): TokenModel {
