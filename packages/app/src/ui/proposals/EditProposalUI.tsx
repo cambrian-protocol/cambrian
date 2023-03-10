@@ -39,49 +39,44 @@ const EditProposalUI = () => {
                             >
                                 <Tab title="Description">
                                     <Box pad={{ top: 'medium' }} gap="medium">
-                                        <Box pad="xsmall">
-                                            <HeaderTextSection
-                                                size="small"
-                                                title={`Provide us with details about the project`}
-                                                paragraph={
-                                                    'Please be sure to include information requested by the Template description.'
-                                                }
-                                            />
-                                            {proposal.templateDoc.content.requirements.trim() !==
-                                                '' && (
-                                                <Box gap="xsmall">
-                                                    <Heading level="4">
-                                                        Requirements
-                                                    </Heading>
-                                                    <Text
-                                                        color="dark-4"
-                                                        style={{
-                                                            whiteSpace:
-                                                                'pre-line',
-                                                        }}
-                                                    >
-                                                        {
-                                                            proposal.templateDoc
-                                                                .content
-                                                                .requirements
-                                                        }
-                                                    </Text>
-                                                </Box>
-                                            )}
-                                        </Box>
-                                        <ProposalDescriptionForm
-                                            proposal={proposal}
+                                        <HeaderTextSection
+                                            size="small"
+                                            title={`Provide us with details about the project`}
+                                            paragraph={
+                                                'Please be sure to include information requested by the Template description.'
+                                            }
                                         />
+                                        {proposal.templateDoc.content.requirements.trim() !==
+                                            '' && (
+                                            <Box gap="xsmall">
+                                                <Heading level="4">
+                                                    Requirements
+                                                </Heading>
+                                                <Text
+                                                    color="dark-4"
+                                                    style={{
+                                                        whiteSpace: 'pre-line',
+                                                    }}
+                                                >
+                                                    {
+                                                        proposal.templateDoc
+                                                            .content
+                                                            .requirements
+                                                    }
+                                                </Text>
+                                            </Box>
+                                        )}
                                     </Box>
+                                    <ProposalDescriptionForm
+                                        proposal={proposal}
+                                    />
                                 </Tab>
                                 <Tab title="Pricing">
                                     <Box pad={{ top: 'medium' }}>
-                                        <Box pad="xsmall">
-                                            <HeaderTextSection
-                                                size="small"
-                                                title="How much are you willing to pay?"
-                                            />
-                                        </Box>
+                                        <HeaderTextSection
+                                            size="small"
+                                            title="How much are you willing to pay?"
+                                        />
                                         <ProposalPricingForm
                                             proposal={proposal}
                                         />
@@ -90,13 +85,11 @@ const EditProposalUI = () => {
                                 {proposal.content.flexInputs.length > 0 && (
                                     <Tab title="Solver Config">
                                         <Box pad={{ top: 'medium' }}>
-                                            <Box pad="xsmall">
-                                                <HeaderTextSection
-                                                    title="Solver Configuration"
-                                                    paragraph="Please input the following information to set up the Solver correctly."
-                                                    size="small"
-                                                />
-                                            </Box>
+                                            <HeaderTextSection
+                                                title="Solver Configuration"
+                                                paragraph="Please input the following information to set up the Solver correctly."
+                                                size="small"
+                                            />
                                             <ProposalFlexInputsForm
                                                 proposal={proposal}
                                             />
