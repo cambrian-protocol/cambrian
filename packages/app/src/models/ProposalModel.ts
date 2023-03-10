@@ -9,9 +9,11 @@ export type ProposalModel = {
         streamID: string
         commitID: string
     }
-    price: { amount: number; tokenAddress: string }
+    price: ProposalPriceModel
     author: string // DID
     isSubmitted: boolean
     isCanceled?: boolean
     version?: number
 }
+
+export type ProposalPriceModel = { amount: number | ''; tokenAddress: string }

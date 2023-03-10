@@ -130,6 +130,10 @@ export default class Proposal {
         return this._collateralToken
     }
 
+    public get denomintaionToken(): TokenModel {
+        return this._template.denominationToken
+    }
+
     public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc?: DocumentModel<TemplateModel>) {
         this._proposalDoc = updatedProposalDoc
         if (updatedTemplateDoc) this._template.refreshDoc(updatedTemplateDoc)

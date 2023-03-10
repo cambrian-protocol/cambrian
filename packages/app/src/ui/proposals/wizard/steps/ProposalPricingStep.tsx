@@ -3,48 +3,47 @@ import {
     ProposalWizardStepsType,
 } from '../ProposalWizard'
 
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
-import { SetStateAction } from 'react'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalPricingStepProps {
-    editProposalContext: EditProposalContextType
     stepperCallback: (step: ProposalWizardStepsType) => void
 }
 
-const ProposalPricingStep = ({
-    editProposalContext,
-    stepperCallback,
-}: ProposalPricingStepProps) => {
-    const { proposal, onSaveProposal } = editProposalContext
+const ProposalPricingStep = ({ stepperCallback }: ProposalPricingStepProps) => {
+    const { proposal } = useProposalContext()
+
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection title="Great! And how much are you willing to pay?" />
-            </Box>
-            <ProposalPricingForm
-                editProposalContext={editProposalContext}
-                onSubmit={async () => {
-                    if (await onSaveProposal()) {
-                        if (proposal && proposal.flexInputs.length > 0) {
+            <HeaderTextSection title="Great! And how much are you willing to pay?" />
+            {proposal ? (
+                <ProposalPricingForm
+                    proposal={proposal}
+                    onSubmit={() => {
+                        if (
+                            proposal &&
+                            proposal.content.flexInputs.length > 0
+                        ) {
                             stepperCallback(PROPOSAL_WIZARD_STEPS.FLEX_INPUTS)
                         } else {
                             stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
                         }
+                    }}
+                    submitLabel="Save & Continue"
+                    onCancel={() =>
+                        stepperCallback(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
                     }
-                }}
-                submitLabel="Save & Continue"
-                onCancel={() =>
-                    stepperCallback(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
-                }
-                cancelLabel="Back"
-            />
+                    cancelLabel="Back"
+                />
+            ) : (
+                <Box height="large" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'small'} width={'100%'} />
+                </Box>
+            )}
         </Box>
     )
 }
