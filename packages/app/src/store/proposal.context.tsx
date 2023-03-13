@@ -1,14 +1,14 @@
-import API, { DocumentModel } from '../services/api/cambrian.api'
 import Proposal, { ProposalConfig } from '../classes/stages/Proposal'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
+import {
+    fetchProposalTokenInfos,
+    fetchStageStack,
+} from '../utils/proposal.utils'
 
-import { CompositionModel } from '../models/CompositionModel'
+import { DocumentModel } from '../services/api/cambrian.api'
 import { ProposalModel } from '../models/ProposalModel'
 import ProposalService from '../services/stages/ProposalService'
-import { TemplateModel } from '../models/TemplateModel'
 import TemplateService from '../services/stages/TemplateService'
-import { TokenAPI } from '../services/api/Token.api'
-import { TokenModel } from '../models/TokenModel'
 import _ from 'lodash'
 import { useCurrentUserContext } from '../hooks/useCurrentUserContext'
 
@@ -32,62 +32,27 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const [proposal, setProposal] = useState<Proposal>()
 
         useEffect(() => {
-            if (isUserLoaded) init()
-        }, [isUserLoaded])
+            if (isUserLoaded) initProposal()
+        }, [isUserLoaded, currentUser])
 
-        const init = async () => {
+        const initProposal = async () => {
             try {
                 setIsLoaded(false)
-                const templateStreamDoc =
-                    await API.doc.readStream<TemplateModel>(
-                        proposalDoc.content.template.streamID
-                    )
-                if (!templateStreamDoc)
-                    throw new Error(
-                        'Read Stream Error: Failed to load Template'
-                    )
+                const stageStack = await fetchStageStack(proposalDoc)
 
-                const latestProposalCommitDoc =
-                    await getLatestProposalCommitDoc(
-                        templateStreamDoc,
-                        proposalDoc.streamID
-                    )
-
-                const templateCommitDoc =
-                    await API.doc.readStream<TemplateModel>(
-                        proposalDoc.content.template.commitID
-                    )
-                if (!templateCommitDoc)
-                    throw new Error(
-                        'Read Commit Error: Failed to load Template'
-                    )
-
-                const compositionDoc =
-                    await API.doc.readCommit<CompositionModel>(
-                        templateStreamDoc.content.composition.streamID,
-                        templateStreamDoc.content.composition.commitID
-                    )
-                if (!compositionDoc)
-                    throw new Error(
-                        'Read Commit Error: Failed to load Composition'
-                    )
+                if (!stageStack)
+                    throw new Error('Error while fetching stage stack')
 
                 const { collateralToken, denominationToken } =
-                    await getProposalTokenInfos(
+                    await fetchProposalTokenInfos(
                         proposalDoc.content.price.tokenAddress,
-                        templateStreamDoc.content.price.denominationTokenAddress
+                        stageStack.templateDocs.commitDoc.content.price
+                            .denominationTokenAddress,
+                        currentUser
                     )
 
                 const proposalConfig: ProposalConfig = {
-                    compositionDoc: compositionDoc,
-                    proposalDocs: {
-                        streamDoc: proposalDoc,
-                        latestCommitDoc: latestProposalCommitDoc,
-                    },
-                    templateDocs: {
-                        streamDoc: templateStreamDoc,
-                        commitDoc: templateCommitDoc,
-                    },
+                    ...stageStack,
                     tokens: {
                         denomination: denominationToken,
                         collateral: collateralToken,
@@ -105,48 +70,6 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                 setIsLoaded(true)
             } catch (e) {
                 console.error(e)
-            }
-        }
-
-        const getLatestProposalCommitDoc = async (
-            templateStreamDoc: DocumentModel<TemplateModel>,
-            proposalStreamID: string
-        ): Promise<DocumentModel<ProposalModel> | undefined> => {
-            const allProposalCommits =
-                templateStreamDoc.content.receivedProposals[proposalStreamID]
-            if (allProposalCommits && allProposalCommits.length > 0) {
-                const latestProposalCommit = allProposalCommits.slice(-1)[0]
-                return await API.doc.readCommit<ProposalModel>(
-                    proposalStreamID,
-                    latestProposalCommit.proposalCommitID
-                )
-            }
-        }
-
-        const getProposalTokenInfos = async (
-            collateralTokenAddress: string,
-            denominationTokenAddress: string
-        ): Promise<{
-            collateralToken: TokenModel
-            denominationToken: TokenModel
-        }> => {
-            const collateralToken = await TokenAPI.getTokenInfo(
-                collateralTokenAddress,
-                currentUser?.web3Provider,
-                currentUser?.chainId
-            )
-            const denominationToken =
-                denominationTokenAddress === collateralTokenAddress
-                    ? collateralToken
-                    : await TokenAPI.getTokenInfo(
-                          denominationTokenAddress,
-                          currentUser?.web3Provider,
-                          currentUser?.chainId
-                      )
-
-            return {
-                collateralToken: collateralToken,
-                denominationToken: denominationToken,
             }
         }
 

@@ -85,7 +85,15 @@ requestChange()
 
 */
 
-export interface ProposalConfig {
+export interface ProposalConfig extends IStageStack {
+    tokens: {
+        collateral: TokenModel
+        denomination: TokenModel
+    }
+    onChainProposal?: any
+}
+
+export interface IStageStack {
     proposalDocs: {
         streamDoc: DocumentModel<ProposalModel>,
         latestCommitDoc?: DocumentModel<ProposalModel>
@@ -95,12 +103,8 @@ export interface ProposalConfig {
         commitDoc: DocumentModel<TemplateModel>
     }
     compositionDoc: DocumentModel<CompositionModel>,
-    tokens: {
-        collateral: TokenModel
-        denomination: TokenModel
-    }
-    onChainProposal?: any
 }
+
 export default class Proposal {
     private _auth?: UserType | null
 
