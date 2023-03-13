@@ -3,69 +3,59 @@ import { useEffect, useState } from 'react'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
-import Messenger from '@cambrian/app/components/messenger/Messenger'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
-import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal/ProposalActionbar'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ProposalPreview from './ProposalPreview'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
+import { UserType } from '@cambrian/app/store/UserContext'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 const ProposalUI = () => {
-    const { currentUser } = useCurrentUserContext()
+    const { currentUser, isUserLoaded } = useCurrentUserContext()
     const { proposal } = useProposalContext()
-    const [showMessenger, setShowMessenger] = useState(false)
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        if (
-            currentUser &&
-            proposal &&
-            proposal.status !== ProposalStatus.Draft
-        ) {
-            setShowMessenger(
-                currentUser.did === proposal.content.author ||
-                    currentUser.did === proposal.template.content.author
-            )
-        }
-    }, [proposal, currentUser])
+        if (proposal && isUserLoaded) init(proposal, currentUser)
+    }, [proposal, isUserLoaded, currentUser])
 
-    /* TODO 
-    View restrictions when on DRAFT
-    Display latest proposal commit when on MODIFIED or CHANGE_REQUESTED
-    receive Proposal as Templater
-    receiveChangeRequest as Proposer
-    */
+    const init = async (_proposal: Proposal, user: UserType | null) => {
+        if (
+            _proposal.status === ProposalStatus.Submitted &&
+            currentUser?.did === _proposal.template.content.author
+        ) {
+            await _proposal.receive()
+        }
+
+        if (
+            _proposal.status === ProposalStatus.ChangeRequested &&
+            _proposal.content.isSubmitted &&
+            _proposal.content.author === currentUser?.did
+        ) {
+            await _proposal.receiveChangeRequest()
+        }
+
+        setIsInitialized(true)
+    }
 
     return (
         <>
-            {proposal ? (
+            {proposal && isInitialized ? (
                 <InteractionLayout
-                    contextTitle={proposal.content.title}
-                    actionBar={
-                        <ProposalActionbar
-                            proposedPrice={{
-                                amount: proposal.content.price.amount || '',
-                                token: proposal.collateralToken,
-                            }}
-                            messenger={
-                                showMessenger ? (
-                                    <Messenger
-                                        chatID={proposal.doc.streamID}
-                                        currentUser={currentUser!}
-                                        participantDIDs={[
-                                            proposal.content.author,
-                                            proposal.template.content.author,
-                                        ]}
-                                    />
-                                ) : undefined
-                            }
-                        />
+                    contextTitle={
+                        proposal.latestCommitDoc?.content.title ||
+                        proposal.content.title
                     }
+                    //actionBar={<ProposalActionbar />}
                 >
                     <Box height={{ min: '80vh' }}>
                         <ProposalPreview
+                            proposalDisplayData={
+                                proposal.latestCommitDoc?.content ||
+                                proposal.doc.content
+                            }
                             proposal={proposal}
-                            showConfiguration
                         />
                     </Box>
                 </InteractionLayout>

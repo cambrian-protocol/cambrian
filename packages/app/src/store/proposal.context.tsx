@@ -1,9 +1,5 @@
 import Proposal, { ProposalConfig } from '../classes/stages/Proposal'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
-import {
-    fetchProposalTokenInfos,
-    fetchStageStack,
-} from '../utils/proposal.utils'
 
 import { DocumentModel } from '../services/api/cambrian.api'
 import { ProposalModel } from '../models/ProposalModel'
@@ -38,13 +34,18 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const initProposal = async () => {
             try {
                 setIsLoaded(false)
-                const stageStack = await fetchStageStack(proposalDoc)
+
+                const proposalService = new ProposalService()
+
+                const stageStack = await proposalService.fetchStageStack(
+                    proposalDoc
+                )
 
                 if (!stageStack)
                     throw new Error('Error while fetching stage stack')
 
                 const { collateralToken, denominationToken } =
-                    await fetchProposalTokenInfos(
+                    await proposalService.fetchProposalTokenInfos(
                         proposalDoc.content.price.tokenAddress,
                         stageStack.templateDocs.commitDoc.content.price
                             .denominationTokenAddress,
@@ -61,7 +62,7 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
 
                 const _proposal = new Proposal(
                     proposalConfig,
-                    new ProposalService(),
+                    proposalService,
                     new TemplateService(),
                     currentUser
                 )

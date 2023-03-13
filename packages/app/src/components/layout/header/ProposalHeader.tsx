@@ -6,6 +6,7 @@ import BaseHeader from './BaseHeader'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DropButtonListItem from '../../list/DropButtonListItem'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
 import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
@@ -15,20 +16,21 @@ import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputH
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {
+    proposalDisplayData: ProposalModel
     proposal: Proposal
-    showConfiguration?: boolean
     showProposalLink?: boolean
 }
 
 const ProposalHeader = ({
+    proposalDisplayData,
     proposal,
-    showConfiguration,
     showProposalLink,
 }: ProposalHeaderProps) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
     const [headerItems, setHeaderItems] = useState<ResponsiveButtonProps[]>([])
+    const [mergedComposition, setMergedComposition] =
+        useState<CompositionModel>()
     const [proposalAuthor] = useCambrianProfile(proposal.content.author)
-    const [composition, setComposition] = useState<CompositionModel>()
     const [showSolverConfigModal, setShowSolverConfigModal] = useState<number>() // Solver index
 
     useEffect(() => {
@@ -47,54 +49,48 @@ const ProposalHeader = ({
             })
         }
 
-        if (showConfiguration) {
-            const mergedComposition = mergeFlexIntoComposition(
-                mergeFlexIntoComposition(
-                    proposal.compositionDoc.content,
-                    proposal.template.content.flexInputs
-                ),
-                proposal.content.flexInputs
-            )
+        const composition = mergeFlexIntoComposition(
+            mergeFlexIntoComposition(
+                proposal.compositionDoc.content,
+                proposal.template.content.flexInputs
+            ),
+            proposal.content.flexInputs
+        )
+        setMergedComposition(composition)
 
-            setComposition(mergedComposition)
-            items.push({
-                label: 'Solver Configurations',
-                dropContent: (
-                    <Box>
-                        {mergedComposition?.solvers.map((solver, idx) => (
-                            <DropButtonListItem
-                                key={idx}
-                                label={
-                                    <Box width="medium">
-                                        <Text>{solver.solverTag.title}</Text>
-                                        <Text
-                                            size="xsmall"
-                                            color="dark-4"
-                                            truncate
-                                        >
-                                            {solver.solverTag.description}
-                                        </Text>
-                                    </Box>
-                                }
-                                icon={<FilmScript />}
-                                onClick={() => setShowSolverConfigModal(idx)}
-                            />
-                        ))}
-                    </Box>
-                ),
-                dropAlign: {
-                    top: 'bottom',
-                    right: 'right',
+        items.push({
+            label: 'Solver Configurations',
+            dropContent: (
+                <Box>
+                    {composition.solvers.map((solver, idx) => (
+                        <DropButtonListItem
+                            key={idx}
+                            label={
+                                <Box width="medium">
+                                    <Text>{solver.solverTag.title}</Text>
+                                    <Text size="xsmall" color="dark-4" truncate>
+                                        {solver.solverTag.description}
+                                    </Text>
+                                </Box>
+                            }
+                            icon={<FilmScript />}
+                            onClick={() => setShowSolverConfigModal(idx)}
+                        />
+                    ))}
+                </Box>
+            ),
+            dropAlign: {
+                top: 'bottom',
+                right: 'right',
+            },
+            dropProps: {
+                round: {
+                    corner: 'bottom',
+                    size: 'xsmall',
                 },
-                dropProps: {
-                    round: {
-                        corner: 'bottom',
-                        size: 'xsmall',
-                    },
-                },
-                icon: <ListNumbers color={cpTheme.global.colors['dark-4']} />,
-            })
-        }
+            },
+            icon: <ListNumbers color={cpTheme.global.colors['dark-4']} />,
+        })
         setHeaderItems(items)
     }, [])
 
@@ -104,7 +100,7 @@ const ProposalHeader = ({
     return (
         <>
             <BaseHeader
-                title={proposal.content.title}
+                title={proposalDisplayData.title}
                 metaTitle="Proposal"
                 items={headerItems}
                 authorProfileDoc={proposalAuthor}
@@ -116,13 +112,15 @@ const ProposalHeader = ({
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
-            {showSolverConfigModal !== undefined && composition && (
+            {showSolverConfigModal !== undefined && mergedComposition && (
                 <SolverInfoModal
                     onClose={() => setShowSolverConfigModal(undefined)}
-                    composition={composition}
-                    composerSolver={composition.solvers[showSolverConfigModal]}
+                    composition={proposal.compositionDoc.content}
+                    composerSolver={
+                        mergedComposition.solvers[showSolverConfigModal]
+                    }
                     price={{
-                        amount: proposal.content.price.amount,
+                        amount: proposalDisplayData.price.amount,
                         token: proposal.collateralToken,
                     }}
                 />

@@ -5,18 +5,21 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import PriceInfo from '@cambrian/app/components/info/PriceInfo'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalPreviewProps {
     proposal: Proposal
-    showConfiguration?: boolean
+    proposalDisplayData: ProposalModel
+    showComposition?: boolean
     showProposalLink?: boolean
 }
 
 const ProposalPreview = ({
     proposal,
-    showConfiguration,
+    proposalDisplayData,
+    showComposition,
     showProposalLink,
 }: ProposalPreviewProps) => {
     const [proposerProfile] = useCambrianProfile(proposal.content.author)
@@ -25,13 +28,13 @@ const ProposalPreview = ({
         <Box gap="medium">
             <ProposalHeader
                 proposal={proposal}
-                showConfiguration={showConfiguration}
+                proposalDisplayData={proposalDisplayData}
                 showProposalLink={showProposalLink}
             />
             <Box gap="small">
                 <Heading level="3">Project details</Heading>
                 <Text style={{ whiteSpace: 'pre-line' }}>
-                    {proposal.content.description}
+                    {proposalDisplayData.description}
                 </Text>
             </Box>
             <PlainSectionDivider />
@@ -43,8 +46,8 @@ const ProposalPreview = ({
                         ? 'Price'
                         : 'Proposed Price'
                 }
-                amount={proposal.content.price.amount}
-                token={proposal.collateralToken}
+                amount={proposalDisplayData.price.amount}
+                token={proposal.collateralToken} // Todo check changed token
             />
             <PlainSectionDivider />
             {proposerProfile && (

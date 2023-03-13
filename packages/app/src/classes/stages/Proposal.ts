@@ -8,6 +8,7 @@ import { TemplateModel } from '../../models/TemplateModel'
 import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { TokenModel } from '@cambrian/app/models/TokenModel'
 import { UserType } from '@cambrian/app/store/UserContext'
+import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 import { isStatusValid } from '@cambrian/app/utils/proposal.utils'
 
@@ -208,12 +209,6 @@ export default class Proposal {
         const unsubmittedUpdatedProposal = { ...updatedProposal, isSubmitted: false }
 
         try {
-            if (this._proposalStreamDoc.content.price.tokenAddress !== updatedProposal.price.tokenAddress) {
-                const newToken = await this._proposalService.fetchToken(updatedProposal.price.tokenAddress, this._auth)
-                if (!newToken) throw new Error('Failed to fetch collateralToken')
-                this._collateralToken = newToken
-            }
-
             await this._proposalService.update(this._auth, this._proposalStreamDoc, unsubmittedUpdatedProposal)
         } catch (e) {
             console.error(e)
@@ -251,6 +246,12 @@ export default class Proposal {
         try {
             await this._proposalService.update(this._auth, this._proposalStreamDoc, updatedProposal)
             const res = await this._proposalService.submit(this._auth, this._proposalStreamDoc.streamID)
+
+            if (this._collateralToken.address !== updatedProposal.price.tokenAddress) {
+                const newToken = await this._proposalService.fetchToken(updatedProposal.price.tokenAddress, this._auth)
+                if (!newToken) throw new Error('Failed to fetch collateralToken')
+                this._collateralToken = newToken
+            }
 
             if (!res || res.status !== 200) {
                 throw Error('Failed to submit Proposal.')
@@ -305,6 +306,7 @@ export default class Proposal {
 
         try {
             await this._template.receive(this._proposalStreamDoc)
+            this._latestProposalCommitDoc = _.cloneDeep(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return

@@ -33,7 +33,7 @@ const ProposalPricingForm = ({
         proposal.content.price.tokenAddress
     )
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const templatePrice = proposal.templateDoc.content.price
+    const templatePrice = proposal.template.content.price
     const isFlexibleCollateralToken =
         templatePrice.allowAnyPaymentToken ||
         templatePrice.preferredTokens.length > 0

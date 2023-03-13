@@ -27,8 +27,8 @@ const EditProposalUI = () => {
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box gap="medium">
                             <ProposalHeader
+                                proposalDisplayData={proposal.doc.content}
                                 proposal={proposal}
-                                showConfiguration
                             />
                             <Tabs
                                 justify="start"
@@ -46,7 +46,7 @@ const EditProposalUI = () => {
                                                 'Please be sure to include information requested by the Template description.'
                                             }
                                         />
-                                        {proposal.templateDoc.content.requirements.trim() !==
+                                        {proposal.templateCommitDoc.content.requirements.trim() !==
                                             '' && (
                                             <Box gap="xsmall">
                                                 <Heading level="4">
@@ -59,7 +59,8 @@ const EditProposalUI = () => {
                                                     }}
                                                 >
                                                     {
-                                                        proposal.templateDoc
+                                                        proposal
+                                                            .templateCommitDoc
                                                             .content
                                                             .requirements
                                                     }
@@ -107,7 +108,7 @@ const EditProposalUI = () => {
                                 currentUser={currentUser}
                                 chatID={proposal.doc.streamID}
                                 participantDIDs={[
-                                    proposal.templateDoc.content.author,
+                                    proposal.template.content.author,
                                     proposal.content.author,
                                 ]}
                             />
