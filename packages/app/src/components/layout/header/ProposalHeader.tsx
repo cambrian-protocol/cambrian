@@ -6,7 +6,6 @@ import BaseHeader from './BaseHeader'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DropButtonListItem from '../../list/DropButtonListItem'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalStatusBadge from '../../badges/ProposalStatusBadge'
 import { ResponsiveButtonProps } from '../../buttons/ResponsiveButton'
 import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
@@ -16,13 +15,11 @@ import { mergeFlexIntoComposition } from '@cambrian/app/utils/helpers/flexInputH
 import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 
 interface ProposalHeaderProps {
-    proposalDisplayData: ProposalModel
     proposal: Proposal
     showProposalLink?: boolean
 }
 
 const ProposalHeader = ({
-    proposalDisplayData,
     proposal,
     showProposalLink,
 }: ProposalHeaderProps) => {
@@ -100,7 +97,7 @@ const ProposalHeader = ({
     return (
         <>
             <BaseHeader
-                title={proposalDisplayData.title}
+                title={proposal.content.title}
                 metaTitle="Proposal"
                 items={headerItems}
                 authorProfileDoc={proposalAuthor}
@@ -109,6 +106,7 @@ const ProposalHeader = ({
             {showTemplateInfoModal && (
                 <TemplateInfoModal
                     template={proposal.template}
+                    templateDisplayContent={proposal.templateCommitDoc.content}
                     onClose={toggleShowTemplateInfoModal}
                 />
             )}
@@ -120,7 +118,7 @@ const ProposalHeader = ({
                         mergedComposition.solvers[showSolverConfigModal]
                     }
                     price={{
-                        amount: proposalDisplayData.price.amount,
+                        amount: proposal.content.price.amount,
                         token: proposal.collateralToken,
                     }}
                 />

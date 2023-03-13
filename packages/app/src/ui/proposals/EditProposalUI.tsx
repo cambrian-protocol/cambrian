@@ -26,10 +26,7 @@ const EditProposalUI = () => {
                 <Stack anchor="bottom-right">
                     <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
                         <Box gap="medium">
-                            <ProposalHeader
-                                proposalDisplayData={proposal.doc.content}
-                                proposal={proposal}
-                            />
+                            <ProposalHeader proposal={proposal} />
                             <Tabs
                                 justify="start"
                                 activeIndex={activeIndex}

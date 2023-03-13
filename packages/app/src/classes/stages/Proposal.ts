@@ -144,7 +144,11 @@ export default class Proposal {
     }
 
     public get content(): ProposalModel {
-        return this._proposalStreamDoc.content
+        if (this._status === ProposalStatus.Modified || this._status === ProposalStatus.Submitted) {
+            return this._proposalStreamDoc.content
+        }
+
+        return this._latestProposalCommitDoc?.content || this._proposalStreamDoc.content
     }
 
     public get doc(): DocumentModel<ProposalModel> {

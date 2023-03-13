@@ -7,7 +7,6 @@ import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionD
 import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ProposalPreview from './ProposalPreview'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { UserType } from '@cambrian/app/store/UserContext'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
@@ -17,10 +16,10 @@ const ProposalUI = () => {
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        if (proposal && isUserLoaded) init(proposal, currentUser)
+        if (proposal && isUserLoaded) init(proposal)
     }, [proposal, isUserLoaded, currentUser])
 
-    const init = async (_proposal: Proposal, user: UserType | null) => {
+    const init = async (_proposal: Proposal) => {
         if (
             _proposal.status === ProposalStatus.Submitted &&
             currentUser?.did === _proposal.template.content.author
@@ -43,20 +42,11 @@ const ProposalUI = () => {
         <>
             {proposal && isInitialized ? (
                 <InteractionLayout
-                    contextTitle={
-                        proposal.latestCommitDoc?.content.title ||
-                        proposal.content.title
-                    }
+                    contextTitle={proposal.content.title}
                     //actionBar={<ProposalActionbar />}
                 >
                     <Box height={{ min: '80vh' }}>
-                        <ProposalPreview
-                            proposalDisplayData={
-                                proposal.latestCommitDoc?.content ||
-                                proposal.doc.content
-                            }
-                            proposal={proposal}
-                        />
+                        <ProposalPreview proposal={proposal} />
                     </Box>
                 </InteractionLayout>
             ) : (
