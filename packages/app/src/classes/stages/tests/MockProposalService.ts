@@ -55,6 +55,16 @@ export default class MockProposalService {
         proposalStreamID: string
     ): Promise<DocumentModel<ProposalModel> | undefined> { return undefined }
 
+    async fetchToken(tokenAddress: string, auth?: UserType,) {
+        return {
+            chainId: 31337,
+            address: "0xc778417e063141139fce010982780140aa0cd5ab",
+            symbol: '??',
+            decimals: 18,
+            name: '??'
+        }
+    }
+
     async subscribe() { }
 
     async unsubscribe() { }
