@@ -234,14 +234,14 @@ export default class Proposal {
             return
         }
 
-        const submittedUpdatedProposal = {
+        const updatedProposal = {
             ...this._proposalStreamDoc.content,
             isSubmitted: true,
             version: this._proposalStreamDoc.content.version ? ++this._proposalStreamDoc.content.version : 1
         }
 
         try {
-            await this._proposalService.update(this._auth, this._proposalStreamDoc, submittedUpdatedProposal)
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, updatedProposal)
             const res = await this._proposalService.submit(this._auth, this._proposalStreamDoc.streamID)
 
             if (!res || res.status !== 200) {
@@ -253,7 +253,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.Submitted
-        this._proposalStreamDoc.content = submittedUpdatedProposal
+        this._proposalStreamDoc.content = updatedProposal
     }
 
     public async cancel() {
@@ -270,13 +270,12 @@ export default class Proposal {
             return
         }
 
-        const canceledProposal = {
+        const updatedProposal = {
             ...this._proposalStreamDoc.content,
             isCanceled: true,
         }
-
         try {
-            await this._proposalService.update(this._auth, this._proposalStreamDoc, canceledProposal)
+            await this._proposalService.update(this._auth, this._proposalStreamDoc, updatedProposal)
             await this._proposalService.cancel(this._auth, this._proposalStreamDoc.streamID)
         } catch (e) {
             console.error(e)
@@ -284,7 +283,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.Canceled
-        this._proposalStreamDoc.content = canceledProposal
+        this._proposalStreamDoc.content = updatedProposal
     }
 
     public async receive() {
