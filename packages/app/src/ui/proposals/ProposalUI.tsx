@@ -23,7 +23,7 @@ const ProposalUI = () => {
             proposal.status !== ProposalStatus.Draft
         ) {
             setShowMessenger(
-                currentUser.did === proposal.doc.content.author ||
+                currentUser.did === proposal.content.author ||
                     currentUser.did === proposal.template.content.author
             )
         }

@@ -127,7 +127,7 @@ describe('Proposal ', () => {
             proposalAuthorUser
         )
         expect(proposal.status).toEqual(ProposalStatus.Draft)
-        expect(proposal.doc.content).toEqual(dummyProposalDoc.content)
+        expect(proposal.content).toEqual(dummyProposalDoc.content)
     })
 
     it('submits a Proposal', async () => {

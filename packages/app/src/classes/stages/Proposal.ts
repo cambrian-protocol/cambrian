@@ -142,6 +142,10 @@ export default class Proposal {
         this._templateCommitDoc = templateDocs.commitDoc
     }
 
+    public get content(): ProposalModel {
+        return this._proposalStreamDoc.content
+    }
+
     public get doc(): DocumentModel<ProposalModel> {
         return this._proposalStreamDoc
     }
