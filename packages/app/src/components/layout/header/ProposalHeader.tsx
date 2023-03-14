@@ -21,7 +21,7 @@ const ProposalHeader = ({ proposal }: ProposalHeaderProps) => {
             authorProfileDoc={proposalAuthor}
             items={[
                 <TemplateInfoButton
-                    denominationToken={proposal.denomintaionToken}
+                    denominationToken={proposal.denominationToken}
                     templateDoc={proposal.templateCommitDoc}
                 />,
                 <SolverConfigInfoButton

@@ -83,7 +83,7 @@ const ProposalPricingForm = ({
                                 ? ' an equivalent of '
                                 : ' '}
                             {templatePrice.amount}{' '}
-                            {proposal.denomintaionToken.symbol}
+                            {proposal.denominationToken.symbol}
                         </Text>
                         {isFlexibleCollateralToken ? (
                             <Text color="dark-4" size="small">

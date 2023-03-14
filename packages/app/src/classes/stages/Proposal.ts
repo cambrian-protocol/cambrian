@@ -179,7 +179,7 @@ export default class Proposal {
         return this._collateralToken
     }
 
-    public get denomintaionToken(): TokenModel {
+    public get denominationToken(): TokenModel {
         return this._template.denominationToken
     }
 
