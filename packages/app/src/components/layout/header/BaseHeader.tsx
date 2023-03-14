@@ -1,7 +1,4 @@
 import { Box, Heading, Text } from 'grommet'
-import ResponsiveButton, {
-    ResponsiveButtonProps,
-} from '../../buttons/ResponsiveButton'
 
 import CambrianProfileInfo from '../../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
@@ -12,7 +9,7 @@ interface BaseHeaderProps {
     title: string
     metaTitle: string
     statusBadge?: JSX.Element
-    items?: ResponsiveButtonProps[]
+    items?: JSX.Element[]
     authorProfileDoc?: TileDocument<CambrianProfileType>
 }
 
@@ -60,11 +57,7 @@ const BaseHeader = ({
                 <Box direction="row" gap="small" align="center">
                     <IconContext.Provider value={{ size: '18' }}>
                         {items?.map((item, idx) => (
-                            <ResponsiveButton
-                                key={idx}
-                                {...item}
-                                color="dark-4"
-                            />
+                            <Box key={idx}>{item}</Box>
                         ))}
                     </IconContext.Provider>
                 </Box>

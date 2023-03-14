@@ -3,7 +3,8 @@ import { Box } from 'grommet'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateActionbar from '@cambrian/app/components/bars/actionbars/TemplateActionbar'
-import TemplatePreview from './TemplatePreview'
+import TemplateBody from './TemplateBody'
+import TemplateHeader from '@cambrian/app/components/layout/header/TemplateHeader'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 const TemplateUI = () => {
@@ -17,9 +18,10 @@ const TemplateUI = () => {
                     actionBar={<TemplateActionbar template={template} />}
                 >
                     <Box height={{ min: '80vh' }}>
-                        <TemplatePreview
-                            template={template}
-                            showConfiguration
+                        <TemplateHeader template={template} />
+                        <TemplateBody
+                            templateContent={template.content}
+                            denominationToken={template.denominationToken}
                         />
                     </Box>
                 </InteractionLayout>
