@@ -17,7 +17,7 @@ const TemplateUI = () => {
                     contextTitle={template.content.title}
                     actionBar={<TemplateActionbar template={template} />}
                 >
-                    <Box height={{ min: '80vh' }}>
+                    <Box height={{ min: '80vh' }} gap="medium">
                         <TemplateHeader template={template} />
                         <TemplateBody
                             templateContent={template.content}

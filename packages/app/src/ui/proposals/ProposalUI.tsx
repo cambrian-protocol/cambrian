@@ -46,7 +46,7 @@ const ProposalUI = () => {
                     contextTitle={proposal.content.title}
                     //actionBar={<ProposalActionbar />}
                 >
-                    <Box height={{ min: '80vh' }}>
+                    <Box height={{ min: '80vh' }} gap="medium">
                         <ProposalHeader proposal={proposal} />
                         <ProposalBody
                             proposalContent={proposal.content}
