@@ -26,6 +26,7 @@ const ProposalInfoButton = ({
             <ResponsiveButton
                 label="Proposal Details"
                 icon={<ClipboardText color={cpTheme.global.colors['dark-4']} />}
+                onClick={toggleShowProposalInfoModal}
             />
             {showProposalInfoModal && (
                 <ProposalInfoModal

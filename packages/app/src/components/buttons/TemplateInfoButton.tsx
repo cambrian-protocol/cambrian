@@ -18,19 +18,14 @@ const TemplateInfoButton = ({
     templateDoc,
 }: ITemplateInfoButton) => {
     const [showTemplateInfoModal, setShowTemplateInfoModal] = useState(false)
-
     const toggleShowTemplateInfoModal = () =>
         setShowTemplateInfoModal(!showTemplateInfoModal)
     return (
         <>
             <ResponsiveButton
                 label="Template Details"
-                icon={
-                    <File
-                        color={cpTheme.global.colors['dark-4']}
-                        onClick={toggleShowTemplateInfoModal}
-                    />
-                }
+                icon={<File color={cpTheme.global.colors['dark-4']} />}
+                onClick={toggleShowTemplateInfoModal}
             />
             {showTemplateInfoModal && (
                 <TemplateInfoModal
