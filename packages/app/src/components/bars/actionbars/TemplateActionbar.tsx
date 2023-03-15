@@ -36,7 +36,10 @@ const TemplateActionbar = ({ template }: TemplateActionbarProps) => {
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
             const proposalService = new ProposalService()
-            const res = await proposalService.create(currentUser, template.doc)
+            const res = await proposalService.createStage(
+                currentUser,
+                template.doc
+            )
 
             if (!res) throw Error('Failed to create Proposal')
 

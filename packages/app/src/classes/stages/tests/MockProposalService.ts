@@ -1,13 +1,15 @@
+import Proposal, { IStageStack } from "../Proposal";
+
 import { DocumentModel } from "../../../services/api/cambrian.api";
-import { IStageStack } from "../Proposal";
 import { ProposalModel } from "@cambrian/app/models/ProposalModel";
+import { SolverModel } from "@cambrian/app/models/SolverModel";
 import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { TokenModel } from "@cambrian/app/models/TokenModel";
 import { UserType } from "@cambrian/app/store/UserContext";
 
 export default class MockProposalService {
 
-    async create(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
+    async createStage(auth: UserType, templateDoc: DocumentModel<TemplateModel>) {
         return { streamID: 'mock-streamID', title: "Proposal" }
     }
 
@@ -46,6 +48,8 @@ export default class MockProposalService {
         }
     }
 
+    async create(auth: UserType, proposal: Proposal) { }
+
     async fetchStageStack(
         _proposalDoc: DocumentModel<ProposalModel>
     ): Promise<IStageStack | undefined> { return undefined }
@@ -54,6 +58,29 @@ export default class MockProposalService {
         templateStreamDoc: DocumentModel<TemplateModel>,
         proposalStreamID: string
     ): Promise<DocumentModel<ProposalModel> | undefined> { return undefined }
+
+    async fetchSolutionBase(auth: UserType, proposalCommitID: string, templateCommitID: string) {
+        return undefined
+    }
+
+    async createSolutionBase(
+        auth: UserType,
+        proposal: Proposal,
+    ) {
+        return true
+    }
+
+    async saveSolverConfig(
+        parsedSolvers: SolverModel[],
+        proposalCommitId: string,
+        auth: UserType
+    ) {
+        return {
+            streamID: '',
+            commitID: '',
+            content: { solverConfigs: [] }
+        }
+    }
 
     async fetchToken(tokenAddress: string, auth?: UserType,) {
         return {

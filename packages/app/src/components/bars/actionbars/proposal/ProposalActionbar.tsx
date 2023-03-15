@@ -23,20 +23,15 @@ const ProposalActionbar = () => {
                 )
             case ProposalStatus.ChangeRequested:
                 return <ProposalEditActionbar proposal={proposal} />
-                /*  case ProposalStatus.Approved:
+            case ProposalStatus.Approved:
                 return (
-                    <>
-                        {currentUser && (
-                            <ProposalApprovedActionbar
-                                messenger={messenger}
-                                currentUser={currentUser}
-                                setIsApproving={setIsApproving}
-                                isApproving={isApproving}
-                            />
-                        )}
-                    </>
+                    <ProposalApprovedActionbar
+                        proposal={proposal}
+                        setIsApproving={setIsApproving}
+                        isApproving={isApproving}
+                    />
                 )
-            case ProposalStatus.Funding:
+                /*    case ProposalStatus.Funding:
                 return (
                     <>
                         {currentUser && proposalContract && (

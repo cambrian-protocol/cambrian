@@ -458,4 +458,55 @@ export default class Proposal {
         return proposalDoc.content.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
     }
 
+    public async create() {
+        if (!this._auth) {
+            return
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Approved])) {
+            return
+        }
+
+        try {
+            await this._proposalService.create(this._auth, this)
+        } catch (e) {
+            console.error(e)
+            return
+        }
+    }
+
+    public async createSolutionBase() {
+        if (!this._auth) {
+            return
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Approved])) {
+            return
+        }
+
+        try {
+            await this._proposalService.createSolutionBase(this._auth, this)
+        } catch (e) {
+            console.error(e)
+            return
+        }
+    }
+
+    public async hasSolution(): Promise<boolean> {
+        if (!this._auth || !this._latestProposalCommitDoc) {
+            return false
+        }
+        try {
+            const solution = await this._proposalService.fetchSolutionBase(
+                this._auth,
+                this._latestProposalCommitDoc.commitID,
+                this.templateCommitDoc.commitID
+            )
+            return Boolean(solution)
+        } catch (error) {
+            return false
+        }
+    }
+
+
 }

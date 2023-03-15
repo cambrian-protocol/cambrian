@@ -1,56 +1,46 @@
-import {
-    createSolutionBase,
-    deployProposal,
-    getSolutionSafeBaseId,
-} from '@cambrian/app/utils/helpers/proposalHelper'
 import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
 import BaseActionbar from '../BaseActionbar'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
-import IPFSSolutionsHub from '@cambrian/app/hubs/IPFSSolutionsHub'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { SolutionModel } from '@cambrian/app/models/SolutionModel'
-import { UserType } from '@cambrian/app/store/UserContext'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { Users } from 'phosphor-react'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { ethers } from 'ethers'
-import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalApprovedActionbarProps {
-    currentUser: UserType
+    proposal: Proposal
     isApproving: boolean
     setIsApproving: React.Dispatch<React.SetStateAction<boolean>>
-    messenger?: JSX.Element
 }
 
 const ProposalApprovedActionbar = ({
-    currentUser,
+    proposal,
     isApproving,
     setIsApproving,
-    messenger,
 }: ProposalApprovedActionbarProps) => {
-    const solutionsHub = new IPFSSolutionsHub(
-        currentUser.signer,
-        currentUser.chainId
-    )
-    const { stageStack } = useProposalContext()
     const [isInTransaction, setIsInTransaction] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
-    const [solutionBase, setSolutionBase] = useState<SolutionModel>()
     const [isLoaded, setIsLoaded] = useState(false)
+    const [hasSolution, setHasSolution] = useState(false)
 
     useEffect(() => {
-        fetchSolution()
-    }, [isApproving, stageStack])
+        init()
+    }, [isApproving])
+
+    const init = async () => {
+        setIsLoaded(false)
+        const _hasSolution = await proposal.hasSolution()
+        setHasSolution(_hasSolution)
+        setIsLoaded(true)
+    }
 
     const onDeployProposal = async () => {
         setIsInTransaction(true)
         try {
-            if (stageStack) {
-                await deployProposal(currentUser, stageStack)
-            }
+            await proposal.create()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsInTransaction(false)
@@ -60,36 +50,29 @@ const ProposalApprovedActionbar = ({
     const onCreateSolutionBase = async () => {
         setIsApproving(true)
         try {
-            if (stageStack) {
-                await createSolutionBase(currentUser, stageStack)
-                await fetchSolution()
-            }
+            await proposal.createSolutionBase()
+            await init()
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
             setIsApproving(false)
         }
     }
 
-    const fetchSolution = async () => {
-        if (stageStack) {
-            const baseId = getSolutionSafeBaseId(
-                stageStack.proposalCommitID,
-                stageStack.proposal.template.commitID
-            )
-            const solution = await solutionsHub.contract.bases(baseId)
-            if (solution?.id !== ethers.constants.HashZero) {
-                setSolutionBase(solution)
-            }
-            setIsLoaded(true)
-        }
-    }
-
     return (
         <>
             {isLoaded ? (
-                solutionBase ? (
+                hasSolution ? (
                     <BaseActionbar
-                        messenger={messenger}
+                        messenger={
+                            <Messenger
+                                chatID={proposal.doc.streamID}
+                                currentUser={proposal.auth!}
+                                participantDIDs={[
+                                    proposal.content.author,
+                                    proposal.template.content.author,
+                                ]}
+                            />
+                        }
                         primaryAction={
                             <LoaderButton
                                 isLoading={isInTransaction}
@@ -118,7 +101,16 @@ const ProposalApprovedActionbar = ({
                     />
                 ) : (
                     <BaseActionbar
-                        messenger={messenger}
+                        messenger={
+                            <Messenger
+                                chatID={proposal.doc.streamID}
+                                currentUser={proposal.auth!}
+                                participantDIDs={[
+                                    proposal.content.author,
+                                    proposal.template.content.author,
+                                ]}
+                            />
+                        }
                         primaryAction={
                             <LoaderButton
                                 isLoading={isApproving}
