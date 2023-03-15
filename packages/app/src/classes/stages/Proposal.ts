@@ -192,6 +192,18 @@ export default class Proposal {
             )
     }
 
+    public get isProposalAuthor(): boolean {
+        return this._auth?.did === this._proposalStreamDoc.content.author
+    }
+
+    public get isTemplateAuthor(): boolean {
+        return this._auth?.did === this.template.content.author
+    }
+
+    public get auth(): UserType | null | undefined {
+        return this._auth
+    }
+
     public refreshDocs(updatedProposalStreamDoc: DocumentModel<ProposalModel>, updatedTemplateStreamDoc?: DocumentModel<TemplateModel>) {
         this._proposalStreamDoc = updatedProposalStreamDoc
         if (updatedTemplateStreamDoc) this._template.refreshDoc(updatedTemplateStreamDoc)

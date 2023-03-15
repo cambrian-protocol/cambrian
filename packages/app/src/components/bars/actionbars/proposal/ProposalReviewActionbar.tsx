@@ -2,47 +2,32 @@ import BaseActionbar, { ActionbarInfoType } from '../BaseActionbar'
 import { Box, Text } from 'grommet'
 import { Chats, PencilLine, User } from 'phosphor-react'
 import {
-    ErrorMessageType,
-    GENERAL_ERROR,
-} from '@cambrian/app/constants/ErrorMessages'
-import {
     SolverSafetyCheckResponseType,
     solverSafetyCheck,
-} from '@cambrian/app/utils/helpers/safetyChecks'
+} from '@cambrian/app/utils/solverSafety.utils'
 import { useEffect, useState } from 'react'
 
 import ActionbarItemDropContainer from '@cambrian/app/components/containers/ActionbarItemDropContainer'
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import ClipboardButton from '@cambrian/app/components/buttons/ClipboardButton'
+import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import { StageStackType } from '../../../../ui/dashboard/ProposalsDashboardUI'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 
 interface ProposalReviewActionbarProps {
-    stageStack: StageStackType
-    currentUser: UserType
+    proposal: Proposal
     isApproving: boolean
     setIsApproving: React.Dispatch<React.SetStateAction<boolean>>
-    messenger?: JSX.Element
-    proposedPrice: PriceModel
 }
 
-export type PriceModel = { amount: number | ''; token?: TokenModel }
-
 const ProposalReviewActionbar = ({
-    stageStack,
-    currentUser,
+    proposal,
     setIsApproving,
     isApproving,
-    messenger,
-    proposedPrice,
 }: ProposalReviewActionbarProps) => {
-    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-
     const [isRequestingChange, setIsRequestingChange] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
     const [safetyChecks, setSafetyChecks] =
@@ -50,55 +35,41 @@ const ProposalReviewActionbar = ({
     const [passedSafetyChecks, setPassedSafetyChecks] = useState(false)
     const [isCheckingSolvers, setIsCheckingSolvers] = useState(true)
 
-    const isTemplateAuthor = currentUser?.did === stageStack?.template.author
-    const isProposalAuthor = currentUser?.did === stageStack?.proposal.author
-
     useEffect(() => {
-        safetyCheckSolver()
+        if (proposal.auth) safetyCheckSolver(proposal.auth)
     }, [])
 
-    const safetyCheckSolver = async () => {
-        const results = await solverSafetyCheck(stageStack, currentUser)
-        if (results) {
-            let success = true
-            results.forEach((solverResult) =>
-                solverResult.forEach((result) => {
-                    if (result.result === false) success = false
-                })
-            )
-            setPassedSafetyChecks(success)
-            setSafetyChecks(results)
+    const safetyCheckSolver = async (user: UserType) => {
+        const results = await solverSafetyCheck(proposal, user)
+        if (!results) {
+            setIsCheckingSolvers(false)
+            return
         }
+        const success = results.every((solverResult) =>
+            solverResult.every((result) => result.result)
+        )
+        setPassedSafetyChecks(success)
+        setSafetyChecks(results)
         setIsCheckingSolvers(false)
     }
 
     const onApproveProposal = async () => {
         setIsApproving(true)
-        if (stageStack) {
-            try {
-                const res = await ceramicTemplateAPI.approveProposal(stageStack)
-
-                if (!res) throw GENERAL_ERROR['PROPOSAL_APPROVE_ERROR']
-            } catch (e) {
-                setErrorMessage(await cpLogger.push(e))
-            }
+        try {
+            await proposal.approve()
+        } catch (e) {
+            setErrorMessage(await cpLogger.push(e))
         }
         setIsApproving(false)
     }
 
     const onRequestChange = async () => {
         setIsRequestingChange(true)
-        if (stageStack) {
-            try {
-                const res = await ceramicTemplateAPI.requestProposalChange(
-                    stageStack
-                )
-
-                if (!res) throw GENERAL_ERROR['PROPOSAL_REQUEST_CHANGE_ERROR']
-            } catch (e) {
-                setIsRequestingChange(false)
-                setErrorMessage(await cpLogger.push(e))
-            }
+        try {
+            await proposal.requestChange()
+        } catch (e) {
+            setIsRequestingChange(false)
+            setErrorMessage(await cpLogger.push(e))
         }
     }
 
@@ -135,9 +106,9 @@ const ProposalReviewActionbar = ({
 
     return (
         <>
-            {isTemplateAuthor ? (
+            {proposal.isTemplateAuthor ? (
                 <BaseActionbar
-                    messenger={messenger}
+                    //messenger={messenger}
                     primaryAction={
                         <LoaderButton
                             isLoading={isApproving}
@@ -162,11 +133,7 @@ const ProposalReviewActionbar = ({
                         !isCheckingSolvers && !passedSafetyChecks
                             ? invalidSolverConfigInfo
                             : {
-                                  title: `${
-                                      proposedPrice.amount === undefined
-                                          ? ''
-                                          : proposedPrice.amount
-                                  } ${proposedPrice.token?.symbol || ''}`,
+                                  title: `${proposal.content.price.amount} ${proposal.collateralToken.symbol}`,
                                   subTitle: 'Proposed price',
                                   dropContent: (
                                       <ActionbarItemDropContainer
@@ -187,9 +154,9 @@ const ProposalReviewActionbar = ({
                               }
                     }
                 />
-            ) : isProposalAuthor ? (
+            ) : proposal.isProposalAuthor ? (
                 <BaseActionbar
-                    messenger={messenger}
+                    //messenger={messenger}
                     info={{
                         title: `Proposal on review`,
                         subTitle:

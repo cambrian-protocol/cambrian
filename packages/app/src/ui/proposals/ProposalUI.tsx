@@ -5,6 +5,7 @@ import { Box } from 'grommet'
 import InteractionLayout from '@cambrian/app/components/layout/InteractionLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
+import ProposalActionbar from '@cambrian/app/components/bars/actionbars/proposal/ProposalActionbar'
 import ProposalBody from './ProposalBody'
 import ProposalHeader from '@cambrian/app/components/layout/header/ProposalHeader'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
@@ -44,7 +45,7 @@ const ProposalUI = () => {
             {proposal && isInitialized ? (
                 <InteractionLayout
                     contextTitle={proposal.content.title}
-                    //actionBar={<ProposalActionbar />}
+                    actionBar={<ProposalActionbar />}
                 >
                     <Box height={{ min: '80vh' }} gap="medium">
                         <ProposalHeader proposal={proposal} />

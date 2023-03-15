@@ -1,15 +1,14 @@
-import _, { result } from 'lodash'
-
-import CTFContract from '@cambrian/app/contracts/CTFContract'
+import CTFContract from '../contracts/CTFContract'
 import PROPOSALSHUB_ARBITRUM from '@cambrian/core/deployments/arbitrum/ProposalsHub.json'
 import PROPOSALSHUB_GOERLI from '@cambrian/core/deployments/goerli/ProposalsHub.json'
 import PROPOSALSHUB_LOCAL from '@cambrian/core/deployments/localhost/ProposalsHub.json'
-import { SlotType } from '@cambrian/app/models/SlotType'
-import { SolverConfigModel } from '@cambrian/app/models/SolverConfigModel'
-import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
-import { UserType } from '@cambrian/app/store/UserContext'
+import Proposal from '../classes/stages/Proposal'
+import { SlotType } from '../models/SlotType'
+import { SolverConfigModel } from '../models/SolverConfigModel'
+import { UserType } from '../store/UserContext'
+import _ from 'lodash'
 import { ethers } from 'ethers'
-import { getParsedSolvers } from './proposalHelper'
+import { getParsedSolvers } from './proposal.utils'
 
 const PROPOSALHUBS = [
     PROPOSALSHUB_GOERLI.address,
@@ -34,11 +33,13 @@ const PROPOSALHUBS = [
 export type SolverSafetyCheckResponseType = { to: string; result: boolean }[][]
 
 export const solverSafetyCheck = async (
-    stageStack: StageStackType,
+    proposal: Proposal,
     currentUser: UserType
 ): Promise<SolverSafetyCheckResponseType | undefined> => {
     try {
-        const parsedSolvers = await getParsedSolvers(stageStack, currentUser)
+        if (!proposal.auth) throw ('Unauthorized')
+
+        const parsedSolvers = await getParsedSolvers(proposal, currentUser)
         if (parsedSolvers) {
             const configs = parsedSolvers.map((solver) => solver.config)
             return await Promise.all(

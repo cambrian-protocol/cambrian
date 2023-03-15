@@ -1,46 +1,27 @@
-import ProposalReviewActionbar, { PriceModel } from './ProposalReviewActionbar'
-
 import ProposalApprovedActionbar from './ProposalApprovedActionbar'
 import ProposalEditActionbar from './ProposalEditActionbar'
 import ProposalExecutedActionbar from './ProposalExecutedActionbar'
 import ProposalFundingActionbar from './ProposalFundingActionbar'
+import ProposalReviewActionbar from './ProposalReviewActionbar'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
-import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 import { useState } from 'react'
 
-interface ProposalActionbarProps {
-    messenger?: JSX.Element
-    proposedPrice: PriceModel
-}
-
-const ProposalActionbar = ({
-    messenger,
-    proposedPrice,
-}: ProposalActionbarProps) => {
-    const { currentUser } = useCurrentUserContext()
-    const { stageStack, proposalStatus, proposalContract } =
-        useProposalContext()
+const ProposalActionbar = () => {
+    const { proposal } = useProposalContext()
     const [isApproving, setIsApproving] = useState(false) // state lift to pass into approveActionbar
 
     const renderControls = () => {
-        switch (proposalStatus) {
+        switch (proposal?.status) {
             case ProposalStatus.OnReview:
                 return (
-                    <>
-                        {currentUser && stageStack && (
-                            <ProposalReviewActionbar
-                                proposedPrice={proposedPrice}
-                                messenger={messenger}
-                                currentUser={currentUser}
-                                setIsApproving={setIsApproving}
-                                isApproving={isApproving}
-                                stageStack={stageStack}
-                            />
-                        )}
-                    </>
+                    <ProposalReviewActionbar
+                        proposal={proposal}
+                        setIsApproving={setIsApproving}
+                        isApproving={isApproving}
+                    />
                 )
-            case ProposalStatus.ChangeRequested:
+                /*   case ProposalStatus.ChangeRequested:
                 return (
                     <>
                         {currentUser && stageStack && (
@@ -89,7 +70,7 @@ const ProposalActionbar = ({
                         )}
                     </>
                 )
-            default:
+            default: */
                 return <></>
         }
     }
@@ -98,3 +79,13 @@ const ProposalActionbar = ({
 }
 
 export default ProposalActionbar
+/*
+                                    <Messenger
+                                        chatID={proposal.doc.streamID}
+                                        currentUser={currentUser!}
+                                        participantDIDs={[
+                                            proposal.content.author,
+                                            proposal.template.content.author,
+                                        ]}
+                                    />
+ */
