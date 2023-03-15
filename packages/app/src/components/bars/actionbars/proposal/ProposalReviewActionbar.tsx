@@ -12,6 +12,7 @@ import ClipboardButton from '@cambrian/app/components/buttons/ClipboardButton'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
@@ -108,7 +109,16 @@ const ProposalReviewActionbar = ({
         <>
             {proposal.isTemplateAuthor ? (
                 <BaseActionbar
-                    //messenger={messenger}
+                    messenger={
+                        <Messenger
+                            chatID={proposal.doc.streamID}
+                            currentUser={proposal.auth!}
+                            participantDIDs={[
+                                proposal.content.author,
+                                proposal.template.content.author,
+                            ]}
+                        />
+                    }
                     primaryAction={
                         <LoaderButton
                             isLoading={isApproving}
@@ -156,7 +166,16 @@ const ProposalReviewActionbar = ({
                 />
             ) : proposal.isProposalAuthor ? (
                 <BaseActionbar
-                    //messenger={messenger}
+                    messenger={
+                        <Messenger
+                            chatID={proposal.doc.streamID}
+                            currentUser={proposal.auth!}
+                            participantDIDs={[
+                                proposal.content.author,
+                                proposal.template.content.author,
+                            ]}
+                        />
+                    }
                     info={{
                         title: `Proposal on review`,
                         subTitle:

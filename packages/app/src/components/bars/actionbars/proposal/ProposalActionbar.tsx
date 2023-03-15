@@ -21,19 +21,9 @@ const ProposalActionbar = () => {
                         isApproving={isApproving}
                     />
                 )
-                /*   case ProposalStatus.ChangeRequested:
-                return (
-                    <>
-                        {currentUser && stageStack && (
-                            <ProposalEditActionbar
-                                stageStack={stageStack}
-                                currentUser={currentUser}
-                                messenger={messenger}
-                            />
-                        )}
-                    </>
-                )
-            case ProposalStatus.Approved:
+            case ProposalStatus.ChangeRequested:
+                return <ProposalEditActionbar proposal={proposal} />
+                /*  case ProposalStatus.Approved:
                 return (
                     <>
                         {currentUser && (
@@ -79,13 +69,3 @@ const ProposalActionbar = () => {
 }
 
 export default ProposalActionbar
-/*
-                                    <Messenger
-                                        chatID={proposal.doc.streamID}
-                                        currentUser={currentUser!}
-                                        participantDIDs={[
-                                            proposal.content.author,
-                                            proposal.template.content.author,
-                                        ]}
-                                    />
- */

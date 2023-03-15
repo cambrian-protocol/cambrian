@@ -4,31 +4,31 @@ import ActionbarItemDropContainer from '@cambrian/app/components/containers/Acti
 import BaseActionbar from '../BaseActionbar'
 import { Button } from 'grommet'
 import Link from 'next/link'
-import { StageStackType } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
-import { UserType } from '@cambrian/app/store/UserContext'
+import Messenger from '@cambrian/app/components/messenger/Messenger'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 
 interface ProposalEditActionbarProps {
-    messenger?: JSX.Element
-    currentUser: UserType
-    stageStack: StageStackType
+    proposal: Proposal
 }
 
-const ProposalEditActionbar = ({
-    stageStack,
-    currentUser,
-    messenger,
-}: ProposalEditActionbarProps) => {
-    const isTemplateAuthor = currentUser?.did === stageStack?.template.author
-    const isProposalAuthor = currentUser?.did === stageStack?.proposal.author
-
+const ProposalEditActionbar = ({ proposal }: ProposalEditActionbarProps) => {
     return (
         <>
-            {isProposalAuthor ? (
+            {proposal.isProposalAuthor ? (
                 <BaseActionbar
-                    messenger={messenger}
+                    messenger={
+                        <Messenger
+                            chatID={proposal.doc.streamID}
+                            currentUser={proposal.auth!}
+                            participantDIDs={[
+                                proposal.content.author,
+                                proposal.template.content.author,
+                            ]}
+                        />
+                    }
                     primaryAction={
                         <Link
-                            href={`${window.location.origin}/proposal/edit/${stageStack.proposalStreamID}`}
+                            href={`${window.location.origin}/proposal/edit/${proposal.doc.streamID}`}
                             passHref
                         >
                             <Button
@@ -59,9 +59,18 @@ const ProposalEditActionbar = ({
                         ),
                     }}
                 />
-            ) : isTemplateAuthor ? (
+            ) : proposal.isTemplateAuthor ? (
                 <BaseActionbar
-                    messenger={messenger}
+                    messenger={
+                        <Messenger
+                            chatID={proposal.doc.streamID}
+                            currentUser={proposal.auth!}
+                            participantDIDs={[
+                                proposal.content.author,
+                                proposal.template.content.author,
+                            ]}
+                        />
+                    }
                     info={{
                         title: `You have requested a change`,
                         subTitle: 'Please provide details via chat',
