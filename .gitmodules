@@ -7,3 +7,6 @@
 [submodule "packages/core/forge/lib/solidity-lib"]
 	path = packages/core/forge/lib/solidity-lib
 	url = https://github.com/uniswap/solidity-lib
+[submodule "packages/core/forge/lib/tranche"]
+	path = packages/core/forge/lib/tranche
+	url = https://github.com/buttonwood-protocol/tranche
