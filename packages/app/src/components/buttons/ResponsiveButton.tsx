@@ -66,6 +66,7 @@ const ResponsiveButton = ({
                                 {...rest}
                                 value={value as string}
                                 size="small"
+                                color={'dark-4'}
                                 label={
                                     screenSize !== 'small' ? label : undefined
                                 }

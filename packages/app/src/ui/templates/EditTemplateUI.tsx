@@ -1,9 +1,8 @@
 import { Box, Tab, Tabs } from 'grommet'
-import { Clipboard, Eye } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 
-import BaseHeader from '@cambrian/app/components/layout/header/BaseHeader'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import EditTemplateHeader from '@cambrian/app/components/layout/header/EditTemplateHeader'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
@@ -13,14 +12,11 @@ import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import TemplateUpdateFromComposition from './forms/TemplateUpdateFromComposition'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
-import { cpTheme } from '@cambrian/app/theme/theme'
-import useCambrianProfile from '@cambrian/app/hooks/useCambrianProfile'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 const EditTemplateUI = () => {
     const { template } = useTemplateContext()
     const [activeIndex, setActiveIndex] = useState(0)
-    const [authorProfile] = useCambrianProfile(template?.content.author)
 
     // Scroll up when tab changes
     const topRefContext = useContext(TopRefContext)
@@ -37,35 +33,7 @@ const EditTemplateUI = () => {
                     kind="narrow"
                 >
                     <Box gap="medium">
-                        <BaseHeader
-                            authorProfileDoc={authorProfile}
-                            title={template.content.title || 'Untitled'}
-                            metaTitle="Edit Template"
-                            items={[
-                                {
-                                    label: 'View Template',
-                                    icon: (
-                                        <Eye
-                                            color={
-                                                cpTheme.global.colors['dark-4']
-                                            }
-                                        />
-                                    ),
-                                    href: `/solver/${template.doc.streamID}`,
-                                },
-                                {
-                                    label: 'Copy URL',
-                                    icon: (
-                                        <Clipboard
-                                            color={
-                                                cpTheme.global.colors['dark-4']
-                                            }
-                                        />
-                                    ),
-                                    value: `${window.location.host}/solver/${template.doc.streamID}`,
-                                },
-                            ]}
-                        />
+                        <EditTemplateHeader template={template} />
                         <Tabs
                             justify="start"
                             activeIndex={activeIndex}
