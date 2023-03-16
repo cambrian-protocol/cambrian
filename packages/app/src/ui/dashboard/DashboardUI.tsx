@@ -1,7 +1,4 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
-import CambrianStagesLib, {
-    CambrianStagesLibType,
-} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -15,6 +12,7 @@ import { useEffect, useState } from 'react'
 
 import API from '@cambrian/app/services/api/cambrian.api'
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
+import { CambrianStagesLibType } from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -22,6 +20,7 @@ import OverviewDashboardUI from './OverviewDashboardUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
+import { Subscription } from 'rxjs'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
@@ -43,15 +42,40 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
-        setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
-        initStagesLib()
-    }, [currentUser])
-
-    useEffect(() => {
         if (query.idx !== activeIndex.toString()) {
             initIndex()
         }
     }, [query])
+
+    useEffect(() => {
+        let subscription: Subscription | undefined
+        const initStagesLib = async () => {
+            setIsFetching(true)
+            try {
+                const stagesLib = await loadStagesLib(currentUser)
+                setStagesLib(stagesLib.content.data)
+                subscription = await API.doc.subscribe(
+                    stagesLib.streamID,
+                    (updatedLib) => {
+                        setStagesLib(updatedLib)
+                    }
+                )
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            } finally {
+                setIsFetching(false)
+            }
+        }
+        if (currentUser) {
+            initStagesLib()
+            setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
+        }
+        return () => {
+            if (subscription) {
+                subscription.unsubscribe()
+            }
+        }
+    }, [currentUser])
 
     const initIndex = () => {
         if (!query.idx) {
@@ -82,35 +106,6 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
             })
             setStagesLib(newStagesLib)
         }
-    }
-
-    const initDocSubsciption = async () => {
-        /*   const stagesLib = await loadStagesLib(currentUser)
-        const cambrianStagesLibSub = stagesLib.subscribe(() => {
-            initStagesLib()
-        })
-        const cambrianProfileSub = currentUser.cambrianProfileDoc?.subscribe(
-            () => {
-                if (userName !== currentUser.cambrianProfileDoc?.content.name) {
-                    setUserName(currentUser.cambrianProfileDoc?.content.name)
-                }
-            }
-        )
-        return () => {
-            cambrianStagesLibSub.unsubscribe()
-            cambrianProfileSub?.unsubscribe()
-        } */
-    }
-
-    const initStagesLib = async () => {
-        setIsFetching(true)
-        try {
-            const stagesLib = await loadStagesLib(currentUser)
-            setStagesLib(stagesLib.content.data)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-        setIsFetching(false)
     }
 
     return (
@@ -149,7 +144,6 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                             <Tab title="Compositions" icon={<TreeStructure />}>
                                 <CompositionsDashboardUI
                                     isFetching={isFetching}
-                                    currentUser={currentUser}
                                     compositionsLib={stagesLib?.compositions}
                                 />
                             </Tab>
