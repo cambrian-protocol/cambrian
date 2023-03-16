@@ -13,4 +13,13 @@ remappings = [
     'forge-std/=packages/core/forge/lib/forge-std/src/',
 ]
 
+block_number = 16833213
+verbosity = 4
+
+[rpc_endpoints]
+mainnet = "https://eth.llamarpc.com"
+
+[etherscan]
+mainnet = { key = "4SVWAWDTMDDTHWWPUU1VHN2NBDAE7M8BR6" }
+
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
