@@ -22,3 +22,6 @@
 [submodule "packages/core/forge/lib/v3-core"]
 	path = packages/core/forge/lib/v3-core
 	url = https://github.com/uniswap/v3-core
+[submodule "packages/core/forge/lib/pnm-contracts"]
+	path = packages/core/forge/lib/pnm-contracts
+	url = https://github.com/pwnednomore/pnm-contracts
