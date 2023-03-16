@@ -16,3 +16,6 @@
 [submodule "packages/core/forge/lib/v3-periphery"]
 	path = packages/core/forge/lib/v3-periphery
 	url = https://github.com/uniswap/v3-periphery
+[submodule "packages/core/forge/lib/v2-periphery"]
+	path = packages/core/forge/lib/v2-periphery
+	url = https://github.com/uniswap/v2-periphery
