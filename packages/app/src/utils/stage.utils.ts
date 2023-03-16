@@ -55,10 +55,10 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         const stageMetadata = {
             controllers: [auth.did],
             family: `template`,
-            tags: [tempUlid] // To generate a unique streamID. Meta tag will be changed to title at API.doc.create  
+            tags: [tempUlid] // To generate a unique streamID
         }
 
-        const stageIds = await API.doc.generateStreamAndCommitId(auth, stageMetadata)
+        const stageIds = await API.doc.deterministic(stageMetadata)
         if (!stageIds) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
         const stagesLibDoc = await loadStagesLib(auth)
@@ -70,14 +70,13 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         } else if (isProposalStage(stage)) {
             uniqueTitle = stagesLibDoc.content.addStage(stageIds.streamID, stage.title, StageNames.proposal)
         }
-
-        const res = await API.doc.create<T>(auth, { ...stage, title: uniqueTitle }, stageMetadata)
+        const res = await API.doc.updateStream<T>(auth, stageIds.streamID, { ...stage, title: uniqueTitle }, { ...stageMetadata, tags: [uniqueTitle] })
         if (!res) throw new Error('Stage create error: failed to create stage')
 
         const updateRes = await API.doc.updateStream<CambrianStagesLibType>(auth, stagesLibDoc.streamID, stagesLibDoc.content.data)
         if (!updateRes || updateRes.status !== 200) throw new Error('StageLib update error: failed to update stagesLib')
 
-        return { streamID: res.streamID, title: uniqueTitle }
+        return { streamID: stageIds.streamID, title: uniqueTitle }
     } catch (e) {
         cpLogger.push(e)
     }

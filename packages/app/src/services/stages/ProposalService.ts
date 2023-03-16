@@ -347,20 +347,22 @@ export default class ProposalService {
                 throw GENERAL_ERROR['UNAUTHORIZED']
 
             const solverConfigs = parsedSolvers.map((solver) => solver.config)
-            const solverConfigDocs = await API.doc.create(
-                auth,
-                { solverConfigs: solverConfigs },
-                {
-                    controllers: [auth.did],
-                    family: SOLVER_CONFIGS_FAMILY,
-                    tags: [proposalCommitId],
-                }
-            )
+            const solverConfigIDs = await API.doc.deterministic({
+                controllers: [auth.did],
+                family: SOLVER_CONFIGS_FAMILY,
+                tags: [proposalCommitId],
+            })
+            if (!solverConfigIDs) throw new Error('Deterministic Error: Failed to generate Stream and Commit Id for SolverConfigs')
 
-            return solverConfigDocs
+            const res = await API.doc.updateStream(auth, solverConfigIDs.streamID, { solverConfigs: solverConfigs })
+            if (!res) throw new Error('Update Stream Error: Failed to update SolverConfigs Stream')
+
+            return {
+                ...solverConfigIDs,
+                content: { solverConfigs: solverConfigs }
+            }
         } catch (e) {
             console.error(e)
         }
     }
-
 }
