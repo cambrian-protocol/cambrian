@@ -170,7 +170,7 @@ const doc = {
         }
     },
 
-    deterministic: async (metadata: MetadataModel): Promise<{ streamID: string, commitID: string, metadata: MetadataModel } | undefined> => {
+    deterministic: async <T>(metadata: MetadataModel): Promise<DocumentModel<T> | undefined> => {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.deterministic(readOnlyCeramicClient, metadata)
@@ -196,6 +196,7 @@ const doc = {
             }
 
             return {
+                content: ceramicDoc.content as T,
                 streamID: ceramicDoc.id.toString(),
                 commitID: ceramicDoc.commitId.toString(),
                 metadata: ceramicDoc.metadata

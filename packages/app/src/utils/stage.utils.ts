@@ -58,7 +58,7 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
             tags: [tempUlid] // To generate a unique streamID
         }
 
-        const stageIds = await API.doc.deterministic(stageMetadata)
+        const stageIds = await API.doc.deterministic<T>(stageMetadata)
         if (!stageIds) throw GENERAL_ERROR['CERAMIC_LOAD_ERROR']
 
         const stagesLibDoc = await loadStagesLib(auth)
