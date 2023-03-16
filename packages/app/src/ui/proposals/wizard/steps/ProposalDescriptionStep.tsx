@@ -29,14 +29,17 @@ const ProposalDescriptionStep = ({
             />
             {proposal ? (
                 <>
-                    {proposal.templateDoc.content.requirements !== '' && (
+                    {proposal.templateCommitDoc.content.requirements !== '' && (
                         <Box gap="xsmall">
                             <Heading level="4">Requirements</Heading>
                             <Text
                                 color="dark-4"
                                 style={{ whiteSpace: 'pre-line' }}
                             >
-                                {proposal.templateDoc.content.requirements}
+                                {
+                                    proposal.templateCommitDoc.content
+                                        .requirements
+                                }
                             </Text>
                         </Box>
                     )}

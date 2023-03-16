@@ -1,9 +1,5 @@
 import { Box, Form, FormField } from 'grommet'
 import { SetStateAction, useState } from 'react'
-import {
-    ceramicInstance,
-    updateStage,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 
 import API from '@cambrian/app/services/api/cambrian.api'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
@@ -14,8 +10,6 @@ import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { StageNames } from '@cambrian/app/models/StageModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
