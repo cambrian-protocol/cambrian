@@ -102,7 +102,7 @@ const doc = {
     readCommit: async <T>(streamID: string, commitID: string,): Promise<DocumentModel<T> | undefined> => {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, streamID)
+            const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, commitID)
             if (DATA_HANDLING.includes(DATA_HANLDING_OPTIONS.SAVE_TO_FIREBASE)) {
                 /*   try {
                       const firebaseDoc = await call(`streams/${streamID}/commits/${commitID}`, 'GET') as DocumentModel<T>

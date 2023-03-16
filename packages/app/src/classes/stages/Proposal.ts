@@ -388,27 +388,6 @@ export default class Proposal {
         this._status = ProposalStatus.ChangeRequested
     }
 
-    public async receiveChangeRequest() {
-        if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
-            return
-        }
-
-        if (!isStatusValid(this._status, [ProposalStatus.ChangeRequested])) {
-            return
-        }
-
-        const unsubmittedUpdatedProposal = { ...this._proposalStreamDoc.content, isSubmitted: false }
-
-        try {
-            await this._proposalService.update(this._auth, this._proposalStreamDoc, unsubmittedUpdatedProposal)
-        } catch (e) {
-            console.error(e)
-            return
-        }
-
-        this._proposalStreamDoc.content = unsubmittedUpdatedProposal
-    }
-
     public async archive() {
         if (!this._auth || !checkAuthorization(this._auth, this._proposalStreamDoc)) {
             return

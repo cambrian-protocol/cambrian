@@ -29,14 +29,6 @@ const ProposalUI = () => {
             await _proposal.receive()
         }
 
-        if (
-            _proposal.status === ProposalStatus.ChangeRequested &&
-            _proposal.content.isSubmitted &&
-            _proposal.content.author === currentUser?.did
-        ) {
-            await _proposal.receiveChangeRequest()
-        }
-
         setIsInitialized(true)
     }
 
