@@ -1,3 +1,6 @@
 [submodule "packages/core/forge/lib/openzeppelin-contracts"]
 	path = packages/core/forge/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "packages/core/forge/lib/openzeppelin-contracts-upgradeable"]
+	path = packages/core/forge/lib/openzeppelin-contracts-upgradeable
+	url = https://github.com/openzeppelin/openzeppelin-contracts-upgradeable
