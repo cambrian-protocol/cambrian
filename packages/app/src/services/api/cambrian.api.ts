@@ -226,7 +226,7 @@ const doc = {
         }
     },
 
-    subscribe: async (streamId: string, onChange: () => Promise<void>) => {
+    subscribe: async (streamId: string, onChange: (next: any) => void) => {
         try {
             // TODO Firestore realtime updates integration
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
@@ -235,8 +235,8 @@ const doc = {
                 streamId
             )
 
-            tileDoc.subscribe(async () => {
-                await onChange()
+            return tileDoc.subscribe(async (x) => {
+                onChange(x.next?.content)
             })
         } catch (e) {
             console.error(e)
