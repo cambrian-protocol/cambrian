@@ -71,14 +71,14 @@ export default class MockProposalService {
     }
 
     async saveSolverConfig(
-        parsedSolvers: SolverModel[],
+        parsedSolvers: any[],
         proposalCommitId: string,
         auth: UserType
     ) {
         return {
             streamID: '',
             commitID: '',
-            content: { solverConfigs: [] }
+            content: { solverConfigs: parsedSolvers }
         }
     }
 

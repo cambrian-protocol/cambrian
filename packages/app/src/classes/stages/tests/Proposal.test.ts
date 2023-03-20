@@ -202,46 +202,6 @@ describe('Proposal ', () => {
         expect(proposalT.template.doc.content.receivedProposals[proposalT.doc.streamID]).toEqual(undefined)
     })
 
-    it('requests change on Proposal and receives changeRequest', async () => {
-        const proposalP = new Proposal(
-            dummyProposalConfig,
-            mockProposalServie,
-            mockTemplateService,
-            proposalAuthorUser
-        )
-        await proposalP.submit()
-
-        const proposalT = new Proposal(
-            {
-                ...dummyProposalConfig,
-                templateDocs: {
-                    ...dummyProposalConfig.templateDocs,
-                    streamDoc: proposalP.template.doc
-                },
-                proposalDocs: {
-                    ...dummyProposalConfig.proposalDocs,
-                    streamDoc: proposalP.doc
-                }
-            },
-            mockProposalServie,
-            mockTemplateService,
-            templateAuthorUser
-        )
-
-        await proposalT.receive()
-        await proposalT.requestChange()
-
-        expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
-        expect(proposalT.template.doc.content.receivedProposals[proposalT.doc.streamID][0]).toEqual({ proposalCommitID: proposalT.doc.commitID, requestChange: true })
-
-        // Receiving ChangeRequest
-        proposalP.refreshDocs(proposalT.doc, proposalT.template.doc)
-        await proposalP.receiveChangeRequest()
-
-        // isSubmitted flag needs to be reset
-        expect(proposalP.doc.content.isSubmitted).toBeFalsy()
-    })
-
     it('updated and resubmitted a Proposal', async () => {
         // Creating & Submitting Proposal
         const proposalP = new Proposal(
@@ -337,9 +297,6 @@ describe('Proposal ', () => {
         proposalP.refreshDocs(proposalT.doc, proposalT.template.doc)
         expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
         expect(proposalP.status).toEqual(ProposalStatus.ChangeRequested)
-
-        //Proposer
-        await proposalP.receiveChangeRequest()
 
         // Status init check
         proposalT.refreshDocs(proposalP.doc, proposalP.template.doc)

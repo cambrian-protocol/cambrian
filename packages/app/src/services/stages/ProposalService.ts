@@ -1,6 +1,6 @@
 import API, { DocumentModel } from "../api/cambrian.api";
 import Proposal, { IStageStack } from "@cambrian/app/classes/stages/Proposal";
-import { getParsedSolvers, getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
+import { getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
 
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
@@ -16,6 +16,7 @@ import { call } from "../../utils/service.utils";
 import { cpLogger } from "../api/Logger.api";
 import { createStage } from "@cambrian/app/utils/stage.utils";
 import { ethers } from "ethers";
+import { getParsedSolvers } from "@cambrian/app/utils/solver.utils";
 import { loadStagesLib } from "../../utils/stagesLib.utils";
 import randimals from 'randimals'
 
