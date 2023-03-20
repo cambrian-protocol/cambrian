@@ -8,7 +8,7 @@ import { SolverConfigModel } from '../models/SolverConfigModel'
 import { UserType } from '../store/UserContext'
 import _ from 'lodash'
 import { ethers } from 'ethers'
-import { getParsedSolvers } from './proposal.utils'
+import { getParsedSolvers } from './solver.utils'
 
 const PROPOSALHUBS = [
     PROPOSALSHUB_GOERLI.address,
