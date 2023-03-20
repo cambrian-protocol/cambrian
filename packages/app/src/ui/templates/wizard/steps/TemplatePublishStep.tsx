@@ -25,7 +25,7 @@ const TemplatePublishStep = () => {
     return (
         <>
             {template ? (
-                <Box height={{ min: '60vh' }} justify="between">
+                <Box>
                     <Box pad="xsmall">
                         <HeaderTextSection
                             title="Share your template"
