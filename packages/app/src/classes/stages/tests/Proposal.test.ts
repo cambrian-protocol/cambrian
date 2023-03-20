@@ -313,14 +313,22 @@ describe('Proposal ', () => {
             commitID: 'dummy-proposal-commitID-2'
         }
         await proposalP.updateContent(updatedProposalDoc.content)
-        expect(proposalP.doc.content).toEqual(updatedProposalDoc.content)
+
+        // updateContent resets the flag isSubmitted to false
+        const unsubmittedUpdatedProposalDoc = {
+            ...updatedProposalDoc, content: { ...updatedProposalDoc.content, isSubmitted: false }
+        }
+
+        expect(proposalP.doc.content).toEqual(unsubmittedUpdatedProposalDoc.content)
 
         // Proposer should see status modified, Templater should see status change requested
-        proposalT.refreshDocs(updatedProposalDoc, proposalP.template.doc)
+        proposalT.refreshDocs(unsubmittedUpdatedProposalDoc, proposalP.template.doc)
         expect(proposalP.status).toEqual(ProposalStatus.Modified)
         expect(proposalT.status).toEqual(ProposalStatus.ChangeRequested)
+
+
         // Proposer needs to see see Modified on refresh
-        proposalP.refreshDocs(updatedProposalDoc, proposalP.template.doc)
+        proposalP.refreshDocs(unsubmittedUpdatedProposalDoc, proposalP.template.doc)
         expect(proposalP.status).toEqual(ProposalStatus.Modified)
 
         await proposalP.submit()
