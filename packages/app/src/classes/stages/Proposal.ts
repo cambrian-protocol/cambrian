@@ -137,7 +137,7 @@ export default class Proposal {
         this._proposalStreamDoc = proposalDocs.streamDoc
         this._latestProposalCommitDoc = proposalDocs.latestCommitDoc
         this._onChainProposal = onChainProposal
-        this._status = this.getProposalStatus(templateDocs.streamDoc, proposalDocs.streamDoc)
+        this._status = this.getProposalStatus(templateDocs.streamDoc.content, proposalDocs.streamDoc.content)
 
         this._template = new Template(compositionDoc, templateDocs.streamDoc, tokens.denomination, templateService, auth)
         this._templateCommitDoc = templateDocs.commitDoc
@@ -204,10 +204,16 @@ export default class Proposal {
         return this._auth
     }
 
-    public refreshDocs(updatedProposalStreamDoc: DocumentModel<ProposalModel>, updatedTemplateStreamDoc?: DocumentModel<TemplateModel>) {
-        this._proposalStreamDoc = updatedProposalStreamDoc
-        if (updatedTemplateStreamDoc) this._template.refreshDoc(updatedTemplateStreamDoc)
-        this._status = this.getProposalStatus(updatedTemplateStreamDoc || this.template.doc, updatedProposalStreamDoc)
+    public refreshDocs(updatedProposalContent: ProposalModel, updatedTemplateContent?: TemplateModel) {
+        this._proposalStreamDoc.content = updatedProposalContent //Commit ID of ProposalStreamDoc is not updated!!! latestCommit must also be updated?
+        if (updatedTemplateContent) this._template.refreshDoc(updatedTemplateContent)
+        this._status = this.getProposalStatus(updatedTemplateContent || this.template.doc.content, updatedProposalContent)
+    }
+
+    public refreshProposalContent(updatedProposalContent: ProposalModel) {
+        this._proposalStreamDoc.content = updatedProposalContent
+        const status = this.getProposalStatus(this.template.doc.content, updatedProposalContent)
+        this._status = status
     }
 
     public async updateContent(updatedProposal: ProposalModel) {
@@ -400,15 +406,15 @@ export default class Proposal {
         }
     }
 
-    private getProposalStatus(templateDoc: DocumentModel<TemplateModel>, proposalDoc: DocumentModel<ProposalModel>, onChainProposal?: any): ProposalStatus {
+    private getProposalStatus(templateContent: TemplateModel, proposalContent: ProposalModel, onChainProposal?: any): ProposalStatus {
         if (onChainProposal) {
             return onChainProposal.isExecuted ? ProposalStatus.Executed : ProposalStatus.Funding
         }
 
-        const receivedProposalCommits = templateDoc.content.receivedProposals[proposalDoc.streamID] || []
+        const receivedProposalCommits = templateContent.receivedProposals[this._proposalStreamDoc.streamID] || []
         const latestProposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
 
-        if (proposalDoc.content.isCanceled) {
+        if (proposalContent.isCanceled) {
             return ProposalStatus.Canceled
         }
 
@@ -418,9 +424,9 @@ export default class Proposal {
             } else if (latestProposalCommit.approved) {
                 return ProposalStatus.Approved
             } else if (latestProposalCommit.requestChange) {
-                const version = proposalDoc.content.version || 0
+                const version = proposalContent.version || 0
                 const hasNewVersion = version > receivedProposalCommits.length
-                if (hasNewVersion && proposalDoc.content.isSubmitted) {
+                if (hasNewVersion && proposalContent.isSubmitted) {
                     return ProposalStatus.Submitted
                 } else {
                     if (this._auth?.did === this._proposalStreamDoc.content.author && !this._proposalStreamDoc.content.isSubmitted) {
@@ -434,7 +440,7 @@ export default class Proposal {
             }
         }
 
-        return proposalDoc.content.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
+        return proposalContent.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
     }
 
     public async create() {
