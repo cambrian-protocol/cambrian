@@ -24,7 +24,7 @@ const EditProposalUI = () => {
         <>
             {proposal ? (
                 <Stack anchor="bottom-right">
-                    <PageLayout contextTitle={'Edit Proposal'} kind="narrow">
+                    <PageLayout contextTitle={'Edit Proposal'}>
                         <Box gap="medium">
                             <ProposalHeader proposal={proposal} />
                             <Tabs
