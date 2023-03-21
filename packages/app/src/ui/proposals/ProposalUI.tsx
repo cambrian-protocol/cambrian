@@ -36,7 +36,7 @@ const ProposalUI = () => {
                                 ? proposal.doc.metadata
                                 : undefined
 
-                            proposal.refreshProposalContent({
+                            proposal.refreshProposalDoc({
                                 commitID: newCommitID,
                                 content: streamState.next.content,
                                 streamID: proposal.doc.streamID,

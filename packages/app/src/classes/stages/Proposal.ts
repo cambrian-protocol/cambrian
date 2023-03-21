@@ -207,8 +207,7 @@ export default class Proposal {
     public get auth(): UserType | null | undefined {
         return this._auth
     }
-
-    public refreshProposalContent(updatedProposalDoc: DocumentModel<ProposalModel>) {
+    public refreshProposalDoc(updatedProposalDoc: DocumentModel<ProposalModel>) {
         this._proposalStreamDoc = updatedProposalDoc
         this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content)
         this._onRefresh()
@@ -216,6 +215,13 @@ export default class Proposal {
     public refreshTemplateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._template.refreshDoc(updatedTemplateDoc)
         this._status = this.getProposalStatus(updatedTemplateDoc.content, this.doc.content)
+        this._onRefresh()
+    }
+
+    public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc: DocumentModel<TemplateModel>) {
+        this._proposalStreamDoc = updatedProposalDoc
+        this._template.refreshDoc(updatedTemplateDoc)
+        this._status = this.getProposalStatus(updatedTemplateDoc.content, updatedProposalDoc.content)
         this._onRefresh()
     }
 

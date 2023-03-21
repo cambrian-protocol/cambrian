@@ -124,6 +124,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         expect(proposal.status).toEqual(ProposalStatus.Draft)
@@ -135,6 +136,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -147,6 +149,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -165,6 +168,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
 
@@ -179,6 +183,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         const proposalT = new Proposal(
@@ -195,6 +200,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
 
@@ -208,6 +214,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -227,6 +234,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
         await proposalT.receive()
@@ -258,6 +266,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -277,6 +286,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
 
@@ -365,6 +375,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -384,6 +395,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
         await proposalT.receive()
@@ -401,6 +413,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -420,6 +433,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
         await proposalT.receive()
@@ -447,6 +461,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -467,6 +482,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
         proposalT.receive()
@@ -480,6 +496,7 @@ describe('Proposal ', () => {
             dummyProposalConfig,
             mockProposalServie,
             mockTemplateService,
+            () => { },
             proposalAuthorUser
         )
         await proposalP.submit()
@@ -498,6 +515,7 @@ describe('Proposal ', () => {
             },
             mockProposalServie,
             mockTemplateService,
+            () => { },
             templateAuthorUser
         )
         await proposalT.receive()
