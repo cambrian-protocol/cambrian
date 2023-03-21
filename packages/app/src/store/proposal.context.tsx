@@ -26,52 +26,57 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
         const { currentUser, isUserLoaded } = useCurrentUserContext()
         const [isLoaded, setIsLoaded] = useState(false)
         const [proposal, setProposal] = useState<Proposal>()
+        const [, forceRender] = useState({})
 
         useEffect(() => {
-            if (isUserLoaded) initProposal()
-        }, [isUserLoaded, currentUser])
+            const initProposal = async () => {
+                try {
+                    setIsLoaded(false)
 
-        const initProposal = async () => {
-            try {
-                setIsLoaded(false)
+                    const proposalService = new ProposalService()
+                    const stageStack = await proposalService.fetchStageStack(
+                        proposalDoc
+                    )
 
-                const proposalService = new ProposalService()
+                    if (!stageStack)
+                        throw new Error('Error while fetching stage stack')
 
-                const stageStack = await proposalService.fetchStageStack(
-                    proposalDoc
-                )
+                    const { collateralToken, denominationToken } =
+                        await proposalService.fetchProposalTokenInfos(
+                            proposalDoc.content.price.tokenAddress,
+                            stageStack.templateDocs.commitDoc.content.price
+                                .denominationTokenAddress,
+                            currentUser
+                        )
 
-                if (!stageStack)
-                    throw new Error('Error while fetching stage stack')
+                    const proposalConfig: ProposalConfig = {
+                        ...stageStack,
+                        tokens: {
+                            denomination: denominationToken,
+                            collateral: collateralToken,
+                        },
+                    }
 
-                const { collateralToken, denominationToken } =
-                    await proposalService.fetchProposalTokenInfos(
-                        proposalDoc.content.price.tokenAddress,
-                        stageStack.templateDocs.commitDoc.content.price
-                            .denominationTokenAddress,
+                    const _proposal = new Proposal(
+                        proposalConfig,
+                        proposalService,
+                        new TemplateService(),
+                        forceUpdate,
                         currentUser
                     )
 
-                const proposalConfig: ProposalConfig = {
-                    ...stageStack,
-                    tokens: {
-                        denomination: denominationToken,
-                        collateral: collateralToken,
-                    },
+                    setProposal(_proposal)
+                    setIsLoaded(true)
+                } catch (e) {
+                    console.error(e)
                 }
-
-                const _proposal = new Proposal(
-                    proposalConfig,
-                    proposalService,
-                    new TemplateService(),
-                    currentUser
-                )
-
-                setProposal(_proposal)
-                setIsLoaded(true)
-            } catch (e) {
-                console.error(e)
             }
+
+            if (isUserLoaded) initProposal()
+        }, [isUserLoaded, currentUser])
+
+        const forceUpdate = () => {
+            forceRender({})
         }
 
         return (

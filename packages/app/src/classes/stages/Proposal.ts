@@ -109,6 +109,8 @@ export interface IStageStack {
 export default class Proposal {
     private _auth?: UserType | null
 
+    private _onRefresh: () => void
+
     private _onChainProposal?: any // TODO Types
     private _proposalStreamDoc: DocumentModel<ProposalModel>
     private _latestProposalCommitDoc?: DocumentModel<ProposalModel>
@@ -126,10 +128,12 @@ export default class Proposal {
         config: ProposalConfig,
         proposalService: ProposalService,
         templateService: TemplateService,
+        onRefresh: () => void,
         auth?: UserType | null,
     ) {
         this._auth = auth
         this._proposalService = proposalService
+        this._onRefresh = onRefresh
 
         const { compositionDoc, templateDocs, proposalDocs, tokens, onChainProposal } = config
 
@@ -204,16 +208,15 @@ export default class Proposal {
         return this._auth
     }
 
-    public refreshDocs(updatedProposalContent: ProposalModel, updatedTemplateContent?: TemplateModel) {
-        this._proposalStreamDoc.content = updatedProposalContent //Commit ID of ProposalStreamDoc is not updated!!! latestCommit must also be updated?
-        if (updatedTemplateContent) this._template.refreshDoc(updatedTemplateContent)
-        this._status = this.getProposalStatus(updatedTemplateContent || this.template.doc.content, updatedProposalContent)
+    public refreshProposalContent(updatedProposalDoc: DocumentModel<ProposalModel>) {
+        this._proposalStreamDoc = updatedProposalDoc
+        this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content)
+        this._onRefresh()
     }
-
-    public refreshProposalContent(updatedProposalContent: ProposalModel) {
-        this._proposalStreamDoc.content = updatedProposalContent
-        const status = this.getProposalStatus(this.template.doc.content, updatedProposalContent)
-        this._status = status
+    public refreshTemplateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
+        this._template.refreshDoc(updatedTemplateDoc)
+        this._status = this.getProposalStatus(updatedTemplateDoc.content, this.doc.content)
+        this._onRefresh()
     }
 
     public async updateContent(updatedProposal: ProposalModel) {
@@ -285,6 +288,7 @@ export default class Proposal {
 
         this._status = ProposalStatus.Submitted
         this._proposalStreamDoc.content = updatedProposal
+        this._onRefresh()
     }
 
     public async cancel() {
@@ -315,6 +319,7 @@ export default class Proposal {
 
         this._status = ProposalStatus.Canceled
         this._proposalStreamDoc.content = updatedProposal
+        this._onRefresh()
     }
 
     public async receive() {
@@ -335,6 +340,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.OnReview
+        this._onRefresh()
     }
 
     public async approve() {
@@ -354,6 +360,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.Approved
+        this._onRefresh()
     }
 
     public async decline() {
@@ -373,6 +380,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.Declined
+        this._onRefresh()
     }
 
     public async requestChange() {
@@ -392,6 +400,7 @@ export default class Proposal {
         }
 
         this._status = ProposalStatus.ChangeRequested
+        this._onRefresh()
     }
 
     public async archive() {
