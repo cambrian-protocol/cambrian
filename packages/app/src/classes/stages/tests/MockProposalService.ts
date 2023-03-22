@@ -1,8 +1,7 @@
-import Proposal, { IStageStack } from "../Proposal";
+import Proposal, { IStageStack, ProposalConfig } from "../Proposal";
 
 import { DocumentModel } from "../../../services/api/cambrian.api";
 import { ProposalModel } from "@cambrian/app/models/ProposalModel";
-import { SolverModel } from "@cambrian/app/models/SolverModel";
 import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { TokenModel } from "@cambrian/app/models/TokenModel";
 import { UserType } from "@cambrian/app/store/UserContext";
@@ -47,6 +46,8 @@ export default class MockProposalService {
             }
         }
     }
+
+    async fetchProposalConfig(_proposalDoc: DocumentModel<ProposalModel>, auth?: UserType | null): Promise<ProposalConfig | undefined> { return undefined }
 
     async create(auth: UserType, proposal: Proposal) { }
 

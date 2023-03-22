@@ -5,6 +5,7 @@ import { getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/pr
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
 import IPFSSolutionsHub from "@cambrian/app/hubs/IPFSSolutionsHub";
+import { ProposalConfig } from './../../classes/stages/Proposal';
 import { ProposalModel } from "../../models/ProposalModel";
 import ProposalsHub from "@cambrian/app/hubs/ProposalsHub";
 import { SolverModel } from "@cambrian/app/models/SolverModel";
@@ -194,6 +195,35 @@ export default class ProposalService {
         return {
             collateralToken: collateralToken,
             denominationToken: denominationToken,
+        }
+    }
+
+    async fetchProposalConfig(_proposalDoc: DocumentModel<ProposalModel>, auth?: UserType | null): Promise<ProposalConfig | undefined> {
+        try {
+
+            const stageStack =
+                await this.fetchStageStack(_proposalDoc)
+
+            if (!stageStack)
+                throw new Error('Error while fetching stage stack')
+
+            const { collateralToken, denominationToken } =
+                await this.fetchProposalTokenInfos(
+                    _proposalDoc.content.price.tokenAddress,
+                    stageStack.templateDocs.commitDoc.content.price
+                        .denominationTokenAddress,
+                    auth
+                )
+
+            return {
+                ...stageStack,
+                tokens: {
+                    denomination: denominationToken,
+                    collateral: collateralToken,
+                },
+            }
+        } catch (e) {
+            console.error(e)
         }
     }
 

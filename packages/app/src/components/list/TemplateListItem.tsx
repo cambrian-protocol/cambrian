@@ -8,6 +8,7 @@ import {
     PauseCircle,
     Pen,
 } from 'phosphor-react'
+import Proposal, { ProposalConfig } from '@cambrian/app/classes/stages/Proposal'
 import { useEffect, useState } from 'react'
 
 import API from '@cambrian/app/services/api/cambrian.api'
@@ -17,7 +18,6 @@ import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ListSkeleton from '../skeletons/ListSkeleton'
 import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
-import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
@@ -72,19 +72,29 @@ const TemplateListItem = ({
             const res = await API.doc.multiQuery<ProposalModel>(
                 filteredReceivedProposals
             )
-
             if (res) {
                 const proposalService = new ProposalService()
-                const templateService = new TemplateService()
-                const _proposals: Proposal[] = res.map(
-                    (p) =>
-                        new Proposal(
-                            template.doc,
-                            p,
+                const _proposals: Proposal[] = await Promise.all(
+                    res.map(async (proposalDoc) => {
+                        const proposalConfig =
+                            await proposalService.fetchProposalConfig(
+                                proposalDoc,
+                                currentUser
+                            )
+
+                        if (!proposalConfig)
+                            throw new Error(
+                                'Error while fetching proposal config'
+                            )
+
+                        return new Proposal(
+                            proposalConfig,
                             proposalService,
-                            templateService,
+                            new TemplateService(),
+                            () => {},
                             currentUser
                         )
+                    })
                 )
                 setReceivedProposals(_proposals)
             }

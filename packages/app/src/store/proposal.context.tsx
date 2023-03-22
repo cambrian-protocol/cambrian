@@ -32,30 +32,12 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
             const initProposal = async () => {
                 try {
                     setIsLoaded(false)
-
                     const proposalService = new ProposalService()
-                    const stageStack = await proposalService.fetchStageStack(
-                        proposalDoc
-                    )
+                    const proposalConfig =
+                        await proposalService.fetchProposalConfig(proposalDoc)
 
-                    if (!stageStack)
-                        throw new Error('Error while fetching stage stack')
-
-                    const { collateralToken, denominationToken } =
-                        await proposalService.fetchProposalTokenInfos(
-                            proposalDoc.content.price.tokenAddress,
-                            stageStack.templateDocs.commitDoc.content.price
-                                .denominationTokenAddress,
-                            currentUser
-                        )
-
-                    const proposalConfig: ProposalConfig = {
-                        ...stageStack,
-                        tokens: {
-                            denomination: denominationToken,
-                            collateral: collateralToken,
-                        },
-                    }
+                    if (!proposalConfig)
+                        throw new Error('Error while fetching propsal config')
 
                     const _proposal = new Proposal(
                         proposalConfig,
