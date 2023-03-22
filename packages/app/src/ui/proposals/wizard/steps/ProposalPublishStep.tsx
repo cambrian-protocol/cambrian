@@ -1,4 +1,4 @@
-import { Box, Button } from 'grommet'
+import { Box, Button, Form } from 'grommet'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
@@ -49,28 +49,30 @@ const ProposalPublishStep = () => {
                     paragraph="Your proposal has been saved. You may submit it now or leave it as a draft."
                 />
                 {proposal ? (
-                    <ButtonRowContainer
-                        primaryButton={
-                            <LoaderButton
-                                isLoading={isSubmitting}
-                                primary
-                                label={'Submit'}
-                                onClick={onSubmitProposal}
-                            />
-                        }
-                        secondaryButton={
-                            <Link
-                                href={`${window.location.origin}/proposal/edit/${proposal.doc.streamID}`}
-                                passHref
-                            >
-                                <Button
-                                    size="small"
-                                    secondary
-                                    label={'Edit Proposal'}
+                    <Form onSubmit={onSubmitProposal}>
+                        <ButtonRowContainer
+                            primaryButton={
+                                <LoaderButton
+                                    isLoading={isSubmitting}
+                                    primary
+                                    label={'Submit'}
+                                    type={'submit'}
                                 />
-                            </Link>
-                        }
-                    />
+                            }
+                            secondaryButton={
+                                <Link
+                                    href={`${window.location.origin}/proposal/edit/${proposal.doc.streamID}`}
+                                    passHref
+                                >
+                                    <Button
+                                        size="small"
+                                        secondary
+                                        label={'Edit Proposal'}
+                                    />
+                                </Link>
+                            }
+                        />
+                    </Form>
                 ) : (
                     <BaseSkeletonBox width={'100%'} height="small" />
                 )}
