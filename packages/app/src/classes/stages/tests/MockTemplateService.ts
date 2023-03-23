@@ -1,4 +1,5 @@
 import { DocumentModel } from "../../../services/api/cambrian.api";
+import { TemplateConfig } from "../Template";
 import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { UserType } from "@cambrian/app/store/UserContext";
 
@@ -47,6 +48,9 @@ export default class MockTemplateService {
     async archive(auth: UserType, templateStreamID: string) { }
 
     async archiveReceivedProposal(auth: UserType, proposalStreamID: string) { }
+
+    async fetchTemplateConfig(templateDoc: DocumentModel<TemplateModel>, auth?: UserType): Promise<TemplateConfig | undefined> { return undefined }
+
     async fetchToken(tokenAddress: string, auth?: UserType,) {
         return {
             chainId: 31337,

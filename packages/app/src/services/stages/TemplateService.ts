@@ -4,6 +4,7 @@ import { createStage, getFormFlexInputs, updateStage } from "@cambrian/app/utils
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
 import { ProposalModel } from "../../models/ProposalModel";
+import { TemplateConfig } from './../../classes/stages/Template';
 import { TemplateModel } from "../../models/TemplateModel";
 import { TokenAPI } from "../api/Token.api";
 import { UserType } from "../../store/UserContext";
@@ -156,12 +157,28 @@ export default class TemplateService {
         }
     }
 
-    async fetchToken(tokenAddress: string, auth?: UserType,) {
+    async fetchTemplateConfig(templateDoc: DocumentModel<TemplateModel>, auth?: UserType): Promise<TemplateConfig | undefined> {
         try {
-            return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
+
+            const denominationToken = await TokenAPI.getTokenInfo(templateDoc.content.price.denominationTokenAddress, auth?.provider, auth?.chainId)
+            const compositionDoc =
+                await API.doc.readCommit<CompositionModel>(
+                    templateDoc.content.composition.streamID,
+                    templateDoc.content.composition.commitID
+                )
+            if (!compositionDoc)
+                throw new Error(
+                    'Read Commit Error: Failed to load Composition'
+                )
+            return { compositionDoc: compositionDoc, denominationToken: denominationToken, templateDoc: templateDoc }
         } catch (e) {
             console.error(e)
         }
+
+    }
+
+    async fetchToken(tokenAddress: string, auth?: UserType,) {
+        return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
     }
 
     async subscribe() { }

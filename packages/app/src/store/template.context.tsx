@@ -35,27 +35,16 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
             try {
                 setIsLoaded(false)
 
-                const compositionDoc =
-                    await API.doc.readCommit<CompositionModel>(
-                        templateDoc.content.composition.streamID,
-                        templateDoc.content.composition.commitID
-                    )
+                const templateService = new TemplateService()
+                const templateConfig =
+                    await templateService.fetchTemplateConfig(templateDoc)
 
-                if (!compositionDoc)
+                if (!templateConfig)
                     throw new Error(
                         'Read Commit Error: Failed to load Composition'
                     )
-
-                const denominationToken = await TokenAPI.getTokenInfo(
-                    templateDoc.content.price.denominationTokenAddress,
-                    currentUser?.web3Provider,
-                    currentUser?.chainId
-                )
-                const templateService = new TemplateService()
                 const _template = new Template(
-                    compositionDoc,
-                    templateDoc,
-                    denominationToken,
+                    templateConfig,
                     templateService,
                     currentUser
                 )

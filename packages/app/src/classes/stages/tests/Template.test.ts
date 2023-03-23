@@ -111,13 +111,13 @@ describe('Template ', () => {
     });
 
     it('Create/Publish a Template', async () => {
-        const template = new Template(dummyCompositionDoc, dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
+        const template = new Template({ compositionDoc: dummyCompositionDoc, templateDoc: dummyTemplateStreamDoc, denominationToken: mockToken }, mockTemplateService, templateAuthorUser)
         expect(template.content).toEqual(dummyTemplateStreamDoc.content)
         expect(template.content.isActive).toBeTruthy()
     })
 
     it('Unpublish a Template', async () => {
-        const template = new Template(dummyCompositionDoc, dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
+        const template = new Template({ compositionDoc: dummyCompositionDoc, templateDoc: dummyTemplateStreamDoc, denominationToken: mockToken }, mockTemplateService, templateAuthorUser)
         await template.unpublish()
 
         expect(template.content).toEqual(dummyTemplateStreamDoc.content)
@@ -125,7 +125,7 @@ describe('Template ', () => {
     })
 
     it('Update a Template', async () => {
-        const template = new Template(dummyCompositionDoc, dummyTemplateStreamDoc, mockToken, mockTemplateService, templateAuthorUser)
+        const template = new Template({ compositionDoc: dummyCompositionDoc, templateDoc: dummyTemplateStreamDoc, denominationToken: mockToken }, mockTemplateService, templateAuthorUser)
 
         const updatedTemplateDoc: DocumentModel<TemplateModel> = {
             ...template.doc,

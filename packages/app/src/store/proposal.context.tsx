@@ -1,7 +1,7 @@
-import Proposal, { ProposalConfig } from '../classes/stages/Proposal'
 import React, { PropsWithChildren, useEffect, useState } from 'react'
 
 import { DocumentModel } from '../services/api/cambrian.api'
+import Proposal from '../classes/stages/Proposal'
 import { ProposalModel } from '../models/ProposalModel'
 import ProposalService from '../services/stages/ProposalService'
 import TemplateService from '../services/stages/TemplateService'

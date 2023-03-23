@@ -143,7 +143,11 @@ export default class Proposal {
         this._onChainProposal = onChainProposal
         this._status = this.getProposalStatus(templateDocs.streamDoc.content, proposalDocs.streamDoc.content)
 
-        this._template = new Template(compositionDoc, templateDocs.streamDoc, tokens.denomination, templateService, auth)
+        this._template = new Template({
+            compositionDoc: compositionDoc,
+            templateDoc: templateDocs.streamDoc,
+            denominationToken: tokens.denomination,
+        }, templateService, auth)
         this._templateCommitDoc = templateDocs.commitDoc
     }
 

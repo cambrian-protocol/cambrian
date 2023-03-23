@@ -163,11 +163,7 @@ export default class ProposalService {
     async unsubscribe() { }
 
     async fetchToken(tokenAddress: string, auth?: UserType,) {
-        try {
-            return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
-        } catch (e) {
-            console.error(e)
-        }
+        return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
     }
 
     async fetchProposalTokenInfos(

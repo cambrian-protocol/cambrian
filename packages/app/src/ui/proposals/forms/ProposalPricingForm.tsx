@@ -88,7 +88,7 @@ const ProposalPricingForm = ({
                         preferredTokenList={templatePrice.preferredTokens.concat(
                             [templatePrice.denominationTokenAddress]
                         )}
-                        tokenAddress={proposal.content.price.tokenAddress}
+                        tokenAddress={proposalInput.price.tokenAddress}
                         onSelect={(newSelectedToken) =>
                             setProposalInput({
                                 ...proposalInput,

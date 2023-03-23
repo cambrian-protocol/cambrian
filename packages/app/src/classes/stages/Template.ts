@@ -8,6 +8,13 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { checkAuthorization } from '@cambrian/app/utils/auth.utils'
 
+export interface TemplateConfig {
+    compositionDoc: DocumentModel<CompositionModel>
+    templateDoc: DocumentModel<TemplateModel>
+    denominationToken: TokenModel
+}
+
+
 export default class Template {
     private _auth?: UserType | null
     private _compositionDoc: DocumentModel<CompositionModel>
@@ -15,13 +22,12 @@ export default class Template {
     private _templateService: TemplateService
     private _denominationToken: TokenModel
 
-
-    constructor(compositionDoc: DocumentModel<CompositionModel>, templateDoc: DocumentModel<TemplateModel>, denominationToken: TokenModel, templateService: TemplateService, auth?: UserType | null,) {
+    constructor(config: TemplateConfig, templateService: TemplateService, auth?: UserType | null,) {
         this._auth = auth
-        this._templateDoc = templateDoc
-        this._compositionDoc = compositionDoc
+        this._templateDoc = config.templateDoc
+        this._compositionDoc = config.compositionDoc
         this._templateService = templateService
-        this._denominationToken = denominationToken
+        this._denominationToken = config.denominationToken
     }
 
     public get content(): TemplateModel {

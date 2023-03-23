@@ -522,7 +522,12 @@ describe('Proposal ', () => {
         await proposalT.requestChange()
 
         // Unpublish template
-        const template = new Template(dummyCompositionDoc, proposalT.template.doc, mockToken, mockTemplateService, templateAuthorUser)
+        const template = new Template({
+            compositionDoc: dummyCompositionDoc,
+            templateDoc: proposalT.template.doc,
+            denominationToken: mockToken
+        },
+            mockTemplateService, templateAuthorUser)
         await template.unpublish()
 
         proposalP.refreshDocs(proposalT.doc, template.doc)
