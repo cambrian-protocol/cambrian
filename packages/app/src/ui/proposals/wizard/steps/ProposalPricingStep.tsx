@@ -1,9 +1,4 @@
 import { Box, Button, Form } from 'grommet'
-import {
-    PROPOSAL_WIZARD_STEPS,
-    ProposalWizardStepsType,
-} from '../ProposalWizard'
-import { SetStateAction, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
@@ -11,46 +6,26 @@ import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSecti
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ProposalInputType } from '../../EditProposalUI'
 import ProposalPricingForm from '../../forms/ProposalPricingForm'
+import { SetStateAction } from 'react'
 import _ from 'lodash'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalPricingStepProps {
     proposalInput: ProposalInputType
     setProposalInput: React.Dispatch<SetStateAction<ProposalInputType>>
-    stepperCallback: (step: ProposalWizardStepsType) => void
+    onSave: () => Promise<void>
+    onBack: () => void
+    isSaving: boolean
 }
 
 const ProposalPricingStep = ({
     proposalInput,
     setProposalInput,
-    stepperCallback,
+    onSave,
+    onBack,
+    isSaving,
 }: ProposalPricingStepProps) => {
     const { proposal } = useProposalContext()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const onSave = async () => {
-        if (proposal) {
-            try {
-                setIsSubmitting(true)
-                const updatedProposal = {
-                    ...proposal.content,
-                    price: proposalInput.price,
-                }
-                if (!_.isEqual(updatedProposal, proposal.content)) {
-                    await proposal.updateContent(updatedProposal)
-                }
-
-                if (proposal && proposal.content.flexInputs.length > 0) {
-                    stepperCallback(PROPOSAL_WIZARD_STEPS.FLEX_INPUTS)
-                } else {
-                    stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
-                }
-                setIsSubmitting(false)
-            } catch (e) {
-                console.error(e)
-            }
-        }
-    }
 
     return (
         <Box>
@@ -65,7 +40,7 @@ const ProposalPricingStep = ({
                     <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
-                                isLoading={isSubmitting}
+                                isLoading={isSaving}
                                 size="small"
                                 primary
                                 label={'Continue'}
@@ -77,11 +52,7 @@ const ProposalPricingStep = ({
                                 size="small"
                                 secondary
                                 label={'Back'}
-                                onClick={() => {
-                                    stepperCallback(
-                                        PROPOSAL_WIZARD_STEPS.DESCRIPTION
-                                    )
-                                }}
+                                onClick={onBack}
                             />
                         }
                     />

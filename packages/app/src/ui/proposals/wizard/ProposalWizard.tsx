@@ -7,6 +7,7 @@ import ProposalFlexInputsStep from './steps/ProposalFlexInputsStep'
 import ProposalPricingStep from './steps/ProposalPricingStep'
 import ProposalPublishStep from './steps/ProposalPublishStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import _ from 'lodash'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 export enum PROPOSAL_WIZARD_STEPS {
@@ -36,6 +37,7 @@ const ProposalWizard = () => {
     const { proposal } = useProposalContext()
     const [proposalInput, setProposalInput] =
         useState<ProposalInputType>(initialProposalInput)
+    const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         if (proposal)
@@ -47,6 +49,24 @@ const ProposalWizard = () => {
             })
     }, [proposal])
 
+    const onSave = async () => {
+        if (proposal) {
+            setIsSaving(true)
+            const updatedProposal = {
+                ...proposal.content,
+                ...proposalInput,
+            }
+            if (!_.isEqual(updatedProposal, proposal.content)) {
+                try {
+                    await proposal.updateContent(updatedProposal)
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+            setIsSaving(false)
+        }
+    }
+
     const renderCurrentFormStep = () => {
         switch (currentStep) {
             case PROPOSAL_WIZARD_STEPS.DESCRIPTION:
@@ -54,7 +74,11 @@ const ProposalWizard = () => {
                     <ProposalDescriptionStep
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
-                        stepperCallback={setCurrentStep}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            setCurrentStep(PROPOSAL_WIZARD_STEPS.PRICING)
+                        }}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PRICING:
@@ -62,7 +86,20 @@ const ProposalWizard = () => {
                     <ProposalPricingStep
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
-                        stepperCallback={setCurrentStep}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            if (proposalInput.flexInputs.length > 0) {
+                                setCurrentStep(
+                                    PROPOSAL_WIZARD_STEPS.FLEX_INPUTS
+                                )
+                            } else {
+                                setCurrentStep(PROPOSAL_WIZARD_STEPS.PUBLISH)
+                            }
+                        }}
+                        onBack={() =>
+                            setCurrentStep(PROPOSAL_WIZARD_STEPS.DESCRIPTION)
+                        }
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.FLEX_INPUTS:
@@ -70,7 +107,14 @@ const ProposalWizard = () => {
                     <ProposalFlexInputsStep
                         proposalInput={proposalInput}
                         setProposalInput={setProposalInput}
-                        stepperCallback={setCurrentStep}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            setCurrentStep(PROPOSAL_WIZARD_STEPS.PUBLISH)
+                        }}
+                        onBack={() => {
+                            setCurrentStep(PROPOSAL_WIZARD_STEPS.PRICING)
+                        }}
                     />
                 )
             case PROPOSAL_WIZARD_STEPS.PUBLISH:
