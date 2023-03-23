@@ -12,6 +12,7 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 interface TemplateFlexInputsStepProps {
     templateInput: TemplateInputType
     setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    isSaving: boolean
     onSave: () => Promise<void>
     onBack: () => void
 }
@@ -19,17 +20,11 @@ interface TemplateFlexInputsStepProps {
 const TemplateFlexInputsStep = ({
     templateInput,
     setTemplateInput,
+    isSaving,
     onSave,
     onBack,
 }: TemplateFlexInputsStepProps) => {
     const { template } = useTemplateContext()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const onSubmit = async () => {
-        setIsSubmitting(true)
-        await onSave()
-        setIsSubmitting(false)
-    }
 
     return (
         <Box>
@@ -38,7 +33,7 @@ const TemplateFlexInputsStep = ({
                 paragraph="Configure the Solver by completing these fields as instructed."
             />
             {template ? (
-                <Form onSubmit={onSubmit}>
+                <Form onSubmit={onSave}>
                     <TemplateFlexInputsForm
                         template={template}
                         templateInput={templateInput}
@@ -47,7 +42,7 @@ const TemplateFlexInputsStep = ({
                     <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
-                                isLoading={isSubmitting}
+                                isLoading={isSaving}
                                 size="small"
                                 primary
                                 label={'Continue'}

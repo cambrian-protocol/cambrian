@@ -1,9 +1,9 @@
 import { Box, Tab, Tabs } from 'grommet'
-import { CheckCircle, FloppyDisk, PauseCircle } from 'phosphor-react'
 import { useContext, useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import EditTemplateHeader from '@cambrian/app/components/layout/header/EditTemplateHeader'
+import { FloppyDisk } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
@@ -17,7 +17,6 @@ import TemplateUpdateFromComposition from './forms/TemplateUpdateFromComposition
 import ToggleTemplatePublishButton from '@cambrian/app/components/buttons/ToggleTemplatePublishButton'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import _ from 'lodash'
-import { cpTheme } from '@cambrian/app/theme/theme'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 export type TemplateInputType = Pick<

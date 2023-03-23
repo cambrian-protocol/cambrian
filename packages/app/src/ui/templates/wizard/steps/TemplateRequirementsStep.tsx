@@ -12,6 +12,7 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 interface TemplateRequirementsStepProps {
     templateInput: TemplateInputType
     setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    isSaving: boolean
     onSave: () => Promise<void>
     onBack: () => void
 }
@@ -19,17 +20,11 @@ interface TemplateRequirementsStepProps {
 const TemplateRequirementsStep = ({
     templateInput,
     setTemplateInput,
+    isSaving,
     onSave,
     onBack,
 }: TemplateRequirementsStepProps) => {
     const { template } = useTemplateContext()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const onSubmit = async () => {
-        setIsSubmitting(true)
-        await onSave()
-        setIsSubmitting(false)
-    }
 
     return (
         <Box>
@@ -38,7 +33,7 @@ const TemplateRequirementsStep = ({
                 paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
             />
             {template ? (
-                <Form onSubmit={onSubmit}>
+                <Form onSubmit={onSave}>
                     <TemplateRequirementsForm
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
@@ -46,7 +41,7 @@ const TemplateRequirementsStep = ({
                     <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
-                                isLoading={isSubmitting}
+                                isLoading={isSaving}
                                 size="small"
                                 primary
                                 label={'Continue'}

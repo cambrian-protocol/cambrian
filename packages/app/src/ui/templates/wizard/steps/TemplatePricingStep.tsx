@@ -12,6 +12,7 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 interface TemplatePricingStepProps {
     templateInput: TemplateInputType
     setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    isSaving: boolean
     onSave: () => Promise<void>
     onBack: () => void
 }
@@ -19,18 +20,11 @@ interface TemplatePricingStepProps {
 const TemplatePricingStep = ({
     templateInput,
     setTemplateInput,
+    isSaving,
     onSave,
     onBack,
 }: TemplatePricingStepProps) => {
     const { template } = useTemplateContext()
-
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const onSubmit = async () => {
-        setIsSubmitting(true)
-        await onSave()
-        setIsSubmitting(false)
-    }
 
     return (
         <Box>
@@ -39,7 +33,7 @@ const TemplatePricingStep = ({
                 paragraph="If the price is variable, provide a baseline. It can be negotiated with customers later."
             />
             {template ? (
-                <Form onSubmit={onSubmit}>
+                <Form onSubmit={onSave}>
                     <TemplatePricingForm
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
@@ -47,7 +41,7 @@ const TemplatePricingStep = ({
                     <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
-                                isLoading={isSubmitting}
+                                isLoading={isSaving}
                                 size="small"
                                 primary
                                 label={'Continue'}

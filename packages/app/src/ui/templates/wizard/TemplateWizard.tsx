@@ -39,6 +39,7 @@ const TemplateWizard = () => {
     const { template } = useTemplateContext()
     const [templateInput, setTemplateInput] =
         useState<TemplateInputType>(initialTemplateInput)
+    const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         if (template)
@@ -53,6 +54,7 @@ const TemplateWizard = () => {
 
     const onSave = async () => {
         if (template) {
+            setIsSaving(true)
             const updatedTemplate = {
                 ...template.content,
                 ...templateInput,
@@ -64,6 +66,7 @@ const TemplateWizard = () => {
                     console.error(e)
                 }
             }
+            setIsSaving(false)
         }
     }
 
@@ -74,6 +77,7 @@ const TemplateWizard = () => {
                     <TemplateDescriptionStep
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
                         onSave={async () => {
                             await onSave()
                             setCurrentStep(TEMPLATE_WIZARD_STEPS.PRICING)
@@ -85,6 +89,7 @@ const TemplateWizard = () => {
                     <TemplatePricingStep
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
                         onSave={async () => {
                             await onSave()
                             if (templateInput.flexInputs.length > 0) {
@@ -107,6 +112,7 @@ const TemplateWizard = () => {
                     <TemplateFlexInputsStep
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
                         onSave={async () => {
                             await onSave()
                             setCurrentStep(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
@@ -121,6 +127,7 @@ const TemplateWizard = () => {
                     <TemplateRequirementsStep
                         templateInput={templateInput}
                         setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
                         onSave={async () => {
                             await onSave()
                             setCurrentStep(TEMPLATE_WIZARD_STEPS.PUBLISH)
