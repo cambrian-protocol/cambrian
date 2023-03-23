@@ -5,12 +5,11 @@ import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import Template from '@cambrian/app/classes/stages/Template'
 import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
 import { TemplateInputType } from '../../EditTemplateUI'
+import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 interface TemplateFlexInputsStepProps {
-    template: Template
     templateInput: TemplateInputType
     setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
     onSave: () => Promise<void>
@@ -18,12 +17,12 @@ interface TemplateFlexInputsStepProps {
 }
 
 const TemplateFlexInputsStep = ({
-    template,
     templateInput,
     setTemplateInput,
     onSave,
     onBack,
 }: TemplateFlexInputsStepProps) => {
+    const { template } = useTemplateContext()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const onSubmit = async () => {

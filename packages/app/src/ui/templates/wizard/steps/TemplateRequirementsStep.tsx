@@ -1,22 +1,35 @@
-import {
-    TEMPLATE_WIZARD_STEPS,
-    TemplateWizardStepsType,
-} from '../TemplateWizard'
+import { Box, Button, Form } from 'grommet'
+import { SetStateAction, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { Box } from 'grommet'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
+import { TemplateInputType } from '../../EditTemplateUI'
 import TemplateRequirementsForm from '../../forms/TemplateRequirementsForm'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 interface TemplateRequirementsStepProps {
-    stepperCallback: (step: TemplateWizardStepsType) => void
+    templateInput: TemplateInputType
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    onSave: () => Promise<void>
+    onBack: () => void
 }
 
 const TemplateRequirementsStep = ({
-    stepperCallback,
+    templateInput,
+    setTemplateInput,
+    onSave,
+    onBack,
 }: TemplateRequirementsStepProps) => {
     const { template } = useTemplateContext()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const onSubmit = async () => {
+        setIsSubmitting(true)
+        await onSave()
+        setIsSubmitting(false)
+    }
 
     return (
         <Box>
@@ -25,21 +38,31 @@ const TemplateRequirementsStep = ({
                 paragraph="Information to help buyers provide you with exactly what you need to start working on their order."
             />
             {template ? (
-                <TemplateRequirementsForm
-                    template={template}
-                    submitLabel="Save & Finish"
-                    onSubmit={() =>
-                        stepperCallback(TEMPLATE_WIZARD_STEPS.PUBLISH)
-                    }
-                    cancelLabel={'Back'}
-                    onCancel={() => {
-                        if (template.content.flexInputs.length > 0) {
-                            stepperCallback(TEMPLATE_WIZARD_STEPS.FLEX_INPUTS)
-                        } else {
-                            stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
+                <Form onSubmit={onSubmit}>
+                    <TemplateRequirementsForm
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                    />
+                    <ButtonRowContainer
+                        primaryButton={
+                            <LoaderButton
+                                isLoading={isSubmitting}
+                                size="small"
+                                primary
+                                label={'Continue'}
+                                type="submit"
+                            />
                         }
-                    }}
-                />
+                        secondaryButton={
+                            <Button
+                                size="small"
+                                secondary
+                                label={'Back'}
+                                onClick={onBack}
+                            />
+                        }
+                    />
+                </Form>
             ) : (
                 <Box height="medium" gap="medium">
                     <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
