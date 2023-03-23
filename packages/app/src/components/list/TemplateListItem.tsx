@@ -1,14 +1,5 @@
 import { AccordionPanel, Box, Button, ResponsiveContext, Text } from 'grommet'
-import {
-    Archive,
-    Check,
-    CheckCircle,
-    Copy,
-    Eye,
-    PauseCircle,
-    Pen,
-} from 'phosphor-react'
-import Proposal, { ProposalConfig } from '@cambrian/app/classes/stages/Proposal'
+import { Archive, Check, Copy, Eye, Pen } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import API from '@cambrian/app/services/api/cambrian.api'
@@ -16,14 +7,15 @@ import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ListSkeleton from '../skeletons/ListSkeleton'
-import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
 import ResponsiveButton from '../buttons/ResponsiveButton'
 import Template from '@cambrian/app/classes/stages/Template'
 import TemplateService from '@cambrian/app/services/stages/TemplateService'
+import ToggleTemplatePublishButton from '../buttons/ToggleTemplatePublishButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
@@ -41,7 +33,6 @@ const TemplateListItem = ({
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [receivedProposals, setReceivedProposals] = useState<Proposal[]>()
     const [isLoading, setIsLoading] = useState(false)
-    const [isTogglingActive, setIsTogglingActive] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
@@ -102,20 +93,6 @@ const TemplateListItem = ({
             setErrorMessage(await cpLogger.push(e))
         }
         setIsLoading(false)
-    }
-
-    const toggleIsActive = async () => {
-        try {
-            setIsTogglingActive(true)
-            if (template.content.isActive) {
-                await template.unpublish()
-            } else {
-                await template.publish()
-            }
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-        setIsTogglingActive(false)
     }
 
     const onArchiveTemplate = async () => {
@@ -191,40 +168,8 @@ const TemplateListItem = ({
                                     <Box>
                                         <Box direction="row" justify="end" wrap>
                                             <Box pad="small">
-                                                <LoaderButton
-                                                    isLoading={isTogglingActive}
-                                                    color="dark-4"
-                                                    icon={
-                                                        template.content
-                                                            .isActive ? (
-                                                            <CheckCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-ok'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <PauseCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-error'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        )
-                                                    }
-                                                    label={
-                                                        template.content
-                                                            .isActive
-                                                            ? 'Open for proposals'
-                                                            : 'Closed for propsals'
-                                                    }
-                                                    onClick={toggleIsActive}
+                                                <ToggleTemplatePublishButton
+                                                    template={template}
                                                 />
                                             </Box>
                                             <Box
