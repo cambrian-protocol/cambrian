@@ -5,9 +5,9 @@ export const parseInputToSeconds = ({
     hours,
     minutes,
 }: TimelockFormInputType): number => {
-    const daysSeconds = days * 60 * 60 * 24
-    const hoursSeconds = hours * 60 * 60
-    const minutesSeconds = minutes * 60
+    const daysSeconds = days === '' || isNaN(days) ? 0 : days * 60 * 60 * 24
+    const hoursSeconds = hours === '' || isNaN(hours) ? 0 : hours * 60 * 60
+    const minutesSeconds = minutes === '' || isNaN(minutes) ? 0 : minutes * 60
     return daysSeconds + hoursSeconds + minutesSeconds
 }
 
@@ -35,17 +35,14 @@ export const parseSecondsToDisplay = (seconds: number): string => {
     let timelockDisplay = ''
 
     if (parsedSeconds.days > 0)
-        timelockDisplay += `${parsedSeconds.days} Day${
-            parsedSeconds.days > 1 ? 's' : ''
-        } `
+        timelockDisplay += `${parsedSeconds.days} Day${parsedSeconds.days > 1 ? 's' : ''
+            } `
     if (parsedSeconds.hours > 0)
-        timelockDisplay += `${parsedSeconds.hours} Hour${
-            parsedSeconds.hours > 1 ? 's' : ''
-        } `
+        timelockDisplay += `${parsedSeconds.hours} Hour${parsedSeconds.hours > 1 ? 's' : ''
+            } `
     if (parsedSeconds.minutes > 0)
-        timelockDisplay += `${parsedSeconds.minutes} Minute${
-            parsedSeconds.minutes > 1 ? 's' : ''
-        } `
+        timelockDisplay += `${parsedSeconds.minutes} Minute${parsedSeconds.minutes > 1 ? 's' : ''
+            } `
 
     if (timelockDisplay === '') {
         return 'No time set'

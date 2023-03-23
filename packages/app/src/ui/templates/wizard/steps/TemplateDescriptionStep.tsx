@@ -1,23 +1,36 @@
-import {
-    TEMPLATE_WIZARD_STEPS,
-    TemplateWizardStepsType,
-} from '../TemplateWizard'
+import { Box, Button, Form } from 'grommet'
+import { SetStateAction, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { Box } from 'grommet'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TemplateDescriptionForm from '../../forms/TemplateDescriptionForm'
-import router from 'next/router'
+import { TemplateInputType } from '../../EditTemplateUI'
+import _ from 'lodash'
+import { useRouter } from 'next/router'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 interface TemplateDescriptionStepProps {
-    stepperCallback: (step: TemplateWizardStepsType) => void
+    templateInput: TemplateInputType
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    onSave: () => Promise<void>
 }
 
 const TemplateDescriptionStep = ({
-    stepperCallback,
+    templateInput,
+    setTemplateInput,
+    onSave,
 }: TemplateDescriptionStepProps) => {
+    const router = useRouter()
     const { template } = useTemplateContext()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
+    const onSubmit = async () => {
+        setIsSubmitting(true)
+        await onSave()
+        setIsSubmitting(false)
+    }
 
     return (
         <Box>
@@ -26,17 +39,35 @@ const TemplateDescriptionStep = ({
                 paragraph="Let the world know how you can help."
             />
             {template ? (
-                <TemplateDescriptionForm
-                    template={template}
-                    onSubmit={() =>
-                        stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
-                    }
-                    submitLabel="Save & Continue"
-                    onCancel={() =>
-                        router.push(`${window.location.origin}/dashboard?idx=1`)
-                    }
-                    cancelLabel="Cancel"
-                />
+                <Form onSubmit={onSubmit}>
+                    <TemplateDescriptionForm
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                    />
+                    <ButtonRowContainer
+                        primaryButton={
+                            <LoaderButton
+                                isLoading={isSubmitting}
+                                size="small"
+                                primary
+                                label={'Continue'}
+                                type="submit"
+                            />
+                        }
+                        secondaryButton={
+                            <Button
+                                size="small"
+                                secondary
+                                label={'Cancel'}
+                                onClick={() =>
+                                    router.push(
+                                        `${window.location.origin}/dashboard?idx=1`
+                                    )
+                                }
+                            />
+                        }
+                    />
+                </Form>
             ) : (
                 <Box height="large" gap="medium">
                     <BaseSkeletonBox height={'xxsmall'} width={'100%'} />

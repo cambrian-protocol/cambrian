@@ -39,9 +39,9 @@ const initialSolverSettingsInput: SolverSettingsFormType = {
 }
 
 export interface TimelockFormInputType {
-    days: number
-    hours: number
-    minutes: number
+    days: number | ''
+    hours: number | ''
+    minutes: number | ''
 }
 
 const SolverSettingsForm = ({ solver, onClose }: SolverSettingsFormProps) => {

@@ -1,49 +1,35 @@
-import {
-    TEMPLATE_WIZARD_STEPS,
-    TemplateWizardStepsType,
-} from '../TemplateWizard'
-import { useEffect, useState } from 'react'
+import { Box, Button, Form } from 'grommet'
+import { SetStateAction, useState } from 'react'
 
-import API from '@cambrian/app/services/api/cambrian.api'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
-import { Box } from 'grommet'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Template from '@cambrian/app/classes/stages/Template'
 import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
-import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
+import { TemplateInputType } from '../../EditTemplateUI'
 
 interface TemplateFlexInputsStepProps {
-    stepperCallback: (step: TemplateWizardStepsType) => void
+    template: Template
+    templateInput: TemplateInputType
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    onSave: () => Promise<void>
+    onBack: () => void
 }
 
 const TemplateFlexInputsStep = ({
-    stepperCallback,
+    template,
+    templateInput,
+    setTemplateInput,
+    onSave,
+    onBack,
 }: TemplateFlexInputsStepProps) => {
-    const { template } = useTemplateContext()
-    const [compositionContent, setCompositionContent] =
-        useState<CompositionModel>()
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    useEffect(() => {
-        if (template) initComposition(template)
-    }, [template])
-
-    const initComposition = async (template: Template) => {
-        try {
-            const _compositionDoc = await API.doc.readCommit<CompositionModel>(
-                template.content.composition.streamID,
-                template?.content.composition.commitID
-            )
-
-            if (!_compositionDoc)
-                throw new Error(
-                    'Commit read error: failed to load Composition Commit'
-                )
-
-            setCompositionContent(_compositionDoc.content)
-        } catch (e) {
-            console.error(e)
-        }
+    const onSubmit = async () => {
+        setIsSubmitting(true)
+        await onSave()
+        setIsSubmitting(false)
     }
 
     return (
@@ -52,19 +38,33 @@ const TemplateFlexInputsStep = ({
                 title="Solver Config"
                 paragraph="Configure the Solver by completing these fields as instructed."
             />
-            {template && compositionContent ? (
-                <TemplateFlexInputsForm
-                    template={template}
-                    compositionContent={compositionContent}
-                    onSubmit={() =>
-                        stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
-                    }
-                    submitLabel="Save & Continue"
-                    onCancel={() =>
-                        stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)
-                    }
-                    cancelLabel="Back"
-                />
+            {template ? (
+                <Form onSubmit={onSubmit}>
+                    <TemplateFlexInputsForm
+                        template={template}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                    />
+                    <ButtonRowContainer
+                        primaryButton={
+                            <LoaderButton
+                                isLoading={isSubmitting}
+                                size="small"
+                                primary
+                                label={'Continue'}
+                                type="submit"
+                            />
+                        }
+                        secondaryButton={
+                            <Button
+                                size="small"
+                                secondary
+                                label={'Back'}
+                                onClick={onBack}
+                            />
+                        }
+                    />
+                </Form>
             ) : (
                 <Box height="medium" gap="medium">
                     <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
