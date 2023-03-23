@@ -37,7 +37,10 @@ export const TemplateContextProvider: React.FunctionComponent<TemplateProviderPr
 
                 const templateService = new TemplateService()
                 const templateConfig =
-                    await templateService.fetchTemplateConfig(templateDoc)
+                    await templateService.fetchTemplateConfig(
+                        templateDoc,
+                        currentUser
+                    )
 
                 if (!templateConfig)
                     throw new Error(

@@ -162,8 +162,8 @@ export default class ProposalService {
 
     async unsubscribe() { }
 
-    async fetchToken(tokenAddress: string, auth?: UserType,) {
-        return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
+    async fetchToken(tokenAddress: string, auth?: UserType | null) {
+        return await TokenAPI.getTokenInfo(tokenAddress, auth?.web3Provider, auth?.chainId)
     }
 
     async fetchProposalTokenInfos(
@@ -174,10 +174,9 @@ export default class ProposalService {
         collateralToken: TokenModel
         denominationToken: TokenModel
     }> {
-        const collateralToken = await TokenAPI.getTokenInfo(
+        const collateralToken = await this.fetchToken(
             collateralTokenAddress,
-            auth?.web3Provider,
-            auth?.chainId
+            auth,
         )
         const denominationToken =
             denominationTokenAddress === collateralTokenAddress

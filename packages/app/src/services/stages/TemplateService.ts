@@ -157,10 +157,9 @@ export default class TemplateService {
         }
     }
 
-    async fetchTemplateConfig(templateDoc: DocumentModel<TemplateModel>, auth?: UserType): Promise<TemplateConfig | undefined> {
+    async fetchTemplateConfig(templateDoc: DocumentModel<TemplateModel>, auth?: UserType | null): Promise<TemplateConfig | undefined> {
         try {
-
-            const denominationToken = await TokenAPI.getTokenInfo(templateDoc.content.price.denominationTokenAddress, auth?.provider, auth?.chainId)
+            const denominationToken = await this.fetchToken(templateDoc.content.price.denominationTokenAddress, auth)
             const compositionDoc =
                 await API.doc.readCommit<CompositionModel>(
                     templateDoc.content.composition.streamID,
@@ -177,8 +176,8 @@ export default class TemplateService {
 
     }
 
-    async fetchToken(tokenAddress: string, auth?: UserType,) {
-        return await TokenAPI.getTokenInfo(tokenAddress, auth?.provider, auth?.chainId)
+    async fetchToken(tokenAddress: string, auth?: UserType | null,) {
+        return await TokenAPI.getTokenInfo(tokenAddress, auth?.web3Provider, auth?.chainId)
     }
 
     async subscribe() { }

@@ -48,16 +48,27 @@ const TemplatesDashboardUI = ({
 
                 if (res) {
                     const templateService = new TemplateService()
-                    setTemplates(
-                        res.map(
-                            (templateDoc) =>
-                                new Template(
-                                    templateDoc,
-                                    templateService,
-                                    currentUser
+                    const _templates = await Promise.all(
+                        res.map(async (templateDoc) => {
+                            const templateConfig =
+                                await templateService.fetchTemplateConfig(
+                                    templateDoc
                                 )
-                        )
+
+                            if (!templateConfig)
+                                throw new Error(
+                                    'Error while loading Template Config'
+                                )
+
+                            return new Template(
+                                templateConfig,
+                                templateService,
+                                currentUser
+                            )
+                        })
                     )
+
+                    setTemplates(_templates)
                 }
             } else {
                 setTemplates([])
