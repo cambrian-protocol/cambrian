@@ -34,8 +34,10 @@ export const ProposalContextProvider: React.FunctionComponent<ProposalProviderPr
                     setIsLoaded(false)
                     const proposalService = new ProposalService()
                     const proposalConfig =
-                        await proposalService.fetchProposalConfig(proposalDoc)
-
+                        await proposalService.fetchProposalConfig(
+                            proposalDoc,
+                            currentUser
+                        )
                     if (!proposalConfig)
                         throw new Error('Error while fetching propsal config')
 
