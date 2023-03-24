@@ -290,7 +290,8 @@ const TemplateListItem = ({
                                                 >
                                                     Proposals
                                                 </Text>
-                                                {receivedProposals ? (
+                                                {receivedProposals &&
+                                                receivedProposals.length > 0 ? (
                                                     receivedProposals.map(
                                                         (receivedProposal) => (
                                                             <ReceivedProposalListItem
