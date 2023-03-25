@@ -4,15 +4,6 @@ out = 'packages/core/forge/out'
 libs = ['packages/core/forge/lib', 'node_modules']
 test = 'packages/core/forge/test/pnm'
 cache_path = 'packages/core/forge/forge-cache'
-remappings = [
-    '@openzeppelin/=node_modules/@openzeppelin/',
-    '@pwnednomore/=node_modules/@pwnednomore/',
-    'eth-gas-reporter/=node_modules/eth-gas-reporter/',
-    'hardhat/=node_modules/hardhat/',
-    'ds-test/=packages/core/forge/lib/forge-std/lib/ds-test/src/',
-    'forge-std/=packages/core/forge/lib/forge-std/src/',
-]
-
 block_number = 16833213
 verbosity = 4
 

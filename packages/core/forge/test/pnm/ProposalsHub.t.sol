@@ -2,7 +2,7 @@
 pragma solidity ^0.8.14;
 
 import "forge-std/Test.sol";
-import "@pwnednomore/contracts/PTest.sol";
+import "@narya-ai/contracts/PTest.sol";
 import "../../../contracts/solvers/SolverFactory.sol";
 import "../../../contracts/solvers/SolverLib.sol";
 import "../../../contracts/solvers/BasicSolverV1.sol";
@@ -88,7 +88,7 @@ contract ProposalsHubTest is PTest {
     }
 
     function testRefunds(RefundTestStruct calldata refundTestStruct) public {
-        vm.assume(refundTestStruct.fundingGoal <= 2**128);
+        vm.assume(refundTestStruct.fundingGoal <= 2 ** 128);
         vm.assume(refundTestStruct.fundingGoal >= 2);
         vm.assume(refundTestStruct.amount <= 10000);
         vm.assume(refundTestStruct.eoaAmount < 10000);
