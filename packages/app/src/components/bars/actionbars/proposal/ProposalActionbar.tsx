@@ -35,7 +35,7 @@ const ProposalActionbar = ({ proposal }: IProposalActionbar) => {
             case ProposalStatus.Approved:
                 return <StartBar proposal={proposal} />
             case ProposalStatus.Funding:
-                return <FundingBar />
+                return <FundingBar proposal={proposal} />
             case ProposalStatus.Executed:
                 return <ExecutedBar />
             default:

@@ -191,6 +191,10 @@ export default class Proposal {
         return this._template.denominationToken
     }
 
+    public get onChainProposal(): any {
+        return this._onChainProposal
+    }
+
     public get isValid(): boolean {
         return this._proposalStreamDoc.content.title.length > 0 &&
             this._proposalStreamDoc.content.description.length > 0 &&
@@ -509,6 +513,71 @@ export default class Proposal {
             this._onChainProposal = onChainProposal
             this._status = this.getProposalStatus(this.template.doc.content, this._proposalStreamDoc.content, onChainProposal)
             this._onRefresh()
+        } catch (e) {
+            throw e
+        }
+    }
+
+    public async approveFunding(amount: number) {
+        if (!this._auth) {
+            throw new Error('Unauthorized!')
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Funding])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
+        try {
+            await this._proposalService.approve(this._auth, amount, this.collateralToken)
+        } catch (e) {
+            throw e
+        }
+    }
+
+    public async fund(amount: number) {
+        if (!this._auth) {
+            throw new Error('Unauthorized!')
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Funding])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
+        try {
+            await this._proposalService.fund(this._auth, this.onChainProposal.id, amount, this.collateralToken)
+        } catch (e) {
+            throw e
+        }
+
+    }
+    public async defund(amount: number) {
+        if (!this._auth) {
+            throw new Error('Unauthorized!')
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Funding])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
+        try {
+            await this._proposalService.defund(this._auth, this.onChainProposal.id, amount, this.collateralToken)
+        } catch (e) {
+            throw e
+        }
+
+    }
+
+    public async execute() {
+        if (!this._auth) {
+            throw new Error('Unauthorized!')
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Funding])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
+        try {
+            //  await this._proposalService.executeProposal(this._auth, this)
         } catch (e) {
             throw e
         }

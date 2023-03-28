@@ -1,4 +1,6 @@
 import API, { DocumentModel } from "../api/cambrian.api";
+import { BigNumber, ethers } from "ethers";
+import { ERC20_IFACE, PROPOSALS_HUB_IFACE } from "packages/app/config/ContractInterfaces";
 import Proposal, { IStageStack } from "@cambrian/app/classes/stages/Proposal";
 import { getOnChainProposalId, getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
 
@@ -8,6 +10,7 @@ import IPFSSolutionsHub from "@cambrian/app/hubs/IPFSSolutionsHub";
 import { ProposalConfig } from './../../classes/stages/Proposal';
 import { ProposalModel } from "../../models/ProposalModel";
 import ProposalsHub from "@cambrian/app/hubs/ProposalsHub";
+import { SUPPORTED_CHAINS } from "packages/app/config/SupportedChains";
 import { SolverModel } from "@cambrian/app/models/SolverModel";
 import { TemplateModel } from "@cambrian/app/models/TemplateModel";
 import { TokenAPI } from "../api/Token.api";
@@ -16,7 +19,6 @@ import { UserType } from "../../store/UserContext";
 import { call } from "../../utils/service.utils";
 import { cpLogger } from "../api/Logger.api";
 import { createStage } from "@cambrian/app/utils/stage.utils";
-import { ethers } from "ethers";
 import { getParsedSolvers } from "@cambrian/app/utils/solver.utils";
 import { loadStagesLib } from "../../utils/stagesLib.utils";
 import randimals from 'randimals'
@@ -425,5 +427,68 @@ export default class ProposalService {
         } catch (e) {
             console.error(e)
         }
+    }
+
+    async approve(auth: UserType, amount: number, token: TokenModel) {
+        try {
+            const weiAmount = ethers.utils.parseUnits(
+                amount.toString(),
+                token.decimals
+            )
+
+            const erc20Contract = new ethers.Contract(
+                token.address,
+                ERC20_IFACE,
+                auth.signer
+            )
+
+            const balance = await erc20Contract.balanceOf(
+                await auth.signer.getAddress()
+            )
+
+            if (BigNumber.from(balance).lt(weiAmount))
+                throw GENERAL_ERROR['INSUFFICIENT_FUNDS']
+
+            await erc20Contract.approve(
+                SUPPORTED_CHAINS[auth.chainId].contracts.proposalsHub, weiAmount
+            )
+        } catch (e) {
+            throw e
+        }
+    }
+
+    async fund(auth: UserType, proposalId: string, amount: number, token: TokenModel) {
+        try {
+            const weiAmount = ethers.utils.parseUnits(
+                amount.toString(),
+                token.decimals
+            )
+
+            const proposalsHubContract = new ethers.Contract(
+                SUPPORTED_CHAINS[auth.chainId].contracts.proposalsHub,
+                PROPOSALS_HUB_IFACE,
+                auth.signer
+            )
+
+            await proposalsHubContract.fundProposal(proposalId, token.address, weiAmount)
+
+        } catch (e) { throw e }
+    }
+
+    async defund(auth: UserType, proposalId: string, amount: number, token: TokenModel) {
+        try {
+            const weiAmount = ethers.utils.parseUnits(
+                amount.toString(),
+                token.decimals
+            )
+
+            const proposalsHubContract = new ethers.Contract(
+                SUPPORTED_CHAINS[auth.chainId].contracts.proposalsHub,
+                PROPOSALS_HUB_IFACE,
+                auth.signer
+            )
+
+            await proposalsHubContract.defundProposal(proposalId, token.address, weiAmount)
+        } catch (e) { throw e }
     }
 }

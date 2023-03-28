@@ -17,7 +17,12 @@ const ProposalHeader = ({ proposal }: ProposalHeaderProps) => {
         <BaseHeader
             title={proposal.content.title}
             metaTitle="Proposal"
-            statusBadge={<ProposalStatusBadge status={proposal.status} />}
+            statusBadge={
+                <ProposalStatusBadge
+                    status={proposal.status}
+                    onChainProposalId={proposal.onChainProposal?.id}
+                />
+            }
             authorProfileDoc={proposalAuthor}
             items={[
                 <TemplateInfoButton

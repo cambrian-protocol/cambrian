@@ -2,8 +2,6 @@ import { BigNumber, ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
 import ProposalsHub from '../hubs/ProposalsHub'
-import { TokenAPI } from '../services/api/Token.api'
-import { TokenModel } from '../models/TokenModel'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 export const useProposalFunding = (onChainProposalId?: string) => {
@@ -12,7 +10,6 @@ export const useProposalFunding = (onChainProposalId?: string) => {
     const [fundingGoal, setFundingGoal] = useState<BigNumber>()
     const [proposalContract, setProposalContract] = useState<ethers.Contract>()
     const [proposalsHub, setProposalsHub] = useState<ProposalsHub>()
-    const [collateralToken, setCollateralToken] = useState<TokenModel>()
     const [fundingPercentage, setFundingPercentage] = useState<number>()
 
     useEffect(() => {
@@ -41,11 +38,6 @@ export const useProposalFunding = (onChainProposalId?: string) => {
                 const funding = await proposalsHub.getProposalFunding(
                     onChainProposal.id
                 )
-                const token = await TokenAPI.getTokenInfo(
-                    onChainProposal.collateralToken,
-                    currentUser.web3Provider,
-                    currentUser.chainId
-                )
                 if (funding) setFunding(funding)
 
                 setFundingPercentage(
@@ -54,7 +46,6 @@ export const useProposalFunding = (onChainProposalId?: string) => {
                 setProposalContract(onChainProposal)
                 setFundingGoal(onChainProposal.fundingGoal)
                 setProposalsHub(proposalsHub)
-                setCollateralToken(token)
             }
         }
     }
@@ -104,7 +95,6 @@ export const useProposalFunding = (onChainProposalId?: string) => {
     return {
         funding: funding,
         fundingGoal: fundingGoal,
-        collateralToken: collateralToken,
         fundingPercentage: fundingPercentage,
         initFunding: init,
     }
