@@ -68,8 +68,11 @@ export default class MockProposalService {
         auth: UserType,
         proposal: Proposal,
     ) {
-        return true
     }
+
+    async fetchOnChainProposal(latestCommitDoc?: DocumentModel<ProposalModel>, auth?: UserType | null) { }
+
+    async createOnChainProposal(auth: UserType, proposal: Proposal) { }
 
     async saveSolverConfig(
         parsedSolvers: any[],
