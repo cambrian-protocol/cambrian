@@ -50,3 +50,26 @@ export const getSolutionSafeBaseId = (
         )
     )
 }
+
+export const getOnChainProposalId = (
+    proposalCommitID: string,
+    templateCommitID: string
+) => {
+    const solutionSafeBaseId = getSolutionSafeBaseId(
+        proposalCommitID,
+        templateCommitID
+    )
+    let nonce = 1
+    // TODO Same idea as above. Somebody may have front-ran the proposalId we expected
+    // We can fetch a proposal starting at nonce = 1, check if its what we expect..
+    // If it's not, increment nonce until it is
+    // We're not worrying about this right now
+
+    return ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(
+            ['bytes32', 'string', 'uint256'],
+            [solutionSafeBaseId, proposalCommitID, nonce]
+        )
+    )
+}
+

@@ -141,7 +141,7 @@ export default class Proposal {
         this._proposalStreamDoc = proposalDocs.streamDoc
         this._latestProposalCommitDoc = proposalDocs.latestCommitDoc
         this._onChainProposal = onChainProposal
-        this._status = this.getProposalStatus(templateDocs.streamDoc.content, proposalDocs.streamDoc.content)
+        this._status = this.getProposalStatus(templateDocs.streamDoc.content, proposalDocs.streamDoc.content, config.onChainProposal)
 
         this._template = new Template({
             compositionDoc: compositionDoc,
@@ -211,21 +211,75 @@ export default class Proposal {
     public get auth(): UserType | null | undefined {
         return this._auth
     }
+
+    public async hasSolution(): Promise<boolean> {
+        if (!this._auth || !this._latestProposalCommitDoc) {
+            return false
+        }
+        try {
+            const solution = await this._proposalService.fetchSolutionBase(
+                this._auth,
+                this._latestProposalCommitDoc.commitID,
+                this.templateCommitDoc.commitID
+            )
+            return Boolean(solution)
+        } catch (error) {
+            return false
+        }
+    }
+
+    private getProposalStatus(templateContent: TemplateModel, proposalContent: ProposalModel, onChainProposal?: any): ProposalStatus {
+        if (onChainProposal) {
+            return onChainProposal.isExecuted ? ProposalStatus.Executed : ProposalStatus.Funding
+        }
+
+        const receivedProposalCommits = templateContent.receivedProposals[this._proposalStreamDoc.streamID] || []
+        const latestProposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
+
+        if (proposalContent.isCanceled) {
+            return ProposalStatus.Canceled
+        }
+
+        if (latestProposalCommit) {
+            if (latestProposalCommit.isDeclined) {
+                return ProposalStatus.Declined
+            } else if (latestProposalCommit.approved) {
+                return ProposalStatus.Approved
+            } else if (latestProposalCommit.requestChange) {
+                const version = proposalContent.version || 0
+                const hasNewVersion = version > receivedProposalCommits.length
+                if (hasNewVersion && proposalContent.isSubmitted) {
+                    return ProposalStatus.Submitted
+                } else {
+                    if (this._auth?.did === this._proposalStreamDoc.content.author && !this._proposalStreamDoc.content.isSubmitted) {
+                        return ProposalStatus.Modified
+                    } else {
+                        return ProposalStatus.ChangeRequested
+                    }
+                }
+            } else {
+                return ProposalStatus.OnReview
+            }
+        }
+
+        return proposalContent.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
+    }
+
     public refreshProposalDoc(updatedProposalDoc: DocumentModel<ProposalModel>) {
         this._proposalStreamDoc = updatedProposalDoc
-        this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content)
+        this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content, this._onChainProposal)
         this._onRefresh()
     }
     public refreshTemplateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._template.refreshDoc(updatedTemplateDoc)
-        this._status = this.getProposalStatus(updatedTemplateDoc.content, this.doc.content)
+        this._status = this.getProposalStatus(updatedTemplateDoc.content, this.doc.content, this._onChainProposal)
         this._onRefresh()
     }
 
     public refreshDocs(updatedProposalDoc: DocumentModel<ProposalModel>, updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._proposalStreamDoc = updatedProposalDoc
         this._template.refreshDoc(updatedTemplateDoc)
-        this._status = this.getProposalStatus(updatedTemplateDoc.content, updatedProposalDoc.content)
+        this._status = this.getProposalStatus(updatedTemplateDoc.content, updatedProposalDoc.content, this._onChainProposal)
         this._onRefresh()
     }
 
@@ -425,92 +479,38 @@ export default class Proposal {
         }
     }
 
-    private getProposalStatus(templateContent: TemplateModel, proposalContent: ProposalModel, onChainProposal?: any): ProposalStatus {
-        if (onChainProposal) {
-            return onChainProposal.isExecuted ? ProposalStatus.Executed : ProposalStatus.Funding
-        }
-
-        const receivedProposalCommits = templateContent.receivedProposals[this._proposalStreamDoc.streamID] || []
-        const latestProposalCommit = receivedProposalCommits[receivedProposalCommits.length - 1]
-
-        if (proposalContent.isCanceled) {
-            return ProposalStatus.Canceled
-        }
-
-        if (latestProposalCommit) {
-            if (latestProposalCommit.isDeclined) {
-                return ProposalStatus.Declined
-            } else if (latestProposalCommit.approved) {
-                return ProposalStatus.Approved
-            } else if (latestProposalCommit.requestChange) {
-                const version = proposalContent.version || 0
-                const hasNewVersion = version > receivedProposalCommits.length
-                if (hasNewVersion && proposalContent.isSubmitted) {
-                    return ProposalStatus.Submitted
-                } else {
-                    if (this._auth?.did === this._proposalStreamDoc.content.author && !this._proposalStreamDoc.content.isSubmitted) {
-                        return ProposalStatus.Modified
-                    } else {
-                        return ProposalStatus.ChangeRequested
-                    }
-                }
-            } else {
-                return ProposalStatus.OnReview
-            }
-        }
-
-        return proposalContent.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
-    }
-
-    public async create() {
-        if (!this._auth) {
-            return
-        }
-
-        if (!isStatusValid(this._status, [ProposalStatus.Approved])) {
-            return
-        }
-
-        try {
-            await this._proposalService.create(this._auth, this)
-        } catch (e) {
-            console.error(e)
-            return
-        }
-    }
-
     public async createSolutionBase() {
         if (!this._auth) {
-            return
+            throw new Error('Unauthorized!')
         }
 
         if (!isStatusValid(this._status, [ProposalStatus.Approved])) {
-            return
+            throw new Error('Invalid Proposal Status')
         }
 
         try {
             await this._proposalService.createSolutionBase(this._auth, this)
         } catch (e) {
-            console.error(e)
-            return
+            throw e
         }
     }
 
-    public async hasSolution(): Promise<boolean> {
-        if (!this._auth || !this._latestProposalCommitDoc) {
-            return false
+    public async createOnChainProposal() {
+        if (!this._auth) {
+            throw new Error('Unauthorized!')
         }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Approved])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
         try {
-            const solution = await this._proposalService.fetchSolutionBase(
-                this._auth,
-                this._latestProposalCommitDoc.commitID,
-                this.templateCommitDoc.commitID
-            )
-            return Boolean(solution)
-        } catch (error) {
-            return false
+            const onChainProposal = await this._proposalService.createOnChainProposal(this._auth, this)
+            this._onChainProposal = onChainProposal
+            this._status = this.getProposalStatus(this.template.doc.content, this._proposalStreamDoc.content, onChainProposal)
+            this._onRefresh()
+        } catch (e) {
+            throw e
         }
     }
-
-
 }

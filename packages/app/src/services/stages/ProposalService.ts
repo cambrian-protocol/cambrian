@@ -1,6 +1,6 @@
 import API, { DocumentModel } from "../api/cambrian.api";
 import Proposal, { IStageStack } from "@cambrian/app/classes/stages/Proposal";
-import { getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
+import { getOnChainProposalId, getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
 
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
@@ -117,47 +117,6 @@ export default class ProposalService {
         }
     }
 
-    async create(auth: UserType, proposal: Proposal) {
-        try {
-            // TODO Sanity check function that this is approved
-            const parsedSolvers = await getParsedSolvers(proposal, auth)
-            if (!parsedSolvers) {
-                return
-            }
-
-            const proposalsHub = new ProposalsHub(
-                auth.signer,
-                auth.chainId
-            )
-
-            const solutionSafeBaseId = getSolutionSafeBaseId(
-                proposal.doc.commitID,
-                proposal.content.template.commitID
-            )
-
-            const amount = typeof proposal.content.price.amount === 'number' ? proposal.content.price.amount : 0
-
-            const transaction = await proposalsHub.createProposal(
-                parsedSolvers[0].collateralToken,
-                amount,
-                solutionSafeBaseId,
-                parsedSolvers.map((solver) => solver.config),
-                proposal.doc.commitID
-            )
-
-            const rc = await transaction.wait()
-            const event = rc.events?.find(
-                (event) => event.event === 'CreateProposal'
-            )
-
-            if (!event) throw GENERAL_ERROR['FAILED_PROPOSAL_DEPLOYMENT']
-            // If for some reason some POS wants to DOS we can save the correct id nonce
-            // on ceramic to save time for subsequent loads
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
     async subscribe() { }
 
     async unsubscribe() { }
@@ -193,16 +152,37 @@ export default class ProposalService {
         }
     }
 
+    async fetchOnChainProposal(latestCommitDoc?: DocumentModel<ProposalModel>, auth?: UserType | null) {
+        try {
+            if (latestCommitDoc && auth) {
+                const proposalID = getOnChainProposalId(
+                    latestCommitDoc.commitID,
+                    latestCommitDoc.content.template.commitID
+                )
+                // TODO default chain when user not connected
+                const proposalsHub = new ProposalsHub(
+                    auth.signer,
+                    auth.chainId
+                )
+                const onChainProposal = await proposalsHub.getProposal(proposalID)
+                console.log(onChainProposal)
+                if (onChainProposal.id !== ethers.constants.HashZero) return onChainProposal
+            }
+        } catch (e) {
+        }
+    }
+
     async fetchProposalConfig(_proposalDoc: DocumentModel<ProposalModel>, auth?: UserType | null): Promise<ProposalConfig | undefined> {
         try {
-
             const stageStack =
                 await this.fetchStageStack(_proposalDoc)
 
             if (!stageStack)
                 throw new Error('Error while fetching stage stack')
 
-            const { collateralToken, denominationToken } =
+            const onChainProposal = await this.fetchOnChainProposal(stageStack.proposalDocs.latestCommitDoc, auth)
+
+            const tokens =
                 await this.fetchProposalTokenInfos(
                     _proposalDoc.content.price.tokenAddress,
                     stageStack.templateDocs.commitDoc.content.price
@@ -212,9 +192,10 @@ export default class ProposalService {
 
             return {
                 ...stageStack,
+                onChainProposal: onChainProposal,
                 tokens: {
-                    denomination: denominationToken,
-                    collateral: collateralToken,
+                    denomination: tokens.denominationToken,
+                    collateral: tokens.collateralToken,
                 },
             }
         } catch (e) {
@@ -322,17 +303,17 @@ export default class ProposalService {
             const parsedSolvers = await getParsedSolvers(proposal, auth)
 
             if (!parsedSolvers || !proposal.latestCommitDoc) {
-                return
+                throw new Error('Invalid solvers or no registered Proposal Commit')
             }
 
             // Save solverConfigs separately to have access without metaData from Solution
             const solverConfigsDoc = await this.saveSolverConfig(
                 parsedSolvers,
-                proposal.latestCommitDoc?.commitID,
+                proposal.latestCommitDoc.commitID,
                 auth
             )
 
-            if (!solverConfigsDoc) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            if (!solverConfigsDoc) throw new Error('Failed to save solver configs')
 
             const solutionsHub = new IPFSSolutionsHub(
                 auth.signer,
@@ -341,7 +322,7 @@ export default class ProposalService {
 
             const solutionBaseId: string = getSolutionBaseId(
                 proposal.latestCommitDoc.commitID,
-                proposal.templateCommitDoc.commitID
+                proposal.latestCommitDoc.content.template.commitID
             )
 
             const transaction = await solutionsHub.createBase(
@@ -357,7 +338,61 @@ export default class ProposalService {
                 (event) => event.event === 'CreateBase'
             )
 
-            return Boolean(event)
+            if (!event) {
+                throw new Error('Failed to create SolutionBase')
+            }
+
+        } catch (e) {
+            throw e
+        }
+    }
+
+    async createOnChainProposal(auth: UserType, proposal: Proposal) {
+        try {
+            // TODO Sanity check function that this is approved
+            const parsedSolvers = await getParsedSolvers(proposal, auth)
+            if (!parsedSolvers || !proposal.latestCommitDoc) {
+                throw new Error('Invalid solvers or no registered Proposal Commit')
+            }
+
+            const amount = typeof proposal.content.price.amount === 'number' ? proposal.content.price.amount : 0
+            const solutionSafeBaseId = getSolutionSafeBaseId(
+                proposal.latestCommitDoc.commitID,
+                proposal.latestCommitDoc.content.template.commitID
+            )
+
+            const proposalsHub = new ProposalsHub(
+                auth.signer,
+                auth.chainId
+            )
+
+            // TODO: If for some reason some POS wants to DOS we can save the correct id nonce
+            // on ceramic to save time for subsequent loads
+
+            const transaction = await proposalsHub.createProposal(
+                parsedSolvers[0].collateralToken,
+                amount,
+                solutionSafeBaseId,
+                parsedSolvers.map((solver) => solver.config),
+                proposal.doc.commitID
+            )
+
+            const receipt = await transaction.wait()
+            const event = receipt.events?.find(
+                (event) => event.event === 'CreateProposal'
+            )
+            if (!event || !event.args || event.args.length < 1) {
+                throw new Error('Failed to create Proposal')
+            }
+
+            const proposalId = event.args[0]
+            const onChainProposal = await proposalsHub.getProposal(proposalId)
+
+            if (!onChainProposal || onChainProposal.id === ethers.constants.HashZero) {
+                throw new Error('Failed to find on-chain Proposal')
+            }
+
+            return onChainProposal
         } catch (e) {
             throw e
         }

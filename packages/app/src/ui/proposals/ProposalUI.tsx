@@ -101,7 +101,7 @@ const ProposalUI = () => {
             {proposal && isInitialized ? (
                 <InteractionLayout
                     contextTitle={proposal.content.title}
-                    actionBar={<ProposalActionbar />}
+                    actionBar={<ProposalActionbar proposal={proposal} />}
                 >
                     <Box height={{ min: '80vh' }} gap="medium">
                         <ProposalHeader proposal={proposal} />
