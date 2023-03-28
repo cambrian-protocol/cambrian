@@ -16,7 +16,7 @@ const SelectRecipientModal = ({
         <BaseLayerModal onBack={onBack}>
             <HeaderTextSection
                 title="Select recipient"
-                subTitle="Choose an existant address from your solution"
+                subTitle="Choose an existing address from your solution"
             />
             <Box fill>
                 <SelectRecipientForm onClose={onClose} />
