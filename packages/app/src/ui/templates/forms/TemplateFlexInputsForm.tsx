@@ -28,7 +28,6 @@ const TemplateFlexInputsForm = ({
     const updateFlexInput =
         (idx: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
             const updatedFlexInputs = _.cloneDeep(templateInput.flexInputs)
-            console.log(event.target.value)
             updatedFlexInputs[idx].value = event.target.value
             setTemplateInput({
                 ...templateInput,
