@@ -422,6 +422,7 @@ export default class ProposalService {
 
             return {
                 ...solverConfigIDs,
+                commitID: res.commitID,
                 content: { solverConfigs: solverConfigs }
             }
         } catch (e) {
@@ -490,5 +491,25 @@ export default class ProposalService {
 
             await proposalsHubContract.defundProposal(proposalId, token.address, weiAmount)
         } catch (e) { throw e }
+    }
+
+    async execute(auth: UserType, proposal: Proposal) {
+        try {
+            const parsedSolvers = await getParsedSolvers(proposal, auth)
+
+            if (!parsedSolvers) throw new Error('Failed to parse Solvers')
+
+            const proposalsHub = new ProposalsHub(
+                auth.signer,
+                auth.chainId
+            )
+
+            await proposalsHub.executeProposal(
+                proposal.onChainProposal.id,
+                parsedSolvers.map((solver) => solver.config)
+            )
+        } catch (e) {
+            throw e
+        }
     }
 }

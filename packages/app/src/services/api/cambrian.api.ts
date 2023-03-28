@@ -220,7 +220,7 @@ const doc = {
                   } */
             }
 
-            return { status: 200 }
+            return { status: 200, commitID: tileDoc.commitId.toString() }
         } catch (e) {
             console.error(e)
         }

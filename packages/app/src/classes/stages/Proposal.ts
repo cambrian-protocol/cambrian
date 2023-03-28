@@ -577,9 +577,11 @@ export default class Proposal {
         }
 
         try {
-            //  await this._proposalService.executeProposal(this._auth, this)
+            await this._proposalService.execute(this._auth, this)
         } catch (e) {
             throw e
         }
+        this._status = ProposalStatus.Executed
+        this._onRefresh()
     }
 }

@@ -99,4 +99,9 @@ export default class MockProposalService {
     async subscribe() { }
 
     async unsubscribe() { }
+
+    async approve(auth: UserType, amount: number, token: TokenModel) { }
+    async fund(auth: UserType, proposalId: string, amount: number, token: TokenModel) { }
+    async defund(auth: UserType, proposalId: string, amount: number, token: TokenModel) { }
+    async execute(auth: UserType, proposal: Proposal) { }
 }
