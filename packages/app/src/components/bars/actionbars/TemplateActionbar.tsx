@@ -64,7 +64,6 @@ const TemplateActionbar = ({ template }: TemplateActionbarProps) => {
                         isLoading={isCreatingProposal}
                         primary
                         disabled={!template.content.isActive}
-                        size="small"
                         label={
                             template.content.isActive
                                 ? 'Create Proposal'
