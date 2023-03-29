@@ -6,12 +6,12 @@ import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import DropButtonListItem from '../list/DropButtonListItem'
 import ResponsiveButton from './ResponsiveButton'
 import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
+import { TokenAmountModel } from '@cambrian/app/models/TokenModel'
 import { cpTheme } from '@cambrian/app/theme/theme'
 
 interface ISolverConfigInfoButton {
     composition: CompositionModel
-    price: { amount: number | ''; token: TokenModel }
+    price: TokenAmountModel
 }
 
 const SolverConfigInfoButton = ({

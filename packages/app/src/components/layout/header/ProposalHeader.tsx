@@ -38,7 +38,10 @@ const ProposalHeader = ({ proposal }: ProposalHeaderProps) => {
                         proposal.content.flexInputs
                     )}
                     price={{
-                        amount: proposal.content.price.amount,
+                        amount:
+                            typeof proposal.content.price.amount === 'string'
+                                ? 0
+                                : proposal.content.price.amount,
                         token: proposal.collateralToken,
                     }}
                 />,

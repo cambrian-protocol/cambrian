@@ -24,7 +24,10 @@ const TemplateHeader = ({ template }: ITemplateHeader) => {
                         template.content.flexInputs
                     )}
                     price={{
-                        amount: template.content.price.amount,
+                        amount:
+                            typeof template.content.price.amount === 'string'
+                                ? 0
+                                : template.content.price.amount,
                         token: template.denominationToken,
                     }}
                 />,
