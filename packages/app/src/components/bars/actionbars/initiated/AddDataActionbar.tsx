@@ -2,7 +2,6 @@ import ActionbarItemDropContainer from '../../../containers/ActionbarItemDropCon
 import AddDataModal from '../../../../ui/interaction/modals/AddDataModal'
 import BaseActionbar from '@cambrian/app/components/bars/actionbars/BaseActionbar'
 import { Button } from 'grommet'
-import DefaultRecipientActionbar from '../solver/DefaultRecipientActionbar'
 import { GenericMethods } from '../../../solver/Solver'
 import { RichSlotModel } from '@cambrian/app/models/SlotModel'
 import { Shield } from 'phosphor-react'
@@ -33,7 +32,6 @@ const AddDataActionbar = ({
             {isKeeper ? (
                 <>
                     <BaseActionbar
-                        messenger={messenger}
                         primaryAction={
                             <Button
                                 size="small"
@@ -70,11 +68,7 @@ const AddDataActionbar = ({
                         />
                     )}
                 </>
-            ) : isRecipient ? (
-                <DefaultRecipientActionbar messenger={messenger} />
-            ) : (
-                <></>
-            )}
+            ) : null}
         </>
     )
 }
