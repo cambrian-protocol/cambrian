@@ -11,14 +11,16 @@ import { Cursor } from 'phosphor-react'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ReclaimAndRedeemTokensModal from '@cambrian/app/ui/common/modals/ReclaimAndRedeemTokensModal'
-import { SolverInfoType } from '../ProposalExecutedActionbar'
 import SolverListModal from '@cambrian/app/ui/common/modals/SolverListModal'
+import { SolverModel } from '@cambrian/app/models/SolverModel'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
 interface IExecutedBar {
     proposal: Proposal
 }
+
+export type SolverInfoType = { address: string; data: SolverModel }
 
 const ExecutedBar = ({ proposal }: IExecutedBar) => {
     const router = useRouter()
