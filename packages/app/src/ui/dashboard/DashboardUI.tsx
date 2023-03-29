@@ -57,7 +57,9 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                 subscription = await API.doc.subscribe(
                     stagesLib.streamID,
                     (updatedLib) => {
-                        setStagesLib(updatedLib)
+                        if (updatedLib.next) {
+                            setStagesLib(updatedLib.next.content)
+                        }
                     }
                 )
             } catch (e) {
@@ -91,20 +93,24 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     }
 
     const onDeleteRecent = async (streamId: string) => {
-        const newStagesLib = _.cloneDeep(stagesLib)
-        if (newStagesLib) {
-            if (newStagesLib?.recents) {
-                const index = newStagesLib.recents.indexOf(streamId)
-                if (index > -1) {
-                    newStagesLib.recents.splice(index, 1)
+        try {
+            const updatedStagesLib = _.cloneDeep(stagesLib)
+            if (updatedStagesLib) {
+                if (updatedStagesLib?.recents) {
+                    const index = updatedStagesLib.recents.indexOf(streamId)
+                    if (index > -1) {
+                        updatedStagesLib.recents.splice(index, 1)
+                    }
                 }
+                const stagesLibDoc = await loadStagesLib(currentUser)
+                stagesLibDoc.content.update(updatedStagesLib)
+                await API.doc.updateStream(currentUser, stagesLibDoc.streamID, {
+                    ...stagesLibDoc.content.data,
+                })
+                setStagesLib(updatedStagesLib)
             }
-            const stagesLibDoc = await loadStagesLib(currentUser)
-            stagesLibDoc.content.update(newStagesLib)
-            await API.doc.updateStream(currentUser, stagesLibDoc.streamID, {
-                ...stagesLibDoc.content.data,
-            })
-            setStagesLib(newStagesLib)
+        } catch (e) {
+            console.error(e)
         }
     }
 
