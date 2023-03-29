@@ -28,7 +28,6 @@ interface RedeemTokensActionbarProps {
     currentUser: UserType
     currentCondition: SolverContractCondition
     solverData: SolverModel
-    messenger?: JSX.Element
 }
 
 const RedeemTokensActionbar = ({
@@ -36,7 +35,6 @@ const RedeemTokensActionbar = ({
     currentCondition,
     solverData,
     currentUser,
-    messenger,
 }: RedeemTokensActionbarProps) => {
     const { payoutInfo, redeemedAmount, ctfContract, isLoaded } = useRedeem(
         currentUser,
@@ -169,7 +167,6 @@ const RedeemTokensActionbar = ({
             {isLoaded ? (
                 redeemedAmount ? (
                     <BaseActionbar
-                        messenger={messenger}
                         info={actionbarInfo}
                         primaryAction={
                             <Box>
@@ -193,7 +190,6 @@ const RedeemTokensActionbar = ({
                 ) : payoutInfo?.amount.gt(0) ||
                   reclaimablePosition?.funderReclaimed.gt(0) ? (
                     <BaseActionbar
-                        messenger={messenger}
                         info={actionbarInfo}
                         primaryAction={
                             <LoaderButton
@@ -223,7 +219,6 @@ const RedeemTokensActionbar = ({
                     />
                 ) : reclaimablePosition?.funderReclaimed.eq(0) ? (
                     <BaseActionbar
-                        messenger={messenger}
                         info={actionbarInfo}
                         primaryAction={
                             <Button
@@ -234,12 +229,8 @@ const RedeemTokensActionbar = ({
                             />
                         }
                     />
-                ) : (
-                    <BaseActionbar messenger={messenger} />
-                )
-            ) : (
-                <BaseActionbar messenger={messenger} />
-            )}
+                ) : null
+            ) : null}
             {showReclaimTokenModal &&
                 reclaimableTokens &&
                 reclaimablePosition?.funderReclaimed.eq(0) && (
