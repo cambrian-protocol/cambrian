@@ -25,8 +25,8 @@ const TemplatePublishStep = () => {
     return (
         <>
             {template ? (
-                <Box>
-                    <Box pad="xsmall">
+                <Box gap="medium">
+                    <Box>
                         <HeaderTextSection
                             title="Share your template"
                             paragraph="Spread the word and distibute your template to your future clients."
