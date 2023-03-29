@@ -59,7 +59,6 @@ const ProposalDescriptionStep = ({
                         primaryButton={
                             <LoaderButton
                                 isLoading={isSaving}
-                                size="small"
                                 primary
                                 label={'Continue'}
                                 type="submit"
@@ -67,7 +66,6 @@ const ProposalDescriptionStep = ({
                         }
                         secondaryButton={
                             <Button
-                                size="small"
                                 secondary
                                 label={'Cancel'}
                                 onClick={() => {

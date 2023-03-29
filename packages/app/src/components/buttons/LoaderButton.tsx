@@ -4,7 +4,6 @@ import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { ButtonExtendedProps } from 'grommet'
-import { IconContext } from 'phosphor-react'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
 import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
@@ -29,13 +28,17 @@ const LoaderButton = ({
     const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null)
 
     useEffect(() => {
+        initSize()
+    }, [children, windowSize, props.disabled, isLoading])
+
+    const initSize = () => {
         if (ref.current && ref.current.getBoundingClientRect().width) {
             setWidth(ref.current.getBoundingClientRect().width)
         }
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [children, windowSize, props.disabled])
+    }
 
     useEffect(() => {
         if (isLoading) {
@@ -52,10 +55,11 @@ const LoaderButton = ({
             }
         }
     }, [isLoading, showLoader])
+
     return (
-        <>
+        <Box style={{ position: 'relative' }}>
             {isInitializing ? (
-                <BaseSkeletonBox height={'3.5em'} width={'8em'} />
+                <BaseSkeletonBox height={'3.5em'} width={'100%'} />
             ) : (
                 <Button
                     {...props}
@@ -75,43 +79,34 @@ const LoaderButton = ({
                             <Box justify="center" align="center">
                                 {!showLoader ? (
                                     <Box animation="fadeIn">
-                                        <Text size="small">{label}</Text>
+                                        <Text>{label}</Text>
                                     </Box>
                                 ) : (
-                                    <Box animation="fadeIn">
-                                        <Spinner color={'white'} />
-                                    </Box>
-                                )}
-                            </Box>
-                        )
-                    }
-                    icon={
-                        icon && !label ? (
-                            <Box justify="center" align="center">
-                                {!showLoader ? (
-                                    <IconContext.Provider
-                                        value={{ size: '24' }}
+                                    <Box
+                                        animation="fadeIn"
+                                        align="center"
+                                        style={{
+                                            position: 'absolute',
+                                            width: '100%',
+                                            left: 0,
+                                            right: 0,
+                                            marginLeft: 'auto',
+                                            marginRight: 'auto',
+                                        }}
                                     >
-                                        <Box align="center" animation="fadeIn">
-                                            {icon}
-                                        </Box>
-                                    </IconContext.Provider>
-                                ) : (
-                                    <Box animation="fadeIn">
                                         <Spinner
-                                            color={'white'}
+                                            color={'dark-4'}
                                             size="xsmall"
                                         />
                                     </Box>
                                 )}
                             </Box>
-                        ) : !showLoader ? (
-                            icon
-                        ) : undefined
+                        )
                     }
+                    icon={showLoader ? undefined : icon}
                 />
             )}
-        </>
+        </Box>
     )
 }
 

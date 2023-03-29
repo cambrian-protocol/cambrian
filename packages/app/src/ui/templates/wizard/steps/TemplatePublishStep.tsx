@@ -52,11 +52,7 @@ const TemplatePublishStep = () => {
                                 href={`${window.location.origin}/solver/${template.doc.streamID}`}
                                 passHref
                             >
-                                <Button
-                                    primary
-                                    label="View template"
-                                    size="small"
-                                />
+                                <Button primary label="View template" />
                             </Link>
                         }
                         secondaryButton={
@@ -64,11 +60,7 @@ const TemplatePublishStep = () => {
                                 href={`${window.location.origin}/template/edit/${template.doc.streamID}`}
                                 passHref
                             >
-                                <Button
-                                    secondary
-                                    label="Edit template"
-                                    size="small"
-                                />
+                                <Button secondary label="Edit template" />
                             </Link>
                         }
                     />

@@ -41,19 +41,13 @@ const ProposalPricingStep = ({
                         primaryButton={
                             <LoaderButton
                                 isLoading={isSaving}
-                                size="small"
                                 primary
                                 label={'Continue'}
                                 type="submit"
                             />
                         }
                         secondaryButton={
-                            <Button
-                                size="small"
-                                secondary
-                                label={'Back'}
-                                onClick={onBack}
-                            />
+                            <Button secondary label={'Back'} onClick={onBack} />
                         }
                     />
                 </Form>

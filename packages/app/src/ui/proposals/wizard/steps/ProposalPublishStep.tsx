@@ -64,11 +64,7 @@ const ProposalPublishStep = () => {
                                     href={`${window.location.origin}/proposal/edit/${proposal.doc.streamID}`}
                                     passHref
                                 >
-                                    <Button
-                                        size="small"
-                                        secondary
-                                        label={'Edit Proposal'}
-                                    />
+                                    <Button secondary label={'Edit Proposal'} />
                                 </Link>
                             }
                         />
