@@ -22,7 +22,6 @@ interface ArbitrateActionbarProps {
     currentCondition: SolverContractCondition
     solverAddress: string
     solverTimelock: TimelockModel
-    messenger?: JSX.Element
 }
 
 const ArbitrateActionbar = ({
@@ -32,7 +31,6 @@ const ArbitrateActionbar = ({
     currentCondition,
     solverAddress,
     solverTimelock,
-    messenger,
 }: ArbitrateActionbarProps) => {
     const [isArbitrating, setIsArbitrating] = useState<number>()
     const [showArbitrateModal, setShowArbitrateModal] = useState(false)
@@ -118,7 +116,6 @@ const ArbitrateActionbar = ({
     return (
         <>
             <BaseActionbar
-                messenger={messenger}
                 primaryAction={
                     <LoaderButton
                         disabled={isTimelockActive}
