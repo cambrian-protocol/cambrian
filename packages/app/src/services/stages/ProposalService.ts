@@ -1,8 +1,9 @@
 import API, { DocumentModel } from "../api/cambrian.api";
+import { BASE_SOLVER_IFACE, ERC20_IFACE, IPFS_SOLUTIONS_HUB_IFACE, PROPOSALS_HUB_IFACE } from "packages/app/config/ContractInterfaces";
 import { BigNumber, ethers } from "ethers";
-import { ERC20_IFACE, PROPOSALS_HUB_IFACE } from "packages/app/config/ContractInterfaces";
 import Proposal, { IStageStack } from "@cambrian/app/classes/stages/Proposal";
 import { getOnChainProposalId, getSolutionBaseId, getSolutionSafeBaseId } from "@cambrian/app/utils/proposal.utils";
+import { getSolverConfig, getSolverData, getSolverMetadata, getSolverOutcomes } from '@cambrian/app/components/solver/SolverGetters';
 
 import { CompositionModel } from "@cambrian/app/models/CompositionModel";
 import { GENERAL_ERROR } from "../../constants/ErrorMessages";
@@ -20,6 +21,7 @@ import { call } from "../../utils/service.utils";
 import { cpLogger } from "../api/Logger.api";
 import { createStage } from "@cambrian/app/utils/stage.utils";
 import { getParsedSolvers } from "@cambrian/app/utils/solver.utils";
+import { getSolverMethods } from '@cambrian/app/utils/helpers/solverHelpers';
 import { loadStagesLib } from "../../utils/stagesLib.utils";
 import randimals from 'randimals'
 
@@ -294,6 +296,61 @@ export default class ProposalService {
 
         } catch (e) {
             console.error(e)
+        }
+    }
+
+    async fetchAllSolvers(auth: UserType, proposal: Proposal) {
+        const ipfsSolutionsHubContract = new ethers.Contract(
+            SUPPORTED_CHAINS[auth.chainId].contracts.ipfsSolutionsHub,
+            IPFS_SOLUTIONS_HUB_IFACE,
+            auth.signer
+        )
+
+        const solverAddresses: string[] = await ipfsSolutionsHubContract.getSolvers(
+            proposal.onChainProposal.solutionId
+        )
+
+        if (solverAddresses && solverAddresses.length > 0) {
+            const solvers = await Promise.all(
+                solverAddresses.map(async (solverAddress) => {
+                    const solverContract = new ethers.Contract(
+                        solverAddress,
+                        BASE_SOLVER_IFACE,
+                        auth?.signer
+                    )
+                    const solverMethods = getSolverMethods(
+                        solverContract.interface,
+                        async (method: string, ...args: any[]) =>
+                            await solverContract[method](...args)
+                    )
+                    const fetchedMetadata = await getSolverMetadata(
+                        solverContract,
+                        auth.web3Provider
+                    )
+
+                    const fetchedSolverConfig = await getSolverConfig(
+                        solverContract
+                    )
+                    const fetchedOutcomes = await getSolverOutcomes(
+                        fetchedSolverConfig
+                    )
+
+                    const solverData = await getSolverData(
+                        solverContract,
+                        solverMethods,
+                        auth,
+                        fetchedOutcomes,
+                        fetchedMetadata,
+                        fetchedSolverConfig
+                    )
+
+                    return {
+                        address: solverAddress,
+                        data: solverData,
+                    }
+                })
+            )
+            return solvers
         }
     }
 

@@ -104,4 +104,5 @@ export default class MockProposalService {
     async fund(auth: UserType, proposalId: string, amount: number, token: TokenModel) { }
     async defund(auth: UserType, proposalId: string, amount: number, token: TokenModel) { }
     async execute(auth: UserType, proposal: Proposal) { }
+    async fetchAllSolvers(auth: UserType, proposal: Proposal) { return undefined }
 }

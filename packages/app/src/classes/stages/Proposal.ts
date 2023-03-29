@@ -232,6 +232,22 @@ export default class Proposal {
         }
     }
 
+    public async fetchAllSolvers() {
+        if (!this.onChainProposal || !this._auth) {
+            return
+        }
+
+        if (!isStatusValid(this._status, [ProposalStatus.Executed])) {
+            throw new Error('Invalid Proposal Status')
+        }
+
+        try {
+            return await this._proposalService.fetchAllSolvers(this._auth, this)
+        } catch (e) {
+            throw e
+        }
+    }
+
     private getProposalStatus(templateContent: TemplateModel, proposalContent: ProposalModel, onChainProposal?: any): ProposalStatus {
         if (onChainProposal) {
             return onChainProposal.isExecuted ? ProposalStatus.Executed : ProposalStatus.Funding
