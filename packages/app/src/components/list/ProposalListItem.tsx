@@ -1,23 +1,15 @@
-import {
-    Archive,
-    Check,
-    Copy,
-    DotsThree,
-    File,
-    Pen,
-    XCircle,
-} from 'phosphor-react'
+import { Archive, Check, Copy, DotsThree, File, Pen } from 'phosphor-react'
 import { Box, Button, DropButton, Spinner, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
-import CeramicProposalAPI from '@cambrian/app/services/ceramic/CeramicProposalAPI'
 import DropButtonListItem from './DropButtonListItem'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import Link from 'next/link'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import { ProposalStatus } from '@cambrian/app/models/ProposalStatus'
 import ProposalStatusBadge from '../badges/ProposalStatusBadge'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
@@ -54,7 +46,7 @@ const ProposalListItem = ({
     currentUser,
 }: ProposalListItemProps) => {
     const router = useRouter()
-    const ceramicProposalAPI = new CeramicProposalAPI(currentUser)
+    const proposalService = new ProposalService()
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [isRemoving, setIsRemoving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -64,11 +56,6 @@ const ProposalListItem = ({
         proposalInfo?.status === ProposalStatus.Draft ||
         proposalInfo?.status === ProposalStatus.ChangeRequested ||
         proposalInfo?.status === ProposalStatus.Modified
-
-    const isDeletable =
-        isEditable ||
-        proposalInfo?.status === ProposalStatus.OnReview ||
-        proposalInfo?.status === ProposalStatus.Canceled
 
     useEffect(() => {
         fetchInfo()
@@ -88,13 +75,10 @@ const ProposalListItem = ({
         setProposalInfo(await fetchProposalInfo(currentUser, proposalStreamID))
     }
 
-    const onRemove = async (
-        proposalStreamID: string,
-        type: 'CANCEL' | 'ARCHIVE'
-    ) => {
+    const onArchiveProposal = async (proposalStreamID: string) => {
         try {
             setIsRemoving(true)
-            await ceramicProposalAPI.removeProposal(proposalStreamID, type)
+            await proposalService.archive(currentUser, proposalStreamID)
         } catch (e) {
             setIsRemoving(false)
             setErrorMessage(await cpLogger.push(e))
@@ -208,30 +192,15 @@ const ProposalListItem = ({
                                 <PlainSectionDivider />
                                 <DropButtonListItem
                                     icon={
-                                        isRemoving ? (
-                                            <Spinner />
-                                        ) : isDeletable ? (
-                                            <XCircle
-                                                color={
-                                                    cpTheme.global.colors[
-                                                        'status-error'
-                                                    ]
-                                                }
-                                            />
-                                        ) : (
-                                            <Archive />
-                                        )
+                                        isRemoving ? <Spinner /> : <Archive />
                                     }
-                                    label={isDeletable ? 'Cancel' : 'Archive'}
+                                    label={'Archive'}
                                     onClick={
                                         isRemoving
                                             ? undefined
                                             : () =>
-                                                  onRemove(
-                                                      proposalStreamID,
-                                                      isDeletable
-                                                          ? 'CANCEL'
-                                                          : 'ARCHIVE'
+                                                  onArchiveProposal(
+                                                      proposalStreamID
                                                   )
                                     }
                                 />
