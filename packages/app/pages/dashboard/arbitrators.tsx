@@ -1,18 +1,15 @@
 import { ArrowsClockwise, CircleDashed, Scales } from 'phosphor-react'
 import { Box, Button, Heading, Tab, Tabs, Text } from 'grommet'
-import {
-    CAMBRIAN_LIB_NAME,
-    ceramicInstance,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import ArbitratorListItem from '@cambrian/app/components/list/ArbitratorListItem'
+import { CAMBRIAN_LIB_NAME } from '@cambrian/app/utils/stagesLib.utils'
 import CreateArbitratorModal from '@cambrian/app/ui/dashboard/modals/CreateArbitratorModal'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
@@ -40,18 +37,16 @@ export default function ArbitratorsDashboardPage() {
         setIsFetching(true)
         if (currentUser?.did) {
             try {
-                const arbitratorLib = (await TileDocument.deterministic(
-                    ceramicInstance(currentUser),
-                    {
-                        controllers: [currentUser.did],
-                        family: CAMBRIAN_LIB_NAME,
-                        tags: ['arbitrators'],
-                    },
-                    { pin: true }
-                )) as TileDocument<{ [address: string]: number }>
-                if (arbitratorLib.content) {
-                    setArbitratorContracts(arbitratorLib.content)
-                }
+                const arbitratorLib = await API.doc.deterministic<{
+                    [address: string]: number
+                }>({
+                    controllers: [currentUser.did],
+                    family: CAMBRIAN_LIB_NAME,
+                    tags: ['arbitrators'],
+                })
+
+                if (!arbitratorLib) throw new Error('No arbitrator lib found')
+                setArbitratorContracts(arbitratorLib.content)
             } catch (e) {
                 setErrorMessage(await cpLogger.push(e))
             }
