@@ -23,6 +23,7 @@ import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
@@ -35,7 +36,6 @@ import { UserType } from '@cambrian/app/store/UserContext'
 import { binaryArrayFromIndexSet } from '@cambrian/app/utils/transformers/ComposerTransformer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
-import { loadStageStackFromID } from './../../services/ceramic/CeramicUtils'
 
 export const getSolverConfig = async (
     contract: ethers.Contract
@@ -150,11 +150,11 @@ export const getSolverOutcomeCollections = async (
                     config.conditionBase.allocations.map((allocation) => {
                         const addressSlot =
                             slotHistory[condition.conditionId][
-                                allocation.recipientAddressSlot
+                            allocation.recipientAddressSlot
                             ]
                         const amountSlot =
                             slotHistory[condition.conditionId][
-                                allocation.recipientAmountSlots[idx]
+                            allocation.recipientAmountSlots[idx]
                             ]
 
                         const amount = BigNumber.from(
@@ -172,7 +172,7 @@ export const getSolverOutcomeCollections = async (
                             if (
                                 numMintedTokensByCondition &&
                                 numMintedTokensByCondition[
-                                    condition.conditionId
+                                condition.conditionId
                                 ] &&
                                 !numMintedTokensByCondition[
                                     condition.conditionId
@@ -311,12 +311,12 @@ export const getSolverSlots = async (
                     tag: slotTags
                         ? slotTags[ulid]
                         : {
-                              slotId: ulid,
-                              label: '',
-                              isFlex: 'None',
-                              description: '',
-                              instruction: '',
-                          },
+                            slotId: ulid,
+                            label: '',
+                            isFlex: 'None',
+                            description: '',
+                            instruction: '',
+                        },
                 }
             }
         })
@@ -445,7 +445,8 @@ export const getSolverMetadata = async (
             const proposalsHub = new ProposalsHub(provider, network.chainId)
             const metadataURI = await proposalsHub.getMetadataCID(proposalId)
             if (proposalId && metadataURI !== '') {
-                const stageStack = await loadStageStackFromID(metadataURI)
+                const proposalService = new ProposalService()
+                const stageStack = await proposalService.fetchStageStack(metadataURI)
                 if (stageStack) {
                     const solverIndex = (await solverContract.chainIndex()) as
                         | number
@@ -453,10 +454,10 @@ export const getSolverMetadata = async (
                     if (solverIndex !== undefined) {
                         return {
                             slotTags:
-                                stageStack.composition.solvers[solverIndex]
+                                stageStack.compositionDoc.content.solvers[solverIndex]
                                     .slotTags,
                             solverTag:
-                                stageStack.composition.solvers[solverIndex]
+                                stageStack.compositionDoc.content.solvers[solverIndex]
                                     .solverTag,
                             stageStack: stageStack,
                         }
@@ -477,7 +478,7 @@ export const getCurrentEscrow = async (
     if (contractSolverData.numMintedTokensByCondition) {
         const numMintedTokens =
             contractSolverData.numMintedTokensByCondition[
-                contractCondition.conditionId
+            contractCondition.conditionId
             ]
         let alreadyRedeemed = BigNumber.from(0)
 

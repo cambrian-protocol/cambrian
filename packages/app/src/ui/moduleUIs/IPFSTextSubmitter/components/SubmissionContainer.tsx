@@ -1,6 +1,7 @@
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SubmissionForm from './SubmissionForm'
@@ -8,7 +9,6 @@ import { SubmissionModel } from '../models/SubmissionModel'
 import SubmissionView from './SubmissionView'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { ethers } from 'ethers'
-import { loadCommitWorkaround } from '@cambrian/app/services/ceramic/CeramicUtils'
 import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
 
 interface ContentMarketingSolverContentProps {
@@ -56,10 +56,10 @@ const SubmissionContainer = ({
         const logs = await moduleContract.queryFilter(submittedWorkFilter)
         const commitIDs: any[] = logs.map((l) => l.args?.cid).filter(Boolean)
         if (commitIDs.length > 0) {
-            const latestCommit = await loadCommitWorkaround<SubmissionModel>(
+            const latestCommit = await API.doc.readCommit<SubmissionModel>(
                 commitIDs[commitIDs.length - 1]
             )
-            setLatestSubmission(latestCommit.content)
+            if (latestCommit) setLatestSubmission(latestCommit.content)
         }
     }
     return (

@@ -1,3 +1,4 @@
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { Box, Button, Form, TextInput } from 'grommet'
 import ChatMessage, { ChatMessageType } from './ChatMessage'
 import { useEffect, useRef, useState } from 'react'
@@ -5,10 +6,8 @@ import { useEffect, useRef, useState } from 'react'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import MESSAGE from '../../../public/sounds/new-message.mp3'
 import { PaperPlaneRight } from 'phosphor-react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '../../store/UserContext'
 import _ from 'lodash'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '../../services/api/Logger.api'
 import { useNotificationCountContext } from '@cambrian/app/hooks/useNotifcationCountContext'
 import useSound from 'use-sound'
@@ -91,22 +90,26 @@ export default function CoreMessenger({
         playNotificationSoundCallback.current = playNotificationSound
     })
 
-    // Subscribe to Messages TileDocuments
+    // Subscribe to Messages
     const initSubscriptions = async () => {
         const messagesDocs = await fetchMessagesDocs(
             participants.filter(
                 (participant) => participant !== currentUser.did
             )
         )
-        const subscriptions = messagesDocs.map((doc) =>
-            doc.subscribe(() => {
-                if (outbox.length === 0) {
-                    loadChat()
-                }
-            })
+
+        const subscriptions = await Promise.all(
+            messagesDocs.map(
+                async (doc) =>
+                    await API.doc.subscribe(doc.streamID, () => {
+                        if (outbox.length === 0) {
+                            loadChat()
+                        }
+                    })
+            )
         )
         return () => {
-            subscriptions.map((sub) => sub.unsubscribe())
+            subscriptions.map((sub) => sub && sub.unsubscribe())
         }
     }
 
@@ -115,21 +118,18 @@ export default function CoreMessenger({
             await Promise.allSettled(
                 dids.map(
                     async (DID) =>
-                        await TileDocument.deterministic(
-                            ceramicInstance(currentUser),
-                            {
-                                controllers: [DID],
-                                family: 'cambrian-chat',
-                                tags: [chatID],
-                            }
-                        )
+                        await API.doc.deterministic<UserChatTileDocumentType>({
+                            controllers: [DID],
+                            family: 'cambrian-chat',
+                            tags: [chatID],
+                        })
                 )
             )
         )
             .map((res) => {
                 return res.status === 'fulfilled' && res.value
             })
-            .filter(Boolean) as TileDocument<UserChatTileDocumentType>[]
+            .filter(Boolean) as DocumentModel<UserChatTileDocumentType>[]
     }
 
     // Load chat
@@ -141,7 +141,9 @@ export default function CoreMessenger({
                 .map((doc) => doc.content.messages)
 
             const usersReadMessagesCounter = messagesDocs.find(
-                (m) => m.controllers[0] === currentUser.did
+                (m) =>
+                    m.metadata?.controllers &&
+                    m.metadata.controllers[0] === currentUser.did
             )?.content.readMessagesCounter
 
             const fetchedMergedMessages = mergeMessages(fetchedMessages)
@@ -212,43 +214,28 @@ export default function CoreMessenger({
             if (!currentUser.did || !currentUser.session)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const messagesDoc: TileDocument<UserChatTileDocumentType> =
-                await TileDocument.deterministic(
-                    ceramicInstance(currentUser),
-                    {
-                        controllers: [currentUser.did],
-                        family: 'cambrian-chat',
-                        tags: [chatID],
-                    },
-                    { pin: true }
-                )
+            const messagesDoc =
+                await API.doc.deterministic<UserChatTileDocumentType>({
+                    controllers: [currentUser.did],
+                    family: 'cambrian-chat',
+                    tags: [chatID],
+                })
+
+            if (!messagesDoc) throw Error('Failed to fetch messagesDoc')
 
             const updatedReadMessagesCounter =
                 messagesDoc.content.readMessagesCounter + messages.length
 
             if (Array.isArray(messagesDoc.content?.messages)) {
-                await messagesDoc.update(
-                    {
-                        readMessagesCounter: updatedReadMessagesCounter,
-                        messages: [
-                            ...messagesDoc.content.messages,
-                            ...messages,
-                        ],
-                    },
-                    undefined,
-                    { pin: true }
-                )
+                await API.doc.updateStream(currentUser, messagesDoc.streamID, {
+                    readMessagesCounter: updatedReadMessagesCounter,
+                    messages: [...messagesDoc.content.messages, ...messages],
+                })
             } else {
-                await messagesDoc.update(
-                    {
-                        readMessagesCounter: updatedReadMessagesCounter,
-                        messages: [...messages],
-                    },
-                    undefined,
-                    {
-                        pin: true,
-                    }
-                )
+                await API.doc.updateStream(currentUser, messagesDoc.streamID, {
+                    readMessagesCounter: updatedReadMessagesCounter,
+                    messages: [...messages],
+                })
             }
 
             return true
@@ -275,31 +262,22 @@ export default function CoreMessenger({
         if (!currentUser.did || !currentUser.session)
             throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-        const messagesDoc: TileDocument<UserChatTileDocumentType> =
-            await TileDocument.deterministic(
-                ceramicInstance(currentUser),
-                {
-                    controllers: [currentUser.did],
-                    family: 'cambrian-chat',
-                    tags: [chatID],
-                },
-                { pin: true }
-            )
+        const messagesDoc =
+            await API.doc.deterministic<UserChatTileDocumentType>({
+                controllers: [currentUser.did],
+                family: 'cambrian-chat',
+                tags: [chatID],
+            })
 
         if (
+            messagesDoc &&
             messagesDoc.content.readMessagesCounter !==
-            updatedReadMessagesCounter
+                updatedReadMessagesCounter
         ) {
-            await messagesDoc.update(
-                {
-                    ...messagesDoc.content,
-                    readMessagesCounter: updatedReadMessagesCounter,
-                },
-                undefined,
-                {
-                    pin: true,
-                }
-            )
+            await API.doc.updateStream(currentUser, messagesDoc.streamID, {
+                ...messagesDoc.content,
+                readMessagesCounter: updatedReadMessagesCounter,
+            })
         }
     }
 

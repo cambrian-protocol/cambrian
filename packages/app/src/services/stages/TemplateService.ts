@@ -67,7 +67,7 @@ export default class TemplateService {
 
     async readProposalCommit(streamID: string, commitID: string) {
         try {
-            const res = await API.doc.readCommit<ProposalModel>(streamID, commitID)
+            const res = await API.doc.readCommit<ProposalModel>(commitID)
             if (res) return res
         } catch (e) {
             cpLogger.push(e)
@@ -162,7 +162,6 @@ export default class TemplateService {
             const denominationToken = await this.fetchToken(templateDoc.content.price.denominationTokenAddress, auth)
             const compositionDoc =
                 await API.doc.readCommit<CompositionModel>(
-                    templateDoc.content.composition.streamID,
                     templateDoc.content.composition.commitID
                 )
             if (!compositionDoc)

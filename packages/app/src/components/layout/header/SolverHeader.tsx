@@ -45,17 +45,15 @@ const SolverHeader = ({
                 metaTitle="Work Solver"
                 title={metadata?.solverTag.title || 'Unnamed Solver'}
                 items={
-                    metadata?.stageStack
+                    metadata?.stageStack &&
+                    metadata.stageStack.proposalDocs.latestCommitDoc
                         ? [
                               <ProposalInfoButton
                                   collateralToken={solverData.collateralToken}
-                                  proposalDoc={{
-                                      content: metadata.stageStack.proposal,
-                                      streamID:
-                                          metadata.stageStack.proposalStreamID,
-                                      commitID:
-                                          metadata.stageStack.proposalCommitID,
-                                  }}
+                                  proposalDoc={
+                                      metadata.stageStack.proposalDocs
+                                          .latestCommitDoc
+                                  }
                               />,
                               solverConfigInfoButton,
                           ]

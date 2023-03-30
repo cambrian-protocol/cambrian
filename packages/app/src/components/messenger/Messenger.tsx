@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 
 import AvatarGroup from '../avatars/AvatarGroup'
 import CoreMessenger from './CoreMessenger'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { getCambrianProfiles } from '@cambrian/app/utils/helpers/cambrianProfile'
 import { useNotificationCountContext } from '@cambrian/app/hooks/useNotifcationCountContext'
 
@@ -22,7 +22,7 @@ const Messenger = React.memo(
         const toggleShowMessenger = () => setShowMessenger(!showMessenger)
 
         const [cambrianProfiles, setCambrianProfiles] = useState<
-            TileDocument<CambrianProfileType>[]
+            DocumentModel<CambrianProfileType>[]
         >([])
 
         useEffect(() => {
@@ -32,8 +32,7 @@ const Messenger = React.memo(
         const fetchCambrianProfiles = async () => {
             setCambrianProfiles(
                 await getCambrianProfiles(
-                    participantDIDs.filter((p) => p !== currentUser.did),
-                    currentUser
+                    participantDIDs.filter((p) => p !== currentUser.did)
                 )
             )
         }

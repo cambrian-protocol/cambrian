@@ -1,5 +1,6 @@
 import { CAMBRIAN_LIB_NAME, ceramicInstance } from './CeramicUtils'
 
+import API from '../api/cambrian.api'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
@@ -28,36 +29,19 @@ export default class CeramicArbitratorAPI {
             if (!this.user.did || !this.user.session)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const arbitratorsLib = await TileDocument.deterministic(
-                ceramicInstance(this.user),
+            const arbitratorsLib = await API.doc.deterministic<ArbitratorContractFeeHashmap>(
                 {
                     controllers: [this.user.did],
                     family: CAMBRIAN_LIB_NAME,
                     tags: ['arbitrators'],
                 },
-                { pin: true }
             )
 
-            if (
-                arbitratorsLib.content !== null &&
-                typeof arbitratorsLib.content === 'object'
-            ) {
-                await arbitratorsLib.update(
-                    {
-                        ...arbitratorsLib.content,
-                        [`${arbitratorContractAddress}`]: fee,
-                    },
-                    undefined,
-                    { pin: true }
-                )
-            } else {
-                await arbitratorsLib.update(
-                    {
-                        [`${arbitratorContractAddress}`]: fee,
-                    },
-                    undefined,
-                    { pin: true }
-                )
+            if (arbitratorsLib) {
+                await API.doc.updateStream(this.user, arbitratorsLib.streamID, {
+                    ...arbitratorsLib.content,
+                    [`${arbitratorContractAddress}`]: fee,
+                },)
             }
         } catch (e) {
             cpLogger.push(e)
@@ -76,16 +60,14 @@ export default class CeramicArbitratorAPI {
 
                 const arbitratorContractsOnConnectedChain: ArbitratorContractFeeHashmap =
                     {}
-                const arbitratorLib = (await TileDocument.deterministic(
-                    ceramicInstance(this.user),
+                const arbitratorLib = await API.doc.deterministic<ArbitratorContractFeeHashmap>(
                     {
                         controllers: [this.user.did],
                         family: CAMBRIAN_LIB_NAME,
                         tags: ['arbitrators'],
                     },
-                    { pin: true }
-                )) as TileDocument<ArbitratorContractFeeHashmap>
-                if (arbitratorLib.content) {
+                )
+                if (arbitratorLib) {
                     return arbitratorLib.content
                 }
                 return arbitratorContractsOnConnectedChain

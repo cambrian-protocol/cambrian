@@ -236,7 +236,6 @@ export default class ProposalService {
 
             const compositionDoc =
                 await API.doc.readCommit<CompositionModel>(
-                    templateStreamDoc.content.composition.streamID,
                     templateStreamDoc.content.composition.commitID
                 )
             if (!compositionDoc)
@@ -269,7 +268,6 @@ export default class ProposalService {
         if (allProposalCommits && allProposalCommits.length > 0) {
             const latestProposalCommit = allProposalCommits.slice(-1)[0]
             return await API.doc.readCommit<ProposalModel>(
-                proposalStreamID,
                 latestProposalCommit.proposalCommitID
             )
         }

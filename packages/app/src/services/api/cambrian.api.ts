@@ -99,7 +99,7 @@ const doc = {
         } catch (e) { console.error(e) }
     },
 
-    readCommit: async <T>(streamID: string, commitID: string,): Promise<DocumentModel<T> | undefined> => {
+    readCommit: async <T>(commitID: string,): Promise<DocumentModel<T> | undefined> => {
         try {
             const readOnlyCeramicClient = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             const ceramicDoc = await TileDocument.load(readOnlyCeramicClient, commitID)

@@ -2,15 +2,15 @@ import { Box, Heading, Text } from 'grommet'
 
 import CambrianProfileInfo from '../../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { IconContext } from 'phosphor-react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 interface BaseHeaderProps {
     title: string
     metaTitle: string
     statusBadge?: JSX.Element
     items?: JSX.Element[]
-    authorProfileDoc?: TileDocument<CambrianProfileType>
+    authorProfileDoc?: DocumentModel<CambrianProfileType>
 }
 
 const BaseHeader = ({

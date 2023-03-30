@@ -1,31 +1,27 @@
-import { CambrianProfileType, UserType } from '@cambrian/app/store/UserContext'
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 
 export const getCambrianProfile = async (
     did: string,
-    currentUser: UserType
 ) => {
-    const cambrianProfile = (await TileDocument.deterministic(
-        ceramicInstance(currentUser),
+    const cambrianProfile = await API.doc.deterministic<CambrianProfileType>(
         {
             controllers: [did],
             family: 'cambrian-profile',
-        },
-        { pin: true }
-    )) as TileDocument<CambrianProfileType>
-
-    return cambrianProfile
+        }
+    )
+    if (cambrianProfile !== undefined) return cambrianProfile
 }
 
 export const getCambrianProfiles = async (
     dids: string[],
-    currentUser: UserType
-) => {
-    return await Promise.all(
+): Promise<(DocumentModel<CambrianProfileType>)[]> => {
+    const profiles = await Promise.all(
         dids.map(async (did) => {
-            return await getCambrianProfile(did, currentUser)
+            const profile = await getCambrianProfile(did)
+            if (profile) return profile
         })
     )
+    return profiles.filter((profile) => profile !== undefined) as DocumentModel<CambrianProfileType>[]
 }
