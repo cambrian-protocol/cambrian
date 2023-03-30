@@ -169,7 +169,6 @@ export default class ProposalService {
                     auth.chainId
                 )
                 const onChainProposal = await proposalsHub.getProposal(proposalID)
-                console.log(onChainProposal)
                 if (onChainProposal.id !== ethers.constants.HashZero) return onChainProposal
             }
         } catch (e) {

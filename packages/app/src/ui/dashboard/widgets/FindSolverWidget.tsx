@@ -1,12 +1,12 @@
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { Box, Text, TextInput } from 'grommet'
 
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import BaseSolverCard from '@cambrian/app/components/cards/BaseSolverCard'
 import ProposalCard from '@cambrian/app/components/list/BaseProposalListItem'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { ethers } from 'ethers'
 import { getSolverMetadata } from '@cambrian/app/components/solver/SolverGetters'
 import { useState } from 'react'
@@ -51,9 +51,9 @@ const FindSolverWidget = ({ currentUser }: FindSolverWidgetProps) => {
                     )
                 }
             } else {
-                const stage = (await ceramicInstance(currentUser).loadStream(
-                    id
-                )) as TileDocument<any>
+                const stage = await API.doc.readStream<any>(id)
+
+                if (!stage) throw new Error('Failed to load stage')
 
                 if (stage.content.solvers) {
                     // Its a Composition
@@ -80,8 +80,7 @@ const FindSolverWidget = ({ currentUser }: FindSolverWidgetProps) => {
                     setFetchedSolver(
                         <ProposalCard
                             currentUser={currentUser}
-                            proposal={stage.content}
-                            proposalStreamID={id}
+                            proposalDoc={stage as DocumentModel<ProposalModel>}
                         />
                     )
                 }
