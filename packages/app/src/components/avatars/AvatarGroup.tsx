@@ -5,7 +5,7 @@ import CambrianProfileInfo from '../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { getAddressFromDID } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getAddressFromDID } from '@cambrian/app/utils/did.utils'
 
 interface AvatarGroupProps {
     participants: TileDocument<CambrianProfileType>[]
