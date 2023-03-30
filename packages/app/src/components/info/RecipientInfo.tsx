@@ -8,7 +8,7 @@ import CambrianProfileAbout from './CambrianProfileAbout'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { CeramicClient } from '@ceramicnetwork/http-client'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { getDIDfromAddress } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getDIDfromAddress } from '@cambrian/app/utils/did.utils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface RecipientInfoItemProps {

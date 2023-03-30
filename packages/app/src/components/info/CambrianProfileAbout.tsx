@@ -6,7 +6,7 @@ import ClipboardButton from '../buttons/ClipboardButton'
 import { CurrencyEth } from 'phosphor-react'
 import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { getAddressFromDID } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getAddressFromDID } from '@cambrian/app/utils/did.utils'
 
 interface CambrianProfileAboutProps {
     cambrianProfile: TileDocument<CambrianProfileType>
