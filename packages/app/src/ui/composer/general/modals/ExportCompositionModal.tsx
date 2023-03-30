@@ -33,12 +33,16 @@ const ExportCompositionModal = ({ onBack }: ExportCompositionModalProps) => {
         setIsExporting(true)
         try {
             if (currentUser) {
-                const ceramicService = new CompositionService()
-                const res = await ceramicService.create(currentUser, {
-                    ...composer,
-                    title: compositionTitleInput,
-                    description: '',
-                })
+                const compositionService = new CompositionService()
+                const res = await compositionService.create(
+                    currentUser,
+                    compositionTitleInput,
+                    {
+                        ...composer,
+                        title: compositionTitleInput,
+                        description: '',
+                    }
+                )
 
                 if (!res) throw new Error('Failed to create Composition')
 
