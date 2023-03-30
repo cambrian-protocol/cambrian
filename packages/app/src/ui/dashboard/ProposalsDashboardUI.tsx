@@ -11,17 +11,12 @@ import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import ProposalListItem from '@cambrian/app/components/list/ProposalListItem'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
     proposalsLib?: BaseStageLibType
-}
-
-export type ProposalHashmap = {
-    [proposalStreamID: string]: TileDocument<ProposalModel>
 }
 
 export type StageStackType = {

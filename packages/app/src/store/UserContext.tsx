@@ -1,3 +1,4 @@
+import API, { DocumentModel } from '../services/api/cambrian.api'
 import { CERAMIC_NODE_ENDPOINT, INFURA_ID } from 'packages/app/config'
 import { EthereumWebAuth, getAccountId } from '@didtools/pkh-ethereum'
 import React, {
@@ -13,7 +14,6 @@ import ConnectWalletPage from '../components/sections/ConnectWalletPage'
 import { DIDSession } from 'did-session'
 import PermissionProvider from './PermissionContext'
 import { SafeAppWeb3Modal } from '@gnosis.pm/safe-apps-web3modal'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import _ from 'lodash'
 import { cpLogger } from '../services/api/Logger.api'
@@ -62,7 +62,7 @@ export type UserType = {
     chainId: number
     isSafeApp: boolean
     permissions: PermissionType[]
-    cambrianProfileDoc?: TileDocument<CambrianProfileType>
+    cambrianProfileDoc?: DocumentModel<CambrianProfileType>
     session?: DIDSession
     did?: string // did:pkh
 }
@@ -76,7 +76,7 @@ type UserActionType =
           address: UserType['address']
           chainId: UserType['chainId']
           isSafeApp: UserType['isSafeApp']
-          cambrianProfileDoc?: TileDocument<CambrianProfileType>
+          cambrianProfileDoc?: DocumentModel<CambrianProfileType>
           session?: UserType['session']
           did?: UserType['did']
       }
@@ -197,14 +197,11 @@ export const UserContextProvider = ({
                 const session = await loadSession(provider, network, address)
                 const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
                 ceramic.did = session.did
-                const cambrianProfileDoc = (await TileDocument.deterministic(
-                    ceramic,
-                    {
+                const cambrianProfileDoc =
+                    await API.doc.deterministic<CambrianProfileType>({
                         controllers: [ceramic.did.parent],
                         family: 'cambrian-profile',
-                    },
-                    { pin: true }
-                )) as TileDocument<CambrianProfileType>
+                    })
 
                 dispatch({
                     type: 'SET_USER',

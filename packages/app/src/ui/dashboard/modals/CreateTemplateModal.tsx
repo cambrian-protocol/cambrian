@@ -16,7 +16,7 @@ import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import randimals from 'randimals'
 import router from 'next/router'
 

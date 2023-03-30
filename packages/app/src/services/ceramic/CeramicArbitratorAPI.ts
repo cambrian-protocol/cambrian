@@ -1,8 +1,6 @@
-import { CAMBRIAN_LIB_NAME, ceramicInstance } from './CeramicUtils'
-
 import API from '../api/cambrian.api'
+import { CAMBRIAN_LIB_NAME } from '@cambrian/app/utils/stagesLib.utils'
 import { GENERAL_ERROR } from '../../constants/ErrorMessages'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '../api/Logger.api'
 

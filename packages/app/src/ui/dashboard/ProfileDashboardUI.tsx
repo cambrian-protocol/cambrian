@@ -7,6 +7,7 @@ import {
 import { FloppyDisk, XCircle } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
@@ -37,7 +38,11 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
             if (!currentUser.cambrianProfileDoc || !currentUser.session)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            await currentUser.cambrianProfileDoc.update(input)
+            await API.doc.updateStream(
+                currentUser,
+                currentUser.cambrianProfileDoc.streamID,
+                input
+            )
         } catch (e) {}
         setIsSaving(false)
     }

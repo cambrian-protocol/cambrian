@@ -4,12 +4,12 @@ import BaseAvatar from '../avatars/BaseAvatar'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import ClipboardButton from '../buttons/ClipboardButton'
 import { CurrencyEth } from 'phosphor-react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
 import { getAddressFromDID } from '@cambrian/app/utils/did.utils'
 
 interface CambrianProfileAboutProps {
-    cambrianProfile: TileDocument<CambrianProfileType>
+    cambrianProfile: DocumentModel<CambrianProfileType>
 }
 
 const CambrianProfileAbout = ({
@@ -39,7 +39,12 @@ const CambrianProfileAbout = ({
             ) : (
                 <BaseAvatar
                     size="medium"
-                    address={getAddressFromDID(cambrianProfile?.controllers[0])}
+                    address={
+                        cambrianProfile.metadata?.controllers &&
+                        getAddressFromDID(
+                            cambrianProfile.metadata.controllers[0]
+                        )
+                    }
                 />
             )}
             <Box>
@@ -65,12 +70,21 @@ const CambrianProfileAbout = ({
             <CurrencyEth size="18" />
             <Text size="xsmall" color="dark-4" truncate>
                 {ellipseAddress(
-                    getAddressFromDID(cambrianProfile?.controllers[0]),
+                    cambrianProfile.metadata?.controllers &&
+                        getAddressFromDID(
+                            cambrianProfile.metadata.controllers[0]
+                        ),
                     15
                 )}
             </Text>
             <ClipboardButton
-                value={getAddressFromDID(cambrianProfile?.controllers[0]) || ''}
+                value={
+                    (cambrianProfile.metadata?.controllers &&
+                        getAddressFromDID(
+                            cambrianProfile.metadata.controllers[0]
+                        )) ||
+                    ''
+                }
                 size="xsmall"
             />
         </Box>

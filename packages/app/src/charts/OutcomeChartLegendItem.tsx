@@ -1,15 +1,13 @@
+import API, { DocumentModel } from '../services/api/cambrian.api'
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import { AllocationModel } from '../models/AllocationModel'
 import BaseAvatar from '../components/avatars/BaseAvatar'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CambrianProfileAbout from '../components/info/CambrianProfileAbout'
 import { CambrianProfileType } from '../store/UserContext'
-import { CeramicClient } from '@ceramicnetwork/http-client'
 import InfoDropButton from '../components/buttons/InfoDropButton'
 import { SolidityDataTypes } from '../models/SolidityDataTypes'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { TokenModel } from '../models/TokenModel'
 import { decodeData } from '../utils/helpers/decodeData'
 import { ethers } from 'ethers'
@@ -30,7 +28,7 @@ const OutcomeChartRecipientLegendItem = ({
 }: OutcomeChartRecipientLegendItemProps) => {
     const { currentUser } = useCurrentUserContext()
     const [cambrianProfile, setCambrianProfile] =
-        useState<TileDocument<CambrianProfileType>>()
+        useState<DocumentModel<CambrianProfileType>>()
     const [decodedAddress, setDecodedAddress] = useState<string>()
 
     useEffect(() => {
@@ -39,7 +37,6 @@ const OutcomeChartRecipientLegendItem = ({
 
     const fetchCeramicProfile = async () => {
         if (currentUser) {
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
             if (
                 allocation.addressSlot.slot.data.length > 0 &&
                 allocation.addressSlot.slot.data !==
@@ -49,16 +46,13 @@ const OutcomeChartRecipientLegendItem = ({
                     [SolidityDataTypes.Address],
                     allocation.addressSlot.slot.data
                 )
-                const cambrianProfileDoc = (await TileDocument.deterministic(
-                    ceramic,
-                    {
+                const cambrianProfileDoc =
+                    await API.doc.deterministic<CambrianProfileType>({
                         controllers: [
                             `did:pkh:eip155:${currentUser.chainId}:${_decodedAddress}`,
                         ],
                         family: 'cambrian-profile',
-                    },
-                    { pin: true }
-                )) as TileDocument<CambrianProfileType>
+                    })
                 setDecodedAddress(_decodedAddress)
                 setCambrianProfile(cambrianProfileDoc)
             }

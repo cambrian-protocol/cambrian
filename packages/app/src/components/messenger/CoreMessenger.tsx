@@ -15,7 +15,7 @@ import useSound from 'use-sound'
 /**
  * Messages are stored for a user in:
  *
- * TileDocument.deterministic(<client>, {
+ * doc.deterministic(<client>, {
  *  controllers: [<did:pkh>],
  *  family: "cambrian-chat"
  *  tags: [<chatID>]
@@ -27,7 +27,7 @@ import useSound from 'use-sound'
  *  Proposal => <proposalStreamID>
  */
 
-type UserChatTileDocumentType = {
+type UserChatDocType = {
     messages: ChatMessageType[]
     readMessagesCounter: number
 }
@@ -118,7 +118,7 @@ export default function CoreMessenger({
             await Promise.allSettled(
                 dids.map(
                     async (DID) =>
-                        await API.doc.deterministic<UserChatTileDocumentType>({
+                        await API.doc.deterministic<UserChatDocType>({
                             controllers: [DID],
                             family: 'cambrian-chat',
                             tags: [chatID],
@@ -129,7 +129,7 @@ export default function CoreMessenger({
             .map((res) => {
                 return res.status === 'fulfilled' && res.value
             })
-            .filter(Boolean) as DocumentModel<UserChatTileDocumentType>[]
+            .filter(Boolean) as DocumentModel<UserChatDocType>[]
     }
 
     // Load chat
@@ -214,12 +214,11 @@ export default function CoreMessenger({
             if (!currentUser.did || !currentUser.session)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const messagesDoc =
-                await API.doc.deterministic<UserChatTileDocumentType>({
-                    controllers: [currentUser.did],
-                    family: 'cambrian-chat',
-                    tags: [chatID],
-                })
+            const messagesDoc = await API.doc.deterministic<UserChatDocType>({
+                controllers: [currentUser.did],
+                family: 'cambrian-chat',
+                tags: [chatID],
+            })
 
             if (!messagesDoc) throw Error('Failed to fetch messagesDoc')
 
@@ -262,12 +261,11 @@ export default function CoreMessenger({
         if (!currentUser.did || !currentUser.session)
             throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-        const messagesDoc =
-            await API.doc.deterministic<UserChatTileDocumentType>({
-                controllers: [currentUser.did],
-                family: 'cambrian-chat',
-                tags: [chatID],
-            })
+        const messagesDoc = await API.doc.deterministic<UserChatDocType>({
+            controllers: [currentUser.did],
+            family: 'cambrian-chat',
+            tags: [chatID],
+        })
 
         if (
             messagesDoc &&
