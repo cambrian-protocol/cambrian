@@ -19,7 +19,10 @@ interface ProfileDashboardUIProps {
 }
 
 const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
-    const cambrianProfile = currentUser.cambrianProfileDoc?.content
+    const [cambrianProfile, setCambrianProfile] = useState(
+        currentUser.cambrianProfileDoc?.content
+    )
+
     const [input, setInput] = useState<CambrianProfileType>(
         initialCambrianProfile
     )
@@ -43,6 +46,7 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 currentUser.cambrianProfileDoc.streamID,
                 input
             )
+            setCambrianProfile(input)
         } catch (e) {}
         setIsSaving(false)
     }
@@ -57,7 +61,6 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 controls={[
                     <Button
                         icon={<XCircle />}
-                        size="small"
                         secondary
                         label="Reset"
                         onClick={() =>
