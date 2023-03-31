@@ -1,10 +1,8 @@
 import { Box, Button, Form, FormField, Heading, Text, TextArea } from 'grommet'
 import {
     CambrianProfileType,
-    UserType,
     initialCambrianProfile,
 } from '@cambrian/app/store/UserContext'
-import { FloppyDisk, XCircle } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
 import API from '@cambrian/app/services/api/cambrian.api'
@@ -13,40 +11,47 @@ import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHea
 import { GENERAL_ERROR } from '@cambrian/app/constants/ErrorMessages'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
-interface ProfileDashboardUIProps {
-    currentUser: UserType
-}
-
-const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
-    const [cambrianProfile, setCambrianProfile] = useState(
-        currentUser.cambrianProfileDoc?.content
-    )
-
+const ProfileDashboardUI = () => {
+    const { currentUser, isUserLoaded, updateProfileDoc } =
+        useCurrentUserContext()
     const [input, setInput] = useState<CambrianProfileType>(
         initialCambrianProfile
     )
     const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
-        setInput({
-            ...initialCambrianProfile,
-            ...currentUser.cambrianProfileDoc?.content,
-        })
-    }, [currentUser])
+        if (currentUser) {
+            setInput({
+                ...initialCambrianProfile,
+                ...currentUser.cambrianProfileDoc?.content,
+            })
+        }
+    }, [isUserLoaded])
 
     const onSave = async () => {
         setIsSaving(true)
         try {
-            if (!currentUser.cambrianProfileDoc || !currentUser.session)
+            if (
+                !currentUser ||
+                !currentUser.cambrianProfileDoc ||
+                !currentUser.session
+            )
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            await API.doc.updateStream(
+            const res = await API.doc.updateStream(
                 currentUser,
                 currentUser.cambrianProfileDoc.streamID,
                 input
             )
-            setCambrianProfile(input)
+            if (res?.status === 200) {
+                updateProfileDoc({
+                    ...currentUser.cambrianProfileDoc,
+                    content: input,
+                    commitID: res.commitID,
+                })
+            }
         } catch (e) {}
         setIsSaving(false)
     }
@@ -60,18 +65,16 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 your wallet."
                 controls={[
                     <Button
-                        icon={<XCircle />}
                         secondary
                         label="Reset"
                         onClick={() =>
                             setInput({
                                 ...initialCambrianProfile,
-                                ...cambrianProfile,
+                                ...currentUser?.cambrianProfileDoc?.content,
                             })
                         }
                     />,
                     <LoaderButton
-                        icon={<FloppyDisk />}
                         onClick={onSave}
                         isLoading={isSaving}
                         primary
@@ -85,16 +88,27 @@ const ProfileDashboardUI = ({ currentUser }: ProfileDashboardUIProps) => {
                 gap="medium"
                 pad={{ top: 'medium' }}
             >
-                {cambrianProfile?.avatar ? (
-                    <BaseAvatar size="large" pfpPath={cambrianProfile.avatar} />
+                {currentUser?.cambrianProfileDoc?.content.avatar ? (
+                    <BaseAvatar
+                        size="large"
+                        pfpPath={
+                            currentUser?.cambrianProfileDoc?.content.avatar
+                        }
+                    />
                 ) : (
-                    <BaseAvatar size="large" address={currentUser.address} />
+                    <BaseAvatar size="large" address={currentUser?.address} />
                 )}
                 <Box gap="small" pad={{ top: 'medium' }}>
-                    <Heading>{cambrianProfile?.name || 'Anon'}</Heading>
-                    <Text>{cambrianProfile?.title || 'Unknown'}</Text>
+                    <Heading>
+                        {currentUser?.cambrianProfileDoc?.content?.name ||
+                            'Anon'}
+                    </Heading>
+                    <Text>
+                        {currentUser?.cambrianProfileDoc?.content?.title ||
+                            'Unknown'}
+                    </Text>
                     <Text color="dark-4">
-                        {ellipseAddress(currentUser.address, 10)}
+                        {ellipseAddress(currentUser?.address, 10)}
                     </Text>
                 </Box>
             </Box>

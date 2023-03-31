@@ -159,7 +159,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                                 />
                             </Tab>
                             <Tab title="Profile" icon={<UserCircle />}>
-                                <ProfileDashboardUI currentUser={currentUser} />
+                                <ProfileDashboardUI />
                             </Tab>
                         </Tabs>
                     </IconContext.Provider>

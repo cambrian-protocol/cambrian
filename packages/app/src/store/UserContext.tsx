@@ -52,6 +52,9 @@ export type UserContextType = {
     connectWallet: () => Promise<void>
     addPermission: (permission: PermissionType) => void
     isUserLoaded: boolean
+    updateProfileDoc: (
+        updatedCambrianProfile: DocumentModel<CambrianProfileType>
+    ) => void
 }
 
 export type UserType = {
@@ -79,6 +82,10 @@ type UserActionType =
           cambrianProfileDoc?: DocumentModel<CambrianProfileType>
           session?: UserType['session']
           did?: UserType['did']
+      }
+    | {
+          type: 'UPDATE_PROFILE'
+          cambrianProfileDoc: DocumentModel<CambrianProfileType>
       }
     | {
           type: 'RESET_WEB3_PROVIDER'
@@ -137,6 +144,14 @@ function userReducer(
                 }
             }
             break
+        case 'UPDATE_PROFILE':
+            if (state) {
+                return {
+                    ...state,
+                    cambrianProfileDoc: action.cambrianProfileDoc,
+                }
+            }
+            break
         case 'RESET_WEB3_PROVIDER':
             return null
         default:
@@ -152,6 +167,7 @@ export const UserContext = React.createContext<UserContextType>({
     disconnectWallet: () => {},
     connectWallet: async () => {},
     isUserLoaded: false,
+    updateProfileDoc: () => {},
 })
 
 type UserContextProviderProps = PropsWithChildren<{}> & {
@@ -328,6 +344,15 @@ export const UserContextProvider = ({
         }
     }
 
+    const updateProfileDoc = (
+        newCambrianProfile: DocumentModel<CambrianProfileType>
+    ) => {
+        dispatch({
+            type: 'UPDATE_PROFILE',
+            cambrianProfileDoc: newCambrianProfile,
+        })
+    }
+
     return (
         <UserContext.Provider
             value={{
@@ -336,6 +361,7 @@ export const UserContextProvider = ({
                 connectWallet: connectWallet,
                 disconnectWallet: disconnectWallet,
                 isUserLoaded: isUserLoaded,
+                updateProfileDoc: updateProfileDoc,
             }}
         >
             <PermissionProvider permissions={user ? user.permissions : []}>
