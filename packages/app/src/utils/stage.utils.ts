@@ -51,10 +51,15 @@ export const createStage = async <T extends StageModel>(auth: UserType, stage: T
         if (!auth.session || !auth.did)
             throw GENERAL_ERROR['UNAUTHORIZED']
 
+        const family = isCompositionStage(stage) ? 'composition'
+            : isTemplateStage(stage) ? 'template'
+                : isProposalStage(stage) ? 'proposal'
+                    : 'unknown'
+
         const tempUlid = ulid()
         const stageMetadata = {
             controllers: [auth.did],
-            family: `template`,
+            family: family,
             tags: [tempUlid] // To generate a unique streamID
         }
 
