@@ -103,7 +103,15 @@ const LoaderButton = ({
                             </Box>
                         )
                     }
-                    icon={showLoader ? undefined : icon}
+                    icon={
+                        showLoader ? (
+                            !label ? (
+                                <Spinner color={'dark-4'} size="xsmall" />
+                            ) : undefined
+                        ) : (
+                            icon
+                        )
+                    }
                 />
             )}
         </Box>
