@@ -290,8 +290,15 @@ export default class Proposal {
         this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content, this._onChainProposal)
         this._onRefresh()
     }
-    public refreshTemplateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
+    public async refreshTemplateDoc(updatedTemplateDoc: DocumentModel<TemplateModel>) {
         this._template.refreshDoc(updatedTemplateDoc)
+
+        // Has the latest proposal commit changed? Reinitialize the latest proposal commit doc if so.
+        const latestProposalCommit = updatedTemplateDoc.content.receivedProposals[this._proposalStreamDoc.streamID]?.slice(-1)[0]
+        if (latestProposalCommit?.proposalCommitID !== this._latestProposalCommitDoc?.commitID) {
+            const proposalCommitDoc = await this._proposalService.fetchLatestProposalCommitDoc(updatedTemplateDoc, this._proposalStreamDoc.streamID)
+            this._latestProposalCommitDoc = proposalCommitDoc
+        }
         this._status = this.getProposalStatus(updatedTemplateDoc.content, this.doc.content, this._onChainProposal)
         this._onRefresh()
     }
@@ -417,12 +424,12 @@ export default class Proposal {
 
         try {
             await this._template.receive(this._proposalStreamDoc)
-            this._latestProposalCommitDoc = _.cloneDeep(this._proposalStreamDoc)
         } catch (e) {
             console.error(e)
             return
         }
 
+        this._latestProposalCommitDoc = _.cloneDeep(this._proposalStreamDoc)
         this._status = ProposalStatus.OnReview
         this._onRefresh()
     }
