@@ -45,7 +45,7 @@ const SolverActionbar = ({
     const allowedForArbitrator = usePermissionContext('Arbitrator')
     const [messenger, setMessenger] = useState<JSX.Element>()
     const ref = useRef<HTMLDivElement>(null)
-    const [height, setHeight] = useState<number>()
+    const [height, setHeight] = useState<number>(0)
     const windowSize = useWindowSize()
 
     useEffect(() => {

@@ -17,7 +17,7 @@ interface IProposalActionbar {
 
 const ProposalActionbar = ({ proposal }: IProposalActionbar) => {
     const ref = useRef<HTMLDivElement>(null)
-    const [height, setHeight] = useState<number>()
+    const [height, setHeight] = useState<number>(0)
     const windowSize = useWindowSize()
 
     useEffect(() => {
