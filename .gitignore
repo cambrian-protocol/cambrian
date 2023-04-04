@@ -12,3 +12,4 @@ deployments/localhost
 
 # Narya
 /reports/
+pnm-cov.json
