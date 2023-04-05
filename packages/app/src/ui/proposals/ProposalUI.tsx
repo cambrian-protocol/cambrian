@@ -14,13 +14,50 @@ import { Subscription } from 'rxjs'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
+const RECEIVE_DELAY_MS = 30000
+
 const ProposalUI = () => {
     const { currentUser, isUserLoaded } = useCurrentUserContext()
     const [isInitialized, setIsInitialized] = useState(false)
     const { proposal } = useProposalContext()
+    const [savedCalls, setSavedCalls] = useState<(() => Promise<void>)[]>([])
+    let lastReceiveTime = 0
+
     useEffect(() => {
-        if (proposal && isUserLoaded) init(proposal)
+        if (proposal && isUserLoaded) {
+            init(proposal)
+        }
     }, [proposal, isUserLoaded, currentUser])
+
+    useEffect(() => {
+        if (savedCalls.length > 0) {
+            // Process saved calls after 30 seconds
+            setTimeout(async () => {
+                const calls = savedCalls.splice(0, savedCalls.length)
+                console.log('Processing saved calls', calls)
+                for (const call of calls) {
+                    await call()
+                }
+            }, 30000)
+        }
+    }, [savedCalls])
+
+    const init = async (_proposal: Proposal) => {
+        if (
+            _proposal.status === ProposalStatus.Submitted &&
+            currentUser?.did === _proposal.template.content.author
+        ) {
+            const currentTime = Date.now()
+            if (currentTime - lastReceiveTime > RECEIVE_DELAY_MS) {
+                lastReceiveTime = currentTime
+                await _proposal.receive()
+                setSavedCalls([])
+            } else {
+                setSavedCalls((calls) => [...calls, () => _proposal.receive()])
+            }
+        }
+        setIsInitialized(true)
+    }
 
     useEffect(() => {
         let proposalSubscription: Subscription | undefined
@@ -87,15 +124,6 @@ const ProposalUI = () => {
         }
     }, [proposal?.doc.streamID])
 
-    const init = async (_proposal: Proposal) => {
-        if (
-            _proposal.status === ProposalStatus.Submitted &&
-            currentUser?.did === _proposal.template.content.author
-        ) {
-            await _proposal.receive()
-        }
-        setIsInitialized(true)
-    }
     return (
         <>
             {proposal && isInitialized ? (

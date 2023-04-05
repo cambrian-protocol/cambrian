@@ -21,7 +21,7 @@ const ProposalActionbar = ({ proposal }: IProposalActionbar) => {
     const windowSize = useWindowSize()
 
     useEffect(() => {
-        if (ref.current && ref.current.getBoundingClientRect().height) {
+        if (ref.current && ref.current.getBoundingClientRect().height > -1) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
     }, [windowSize, proposal.status])
