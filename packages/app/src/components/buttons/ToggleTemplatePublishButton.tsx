@@ -2,6 +2,7 @@ import { CheckCircle, PauseCircle } from 'phosphor-react'
 import React, { useState } from 'react'
 
 import LoaderButton from './LoaderButton'
+import { ResponsiveContext } from 'grommet'
 import Template from '@cambrian/app/classes/stages/Template'
 import { cpTheme } from '@cambrian/app/theme/theme'
 
@@ -30,24 +31,38 @@ const ToggleTemplatePublishButton = ({
     }
 
     return (
-        <LoaderButton
-            isLoading={isTogglingActive}
-            icon={
-                template.content.isActive ? (
-                    <CheckCircle color={cpTheme.global.colors['status-ok']} />
-                ) : (
-                    <PauseCircle
-                        color={cpTheme.global.colors['status-error']}
+        <ResponsiveContext.Consumer>
+            {(screenSize) => {
+                return (
+                    <LoaderButton
+                        isLoading={isTogglingActive}
+                        size="small"
+                        color={'dark-4'}
+                        icon={
+                            template.content.isActive ? (
+                                <CheckCircle
+                                    color={cpTheme.global.colors['status-ok']}
+                                />
+                            ) : (
+                                <PauseCircle
+                                    color={
+                                        cpTheme.global.colors['status-error']
+                                    }
+                                />
+                            )
+                        }
+                        label={
+                            screenSize !== 'small'
+                                ? template.content.isActive
+                                    ? 'Open for Proposals'
+                                    : 'Closed for Propsals'
+                                : null
+                        }
+                        onClick={toggleIsActive}
                     />
                 )
-            }
-            label={
-                template.content.isActive
-                    ? 'Open for proposals'
-                    : 'Closed for propsals'
-            }
-            onClick={toggleIsActive}
-        />
+            }}
+        </ResponsiveContext.Consumer>
     )
 }
 

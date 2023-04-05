@@ -19,6 +19,7 @@ const LoaderButton = ({
     label,
     icon,
     isInitializing,
+    size,
     ...props
 }: LoaderButtonProps) => {
     const windowSize = useWindowSize()
@@ -79,7 +80,7 @@ const LoaderButton = ({
                             <Box justify="center" align="center">
                                 {!showLoader ? (
                                     <Box animation="fadeIn">
-                                        <Text>{label}</Text>
+                                        <Text size={size}>{label}</Text>
                                     </Box>
                                 ) : (
                                     <Box
