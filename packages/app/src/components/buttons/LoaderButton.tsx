@@ -6,6 +6,7 @@ import { Button } from 'grommet'
 import { ButtonExtendedProps } from 'grommet'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
+import { cpTheme } from '@cambrian/app/theme/theme'
 import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
 
 export type LoaderButtonProps = ButtonExtendedProps & {
@@ -71,6 +72,9 @@ const LoaderButton = ({
                                   width: `${width}px`,
                                   height: `${height}px`,
                                   maxWidth: '100%',
+                                  backgroundColor:
+                                      cpTheme.global.colors['background-front']
+                                          .dark,
                               }
                             : {}
                     }
