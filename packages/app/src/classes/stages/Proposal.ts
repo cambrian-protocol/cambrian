@@ -285,6 +285,12 @@ export default class Proposal {
         return proposalContent.isSubmitted ? ProposalStatus.Submitted : ProposalStatus.Draft
     }
 
+    public setOnChainProposal(onChainProposal: any) {
+        this._onChainProposal = onChainProposal
+        this._status = this.getProposalStatus(this.template.doc.content, this._proposalStreamDoc.content, onChainProposal)
+        this._onRefresh()
+    }
+
     public refreshProposalDoc(updatedProposalDoc: DocumentModel<ProposalModel>) {
         this._proposalStreamDoc = updatedProposalDoc
         this._status = this.getProposalStatus(this.template.doc.content, updatedProposalDoc.content, this._onChainProposal)
