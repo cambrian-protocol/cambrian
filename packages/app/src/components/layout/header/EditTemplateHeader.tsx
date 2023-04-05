@@ -1,5 +1,5 @@
 import { Clipboard, Eye, FloppyDisk } from 'phosphor-react'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import BaseHeader from './BaseHeader'
 import LoaderButton from '../../buttons/LoaderButton'
@@ -40,6 +40,14 @@ const EditTemplateHeader = ({
             }
         }
     }
+
+    const mergedContent = useMemo(() => {
+        return {
+            ...template.content,
+            ...templateInput,
+        }
+    }, [template.content, templateInput])
+
     return (
         <BaseHeader
             authorProfileDoc={authorProfile}
@@ -58,7 +66,7 @@ const EditTemplateHeader = ({
                 />,
                 <ToggleTemplatePublishButton template={template} />,
                 <LoaderButton
-                    disabled={_.isEqual(template.content, templateInput)}
+                    disabled={_.isEqual(template.content, mergedContent)}
                     label="Save"
                     color="dark-4"
                     isLoading={isSaving}
