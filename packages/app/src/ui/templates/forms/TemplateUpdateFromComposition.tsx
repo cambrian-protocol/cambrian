@@ -1,56 +1,52 @@
-import { Box, Button } from 'grommet'
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
+import { useEffect, useState } from 'react'
 
-import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
+import { Box } from 'grommet'
+import ButtonDescriptionLayout from '@cambrian/app/components/layout/ButtonDescriptionLayout'
+import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import Template from '@cambrian/app/classes/stages/Template'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import { TemplateInputType } from '../EditTemplateUI'
 import _ from 'lodash'
 import { getFormFlexInputs } from '@cambrian/app/utils/stage.utils'
-import { useState } from 'react'
 
 interface ITemplateUpdateFromComposition {
-    template: Template
-}
-
-export type TemplateUpdateFromCompositionType = {
-    requirements: string
+    templateInput: TemplateInputType
+    setTemplateInput: React.Dispatch<React.SetStateAction<TemplateInputType>>
 }
 
 const TemplateUpdateFromComposition = ({
-    template,
+    templateInput,
+    setTemplateInput,
 }: ITemplateUpdateFromComposition) => {
-    const [updatedTemplate, setUpdatedTemplate] = useState<TemplateModel>()
     const [isUpdating, setIsUpdating] = useState(false)
-    const [isSaving, setIsSaving] = useState(false)
-    const isUpdated =
-        template.content.composition.commitID ===
-        template.compositionDoc.commitID
+    const [isInitializing, setIsInitializing] = useState(true)
+    const [upToDateCompositionDoc, setUpToDateCompositionDoc] =
+        useState<DocumentModel<CompositionModel>>()
 
-    const handleSave = async () => {
-        try {
-            setIsSaving(true)
-            if (
-                updatedTemplate &&
-                !_.isEqual(updatedTemplate, template.content)
-            ) {
-                await template.updateContent(updatedTemplate)
-            }
-        } catch (e) {
-            console.error(e)
-        }
-        setIsSaving(false)
+    useEffect(() => {
+        init()
+    }, [])
+
+    const init = async () => {
+        const compositionDoc = await API.doc.readStream<CompositionModel>(
+            templateInput.composition.streamID
+        )
+        setUpToDateCompositionDoc(compositionDoc)
+        setIsInitializing(false)
     }
 
     const updateTemplateFromComposition = async () => {
         try {
+            if (!upToDateCompositionDoc) return
+
             setIsUpdating(true)
             const { formFlexInputs, isCollateralFlex } = getFormFlexInputs(
-                template.compositionDoc.content
+                upToDateCompositionDoc.content
             )
 
             const mergedFormFlexInputs = formFlexInputs
             mergedFormFlexInputs.forEach((flexInput, idx) => {
-                const preExisting = template.content.flexInputs.find(
+                const preExisting = templateInput.flexInputs.find(
                     (x) =>
                         x.tagId == flexInput.tagId &&
                         (flexInput.isFlex == 'Both' ||
@@ -61,19 +57,18 @@ const TemplateUpdateFromComposition = ({
                 }
             })
 
-            setUpdatedTemplate({
-                ...template.content,
+            setTemplateInput({
+                ...templateInput,
                 flexInputs: formFlexInputs,
                 price: {
-                    ...template.content.price,
+                    ...templateInput.price,
                     isCollateralFlex: isCollateralFlex,
                 },
                 composition: {
-                    ...template.content.composition,
-                    commitID: template.compositionDoc.commitID,
+                    ...templateInput.composition,
+                    commitID: upToDateCompositionDoc.commitID,
                 },
             })
-
             setIsUpdating(false)
         } catch (e) {
             setIsUpdating(false)
@@ -82,31 +77,29 @@ const TemplateUpdateFromComposition = ({
 
     return (
         <Box gap="medium">
-            <LoaderButton
-                isLoading={isUpdating}
-                primary
-                disabled={isUpdated || updatedTemplate !== undefined}
-                size="small"
-                label={isUpdated ? 'Currently Up-to-date' : 'Update'}
-                onClick={() => updateTemplateFromComposition()}
-            />
-            <ButtonRowContainer
-                primaryButton={
-                    <LoaderButton
-                        isLoading={isSaving}
-                        size="small"
-                        primary
-                        label={'Save'}
-                        disabled={updatedTemplate === undefined}
-                        onClick={() => handleSave()}
-                    />
+            <ButtonDescriptionLayout
+                disabled={
+                    upToDateCompositionDoc?.commitID ===
+                        templateInput.composition.commitID || isInitializing
                 }
-                secondaryButton={
-                    <Button
+                description="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
+                button={
+                    <LoaderButton
+                        isLoading={isUpdating}
+                        isInitializing={isInitializing}
+                        primary
+                        disabled={
+                            upToDateCompositionDoc?.commitID ===
+                            templateInput.composition.commitID
+                        }
                         size="small"
-                        secondary
-                        label={'Reset changes'}
-                        onClick={() => setUpdatedTemplate(undefined)}
+                        label={
+                            upToDateCompositionDoc?.commitID ===
+                            templateInput.composition.commitID
+                                ? 'Up-to-date'
+                                : 'Update'
+                        }
+                        onClick={() => updateTemplateFromComposition()}
                     />
                 }
             />

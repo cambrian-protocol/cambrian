@@ -18,7 +18,12 @@ import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 export type TemplateInputType = Pick<
     TemplateModel,
-    'title' | 'description' | 'price' | 'flexInputs' | 'requirements'
+    | 'title'
+    | 'description'
+    | 'price'
+    | 'flexInputs'
+    | 'requirements'
+    | 'composition'
 >
 
 export const initialTemplateInput: TemplateInputType = {
@@ -33,6 +38,7 @@ export const initialTemplateInput: TemplateInputType = {
     },
     flexInputs: [],
     requirements: '',
+    composition: { commitID: '', streamID: '' },
 }
 
 const EditTemplateUI = () => {
@@ -49,6 +55,7 @@ const EditTemplateUI = () => {
                 flexInputs: template.content.flexInputs,
                 price: template.content.price,
                 requirements: template.content.requirements,
+                composition: template.content.composition,
             })
     }, [template])
 
@@ -158,10 +165,10 @@ const EditTemplateUI = () => {
                                     <HeaderTextSection
                                         size="small"
                                         title="Update Template from Composition"
-                                        paragraph="Update this template to use the newest version of its source Composition. Existing proposals for this Template will not be affected."
                                     />
                                     <TemplateUpdateFromComposition
-                                        template={template}
+                                        templateInput={templateInput}
+                                        setTemplateInput={setTemplateInput}
                                     />
                                 </Box>
                             </Tab>
