@@ -34,7 +34,6 @@ const ProposalUI = () => {
             // Process saved calls after 30 seconds
             setTimeout(async () => {
                 const calls = savedCalls.splice(0, savedCalls.length)
-                console.log('Processing saved calls', calls)
                 for (const call of calls) {
                     await call()
                 }
