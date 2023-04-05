@@ -29,13 +29,9 @@ const SolverHeader = ({
 
     const solverConfigInfoButton = (
         <ResponsiveButton
-            label="Configuration"
-            icon={
-                <Gear
-                    color={cpTheme.global.colors['dark-4']}
-                    onClick={toggleShowSolverConfigInfoModal}
-                />
-            }
+            label="Solver Configuration"
+            icon={<Gear color={cpTheme.global.colors['dark-4']} />}
+            onClick={toggleShowSolverConfigInfoModal}
         />
     )
 
