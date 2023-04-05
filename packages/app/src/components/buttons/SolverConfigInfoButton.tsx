@@ -56,6 +56,7 @@ const SolverConfigInfoButton = ({
                     right: 'right',
                 }}
                 dropProps={{
+                    margin: { top: 'xsmall' },
                     round: {
                         corner: 'bottom',
                         size: 'xsmall',
