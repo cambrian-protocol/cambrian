@@ -3,9 +3,7 @@ import { useContext, useEffect, useState } from 'react'
 
 import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
 import EditTemplateHeader from '@cambrian/app/components/layout/header/EditTemplateHeader'
-import { FloppyDisk } from 'phosphor-react'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
-import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import TemplateDescriptionForm from './forms/TemplateDescriptionForm'
@@ -14,7 +12,6 @@ import { TemplateModel } from '@cambrian/app/models/TemplateModel'
 import TemplatePricingForm from './forms/TemplatePricingForm'
 import TemplateRequirementsForm from './forms/TemplateRequirementsForm'
 import TemplateUpdateFromComposition from './forms/TemplateUpdateFromComposition'
-import ToggleTemplatePublishButton from '@cambrian/app/components/buttons/ToggleTemplatePublishButton'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
 import _ from 'lodash'
 import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
@@ -43,7 +40,6 @@ const EditTemplateUI = () => {
     const [activeIndex, setActiveIndex] = useState(0)
     const [templateInput, setTemplateInput] =
         useState<TemplateInputType>(initialTemplateInput)
-    const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         if (template)
@@ -63,24 +59,6 @@ const EditTemplateUI = () => {
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [activeIndex])
 
-    const onSave = async () => {
-        if (template) {
-            try {
-                setIsSaving(true)
-                const updatedTemplate = {
-                    ...template.content,
-                    ...templateInput,
-                }
-                if (!_.isEqual(updatedTemplate, template.content)) {
-                    await template.updateContent(updatedTemplate)
-                }
-                setIsSaving(false)
-            } catch (e) {
-                console.error(e)
-            }
-        }
-    }
-
     return (
         <>
             {template ? (
@@ -89,7 +67,10 @@ const EditTemplateUI = () => {
                     kind="narrow"
                 >
                     <Box gap="medium">
-                        <EditTemplateHeader template={template} />
+                        <EditTemplateHeader
+                            template={template}
+                            templateInput={templateInput}
+                        />
                         <Tabs
                             justify="start"
                             activeIndex={activeIndex}
@@ -184,18 +165,6 @@ const EditTemplateUI = () => {
                                     />
                                 </Box>
                             </Tab>
-                            <Box align="end" justify="center" flex>
-                                <Box direction="row" gap="small">
-                                    <ToggleTemplatePublishButton
-                                        template={template}
-                                    />
-                                    <LoaderButton
-                                        isLoading={isSaving}
-                                        icon={<FloppyDisk />}
-                                        onClick={onSave}
-                                    />
-                                </Box>
-                            </Box>
                         </Tabs>
                     </Box>
                 </PageLayout>
