@@ -54,13 +54,18 @@ const BaseHeader = ({
                 ) : (
                     <Box />
                 )}
-                <Box direction="row" gap="small" align="center">
-                    <IconContext.Provider value={{ size: '18' }}>
+                <IconContext.Provider value={{ size: '18' }}>
+                    <Box
+                        direction="row"
+                        gap="xsmall"
+                        align="center"
+                        pad={{ bottom: 'xsmall' }}
+                    >
                         {items?.map((item, idx) => (
                             <Box key={idx}>{item}</Box>
                         ))}
-                    </IconContext.Provider>
-                </Box>
+                    </Box>
+                </IconContext.Provider>
             </Box>
         </Box>
     )
