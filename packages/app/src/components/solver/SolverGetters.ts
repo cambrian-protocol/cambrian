@@ -14,6 +14,7 @@ import {
     getSolverIngestWithMetaData,
 } from '@cambrian/app/utils/helpers/solverHelpers'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import { AllocationModel } from '@cambrian/app/models/AllocationModel'
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
 import CTFContract from '@cambrian/app/contracts/CTFContract'
@@ -23,6 +24,7 @@ import { GenericMethods } from './Solver'
 import { IPFSAPI } from '@cambrian/app/services/api/IPFS.api'
 import { OutcomeCollectionsHashMapType } from '@cambrian/app/models/OutcomeCollectionModel'
 import { OutcomeModel } from '@cambrian/app/models/OutcomeModel'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SlotTagsHashMapType } from '@cambrian/app/src/classes/Tags/SlotTag'
@@ -445,8 +447,10 @@ export const getSolverMetadata = async (
             const proposalsHub = new ProposalsHub(provider, network.chainId)
             const metadataURI = await proposalsHub.getMetadataCID(proposalId)
             if (proposalId && metadataURI !== '') {
+                const proposalDoc = await API.doc.readStream<ProposalModel>(metadataURI)
+                if (!proposalDoc) throw new Error('Proposal not found')
                 const proposalService = new ProposalService()
-                const stageStack = await proposalService.fetchStageStack(metadataURI)
+                const stageStack = await proposalService.fetchStageStack(proposalDoc)
                 if (stageStack) {
                     const solverIndex = (await solverContract.chainIndex()) as
                         | number
