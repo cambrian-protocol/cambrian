@@ -19,6 +19,8 @@ contract BondControllerTest is PTest {
     uint256 forkId;
 
     Tranche tranche = Tranche(0xa07Df4a1721bF151104234A8B73B93e5E371f7e8);
+    Tranche bWETH = Tranche(0xd7dfc5318ed2836C6E91778A1B2e0125219D4d03);
+
     BondController bondController =
         BondController(0x8c624D6a336edE5da3bDA01574cF091A938EA906);
     UniV3LoanRouter uv3lr =
