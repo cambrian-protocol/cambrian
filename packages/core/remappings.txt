@@ -2,7 +2,7 @@ tranche/=forge/lib/tranche/contracts/
 @openzeppelin/contracts/=forge/lib/openzeppelin-contracts/contracts/
 @openzeppelin/contracts-upgradeable/=forge/lib/openzeppelin-contracts-upgradeable/contracts/
 @uniswap/lib/=forge/lib/solidity-lib/
-forge-std/=forge/lib/narya-contracts/lib/forge-std/src/
+forge-std/=forge/lib/forge-std/src/
 ds-test/=forge/lib/narya-contracts/lib/forge-std/lib/ds-test/src/
 @rari-capital/solmate/=forge/lib/solmate/
 @uniswap/v3-periphery/=forge/lib/v3-periphery/
@@ -10,3 +10,4 @@ ds-test/=forge/lib/narya-contracts/lib/forge-std/lib/ds-test/src/
 @uniswap/v2-periphery/=forge/lib/v2-periphery/
 narya-contracts/=forge/lib/narya-contracts/
 button-wrappers/=forge/lib/button-wrappers/
+

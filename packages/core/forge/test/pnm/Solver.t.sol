@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "forge-std/Test.sol";
-import "@narya-ai/contracts/PTest.sol";
+import "narya-contracts/PTest.sol";
 import "../../../contracts/solvers/SolverFactory.sol";
 import "../../../contracts/solvers/SolverLib.sol";
 import "../../../contracts/solvers/BasicSolverV1.sol";

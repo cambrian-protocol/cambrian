@@ -19,9 +19,6 @@
 [submodule "packages/core/forge/lib/v3-core"]
 	path = packages/core/forge/lib/v3-core
 	url = https://github.com/uniswap/v3-core
-[submodule "packages/core/forge/lib/narya-contracts"]
-	path = packages/core/forge/lib/narya-contracts
-	url = https://github.com/naryaai/narya-contracts
 [submodule "packages/core/forge/lib/button-wrappers"]
 	path = packages/core/forge/lib/button-wrappers
 	url = https://github.com/buttonwood-protocol/button-wrappers
