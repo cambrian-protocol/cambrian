@@ -2615,6 +2615,11 @@
   resolved "https://registry.yarnpkg.com/@multiformats/base-x/-/base-x-4.0.1.tgz#95ff0fa58711789d53aefb2590a8b7a4e715d121"
   integrity sha512-eMk0b9ReBbV23xXU693TAIrLyeO5iTgBZGSJfpqriG8UkYvr/hC9u9pyMlAakDNHWmbhMZCDs6KQO0jzKD8OTw==
 
+"@narya-ai/contracts@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@narya-ai/contracts/-/contracts-0.4.0.tgz#afb64ab7100d052f4454dc8ccdc92d23f7b40c05"
+  integrity sha512-kYiwS2bNcxVZwCr0vxS5C3Z5fIwNC+/rUIxias9eiorJdzL/yLk3yUkrwpQ+BvbP+o8TLEl4/Xaghrxijy1/IQ==
+
 "@next/env@12.3.1":
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-12.3.1.tgz#18266bd92de3b4aa4037b1927aa59e6f11879260"
@@ -3015,11 +3020,6 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==
-
-"@pwnednomore/contracts@^0.2.14":
-  version "0.2.14"
-  resolved "https://registry.yarnpkg.com/@pwnednomore/contracts/-/contracts-0.2.14.tgz#0f2d01907a7491a3867763a148b521796bd05bbc"
-  integrity sha512-XGKwIy+VKSCn0PRXnf79SPTeKPsumagw9KABws5aUyvIos41/xJssRZWFyHwypdd4bl03oVkYYaJZAZQTDpWag==
 
 "@resolver-engine/core@^0.2.1":
   version "0.2.1"
@@ -8711,11 +8711,6 @@ forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
   integrity sha512-j0KLYPhm6zeac4lz3oJ3o65qvgQCcPubiyotZrXqEaG4hNagNYO8qdlUrX5vwqv9ohqeT/Z3j6+yW067yWWdUw==
-
-forge-std@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/forge-std/-/forge-std-1.1.2.tgz#f4a0eda103538d56f9c563f3cd1fa2fd01bd9378"
-  integrity sha512-Wfb0iAS9PcfjMKtGpWQw9mXzJxrWD62kJCUqqLcyuI0+VRtJ3j20XembjF3kS20qELYdXft1vD/SPFVWVKMFOw==
 
 form-data-encoder@1.7.1:
   version "1.7.1"
