@@ -109,5 +109,7 @@ contract BondControllerTest is PTest, StdInvariant {
 
     function invariantStolen() external view {
         assert(agent.balance <= 1 ether);
+        assert((aTrancheWETH).balanceOf(agent) == 0);
+        assert((bTrancheWETH).balanceOf(agent) == 0);
     }
 }
