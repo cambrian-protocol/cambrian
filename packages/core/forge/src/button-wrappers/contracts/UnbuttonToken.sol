@@ -1,4 +1,4 @@
-pragma solidity 0.8.4;
+pragma solidity ^0.8.4;
 
 import {IButtonWrapper} from "./interfaces/IButtonWrapper.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Source https://github.com/ampleforth/token-geyser-v2/blob/main/contracts/Factory/InstanceRegistry.sol
-pragma solidity 0.8.4;
+pragma solidity ^0.8.4;
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 

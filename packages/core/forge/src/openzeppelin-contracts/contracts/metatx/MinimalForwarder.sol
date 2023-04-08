@@ -44,10 +44,11 @@ contract MinimalForwarder is EIP712 {
         return _nonces[req.from] == req.nonce && signer == req.from;
     }
 
-    function execute(
-        ForwardRequest calldata req,
-        bytes calldata signature
-    ) public payable returns (bool, bytes memory) {
+    function execute(ForwardRequest calldata req, bytes calldata signature)
+        public
+        payable
+        returns (bool, bytes memory)
+    {
         require(verify(req, signature), "MinimalForwarder: signature does not match request");
         _nonces[req.from] = req.nonce + 1;
 
@@ -59,7 +60,7 @@ contract MinimalForwarder is EIP712 {
         // See https://ronan.eth.limo/blog/ethereum-gas-dangers/
         if (gasleft() <= req.gas / 63) {
             // We explicitly trigger invalid opcode to consume all gas and bubble-up the effects, since
-            // neither revert or assert consume all gas since Solidity 0.8.0
+            // neither revert or assert consume all gas since Solidity^0.8.0
             // https://docs.soliditylang.org/en/v0.8.0/control-structures.html#panic-via-assert-and-error-via-require
             /// @solidity memory-safe-assembly
             assembly {

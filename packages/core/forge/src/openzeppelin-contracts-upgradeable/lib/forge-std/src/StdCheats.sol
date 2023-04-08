@@ -189,7 +189,7 @@ abstract contract StdCheatsSafe {
     }
 
     function assumeNoPrecompiles(address addr) internal virtual {
-        // Assembly required since `block.chainid` was introduced in 0.8.0.
+        // Assembly required since `block.chainid` was introduced in^0.8.0.
         uint256 chainId;
         assembly {
             chainId := chainid()
@@ -207,15 +207,30 @@ abstract contract StdCheatsSafe {
         // forgefmt: disable-start
         if (chainId == 10 || chainId == 420) {
             // https://github.com/ethereum-optimism/optimism/blob/eaa371a0184b56b7ca6d9eb9cb0a2b78b2ccd864/op-bindings/predeploys/addresses.go#L6-L21
-            vm.assume(addr < address(0x4200000000000000000000000000000000000000) || addr > address(0x4200000000000000000000000000000000000800));
+            vm.assume(
+                addr < address(0x4200000000000000000000000000000000000000) ||
+                    addr > address(0x4200000000000000000000000000000000000800)
+            );
         } else if (chainId == 42161 || chainId == 421613) {
             // https://developer.arbitrum.io/useful-addresses#arbitrum-precompiles-l2-same-on-all-arb-chains
-            vm.assume(addr < address(0x0000000000000000000000000000000000000064) || addr > address(0x0000000000000000000000000000000000000068));
+            vm.assume(
+                addr < address(0x0000000000000000000000000000000000000064) ||
+                    addr > address(0x0000000000000000000000000000000000000068)
+            );
         } else if (chainId == 43114 || chainId == 43113) {
             // https://github.com/ava-labs/subnet-evm/blob/47c03fd007ecaa6de2c52ea081596e0a88401f58/precompile/params.go#L18-L59
-            vm.assume(addr < address(0x0100000000000000000000000000000000000000) || addr > address(0x01000000000000000000000000000000000000ff));
-            vm.assume(addr < address(0x0200000000000000000000000000000000000000) || addr > address(0x02000000000000000000000000000000000000FF));
-            vm.assume(addr < address(0x0300000000000000000000000000000000000000) || addr > address(0x03000000000000000000000000000000000000Ff));
+            vm.assume(
+                addr < address(0x0100000000000000000000000000000000000000) ||
+                    addr > address(0x01000000000000000000000000000000000000ff)
+            );
+            vm.assume(
+                addr < address(0x0200000000000000000000000000000000000000) ||
+                    addr > address(0x02000000000000000000000000000000000000FF)
+            );
+            vm.assume(
+                addr < address(0x0300000000000000000000000000000000000000) ||
+                    addr > address(0x03000000000000000000000000000000000000Ff)
+            );
         }
         // forgefmt: disable-end
     }
@@ -379,7 +394,11 @@ abstract contract StdCheatsSafe {
     }
 
     /// @dev deploy contract with value on construction
-    function deployCode(string memory what, bytes memory args, uint256 val) internal virtual returns (address addr) {
+    function deployCode(
+        string memory what,
+        bytes memory args,
+        uint256 val
+    ) internal virtual returns (address addr) {
         bytes memory bytecode = abi.encodePacked(vm.getCode(what), args);
         /// @solidity memory-safe-assembly
         assembly {
@@ -408,7 +427,7 @@ abstract contract StdCheatsSafe {
 
     // creates a labeled address
     function makeAddr(string memory name) internal virtual returns (address addr) {
-        (addr,) = makeAddrAndKey(name);
+        (addr, ) = makeAddrAndKey(name);
     }
 
     function deriveRememberKey(string memory mnemonic, uint32 index)
@@ -497,7 +516,11 @@ abstract contract StdCheats is StdCheatsSafe {
         vm.prank(who, origin);
     }
 
-    function hoax(address who, address origin, uint256 give) internal virtual {
+    function hoax(
+        address who,
+        address origin,
+        uint256 give
+    ) internal virtual {
         vm.deal(who, give);
         vm.prank(who, origin);
     }
@@ -520,7 +543,11 @@ abstract contract StdCheats is StdCheatsSafe {
         vm.startPrank(who, origin);
     }
 
-    function startHoax(address who, address origin, uint256 give) internal virtual {
+    function startHoax(
+        address who,
+        address origin,
+        uint256 give
+    ) internal virtual {
         vm.deal(who, give);
         vm.startPrank(who, origin);
     }
@@ -538,11 +565,20 @@ abstract contract StdCheats is StdCheatsSafe {
 
     // Set the balance of an account for any ERC20 token
     // Use the alternative signature to update `totalSupply`
-    function deal(address token, address to, uint256 give) internal virtual {
+    function deal(
+        address token,
+        address to,
+        uint256 give
+    ) internal virtual {
         deal(token, to, give, false);
     }
 
-    function deal(address token, address to, uint256 give, bool adjust) internal virtual {
+    function deal(
+        address token,
+        address to,
+        uint256 give,
+        bool adjust
+    ) internal virtual {
         // get current balance
         (, bytes memory balData) = token.call(abi.encodeWithSelector(0x70a08231, to));
         uint256 prevBal = abi.decode(balData, (uint256));

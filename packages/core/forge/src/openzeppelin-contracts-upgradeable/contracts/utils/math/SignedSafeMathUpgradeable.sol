@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
 /**
  * @dev Wrappers over Solidity's arithmetic operations.
  *
- * NOTE: `SignedSafeMath` is no longer needed starting with Solidity 0.8. The compiler
+ * NOTE: `SignedSafeMath` is no longer needed starting with Solidity^0.8. The compiler
  * now has built in overflow checking.
  */
 library SignedSafeMathUpgradeable {
