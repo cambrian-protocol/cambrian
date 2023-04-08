@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.3;
 
-import "@narya-ai/contracts/PTest.sol";
+import "narya-contracts/PTest.sol";
 import "forge-std/StdInvariant.sol";
 
 import {BondController} from "tranche/BondController.sol";
