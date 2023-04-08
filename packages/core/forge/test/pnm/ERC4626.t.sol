@@ -2,6 +2,7 @@
 pragma solidity ^0.8.3;
 
 import "narya-contracts/PTest.sol";
+import "narya-contracts/lib/forge-std/src/StdInvariant.sol";
 
 import {BondController} from "tranche/BondController.sol";
 import {Tranche} from "tranche/Tranche.sol";
@@ -13,14 +14,14 @@ import {UniV3LoanRouter} from "tranche/UniV3LoanRouter.sol";
 import {WamplLoanRouter} from "tranche/WamplLoanRouter.sol";
 import {WethLoanRouter} from "tranche/WethLoanRouter.sol";
 import {IButtonWrapper} from "tranche/interfaces/IButtonWrapper.sol";
-import "button-wrappers/contracts/ButtonToken.sol";
-import "button-wrappers/contracts/ButtonTokenFactory.sol";
-import "button-wrappers/contracts/ButtonTokenWamplRouter.sol";
-import "button-wrappers/contracts/ButtonTokenWethRouter.sol";
-import "button-wrappers/contracts/UnbuttonToken.sol";
-import "button-wrappers/contracts/UnbuttonTokenFactory.sol";
+import {ButtonToken} from "button-wrappers/contracts/ButtonToken.sol";
+import {ButtonTokenFactory} from "button-wrappers/contracts/ButtonTokenFactory.sol";
+import {ButtonTokenWamplRouter} from "button-wrappers/contracts/ButtonTokenWamplRouter.sol";
+import {ButtonTokenWethRouter} from "button-wrappers/contracts/ButtonTokenWethRouter.sol";
+import {UnbuttonToken} from "button-wrappers/contracts/UnbuttonToken.sol";
+import {UnbuttonTokenFactory} from "button-wrappers/contracts/UnbuttonTokenFactory.sol";
 
-contract BondControllerTest is PTest {
+contract BondControllerTest is PTest, StdInvariant {
     address agent;
     uint256 forkId;
 
@@ -58,17 +59,19 @@ contract BondControllerTest is PTest {
     TrancheFactory trancheFactory =
         TrancheFactory(0xeca709A67E8e774c827547D900e01B763f77E99f);
     BondFactory bondFactory =
-        BondFactory(0x71868d38ea3b3eb5e4db9a45ee355548b46c82e0);
+        BondFactory(0x71868D38Ea3b3eB5e4db9a45ee355548B46c82E0);
 
-    DualAuction dualAuction =
-        DualAction(0xc8f46c1545AbAc895D3ca18f75eADD452643Cffb);
-    DualActionFactory dualAuctionFactory =
-        DualAuctionFactory(0x1696D00fe4b0F473FaCbf1958C49090Ba55B47a2);
+    // DualAuction dualAuction =
+    //     DualAction(0xc8f46c1545AbAc895D3ca18f75eADD452643Cffb);
+    // DualActionFactory dualAuctionFactory =
+    //     DualAuctionFactory(0x1696D00fe4b0F473FaCbf1958C49090Ba55B47a2);
 
     ButtonTokenWethRouter buttonTokenWethRouter =
-        ButtonTokenWethRouter(0xb08c5e2e8e73d0fb9842171496b2da04e8e80a0d);
+        ButtonTokenWethRouter(
+            payable(0xB08c5e2E8E73d0FB9842171496B2da04E8E80A0D)
+        );
     ButtonTokenWamplRouter buttonTokenWamplRouter =
-        ButtonTokenWamplRouter(0x2c76a2ce5f285f10c5674bee172b420b4e20a983);
+        ButtonTokenWamplRouter(0x2c76A2Ce5f285f10C5674BEE172b420B4e20A983);
 
     function setUp() external {
         forkId = vm.createSelectFork(vm.rpcUrl("mainnet"), 16833213);
@@ -94,8 +97,8 @@ contract BondControllerTest is PTest {
         targetContract(address(trancheFactory));
         targetContract(address(bondFactory));
 
-        targetContract(address(dualAuction));
-        targetContract(address(dualAuctionFactory));
+        // targetContract(address(dualAuction));
+        // targetContract(address(dualAuctionFactory));
 
         targetContract(address(buttonTokenWethRouter));
         targetContract(address(buttonTokenWamplRouter));
