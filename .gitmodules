@@ -25,3 +25,6 @@
 [submodule "packages/core/forge/lib/openzeppelin-contracts"]
 	path = packages/core/forge/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "packages/core/forge/lib/narya-contracts"]
+	path = packages/core/forge/lib/narya-contracts
+	url = https://github.com/naryaai/narya-contracts
