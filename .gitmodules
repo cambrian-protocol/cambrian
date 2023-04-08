@@ -25,3 +25,6 @@
 [submodule "packages/core/forge/lib/button-wrappers"]
 	path = packages/core/forge/lib/button-wrappers
 	url = https://github.com/buttonwood-protocol/button-wrappers
+[submodule "packages/core/forge/lib/openzeppelin-contracts"]
+	path = packages/core/forge/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts
