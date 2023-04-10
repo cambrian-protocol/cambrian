@@ -6,18 +6,17 @@ import {
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CambrianStagesLib from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import CompositionListItem from '@cambrian/app/components/list/CompositionListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import { StringHashmap } from '@cambrian/app/models/UtilityModels'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import randimals from 'randimals'
 import router from 'next/router'
 
@@ -30,7 +29,6 @@ const CreateTemplateModal = ({
     onClose,
     currentUser,
 }: CreateTemplateModalProps) => {
-    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
     const [compositions, setCompositions] = useState<StringHashmap>()
     const [isCreatingTemplate, setIsCreatingTemplate] = useState<string>()
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -63,17 +61,20 @@ const CreateTemplateModal = ({
             if (!currentUser.did || !currentUser.cambrianProfileDoc)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            const streamID = await ceramicTemplateAPI.createTemplate(
-                randimals(),
-                compositionStreamID
+            const templateService = new TemplateService()
+            const res = await templateService.create(
+                currentUser,
+                compositionStreamID,
+                randimals()
             )
-
-            if (!streamID) throw GENERAL_ERROR['CERAMIC_UPDATE_ERROR']
+            if (!res) throw new Error('Failed to create Template')
 
             if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
-                router.push(`/profile/new/${streamID}?target=template`)
+                router.push(`/profile/new/${res.streamID}?target=template`)
             } else {
-                router.push(`/template/new/${streamID}`)
+                router.push(
+                    `${window.location.origin}/template/new/${res.streamID}`
+                )
             }
         } catch (e) {
             setIsCreatingTemplate(undefined)

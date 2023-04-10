@@ -1,50 +1,65 @@
-import {
-    PROPOSAL_WIZARD_STEPS,
-    ProposalWizardStepsType,
-} from '../ProposalWizard'
+import { Box, Button, Form } from 'grommet'
 
-import { Box } from 'grommet'
-import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ProposalFlexInputsForm from '../../forms/ProposalFlexInputsForm'
-import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import { ProposalInputType } from '../../EditProposalUI'
 import { SetStateAction } from 'react'
-import useEditProposal, {
-    EditProposalContextType,
-} from '@cambrian/app/hooks/useEditProposal'
+import _ from 'lodash'
+import { useProposalContext } from '@cambrian/app/hooks/useProposalContext'
 
 interface ProposalFlexInputsStepProps {
-    editProposalContext: EditProposalContextType
-    stepperCallback: (step: ProposalWizardStepsType) => void
+    proposalInput: ProposalInputType
+    setProposalInput: React.Dispatch<SetStateAction<ProposalInputType>>
+    onSave: () => Promise<void>
+    onBack: () => void
+    isSaving: boolean
 }
 
 const ProposalFlexInputsStep = ({
-    editProposalContext,
-    stepperCallback,
+    proposalInput,
+    setProposalInput,
+    onSave,
+    onBack,
+    isSaving,
 }: ProposalFlexInputsStepProps) => {
-    const { onSaveProposal } = editProposalContext
+    const { proposal } = useProposalContext()
+
     return (
-        <Box height={{ min: '60vh' }}>
-            <Box gap="medium">
-                <Box pad="xsmall">
-                    <HeaderTextSection
-                        title="Reasonable. Just a few more details"
-                        paragraph="Please input the following information to set up the Solver correctly."
+        <Box>
+            <HeaderTextSection
+                title="Reasonable. Just a few more details"
+                paragraph="Please input the following information to set up the Solver correctly."
+            />
+            {proposal ? (
+                <Form onSubmit={onSave}>
+                    <ProposalFlexInputsForm
+                        proposal={proposal}
+                        proposalInput={proposalInput}
+                        setProposalInput={setProposalInput}
                     />
+                    <ButtonRowContainer
+                        primaryButton={
+                            <LoaderButton
+                                isLoading={isSaving}
+                                primary
+                                label={'Continue'}
+                                type="submit"
+                            />
+                        }
+                        secondaryButton={
+                            <Button secondary label={'Back'} onClick={onBack} />
+                        }
+                    />
+                </Form>
+            ) : (
+                <Box height="medium" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
                 </Box>
-                <ProposalFlexInputsForm
-                    editProposalContext={editProposalContext}
-                    onSubmit={async () => {
-                        if (await onSaveProposal())
-                            stepperCallback(PROPOSAL_WIZARD_STEPS.PUBLISH)
-                    }}
-                    submitLabel="Save & Continue"
-                    onCancel={() =>
-                        stepperCallback(PROPOSAL_WIZARD_STEPS.PRICING)
-                    }
-                    cancelLabel="Back"
-                />
-            </Box>
+            )}
         </Box>
     )
 }

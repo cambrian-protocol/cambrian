@@ -61,9 +61,7 @@ const ArbitrationDashboardUI = ({
                     controls={[
                         <Button
                             secondary
-                            size="small"
                             label="New Arbitrator Contract"
-                            icon={<Scales />}
                             onClick={toggleShowCreateArbitrator}
                         />,
                     ]}

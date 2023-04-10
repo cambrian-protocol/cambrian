@@ -7,3 +7,8 @@ export interface TokenModel {
     readonly logoURI?: string
     readonly tags?: string[]
 }
+
+export type TokenAmountModel = {
+    amount: number,
+    token: TokenModel
+}

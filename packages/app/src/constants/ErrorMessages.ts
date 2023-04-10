@@ -10,6 +10,11 @@ export type ErrorMessageType = {
 }
 
 export const GENERAL_ERROR: ErrorMessagesType = {
+    UNAUTHORIZED: {
+        title: 'Unauthorized!',
+        message: 'Please make sure the right wallet is connected.',
+        logLevel: 0,
+    },
     TRILOBOT_ERROR: {
         title: 'Error while fetching from Trilobot',
         message: 'Please try again later...',

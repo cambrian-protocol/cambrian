@@ -8,10 +8,10 @@ import {
     X,
 } from 'phosphor-react'
 import {
-    isComposition,
-    isProposal,
-    isTemplate,
-} from '@cambrian/app/utils/helpers/stageHelper'
+    isCompositionStage,
+    isProposalStage,
+    isTemplateStage,
+} from '@cambrian/app/utils/stage.utils'
 import { useEffect, useState } from 'react'
 
 import { BASE_SOLVER_IFACE } from 'packages/app/config/ContractInterfaces'
@@ -64,19 +64,19 @@ const RecentSolverTile = ({
 
             const title = stageDoc.content.title
 
-            if (isComposition(stageDoc.content)) {
+            if (isCompositionStage(stageDoc.content)) {
                 setSolverInfo({
                     title: title,
                     icon: <TreeStructure />,
                     stage: 'Composition',
                 })
-            } else if (isTemplate(stageDoc.content)) {
+            } else if (isTemplateStage(stageDoc.content)) {
                 setSolverInfo({
                     title: title,
                     icon: <File />,
                     stage: 'Template',
                 })
-            } else if (isProposal(stageDoc.content)) {
+            } else if (isProposalStage(stageDoc.content)) {
                 setSolverInfo({
                     title: title,
                     icon: <ClipboardText />,

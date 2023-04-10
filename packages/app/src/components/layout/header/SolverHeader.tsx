@@ -1,7 +1,7 @@
-import { ClipboardText, Gear } from 'phosphor-react'
-
 import BaseHeader from './BaseHeader'
-import ProposalInfoModal from '@cambrian/app/ui/common/modals/ProposalInfoModal'
+import { Gear } from 'phosphor-react'
+import ProposalInfoButton from '../../buttons/ProposalInfoButton'
+import ResponsiveButton from '../../buttons/ResponsiveButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverInfoModal from '@cambrian/app/ui/common/modals/SolverInfoModal'
 import { SolverMetadataModel } from '@cambrian/app/models/SolverMetadataModel'
@@ -21,20 +21,19 @@ const SolverHeader = ({
     solverData,
     currentCondition,
 }: SolverHeaderProps) => {
-    const [showProposalInfoModal, setShowProposalInfoModal] = useState(false)
     const toggleShowSolverConfigInfoModal = () =>
         setShowSolverConfigInfoModal(!showSolverConfigInfoModal)
 
-    const toggleShowProposalInfoModal = () =>
-        setShowProposalInfoModal(!showProposalInfoModal)
     const [showSolverConfigInfoModal, setShowSolverConfigInfoModal] =
         useState(false)
 
-    const configItem = {
-        label: 'Configuration',
-        icon: <Gear color={cpTheme.global.colors['dark-4']} />,
-        onClick: toggleShowSolverConfigInfoModal,
-    }
+    const solverConfigInfoButton = (
+        <ResponsiveButton
+            label="Solver Configuration"
+            icon={<Gear color={cpTheme.global.colors['dark-4']} />}
+            onClick={toggleShowSolverConfigInfoModal}
+        />
+    )
 
     return (
         <>
@@ -42,34 +41,24 @@ const SolverHeader = ({
                 metaTitle="Work Solver"
                 title={metadata?.solverTag.title || 'Unnamed Solver'}
                 items={
-                    metadata
+                    metadata?.stageStack &&
+                    metadata.stageStack.proposalDocs.latestCommitDoc
                         ? [
-                              {
-                                  label: 'Proposal Details',
-                                  icon: (
-                                      <ClipboardText
-                                          color={
-                                              cpTheme.global.colors['dark-4']
-                                          }
-                                      />
-                                  ),
-                                  onClick: toggleShowProposalInfoModal,
-                              },
-                              configItem,
+                              <ProposalInfoButton
+                                  collateralToken={solverData.collateralToken}
+                                  proposalDoc={
+                                      metadata.stageStack.proposalDocs
+                                          .latestCommitDoc
+                                  }
+                              />,
+                              solverConfigInfoButton,
                           ]
-                        : [configItem]
+                        : [solverConfigInfoButton]
                 }
                 statusBadge={
                     <SolverStatusBadge status={currentCondition.status} />
                 }
             />
-            {showProposalInfoModal && metadata?.stageStack && (
-                <ProposalInfoModal
-                    collateralToken={solverData.collateralToken}
-                    stageStack={metadata.stageStack}
-                    onClose={toggleShowProposalInfoModal}
-                />
-            )}
             {showSolverConfigInfoModal && (
                 <SolverInfoModal
                     contractCondition={currentCondition}

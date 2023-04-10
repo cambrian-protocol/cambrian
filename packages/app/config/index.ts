@@ -36,4 +36,16 @@ export const SCHEMA_VER = {
     cambrianStagesLib: 1,
     baseStageLib: 1,
     templateStageLib: 1,
+    proposal: 1,
+    template: 1,
 }
+
+export enum DATA_HANLDING_OPTIONS {
+    SAVE_TO_FIREBASE,
+    RETURN_FIREBASE_DATA,
+    RETURN_CERAMIC_DATA
+}
+
+// Data handling
+export const DATA_HANDLING: DATA_HANLDING_OPTIONS[] = [DATA_HANLDING_OPTIONS.RETURN_CERAMIC_DATA,]
+

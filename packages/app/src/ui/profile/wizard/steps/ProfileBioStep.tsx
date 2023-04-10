@@ -10,12 +10,12 @@ import {
 import { PROFILE_WIZARD_STEPS, ProfileWizardStepsType } from '../ProfileWizard'
 import { SetStateAction, useState } from 'react'
 
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ProfileBioStepProps {
@@ -93,19 +93,17 @@ const ProfileBioStep = ({
                                 </Text>
                             </Box>
                         </Box>
-                        <TwoButtonWrapContainer
+                        <ButtonRowContainer
                             primaryButton={
                                 <LoaderButton
                                     isLoading={isSaving}
-                                    size="small"
                                     primary
-                                    label={'Save & Continue'}
+                                    label={'Continue'}
                                     type="submit"
                                 />
                             }
                             secondaryButton={
                                 <Button
-                                    size="small"
                                     secondary
                                     label={'Back'}
                                     onClick={() =>

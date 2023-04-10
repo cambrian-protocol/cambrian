@@ -4,7 +4,7 @@ import ClaimItem from '@cambrian/app/components/list/ClaimItem'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import ReclaimAndRedeemTokenCard from '@cambrian/app/components/cards/ReclaimAndRedeemTokenCard'
 import { ReclaimableTokensType } from '@cambrian/app/utils/helpers/redeemHelper'
-import { SolverInfoType } from '@cambrian/app/components/bars/actionbars/proposal/ProposalExecutedActionbar'
+import { SolverInfoType } from '@cambrian/app/components/bars/actionbars/proposal/general/ExecutedBar'
 import { UserType } from '@cambrian/app/store/UserContext'
 
 interface ReclaimAndRedeemTokensModalProps {

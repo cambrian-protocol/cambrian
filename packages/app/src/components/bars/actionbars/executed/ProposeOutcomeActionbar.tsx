@@ -12,14 +12,12 @@ interface ProposeOutcomeActionbarProps {
     solverData: SolverModel
     solverMethods: GenericMethods
     currentCondition: SolverContractCondition
-    messenger?: JSX.Element
 }
 
 const ProposeOutcomeActionbar = ({
     solverData,
     solverMethods,
     currentCondition,
-    messenger,
 }: ProposeOutcomeActionbarProps) => {
     // To keep track if Keeper is currently in a transaction
     const [proposedIndexSet, setProposedIndexSet] = useState<number>()
@@ -32,7 +30,6 @@ const ProposeOutcomeActionbar = ({
     return (
         <>
             <BaseActionbar
-                messenger={messenger}
                 primaryAction={
                     <Button
                         primary

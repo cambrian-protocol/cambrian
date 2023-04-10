@@ -4,15 +4,15 @@ import BaseSolverInfo from './BaseSolverInfo'
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { HourglassSimpleMedium } from 'phosphor-react'
-import { PriceModel } from '../../bars/actionbars/proposal/ProposalReviewActionbar'
 import SolverConfigItem from '../../list/SolverConfigItem'
+import { TokenAmountModel } from '@cambrian/app/models/TokenModel'
 import { getOutcomeCollectionsInfoFromCeramicData } from '@cambrian/app/utils/helpers/solverHelpers'
 import { parseSecondsToDisplay } from '@cambrian/app/utils/helpers/timeParsing'
 
 interface SolverCeramicInfoProps {
     composerSolver: ComposerSolver
     composition: CompositionModel
-    price: PriceModel
+    price: TokenAmountModel
 }
 
 const SolverCeramicInfo = ({

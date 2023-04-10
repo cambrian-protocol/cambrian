@@ -1,42 +1,64 @@
-import {
-    TEMPLATE_WIZARD_STEPS,
-    TemplateWizardStepsType,
-} from '../TemplateWizard'
+import { Box, Button, Form } from 'grommet'
+import { SetStateAction, useState } from 'react'
 
-import { Box } from 'grommet'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
+import BaseSkeletonBox from '@cambrian/app/components/skeletons/BaseSkeletonBox'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import HeaderTextSection from '@cambrian/app/components/sections/HeaderTextSection'
+import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import TemplateFlexInputsForm from '../../forms/TemplateFlexInputsForm'
+import { TemplateInputType } from '../../EditTemplateUI'
+import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 interface TemplateFlexInputsStepProps {
-    editTemplateProps: EditTemplatePropsType
-    stepperCallback: (step: TemplateWizardStepsType) => void
+    templateInput: TemplateInputType
+    setTemplateInput: React.Dispatch<SetStateAction<TemplateInputType>>
+    isSaving: boolean
+    onSave: () => Promise<void>
+    onBack: () => void
 }
 
 const TemplateFlexInputsStep = ({
-    editTemplateProps,
-    stepperCallback,
+    templateInput,
+    setTemplateInput,
+    isSaving,
+    onSave,
+    onBack,
 }: TemplateFlexInputsStepProps) => {
-    const { onSaveTemplate } = editTemplateProps
+    const { template } = useTemplateContext()
 
     return (
         <Box>
-            <Box pad="xsmall">
-                <HeaderTextSection
-                    title="Solver Config"
-                    paragraph="Configure the Solver by completing these fields as instructed."
-                />
-            </Box>
-            <TemplateFlexInputsForm
-                editTemplateProps={editTemplateProps}
-                onSubmit={async () => {
-                    if (await onSaveTemplate())
-                        stepperCallback(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
-                }}
-                submitLabel="Save & Continue"
-                onCancel={() => stepperCallback(TEMPLATE_WIZARD_STEPS.PRICING)}
-                cancelLabel="Back"
+            <HeaderTextSection
+                title="Solver Config"
+                paragraph="Configure the Solver by completing these fields as instructed."
             />
+            {template ? (
+                <Form onSubmit={onSave}>
+                    <TemplateFlexInputsForm
+                        template={template}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                    />
+                    <ButtonRowContainer
+                        primaryButton={
+                            <LoaderButton
+                                isLoading={isSaving}
+                                primary
+                                label={'Continue'}
+                                type="submit"
+                            />
+                        }
+                        secondaryButton={
+                            <Button secondary label={'Back'} onClick={onBack} />
+                        }
+                    />
+                </Form>
+            ) : (
+                <Box height="medium" gap="medium">
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                    <BaseSkeletonBox height={'xxsmall'} width={'100%'} />
+                </Box>
+            )}
         </Box>
     )
 }

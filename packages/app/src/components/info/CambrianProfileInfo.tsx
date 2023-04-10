@@ -2,11 +2,11 @@ import { Box, Text } from 'grommet'
 
 import BaseAvatar from '@cambrian/app/components/avatars/BaseAvatar'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 
 interface CambrianProfileInfoProps {
     role?: string
-    cambrianProfileDoc?: TileDocument<CambrianProfileType>
+    cambrianProfileDoc?: DocumentModel<CambrianProfileType>
     size?: 'small'
 }
 
@@ -26,7 +26,12 @@ const CambrianProfileInfo = ({
                     />
                 ) : (
                     <BaseAvatar
-                        address={cambrianProfileDoc?.controllers[0].slice(-42)}
+                        address={
+                            cambrianProfileDoc?.metadata?.controllers &&
+                            cambrianProfileDoc.metadata.controllers[0].slice(
+                                -42
+                            )
+                        }
                         size={size ? undefined : 'medium'}
                     />
                 )}

@@ -1,4 +1,4 @@
-import { ProposalContext, ProposalContextType } from '../store/ProposalContext'
+import { ProposalContext, ProposalContextType } from '../store/proposal.context'
 
 import { useContext } from 'react'
 

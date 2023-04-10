@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import {
-    addRecentStage,
-    ceramicInstance,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
+    isCompositionStage,
+    isProposalStage,
+    isTemplateStage,
+} from '@cambrian/app/utils/stage.utils'
 
+import API from '@cambrian/app/services/api/cambrian.api'
+import { CambrianStagesLibType } from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import { ComposerContextProvider } from '@cambrian/app/store/composer/composer.context'
 import { ComposerUI } from '@cambrian/app/ui/composer/ComposerUI'
 import Custom404Page from '../404'
 import LoadingScreen from '@cambrian/app/components/info/LoadingScreen'
-import { ProposalContextProvider } from '@cambrian/app/store/ProposalContext'
+import { ProposalContextProvider } from '@cambrian/app/store/proposal.context'
 import ProposalUI from '@cambrian/app/ui/proposals/ProposalUI'
 import SolverUI from '@cambrian/app/ui/solver/SolverUI'
+import { TemplateContextProvider } from '@cambrian/app/store/template.context'
 import TemplateUI from '@cambrian/app/ui/templates/TemplateUI'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useRouter } from 'next/router'
 
@@ -41,38 +45,40 @@ export default function SolverPage() {
                         />
                     )
                 } else {
-                    const stage = (await ceramicInstance(
-                        currentUser
-                    ).loadStream(solverAddress)) as TileDocument<any>
-                    if (stage.content.solvers) {
-                        // Its a Composition
+                    const stageDoc = await API.doc.readStream<any>(
+                        solverAddress
+                    )
+                    if (!stageDoc) throw new Error('Failed to fetch stage!')
+
+                    if (isCompositionStage(stageDoc.content)) {
                         setUi(
-                            <ComposerContextProvider>
-                                <ComposerUI
-                                    compositionStreamDoc={stage}
-                                    currentUser={currentUser}
-                                />
+                            <ComposerContextProvider compositionDoc={stageDoc}>
+                                <ComposerUI />
                             </ComposerContextProvider>
                         )
-                    } else if (stage.content.composition) {
-                        // Its a Template
-                        setUi(<TemplateUI templateStreamDoc={stage} />)
-                    } else if (stage.content.template) {
-                        // Its a Proposal
+                    } else if (isTemplateStage(stageDoc.content)) {
                         setUi(
-                            <ProposalContextProvider
-                                proposalStreamDoc={stage}
-                                currentUser={currentUser}
-                            >
-                                <ProposalUI currentUser={currentUser} />
+                            <TemplateContextProvider templateDoc={stageDoc}>
+                                <TemplateUI />
+                            </TemplateContextProvider>
+                        )
+                    } else if (isProposalStage(stageDoc.content)) {
+                        setUi(
+                            <ProposalContextProvider proposalDoc={stageDoc}>
+                                <ProposalUI />
                             </ProposalContextProvider>
                         )
                     }
-                    if (currentUser.session)
-                        await addRecentStage(
+
+                    if (currentUser) {
+                        const stagesLib = await loadStagesLib(currentUser)
+                        stagesLib.content.addRecent(solverAddress)
+                        await API.doc.updateStream<CambrianStagesLibType>(
                             currentUser,
-                            solverAddress as string
+                            stagesLib.streamID,
+                            stagesLib.content.data
                         )
+                    }
                 }
             } catch (e) {
                 console.error(e)

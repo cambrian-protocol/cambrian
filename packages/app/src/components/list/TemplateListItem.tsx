@@ -1,53 +1,38 @@
 import { AccordionPanel, Box, Button, ResponsiveContext, Text } from 'grommet'
-import {
-    Archive,
-    Check,
-    CheckCircle,
-    Copy,
-    Eye,
-    PauseCircle,
-    Pen,
-} from 'phosphor-react'
+import { Archive, Check, Copy, Eye, Pen } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '../modals/ErrorPopupModal'
 import ListSkeleton from '../skeletons/ListSkeleton'
-import LoaderButton from '../buttons/LoaderButton'
 import PlainSectionDivider from '../sections/PlainSectionDivider'
-import { ProposalHashmap } from '@cambrian/app/ui/dashboard/ProposalsDashboardUI'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
+import { ProposalModel } from '@cambrian/app/models/ProposalModel'
+import ProposalService from '@cambrian/app/services/stages/ProposalService'
 import ReceivedProposalListItem from './ReceivedProposalListItem'
 import ResponsiveButton from '../buttons/ResponsiveButton'
-import { StringHashmap } from '@cambrian/app/models/UtilityModels'
-import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
+import Template from '@cambrian/app/classes/stages/Template'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
+import ToggleTemplatePublishButton from '../buttons/ToggleTemplatePublishButton'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface TemplateListItemProps {
-    currentUser: UserType
-    templateStreamID: string
-    template: TemplateModel
+    template: Template
     receivedProposalsArchive?: string[]
 }
 
 const TemplateListItem = ({
-    currentUser,
     template,
-    templateStreamID,
     receivedProposalsArchive,
 }: TemplateListItemProps) => {
-    const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
+    const { currentUser } = useCurrentUserContext()
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
-    const [receivedProposals, setReceivedProposals] = useState<ProposalHashmap>(
-        {}
-    )
+    const [receivedProposals, setReceivedProposals] = useState<Proposal[]>()
     const [isLoading, setIsLoading] = useState(false)
-    const [isTogglingActive, setIsTogglingActive] = useState(false)
-    const [isActive, setIsActive] = useState(template.isActive)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
     useEffect(() => {
@@ -68,41 +53,52 @@ const TemplateListItem = ({
         try {
             setIsLoading(true)
             let filteredReceivedProposals = Object.keys(
-                template.receivedProposals
+                template.content.receivedProposals
             )
             if (receivedProposalsArchive) {
                 filteredReceivedProposals = filteredReceivedProposals.filter(
                     (rp) => receivedProposalsArchive.indexOf(rp) === -1
                 )
             }
-            setReceivedProposals(
-                (await ceramicInstance(currentUser).multiQuery(
-                    filteredReceivedProposals.map((p) => {
-                        return { streamId: p }
-                    })
-                )) as ProposalHashmap
+            const res = await API.doc.multiQuery<ProposalModel>(
+                filteredReceivedProposals
             )
+            if (res) {
+                const proposalService = new ProposalService()
+                const _proposals: Proposal[] = await Promise.all(
+                    res.map(async (proposalDoc) => {
+                        const proposalConfig =
+                            await proposalService.fetchProposalConfig(
+                                proposalDoc,
+                                currentUser
+                            )
+
+                        if (!proposalConfig)
+                            throw new Error(
+                                'Error while fetching proposal config'
+                            )
+
+                        return new Proposal(
+                            proposalConfig,
+                            proposalService,
+                            new TemplateService(),
+                            () => {},
+                            currentUser
+                        )
+                    })
+                )
+                setReceivedProposals(_proposals)
+            }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
         }
         setIsLoading(false)
     }
 
-    const toggleIsActive = async () => {
-        try {
-            setIsTogglingActive(true)
-            await ceramicTemplateAPI.toggleActivate(templateStreamID)
-            setIsActive(!isActive)
-        } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
-        }
-        setIsTogglingActive(false)
-    }
-
-    const onArchiveTemplate = async (templateStreamID: string) => {
+    const onArchiveTemplate = async () => {
         try {
             setIsLoading(true)
-            await ceramicTemplateAPI.archiveTemplate(templateStreamID)
+            await template.archive()
         } catch (e) {
             setIsLoading(false)
             setErrorMessage(await cpLogger.push(e))
@@ -130,7 +126,9 @@ const TemplateListItem = ({
                                 <AccordionPanel
                                     label={
                                         <Box gap="xsmall">
-                                            <Text>{template.title}</Text>
+                                            <Text>
+                                                {template.content.title}
+                                            </Text>
                                             <Box
                                                 direction="row"
                                                 gap="small"
@@ -158,9 +156,7 @@ const TemplateListItem = ({
                                                             size="small"
                                                         >
                                                             {
-                                                                Object.keys(
-                                                                    receivedProposals
-                                                                ).length
+                                                                receivedProposals?.length
                                                             }
                                                         </Text>
                                                     </Box>
@@ -172,38 +168,8 @@ const TemplateListItem = ({
                                     <Box>
                                         <Box direction="row" justify="end" wrap>
                                             <Box pad="small">
-                                                <LoaderButton
-                                                    isLoading={isTogglingActive}
-                                                    color="dark-4"
-                                                    icon={
-                                                        isActive ? (
-                                                            <CheckCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-ok'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <PauseCircle
-                                                                color={
-                                                                    cpTheme
-                                                                        .global
-                                                                        .colors[
-                                                                        'status-error'
-                                                                    ]
-                                                                }
-                                                            />
-                                                        )
-                                                    }
-                                                    label={
-                                                        isActive
-                                                            ? 'Open for proposals'
-                                                            : 'Closed for propsals'
-                                                    }
-                                                    onClick={toggleIsActive}
+                                                <ToggleTemplatePublishButton
+                                                    template={template}
                                                 />
                                             </Box>
                                             <Box
@@ -213,7 +179,7 @@ const TemplateListItem = ({
                                                 pad={{ vertical: 'small' }}
                                             >
                                                 <ResponsiveButton
-                                                    href={`/solver/${templateStreamID}`}
+                                                    href={`/solver/${template.doc.streamID}`}
                                                     label="View"
                                                     icon={
                                                         <Eye
@@ -254,7 +220,7 @@ const TemplateListItem = ({
                                                     }
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(
-                                                            `${window.location.origin}/solver/${templateStreamID}`
+                                                            `${window.location.origin}/solver/${template.doc.streamID}`
                                                         )
                                                         setIsSavedToClipboard(
                                                             true
@@ -267,7 +233,7 @@ const TemplateListItem = ({
                                                     }
                                                 />
                                                 <ResponsiveButton
-                                                    href={`/template/edit/${templateStreamID}`}
+                                                    href={`/template/edit/${template.doc.streamID}`}
                                                     label="Edit"
                                                     icon={
                                                         <Pen
@@ -285,11 +251,9 @@ const TemplateListItem = ({
                                                         return (
                                                             <Button
                                                                 color="dark-4"
-                                                                onClick={() => {
-                                                                    onArchiveTemplate(
-                                                                        templateStreamID
-                                                                    )
-                                                                }}
+                                                                onClick={
+                                                                    onArchiveTemplate
+                                                                }
                                                                 size="small"
                                                                 label={
                                                                     screenSize !==
@@ -327,32 +291,23 @@ const TemplateListItem = ({
                                                     Proposals
                                                 </Text>
                                                 {receivedProposals &&
-                                                Object.keys(receivedProposals)
-                                                    .length > 0 ? (
-                                                    Object.keys(
-                                                        receivedProposals
-                                                    ).map(
-                                                        (proposalStreamID) => {
-                                                            return (
-                                                                <ReceivedProposalListItem
-                                                                    key={
-                                                                        proposalStreamID
-                                                                    }
-                                                                    currentUser={
-                                                                        currentUser
-                                                                    }
-                                                                    proposalStreamID={
-                                                                        proposalStreamID
-                                                                    }
-                                                                    proposal={
-                                                                        receivedProposals[
-                                                                            proposalStreamID
-                                                                        ]
-                                                                            .content
-                                                                    }
-                                                                />
-                                                            )
-                                                        }
+                                                receivedProposals.length > 0 ? (
+                                                    receivedProposals.map(
+                                                        (receivedProposal) => (
+                                                            <ReceivedProposalListItem
+                                                                key={
+                                                                    receivedProposal
+                                                                        .doc
+                                                                        .streamID
+                                                                }
+                                                                proposal={
+                                                                    receivedProposal
+                                                                }
+                                                                template={
+                                                                    template
+                                                                }
+                                                            />
+                                                        )
                                                     )
                                                 ) : (
                                                     <ListSkeleton

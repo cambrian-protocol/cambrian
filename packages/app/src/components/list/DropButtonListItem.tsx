@@ -6,16 +6,18 @@ interface DropButtonListItemProps {
     onClick?: () => void
     label: string | JSX.Element
     icon: JSX.Element
+    disabled?: boolean
 }
 
 const DropButtonListItem = ({
     label,
     icon,
     onClick,
+    disabled,
 }: DropButtonListItemProps) => (
     <Box
         pad={{ horizontal: 'medium', vertical: 'small' }}
-        onClick={onClick}
+        onClick={disabled ? undefined : onClick}
         direction="row"
         align="center"
         gap="small"

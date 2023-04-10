@@ -1,24 +1,20 @@
 import 'react-quill/dist/quill.snow.css'
 
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import {
     ErrorMessageType,
     GENERAL_ERROR,
 } from '@cambrian/app/constants/ErrorMessages'
 import { FloppyDisk, PaperPlaneRight } from 'phosphor-react'
-import {
-    ceramicInstance,
-    saveCambrianCommitData,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 import styled, { css } from 'styled-components'
 import { useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SubmissionModel } from '../models/SubmissionModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
@@ -47,8 +43,8 @@ const SubmissionForm = ({
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
-    const [submissionsTileDocument, setSubmissionsTileDocument] =
-        useState<TileDocument<SubmissionModel>>()
+    const [submissionsDoc, setSubmissionsDoc] =
+        useState<DocumentModel<SubmissionModel>>()
 
     useEffect(() => {
         init()
@@ -56,36 +52,28 @@ const SubmissionForm = ({
 
     const init = async () => {
         if (currentUser.did) {
-            const submissionDoc = (await TileDocument.deterministic(
-                ceramicInstance(currentUser),
-                {
-                    controllers: [currentUser.did],
-                    family: 'cambrian-ipfs-text-submitter',
-                    tags: [solverAddress],
-                },
-                { pin: true }
-            )) as TileDocument<SubmissionModel>
-            setInput(submissionDoc.content)
-            setSubmissionsTileDocument(submissionDoc)
+            const submissionDoc = await API.doc.deterministic<SubmissionModel>({
+                controllers: [currentUser.did],
+                family: 'cambrian-ipfs-text-submitter',
+                tags: [solverAddress],
+            })
+            if (submissionDoc) {
+                setInput(submissionDoc.content)
+                setSubmissionsDoc(submissionDoc)
+            }
         }
     }
 
     const onSubmit = async (): Promise<void> => {
         setIsSubmitting(true)
         try {
-            if (submissionsTileDocument) {
-                await onSave()
-
-                // NOTE: Work around until Ceramic fixes their commit load bug
-                await saveCambrianCommitData(
-                    currentUser,
-                    submissionsTileDocument.commitId.toString()
-                )
-
+            if (submissionsDoc) {
+                const res = await onSave()
+                if (!res) throw new Error('Error while saving submission')
                 const transaction: ethers.ContractTransaction =
                     await moduleContract.submit(
                         solverAddress,
-                        submissionsTileDocument.commitId.toString(),
+                        res.commitID,
                         currentCondition.executions - 1
                     )
                 const rc = await transaction.wait()
@@ -106,20 +94,16 @@ const SubmissionForm = ({
             if (!currentUser.did || !currentUser.session)
                 throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-            if (submissionsTileDocument) {
-                await submissionsTileDocument.update(
+            if (submissionsDoc) {
+                return await API.doc.updateStream(
+                    currentUser,
+                    submissionsDoc.streamID,
                     {
                         submission: input.submission,
                         conditionId: currentCondition.conditionId,
                         sender: { address: currentUser.address },
                         timestamp: new Date(),
-                    },
-                    {
-                        controllers: [currentUser.did],
-                        family: 'cambrian-ipfs-text-submitter',
-                        tags: [solverAddress],
-                    },
-                    { pin: true }
+                    }
                 )
             }
         } catch (e) {
@@ -157,7 +141,7 @@ const SubmissionForm = ({
                     />
                 </Box>
                 <Box height={{ min: 'auto' }}>
-                    <TwoButtonWrapContainer
+                    <ButtonRowContainer
                         primaryButton={
                             <LoaderButton
                                 isLoading={isSubmitting}
@@ -178,8 +162,7 @@ const SubmissionForm = ({
                                 disabled={
                                     isSubmitting ||
                                     input.submission ===
-                                        submissionsTileDocument?.content
-                                            .submission
+                                        submissionsDoc?.content.submission
                                 }
                                 isLoading={isSaving}
                                 onClick={onSave}

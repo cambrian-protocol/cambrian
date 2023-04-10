@@ -13,12 +13,10 @@ import { useState } from 'react'
 interface ExecuteSolveActionbarProps {
     currentCondition: SolverContractCondition
     solverMethods: GenericMethods
-    messenger?: JSX.Element
 }
 const ExecuteSolveActionbar = ({
     currentCondition,
     solverMethods,
-    messenger,
 }: ExecuteSolveActionbarProps) => {
     const [isExecuting, setIsExecuting] = useState(false)
     const [errMsg, setErrMsg] = useState<ErrorMessageType>()
@@ -42,7 +40,6 @@ const ExecuteSolveActionbar = ({
     return (
         <>
             <BaseActionbar
-                messenger={messenger}
                 primaryAction={
                     <LoaderButton
                         primary

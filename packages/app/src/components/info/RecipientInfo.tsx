@@ -1,14 +1,12 @@
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { useEffect, useState } from 'react'
 
 import BaseAvatar from '../avatars/BaseAvatar'
 import BaseInfoItem from './BaseInfoItem'
 import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
-import { CERAMIC_NODE_ENDPOINT } from 'packages/app/config'
 import CambrianProfileAbout from './CambrianProfileAbout'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
-import { CeramicClient } from '@ceramicnetwork/http-client'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { getDIDfromAddress } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getDIDfromAddress } from '@cambrian/app/utils/did.utils'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface RecipientInfoItemProps {
@@ -18,7 +16,7 @@ interface RecipientInfoItemProps {
 const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
     const { currentUser } = useCurrentUserContext()
     const [cambrianProfile, setCambrianProfile] =
-        useState<TileDocument<CambrianProfileType>>()
+        useState<DocumentModel<CambrianProfileType>>()
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
@@ -28,17 +26,13 @@ const RecipientInfoItem = ({ address }: RecipientInfoItemProps) => {
     const fetchCeramicProfile = async () => {
         setIsInitialized(false)
         if (currentUser && address) {
-            const ceramic = new CeramicClient(CERAMIC_NODE_ENDPOINT)
-            const cambrianProfileDoc = (await TileDocument.deterministic(
-                ceramic,
-                {
+            const cambrianProfileDoc =
+                await API.doc.deterministic<CambrianProfileType>({
                     controllers: [
                         getDIDfromAddress(address, currentUser.chainId),
                     ],
                     family: 'cambrian-profile',
-                },
-                { pin: true }
-            )) as TileDocument<CambrianProfileType>
+                })
             setCambrianProfile(cambrianProfileDoc)
         }
         setIsInitialized(true)

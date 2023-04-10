@@ -1,3 +1,4 @@
+import API, { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { Box, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
@@ -10,18 +11,12 @@ import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
 import ProposalListItem from '@cambrian/app/components/list/ProposalListItem'
 import { ProposalModel } from '@cambrian/app/models/ProposalModel'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface ProposalsDashboardUIProps {
     currentUser: UserType
     proposalsLib?: BaseStageLibType
-}
-
-export type ProposalHashmap = {
-    [proposalStreamID: string]: TileDocument<ProposalModel>
 }
 
 export type StageStackType = {
@@ -40,7 +35,9 @@ const ProposalsDashboardUI = ({
     currentUser,
     proposalsLib,
 }: ProposalsDashboardUIProps) => {
-    const [proposals, setProposals] = useState<ProposalHashmap>({})
+    const [proposals, setProposals] = useState<DocumentModel<ProposalModel>[]>(
+        []
+    )
     const [isFetching, setIsFetching] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -52,15 +49,15 @@ const ProposalsDashboardUI = ({
         try {
             setIsFetching(true)
             if (proposalsLib) {
-                setProposals(
-                    (await ceramicInstance(currentUser).multiQuery(
-                        Object.keys(proposalsLib.lib).map((p) => {
-                            return { streamId: p }
-                        })
-                    )) as ProposalHashmap
+                const _proposalDocs = await API.doc.multiQuery<ProposalModel>(
+                    Object.keys(proposalsLib.lib)
                 )
+
+                if (!_proposalDocs)
+                    throw new Error('Error while loading Proposals')
+                setProposals(_proposalDocs)
             } else {
-                setProposals({})
+                setProposals([])
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -77,25 +74,18 @@ const ProposalsDashboardUI = ({
                 />
                 <Box fill>
                     <Text color={'dark-4'}>
-                        Your Proposals (
-                        {proposals && Object.keys(proposals).length})
+                        Your Proposals ({proposals.length})
                     </Text>
                     <Box pad={{ top: 'medium' }}>
                         {proposals && Object.keys(proposals).length > 0 ? (
                             <Box gap="small">
-                                {Object.keys(proposals).map(
-                                    (proposalStreamID) => (
-                                        <ProposalListItem
-                                            key={proposalStreamID}
-                                            currentUser={currentUser}
-                                            proposalStreamID={proposalStreamID}
-                                            proposal={
-                                                proposals[proposalStreamID]
-                                                    .content
-                                            }
-                                        />
-                                    )
-                                )}
+                                {proposals.map((proposalDoc) => (
+                                    <ProposalListItem
+                                        key={proposalDoc.streamID}
+                                        currentUser={currentUser}
+                                        proposalDoc={proposalDoc}
+                                    />
+                                ))}
                             </Box>
                         ) : (
                             <ListSkeleton

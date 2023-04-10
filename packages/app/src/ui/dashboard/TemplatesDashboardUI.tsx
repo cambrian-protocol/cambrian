@@ -1,18 +1,19 @@
 import { Accordion, Box, Button, Text } from 'grommet'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import CreateTemplateModal from './modals/CreateTemplateModal'
 import DashboardHeader from '@cambrian/app/components/layout/header/DashboardHeader'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import { FilePlus } from 'phosphor-react'
 import ListSkeleton from '@cambrian/app/components/skeletons/ListSkeleton'
+import Template from '@cambrian/app/classes/stages/Template'
 import TemplateListItem from '@cambrian/app/components/list/TemplateListItem'
 import { TemplateModel } from '@cambrian/app/models/TemplateModel'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { TemplateStagesLibType } from '@cambrian/app/classes/stageLibs/TemplateStageLib'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { UserType } from '@cambrian/app/store/UserContext'
-import { ceramicInstance } from '@cambrian/app/services/ceramic/CeramicUtils'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 
 interface TemplatesDashboardUIProps {
@@ -20,15 +21,11 @@ interface TemplatesDashboardUIProps {
     templatesLib?: TemplateStagesLibType
 }
 
-type TemplateHashmap = {
-    [templateStreamID: string]: TileDocument<TemplateModel>
-}
-
 const TemplatesDashboardUI = ({
     currentUser,
     templatesLib,
 }: TemplatesDashboardUIProps) => {
-    const [templates, setTemplates] = useState<TemplateHashmap>({})
+    const [templates, setTemplates] = useState<Template[]>([])
     const [showCreateTemplateModal, setShowCreateTemplateModal] =
         useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -45,15 +42,36 @@ const TemplatesDashboardUI = ({
         try {
             setIsFetching(true)
             if (templatesLib) {
-                setTemplates(
-                    (await ceramicInstance(currentUser).multiQuery(
-                        Object.keys(templatesLib.lib).map((t) => {
-                            return { streamId: t }
-                        })
-                    )) as TemplateHashmap
+                const res = await API.doc.multiQuery<TemplateModel>(
+                    Object.keys(templatesLib.lib)
                 )
+
+                if (res) {
+                    const templateService = new TemplateService()
+                    const _templates = await Promise.all(
+                        res.map(async (templateDoc) => {
+                            const templateConfig =
+                                await templateService.fetchTemplateConfig(
+                                    templateDoc
+                                )
+
+                            if (!templateConfig)
+                                throw new Error(
+                                    'Error while loading Template Config'
+                                )
+
+                            return new Template(
+                                templateConfig,
+                                templateService,
+                                currentUser
+                            )
+                        })
+                    )
+
+                    setTemplates(_templates)
+                }
             } else {
-                setTemplates({})
+                setTemplates([])
             }
         } catch (e) {
             setErrorMessage(await cpLogger.push(e))
@@ -79,32 +97,22 @@ const TemplatesDashboardUI = ({
                 />
                 <Box fill>
                     <Text color={'dark-4'}>
-                        Your Templates (
-                        {templates && Object.keys(templates).length})
+                        Your Templates ({templates.length})
                     </Text>
                     <Box pad={{ top: 'medium' }}>
-                        {templates && Object.keys(templates).length > 0 ? (
+                        {templates.length > 0 ? (
                             <Box gap="small">
                                 <Accordion gap="small">
-                                    {Object.keys(templates).map(
-                                        (templateStreamID) => (
-                                            <TemplateListItem
-                                                key={templateStreamID}
-                                                currentUser={currentUser}
-                                                templateStreamID={
-                                                    templateStreamID
-                                                }
-                                                template={
-                                                    templates[templateStreamID]
-                                                        .content
-                                                }
-                                                receivedProposalsArchive={
-                                                    templatesLib?.archive
-                                                        .receivedProposals
-                                                }
-                                            />
-                                        )
-                                    )}
+                                    {templates.map((template) => (
+                                        <TemplateListItem
+                                            key={template.doc.streamID}
+                                            template={template}
+                                            receivedProposalsArchive={
+                                                templatesLib?.archive
+                                                    .receivedProposals
+                                            }
+                                        />
+                                    ))}
                                 </Accordion>
                             </Box>
                         ) : (

@@ -1,36 +1,33 @@
 import { Box, Form, FormField } from 'grommet'
 import { SetStateAction, useState } from 'react'
-import {
-    ceramicInstance,
-    updateStage,
-} from '@cambrian/app/services/ceramic/CeramicUtils'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
+import Composition from '@cambrian/app/classes/stages/Composition'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { StageNames } from '@cambrian/app/models/StageModel'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface RenameCompositionModalProps {
     onClose: () => void
     compositionStreamID: string
-    currentTag: string
-    setCurrentTag: React.Dispatch<SetStateAction<string>>
+    title: string
+    setTitle: React.Dispatch<SetStateAction<string>>
 }
 
 const RenameCompositionModal = ({
     onClose,
     compositionStreamID,
-    setCurrentTag,
-    currentTag,
+    setTitle,
+    title,
 }: RenameCompositionModalProps) => {
     const { currentUser } = useCurrentUserContext()
-    const [input, setInput] = useState(currentTag)
+    const [titleInput, setTitleInput] = useState(title)
     const [isSaving, setIsSaving] = useState(false)
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
 
@@ -38,20 +35,29 @@ const RenameCompositionModal = ({
         setIsSaving(true)
         try {
             if (currentUser) {
-                const currentComposition = (await ceramicInstance(
-                    currentUser
-                ).loadStream(
-                    compositionStreamID
-                )) as TileDocument<CompositionModel>
+                const compositionDoc =
+                    await API.doc.readStream<CompositionModel>(
+                        compositionStreamID
+                    )
+                if (!compositionDoc)
+                    throw new Error('Failed to load Composition')
 
-                const compositionTitle = await updateStage(
-                    compositionStreamID,
-                    { ...currentComposition.content, title: input },
-                    StageNames.composition,
+                const compositionService = new CompositionService()
+                const composition = new Composition(
+                    compositionDoc,
+                    compositionService,
                     currentUser
                 )
 
-                setCurrentTag(compositionTitle)
+                const uniqueTitle = await composition.updateContent({
+                    ...compositionDoc.content,
+                    title: titleInput,
+                })
+
+                if (!uniqueTitle)
+                    throw new Error('Failed to update Composition')
+
+                setTitle(uniqueTitle)
                 onClose()
             }
         } catch (e) {
@@ -67,8 +73,8 @@ const RenameCompositionModal = ({
                 <Form onSubmit={onSubmit}>
                     <FormField
                         label="Composition Title"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        value={titleInput}
+                        onChange={(e) => setTitleInput(e.target.value)}
                     />
                     <Box>
                         <LoaderButton

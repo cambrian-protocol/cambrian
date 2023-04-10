@@ -3,7 +3,7 @@ import { Box, Button, Text } from 'grommet'
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
 import Link from 'next/link'
 import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
-import { SolverInfoType } from '@cambrian/app/components/bars/actionbars/proposal/ProposalExecutedActionbar'
+import { SolverInfoType } from '@cambrian/app/components/bars/actionbars/proposal/general/ExecutedBar'
 import SolverStatusBadge from '@cambrian/app/components/badges/SolverStatusBadge'
 import { ethers } from 'ethers'
 

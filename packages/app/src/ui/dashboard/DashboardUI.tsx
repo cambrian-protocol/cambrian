@@ -1,7 +1,4 @@
 import { Box, Heading, Tab, Tabs, Text } from 'grommet'
-import CambrianStagesLib, {
-    CambrianStagesLibType,
-} from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import {
     ClipboardText,
     File,
@@ -13,7 +10,9 @@ import {
 } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import ArbitrationDashboardUI from './ArbitrationDashboardUI'
+import { CambrianStagesLibType } from '@cambrian/app/classes/stageLibs/CambrianStagesLib'
 import CompositionsDashboardUI from './CompositionsDashboardUI'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -21,11 +20,12 @@ import OverviewDashboardUI from './OverviewDashboardUI'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
 import ProfileDashboardUI from './ProfileDashboardUI'
 import ProposalsDashboardUI from './ProposalsDashboardUI'
+import { Subscription } from 'rxjs'
 import TemplatesDashboardUI from './TemplatesDashboardUI'
 import { UserType } from '@cambrian/app/store/UserContext'
 import _ from 'lodash'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
-import { loadStagesLib } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { loadStagesLib } from '@cambrian/app/utils/stagesLib.utils'
 import { useRouter } from 'next/router'
 
 interface DashboardUIProps {
@@ -42,15 +42,42 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     const [userName, setUserName] = useState<string>()
 
     useEffect(() => {
-        setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
-        initDocSubsciption()
-    }, [currentUser])
-
-    useEffect(() => {
         if (query.idx !== activeIndex.toString()) {
             initIndex()
         }
     }, [query])
+
+    useEffect(() => {
+        let subscription: Subscription | undefined
+        const initStagesLib = async () => {
+            setIsFetching(true)
+            try {
+                const stagesLib = await loadStagesLib(currentUser)
+                setStagesLib(stagesLib.content.data)
+                subscription = await API.doc.subscribe(
+                    stagesLib.streamID,
+                    (updatedLib) => {
+                        if (updatedLib.next) {
+                            setStagesLib(updatedLib.next.content)
+                        }
+                    }
+                )
+            } catch (e) {
+                setErrorMessage(await cpLogger.push(e))
+            } finally {
+                setIsFetching(false)
+            }
+        }
+        if (currentUser) {
+            initStagesLib()
+            setUserName(currentUser.cambrianProfileDoc?.content?.name || 'Anon')
+        }
+        return () => {
+            if (subscription) {
+                subscription.unsubscribe()
+            }
+        }
+    }, [currentUser])
 
     const initIndex = () => {
         if (!query.idx) {
@@ -66,45 +93,25 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
     }
 
     const onDeleteRecent = async (streamId: string) => {
-        const newStagesLib = _.cloneDeep(stagesLib)
-        if (newStagesLib?.recents) {
-            const index = newStagesLib.recents.indexOf(streamId)
-            if (index > -1) {
-                newStagesLib.recents.splice(index, 1)
-            }
-        }
-        const stagesLibDoc = await loadStagesLib(currentUser)
-        await stagesLibDoc.update(newStagesLib)
-        setStagesLib(newStagesLib)
-    }
-
-    const initDocSubsciption = async () => {
-        const stagesLib = await loadStagesLib(currentUser)
-        const cambrianStagesLibSub = stagesLib.subscribe(() => {
-            initStagesLib()
-        })
-        const cambrianProfileSub = currentUser.cambrianProfileDoc?.subscribe(
-            () => {
-                if (userName !== currentUser.cambrianProfileDoc?.content.name) {
-                    setUserName(currentUser.cambrianProfileDoc?.content.name)
-                }
-            }
-        )
-        return () => {
-            cambrianStagesLibSub.unsubscribe()
-            cambrianProfileSub?.unsubscribe()
-        }
-    }
-
-    const initStagesLib = async () => {
-        setIsFetching(true)
         try {
-            const stagesLib = await loadStagesLib(currentUser)
-            setStagesLib(stagesLib.content)
+            const updatedStagesLib = _.cloneDeep(stagesLib)
+            if (updatedStagesLib) {
+                if (updatedStagesLib?.recents) {
+                    const index = updatedStagesLib.recents.indexOf(streamId)
+                    if (index > -1) {
+                        updatedStagesLib.recents.splice(index, 1)
+                    }
+                }
+                const stagesLibDoc = await loadStagesLib(currentUser)
+                stagesLibDoc.content.update(updatedStagesLib)
+                await API.doc.updateStream(currentUser, stagesLibDoc.streamID, {
+                    ...stagesLibDoc.content.data,
+                })
+                setStagesLib(updatedStagesLib)
+            }
         } catch (e) {
-            setErrorMessage(await cpLogger.push(e))
+            console.error(e)
         }
-        setIsFetching(false)
     }
 
     return (
@@ -143,7 +150,6 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                             <Tab title="Compositions" icon={<TreeStructure />}>
                                 <CompositionsDashboardUI
                                     isFetching={isFetching}
-                                    currentUser={currentUser}
                                     compositionsLib={stagesLib?.compositions}
                                 />
                             </Tab>
@@ -153,7 +159,7 @@ const DashboardUI = ({ currentUser }: DashboardUIProps) => {
                                 />
                             </Tab>
                             <Tab title="Profile" icon={<UserCircle />}>
-                                <ProfileDashboardUI currentUser={currentUser} />
+                                <ProfileDashboardUI />
                             </Tab>
                         </Tabs>
                     </IconContext.Provider>

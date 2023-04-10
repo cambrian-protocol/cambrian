@@ -31,6 +31,7 @@ const CompositionListItem = ({
             >
                 <Text>{title}</Text>
                 <LoaderButton
+                    secondary
                     isLoading={isLoading}
                     disabled={isDisabled}
                     icon={<FilePlus />}

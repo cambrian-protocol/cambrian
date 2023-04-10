@@ -1,13 +1,15 @@
+import { TemplateInputType, initialTemplateInput } from '../EditTemplateUI'
 import { useContext, useEffect, useState } from 'react'
 
 import { Box } from 'grommet'
-import { EditTemplatePropsType } from '@cambrian/app/hooks/useEditTemplate'
 import TemplateDescriptionStep from './steps/TemplateDescriptionStep'
 import TemplateFlexInputsStep from './steps/TemplateFlexInputsStep'
 import TemplatePricingStep from './steps/TemplatePricingStep'
 import TemplatePublishStep from './steps/TemplatePublishStep'
 import TemplateRequirementsStep from './steps/TemplateRequirementsStep'
 import { TopRefContext } from '@cambrian/app/store/TopRefContext'
+import _ from 'lodash'
+import { useTemplateContext } from '@cambrian/app/hooks/useTemplateContext'
 
 export enum TEMPLATE_WIZARD_STEPS {
     DESCRIPTION,
@@ -23,11 +25,7 @@ export type TemplateWizardStepsType =
     | TEMPLATE_WIZARD_STEPS.REQUIREMENTS
     | TEMPLATE_WIZARD_STEPS.PUBLISH
 
-const TemplateWizard = ({
-    editTemplateProps: editTemplateProps,
-}: {
-    editTemplateProps: EditTemplatePropsType
-}) => {
+const TemplateWizard = () => {
     const [currentStep, setCurrentStep] = useState<TemplateWizardStepsType>(
         TEMPLATE_WIZARD_STEPS.DESCRIPTION
     )
@@ -38,54 +36,127 @@ const TemplateWizard = ({
             topRefContext.current?.scrollIntoView({ behavior: 'smooth' })
     }, [currentStep])
 
+    const { template } = useTemplateContext()
+    const [templateInput, setTemplateInput] =
+        useState<TemplateInputType>(initialTemplateInput)
+    const [isSaving, setIsSaving] = useState(false)
+
+    useEffect(() => {
+        if (template)
+            setTemplateInput({
+                title: template.content.title,
+                description: template.content.description,
+                flexInputs: template.content.flexInputs,
+                price: template.content.price,
+                requirements: template.content.requirements,
+            })
+    }, [template])
+
+    const onSave = async () => {
+        if (template) {
+            setIsSaving(true)
+            const updatedTemplate = {
+                ...template.content,
+                ...templateInput,
+            }
+            if (!_.isEqual(updatedTemplate, template.content)) {
+                try {
+                    await template.updateContent(updatedTemplate)
+                } catch (e) {
+                    console.error(e)
+                }
+            }
+            setIsSaving(false)
+        }
+    }
+
     const renderCurrentFormStep = () => {
         switch (currentStep) {
             case TEMPLATE_WIZARD_STEPS.DESCRIPTION:
                 return (
                     <TemplateDescriptionStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            setCurrentStep(TEMPLATE_WIZARD_STEPS.PRICING)
+                        }}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PRICING:
                 return (
                     <TemplatePricingStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            if (templateInput.flexInputs.length > 0) {
+                                setCurrentStep(
+                                    TEMPLATE_WIZARD_STEPS.FLEX_INPUTS
+                                )
+                            } else {
+                                setCurrentStep(
+                                    TEMPLATE_WIZARD_STEPS.REQUIREMENTS
+                                )
+                            }
+                        }}
+                        onBack={() =>
+                            setCurrentStep(TEMPLATE_WIZARD_STEPS.DESCRIPTION)
+                        }
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.FLEX_INPUTS:
                 return (
                     <TemplateFlexInputsStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            setCurrentStep(TEMPLATE_WIZARD_STEPS.REQUIREMENTS)
+                        }}
+                        onBack={() =>
+                            setCurrentStep(TEMPLATE_WIZARD_STEPS.PRICING)
+                        }
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.REQUIREMENTS:
                 return (
                     <TemplateRequirementsStep
-                        editTemplateProps={editTemplateProps}
-                        stepperCallback={setCurrentStep}
+                        templateInput={templateInput}
+                        setTemplateInput={setTemplateInput}
+                        isSaving={isSaving}
+                        onSave={async () => {
+                            await onSave()
+                            setCurrentStep(TEMPLATE_WIZARD_STEPS.PUBLISH)
+                        }}
+                        onBack={() => {
+                            if (templateInput.flexInputs.length > 0) {
+                                setCurrentStep(
+                                    TEMPLATE_WIZARD_STEPS.FLEX_INPUTS
+                                )
+                            } else {
+                                setCurrentStep(TEMPLATE_WIZARD_STEPS.PRICING)
+                            }
+                        }}
                     />
                 )
             case TEMPLATE_WIZARD_STEPS.PUBLISH:
-                return (
-                    <TemplatePublishStep
-                        editTemplateProps={editTemplateProps}
-                    />
-                )
+                return <TemplatePublishStep />
             default:
                 return <></>
         }
     }
 
     return (
-        <>
-            <Box height={{ min: '80vh' }} justify="center">
+        <Box align="center">
+            <Box height={{ min: '80vh' }} justify="center" width={'xlarge'}>
                 {/* TODO Wizard Nav  */}
                 {renderCurrentFormStep()}
             </Box>
-        </>
+        </Box>
     )
 }
 

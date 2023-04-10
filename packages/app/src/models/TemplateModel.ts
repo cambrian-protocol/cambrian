@@ -1,6 +1,7 @@
 import { FlexInputFormType } from '../ui/templates/forms/TemplateFlexInputsForm'
 
 export type TemplateModel = {
+    schemaVer?: number
     title: string
     description: string
     requirements: string

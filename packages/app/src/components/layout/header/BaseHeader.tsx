@@ -1,19 +1,16 @@
 import { Box, Heading, Text } from 'grommet'
-import ResponsiveButton, {
-    ResponsiveButtonProps,
-} from '../../buttons/ResponsiveButton'
 
 import CambrianProfileInfo from '../../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { IconContext } from 'phosphor-react'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
 
 interface BaseHeaderProps {
     title: string
     metaTitle: string
     statusBadge?: JSX.Element
-    items?: ResponsiveButtonProps[]
-    authorProfileDoc?: TileDocument<CambrianProfileType>
+    items?: JSX.Element[]
+    authorProfileDoc?: DocumentModel<CambrianProfileType>
 }
 
 const BaseHeader = ({
@@ -57,17 +54,18 @@ const BaseHeader = ({
                 ) : (
                     <Box />
                 )}
-                <Box direction="row" gap="small" align="center">
-                    <IconContext.Provider value={{ size: '18' }}>
+                <IconContext.Provider value={{ size: '18' }}>
+                    <Box
+                        direction="row"
+                        gap="xsmall"
+                        align="center"
+                        pad={{ bottom: 'xsmall' }}
+                    >
                         {items?.map((item, idx) => (
-                            <ResponsiveButton
-                                key={idx}
-                                {...item}
-                                color="dark-4"
-                            />
+                            <Box key={idx}>{item}</Box>
                         ))}
-                    </IconContext.Provider>
-                </Box>
+                    </Box>
+                </IconContext.Provider>
             </Box>
         </Box>
     )

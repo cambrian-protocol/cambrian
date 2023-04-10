@@ -13,11 +13,12 @@ import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import { OutcomeCollectionModel } from '@cambrian/app/models/OutcomeCollectionModel'
-import { PriceModel } from '@cambrian/app/components/bars/actionbars/proposal/ProposalReviewActionbar'
+import { ProposalPriceModel } from '@cambrian/app/models/ProposalModel'
 import { SlotType } from '@cambrian/app/models/SlotType'
 import { SolidityDataTypes } from '@cambrian/app/models/SolidityDataTypes'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TokenAmountModel } from '@cambrian/app/models/TokenModel'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { decodeData } from './decodeData'
 import { ethers } from 'ethers'
@@ -115,12 +116,12 @@ export const getSolverIngestWithMetaData = (
             slotTags && slotTags[ulid]
                 ? slotTags[ulid]
                 : {
-                      label: '',
-                      isFlex: 'None',
-                      description: '',
-                      instruction: '',
-                      slotId: ulid,
-                  }
+                    label: '',
+                    isFlex: 'None',
+                    description: '',
+                    instruction: '',
+                    slotId: ulid,
+                }
 
         return {
             slot: ingestSlot,
@@ -138,7 +139,7 @@ export const getSolverRecipientSlots = (
     return solverData.config.conditionBase.allocations.map(
         (allocation) =>
             solverData.slotsHistory[condition.conditionId][
-                allocation.recipientAddressSlot
+            allocation.recipientAddressSlot
             ] ||
             getSolverIngestWithMetaData(
                 allocation.recipientAddressSlot,
@@ -219,8 +220,8 @@ export const getSolverMethods = (
                 (k) =>
                     k ==
                     Object.keys(SolidityDataTypes)[
-                        /* @ts-ignore */
-                        Object.values(SolidityDataTypes).indexOf(i.type)
+                    /* @ts-ignore */
+                    Object.values(SolidityDataTypes).indexOf(i.type)
                     ]
             )
         )
@@ -235,7 +236,7 @@ export const getSolverMethods = (
 export const getOutcomeCollectionsInfoFromCeramicData = (
     composerSolver: ComposerSolver,
     composition: CompositionModel,
-    price: PriceModel
+    price: TokenAmountModel
 ): OutcomeCollectionModel[] => {
     return composerSolver.config.condition.partition.map((p) => {
         const recipientAmounts =
@@ -274,7 +275,7 @@ export const getOutcomeCollectionsInfoFromCeramicData = (
 export const getAmountInfoFromComposer = (
     amountSlotPath: ComposerSlotPathType,
     composition: CompositionModel,
-    price: PriceModel
+    price: TokenAmountModel
 ) => {
     const amountSlot = getComposerRichSlot(amountSlotPath, composition)
 
@@ -284,7 +285,7 @@ export const getAmountInfoFromComposer = (
         const amount = price.amount ? price.amount * percentage * 100 : 0
         const parsedAmount = ethers.utils.parseUnits(
             amount.toString(),
-            price.token?.decimals
+            price.token.decimals
         )
         return {
             percentage: percentage.toString(),
@@ -328,11 +329,11 @@ export const getComposerRichSlot = (
             slot: {
                 data:
                     data !== '' &&
-                    data !== ethers.constants.AddressZero &&
-                    slot.dataTypes[0] === SolidityDataTypes.Address
+                        data !== ethers.constants.AddressZero &&
+                        slot.dataTypes[0] === SolidityDataTypes.Address
                         ? ethers.utils.defaultAbiCoder.encode(slot.dataTypes, [
-                              data,
-                          ])
+                            data,
+                        ])
                         : data,
                 executions: 0,
                 ingestType: slot.slotType,

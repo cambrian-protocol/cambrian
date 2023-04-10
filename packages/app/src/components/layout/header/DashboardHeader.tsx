@@ -19,7 +19,7 @@ const DashboardHeader = ({
             align="center"
             wrap
         >
-            <Box pad={{ right: 'medium' }}>
+            <Box pad={{ right: 'medium' }} width={'large'}>
                 <Heading level="2">{title}</Heading>
                 <Text color="dark-4">{description}</Text>
             </Box>

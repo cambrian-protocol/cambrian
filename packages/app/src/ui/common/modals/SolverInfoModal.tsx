@@ -4,11 +4,11 @@ import BaseLayerModal, {
 
 import ComposerSolver from '@cambrian/app/classes/ComposerSolver'
 import { CompositionModel } from '@cambrian/app/models/CompositionModel'
-import { PriceModel } from '@cambrian/app/components/bars/actionbars/proposal/ProposalReviewActionbar'
 import SolverCeramicInfo from '@cambrian/app/components/info/solver/SolverCeramicInfo'
 import { SolverContractCondition } from '@cambrian/app/models/ConditionModel'
 import SolverContractInfo from '@cambrian/app/components/info/solver/SolverContractInfo'
 import { SolverModel } from '@cambrian/app/models/SolverModel'
+import { TokenAmountModel } from '@cambrian/app/models/TokenModel'
 
 type ContractOrCeramicSolverData = BaseLayerModalProps &
     (
@@ -24,7 +24,7 @@ type ContractOrCeramicSolverData = BaseLayerModalProps &
               contractCondition?: never
               composerSolver?: ComposerSolver
               composition?: CompositionModel
-              price?: PriceModel
+              price?: TokenAmountModel
           }
     )
 

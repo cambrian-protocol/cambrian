@@ -2,9 +2,10 @@ import { TextInput, TextInputProps } from 'grommet'
 
 import styled from 'styled-components'
 
-const NumberInput = ({ value, name, onChange }: TextInputProps) => {
+const NumberInput = ({ value, name, onChange, disabled }: TextInputProps) => {
     return (
         <TextInputWihtoutArrows
+            disabled={disabled}
             value={value}
             name={name}
             onChange={onChange}

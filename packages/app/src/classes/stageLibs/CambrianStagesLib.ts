@@ -8,6 +8,7 @@ import TemplateStageLib, {
 } from './TemplateStageLib'
 
 import { SCHEMA_VER } from '@cambrian/app/config'
+import { StageNames } from '@cambrian/app/models/StageModel';
 import { updateCambrianStagesLibToSchema } from '@cambrian/app/utils/transformers/schema/stageLibs/CambrianStagesLibTransformer'
 
 export type CambrianStagesLibType = {
@@ -86,5 +87,18 @@ export default class CambrianStagesLib {
         }
         updatedItems.push(streamID)
         this._recents = updatedItems
+    }
+
+    public addStage(stageStreamId: string, title: string, stageName: StageNames) {
+        switch (stageName) {
+            case StageNames.composition:
+                return this._compositions.addStageWithUniqueTitle(stageStreamId, title)
+            case StageNames.template:
+                return this._templates.addStageWithUniqueTitle(stageStreamId, title)
+            case StageNames.proposal:
+                return this._proposals.addStageWithUniqueTitle(stageStreamId, title)
+            default:
+                return title
+        }
     }
 }

@@ -2,7 +2,7 @@ import { Box, Form, FormField } from 'grommet'
 import { useEffect, useState } from 'react'
 
 import BaseLayerModal from '@cambrian/app/components/modals/BaseLayerModal'
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
@@ -10,16 +10,14 @@ import ModalHeader from '@cambrian/app/components/layout/header/ModalHeader'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import randimals from 'randimals'
 import router from 'next/router'
+import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface CreateCompositionModalProps {
-    ceramicCompositionAPI: CeramicCompositionAPI
     onClose: () => void
 }
 
-const CreateCompositionModal = ({
-    ceramicCompositionAPI,
-    onClose,
-}: CreateCompositionModalProps) => {
+const CreateCompositionModal = ({ onClose }: CreateCompositionModalProps) => {
+    const { currentUser } = useCurrentUserContext()
     const [isCreating, setIsCreating] = useState(false)
     const [input, setInput] = useState('')
     const [errorMessage, setErrorMessage] = useState<ErrorMessageType>()
@@ -31,10 +29,13 @@ const CreateCompositionModal = ({
     const onSubmit = async () => {
         setIsCreating(true)
         try {
-            const streamID = await ceramicCompositionAPI.createComposition(
-                input
-            )
-            router.push(`/solver/${streamID}`)
+            if (currentUser) {
+                const compositionService = new CompositionService()
+                const res = await compositionService.create(currentUser, input)
+                if (res) {
+                    router.push(`/solver/${res.streamID}`)
+                }
+            }
         } catch (e) {
             setIsCreating(false)
             setErrorMessage(await cpLogger.push(e))

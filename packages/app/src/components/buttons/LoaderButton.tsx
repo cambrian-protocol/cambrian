@@ -4,9 +4,9 @@ import BaseSkeletonBox from '../skeletons/BaseSkeletonBox'
 import { Box } from 'grommet'
 import { Button } from 'grommet'
 import { ButtonExtendedProps } from 'grommet'
-import { IconContext } from 'phosphor-react'
 import { Spinner } from 'grommet'
 import { Text } from 'grommet'
+import { cpTheme } from '@cambrian/app/theme/theme'
 import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
 
 export type LoaderButtonProps = ButtonExtendedProps & {
@@ -20,6 +20,7 @@ const LoaderButton = ({
     label,
     icon,
     isInitializing,
+    size,
     ...props
 }: LoaderButtonProps) => {
     const windowSize = useWindowSize()
@@ -29,13 +30,17 @@ const LoaderButton = ({
     const ref = useRef<HTMLAnchorElement & HTMLButtonElement>(null)
 
     useEffect(() => {
+        initSize()
+    }, [children, windowSize, props.disabled, isLoading])
+
+    const initSize = () => {
         if (ref.current && ref.current.getBoundingClientRect().width) {
             setWidth(ref.current.getBoundingClientRect().width)
         }
         if (ref.current && ref.current.getBoundingClientRect().height) {
             setHeight(ref.current.getBoundingClientRect().height)
         }
-    }, [children, windowSize, props.disabled])
+    }
 
     useEffect(() => {
         if (isLoading) {
@@ -52,10 +57,11 @@ const LoaderButton = ({
             }
         }
     }, [isLoading, showLoader])
+
     return (
-        <>
+        <Box style={{ position: 'relative' }}>
             {isInitializing ? (
-                <BaseSkeletonBox height={'3.5em'} width={'8em'} />
+                <BaseSkeletonBox height={'3.5em'} width={'100%'} />
             ) : (
                 <Button
                     {...props}
@@ -66,6 +72,9 @@ const LoaderButton = ({
                                   width: `${width}px`,
                                   height: `${height}px`,
                                   maxWidth: '100%',
+                                  backgroundColor:
+                                      cpTheme.global.colors['background-front']
+                                          .dark,
                               }
                             : {}
                     }
@@ -75,43 +84,42 @@ const LoaderButton = ({
                             <Box justify="center" align="center">
                                 {!showLoader ? (
                                     <Box animation="fadeIn">
-                                        <Text size="small">{label}</Text>
+                                        <Text size={size}>{label}</Text>
                                     </Box>
                                 ) : (
-                                    <Box animation="fadeIn">
-                                        <Spinner color={'white'} />
+                                    <Box
+                                        animation="fadeIn"
+                                        align="center"
+                                        style={{
+                                            position: 'absolute',
+                                            width: '100%',
+                                            left: 0,
+                                            right: 0,
+                                            marginLeft: 'auto',
+                                            marginRight: 'auto',
+                                        }}
+                                    >
+                                        <Spinner
+                                            color={'dark-4'}
+                                            size="xsmall"
+                                        />
                                     </Box>
                                 )}
                             </Box>
                         )
                     }
                     icon={
-                        icon && !label ? (
-                            <Box justify="center" align="center">
-                                {!showLoader ? (
-                                    <IconContext.Provider
-                                        value={{ size: '24' }}
-                                    >
-                                        <Box align="center" animation="fadeIn">
-                                            {icon}
-                                        </Box>
-                                    </IconContext.Provider>
-                                ) : (
-                                    <Box animation="fadeIn">
-                                        <Spinner
-                                            color={'white'}
-                                            size="xsmall"
-                                        />
-                                    </Box>
-                                )}
-                            </Box>
-                        ) : !showLoader ? (
+                        showLoader ? (
+                            !label ? (
+                                <Spinner color={'dark-4'} size="xsmall" />
+                            ) : undefined
+                        ) : (
                             icon
-                        ) : undefined
+                        )
                     }
                 />
             )}
-        </>
+        </Box>
     )
 }
 

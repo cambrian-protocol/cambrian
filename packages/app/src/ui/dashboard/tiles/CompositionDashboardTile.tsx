@@ -25,13 +25,13 @@ import {
 } from '@cambrian/app/constants/ErrorMessages'
 import { useEffect, useState } from 'react'
 
-import CeramicCompositionAPI from '@cambrian/app/services/ceramic/CeramicCompositionAPI'
-import CeramicTemplateAPI from '@cambrian/app/services/ceramic/CeramicTemplateAPI'
+import CompositionService from '@cambrian/app/services/stages/CompositionService'
 import DropButtonListItem from '@cambrian/app/components/list/DropButtonListItem'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import PlainSectionDivider from '@cambrian/app/components/sections/PlainSectionDivider'
 import RenameCompositionModal from '../modals/RenameCompositionModal'
+import TemplateService from '@cambrian/app/services/stages/TemplateService'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { cpTheme } from '@cambrian/app/theme/theme'
 import { isNewProfile } from '@cambrian/app/utils/helpers/profileHelper'
@@ -40,19 +40,17 @@ import router from 'next/router'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 
 interface CompositionDashboardTileProps {
-    compositionTag: string
+    compositionTitle: string
     compositionStreamID: string
-    ceramicCompositionAPI: CeramicCompositionAPI
 }
 
 const CompositionDashboardTile = ({
-    compositionTag,
+    compositionTitle,
     compositionStreamID,
-    ceramicCompositionAPI,
 }: CompositionDashboardTileProps) => {
     const { currentUser } = useCurrentUserContext()
     // Cache Tag to prevent refetch after rename
-    const [currentTag, setCurrentTag] = useState(compositionTag)
+    const [title, setTitle] = useState(compositionTitle)
     const [isSavedToClipboard, setIsSavedToClipboard] = useState(false)
     const [showRenameCompositionModal, setShowRenameCompositionModal] =
         useState(false)
@@ -80,16 +78,19 @@ const CompositionDashboardTile = ({
                 if (!currentUser.did || !currentUser.cambrianProfileDoc)
                     throw GENERAL_ERROR['NO_CERAMIC_CONNECTION']
 
-                const ceramicTemplateAPI = new CeramicTemplateAPI(currentUser)
-                const streamID = await ceramicTemplateAPI.createTemplate(
-                    randimals(),
-                    compositionStreamID
+                const templateService = new TemplateService()
+                const res = await templateService.create(
+                    currentUser,
+                    compositionStreamID,
+                    randimals()
                 )
+                if (!res) throw new Error('Failed to create Template')
+
                 if (isNewProfile(currentUser.cambrianProfileDoc.content)) {
-                    router.push(`/profile/new/${streamID}?target=template`)
+                    router.push(`/profile/new/${res.streamID}?target=template`)
                 } else {
                     router.push(
-                        `${window.location.origin}/template/new/${streamID}`
+                        `${window.location.origin}/template/new/${res.streamID}`
                     )
                 }
             }
@@ -100,9 +101,18 @@ const CompositionDashboardTile = ({
     }
 
     const onRemove = async (compositionID: string) => {
+        setIsRemoving(true)
         try {
-            setIsRemoving(true)
-            await ceramicCompositionAPI.archiveComposition(compositionID)
+            if (currentUser) {
+                const compositionService = new CompositionService()
+                const res = await compositionService.archive(
+                    currentUser,
+                    compositionID
+                )
+                if (res?.status === 200) {
+                    // TODO Manually update users lib
+                }
+            }
         } catch (e) {
             setIsRemoving(false)
             setErrorMessage(await cpLogger.push(e))
@@ -120,7 +130,7 @@ const CompositionDashboardTile = ({
                     >
                         <CardHeader pad={{ right: 'small', vertical: 'small' }}>
                             <Box pad={{ left: 'medium' }}>
-                                <Heading level="4">{currentTag}</Heading>
+                                <Heading level="4">{title}</Heading>
                             </Box>
                             <DropButton
                                 size="small"
@@ -221,9 +231,9 @@ const CompositionDashboardTile = ({
             </IconContext.Provider>
             {showRenameCompositionModal && (
                 <RenameCompositionModal
-                    currentTag={currentTag}
+                    title={title}
+                    setTitle={setTitle}
                     compositionStreamID={compositionStreamID}
-                    setCurrentTag={setCurrentTag}
                     onClose={toggleShowRenameCompositionModal}
                 />
             )}

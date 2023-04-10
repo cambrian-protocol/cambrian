@@ -5,6 +5,7 @@ import {
 } from '@cambrian/app/store/UserContext'
 import { useContext, useEffect, useState } from 'react'
 
+import API from '@cambrian/app/services/api/cambrian.api'
 import { Box } from 'grommet'
 import ProfileBioStep from './steps/ProfileBioStep'
 import ProfileContactStep from './steps/ProfileContactStep'
@@ -49,7 +50,13 @@ const ProfileWizard = ({ currentUser, successRoute }: ProfileWizardProps) => {
     }, [])
 
     const onSave = async () => {
-        await currentUser.cambrianProfileDoc?.update(input)
+        if (currentUser.cambrianProfileDoc) {
+            await API.doc.updateStream(
+                currentUser,
+                currentUser.cambrianProfileDoc.streamID,
+                input
+            )
+        }
     }
 
     const renderCurrentFormStep = () => {

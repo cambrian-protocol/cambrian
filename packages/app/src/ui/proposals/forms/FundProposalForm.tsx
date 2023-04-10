@@ -1,9 +1,10 @@
 import { ArrowLineUp, CheckCircle, Info } from 'phosphor-react'
 import { BigNumber, ethers } from 'ethers'
 import { Box, Button, Form, Text } from 'grommet'
-import React, { SetStateAction, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import BaseTokenBadge from '@cambrian/app/components/token/BaseTokenBadge'
+import ButtonRowContainer from '@cambrian/app/components/containers/ButtonRowContainer'
 import { ERC20_IFACE } from 'packages/app/config/ContractInterfaces'
 import { ErrorMessageType } from '@cambrian/app/constants/ErrorMessages'
 import ErrorPopupModal from '@cambrian/app/components/modals/ErrorPopupModal'
@@ -11,19 +12,17 @@ import FundingProgressMeter from '@cambrian/app/components/progressMeters/Fundin
 import FundingSkeleton from '@cambrian/app/components/skeletons/FundingSkeleton'
 import LoaderButton from '@cambrian/app/components/buttons/LoaderButton'
 import NumberInput from '@cambrian/app/components/inputs/NumberInput'
+import Proposal from '@cambrian/app/classes/stages/Proposal'
 import ProposalsHub from '@cambrian/app/hubs/ProposalsHub'
 import { SUPPORTED_CHAINS } from 'packages/app/config/SupportedChains'
 import TokenBridgeButton from '@cambrian/app/components/buttons/TokenBridgeButton'
-import { TokenModel } from '@cambrian/app/models/TokenModel'
-import TwoButtonWrapContainer from '@cambrian/app/components/containers/TwoButtonWrapContainer'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { cpLogger } from '@cambrian/app/services/api/Logger.api'
 import { useProposalFunding } from '@cambrian/app/hooks/useProposalFunding'
 
 interface FundProposalFormProps {
-    proposalContract: ethers.Contract
+    proposal: Proposal
     currentUser: UserType
-    collateralToken: TokenModel
 }
 
 type FundProposalFormType = {
@@ -34,12 +33,8 @@ const initialInput = {
     amount: 0,
 }
 
-const FundProposalForm = ({
-    proposalContract,
-    currentUser,
-    collateralToken,
-}: FundProposalFormProps) => {
-    const { funding } = useProposalFunding(proposalContract.id)
+const FundProposalForm = ({ proposal, currentUser }: FundProposalFormProps) => {
+    const { funding } = useProposalFunding(proposal.onChainProposal.id)
     const [input, _setInput] = useState<FundProposalFormType>(initialInput)
 
     // Necessary to access amount state in approvalListener
@@ -54,25 +49,27 @@ const FundProposalForm = ({
         currentUser.chainId
     )
     const [currentAllowance, setCurrentAllowance] = useState<BigNumber>()
-    const [isInPrimaryTransaction, setIsInPrimaryTransaction] = useState(false)
-    const [isInSecondaryTransaction, setIsInSecondaryTransaction] =
-        useState(false)
+    const [isApproving, setIsApproving] = useState(false)
+    const [isFunding, setIsFunding] = useState(false)
+    const [isDefunding, setIsDefunding] = useState(false)
+
     const [errorMsg, setErrorMsg] = useState<ErrorMessageType>()
     const [currentUserFunding, setCurrentUserFunding] = useState<BigNumber>(
         BigNumber.from(0)
     )
 
     const erc20TokenContract = new ethers.Contract(
-        proposalContract.collateralToken,
+        proposal.collateralToken.address,
         ERC20_IFACE,
         currentUser.signer
     )
 
     const approvalFilter = erc20TokenContract.filters.Approval(
         currentUser.address,
-        proposalContract.address,
+        proposal.onChainProposal.address,
         null
     )
+
     useEffect(() => {
         init()
     }, [])
@@ -97,8 +94,10 @@ const FundProposalForm = ({
 
                 // Init input with allowance but maximum the amount which is left
                 let initInput = allowanceWei
-                const max = proposalContract.fundingGoal.sub(
-                    await proposalsHub.getProposalFunding(proposalContract.id)
+                const max = proposal.onChainProposal.fundingGoal.sub(
+                    await proposalsHub.getProposalFunding(
+                        proposal.onChainProposal.id
+                    )
                 )
                 if (BigNumber.from(allowanceWei).gt(max)) initInput = max
 
@@ -106,7 +105,7 @@ const FundProposalForm = ({
                     amount: Number(
                         ethers.utils.formatUnits(
                             initInput,
-                            collateralToken?.decimals
+                            proposal.collateralToken.decimals
                         )
                     ),
                 })
@@ -126,27 +125,32 @@ const FundProposalForm = ({
     ) => {
         if (
             Number(inputRef.current.amount) ===
-            Number(ethers.utils.formatUnits(amount, collateralToken?.decimals))
+            Number(
+                ethers.utils.formatUnits(
+                    amount,
+                    proposal.collateralToken.decimals
+                )
+            )
         ) {
             setCurrentAllowance(amount)
         }
-        setIsInPrimaryTransaction(false)
+        setIsApproving(false)
     }
 
     const init = async () => {
         await initAllowance()
-        await updateUserFunding(proposalContract.id)
+        await updateUserFunding(proposal.onChainProposal.id)
     }
 
     const initProposalsHubListeners = async () => {
         proposalsHub.contract.on(
             proposalsHub.contract.filters.FundProposal(
-                proposalContract.id,
+                proposal.onChainProposal.id,
                 null,
                 null
             ),
             async (proposalId) => {
-                setIsInPrimaryTransaction(false)
+                setIsFunding(false)
                 await initAllowance()
                 await updateUserFunding(proposalId)
             }
@@ -154,14 +158,12 @@ const FundProposalForm = ({
 
         proposalsHub.contract.on(
             proposalsHub.contract.filters.DefundProposal(
-                proposalContract.id,
+                proposal.onChainProposal.id,
                 null,
                 null
             ),
             async (proposalId) => {
-                // Can be both - Secondary or primary in case proposal is fully funded
-                setIsInPrimaryTransaction(false)
-                setIsInSecondaryTransaction(false)
+                setIsDefunding(false)
                 await initAllowance()
                 await updateUserFunding(proposalId)
             }
@@ -176,77 +178,54 @@ const FundProposalForm = ({
         if (userFunding) setCurrentUserFunding(userFunding)
     }
 
-    const safeTransactionCall = async (
-        contractCall: () => Promise<void>,
-        isLoading: React.Dispatch<SetStateAction<boolean>>
-    ) => {
-        isLoading(true)
+    const onApproveFunding = async () => {
+        setIsApproving(true)
         try {
-            await contractCall()
+            await proposal.approveFunding(input.amount)
         } catch (e) {
-            isLoading(false)
             setErrorMsg(await cpLogger.push(e))
+            setIsApproving(false)
         }
     }
 
-    const onApproveFunding = async () => {
-        safeTransactionCall(
-            () => proposalsHub.approveFunding(input.amount, collateralToken),
-            setIsInPrimaryTransaction
-        )
-    }
-
     const onFundProposal = async () => {
-        safeTransactionCall(
-            () =>
-                proposalsHub.fundProposal(
-                    proposalContract.id,
-                    input.amount,
-                    collateralToken
-                ),
-            setIsInPrimaryTransaction
-        )
+        setIsFunding(true)
+        try {
+            await proposal.fund(input.amount)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
+            setIsFunding(false)
+        }
     }
 
     const onDefundProposal = async () => {
-        if (funding?.eq(proposalContract.fundingGoal)) {
-            safeTransactionCall(
-                () =>
-                    proposalsHub.defundProposal(
-                        proposalContract.id,
-                        input.amount,
-                        collateralToken
-                    ),
-                setIsInPrimaryTransaction
-            )
-        } else {
-            safeTransactionCall(
-                () =>
-                    proposalsHub.defundProposal(
-                        proposalContract.id,
-                        input.amount,
-                        collateralToken
-                    ),
-                setIsInSecondaryTransaction
-            )
+        setIsDefunding(true)
+        try {
+            await proposal.defund(input.amount)
+        } catch (e) {
+            setErrorMsg(await cpLogger.push(e))
+            setIsDefunding(false)
         }
     }
 
     const inputMaxAmount = () => {
-        if (funding?.eq(proposalContract.fundingGoal)) {
+        if (funding?.eq(proposal.onChainProposal.fundingGoal)) {
             setInput({
                 amount: Number(
                     ethers.utils.formatUnits(
                         currentUserFunding,
-                        collateralToken?.decimals
+                        proposal.collateralToken.decimals
                     )
                 ),
             })
         } else {
-            const max = proposalContract.fundingGoal.sub(funding)
+            const max = proposal.onChainProposal.fundingGoal.sub(funding)
             setInput({
                 amount: Number(
-                    ethers.utils.formatUnits(max, collateralToken?.decimals)
+                    ethers.utils.formatUnits(
+                        max,
+                        proposal.collateralToken.decimals
+                    )
                 ),
             })
         }
@@ -259,17 +238,17 @@ const FundProposalForm = ({
         input.amount <=
             Number(
                 ethers.utils.formatUnits(
-                    proposalContract.fundingGoal,
-                    collateralToken?.decimals
+                    proposal.onChainProposal.fundingGoal,
+                    proposal.collateralToken.decimals
                 )
             )
 
-    const disableButtons = isInPrimaryTransaction || isInSecondaryTransaction
+    const disableButtons = isApproving || isDefunding || isFunding
 
     return (
         <>
             <Box align="center">
-                {funding && collateralToken ? (
+                {funding ? (
                     <>
                         <Box
                             width={{ min: 'medium' }}
@@ -277,9 +256,11 @@ const FundProposalForm = ({
                             pad={{ bottom: 'medium' }}
                         >
                             <FundingProgressMeter
-                                token={collateralToken}
+                                token={proposal.collateralToken}
                                 funding={funding}
-                                fundingGoal={proposalContract.fundingGoal}
+                                fundingGoal={
+                                    proposal.onChainProposal.fundingGoal
+                                }
                                 userFunding={currentUserFunding}
                             />
                         </Box>
@@ -290,13 +271,16 @@ const FundProposalForm = ({
                                 }}
                                 value={input}
                                 onSubmit={
-                                    funding.eq(proposalContract.fundingGoal)
+                                    funding.eq(
+                                        proposal.onChainProposal.fundingGoal
+                                    )
                                         ? onDefundProposal
                                         : input.amount &&
                                           currentAllowance?.gte(
                                               ethers.utils.parseUnits(
                                                   input.amount.toString(),
-                                                  collateralToken.decimals
+                                                  proposal.collateralToken
+                                                      .decimals
                                               )
                                           )
                                         ? onFundProposal
@@ -304,40 +288,38 @@ const FundProposalForm = ({
                                 }
                             >
                                 <Box gap="medium">
-                                    <Box pad="xsmall" gap="medium">
-                                        <>
-                                            <Box
-                                                direction="row"
-                                                justify="between"
-                                                align="center"
-                                                gap="small"
-                                                background="background-contrast"
-                                                pad="small"
-                                                round="xsmall"
-                                            >
-                                                <Button
+                                    <Box gap="medium">
+                                        <Box
+                                            direction="row"
+                                            justify="between"
+                                            align="center"
+                                            gap="small"
+                                            background="background-contrast"
+                                            pad="small"
+                                            round="xsmall"
+                                        >
+                                            <Button
+                                                disabled={disableButtons}
+                                                icon={<ArrowLineUp />}
+                                                onClick={inputMaxAmount}
+                                            />
+                                            <Box flex>
+                                                <NumberInput
+                                                    name="amount"
+                                                    required={
+                                                        !funding.eq(
+                                                            proposal
+                                                                .onChainProposal
+                                                                .fundingGoal
+                                                        )
+                                                    }
                                                     disabled={disableButtons}
-                                                    icon={<ArrowLineUp />}
-                                                    onClick={inputMaxAmount}
-                                                />
-                                                <Box flex>
-                                                    <NumberInput
-                                                        name="amount"
-                                                        required={
-                                                            !funding.eq(
-                                                                proposalContract.fundingGoal
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            disableButtons
-                                                        }
-                                                    />
-                                                </Box>
-                                                <BaseTokenBadge
-                                                    token={collateralToken}
                                                 />
                                             </Box>
-                                        </>
+                                            <BaseTokenBadge
+                                                token={proposal.collateralToken}
+                                            />
+                                        </Box>
                                         <Box
                                             justify="center"
                                             align="center"
@@ -360,14 +342,21 @@ const FundProposalForm = ({
                                                         {Number(
                                                             ethers.utils.formatUnits(
                                                                 currentAllowance,
-                                                                collateralToken.decimals
+                                                                proposal
+                                                                    .collateralToken
+                                                                    .decimals
                                                             )
                                                         ).toFixed(2)}{' '}
-                                                        {collateralToken.symbol}
+                                                        {
+                                                            proposal
+                                                                .collateralToken
+                                                                .symbol
+                                                        }
                                                     </Text>
                                                 </Box>
                                             ) : funding.eq(
-                                                  proposalContract.fundingGoal
+                                                  proposal.onChainProposal
+                                                      .fundingGoal
                                               ) ? (
                                                 <Box
                                                     direction="row"
@@ -394,15 +383,14 @@ const FundProposalForm = ({
                                             )}
                                         </Box>
                                     </Box>
-                                    <TwoButtonWrapContainer
+                                    <ButtonRowContainer
                                         primaryButton={
                                             funding.eq(
-                                                proposalContract.fundingGoal
+                                                proposal.onChainProposal
+                                                    .fundingGoal
                                             ) ? (
                                                 <LoaderButton
-                                                    isLoading={
-                                                        isInPrimaryTransaction
-                                                    }
+                                                    isLoading={isDefunding}
                                                     disabled={
                                                         !isValidInput ||
                                                         disableButtons
@@ -415,13 +403,12 @@ const FundProposalForm = ({
                                               currentAllowance?.gte(
                                                   ethers.utils.parseUnits(
                                                       input.amount.toString(),
-                                                      collateralToken.decimals
+                                                      proposal.collateralToken
+                                                          .decimals
                                                   )
                                               ) ? (
                                                 <LoaderButton
-                                                    isLoading={
-                                                        isInPrimaryTransaction
-                                                    }
+                                                    isLoading={isFunding}
                                                     disabled={
                                                         !isValidInput ||
                                                         disableButtons
@@ -432,9 +419,7 @@ const FundProposalForm = ({
                                                 />
                                             ) : (
                                                 <LoaderButton
-                                                    isLoading={
-                                                        isInPrimaryTransaction
-                                                    }
+                                                    isLoading={isApproving}
                                                     disabled={
                                                         !isValidInput ||
                                                         disableButtons
@@ -447,12 +432,11 @@ const FundProposalForm = ({
                                         }
                                         secondaryButton={
                                             funding.eq(
-                                                proposalContract.fundingGoal
+                                                proposal.onChainProposal
+                                                    .fundingGoal
                                             ) ? undefined : (
                                                 <LoaderButton
-                                                    isLoading={
-                                                        isInSecondaryTransaction
-                                                    }
+                                                    isLoading={isDefunding}
                                                     disabled={
                                                         !isValidInput ||
                                                         disableButtons

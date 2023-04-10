@@ -1,10 +1,10 @@
 import {
-    Activity,
     CheckCircle,
     Coins,
     Eye,
     FileDotted,
     FileX,
+    PaperPlaneRight,
     PencilSimpleLine,
     Question,
     RocketLaunch,
@@ -13,10 +13,12 @@ import {
 export enum ProposalStatus {
     Unknown,
     Draft,
+    Submitted,
     OnReview,
     ChangeRequested,
     Modified,
     Canceled,
+    Declined,
     Approved,
     Funding,
     Executed,
@@ -48,8 +50,13 @@ PROPOSAL_STATUS_INFO[ProposalStatus.Draft] = {
 PROPOSAL_STATUS_INFO[ProposalStatus.OnReview] = {
     name: 'On Review',
     icon: <Eye />,
-    description:
-        'Proposal has been submitted to the Seller and needs approval.',
+    description: 'Proposal is being reviewed',
+    color: 'status-executed',
+}
+PROPOSAL_STATUS_INFO[ProposalStatus.Submitted] = {
+    name: 'Submitted',
+    icon: <PaperPlaneRight />,
+    description: 'Proposal has been submitted to the Seller.',
     color: 'status-executed',
 }
 PROPOSAL_STATUS_INFO[ProposalStatus.Canceled] = {

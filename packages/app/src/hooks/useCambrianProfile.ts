@@ -1,15 +1,14 @@
+import API, { DocumentModel } from '../services/api/cambrian.api'
 import { useEffect, useState } from 'react'
 
 import { CambrianProfileType } from '../store/UserContext'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
-import { ceramicInstance } from '../services/ceramic/CeramicUtils'
 import { useCurrentUserContext } from './useCurrentUserContext'
 
 const useCambrianProfile = (did?: string) => {
     const { currentUser } = useCurrentUserContext()
 
     const [cambrianProfile, setCambrianProfile] =
-        useState<TileDocument<CambrianProfileType>>()
+        useState<DocumentModel<CambrianProfileType>>()
 
     useEffect(() => {
         initCambrianProfile()
@@ -17,14 +16,12 @@ const useCambrianProfile = (did?: string) => {
 
     const initCambrianProfile = async () => {
         if (currentUser && did) {
-            const cambrianProfile = (await TileDocument.deterministic(
-                ceramicInstance(currentUser),
+            const cambrianProfile = await API.doc.deterministic<CambrianProfileType>(
                 {
                     controllers: [did],
                     family: 'cambrian-profile',
                 },
-                { pin: true }
-            )) as TileDocument<CambrianProfileType>
+            )
             if (cambrianProfile) setCambrianProfile(cambrianProfile)
         }
     }

@@ -3,12 +3,12 @@ import { Box, Text } from 'grommet'
 import BaseAvatar from './BaseAvatar'
 import CambrianProfileInfo from '../info/CambrianProfileInfo'
 import { CambrianProfileType } from '@cambrian/app/store/UserContext'
-import { TileDocument } from '@ceramicnetwork/stream-tile'
+import { DocumentModel } from '@cambrian/app/services/api/cambrian.api'
 import { ellipseAddress } from '@cambrian/app/utils/helpers/ellipseAddress'
-import { getAddressFromDID } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getAddressFromDID } from '@cambrian/app/utils/did.utils'
 
 interface AvatarGroupProps {
-    participants: TileDocument<CambrianProfileType>[]
+    participants: DocumentModel<CambrianProfileType>[]
 }
 
 const AvatarGroup = ({ participants }: AvatarGroupProps) => (
@@ -44,10 +44,13 @@ const AvatarGroup = ({ participants }: AvatarGroupProps) => (
                         (p, idx) =>
                             `${
                                 p.content.name ||
-                                ellipseAddress(
-                                    getAddressFromDID(p.controllers[0]),
-                                    4
-                                )
+                                (p.metadata?.controllers &&
+                                    ellipseAddress(
+                                        getAddressFromDID(
+                                            p.metadata.controllers[0]
+                                        ),
+                                        4
+                                    ))
                             }${participants.length > idx + 1 ? ', ' : ''}`
                     )}
                 </Text>

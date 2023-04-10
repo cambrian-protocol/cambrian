@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import ArbitrateActionbar from '@cambrian/app/components/bars/actionbars/arbitrate/ArbitrateActionbar'
+import { Box } from 'grommet'
 import { ConditionStatus } from '@cambrian/app/models/ConditionStatus'
 import ConfirmOutcomeActionbar from '@cambrian/app/components/bars/actionbars/proposed/ConfirmOutcomeActionbar'
-import DefaultRecipientActionbar from './DefaultRecipientActionbar'
 import { GenericMethods } from '@cambrian/app/components/solver/Solver'
 import InitiatedActionbar from '@cambrian/app/components/bars/actionbars/initiated/InitiatedActionbar'
 import LockedByArbitrationActionbar from '@cambrian/app/components/bars/actionbars/arbitrate/LockedByArbitrationActionbar'
@@ -18,9 +18,10 @@ import { TimelockModel } from '@cambrian/app/models/TimeLocksHashMapType'
 import { UserType } from '@cambrian/app/store/UserContext'
 import { decodeData } from '@cambrian/app/utils/helpers/decodeData'
 import { getArbitratorAddressOrOwner } from '@cambrian/app/utils/helpers/arbitratorHelper'
-import { getDIDfromAddress } from '@cambrian/app/services/ceramic/CeramicUtils'
+import { getDIDfromAddress } from '@cambrian/app/utils/did.utils'
 import { getSolverRecipientSlots } from '@cambrian/app/utils/helpers/solverHelpers'
 import usePermissionContext from '@cambrian/app/hooks/usePermissionContext'
+import { useWindowSize } from '@cambrian/app/hooks/useWindowSize'
 
 interface DefaultSolverActionbarProps {
     currentUser: UserType
@@ -43,6 +44,15 @@ const SolverActionbar = ({
     const allowedForRecipients = usePermissionContext('Recipient')
     const allowedForArbitrator = usePermissionContext('Arbitrator')
     const [messenger, setMessenger] = useState<JSX.Element>()
+    const ref = useRef<HTMLDivElement>(null)
+    const [height, setHeight] = useState<number>(0)
+    const windowSize = useWindowSize()
+
+    useEffect(() => {
+        if (ref.current && ref.current.getBoundingClientRect().height) {
+            setHeight(ref.current.getBoundingClientRect().height)
+        }
+    }, [windowSize])
 
     useEffect(() => {
         if (currentCondition) {
@@ -106,70 +116,77 @@ const SolverActionbar = ({
     if (!currentCondition)
         return <PrepareSolveActionbar solverMethods={solverMethods} />
 
-    switch (currentCondition.status) {
-        case ConditionStatus.Initiated:
-            return (
-                <InitiatedActionbar
-                    messenger={messenger}
-                    solverData={solverData}
-                    solverMethods={solverMethods}
-                    currentCondition={currentCondition}
-                />
-            )
-        case ConditionStatus.Executed:
-            if (allowedForKeeper) {
+    const renderActionbar = () => {
+        switch (currentCondition.status) {
+            case ConditionStatus.Initiated:
                 return (
-                    <ProposeOutcomeActionbar
-                        messenger={messenger}
+                    <InitiatedActionbar
                         solverData={solverData}
                         solverMethods={solverMethods}
                         currentCondition={currentCondition}
                     />
                 )
-            } else if (allowedForRecipients || allowedForArbitrator) {
-                return <DefaultRecipientActionbar messenger={messenger} />
-            }
-            break
-        case ConditionStatus.OutcomeProposed:
-            return (
-                <ConfirmOutcomeActionbar
-                    messenger={messenger}
-                    solverTimelock={solverTimelock}
-                    solverMethods={solverMethods}
-                    currentCondition={currentCondition}
-                />
-            )
-        case ConditionStatus.ArbitrationRequested:
-            if (allowedForArbitrator) {
+            case ConditionStatus.Executed:
+                if (allowedForKeeper) {
+                    return (
+                        <ProposeOutcomeActionbar
+                            solverData={solverData}
+                            solverMethods={solverMethods}
+                            currentCondition={currentCondition}
+                        />
+                    )
+                }
+                break
+            case ConditionStatus.OutcomeProposed:
                 return (
-                    <ArbitrateActionbar
-                        messenger={messenger}
-                        currentUser={currentUser}
+                    <ConfirmOutcomeActionbar
                         solverTimelock={solverTimelock}
-                        solverAddress={solverAddress}
-                        solverData={solverData}
                         solverMethods={solverMethods}
                         currentCondition={currentCondition}
                     />
                 )
-            } else {
-                return <LockedByArbitrationActionbar messenger={messenger} />
-            }
-        case ConditionStatus.ArbitrationDelivered:
-        case ConditionStatus.OutcomeReported:
-            return (
-                <RedeemTokensActionbar
-                    solverAddress={solverAddress}
-                    messenger={messenger}
-                    currentUser={currentUser}
-                    currentCondition={currentCondition}
-                    solverData={solverData}
-                />
-            )
-            break
+            case ConditionStatus.ArbitrationRequested:
+                if (allowedForArbitrator) {
+                    return (
+                        <ArbitrateActionbar
+                            currentUser={currentUser}
+                            solverTimelock={solverTimelock}
+                            solverAddress={solverAddress}
+                            solverData={solverData}
+                            solverMethods={solverMethods}
+                            currentCondition={currentCondition}
+                        />
+                    )
+                } else {
+                    return <LockedByArbitrationActionbar />
+                }
+            case ConditionStatus.ArbitrationDelivered:
+            case ConditionStatus.OutcomeReported:
+                return (
+                    <RedeemTokensActionbar
+                        solverAddress={solverAddress}
+                        currentUser={currentUser}
+                        currentCondition={currentCondition}
+                        solverData={solverData}
+                    />
+                )
+            default:
+                return <></>
+        }
     }
 
-    return <></>
+    return (
+        <Box
+            style={{ position: 'relative' }}
+            height={{ min: 'auto' }}
+            ref={ref}
+        >
+            {renderActionbar()}
+            <Box style={{ position: 'absolute', bottom: height, right: 0 }}>
+                {messenger}
+            </Box>
+        </Box>
+    )
 }
 
 export default SolverActionbar
