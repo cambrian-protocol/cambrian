@@ -1,16 +1,34 @@
 import { Box } from 'grommet'
 import { Heading } from 'grommet'
+import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
+import { cpTheme } from '@cambrian/app/theme/theme'
 
 interface USPListItemProps {
     title: string
     description: string
+    icon?: JSX.Element
 }
 
-const USPListItem = ({ title, description }: USPListItemProps) => {
+const USPListItem = ({ title, description, icon }: USPListItemProps) => {
     return (
         <Box direction="row" pad={{ vertical: 'medium' }} align="center" wrap>
-            <Box flex width={{ min: 'medium' }} pad="medium">
+            <Box
+                flex
+                width={{ min: 'medium' }}
+                pad="medium"
+                direction="row"
+                gap="medium"
+                align="center"
+            >
+                <IconContext.Provider
+                    value={{
+                        size: '32px',
+                        color: cpTheme.global.colors['brand'].dark,
+                    }}
+                >
+                    {icon}
+                </IconContext.Provider>
                 <Heading level="2">{title}</Heading>
             </Box>
             <Box width={{ max: 'medium' }} pad="medium">

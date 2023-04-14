@@ -1,13 +1,14 @@
 import { Box, Image } from 'grommet'
 
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
+import EnderSection from '@cambrian/app/components/sections/EnderSection'
 import Glow from '@cambrian/app/components/branding/Glow'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
 import LogoButton from '@cambrian/app/components/buttons/LogoButton'
 import PageLayout from '@cambrian/app/components/layout/PageLayout'
+import PainPointSection from '@cambrian/app/components/sections/PainPointSection'
 import { Text } from 'grommet'
 import USPListSection from '@cambrian/app/components/sections/USPListSection'
-import USPSection from '@cambrian/app/components/sections/USPSection'
 import { useCurrentUserContext } from '@cambrian/app/hooks/useCurrentUserContext'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
@@ -33,11 +34,17 @@ export default function Home() {
                         <Glow
                             height="1000px"
                             width="1000px"
-                            left={'-20%'}
+                            left={'80%'}
                             bottom={'20%'}
                         />
+                        <Glow
+                            height="1000px"
+                            width="1000px"
+                            left={'-20%'}
+                            bottom={'60%'}
+                        />
                         <Box style={{ position: 'relative' }}>
-                            <USPSection />
+                            <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
                                 title={'Solver'}

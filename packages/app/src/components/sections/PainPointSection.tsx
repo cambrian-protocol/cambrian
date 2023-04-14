@@ -11,7 +11,7 @@ import {
 import StackedIcon from '../icons/StackedIcon'
 import USPCard from '../cards/USPCard'
 
-const USPSection = () => {
+const PainPointSection = () => {
     return (
         <Box
             height={{ min: '100vh' }}
@@ -64,4 +64,4 @@ const USPSection = () => {
     )
 }
 
-export default USPSection
+export default PainPointSection
