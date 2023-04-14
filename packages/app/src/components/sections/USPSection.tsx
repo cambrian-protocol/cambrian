@@ -1,6 +1,14 @@
-import { BoundingBox, Coins, ShareNetwork } from 'phosphor-react'
+import { Box, Heading } from 'grommet'
+import {
+    Database,
+    Gear,
+    MinusCircle,
+    Prohibit,
+    Stamp,
+    UsersFour,
+} from 'phosphor-react'
 
-import { Box } from 'grommet'
+import StackedIcon from '../icons/StackedIcon'
 import USPCard from '../cards/USPCard'
 
 const USPSection = () => {
@@ -11,7 +19,9 @@ const USPSection = () => {
             justify="center"
             style={{ position: 'relative', overflow: 'hidden' }}
             pad="large"
+            gap="large"
         >
+            <Heading>Navigating the Two-Sided Marketplace Landscape</Heading>
             <Box
                 direction="row"
                 justify="around"
@@ -20,22 +30,34 @@ const USPSection = () => {
                 style={{ position: 'relative' }}
             >
                 <USPCard
-                    icon={<Coins />}
-                    title="Earn Together"
-                    description="Publish your smart template in 5 minutes to start selling your services and skills"
-                    href="https://cambrianprotocol.notion.site/Create-your-Freelance-Solver-13cd00c5ee6d42db900420eea97f4f74"
+                    icon={
+                        <StackedIcon
+                            icon={<Gear />}
+                            stackedIcon={<MinusCircle color="red" />}
+                        />
+                    }
+                    title="Limited Interoperability"
+                    description="Traditional marketplaces often struggle to connect various platforms, protocols, and systems, leading to inefficiencies and missed opportunities."
                 />
                 <USPCard
-                    icon={<BoundingBox />}
-                    title="Build Together"
-                    description="Help us expand open, secure access to new labor markets for people worldwide"
-                    href="https://cambrianprotocol.notion.site/Community-Ownership-85c3c3b76ffb40c5b099c23eb68e23c3"
+                    icon={
+                        <StackedIcon
+                            icon={<Database />}
+                            stackedIcon={<Prohibit color="red" />}
+                        />
+                    }
+                    title="Information Silos"
+                    description="Data and knowledge remain isolated, making it difficult for businesses and freelancers to access and leverage valuable insights"
                 />
                 <USPCard
-                    icon={<ShareNetwork />}
-                    title="WRK Together"
-                    description="Learn how the WRK token shares ownership in the world's most important cooperative"
-                    href="https://cambrianprotocol.notion.site/Incentive-Driven-Development-c7d8cb53f0ca42a9b21b8286477b9e0b"
+                    icon={
+                        <StackedIcon
+                            icon={<UsersFour />}
+                            stackedIcon={<Stamp color="red" />}
+                        />
+                    }
+                    title="Lack of Personalization"
+                    description="Traditional marketplaces often fail to tailor experiences to individual users' needs, resulting in less effective matches and lower user satisfaction"
                 />
             </Box>
         </Box>
