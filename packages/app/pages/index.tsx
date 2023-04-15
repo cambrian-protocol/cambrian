@@ -49,24 +49,17 @@ export default function Home() {
                             <BaseContentSection
                                 title={'Solver'}
                                 subTitle={'Technical Interoperability'}
-                                paragraph="A concise explanation of programmable escrow
-                                contracts called Solvers and how they enable
-                                technical interoperability "
+                                paragraph="Solvers are smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
                                 image={
-                                    <Box
-                                        round="xsmall"
-                                        elevation="large"
-                                        border
-                                        overflow="hidden"
-                                    >
+                                    <Box round="xsmall" overflow="hidden">
                                         <Image
                                             fit="contain"
                                             fill
-                                            src="/images/template.png"
+                                            src="/solver/solver_diagram.svg"
                                         />
                                     </Box>
                                 }
-                                anchor={<Text>TODO</Text>}
+                                anchor={<></>}
                             />
                             <BaseContentSection
                                 align="right"
