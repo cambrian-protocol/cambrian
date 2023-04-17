@@ -31,7 +31,7 @@ const BaseContentSection = ({
                         direction={align === 'right' ? 'row-reverse' : 'row'}
                         wrap
                         justify="center"
-                        height={{ min: '50vh' }}
+                        height={{ min: '70vh' }}
                     >
                         <Box
                             justify="center"

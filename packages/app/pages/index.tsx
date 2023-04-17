@@ -44,15 +44,7 @@ export default function Home() {
                             left={'-20%'}
                             bottom={'60%'}
                         />
-                        <Image
-                            src="/illustrations/wave.svg"
-                            style={{
-                                position: 'absolute',
-                                bottom: '-200px',
-                                left: 0,
-                                opacity: '0.3',
-                            }}
-                        />
+
                         <Box style={{ position: 'relative' }}>
                             <PainPointSection />
                             <USPListSection />
@@ -98,7 +90,12 @@ export default function Home() {
                                 title={'Decentralized Data Storage'}
                                 paragraph="Decentralized data storage using Arbitrum and Ceramic is a modern approach that stores data across multiple nodes, reducing the risk of a single point of failure or data breach. Data is encrypted, enhancing user privacy, and only accessible with a private key. This solution provides a secure and cost-effective way to store sensitive data, making it an excellent option for businesses and individuals."
                                 image={
-                                    <Box direction="row" wrap fill>
+                                    <Box
+                                        direction="row"
+                                        wrap
+                                        fill
+                                        style={{ zIndex: 1 }}
+                                    >
                                         <Box
                                             flex
                                             justify="center"
@@ -129,6 +126,16 @@ export default function Home() {
                         </Box>
                     </Box>
                 </Box>
+                <Image
+                    src="/illustrations/wave.svg"
+                    style={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: 0,
+                        opacity: '0.3',
+                        zIndex: 0,
+                    }}
+                />
             </PageLayout>
         </>
     )
