@@ -1,14 +1,7 @@
 import { Box, Heading } from 'grommet'
-import {
-    Database,
-    Gear,
-    MinusCircle,
-    Prohibit,
-    Stamp,
-    UsersFour,
-} from 'phosphor-react'
+import { Database, ShareNetwork, UsersFour } from 'phosphor-react'
 
-import StackedIcon from '../icons/StackedIcon'
+import FadeIn from '@cambrian/app/animations/FadeIn'
 import USPCard from '../cards/USPCard'
 
 const PainPointSection = () => {
@@ -21,7 +14,10 @@ const PainPointSection = () => {
             pad="large"
             gap="large"
         >
-            <Heading>Navigating the Two-Sided Marketplace Landscape</Heading>
+            <Box align="center" gap="small">
+                <Heading level={'3'}>Navigating the</Heading>
+                <Heading>Two-Sided Marketplace Landscape</Heading>
+            </Box>
             <Box
                 direction="row"
                 justify="around"
@@ -29,36 +25,34 @@ const PainPointSection = () => {
                 wrap
                 style={{ position: 'relative' }}
             >
-                <USPCard
-                    icon={
-                        <StackedIcon
-                            icon={<Gear />}
-                            stackedIcon={<MinusCircle color="red" />}
-                        />
-                    }
-                    title="Limited Interoperability"
-                    description="Traditional marketplaces often struggle to connect various platforms, protocols, and systems, leading to inefficiencies and missed opportunities."
-                />
-                <USPCard
-                    icon={
-                        <StackedIcon
-                            icon={<Database />}
-                            stackedIcon={<Prohibit color="red" />}
-                        />
-                    }
-                    title="Information Silos"
-                    description="Data and knowledge remain isolated, making it difficult for businesses and freelancers to access and leverage valuable insights"
-                />
-                <USPCard
-                    icon={
-                        <StackedIcon
-                            icon={<UsersFour />}
-                            stackedIcon={<Stamp color="red" />}
-                        />
-                    }
-                    title="Lack of Personalization"
-                    description="Traditional marketplaces often fail to tailor experiences to individual users' needs, resulting in less effective matches and lower user satisfaction"
-                />
+                <FadeIn direction="X" distance="-5%">
+                    <USPCard
+                        icon={
+                            <Box direction="row">
+                                <ShareNetwork />
+                                <ShareNetwork
+                                    style={{ transform: 'scaleX(-1)' }}
+                                />
+                            </Box>
+                        }
+                        title="Limited Interoperability"
+                        description="Traditional marketplaces often struggle to connect various platforms, protocols, and systems, leading to inefficiencies and missed opportunities."
+                    />
+                </FadeIn>
+                <FadeIn direction="Y" distance="0%">
+                    <USPCard
+                        icon={<Database />}
+                        title="Information Silos"
+                        description="Data and knowledge remain isolated, making it difficult for businesses and freelancers to access and leverage valuable insights"
+                    />
+                </FadeIn>
+                <FadeIn direction="X" distance="5%">
+                    <USPCard
+                        icon={<UsersFour />}
+                        title="Lack of Personalization"
+                        description="Traditional marketplaces often fail to tailor experiences to individual users' needs, resulting in less effective matches and lower user satisfaction"
+                    />
+                </FadeIn>
             </Box>
         </Box>
     )

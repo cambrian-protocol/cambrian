@@ -15,25 +15,25 @@ const USPCard = ({ icon, title, description }: USPCardProps) => {
             <Card
                 elevation="small"
                 pad={{ vertical: 'large', horizontal: 'medium' }}
-                round="xsmall"
-                height="medium"
+                round="small"
                 width={'medium'}
-                background="background-back"
-                border={{ color: '#280000', size: 'small' }}
+                background="#280000"
                 justify="around"
                 align="center"
-                gap="large"
+                style={{ position: 'relative' }}
             >
-                <IconContext.Provider value={{ size: '48' }}>
-                    {icon}
-                </IconContext.Provider>
+                <Box style={{ position: 'absolute', top: -80, right: -80 }}>
+                    <IconContext.Provider
+                        value={{ size: '256', opacity: 0.05 }}
+                    >
+                        {icon}
+                    </IconContext.Provider>
+                </Box>
                 <Box gap="small">
-                    <Text size="large" textAlign="center">
+                    <Text size="large" textAlign="center" weight={'bold'}>
                         {title}
                     </Text>
-                    <Text textAlign="center" color="dark-4">
-                        {description}
-                    </Text>
+                    <Text textAlign="center">{description}</Text>
                 </Box>
             </Card>
         </Box>
