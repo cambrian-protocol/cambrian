@@ -8,6 +8,7 @@ import {
     ShareNetwork,
 } from 'phosphor-react'
 
+import FadeIn from '@cambrian/app/animations/FadeIn'
 import PlainSectionDivider from './PlainSectionDivider'
 import USPListItem from '../list/USPListItem'
 
@@ -38,41 +39,53 @@ const USPListSection = () => {
                 A New Era for Two-Sided Marketplaces
             </Heading>
             <Box width={'xlarge'} pad="large">
-                <USPListItem
-                    title="Solvers"
-                    description="Programmable escrow contracts that enable seamless technical interoperability for transactions."
-                    icon={<PuzzlePiece />}
-                />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="Web3 Integration"
-                    description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
-                    icon={<CurrencyEth />}
-                />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="AI-Powered Matching"
-                    description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
-                    icon={<Brain />}
-                />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="No-Code Web App"
-                    description="A user-friendly platform that allows for easy Solver design, management, and collaboration."
-                    icon={<Cursor />}
-                />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="Decentralized Data Storage"
-                    description="Enhanced security and user privacy through Arbitrum and Ceramic integration."
-                    icon={<ShareNetwork />}
-                />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="Flexible & Customizable"
-                    description="Adaptable to various use cases, industries, and individual needs."
-                    icon={<Palette />}
-                />
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="Solvers"
+                        description="Programmable escrow contracts that enable seamless technical interoperability for transactions."
+                        icon={<PuzzlePiece />}
+                    />
+                    <PlainSectionDivider />
+                </FadeIn>
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="Web3 Integration"
+                        description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
+                        icon={<CurrencyEth />}
+                    />
+                    <PlainSectionDivider />
+                </FadeIn>
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="AI-Powered Matching"
+                        description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
+                        icon={<Brain />}
+                    />
+                    <PlainSectionDivider />
+                </FadeIn>
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="No-Code Web App"
+                        description="A user-friendly platform that allows for easy Solver design, management, and collaboration."
+                        icon={<Cursor />}
+                    />
+                    <PlainSectionDivider />
+                </FadeIn>
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="Decentralized Data Storage"
+                        description="Enhanced security and user privacy through Arbitrum and Ceramic integration."
+                        icon={<ShareNetwork />}
+                    />
+                    <PlainSectionDivider />
+                </FadeIn>
+                <FadeIn distance="20%">
+                    <USPListItem
+                        title="Flexible & Customizable"
+                        description="Adaptable to various use cases, industries, and individual needs."
+                        icon={<Palette />}
+                    />
+                </FadeIn>
             </Box>
         </Box>
     )

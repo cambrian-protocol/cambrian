@@ -2,6 +2,7 @@ import { Box, Image } from 'grommet'
 
 import BaseContentSection from '@cambrian/app/components/sections/BaseContentSection'
 import EnderSection from '@cambrian/app/components/sections/EnderSection'
+import FadeIn from '@cambrian/app/animations/FadeIn'
 import Glow from '@cambrian/app/components/branding/Glow'
 import IndexHeaderSection from '@cambrian/app/components/sections/IndexHeaderSection'
 import LogoButton from '@cambrian/app/components/buttons/LogoButton'
@@ -43,49 +44,59 @@ export default function Home() {
                             left={'-20%'}
                             bottom={'60%'}
                         />
+                        <Image
+                            src="/illustrations/wave.svg"
+                            style={{
+                                position: 'absolute',
+                                bottom: '-200px',
+                                left: 0,
+                                opacity: '0.3',
+                            }}
+                        />
                         <Box style={{ position: 'relative' }}>
                             <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
-                                title={'Solver'}
+                                title={'Solvers'}
                                 subTitle={'Technical Interoperability'}
-                                paragraph="Solvers are smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
+                                paragraph="Solvers are escrow smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
                                 image={
-                                    <Box round="xsmall" overflow="hidden">
-                                        <Image
-                                            fit="contain"
-                                            fill
-                                            src="/solver/solver_diagram.svg"
-                                        />
-                                    </Box>
+                                    <FadeIn direction="X" distance="10%">
+                                        <Box round="xsmall" overflow="hidden">
+                                            <Image
+                                                fit="contain"
+                                                fill
+                                                src="/solver/solver_diagram.svg"
+                                            />
+                                        </Box>
+                                    </FadeIn>
                                 }
                                 anchor={<></>}
                             />
                             <BaseContentSection
                                 align="right"
-                                title={'AI integration*'}
+                                title={'AI Real-Time Matching*'}
                                 subTitle={'Informational Interoperability'}
-                                paragraph="A summary of how AI enhances informational interoperability, breaking down information silos and streamlining the platform"
+                                paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging advanced algorithms and machine learning techniques, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
                                 image={
-                                    <Box
-                                        round="xsmall"
-                                        elevation="large"
-                                        border
-                                        overflow="hidden"
-                                    >
-                                        <Image
-                                            fit="contain"
-                                            fill
-                                            src="/images/template.png"
-                                        />
-                                    </Box>
+                                    <FadeIn direction="X" distance="-10%">
+                                        <Box round="xsmall" overflow="hidden">
+                                            <Image
+                                                fit="contain"
+                                                fill
+                                                src="/illustrations/ai_matching_diagram.svg"
+                                            />
+                                        </Box>
+                                    </FadeIn>
                                 }
-                                anchor={<Text>*Coming soon</Text>}
+                                anchor={
+                                    <Text color="dark-4">*Coming soon</Text>
+                                }
                             />
                             <BaseContentSection
                                 subTitle={'Security & Privacy'}
                                 title={'Decentralized Data Storage'}
-                                paragraph="A brief description of decentralized data storage using Arbitrum and Ceramic for enhanced security and user privacy"
+                                paragraph="Decentralized data storage using Arbitrum and Ceramic is a modern approach that stores data across multiple nodes, reducing the risk of a single point of failure or data breach. Data is encrypted, enhancing user privacy, and only accessible with a private key. This solution provides a secure and cost-effective way to store sensitive data, making it an excellent option for businesses and individuals."
                                 image={
                                     <Box direction="row" wrap fill>
                                         <Box
@@ -114,6 +125,7 @@ export default function Home() {
                                 }
                                 anchor={<></>}
                             />
+                            <EnderSection />
                         </Box>
                     </Box>
                 </Box>
