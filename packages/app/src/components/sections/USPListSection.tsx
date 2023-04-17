@@ -36,7 +36,7 @@ const USPListSection = () => {
                 Introducing Cambrian Protocol:
             </Heading>
             <Heading textAlign="center">
-                A New Era for Two-Sided Marketplaces
+                A New Era for Million-Sided Marketplaces
             </Heading>
             <Box width={'xlarge'} pad="large">
                 <USPListItem

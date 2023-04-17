@@ -25,7 +25,7 @@ const BaseContentSection = ({
                 <Box
                     justify="center"
                     align="center"
-                    pad={{ vertical: 'large' }}
+                    pad={{ vertical: 'xlarge' }}
                 >
                     <Box
                         direction={align === 'right' ? 'row-reverse' : 'row'}
