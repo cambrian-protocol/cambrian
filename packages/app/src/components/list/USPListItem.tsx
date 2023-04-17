@@ -1,4 +1,5 @@
 import { Box } from 'grommet'
+import FadeIn from '@cambrian/app/animations/FadeIn'
 import { Heading } from 'grommet'
 import { IconContext } from 'phosphor-react'
 import { Text } from 'grommet'
@@ -13,26 +14,30 @@ interface USPListItemProps {
 const USPListItem = ({ title, description, icon }: USPListItemProps) => {
     return (
         <Box direction="row" pad={{ vertical: 'medium' }} align="center" wrap>
-            <Box
-                flex
-                width={{ min: 'medium' }}
-                pad="medium"
-                direction="row"
-                gap="medium"
-                align="center"
-            >
-                <IconContext.Provider
-                    value={{
-                        size: '32px',
-                        color: cpTheme.global.colors['brand'].dark,
-                    }}
-                >
-                    {icon}
-                </IconContext.Provider>
-                <Heading level="2">{title}</Heading>
+            <Box flex width={{ min: 'medium' }}>
+                <FadeIn direction="X" distance="-5%">
+                    <Box
+                        pad="medium"
+                        direction="row"
+                        gap="medium"
+                        align="center"
+                    >
+                        <IconContext.Provider
+                            value={{
+                                size: '32px',
+                                color: cpTheme.global.colors['brand'].dark,
+                            }}
+                        >
+                            {icon}
+                        </IconContext.Provider>
+                        <Heading level="2">{title}</Heading>
+                    </Box>
+                </FadeIn>
             </Box>
             <Box width={{ max: 'medium' }} pad="medium">
-                <Text color="dark-4">{description}</Text>
+                <FadeIn direction="X" distance="5%">
+                    <Text color="dark-4">{description}</Text>
+                </FadeIn>
             </Box>
         </Box>
     )

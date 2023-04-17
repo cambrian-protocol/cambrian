@@ -15,8 +15,12 @@ const PainPointSection = () => {
             gap="large"
         >
             <Box align="center" gap="small">
-                <Heading level={'3'}>Navigating the</Heading>
-                <Heading>Two-Sided Marketplace Landscape</Heading>
+                <Heading textAlign="center" level={'3'}>
+                    Navigating the
+                </Heading>
+                <Heading textAlign="center">
+                    Two-Sided Marketplace Landscape
+                </Heading>
             </Box>
             <Box
                 direction="row"
