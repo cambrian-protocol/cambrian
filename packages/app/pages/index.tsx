@@ -49,11 +49,12 @@ export default function Home() {
                             <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
+                                align="right"
                                 title={'Solvers'}
                                 subTitle={'Technical Interoperability'}
                                 paragraph="Solvers are escrow smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
                                 image={
-                                    <FadeIn direction="X" distance="10%">
+                                    <FadeIn direction="X" distance="-10%">
                                         <Box round="xsmall" overflow="hidden">
                                             <Image
                                                 fit="contain"
@@ -66,12 +67,11 @@ export default function Home() {
                                 anchor={<></>}
                             />
                             <BaseContentSection
-                                align="right"
                                 title={'AI Real-Time Matching*'}
                                 subTitle={'Informational Interoperability'}
                                 paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging advanced algorithms and machine learning techniques, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
                                 image={
-                                    <FadeIn direction="X" distance="-10%">
+                                    <FadeIn direction="X" distance="10%">
                                         <Box round="xsmall" overflow="hidden">
                                             <Image
                                                 fit="contain"
