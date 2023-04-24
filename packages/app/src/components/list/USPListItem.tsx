@@ -6,7 +6,7 @@ import { Text } from 'grommet'
 import { cpTheme } from '@cambrian/app/theme/theme'
 
 interface USPListItemProps {
-    title: string
+    title: string | JSX.Element
     description: string
     icon?: JSX.Element
 }
@@ -30,7 +30,11 @@ const USPListItem = ({ title, description, icon }: USPListItemProps) => {
                         >
                             {icon}
                         </IconContext.Provider>
-                        <Heading level="2">{title}</Heading>
+                        {typeof title === 'string' ? (
+                            <Heading level="2">{title}</Heading>
+                        ) : (
+                            title
+                        )}
                     </Box>
                 </FadeIn>
             </Box>

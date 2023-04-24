@@ -1,4 +1,4 @@
-import { Box, Heading, Image } from 'grommet'
+import { Box, Heading, Image, Text } from 'grommet'
 import {
     Brain,
     CurrencyEth,
@@ -52,7 +52,14 @@ const USPListSection = () => {
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="AI-Powered Matching"
+                    title={
+                        <Box>
+                            <Heading level="2">AI-Powered Matching*</Heading>
+                            <Text color="dark-4" size="small">
+                                *Coming soon
+                            </Text>
+                        </Box>
+                    }
                     description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
                     icon={<Brain />}
                 />
