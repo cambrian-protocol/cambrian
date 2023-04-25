@@ -19,7 +19,7 @@ export default function Home() {
     const { currentUser } = useCurrentUserContext()
 
     function handleClickHeaderCTA() {
-        router.push('/freelancer')
+        document.getElementById('start')?.scrollIntoView({ behavior: 'smooth' })
     }
 
     useEffect(() => {
@@ -45,7 +45,7 @@ export default function Home() {
                             bottom={'60%'}
                         />
 
-                        <Box style={{ position: 'relative' }}>
+                        <Box style={{ position: 'relative' }} id={'start'}>
                             <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
