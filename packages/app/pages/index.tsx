@@ -52,7 +52,7 @@ export default function Home() {
                                 align="right"
                                 title={'Solvers'}
                                 subTitle={'Technical Interoperability'}
-                                paragraph="Solvers are escrow smart contracts that manage on-chain transactions based on specific conditions. They are programmable and customizable, allowing for a wide range of applications and integration with other smart contracts and blockchains. Solvers make complex transactions easier to manage and enable automation and innovation in a decentralized ecosystem."
+                                paragraph="Solvers are customizable smart contracts that enable on-chain transactions, integrate with other smart contracts and blockchains, automate and innovate, and simplify complex transactions in a decentralized ecosystem."
                                 image={
                                     <FadeIn direction="X" distance="-10%">
                                         <Box round="xsmall" overflow="hidden">
@@ -69,7 +69,7 @@ export default function Home() {
                             <BaseContentSection
                                 title={'AI Real-Time Matching*'}
                                 subTitle={'Informational Interoperability'}
-                                paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging advanced algorithms and machine learning techniques, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
+                                paragraph="AI-based candidate and job matching uses advanced algorithms and machine learning to instantly analyze job requirements and candidate profiles, resulting in streamlined recruitment, faster hiring, and better talent-to-opportunity connections."
                                 image={
                                     <FadeIn direction="X" distance="10%">
                                         <Box round="xsmall" overflow="hidden">
@@ -88,7 +88,7 @@ export default function Home() {
                             <BaseContentSection
                                 subTitle={'Security & Privacy'}
                                 title={'Decentralized Data Storage'}
-                                paragraph="Decentralized data storage using Arbitrum and Ceramic is a modern approach that stores data across multiple nodes, reducing the risk of a single point of failure or data breach. Data is encrypted, enhancing user privacy, and only accessible with a private key. This solution provides a secure and cost-effective way to store sensitive data, making it an excellent option for businesses and individuals."
+                                paragraph="Decentralized data storage using Arbitrum and Ceramic stores data across multiple nodes, encrypts it for privacy, and provides a secure and cost-effective solution for businesses and individuals to store sensitive data."
                                 image={
                                     <Box
                                         direction="row"

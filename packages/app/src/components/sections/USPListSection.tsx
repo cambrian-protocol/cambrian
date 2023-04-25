@@ -41,13 +41,13 @@ const USPListSection = () => {
             <Box width={'xlarge'} pad="large">
                 <USPListItem
                     title="Solvers"
-                    description="Programmable escrow contracts that enable seamless technical interoperability for transactions."
+                    description="Escrow contracts that allow seamless technical interoperability in transactions."
                     icon={<PuzzlePiece />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
                     title="Web3 Integration"
-                    description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
+                    description="Using decentralized technologies to create a secure, transparent, and trustless marketplace."
                     icon={<CurrencyEth />}
                 />
                 <PlainSectionDivider />
@@ -60,7 +60,7 @@ const USPListSection = () => {
                             </Text>
                         </Box>
                     }
-                    description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
+                    description="Leveraging AI for personalized matches and streamlined information processing across platforms."
                     icon={<Brain />}
                 />
                 <PlainSectionDivider />
