@@ -151,6 +151,8 @@ export const getAllRedeemablePositions = async (
         transferBatchFilter
     )
 
+    console.log(transferBatchLogs)
+
     await Promise.all(
         transferBatchLogs.map(async (log) => {
             const solverAddress = log.args![0]
@@ -212,7 +214,7 @@ export const getAllRedeemablePositions = async (
                         }
                     }
                 } catch (e) {
-                    throw e
+                    // throw e
                 }
             }
             if (solverCache[solverAddress]) {
@@ -470,7 +472,7 @@ const getPositionIdFromConditionResolution = async (
             conditionResolutionLogs[0].args?.payoutNumerators
 
         const ctfPayoutNumerators = ctfPayoutNumeratorsBN.map((numberator) =>
-            numberator.toNumber()
+            numberator.toNumber() > 0 ? 1 : 0
         )
 
         return getPositionId(
