@@ -1,34 +1,85 @@
-import { Box } from 'grommet'
+import { Box, Heading, Image, Text } from 'grommet'
+import {
+    Brain,
+    CurrencyEth,
+    Cursor,
+    Palette,
+    PuzzlePiece,
+    ShareNetwork,
+} from 'phosphor-react'
+
+import FadeIn from '@cambrian/app/animations/FadeIn'
 import PlainSectionDivider from './PlainSectionDivider'
 import USPListItem from '../list/USPListItem'
 
 const USPListSection = () => {
     return (
-        <Box height={{ min: '100vh' }} justify="center" align="center">
+        <Box
+            height={{ min: '100vh' }}
+            justify="center"
+            align="center"
+            gap="medium"
+        >
+            <Box
+                width={{
+                    min: 'xsmall',
+                    max: 'xsmall',
+                }}
+            >
+                <Image
+                    fit="contain"
+                    fill
+                    src="/images/logo/cambrian_protocol_logo.svg"
+                />
+            </Box>
+            <Heading textAlign="center" level={'3'}>
+                Introducing Cambrian Protocol:
+            </Heading>
+            <Heading textAlign="center">
+                A New Era for Million-Sided Marketplaces
+            </Heading>
             <Box width={'xlarge'} pad="large">
                 <USPListItem
-                    title="Marketplace"
-                    description="Find the perfect solution in our marketplace or create them yourself in our no-code environment"
+                    title="Solvers"
+                    description="Programmable escrow contracts that enable seamless technical interoperability for transactions."
+                    icon={<PuzzlePiece />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="Feature Rich"
-                    description="Dapps built on our stack are seamlessly compatible with an ecosystem greater than the sum of its parts"
+                    title="Web3 Integration"
+                    description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
+                    icon={<CurrencyEth />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="Decentralized"
-                    description="Bring your own Gnosis Safe, keep your data on IPFS and use the management schemes that work for your organization"
+                    title={
+                        <Box>
+                            <Heading level="2">AI-Powered Matching*</Heading>
+                            <Text color="dark-4" size="small">
+                                *Coming soon
+                            </Text>
+                        </Box>
+                    }
+                    description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
+                    icon={<Brain />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="Composable"
-                    description="Quickly create full-feature solidity dapps compatible with a growing marketplace of solutions"
+                    title="No-Code Web App"
+                    description="A user-friendly platform that allows for easy Solver design, management, and collaboration."
+                    icon={<Cursor />}
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="Opportunities"
-                    description="Hire contractors, sell services and enforce contracts"
+                    title="Decentralized Data Storage"
+                    description="Enhanced security and user privacy through Arbitrum and Ceramic integration."
+                    icon={<ShareNetwork />}
+                />
+                <PlainSectionDivider />
+                <USPListItem
+                    title="Flexible & Customizable"
+                    description="Adaptable to various use cases, industries, and individual needs."
+                    icon={<Palette />}
                 />
             </Box>
         </Box>
