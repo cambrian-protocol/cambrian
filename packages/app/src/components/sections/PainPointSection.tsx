@@ -7,6 +7,7 @@ import USPCard from '../cards/USPCard'
 const PainPointSection = () => {
     return (
         <Box
+            id={'start'}
             height={{ min: '100vh' }}
             align="center"
             justify="center"

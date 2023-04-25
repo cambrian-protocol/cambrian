@@ -45,7 +45,7 @@ export default function Home() {
                             bottom={'60%'}
                         />
 
-                        <Box style={{ position: 'relative' }} id={'start'}>
+                        <Box style={{ position: 'relative' }}>
                             <PainPointSection />
                             <USPListSection />
                             <BaseContentSection
