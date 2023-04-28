@@ -38,7 +38,7 @@ const USPListSection = () => {
             <Heading textAlign="center">
                 A New Era for Million-Sided Marketplaces
             </Heading>
-            <Box width={'xlarge'} pad="large">
+            <Box width={'xlarge'} pad="large" style={{ position: 'relative' }}>
                 <USPListItem
                     title="Solvers"
                     description="Escrow contracts that allow seamless technical interoperability in transactions."
@@ -75,11 +75,15 @@ const USPListSection = () => {
                     description="Enhanced security and user privacy through Arbitrum and Ceramic integration."
                     icon={<ShareNetwork />}
                 />
-                <PlainSectionDivider />
-                <USPListItem
-                    title="Flexible & Customizable"
-                    description="Adaptable to various use cases, industries, and individual needs."
-                    icon={<Palette />}
+                <Image
+                    src="/illustrations/twinkle.svg"
+                    style={{
+                        position: 'absolute',
+                        top: '20%',
+                        left: 0,
+                        opacity: '0.5',
+                        zIndex: 0,
+                    }}
                 />
             </Box>
         </Box>

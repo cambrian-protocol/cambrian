@@ -41,21 +41,21 @@ const PainPointSection = () => {
                             </Box>
                         }
                         title="Limited Interoperability"
-                        description="Traditional marketplaces struggle to connect platforms, protocols, and systems, resulting in inefficiencies and missed opportunities."
+                        description="Traditional marketplaces struggle to connect platforms, protocols, and systems, resulting in inefficiencies and missed opportunities"
                     />
                 </FadeIn>
-                <FadeIn direction="Y" distance="0%">
+                <FadeIn direction="Y" distance="10%">
                     <USPCard
                         icon={<Database />}
                         title="Information Silos"
-                        description="Isolated data and knowledge make it hard for businesses and freelancers to access and use valuable insights."
+                        description="Data and knowledge remain isolated, making it difficult for businesses and freelancers to access and leverage valuable insights"
                     />
                 </FadeIn>
                 <FadeIn direction="X" distance="5%">
                     <USPCard
                         icon={<UsersFour />}
                         title="Lack of Personalization"
-                        description="Traditional marketplaces often lack personalized experiences, leading to less effective matches and lower user satisfaction."
+                        description="Traditional marketplaces often lack personalized experiences, leading to less effective matches and lower user satisfaction"
                     />
                 </FadeIn>
             </Box>
