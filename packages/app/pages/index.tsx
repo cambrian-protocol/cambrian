@@ -19,6 +19,10 @@ export default function Home() {
     const { currentUser } = useCurrentUserContext()
 
     function handleClickHeaderCTA() {
+        router.push('/freelancer')
+    }
+
+    function handleClickHeaderArrow() {
         document.getElementById('start')?.scrollIntoView({ behavior: 'smooth' })
     }
 
@@ -30,7 +34,10 @@ export default function Home() {
         <>
             <PageLayout contextTitle="Work is evolving" plain>
                 <Box style={{ position: 'relative' }} fill>
-                    <IndexHeaderSection onClickCTA={handleClickHeaderCTA} />
+                    <IndexHeaderSection
+                        onClickCTA={handleClickHeaderCTA}
+                        onClickArrow={handleClickHeaderArrow}
+                    />
                     <Box>
                         <Glow
                             height="1000px"
@@ -46,7 +53,7 @@ export default function Home() {
                         />
 
                         <Box style={{ position: 'relative' }} id={'start'}>
-                            <PainPointSection />
+                            {/* <PainPointSection /> */}
                             <USPListSection />
                             <BaseContentSection
                                 align="right"
@@ -67,9 +74,9 @@ export default function Home() {
                                 anchor={<></>}
                             />
                             <BaseContentSection
-                                title={'AI Real-Time Matching*'}
+                                title={'AI Real-Time Matching'}
                                 subTitle={'Informational Interoperability'}
-                                paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging advanced algorithms and machine learning techniques, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
+                                paragraph="AI-powered candidate and job real-time matching revolutionizes the hiring process by analyzing and comparing job requirements and candidate profiles in an instant. By leveraging the power of modern LLMs and vector databases, this innovative approach identifies the most suitable matches between job seekers and available positions, streamlining the recruitment process, reducing time-to-hire, and ensuring that the right talent is connected with the right opportunity."
                                 image={
                                     <FadeIn direction="X" distance="10%">
                                         <Box round="xsmall" overflow="hidden">
@@ -81,9 +88,7 @@ export default function Home() {
                                         </Box>
                                     </FadeIn>
                                 }
-                                anchor={
-                                    <Text color="dark-4">*Coming soon</Text>
-                                }
+                                anchor={<Text color="dark-4">Coming soon</Text>}
                             />
                             <BaseContentSection
                                 subTitle={'Security & Privacy'}

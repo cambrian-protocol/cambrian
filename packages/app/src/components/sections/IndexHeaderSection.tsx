@@ -10,8 +10,12 @@ import { WorldMap } from 'grommet'
 
 interface IndexHeaderSectionProps {
     onClickCTA: () => void
+    onClickArrow: () => void
 }
-const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
+const IndexHeaderSection = ({
+    onClickCTA,
+    onClickArrow,
+}: IndexHeaderSectionProps) => (
     <ResponsiveContext.Consumer>
         {(screenSize) => {
             const isSmallScreen = screenSize === 'small'
@@ -99,7 +103,7 @@ const IndexHeaderSection = ({ onClickCTA }: IndexHeaderSectionProps) => (
                         pad="large"
                         alignSelf="end"
                         animation={'pulse'}
-                        onClick={onClickCTA}
+                        onClick={onClickArrow}
                         focusIndicator={false}
                     >
                         <ArrowCircleDown

@@ -20,7 +20,7 @@ const USPListSection = () => {
             align="center"
             gap="medium"
         >
-            <Box
+            {/* <Box
                 width={{
                     min: 'xsmall',
                     max: 'xsmall',
@@ -34,7 +34,7 @@ const USPListSection = () => {
             </Box>
             <Heading textAlign="center" level={'3'}>
                 Introducing Cambrian Protocol:
-            </Heading>
+            </Heading> */}
             <Heading textAlign="center">
                 A New Era for Million-Sided Marketplaces
             </Heading>
@@ -46,7 +46,7 @@ const USPListSection = () => {
                 />
                 <PlainSectionDivider />
                 <USPListItem
-                    title="Web3 Integration"
+                    title="Web3 Native"
                     description="Leveraging decentralized technologies to build a secure, transparent, and trustless marketplace."
                     icon={<CurrencyEth />}
                 />
@@ -54,10 +54,10 @@ const USPListSection = () => {
                 <USPListItem
                     title={
                         <Box>
-                            <Heading level="2">AI-Powered Matching*</Heading>
-                            <Text color="dark-4" size="small">
+                            <Heading level="2">AI-Powered Matching</Heading>
+                            {/* <Text color="dark-4" size="small">
                                 *Coming soon
-                            </Text>
+                            </Text> */}
                         </Box>
                     }
                     description="Using artificial intelligence to personalize matches and streamline information processing across platforms."
