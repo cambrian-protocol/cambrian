@@ -31,9 +31,10 @@ const CreateCompositionModal = ({
     const onSubmit = async () => {
         setIsCreating(true)
         try {
-            const streamID = await ceramicCompositionAPI.createComposition(
-                input
-            )
+            const streamID = (
+                await ceramicCompositionAPI.createComposition(input)
+            ).streamID
+            console.log('StreamID: ', streamID)
             router.push(`/solver/${streamID}`)
         } catch (e) {
             setIsCreating(false)
